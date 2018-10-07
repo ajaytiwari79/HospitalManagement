@@ -35,6 +35,7 @@ public class UserRestClient {
     private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
 
     @Inject
+    @Qualifier("restTemplate")
     private RestTemplate restTemplate;
     @Inject
     @Qualifier("schedulerServiceRestTemplate")

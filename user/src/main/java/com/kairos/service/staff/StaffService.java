@@ -926,7 +926,7 @@ public class StaffService {
     }
 
     private boolean checkStaffEmailConstraint(Staff staff) {
-        logger.info("Checking Email constraint");
+        logger.info("Cheucking Email constraint");
         if (staff.getEmail() != null && userGraphRepository.findByEmail(staff.getEmail()) != null) {
 
             logger.info("Email matched !");

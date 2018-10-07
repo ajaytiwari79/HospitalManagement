@@ -122,7 +122,7 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
     @Profile({"development","qa","production"})
     @LoadBalanced
     @Primary
-    @Bean
+    @Bean(name="restTemplate")
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
@@ -133,7 +133,7 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
 
     @Profile({"local", "test"})
     @Primary
-    @Bean
+    @Bean(name="restTemplate")
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
@@ -160,6 +160,27 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
 
         RestTemplate template =restTemplateBuilder
                 .interceptors(new SchedulerUserContextInterceptor(authorization))
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
+    @Profile({"development","qa","production"})
+    @LoadBalanced
+    @Primary
+    @Bean(name="restTemplateWithoutAuth")
+    public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
+    @Profile({"local", "test"})
+    @Primary
+    @Bean(name="restTemplateWithoutAuth")
+    public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
         return template;

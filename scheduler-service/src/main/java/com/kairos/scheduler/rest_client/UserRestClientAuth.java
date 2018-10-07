@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,15 +30,15 @@ import java.util.Map;
 
 import static com.kairos.scheduler.rest_client.RestClientUrlUtil.getBaseUrl;
 
+@Component
 public class UserRestClientAuth {
 
     private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
 
     @Inject
+    @Qualifier("restTemplateWithoutAuth")
     private RestTemplate restTemplate;
-    @Inject
-    @Qualifier("schedulerServiceRestTemplate")
-    private RestTemplate schedulerServiceRestTemplate;
+
 
     @Inject
     private ExceptionService exceptionService;
@@ -56,10 +61,14 @@ public class UserRestClientAuth {
         }
     }
 
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference,Map<String,String> formParameters) {
-        final String baseUrl = getBaseUrl(isUnit,id,env.getUserServiceUrl())+uri;
+    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference,MultiValueMap<String,String> formParameters) {
+        final String baseUrl = getBaseUrl(isUnit,id,env.getUserServiceUrlAuth());
         String url = baseUrl.replace("%2C+",",");
         try {
+
+            HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+            HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
+            restTemplate.getMessageConverters().add(formHttpMessageConverter);
 
             String authHeaderCode = env.getUserLoginApiAuthToken();
             HttpHeaders headers = new HttpHeaders();

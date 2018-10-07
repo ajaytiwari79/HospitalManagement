@@ -57,7 +57,7 @@ public class KafkaProducer {
         return props;
     }
     private Map<String, Object> consumerProps() {
-        Map<String, Object> props = new HashMap<>();
+        Map<String, Objerect> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "groupId");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
