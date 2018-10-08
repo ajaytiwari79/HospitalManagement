@@ -358,4 +358,13 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
+    /**
+     * @author mohit
+     * @date 8-10-2018
+     * @param unitId
+     * @return
+     */
+    public List<PhaseDTO> getDefaultPhasesByUnit(Long unitId) {
+        return phaseMongoRepository.findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(unitId);
+    }
 }

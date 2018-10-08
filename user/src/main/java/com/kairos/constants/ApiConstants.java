@@ -32,4 +32,6 @@ public final class ApiConstants {
     public static final String GET_CTA_WTA_BY_UPIDS = "/unitposition-cta-wta";
     public static final String GET_VERSION_WTA = "/wta/versions";
     public static final String GET_WTA_BY_UNITPOSITION = "/wta/unitPosition/{unitPositionId}";
+    public static final String API_ALL_PHASES_URL = "/phase/all";
+
 }
