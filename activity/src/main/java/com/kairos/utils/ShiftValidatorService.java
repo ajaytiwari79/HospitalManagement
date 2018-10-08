@@ -185,8 +185,10 @@ public class ShiftValidatorService {
             if (latestStartTime != null && latestStartTime.isBefore(shiftTimeDetails.getActivityStartTime())) {
                 errorMessages.add(exceptionService.convertMessage("error.start_time.less_than.latest_time"));
             }
-            Activity activity = activityWrapperMap.get(activityId).getActivity();
-            activityRuleViolations.add(new ActivityRuleViolation(activityId, activity.getName(), 0, errorMessages));
+            if(!errorMessages.isEmpty()){
+                Activity activity = activityWrapperMap.get(activityId).getActivity();
+                activityRuleViolations.add(new ActivityRuleViolation(activityId, activity.getName(), 0, errorMessages));
+            }
         });
         return activityRuleViolations;
     }
