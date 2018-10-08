@@ -1181,6 +1181,7 @@ public class ActivityService extends MongoBaseService {
         Collections.sort(communicationActivityDTO.getActivityReminderSettings(), Comparator.comparing(ActivityReminderSettings::getSequence));
         int counter = 0;
         for (ActivityReminderSettings currentSettings : communicationActivityDTO.getActivityReminderSettings()) {
+
             if (currentSettings.getSendReminder().getDurationType() == DurationType.HOURS
                     && currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS) {
                 exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
@@ -1206,6 +1207,9 @@ public class ActivityService extends MongoBaseService {
                 }
             }
             counter++;
+            if (currentSettings.getSequence() == null){
+                currentSettings.setSequence((byte)counter);
+            }
 
         }
         return true;
