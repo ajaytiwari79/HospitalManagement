@@ -244,7 +244,7 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, subProcessingActivityId);
+        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.findOne(subProcessingActivityId);
         if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
         }

@@ -4,6 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
+import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -78,6 +80,21 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         if (!Optional.ofNullable(entity).isPresent()) {
             throw new DataNotFoundByIdException("invalid request " + entityInformation.getJavaType().getSimpleName() + " id " + id);
         }
+        return true;
+    }
+
+
+    //todo implement method
+    @Override
+    public boolean safeDeleteAll(List<ID> ids) {
+        Assert.notEmpty(ids, "ids must not be empty!");
+        Query query = new Query(Criteria.where("_id").is(ids).and("deleted").is(false));
+        Update update = new Update().set("deleted", true);
+        update.set("updatedAt", DateUtils.getDate());
+        UpdateResult entity = mongoOperations.updateMulti(query, update, entityInformation.getJavaType());
+       /* if (!Optional.ofNullable(entity).isPresent()) {
+            throw new DataNotFoundByIdException("invalid request " + entityInformation.getJavaType().getSimpleName() + " id " + id);
+        }*/
         return true;
     }
 }
