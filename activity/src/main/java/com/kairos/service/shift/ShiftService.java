@@ -879,23 +879,23 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftActivityResponseDTO> updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
-        Map<BigInteger, BigInteger> activityIdsMap = ((Set<BigInteger>) objects[1]).stream().collect(Collectors.toMap(k -> k, v -> v));
+        Set<BigInteger> shiftActivitiyIds = ((Set<BigInteger>) objects[1]);
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
         if (!shifts.isEmpty() && objects[1] != null) {
-            Set<BigInteger> activityIds = (Set<BigInteger>) objects[1];
+            Set<BigInteger> activityIds = shifts.stream().flatMap(shift -> shift.getActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
             Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
             List<BigInteger> phaseIds = phaseListByDate.values().stream().map(p -> p.getId()).collect(Collectors.toList());
             List<ActivityShiftStatusSettings> activityShiftStatusSettings = activityAndShiftStatusSettingsRepository.findByPhaseIdsAndActivityIdsAndShiftStatus(phaseIds, activityIds, shiftPublishDTO.getStatus());
             StaffAccessGroupDTO staffAccessGroupDTO = genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {
             });
-            Map<StringBuffer, ActivityShiftStatusSettings> activityShiftStatusSettingsMap = activityShiftStatusSettings.stream().collect(Collectors.toMap(k -> new StringBuffer(k.getActivityId().toString()).append(k.getPhaseId()), v -> v));
+            Map<String, ActivityShiftStatusSettings> activityShiftStatusSettingsMap = activityShiftStatusSettings.stream().collect(Collectors.toMap(k ->k.getActivityId().toString()+""+k.getPhaseId().toString(), v -> v));
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    if (activityIdsMap.containsKey(shiftActivity.getId())) {
+                    if (shiftActivitiyIds.contains(shiftActivity.getId())) {
                         Phase phase = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-                        ActivityShiftStatusSettings activityShiftStatusSettings1 = activityShiftStatusSettingsMap.get(new StringBuffer(shiftActivity.getActivityId().toString()).append(phase.getId()));
+                        ActivityShiftStatusSettings activityShiftStatusSettings1 = activityShiftStatusSettingsMap.get(shiftActivity.getActivityId().toString()+""+phase.getId().toString());
                         boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings1, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
