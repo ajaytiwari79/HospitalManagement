@@ -1,4 +1,4 @@
-package com.kairos.controller.timeBank;
+package com.kairos.controller.time_bank;
 
 
 import com.kairos.constants.ApiConstants;
