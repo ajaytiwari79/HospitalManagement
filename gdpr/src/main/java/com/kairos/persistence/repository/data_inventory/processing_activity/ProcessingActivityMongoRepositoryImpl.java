@@ -61,6 +61,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 "'active':{'$first':'$active'}," +
                 "'suggested':{'$first':'$suggested'}," +
                 "'description':{'$first':'$description'}," +
+                "'risks':{'$first':'$risks'}," +
                 "'managingDepartment':{'$first':'$managingDepartment'}," +
                 "'processOwner':{'$first':'$processOwner'}}}";
 

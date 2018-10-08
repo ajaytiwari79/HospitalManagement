@@ -408,7 +408,7 @@ public class DefaultDataInheritService extends MongoBaseService {
 
     private QuestionnaireTemplate buildQuestionnaireTemplate(Long unitId, QuestionnaireTemplateResponseDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(),QuestionnaireTemplateStatus.DRAFT);
+        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), QuestionnaireTemplateStatus.DRAFT);
         questionnaireTemplate.setOrganizationId(unitId);
         switch (questionnaireTemplateDTO.getTemplateType()) {
             case ASSET_TYPE:
@@ -605,7 +605,8 @@ public class DefaultDataInheritService extends MongoBaseService {
                     for (AssetTypeRiskResponseDTO subAssetTypeDTO : assetTypeDTO.getSubAssetTypes()) {
                         AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
                         subAssetType.setOrganizationId(unitId);
-                        subAssetType.setSubAsset(true);
+                        subAssetType.setSubAssetType(true);
+                        assetType.setHasSubAsset(true);
                         assetTypeRiskMap.put(subAssetType, buildRisks(unitId, subAssetTypeDTO.getRisks()));
                         subAssetTypes.add(subAssetType);
                     }
@@ -635,7 +636,7 @@ public class DefaultDataInheritService extends MongoBaseService {
     }
 
 
-    private List<Risk> buildRisks(Long unitId, List<RiskResponseDTO> riskDTOS) {
+    private List<Risk> buildRisks(Long unitId, List<RiskBasicResponseDTO> riskDTOS) {
 
         List<Risk> risks = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(riskDTOS)) {

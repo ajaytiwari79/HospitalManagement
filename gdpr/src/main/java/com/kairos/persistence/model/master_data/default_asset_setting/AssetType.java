@@ -19,7 +19,7 @@ public class AssetType extends MongoBaseEntity {
     @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
     private Long countryId;
-    private boolean subAsset;
+    private boolean subAssetType;
     private boolean hasSubAsset;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
@@ -55,9 +55,9 @@ public class AssetType extends MongoBaseEntity {
 
     public void setSubAssetTypes(List<BigInteger> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
 
-    public boolean isSubAsset() { return subAsset; }
+    public boolean isSubAssetType() { return subAssetType; }
 
-    public void setSubAsset(boolean subAsset) { this.subAsset = subAsset; }
+    public void setSubAssetType(boolean subAssetType) { this.subAssetType = subAssetType; }
 
     public Long getCountryId() {
         return countryId;
