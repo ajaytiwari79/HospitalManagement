@@ -98,6 +98,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
@@ -497,8 +498,25 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
         }
+
+        List<ShiftActivity> existingActivitiesOfShift=shift.getActivities();
+
+        Map<BigInteger,ShiftActivity> shiftActivityIdMap=existingActivitiesOfShift.stream().collect(Collectors.toMap(ShiftActivity::getActivityId,Function.identity()));
+
         shiftValidatorService.validateStatusOfShiftOnUpdate(shift, shiftDTO);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
+
+        // Validating Shift to eligibility
+
+        Set<BigInteger> allActivityIds = shiftDTO.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet());
+        List<Activity> allActivities=activityRepository.findAllActivitiesByIds(allActivityIds);
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
+        Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=allActivities.stream().collect(Collectors.toMap(Activity::getId,v->v.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i->i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
+        shiftValidatorService.eligibleToEdit(staffAdditionalInfoDTO.getRoles(),activityPerPhaseMap);
+
+
+        // End Here
+
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.cta.notFound", shiftDTO.getStartDate());
@@ -519,7 +537,6 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activity, ActivityDTO.class);
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityDTO);
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, false);
         shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
@@ -1141,6 +1158,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setId(null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId, shiftDTO, type, true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
+        shiftWithViolatedInfoDTO.getShifts().get(0).setDurationMinutes((int)shiftWithViolatedInfoDTO.getShifts().get(0).getInterval().getMinutes());
         return shiftWithViolatedInfoDTO;
     }
 
@@ -1162,6 +1180,7 @@ public class ShiftService extends MongoBaseService {
         if(validatedByStaff){
             shiftDTO1.setEditable(true);
         }
+        shiftDTO1.setDurationMinutes((int)shiftDTO1.getInterval().getMinutes());
         return shiftDTO1;
     }
 

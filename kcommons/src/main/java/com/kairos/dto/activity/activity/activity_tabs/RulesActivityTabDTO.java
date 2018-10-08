@@ -19,13 +19,10 @@ public class RulesActivityTabDTO {
     private boolean eligibleForFinalSchedule;
     private boolean eligibleForDraftSchedule;
     private boolean eligibleForRequest;
-    private boolean eligibleAgainstTimeRules;
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
     private List<Long> dayTypes;
     private boolean eligibleForStaffingLevel;
-    private boolean eligibleForPresence;
-    private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
     private LocalDate cutOffStartFrom;
@@ -89,22 +86,6 @@ public class RulesActivityTabDTO {
         this.eligibleForStaffingLevel = eligibleForStaffingLevel;
     }
 
-    public boolean isEligibleForPresence() {
-        return eligibleForPresence;
-    }
-
-    public void setEligibleForPresence(boolean eligibleForPresence) {
-        this.eligibleForPresence = eligibleForPresence;
-    }
-
-    public boolean isEligibleForAbsence() {
-        return eligibleForAbsence;
-    }
-
-    public void setEligibleForAbsence(boolean eligibleForAbsence) {
-        this.eligibleForAbsence = eligibleForAbsence;
-    }
-
     public BigInteger getActivityId() {
         return activityId;
     }
@@ -137,13 +118,6 @@ public class RulesActivityTabDTO {
         this.eligibleForRequest = eligibleForRequest;
     }
 
-    public boolean isEligibleAgainstTimeRules() {
-        return eligibleAgainstTimeRules;
-    }
-
-    public void setEligibleAgainstTimeRules(boolean eligibleAgainstTimeRules) {
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-    }
 
     public boolean isLockLengthPresent() {
         return lockLengthPresent;

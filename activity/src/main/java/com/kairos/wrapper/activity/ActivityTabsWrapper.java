@@ -320,4 +320,12 @@ public class ActivityTabsWrapper {
     public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
     }
+
+    public Set<AccessGroupRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<AccessGroupRole> roles) {
+        this.roles = roles;
+    }
 }

@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class AllowedSettings {
     private Set<AccessGroupRole> canEdit;
-    private Set<AccessGroupRole> canDelete;
+    private Set<AccessGroupRole> canUsed;
 
     public AllowedSettings() {
         //Default Constructor
@@ -25,11 +25,11 @@ public class AllowedSettings {
         this.canEdit = canEdit;
     }
 
-    public Set<AccessGroupRole> getCanDelete() {
-        return Optional.ofNullable(canDelete).orElse(new HashSet<>());
+    public Set<AccessGroupRole> getCanUsed() {
+        return Optional.ofNullable(canUsed).orElse(new HashSet<>());
     }
 
-    public void setCanDelete(Set<AccessGroupRole> canDelete) {
-        this.canDelete = canDelete;
+    public void setCanUsed(Set<AccessGroupRole> canUsed) {
+        this.canUsed = canUsed;
     }
 }

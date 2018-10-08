@@ -77,6 +77,7 @@ import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1290,14 +1291,14 @@ public class UnitPositionService {
      * @return matchedDates
      * @Desc This method will return the Matched or common dates from two sets
      */
-    private Set<LocalDate> getIntersectedDates(Set<LocalDate> first, Set<LocalDate> second){
-        Set<LocalDate> matchedDates=new HashSet<>();
+    private Set<T> getIntersectedDates(Set<T> first, Set<T> second){
+        Set<T> matchedDates=new HashSet<>();
         if(CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)){
             return matchedDates;
         }
-        for(LocalDate currentLocalDate:second){
-            if(first.contains(currentLocalDate)){
-                matchedDates.add(currentLocalDate);
+        for(T current:second){
+            if(first.contains(current)){
+                matchedDates.add(current);
             }
 
         }
