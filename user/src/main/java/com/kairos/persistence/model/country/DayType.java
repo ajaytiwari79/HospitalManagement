@@ -30,7 +30,6 @@ public class DayType  extends UserBaseEntity {
     // @NotEmpty(message = "error.DayType.description.notEmpty") @NotNull(message = "error.DayType.description.notnull")
     private String description;
 
-    @NotEmpty(message = "error.DayType.colorCode.notEmpty") @NotNull(message = "error.DayType.colorCode.notnull")
     private String colorCode;
 
     @Relationship(type = BELONGS_TO)

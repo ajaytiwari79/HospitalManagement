@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
@@ -149,6 +150,11 @@ public class ShiftDTO {
 
     public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
         this.validatedByStaffDate = validatedByStaffDate;
+    }
+
+    @JsonIgnore
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
 
     public LocalDate getValidatedByPlannerDate() {

@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.staff.employment;
 
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 
 import java.util.List;
 
