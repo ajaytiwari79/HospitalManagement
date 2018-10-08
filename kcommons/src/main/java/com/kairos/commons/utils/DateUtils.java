@@ -586,7 +586,7 @@ public class DateUtils {
 
 
     public static Long getLongFromLocalDate(LocalDate date) {
-        return date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return (date==null)?  null: date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static LocalDate getDateFromEpoch(Long dateLong) {
@@ -702,9 +702,7 @@ public class DateUtils {
 
     }
 
-    public static Date getCurrentDayMidNight() {
-        return Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant());
 
 
-    }
+
 }

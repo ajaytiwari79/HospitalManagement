@@ -2,10 +2,7 @@ package com.kairos.service.data_inventory.assessment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.enums.gdpr.AssessmentStatus;
-import com.kairos.enums.gdpr.AssetAttributeName;
-import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssetAssessmentAnswerVO;
 import com.kairos.persistence.model.data_inventory.assessment.ProcessingActivityAssessmentAnswerVO;
@@ -115,11 +112,10 @@ public class AssessmentService extends MongoBaseService {
         switch (templateType) {
             case ASSET_TYPE:
                 Asset asset = (Asset) entity;
-
                 if (CollectionUtils.isNotEmpty(asset.getAssetSubTypes())) {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetType(unitId, asset.getAssetType(), asset.getAssetSubTypes());
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetType(), asset.getAssetSubTypes());
                 } else {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndUnitId(unitId, asset.getAssetType());
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetType());
                 }
                 if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
                     questionnaireTemplateType = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
@@ -132,6 +128,8 @@ public class AssessmentService extends MongoBaseService {
         }
         if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
+        } else if (questionnaireTemplateType.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
+            exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
         }
         Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssignee(), assessmentDTO.getApprover());
         assessment.setOrganizationId(unitId);
@@ -153,7 +151,7 @@ public class AssessmentService extends MongoBaseService {
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
-        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByUnitIdAndId(unitId, assessment.getQuestionnaireTemplateId());
+        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             getAssetAssessmentQuestionAndValuesById(unitId, assessment.getAssessmentStatus(), assessment, assessmentQuestionnaireSections);

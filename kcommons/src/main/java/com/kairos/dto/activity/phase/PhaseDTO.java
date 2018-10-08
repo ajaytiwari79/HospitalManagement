@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class PhaseDTO {
     private LocalTime flippingDefaultTime;
     private int gracePeriodByStaff;
     private int gracePeriodByManagement;
-    private String untilNextDay;
+    private DayOfWeek untilNextDay;
     private int realtimeDuration;
     private String shortName;
     public Long getOrganizationId() {
@@ -200,11 +201,11 @@ public class PhaseDTO {
         this.gracePeriodByManagement = gracePeriodByManagement;
     }
 
-    public String getUntilNextDay() {
+    public DayOfWeek getUntilNextDay() {
         return untilNextDay;
     }
 
-    public void setUntilNextDay(String untilNextDay) {
+    public void setUntilNextDay(DayOfWeek untilNextDay) {
         this.untilNextDay = untilNextDay;
     }
 

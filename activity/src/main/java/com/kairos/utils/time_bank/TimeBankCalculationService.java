@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.BONUS_HOURS;
+import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 
@@ -227,6 +228,13 @@ public class TimeBankCalculationService {
                                                 }
 
                                             }
+                                        }
+                                    }
+                                    else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
+                                        if(ruleTemplate.getStaffFunctions().contains(ctaDto.getFunctionId())){
+                                            float value=ctaDto.getHourlyCost()>0?(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount())/ctaDto.getHourlyCost()*60:0;
+                                            ctaTimeBankMin += value;
+                                            totalDailyTimebank += ctaTimeBankMin;
                                         }
                                     }
                                 }

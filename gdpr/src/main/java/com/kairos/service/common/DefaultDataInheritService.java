@@ -2,6 +2,7 @@ package com.kairos.service.common;
 
 
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
@@ -407,7 +408,7 @@ public class DefaultDataInheritService extends MongoBaseService {
 
     private QuestionnaireTemplate buildQuestionnaireTemplate(Long unitId, QuestionnaireTemplateResponseDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription());
+        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(),QuestionnaireTemplateStatus.DRAFT);
         questionnaireTemplate.setOrganizationId(unitId);
         switch (questionnaireTemplateDTO.getTemplateType()) {
             case ASSET_TYPE:

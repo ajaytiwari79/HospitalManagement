@@ -501,7 +501,15 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      */
     public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
-        return processingActivityMongoRepository.getAllProcessingActivityAndSubProcessWithRisks(unitId);
+        List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = processingActivityMongoRepository.getAllProcessingActivityAndSubProcessWithRisksByUnitId(unitId);
+        processingActivityRiskResponseDTOS.forEach(processingActivity -> {
+            if (!Optional.ofNullable(processingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
+                processingActivity.setProcessingActivities(new ArrayList<>());
+            }
+            processingActivity.getProcessingActivities().add(0, new ProcessingActivityRiskResponseDTO(processingActivity.getId(), processingActivity.getName(), true, processingActivity.getRisks()));
+            processingActivity.setMainParent(true);
+        });
+        return processingActivityRiskResponseDTOS;
     }
 
 
