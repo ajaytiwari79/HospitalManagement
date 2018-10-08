@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -44,10 +45,11 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableEurekaClient
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableResourceServer
-@ComponentScan({"com.kairos.persistence.model"})
-
+@EntityScan({"com.kairos.persistence.model"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
+//@EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
+@EnableNeo4jRepositories(repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
+
 @EnableCircuitBreaker
 @EnableKafka
 public class UserServiceApplication implements WebMvcConfigurer {
