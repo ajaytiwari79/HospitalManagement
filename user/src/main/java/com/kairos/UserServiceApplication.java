@@ -45,10 +45,10 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableEurekaClient
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableResourceServer
-@EntityScan({"com.kairos.persistence.model"})
+//@EntityScan({"com.kairos.persistence.model"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-//@EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
-@EnableNeo4jRepositories(repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
+@EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
+//@EnableNeo4jRepositories(repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
 
 @EnableCircuitBreaker
 @EnableKafka
