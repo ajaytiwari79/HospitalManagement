@@ -12,11 +12,16 @@ public class AssetAssessmentAnswerVO {
 
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private BigInteger questionId;
-
     @NotNull(message ="Field Not Match with Asset" )
     private AssetAttributeName assetField;
-
     private Object value;
+
+
+    public AssetAssessmentAnswerVO( BigInteger questionId,  AssetAttributeName assetField, Object value) {
+        this.questionId = questionId;
+        this.assetField = assetField;
+        this.value = value;
+    }
 
     public BigInteger getQuestionId() { return questionId; }
 
