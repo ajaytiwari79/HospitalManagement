@@ -272,7 +272,8 @@ public class QuestionnaireTemplateService extends MongoBaseService {
 
 
     public boolean deleteQuestionnaireTemplate(Long unitId, BigInteger questionnaireTemplateId) {
-        return questionnaireTemplateMongoRepository.safeDelete(questionnaireTemplateId);
+        questionnaireTemplateMongoRepository.safeDelete(questionnaireTemplateId);
+        return true;
     }
 
     /**

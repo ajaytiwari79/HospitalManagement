@@ -619,10 +619,10 @@ public class DefaultDataInheritService extends MongoBaseService {
             }
             List<AssetType> assetSubTypes = new ArrayList<>();
             assetTypeAndSubAssetTypeMap.forEach((assetType, subAssetTypes) -> {
-                assetType.setRisks(assetTypeRiskMap.get(assetType).stream().map(Risk::getId).collect(Collectors.toList()));
+                assetType.setRisks(assetTypeRiskMap.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
                 if (CollectionUtils.isNotEmpty(subAssetTypes)) {
                     assetSubTypes.addAll(subAssetTypes);
-                    subAssetTypes.forEach(subAssetType -> subAssetType.setRisks(assetTypeRiskMap.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toList())));
+                    subAssetTypes.forEach(subAssetType -> subAssetType.setRisks(assetTypeRiskMap.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet())));
                 }
             });
             if (CollectionUtils.isNotEmpty(assetSubTypes)) {
@@ -630,7 +630,7 @@ public class DefaultDataInheritService extends MongoBaseService {
                 assetSubTypes.forEach(subAssetType -> globalAssetTypeAndSubAssetTypeMap.put(subAssetType.getName().toLowerCase(), subAssetType.getId()));
             }
             List<AssetType> assetTypes = new ArrayList<>(assetTypeAndSubAssetTypeMap.keySet());
-            assetTypes.forEach(assetType -> assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList())));
+            assetTypes.forEach(assetType -> assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toSet())));
             assetTypeMongoRepository.saveAll(getNextSequence(assetTypes)).forEach(assetType -> globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId()));
         }
     }

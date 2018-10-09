@@ -9,7 +9,9 @@ import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Document(collection = "asset_type")
@@ -23,8 +25,8 @@ public class AssetType extends MongoBaseEntity {
     private boolean hasSubAsset;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
-    private List<BigInteger> risks;
-    private List<BigInteger> subAssetTypes=new ArrayList<>();
+    private Set<BigInteger> risks;
+    private Set<BigInteger> subAssetTypes=new HashSet<>();
 
 
     public AssetType(String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
@@ -51,9 +53,9 @@ public class AssetType extends MongoBaseEntity {
 
     public void setHasSubAsset(boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
 
-    public List<BigInteger> getSubAssetTypes() { return subAssetTypes; }
+    public Set<BigInteger> getSubAssetTypes() { return subAssetTypes; }
 
-    public void setSubAssetTypes(List<BigInteger> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
+    public void setSubAssetTypes(Set<BigInteger> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
 
     public boolean isSubAssetType() { return subAssetType; }
 
@@ -75,10 +77,9 @@ public class AssetType extends MongoBaseEntity {
         this.name = name;
     }
 
-    public List<BigInteger> getRisks() { return risks; }
+    public Set<BigInteger> getRisks() { return risks; }
 
-    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
-
+    public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
 
     public AssetType() {
     }

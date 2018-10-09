@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -35,6 +36,9 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
     List<AssetType> findAllAssetTypeByUnitIdAndIds(Long unitId, List<BigInteger> ids);
+
+    @Query("{deleted:false,organizationId:?0,_id:{$in:?1},'subAssetType':true}")
+    List<AssetType> findAllAssetSubTypeByUnitIdAndIds(Long unitId, Set<BigInteger> ids);
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false,subAssetType:false}")
