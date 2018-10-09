@@ -4,10 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
@@ -20,6 +17,7 @@ import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
@@ -145,13 +143,28 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a->a.getActivityShiftStatusSettings().stream().flatMap(b->b.getAccessGroupIds().stream())).collect(Collectors.toSet());
+            Map<Long,Long> accessGroupIdsMap=genericIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
+                List<ActivityShiftStatusSettings> activityShiftStatusSettings=phaseTemplateValues.get(i).getActivityShiftStatusSettings();
+                Set<Long> agIds=new HashSet<>();
                 PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
                         activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
                         activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
+                for (int j = 0; j < activityShiftStatusSettings.size(); j++) {
+                    List<Long> accessGroupIds=new ArrayList<>(activityShiftStatusSettings.get(j).getAccessGroupIds());
+                     for(int k=0;k<accessGroupIds.size();k++){
+                        if(accessGroupIdsMap.get(accessGroupIds.get(k))!=null){
+                            agIds.add(accessGroupIdsMap.get(accessGroupIds.get(k)));
+                        }
+                    }
+                    activityShiftStatusSettings.add(new ActivityShiftStatusSettings(activityShiftStatusSettings.get(j).getShiftStatus(),agIds));
+                }
+                phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
                 phaseTemplateValues.add(phaseTemplateValue);
             }
+            activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
         } else {

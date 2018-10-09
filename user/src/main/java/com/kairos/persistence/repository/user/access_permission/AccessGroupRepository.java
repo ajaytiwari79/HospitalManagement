@@ -314,6 +314,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN id(accessGroup) as id, accessGroup.name as name, accessGroup.description as description, accessGroup.typeOfTaskGiver as typeOfTaskGiver, accessGroup.deleted as deleted, accessGroup.role as role, accessGroup.enabled as enabled,accessGroup.startDate as startDate, accessGroup.endDate as endDate, collect(dayType) as dayTypes")
    AccessGroupQueryResult findByAccessGroupId(long unitId,long accessGroupId);
 
+   @Query("MATCH(countryAccessGroup:AccessGroup{deleted:false})<-[:"+HAS_PARENT_ACCESS_GROUP+"]-(unitAccessGroup:AccessGroup{deleted:false})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(org:Organization) where id(org) ={0} AND id(countryAccessGroup) IN {1} " +
+           "return {id(countryAccessGroup):id(unitAccessGroup)} as responseMap")
+   Map<Long,Long> getAccessGroupIdsUsingParentIds(Long unitId,Set<Long> parentIds);
+
 }
 
 

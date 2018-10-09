@@ -208,7 +208,6 @@ public class ShiftValidatorService {
         boolean staff=roles.contains(AccessGroupRole.STAFF);
         boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
         ArrayList<Integer> integers=new ArrayList<>();
-        integers.contains()
         phaseTemplateValue.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
                 if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){
