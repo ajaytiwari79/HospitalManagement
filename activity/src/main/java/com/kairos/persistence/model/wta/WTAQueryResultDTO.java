@@ -21,7 +21,7 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTAQueryResultDTO {
 
-    private BigInteger parentWTA;
+    private BigInteger parentId;
 
     private BigInteger countryParentWTA;
 
@@ -92,12 +92,12 @@ public class WTAQueryResultDTO {
         this.tags = tags;
     }
 
-    public BigInteger getParentWTA() {
-        return parentWTA;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setParentWTA(BigInteger parentWTA) {
-        this.parentWTA = parentWTA;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public Date getStartDate() {
