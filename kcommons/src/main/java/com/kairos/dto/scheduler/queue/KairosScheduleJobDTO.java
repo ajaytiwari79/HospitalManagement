@@ -5,6 +5,7 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 */
 
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -40,6 +41,7 @@ public class KairosScheduleJobDTO {
     private IntegrationOperation integrationOperation;
     private boolean oneTimeTrigger;
     private Long oneTimeTriggerDateMillis;
+    private List<ActivityReminderSettings> reminderSettings;
 
     public KairosScheduleJobDTO() {
 
@@ -265,4 +267,11 @@ public class KairosScheduleJobDTO {
         this.runOnce = runOnce;
     }
 
+    public List<ActivityReminderSettings> getReminderSettings() {
+        return reminderSettings;
+    }
+
+    public void setReminderSettings(List<ActivityReminderSettings> reminderSettings) {
+        this.reminderSettings = reminderSettings;
+    }
 }

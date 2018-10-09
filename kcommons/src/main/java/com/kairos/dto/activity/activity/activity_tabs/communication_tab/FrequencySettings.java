@@ -30,4 +30,12 @@ public class FrequencySettings implements Serializable {
     public void setDurationType(DurationType durationType) {
         this.durationType = durationType;
     }
+
+    @Override
+    public String toString() {
+        return "FrequencySettings{" +
+                "timeValue=" + timeValue +
+                ", durationType=" + durationType +
+                '}';
+    }
 }

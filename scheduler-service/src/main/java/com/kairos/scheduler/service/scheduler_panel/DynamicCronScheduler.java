@@ -137,6 +137,13 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     }
 
+    /**
+     * This method is useed to execute a job.
+     * @param schedulerPanel
+     * @param trigger
+     * @param timeZone
+     * @return
+     */
     private Runnable getTask(SchedulerPanel schedulerPanel,  CronTrigger trigger, TimeZone timeZone){
         Runnable runnable = new Runnable() {
             @Override

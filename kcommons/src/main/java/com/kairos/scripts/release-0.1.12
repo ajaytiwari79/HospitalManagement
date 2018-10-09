@@ -33,3 +33,9 @@ MATCH (n:UnitPosition)-[:HAS_POSITION_LINES]->(pl:UnitPositionLine)
 MATCH(n)-[rel:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel)
 merge(pl)-[:HAS_SENIORITY_LEVEL]->(sl)
 detach delete rel
+
+MATCH (n:UnitPosition)-[:HAS_POSITION_LINES]->(pl:UnitPositionLine)
+MATCH(u)-[employmentRel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType)
+merge(pl)-[newRel:HAS_EMPLOYMENT_TYPE]->(employmentType)
+set newRel.employmentTypeCategory=employmentRel.employmentTypeCategory
+detach delete employmentRel

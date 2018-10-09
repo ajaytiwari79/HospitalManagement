@@ -53,4 +53,14 @@ public class ActivityReminderSettings implements Serializable,Comparator<Activit
     public int compare(ActivityReminderSettings first, ActivityReminderSettings second) {
         return first.getSequence()-second.getSequence();
     }
+
+    @Override
+    public String toString() {
+        return "ActivityReminderSettings{" +
+                "sequence=" + sequence +
+                ", sendReminder=" + sendReminder +
+                ", repeatAllowed=" + repeatAllowed +
+                ", repeatReminder=" + repeatReminder +
+                '}';
+    }
 }

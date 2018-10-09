@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.ACTIVITY_SHIFT_STATUS_SETTINGS_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
@@ -33,22 +34,31 @@ public class ActivityShiftStatusSettingsController {
     @PostMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("create Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> addActivityAndShiftStatusSetting(@PathVariable Long unitId, @Valid @RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.addActivityAndShiftStatusSetting(unitId, activityShiftStatusSettingsDTO));
+    public ResponseEntity<Map<String, Object>> addActivityAndShiftStatusSetting(@PathVariable Long unitId, @Valid @RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityShiftStatusSettingsService.addActivityAndShiftStatusSetting(unitId, activityShiftStatusSettingsDTO));
     }
 
-    @GetMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL +"/activity/{activityId}")
+    @GetMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL + "/activity/{activityId}")
     @ApiOperation("get All Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettingsByActivityId(@PathVariable Long unitId,@PathVariable BigInteger activityId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(unitId,activityId));
+    public ResponseEntity<Map<String, Object>> getAllActivityAndShiftStatusSettingsByActivityId(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(unitId, activityId));
     }
 
-    @PutMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL+"/{id}")
+    @PutMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL + "/{id}")
     @ApiOperation("update Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> updateActivityAndShiftStatusSettings(@PathVariable Long unitId,@PathVariable BigInteger id,@RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.updateActivityAndShiftStatusSettings(unitId,id, activityShiftStatusSettingsDTO));
+    public ResponseEntity<Map<String, Object>> updateActivityAndShiftStatusSettings(@PathVariable Long unitId, @PathVariable BigInteger id, @RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityShiftStatusSettingsService.updateActivityAndShiftStatusSettings(unitId, id, activityShiftStatusSettingsDTO));
+    }
+
+    //TODO DO NOT REMOVE Its for test
+    @PutMapping(value = UNIT_URL + "/activity/{activityId}/reminder")
+    @ApiOperation("job for reminder")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setReminderTrigger(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
+        activityShiftStatusSettingsService.setReminderTrigger(activityId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 
