@@ -1,2 +1,16 @@
 // questionnaire template script gdpr
 db.getCollection('questionnaire_template').updateMany({'deleted':false,'defaultAssetTemplate':{ $exists: false}},{$set:{"defaultAssetTemplate":false}})
+
+
+MATCH (n:UnitPosition) where NOT (n)-[:HAS_POSITION_LINES]-(:UnitPositionLine)
+with collect (n) as allL
+forEach(n IN (allL)|
+merge(n)-[:HAS_POSITION_LINES]-(npl:UnitPositionLine)
+set npl.avgDailyWorkingHours=n.avgDailyWorkingHours
+  set npl.workingDaysInWeek= n.workingDaysInWeek
+  set npl.hourlyWages= n.hourlyWages
+  set npl.totalWeeklyMinutes= n.totalWeeklyMinutes
+  set npl.startDate= "2018-10-05"
+  set npl.fullTimeWeeklyMinutes= n.fullTimeWeeklyMinutes
+  merge(npl)-[:HAS_SENIORITY_LEVEL]->(sl)<-[last:HAS_SENIORITY_LEVEL]-(n)
+);
