@@ -9,7 +9,7 @@ import java.util.Comparator;
  * CreatedBy vipulpandey on 6/10/18
  **/
 public class ActivityReminderSettings implements Serializable,Comparator<ActivityReminderSettings> {
-    private Byte sequence;
+    private byte sequence;
     private FrequencySettings sendReminder; // this is used for settings before days and value settings
     private boolean repeatAllowed;
     private FrequencySettings repeatReminder;
@@ -18,11 +18,11 @@ public class ActivityReminderSettings implements Serializable,Comparator<Activit
         // DC
     }
 
-    public Byte getSequence() {
+    public byte getSequence() {
         return sequence;
     }
 
-    public void setSequence(Byte sequence) {
+    public void setSequence(byte sequence) {
         this.sequence = sequence;
     }
 

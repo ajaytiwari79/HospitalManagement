@@ -1180,37 +1180,41 @@ public class ActivityService extends MongoBaseService {
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {
         Collections.sort(communicationActivityDTO.getActivityReminderSettings(), Comparator.comparing(ActivityReminderSettings::getSequence));
         int counter = 0;
-        for (ActivityReminderSettings currentSettings : communicationActivityDTO.getActivityReminderSettings()) {
+        if (!communicationActivityDTO.getActivityReminderSettings().isEmpty()) {
+            byte lastSequence = communicationActivityDTO.getActivityReminderSettings().get(communicationActivityDTO.getActivityReminderSettings().size() - 1).getSequence();
+            for (ActivityReminderSettings currentSettings : communicationActivityDTO.getActivityReminderSettings()) {
 
-            if (currentSettings.getSendReminder().getDurationType() == DurationType.HOURS
-                    && currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS) {
-                exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
-            }
-            if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
-                    (currentSettings.getRepeatReminder().getDurationType() == DurationType.HOURS
-                            || currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS)) {
-                exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
-            }
-            // if both are same ie days or minute and reminder value id greater than time value
-            if (currentSettings.getSendReminder().getDurationType() == currentSettings.getRepeatReminder().getDurationType() &&
-                    currentSettings.getSendReminder().getTimeValue() < currentSettings.getRepeatReminder().getTimeValue()) {
-                exceptionService.actionNotPermittedException("reminder_value_cant_be_greater_than_repeat_value",
-                        currentSettings.getRepeatReminder().getTimeValue(), currentSettings.getRepeatReminder().getDurationType(),
-                        currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType());
-            }
-            if (counter > 0) {
-                ActivityReminderSettings previousSettings = communicationActivityDTO.getActivityReminderSettings().get(counter-1);
-                if (previousSettings.isRepeatAllowed()) {
-                    validateWithPreviousFrequency(currentSettings, previousSettings.getRepeatReminder());
-                } else {
-                    validateWithPreviousFrequency(currentSettings, previousSettings.getSendReminder());
+                if (currentSettings.getSendReminder().getDurationType() == DurationType.HOURS
+                        && currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS) {
+                    exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
                 }
-            }
-            counter++;
-            if (currentSettings.getSequence() == null){
-                currentSettings.setSequence((byte)counter);
-            }
+                if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
+                        (currentSettings.getRepeatReminder().getDurationType() == DurationType.HOURS
+                                || currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS)) {
+                    exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
+                }
+                // if both are same ie days or minute and reminder value id greater than time value
+                if (currentSettings.getSendReminder().getDurationType() == currentSettings.getRepeatReminder().getDurationType() &&
+                        currentSettings.getSendReminder().getTimeValue() < currentSettings.getRepeatReminder().getTimeValue()) {
+                    exceptionService.actionNotPermittedException("reminder_value_cant_be_greater_than_repeat_value",
+                            currentSettings.getRepeatReminder().getTimeValue(), currentSettings.getRepeatReminder().getDurationType(),
+                            currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType());
+                }
+                if (counter > 0) {
+                    ActivityReminderSettings previousSettings = communicationActivityDTO.getActivityReminderSettings().get(counter - 1);
+                    if (previousSettings.isRepeatAllowed()) {
+                        validateWithPreviousFrequency(currentSettings, previousSettings.getRepeatReminder());
+                    } else {
+                        validateWithPreviousFrequency(currentSettings, previousSettings.getSendReminder());
+                    }
+                }
+                if (currentSettings.getSequence() == 0) {
+                    currentSettings.setSequence(++lastSequence);
+                }
+                counter++;
 
+
+            }
         }
         return true;
     }

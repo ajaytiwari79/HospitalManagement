@@ -699,8 +699,6 @@ public class UnitPositionService {
         result.setUnitId(unitPosition.getUnit().getId());
 
         result.setParentUnitId(parentOrganizationId);
-        result.setEditable(unitPosition.isEditable());
-        result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
         Map<String, Object> reasonCode = null;
         if (Optional.ofNullable(unitPosition.getReasonCode()).isPresent()) {
@@ -745,8 +743,6 @@ public class UnitPositionService {
                 unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDate(), null, null/*unitPosition.getWorkingTimeAgreement()*/);
         result.setUnitId(unitPositionQueryResult.getUnitId());
-        result.setEditable(unitPosition.isEditable());
-        result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
         return result;

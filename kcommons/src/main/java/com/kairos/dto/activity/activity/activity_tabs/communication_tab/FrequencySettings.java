@@ -8,18 +8,18 @@ import java.io.Serializable;
  * CreatedBy vipulpandey on 6/10/18
  **/
 public class FrequencySettings implements Serializable {
-    private Short timeValue;
+    private Integer timeValue;
     private DurationType durationType;
 
     public FrequencySettings() {
 
     }
 
-    public Short getTimeValue() {
+    public Integer getTimeValue() {
         return timeValue;
     }
 
-    public void setTimeValue(Short timeValue) {
+    public void setTimeValue(Integer timeValue) {
         this.timeValue = timeValue;
     }
 
