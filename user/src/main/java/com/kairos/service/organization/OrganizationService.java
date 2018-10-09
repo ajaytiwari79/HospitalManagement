@@ -1372,10 +1372,10 @@ public class OrganizationService {
             //  plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
             List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips;
             unitPositionEmploymentTypeRelationShips = unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
-            if (!unitPositionEmploymentTypeRelationShips.isEmpty()) {
+          /*  if (!unitPositionEmploymentTypeRelationShips.isEmpty()) {
                 plannerSyncService.publishAllUnitPositions(unitId, unitPositionEmploymentTypeRelationShips, IntegrationOperation.CREATE);
             }
-            phaseRestClient.initialOptaplannerSync(unitId);
+            */phaseRestClient.initialOptaplannerSync(unitId);
         }
         return new PlannerSyncResponseDTO(syncStarted);
     }

@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 
 @RestController
@@ -56,9 +55,15 @@ public class AssessmentController {
 
 
     @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
-    @GetMapping("/assessment")
+    @GetMapping("/assessment/assignee")
     public ResponseEntity<Object> getAllLaunchedAssessment(@PathVariable Long unitId,@RequestParam Long loggedInUserId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfAssignee(unitId,loggedInUserId));
+    }
+
+    @ApiOperation(value = "get All Assessment of unit")
+    @GetMapping("/assessment")
+    public ResponseEntity<Object> getAllAssessmentByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
     }
 
     @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")

@@ -13,8 +13,8 @@ public interface MongoBaseRepository<T, ID extends Serializable> extends MongoRe
 	 T findOne(ID id);
 	 void safeDeleteById(ID id);
 	<T extends MongoBaseEntity> void safeDelete(T object);
-	<T extends MongoBaseEntity> List<T> saveObjects(List<T> entities);
-	<T extends MongoBaseEntity> T saveObject(T entity);
+	<T extends MongoBaseEntity> List<T> saveEntities(List<T> entities);
+	//<T extends MongoBaseEntity> T save(T entity);
 
 
 }

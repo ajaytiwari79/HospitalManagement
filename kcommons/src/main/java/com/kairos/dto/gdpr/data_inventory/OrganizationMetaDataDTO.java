@@ -6,40 +6,34 @@ import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
 
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationMetaDataDTO {
 
-    private OrganizationType organizationType;
 
-    private OrganizationSubType organizationSubType;
+    private Long typeId;
 
-    private ServiceCategory organizationService;
+    private List<Long> subTypeIds;
 
-    private SubServiceCategory organizationSubService;
+    private List<Long> serviceCategoryIds;
 
-    public OrganizationType getOrganizationType() {
-        return organizationType;
-    }
+    private List<Long> subServiceCategoryIds;
 
-    public void setOrganizationType(OrganizationType organizationType) {
-        this.organizationType = organizationType;
-    }
+    public Long getTypeId() { return typeId; }
 
-    public OrganizationSubType getOrganizationSubType() {
-        return organizationSubType;
-    }
+    public void setTypeId(Long typeId) { this.typeId = typeId; }
 
-    public void setOrganizationSubType(OrganizationSubType organizationSubType) { this.organizationSubType = organizationSubType; }
+    public List<Long> getSubTypeIds() { return subTypeIds; }
 
-    public ServiceCategory getOrganizationService() {
-        return organizationService;
-    }
+    public void setSubTypeIds(List<Long> subTypeIds) { this.subTypeIds = subTypeIds; }
 
-    public void setOrganizationService(ServiceCategory organizationService) { this.organizationService = organizationService; }
+    public List<Long> getServiceCategoryIds() { return serviceCategoryIds; }
 
-    public SubServiceCategory getOrganizationSubService() {
-        return organizationSubService;
-    }
+    public void setServiceCategoryIds(List<Long> serviceCategoryIds) { this.serviceCategoryIds = serviceCategoryIds; }
 
-    public void setOrganizationSubService(SubServiceCategory organizationSubService) { this.organizationSubService = organizationSubService; }
+    public List<Long> getSubServiceCategoryIds() { return subServiceCategoryIds; }
+
+    public void setSubServiceCategoryIds(List<Long> subServiceCategoryIds) { this.subServiceCategoryIds = subServiceCategoryIds; }
 }

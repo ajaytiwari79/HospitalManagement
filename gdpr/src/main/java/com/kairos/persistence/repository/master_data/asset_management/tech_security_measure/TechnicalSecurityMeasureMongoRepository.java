@@ -23,11 +23,13 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseReposi
     @Query("{countryId:?0,name:?1,deleted:false}")
     TechnicalSecurityMeasure findByNameAndCountryId(Long countryId,String name);
 
-
     TechnicalSecurityMeasure findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<TechnicalSecurityMeasureResponseDTO> findAllTechnicalSecurityMeasures(Long countryId, Sort sort);
+    List<TechnicalSecurityMeasureResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<TechnicalSecurityMeasureResponseDTO> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<TechnicalSecurityMeasure> getTechnicalSecurityMeasureListByIds(Long countryId, Set<BigInteger> techSecurityMeasureIds);
@@ -37,14 +39,14 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseReposi
 
 
     @Query("{deleted:false,organizationId:?0}")
-    List<TechnicalSecurityMeasureResponseDTO> findAllOrganizationTechnicalSecurityMeasures(Long organizationId,Sort sort);
+    List<TechnicalSecurityMeasureResponseDTO> findAllByUnitIdSortByCreatedDate(Long organizationId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    TechnicalSecurityMeasure findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    TechnicalSecurityMeasure findByUnitIdAndId(Long unitId, BigInteger id);
 
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    TechnicalSecurityMeasure findByOrganizationIdAndName(Long organizationId,String name);
+    TechnicalSecurityMeasure findByUnitIdAndName(Long unitId, String name);
 
 
 

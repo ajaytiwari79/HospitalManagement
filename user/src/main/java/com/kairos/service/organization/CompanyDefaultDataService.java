@@ -45,7 +45,7 @@ public class CompanyDefaultDataService {
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots, List<AccessGroupQueryResult> accessGroups) throws InterruptedException, ExecutionException {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
         units.forEach(unit -> {
-                asynchronousService.executeInBackGround(() -> accessGroupService.createDefaultAccessGroupsInOrganization(unit,accessGroups));
+                asynchronousService.executeInBackGround(() -> accessGroupService.createDefaultAccessGroupsInOrganization(unit,accessGroups,false));
                 asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));

@@ -15,13 +15,13 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface DataSourceMongoRepository extends MongoBaseRepository<DataSource,BigInteger>,CustomDataSourceRepository {
+public interface DataSourceMongoRepository extends MongoBaseRepository<DataSource, BigInteger>, CustomDataSourceRepository {
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
-    DataSource findByIdAndNonDeleted(Long countryId,BigInteger id);
+    DataSource findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
-    DataSource findByNameAndCountryId(Long countryId,String name);
+    DataSource findByNameAndCountryId(Long countryId, String name);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<DataSourceResponseDTO> findDataSourceByIds(List<BigInteger> dataSourceIds);
@@ -31,16 +31,20 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<DataSource> getDataSourceListByIds(Long countryId, Set<BigInteger> dataSourceIds);
 
-    @Query("{deleted:false,countryId:?0}")
-    List<DataSourceResponseDTO> findAllDataSources(Long countryId, Sort sort);
 
-      @Query("{organizationId:?0,deleted:false}")
-    List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId,Sort sort);
+    @Query("{deleted:false,countryId:?0}")
+    List<DataSourceResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<DataSourceResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
+
+    @Query("{organizationId:?0,deleted:false}")
+    List<DataSourceResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    DataSource findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    DataSource findByUnitIdAndId(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    DataSource findByNameAndOrganizationId(Long organizationId,String name);
+    DataSource findByNameAndUnitId(Long unitId, String name);
 
 }

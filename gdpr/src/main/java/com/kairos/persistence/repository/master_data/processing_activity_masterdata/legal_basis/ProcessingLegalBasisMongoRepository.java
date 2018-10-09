@@ -30,17 +30,20 @@ public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository
     List<ProcessingLegalBasis> findProcessingLegalBasisByIds(List<BigInteger> legalBasisIds);
 
     @Query("{deleted:false,countryId:?0}")
-    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId, Sort sort);
+    List<ProcessingLegalBasisResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<ProcessingLegalBasisResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<ProcessingLegalBasisResponseDTO> findAllOrganizationProcessingLegalBases( Long organizationId,Sort sort);
+    List<ProcessingLegalBasisResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    ProcessingLegalBasis findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    ProcessingLegalBasis findByUnitIdAndId(Long unitId, BigInteger id);
 
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    ProcessingLegalBasis findByNameAndOrganizationId(Long organizationId,String name);
+    ProcessingLegalBasis findByNameAndUnitId(Long unitId, String name);
 
 
 

@@ -127,7 +127,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     sortClauseOfAgreementSectionAndSubSectionInResponseDTO(clauseBasicResponseDTOS, agreementSectionResponseDTO);
                     if (!Optional.ofNullable(agreementSectionResponseDTO.getSubSections().get(0).getId()).isPresent()) {
                         agreementSectionResponseDTO.getSubSections().clear();
-                        ;
                     } else {
                         agreementSectionResponseDTO.getSubSections().forEach(agreementSubSectionResponseDTO -> {
                             Map<BigInteger, ClauseBasicResponseDTO> subSectionClauseBasicResponseDTOS = agreementSubSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));

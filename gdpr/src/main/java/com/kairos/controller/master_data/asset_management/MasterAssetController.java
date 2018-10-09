@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
-import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 
 /*

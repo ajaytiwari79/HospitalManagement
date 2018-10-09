@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author pradeep
@@ -24,6 +25,13 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
         Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("date").lt(date).and("deleted").is(false));
         query.with(Sort.by(Sort.Direction.ASC,"date"));
         return mongoTemplate.findOne(query,DailyTimeBankEntry.class);
+    }
+
+    @Override
+    public List<DailyTimeBankEntry> findLastTimeBankByUnitPositionIds(List<Long> unitPositionId, Date date) {
+        Query query = new Query(Criteria.where("unitPositionId").in(unitPositionId).and("date").lt(date).and("deleted").is(false));
+        query.with(Sort.by(Sort.Direction.ASC,"date"));
+        return mongoTemplate.find(query,DailyTimeBankEntry.class);
     }
 
     @Override

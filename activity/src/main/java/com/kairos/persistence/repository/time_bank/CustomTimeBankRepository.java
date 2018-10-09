@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.time_bank;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author pradeep
@@ -12,6 +13,8 @@ import java.util.Date;
 public interface CustomTimeBankRepository {
 
     DailyTimeBankEntry findLastTimeBankByUnitPositionId(Long unitPositionId, Date date);
+
+    List<DailyTimeBankEntry> findLastTimeBankByUnitPositionIds(List<Long> unitPositionId, Date date);
 
     void updateAccumulatedTimeBank(Long unitPositionId,int timeBank);
 }

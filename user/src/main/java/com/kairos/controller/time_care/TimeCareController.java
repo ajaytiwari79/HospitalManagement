@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
@@ -46,7 +47,7 @@ public class TimeCareController {
 
     @RequestMapping(value = "/organization/{organizationId}/unit/{unitId}/staff/employments",method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> importEmploymentsFromTimeCare(@RequestBody List<TimeCareEmploymentDTO> timeCareEmploymentDTOS,
-                                                                            @RequestParam(value = "expertiseId",required = false) Long expertiseId){
+                                                                            @RequestParam(value = "expertiseId",required = false) Long expertiseId) throws InterruptedException ,ExecutionException {
 
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true, unitPositionService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS, expertiseId));
     }

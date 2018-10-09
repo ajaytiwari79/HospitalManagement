@@ -45,7 +45,7 @@ public class DataDisposal extends MongoBaseEntity {
         this.name = name;
     }
 
-    public DataDisposal( String name) {
+    public DataDisposal(@NotBlank String name) {
         this.name = name;
     }
 

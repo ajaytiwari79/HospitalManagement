@@ -18,7 +18,7 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

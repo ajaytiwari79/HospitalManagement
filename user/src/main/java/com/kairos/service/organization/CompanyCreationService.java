@@ -299,6 +299,7 @@ public class CompanyCreationService {
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
+
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
@@ -312,6 +313,7 @@ public class CompanyCreationService {
                     if (userBySameEmailOrCPR != 0) {
                         exceptionService.duplicateDataException("user already exist by email or cpr");
                     }
+
                 }
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
@@ -324,6 +326,7 @@ public class CompanyCreationService {
     }
 
     //It checks null as well
+
     private void setEncryptedPasswordAndAge(UnitManagerDTO unitManagerDTO, User user) {
         if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
             user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
@@ -556,7 +559,7 @@ public class CompanyCreationService {
 
         // if more than 2 default things needed make a  async service Please
         List<AccessGroupQueryResult> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups);
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups,true);
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
