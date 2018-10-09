@@ -170,17 +170,6 @@ public class MongoBaseService {
     }
 
 
-    public <T extends MongoBaseEntity> List<T> deleteAll(List<T> entities) {
-
-        Assert.notNull(entities, "Entity must not be null!");
-        //  Get class name for sequence class
-
-        entities.forEach(entity -> entity.setDeleted(true));
-        mongoTemplate.save(entities);
-        return entities;
-    }
-
-
     public Boolean remove(List<BigInteger> ids, Class entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
