@@ -12,11 +12,15 @@ public class ProcessingActivityAssessmentAnswerVO {
 
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private BigInteger questionId;
-
     @NotNull(message ="Field Not Match with Asset" )
     private ProcessingActivityAttributeName processingActivityField;
-
     private Object value;
+
+    public ProcessingActivityAssessmentAnswerVO(BigInteger questionId, ProcessingActivityAttributeName processingActivityField, Object value) {
+        this.questionId = questionId;
+        this.processingActivityField = processingActivityField;
+        this.value = value;
+    }
 
     public BigInteger getQuestionId() { return questionId; }
 
