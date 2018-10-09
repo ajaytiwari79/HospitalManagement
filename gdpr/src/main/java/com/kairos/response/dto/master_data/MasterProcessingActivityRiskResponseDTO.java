@@ -2,9 +2,8 @@ package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.response.dto.common.RiskResponseDTO;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -18,7 +17,7 @@ public class MasterProcessingActivityRiskResponseDTO {
     private BigInteger id;
     private String name;
     private Boolean mainParent;
-    private List<RiskResponseDTO> risks=new ArrayList<>();
+    private List<RiskBasicResponseDTO> risks=new ArrayList<>();
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
@@ -27,7 +26,7 @@ public class MasterProcessingActivityRiskResponseDTO {
     public MasterProcessingActivityRiskResponseDTO() {
     }
 
-    public MasterProcessingActivityRiskResponseDTO(BigInteger id, String name, boolean mainParent, List<RiskResponseDTO> risks,LocalDate suggestedDate,SuggestedDataStatus suggestedDataStatus) {
+    public MasterProcessingActivityRiskResponseDTO(BigInteger id, String name, boolean mainParent, List<RiskBasicResponseDTO> risks, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
         this.id = id;
         this.name = name;
         this.mainParent = mainParent;
@@ -60,7 +59,7 @@ public class MasterProcessingActivityRiskResponseDTO {
 
     public void setName(String name) { this.name = name; }
 
-    public List<RiskResponseDTO> getRisks() { return risks; }
+    public List<RiskBasicResponseDTO> getRisks() { return risks; }
 
-    public void setRisks(List<RiskResponseDTO> risks) { this.risks = risks; }
+    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 }

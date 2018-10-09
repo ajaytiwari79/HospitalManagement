@@ -31,14 +31,17 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     private MongoTemplate mongoTemplate;
 
 
-    final String nonDeletedSubAsset = CustomAggregationQuery.assetTypesAddNonDeletedSubAssetTypes();
+    private String nonDeletedSubAsset = CustomAggregationQuery.assetTypesAddNonDeletedSubAssetTypes();
     Document nonDeletedSubAssetOperation = Document.parse(nonDeletedSubAsset);
+    private String groupOperation = "{ '$group' : { '_id' : '$_id', 'subAssetTypes': { '$addToSet' : '$subAssetTypes' },'risks' : { '$first' : '$risks' }, 'hasSubAsset' : { '$first' : '$hasSubAsset' }, 'name' : { '$first':'$name' }," +
+            "'subAssetType' : { '$first' :'$subAssetType'}, 'createdAt':{'$first' : '$createdAt' } } }";
+
 
     @Override
     public AssetType findByNameAndCountryId(Long countryId, String name) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").is(name).and("subAsset").is(false));
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").is(name).and("subAssetType").is(false));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, AssetType.class);
@@ -46,20 +49,16 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
     @Override
     public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(Long countryId) {
+
+
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("subAsset").is(false).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("subAssetType").is(false).and(DELETED).is(false)),
                 lookup("risk", "risks", "_id", "risks"),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 unwind("subAssetTypes", true),
                 lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
-                group("$id")
-                        .addToSet("subAssetTypes").as("subAssetTypes")
-                        .first("risks").as("risks")
-                        .first("hasSubAsset").as("hasSubAsset")
-                        .first("name").as("name")
-                        .first("subAsset").as("subAsset")
-                        .first("createdAt").as("createdAt"),
+                new CustomAggregationOperation(Document.parse(groupOperation)),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
@@ -74,7 +73,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     public AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("subAssetType").is(false).and(DELETED).is(false).and("_id").is(id)),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
@@ -86,7 +85,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     @Override
     public AssetType findByNameAndUnitId(Long organizationId, String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(organizationId).and("deleted").is(false).and("name").is(name).and("subAsset").is(false));
+        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(organizationId).and("deleted").is(false).and("name").is(name).and("subAssetType").is(false));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, AssetType.class);
@@ -98,19 +97,12 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAsset").is(false).and(DELETED).is(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAssetType").is(false).and(DELETED).is(false)),
                 lookup("risk", "risks", "_id", "risks"),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 unwind("subAssetTypes", true),
-                sort(Sort.Direction.ASC, "subAssetTypes.name"),
                 lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
-                group("$id")
-                        .addToSet("subAssetTypes").as("subAssetTypes")
-                        .first("risks").as("risks")
-                        .first("hasSubAsset").as("hasSubAsset")
-                        .first("name").as("name")
-                        .first("subAsset").as("subAsset")
-                        .first("createdAt").as("createdAt"),
+                new CustomAggregationOperation(Document.parse(groupOperation)),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
@@ -125,7 +117,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     public AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndUnitId(Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and("subAssetType").is(false).and(DELETED).is(false).and("_id").is(id)),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
