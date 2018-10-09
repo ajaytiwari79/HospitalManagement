@@ -1,23 +1,26 @@
-package com.kairos.persistence.model.user.unit_position;
+package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
+import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult
 public class UnitPositionSeniorityLevelQueryResult {
 
-    private UnitPosition unitPosition;
+    private Long unitPositionId;
     private SeniorityLevel seniorityLevel;
     private UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
     private EmploymentType employmentType;
+    private UnitPositionLine unitPositionLine;
 
-    public UnitPosition getUnitPosition() {
-        return unitPosition;
+    public Long getUnitPositionId() {
+        return unitPositionId;
     }
 
-    public void setUnitPosition(UnitPosition unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public SeniorityLevel getSeniorityLevel() {
@@ -43,6 +46,11 @@ public class UnitPositionSeniorityLevelQueryResult {
         this.employmentType = employmentType;
     }
 
+    public UnitPositionLine getUnitPositionLine() {
+        return unitPositionLine;
+    }
 
-
+    public void setUnitPositionLine(UnitPositionLine unitPositionLine) {
+        this.unitPositionLine = unitPositionLine;
+    }
 }

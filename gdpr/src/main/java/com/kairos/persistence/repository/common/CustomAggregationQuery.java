@@ -75,7 +75,8 @@ public class CustomAggregationQuery {
                 "        'sections':1," +
                 "      'description':1," +
                 "     'templateType':1," +
-                "'defaultAssetTemplate':1" +
+                "'defaultAssetTemplate':1," +
+                "'templateStatus':1" +
                 "            }}";
     }
 

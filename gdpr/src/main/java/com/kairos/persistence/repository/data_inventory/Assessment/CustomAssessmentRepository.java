@@ -19,6 +19,8 @@ public interface CustomAssessmentRepository {
 
     Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId);
 
+    List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId,BigInteger templateId);
+
 
 
 }
