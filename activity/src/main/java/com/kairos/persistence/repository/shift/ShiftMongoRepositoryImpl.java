@@ -219,6 +219,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.remove(query,Shift.class);
     }
 
+    @Override
+    public List<Shift> findShiftAfterRestorePhase(BigInteger planningPeriodId, BigInteger phaseId) {
+        Query query=new Query(Criteria.where("planningPeriodId").is(planningPeriodId).and("phaseId").is(phaseId));
+       return mongoTemplate.find(query,Shift.class);
+    }
+
     public static Document shiftWithActivityProjection(){
         String project = "{  \n" +
                 "      '$project':{  \n" +

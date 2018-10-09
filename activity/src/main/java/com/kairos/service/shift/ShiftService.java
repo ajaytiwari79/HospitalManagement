@@ -584,8 +584,7 @@ public class ShiftService extends MongoBaseService {
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
 
-    public void deleteAllShift(List<BigInteger> shiftIds,Long unitId){
-        List<Shift> shifts = shiftMongoRepository.findAllShiftByIds(shiftIds);
+    public void deleteAllShift(List<Shift> shifts,Long unitId){
         if (!Optional.ofNullable(shifts).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.ids");
         }
@@ -594,13 +593,14 @@ public class ShiftService extends MongoBaseService {
 //        List<BigInteger> activityIds=shifts.stream().map(shift-> shift.getActivities().get(0).getActivityId()).collect(Collectors.toList());
 //        List<ActivityWrapper> activityWrappers = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/verifyUnitEmployment",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){},staffids,unitPositionids);
-        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
-        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
-        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
-        Date startDate=shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get();
-        Date endDate=shifts.stream().map(shift -> shift.getEndDate()).max(Date::compareTo).get();
+        timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
+        //        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
+//        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
+//        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
+//        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+//        List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
+       // Date startDate=shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get();
+       // Date endDate=shifts.stream().map(shift -> shift.getEndDate()).max(Date::compareTo).get();
        // List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
      //   Map<Long,List<CTAResponseDTO>> unitPositionAndCTAResponseMap=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
 

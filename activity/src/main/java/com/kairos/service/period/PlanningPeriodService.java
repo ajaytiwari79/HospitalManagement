@@ -27,6 +27,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.service.shift.ShiftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -57,7 +58,8 @@ public class PlanningPeriodService extends MongoBaseService {
 
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
-
+    @Inject
+    private ShiftService shiftService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
@@ -546,7 +548,9 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
         restoreShifts(shiftStates);
-        shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
+        List<Shift> shifts=shiftMongoRepository.findShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
+        shiftService.deleteAllShift(shifts, unitId);
+        //shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
 
