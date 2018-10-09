@@ -166,11 +166,11 @@ public class ShiftTemplateService extends MongoBaseService {
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
-            ShiftDTO shiftDTO1 = new ShiftDTO();
-            ObjectMapperUtils.copyPropertiesExceptSpecific(individualShiftTemplateDTO,shiftDTO1, "activities");
-            shiftDTO1.setId(null);
-            shiftDTO1.setStaffId(shiftDTO.getStaffId());
-            shiftDTO1.setUnitPositionId(shiftDTO.getUnitPositionId());
+            ShiftDTO newShiftDTO = new ShiftDTO();
+            ObjectMapperUtils.copyPropertiesExceptSpecific(individualShiftTemplateDTO,newShiftDTO, "activities");
+            newShiftDTO.setId(null);
+            newShiftDTO.setStaffId(shiftDTO.getStaffId());
+            newShiftDTO.setUnitPositionId(shiftDTO.getUnitPositionId());
             List<ShiftActivity> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
                 Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(),shiftTemplateActivity.getStartTime());
@@ -178,8 +178,8 @@ public class ShiftTemplateService extends MongoBaseService {
                 ShiftActivity shiftActivity = new ShiftActivity(shiftTemplateActivity.getActivityName(),startDate,endDate,shiftTemplateActivity.getActivityId());
                 shiftActivities.add(shiftActivity);
             });
-            shiftDTO1.setActivities(shiftActivities);
-            ShiftDTO newShiftDTO = shiftService.createShift(unitId, shiftDTO1, "Organization",false).getShifts().get(0);
+            newShiftDTO.setActivities(shiftActivities);
+            newShiftDTO = shiftService.createShift(unitId, newShiftDTO, "Organization",false).getShifts().get(0);
             shifts.add(newShiftDTO);
         });
         return new ShiftWithViolatedInfoDTO(shifts,new ViolatedRulesDTO());
