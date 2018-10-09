@@ -1178,13 +1178,6 @@ public class UnitPositionService {
         unitPositionDetails.setCountryId(countryId);
         convertUnitPositionObject(unitPosition, unitPositionDetails);
         unitPositionDetails.setCountryId(countryId);
-        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(),
-                unitPositionDetails.getEmploymentType().getId());
-        if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
-            unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
-            unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-
-        }
         unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
         return unitPositionDetails;
 
