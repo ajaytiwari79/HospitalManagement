@@ -505,10 +505,12 @@ public class ShiftService extends MongoBaseService {
 
         // Validating Shift to eligibility
 
-        List<Activity> allActivities = activityRepository.findAllActivitiesByIds(allActivitiesIds);
+        //List<Activity> allActivities = activityRepository.findAllActivitiesByIds(allActivitiesIds);
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(allActivitiesIds));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
-        Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = allActivities.stream().collect(Collectors.toMap(Activity::getId, v -> v.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
-        shiftValidatorService.eligibleToEdit(staffAdditionalInfoDTO.getRoles(), activityPerPhaseMap,shiftActivityIdsDTO);
+        Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v -> v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
+        //Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = activities.stream().collect(Collectors.toMap(k->k.getActivity(), v -> v..getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
+        shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(),staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap,shiftActivityIdsDTO);
 
 
         // End Here
@@ -526,7 +528,9 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
         }
-        Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivities().get(0).getActivityId());
+        BigInteger activityId=shift.getActivities().get(0).getActivityId();
+        Activity activityOld = activities.stream().filter(k->k.getActivity().getId().equals(activityId)).findFirst().get().getActivity();
+        //Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivities().get(0).getActivityId());
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
         //copy old state of activity object
         Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
@@ -538,7 +542,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
             List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
-            List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);

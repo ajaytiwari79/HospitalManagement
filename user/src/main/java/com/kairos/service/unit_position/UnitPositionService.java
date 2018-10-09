@@ -782,7 +782,6 @@ public class UnitPositionService {
         if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
             unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
             unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-
         }
         unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
         return unitPositionDetails;

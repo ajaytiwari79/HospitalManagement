@@ -204,11 +204,28 @@ public class ShiftValidatorService {
 
     }
 
-   public void eligibleToEdit(Set<AccessGroupRole> roles, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue,ShiftActivityIdsDTO shiftActivityIdsDTO){
+   public void verifyShiftActivities(Set<AccessGroupRole> roles,Long employmentTypeId, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue, ShiftActivityIdsDTO shiftActivityIdsDTO){
+        boolean staff=roles.contains(AccessGroupRole.STAFF);
+        boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
+        ArrayList<Integer> integers=new ArrayList<>();
+        integers.contains()
         phaseTemplateValue.forEach((k,v)->{
-            if(!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),roles)){
-                exceptionService.actionNotPermittedException("you are not eligible to edit shift");
+            if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
+                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){
+                    exceptionService.actionNotPermittedException("you are not eligible to Add shift in this phase");
+                }
             }
+            if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
+                if(!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),roles)){
+                    exceptionService.actionNotPermittedException("you are not eligible to edit shift in this phase");
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
+                if((management && v.isManagementCanDelete()) || (staff && v.isStaffCanDelete())){
+                    exceptionService.actionNotPermittedException("you are not eligible to delete shift in this phase");
+                }
+            }
+
         });
    }
 
