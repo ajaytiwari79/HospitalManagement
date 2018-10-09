@@ -3,12 +3,12 @@ package com.kairos.dto.activity.activity.activity_tabs;/*
  *
  */
 
-import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PhaseSettingsActivityTab implements Serializable {
 
     private BigInteger activityId;

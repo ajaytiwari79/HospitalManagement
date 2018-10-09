@@ -174,8 +174,10 @@ public class ShiftValidatorService {
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getActivities().get(0).getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, sc -> sc.getCount()));
         Date endTimeOfInterval = DateUtils.getDateByZoneDateTime(ZonedDateTime.ofInstant(shift.getActivities().get(0).getEndDate().toInstant(), ZoneId.systemDefault()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
-        Interval interval = new Interval(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis(), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() == null ? endTimeOfInterval.getTime() : staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis());
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(), DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis())), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() != null ? DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis())) : null);
+        Interval interval = new Interval(DateUtils.getLongFromLocalDate(staffAdditionalInfoDTO.getUnitPosition().getStartDate()),
+                staffAdditionalInfoDTO.getUnitPosition().getEndDate() == null ? endTimeOfInterval.getTime() : DateUtils.getLongFromLocalDate(staffAdditionalInfoDTO.getUnitPosition().getEndDate()));
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(),
+                staffAdditionalInfoDTO.getUnitPosition().getStartDate(), staffAdditionalInfoDTO.getUnitPosition().getEndDate() != null ? staffAdditionalInfoDTO.getUnitPosition().getEndDate() : null);
         int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
         return new RuleTemplateSpecificInfo(shifts, shift, staffAdditionalInfoDTO.getTimeSlotSets(), phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, staffAdditionalInfoDTO.getDayTypes(), staffAdditionalInfoDTO.getUser(), totalTimeBank);
     }
@@ -202,7 +204,7 @@ public class ShiftValidatorService {
 
     }
 
-   public void eligibleToEdit(Set<AccessGroupRole> roles, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue){
+   public void eligibleToEdit(Set<AccessGroupRole> roles, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue,ShiftActivityIdsDTO shiftActivityIdsDTO){
         phaseTemplateValue.forEach((k,v)->{
             if(!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),roles)){
                 exceptionService.actionNotPermittedException("you are not eligible to edit shift");

@@ -37,6 +37,18 @@ public class Employment extends UserBaseEntity {
     @Convert(LocalDateConverter.class)
     private LocalDate mainEmploymentEndDate;
     private boolean mainEmployment;
+    private Long accessGroupIdOnEmploymentEnd;
+    @Relationship(type = HAS_REASON_CODE)
+    private ReasonCode reasonCode;
+
+    public Employment(){}
+
+    public Employment(String name, Staff staff) {
+        this.name = name;
+        this.staff = staff;
+    }
+
+
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
     }
@@ -45,7 +57,6 @@ public class Employment extends UserBaseEntity {
         this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
     }
 
-    private Long accessGroupIdOnEmploymentEnd;
     public ReasonCode getReasonCode() {
         return reasonCode;
     }
@@ -53,9 +64,6 @@ public class Employment extends UserBaseEntity {
     public void setReasonCode(ReasonCode reasonCode) {
         this.reasonCode = reasonCode;
     }
-
-    @Relationship(type = HAS_REASON_CODE)
-    private ReasonCode reasonCode;
 
     public Long getStartDateMillis() {
         return startDateMillis;
@@ -74,8 +82,6 @@ public class Employment extends UserBaseEntity {
     }
 
     private EmploymentStatus employmentStatus = EmploymentStatus.PENDING;
-
-    public Employment(){}
 
     public String getName() {
         return name;
@@ -107,11 +113,6 @@ public class Employment extends UserBaseEntity {
 
     public EmploymentStatus getEmploymentStatus() {
         return employmentStatus;
-    }
-
-    public Employment(String name, Staff staff) {
-        this.name = name;
-        this.staff = staff;
     }
 
     public LocalDate getMainEmploymentStartDate() {

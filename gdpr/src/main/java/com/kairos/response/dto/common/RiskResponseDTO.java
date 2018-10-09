@@ -1,6 +1,8 @@
 package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
 
 import javax.validation.constraints.NotBlank;
@@ -9,6 +11,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskResponseDTO {
 
     private BigInteger id;
@@ -23,11 +26,16 @@ public class RiskResponseDTO {
     private int daysToReminderBefore;
     @NotNull(message = "Risk Level can't be empty")
     private RiskSeverity riskLevel;
+    private Staff riskOwner;
 
 
     public BigInteger getId() { return id; }
 
     public void setId(BigInteger id) { this.id = id; }
+
+    public Staff getRiskOwner() { return riskOwner; }
+
+    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
 
     public String getName() { return name; }
 

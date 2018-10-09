@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.questionnaire_template;
 
 
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,7 +24,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
     private BigInteger assetSubType;
     private Long countryId;
     private boolean defaultAssetTemplate;
-
+    private QuestionnaireTemplateStatus templateStatus;
     private List<BigInteger> sections=new ArrayList<>();
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
@@ -32,7 +33,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
         this.description = description;
     }
 
-    public QuestionnaireTemplate(@NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description cannot be empty") String description) {
+    public QuestionnaireTemplate(@NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
         this.name = name;
         this.description = description;
     }
@@ -47,7 +48,10 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
 
     public String getName() { return name; }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) { this.name = name.trim(); }
+    public QuestionnaireTemplateStatus getTemplateStatus() { return templateStatus; }
+
+    public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
 
     public List<BigInteger> getSections() { return sections; }
 
