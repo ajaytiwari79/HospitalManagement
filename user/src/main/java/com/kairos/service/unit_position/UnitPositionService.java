@@ -703,8 +703,9 @@ public class UnitPositionService {
         result.setEditable(unitPosition.isEditable());
         result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
-        Map<String, Object> reasonCode = new HashMap();
+        Map<String, Object> reasonCode = null;
         if (Optional.ofNullable(unitPosition.getReasonCode()).isPresent()) {
+            reasonCode = new HashMap();
             reasonCode.put("name", unitPosition.getReasonCode().getName());
             reasonCode.put("id", unitPosition.getReasonCode().getId());
         }
