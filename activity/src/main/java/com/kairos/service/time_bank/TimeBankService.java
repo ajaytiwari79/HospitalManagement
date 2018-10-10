@@ -157,8 +157,9 @@ public class TimeBankService extends MongoBaseService {
     }
 
     private List<DailyTimeBankEntry> renewDailyTimeBanks(List<StaffAdditionalInfoDTO> unitPositionWithCtaDetailsDTOS, List<Shift> shifts) {
-        DateTime startDate=new DateTime(shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get());
-        DateTime endDate=new DateTime(shifts.stream().map(shift -> shift.getStartDate()).max(Date::compareTo).get());
+        shifts.sort((s1,s2)->s1.getStartDate().compareTo(s2.getStartDate()));
+        DateTime startDate=new DateTime(shifts.get(0).getStartDate());
+        DateTime endDate=new DateTime(shifts.get(shifts.size()-1).getEndDate());
         List<Long> unitPositionIds=unitPositionWithCtaDetailsDTOS.stream().map(unitPositionWithCtaDetailsDTO->unitPositionWithCtaDetailsDTO.getId()).collect(Collectors.toList());
         timeBankRepository.deleteDailyTimeBankByIds(unitPositionIds, startDate.toDate(), endDate.toDate());
         List<ShiftWithActivityDTO> shiftsList = shiftMongoRepository.findAllShiftsBetweenDurationByUEPS(unitPositionIds, startDate.toDate(), startDate.plusDays(1).toDate());
