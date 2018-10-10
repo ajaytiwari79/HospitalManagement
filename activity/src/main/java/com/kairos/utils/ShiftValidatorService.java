@@ -211,17 +211,17 @@ public class ShiftValidatorService {
         phaseTemplateValue.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
                 if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){
-                    exceptionService.actionNotPermittedException("you are not eligible to Add shift in this phase");
+                    exceptionService.actionNotPermittedException("error.shift.not.authorised.phase");
                 }
             }
             if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
                 if(!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),roles)){
-                    exceptionService.actionNotPermittedException("you are not eligible to edit shift in this phase");
+                    exceptionService.actionNotPermittedException("error.shift.not.editable.phase");
                 }
             }
             if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
                 if((management && v.isManagementCanDelete()) || (staff && v.isStaffCanDelete())){
-                    exceptionService.actionNotPermittedException("you are not eligible to delete shift in this phase");
+                    exceptionService.actionNotPermittedException("error.shift.not.deletable.phase");
                 }
             }
 

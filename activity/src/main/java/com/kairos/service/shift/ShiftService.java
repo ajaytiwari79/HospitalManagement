@@ -513,6 +513,8 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(),staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap,shiftActivityIdsDTO);
 
 
+
+
         // End Here
 
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());

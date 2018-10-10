@@ -154,11 +154,7 @@ public class OrganizationActivityService extends MongoBaseService {
                         activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
                 for (int j = 0; j < activityShiftStatusSettings.size(); j++) {
                     List<Long> accessGroupIds=new ArrayList<>(activityShiftStatusSettings.get(j).getAccessGroupIds());
-                     for(int k=0;k<accessGroupIds.size();k++){
-                        if(accessGroupIdsMap.get(accessGroupIds.get(k))!=null){
-                            agIds.add(accessGroupIdsMap.get(accessGroupIds.get(k)));
-                        }
-                    }
+                    accessGroupIds.forEach(a->{if(accessGroupIdsMap.get(a)!=null){agIds.add(accessGroupIdsMap.get(a));}});
                     activityShiftStatusSettings.add(new ActivityShiftStatusSettings(activityShiftStatusSettings.get(j).getShiftStatus(),agIds));
                 }
                 phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
