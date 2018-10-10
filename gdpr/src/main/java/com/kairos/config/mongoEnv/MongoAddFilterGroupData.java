@@ -5,6 +5,7 @@ import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
 import com.kairos.persistence.repository.filter.FilterMongoRepository;
+import com.kairos.service.S3BucketService;
 import com.kairos.service.common.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +39,13 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
     @Inject
     private FilterMongoRepository filterMongoRepository;
 
+    @Inject
+    private S3BucketService  s3BucketService;
+
     @Override
     public void run(String... args) {
 
+        s3BucketService.getListOfBuckets();
         LOGGER.info("creating filter group data");
 
         Query clauseQuery = new Query(Criteria.where(COUNTRY_ID).is(4L).and("accessModule.active").is(true).and("accessModule.moduleId").is(CLAUSE_MODULE_ID));
