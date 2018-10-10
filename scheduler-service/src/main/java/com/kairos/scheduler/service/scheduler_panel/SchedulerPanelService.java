@@ -178,10 +178,13 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
+            panel.setOneTimeTrigger(false);
+            panel.setOneTimeTriggerDate(null);
 
         }
         else {
             panel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
+            panel.setOneTimeTrigger(true);
         }
 
         save(panel);
