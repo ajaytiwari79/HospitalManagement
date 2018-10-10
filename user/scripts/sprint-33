@@ -1,2 +1,2 @@
 //To update filter Group with new filter
-MATCH (fg:FilterGroup) Set fg.filterTypes=["EMPLOYMENT_TYPE","GENDER","STAFF_STATUS","ENGINEER_TYPE","EXPERTISE","UNITPOSITION"]  RETURN fg
+MATCH (fg:FilterGroup) Set fg.filterTypes=["EMPLOYMENT_TYPE","GENDER","STAFF_STATUS","ENGINEER_TYPE","EXPERTISE","UNIT_POSITION"]  RETURN fg

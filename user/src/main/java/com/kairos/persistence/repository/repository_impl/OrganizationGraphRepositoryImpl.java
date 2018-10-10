@@ -48,7 +48,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return matchQueryForStaff;
     }
 
-    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters, Boolean fetchStaffHavingUnitPosition) {
+    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             matchRelationshipQueryForStaff += " MATCH (unitPos)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
@@ -118,8 +118,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
-        boolean isStaffHavingUnitPositionRequired=Optional.ofNullable(filters.get(FilterType.UNITPOSITION)).isPresent();
-        if (isStaffHavingUnitPositionRequired) {
+        if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent()) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos";
         } else {
@@ -128,7 +127,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos ";
         }
 
-        query += getMatchQueryForRelationshipOfStaffByFilters(filters, isStaffHavingUnitPositionRequired);
+        query += getMatchQueryForRelationshipOfStaffByFilters(filters);
 
         query += " Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) WITH engineerType, staff, user, contactAddress,expertiseList,employmentList";
 
