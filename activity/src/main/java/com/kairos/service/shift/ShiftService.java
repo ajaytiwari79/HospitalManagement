@@ -1127,14 +1127,14 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftWithViolatedInfoDTO updateShift(Long unitId, ShiftDTO shiftDTO,
-             String type) {
+             String type,boolean validated) {
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.getDate(), true);
         if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
         shiftStateMongoRepository.deleteShiftStateByShiftId(shiftDTO.getShiftId());
-        if(shiftDTO.getShiftId()==null){
+        if(shiftDTO.getShiftId()==null && !validated){
             shiftDTO.setShiftId(shiftDTO.getId());
         }
         shiftDTO.setId(null);
