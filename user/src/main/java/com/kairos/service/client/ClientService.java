@@ -2,7 +2,6 @@ package com.kairos.service.client;
 
 import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.dto.activity.task.EscalateTaskWrapper;
 import com.kairos.dto.activity.task.EscalatedTasksWrapper;
 import com.kairos.dto.user.client.ClientExceptionDTO;
