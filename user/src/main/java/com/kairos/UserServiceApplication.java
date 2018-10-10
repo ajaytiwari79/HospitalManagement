@@ -43,13 +43,10 @@ import static java.time.format.DateTimeFormatter.ofPattern;
  */
 @SpringBootApplication
 @EnableEurekaClient
-@EnableTransactionManagement(proxyTargetClass=true)
 @EnableResourceServer
-//@EntityScan({"com.kairos.persistence.model"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
-//@EnableNeo4jRepositories(repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
-
+@EnableTransactionManagement(proxyTargetClass=true)
 @EnableCircuitBreaker
 @EnableKafka
 public class UserServiceApplication implements WebMvcConfigurer {
