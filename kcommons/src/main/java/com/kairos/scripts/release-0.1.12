@@ -2,4 +2,4 @@
 db.getCollection('questionnaire_template').updateMany({'deleted':false,'defaultAssetTemplate':{ $exists: false}},{$set:{"defaultAssetTemplate":false}})
 //set systemUser property
 match(user:User) where user.userName<>"systemuser" set user.systemUser=false;
-create(user:User{userName:"systemuser",password:"$2a$10$480/B8N6VnpNLdjPKGPw7OqCu2e85bUMBOAKxYtsbzp11kJTLMkKu",systemUser:true,email:"systemuser"})
+create(user:User{userName:"systemuser@kairos.com",password:"$2a$10$480/B8N6VnpNLdjPKGPw7OqCu2e85bUMBOAKxYtsbzp11kJTLMkKu",systemUser:true,email:"systemuser@kairos.com"})
