@@ -30,4 +30,11 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
 
     List<Phase> findByOrganizationIdAndDeletedFalse(Long unitId);
 
+    /**
+     *@since 8-10-2018
+     * @param unitId
+     * @return
+     */
+    List<PhaseDTO> findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(Long unitId);
+
 }

@@ -1193,20 +1193,11 @@ public class UnitPositionService {
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-//        unitPositionWithCtaDetailsDTO.setStaffId(unitPosition.getStaff().getId());
         unitPositionDetails.setCountryId(countryId);
         convertUnitPositionObject(unitPosition, unitPositionDetails);
-                unitPositionDetails.setCountryId(countryId);
-        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(),
-                unitPositionDetails.getEmploymentType().getId());
-        if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
-            unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
-            unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-
-        }
+        unitPositionDetails.setCountryId(countryId);
         unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
         return unitPositionDetails;
-
 
     }
 }

@@ -44,6 +44,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 
 /**
@@ -585,12 +586,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
 
-    @RequestMapping(value = "/verifyUnitEmployment", method = RequestMethod.GET)
+    @RequestMapping(value = "/{staffIds}/verifyUnitEmployment/{unitPositionIds}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable List<Long> staffIds,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData( @PathVariable long unitId, @PathVariable List<Long> staffIds,
                                                                       @PathVariable List<Long> unitPositionIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds, unitPositionIds, unitId, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds, unitPositionIds, unitId, ORGANIZATION));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
+import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
@@ -13,6 +14,9 @@ import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributi
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
@@ -29,6 +33,7 @@ import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -94,16 +99,16 @@ public class TimeBankCalculationService {
 
     /**
      *
-     * @param ctaDto
+     * @param staffAdditionalInfoDTO
      * @param interval
      * @param shifts
      * @return DailyTimeBankEntry
      */
-    public DailyTimeBankEntry getTimeBankByInterval(StaffUnitPositionDetails ctaDto, Interval interval, List<ShiftWithActivityDTO> shifts) {
+    public DailyTimeBankEntry getTimeBankByInterval(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Interval interval, List<ShiftWithActivityDTO> shifts) {
         DailyTimeBankEntry dailyTimeBank = null;
         if (shifts != null && !shifts.isEmpty()) {
             //shifts = filterSubshifts(shifts);
-            dailyTimeBank = calculateDailyTimebank(interval, ctaDto, shifts);
+            dailyTimeBank = calculateDailyTimebank(interval, staffAdditionalInfoDTO, shifts);
         }
         return dailyTimeBank;
     }
@@ -185,11 +190,12 @@ public class TimeBankCalculationService {
     /**
      *
      * @param interval
-     * @param ctaDto
+     * @param staffAdditionalInfoDTO
      * @param shifts
      * @return DailyTimeBankEntry
      */
-    public DailyTimeBankEntry calculateDailyTimebank(Interval interval, StaffUnitPositionDetails ctaDto, List<ShiftWithActivityDTO> shifts) {
+    public DailyTimeBankEntry calculateDailyTimebank(Interval interval, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftWithActivityDTO> shifts) {
+        StaffUnitPositionDetails ctaDto=staffAdditionalInfoDTO.getUnitPosition();
         DailyTimeBankEntry dailyTimeBank = new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         int totalDailyTimebank = 0;
         int dailyScheduledMin = 0;
@@ -201,7 +207,7 @@ public class TimeBankCalculationService {
                 if (interval.overlaps(shiftInterval)) {
                     shiftInterval = interval.overlap(shiftInterval);
                     for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
-                        if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() != null && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
+                        if (validateCTARuleTemplateDTO(ruleTemplate,staffAdditionalInfoDTO.getUserAccessRoleDTO(),ctaDto.getEmploymentType(),shift.getPhaseId())&&ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
                             int ctaTimeBankMin = 0;
                             boolean activityValid = ruleTemplate.getActivityIds().contains(shiftActivity.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
                             if (activityValid) {
@@ -259,6 +265,25 @@ public class TimeBankCalculationService {
         return dailyTimeBank;
     }
 
+    /**
+     *Called by @link {calculateDailyTimebank}
+     * @param ruleTemplate
+     * @param userAccessRoleDTO
+     * @param employmentType
+     * @param shiftPhaseId
+     * @return
+     * @author mohit
+     * @date 6-10-2018
+     */
+    public boolean validateCTARuleTemplateDTO(CTARuleTemplateDTO ruleTemplate, UserAccessRoleDTO userAccessRoleDTO, EmploymentType employmentType, BigInteger shiftPhaseId)
+    {
+        if      (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null) return false;
+        //else if (!ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) return false;
+        else if (CollectionUtils.isNotEmpty(ruleTemplate.getEmploymentTypes()) && !ruleTemplate.getEmploymentTypes().contains(employmentType.getId())) return false;
+        else if (CollectionUtils.isNotEmpty(ruleTemplate.getPhaseInfo()) && !(ruleTemplate.getPhaseInfo().stream().filter(p->p.getPhaseId().equals(shiftPhaseId)).findFirst().isPresent())) return false;
+        else if (CollectionUtils.isNotEmpty(ruleTemplate.getCalculateValueIfPlanned()) &&!((ruleTemplate.getCalculateValueIfPlanned().stream().filter(cvpf-> (cvpf.equals(CalculateValueIfPlanned.STAFF) && userAccessRoleDTO.getStaff()) || (cvpf.equals(CalculateValueIfPlanned.MANAGER) && userAccessRoleDTO.getManagement())).findFirst().isPresent()))) return false;
+       return true;
+    }
     /**
      *
      * @param interval

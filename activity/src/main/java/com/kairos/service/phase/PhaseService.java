@@ -57,7 +57,7 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
             Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime(),phaseDTO.getGracePeriodByStaff(),phaseDTO.getGracePeriodByManagement(),phaseDTO.getUntilNextDay(),phaseDTO.getRealtimeDuration());
 
             phases.add(phase);
         }
@@ -358,4 +358,13 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
+    /**
+     * @author mohit
+     * @date 8-10-2018
+     * @param unitId
+     * @return
+     */
+    public List<PhaseDTO> getDefaultPhasesByUnit(Long unitId) {
+        return phaseMongoRepository.findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(unitId);
+    }
 }

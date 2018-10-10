@@ -490,7 +490,7 @@ public class PlanningPeriodService extends MongoBaseService {
         periodPhaseFlippingDate.setFlippingTime(DateUtils.getCurrentLocalTime());
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         save(planningPeriod);
-        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
+        //      schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -548,7 +548,8 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
         restoreShifts(shiftStates);
-        List<Shift> shifts=shiftMongoRepository.findShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
+        List<Shift> shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(),unitId);
+        //List<Shift> shifts=shiftMongoRepository.findShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         shiftService.deleteAllShift(shifts, unitId);
         //shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;

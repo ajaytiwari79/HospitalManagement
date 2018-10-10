@@ -588,11 +588,11 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shifts).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.ids");
         }
-        List<Long> staffids=shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
-        List<Long> unitPositionids=shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
+        List<Long> staffIds=shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
+        List<Long> unitPositionIds=shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
 //        List<BigInteger> activityIds=shifts.stream().map(shift-> shift.getActivities().get(0).getActivityId()).collect(Collectors.toList());
 //        List<ActivityWrapper> activityWrappers = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/verifyUnitEmployment",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){},staffids,unitPositionids);
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/{staffIds}/verifyUnitEmployment/{unitPositionIds}",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){},staffIds,unitPositionIds);
         timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
         //        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
 //        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
