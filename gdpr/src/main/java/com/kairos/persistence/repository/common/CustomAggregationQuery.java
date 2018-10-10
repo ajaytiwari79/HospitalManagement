@@ -54,7 +54,6 @@ public class CustomAggregationQuery {
     }
 
 
-
     public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
                 "'_id':'$_id','sections':{'$push':{ '$cond': [ { '$eq': [ '$sections.deleted',false ] }, '$sections', {} ] }}," +
@@ -148,7 +147,9 @@ public class CustomAggregationQuery {
                 "       'organizationSubTypes':1," +
                 "       'organizationTypes':1," +
                 "       'organizationServices':1," +
-                "       'organizationSubServices':1" +
+                "       'organizationSubServices':1," +
+                "'suggestedDate':1," +
+                "'suggestedDataStatus':1" +
 
                 "            }}";
     }
@@ -226,8 +227,6 @@ public class CustomAggregationQuery {
     public static String metaDataReplaceRoot() {
         return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
     }
-
-
 
 
 }

@@ -1,13 +1,12 @@
-package com.kairos.config.mongoEnv;
+package com.kairos.config.env;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 
-
 @Configuration
-@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+@PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 public class EnvConfig {
 
 
@@ -27,7 +26,8 @@ public class EnvConfig {
     private String mongoUserName;
 
     @Value("${spring.data.mongodb.password}")
-    private  String mongoPassword;
+    private String mongoPassword;
+
 
     public String getDataBaseName() {
         return dataBaseName;
@@ -65,8 +65,6 @@ public class EnvConfig {
         return mongoUserName;
     }
 
-
-
     public void setMongoUserName(String mongoUserName) {
         this.mongoUserName = mongoUserName;
     }
@@ -75,8 +73,10 @@ public class EnvConfig {
         return mongoPassword;
     }
 
-
     public void setMongoPassword(String mongoPassword) {
         this.mongoPassword = mongoPassword;
     }
+
+
+
 }
