@@ -125,6 +125,8 @@ public class StaffingLevelService extends MongoBaseService {
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
     @Inject
     private StaffingLevelTemplateService staffingLevelTemplateService;
+    @Inject
+    private StaffingLevelActivityRankService staffingLevelActivityRankService;
 
 
     /**
@@ -156,6 +158,7 @@ public class StaffingLevelService extends MongoBaseService {
 
         }
         this.save(staffingLevel);
+        staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()),staffingLevel.getId(),staffingLevel.getStaffingLevelSetting().getActivitiesRank());
         BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO, new String[]{"presenceStaffingLevelInterval", "absenceStaffingLevelInterval"});
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
