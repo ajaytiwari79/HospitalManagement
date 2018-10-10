@@ -42,7 +42,7 @@ public class RestClientForSchedulerMessages {
     private TokenAuthService tokenAuthService;
 
     public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit, id);
+        final String baseUrl = getBaseUrl(isUnit, id)+getURI(t,uri,queryParams,pathParams);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
@@ -52,7 +52,7 @@ public class RestClientForSchedulerMessages {
             HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplateWithoutAuth.exchange(
-                            baseUrl  + getURI(t,uri,queryParams,pathParams),
+                            baseUrl,
                             getHttpMethod(integrationOperation),
                             httpEntity, typeReference);
             if(restExchange.getStatusCode().value()==401) {
@@ -61,7 +61,7 @@ public class RestClientForSchedulerMessages {
                 headers.add("Authorization", "bearer " + tokenAuthService.getNewAuthToken());
                 httpEntity = new HttpEntity<T>(t, headers);
                 restExchange = restTemplateWithoutAuth.exchange(
-                        baseUrl  + getURI(t,uri,queryParams,pathParams),
+                        baseUrl,
                         getHttpMethod(integrationOperation),
                         httpEntity, typeReference);
 
