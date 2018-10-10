@@ -643,7 +643,9 @@ public class UnitPositionService {
                         positionLine.setWorkingTimeAgreement(wta);
                     }
                 });
-
+                if (u.getEndDate() != null) {
+                    u.setEndDate(positionLine.getEndDate());
+                }
             });
         });
 
