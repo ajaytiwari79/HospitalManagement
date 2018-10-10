@@ -1,6 +1,7 @@
 package com.kairos.utils.service_util;
 
 import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
@@ -10,10 +11,9 @@ import org.springframework.beans.BeanUtils;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class StaffingLevelUtil {
 
@@ -98,20 +98,17 @@ public class StaffingLevelUtil {
 
     }
 
-    public static PresenceStaffingLevelDto sortValues(PresenceStaffingLevelDto presenceStaffingLevelDto) {
+    public static void sortStaffingLevelActivities(PresenceStaffingLevelDto presenceStaffingLevelDto, Map<BigInteger,Integer> activitiesRankMap) {
 
-
-        for(StaffingLevel staffingLevel : staffingLevels) {
-            AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(),staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(),staffingLevel.getWeekCount());
-            absenceStaffingLevelDto.setMinNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMinNoOfStaff());
-            absenceStaffingLevelDto.setMaxNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());
-            absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
-            absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
-            absenceStaffingLevelDtos.add(absenceStaffingLevelDto);
+        for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO:presenceStaffingLevelDto.getPresenceStaffingLevelInterval()){
+            Map<BigInteger,StaffingLevelActivity> staffingLevelActivityMap=staffingLevelTimeSlotDTO.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId,Function.identity()));
+            StaffingLevelActivity staffingLevelActivities[]=new StaffingLevelActivity[staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()];
+            activitiesRankMap.forEach((activityId,rank)->{
+                staffingLevelActivities[rank]=staffingLevelActivityMap.get(activityId);
+            });
+            staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
 
         }
-
-        return absenceStaffingLevelDtos;
 
     }
 }
