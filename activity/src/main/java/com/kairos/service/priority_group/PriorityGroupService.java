@@ -246,10 +246,5 @@ public class PriorityGroupService extends MongoBaseService {
         return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
 
     }
-
-    public void getException() {
-        exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
-    }
 }
 

@@ -2171,9 +2171,4 @@ public class StaffService {
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }
-
-    public void getException() {
-        exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
-    }
 }

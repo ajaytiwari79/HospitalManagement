@@ -121,13 +121,5 @@ public class PriorityGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-    @GetMapping(value = "/exception")
-    @ApiOperation("get staff details  by ids")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getException() {
-        priorityGroupService.getException();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
-
 
 }

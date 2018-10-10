@@ -683,13 +683,5 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffDetailByIds(@PathVariable Long unitId,@RequestBody Set<Long> staffIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffDetailByIds(unitId,staffIds));
     }
-    @GetMapping(value = "/exception")
-    @ApiOperation("get staff details  by ids")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getException() {
-        staffService.getException();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
-
 
 }
