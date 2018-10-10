@@ -186,11 +186,14 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
         save(ruleTemplateCategoryObj);
+        RuleTemplateAndCategoryResponseDTO ruleTemplateAndCategoryResponseDTO;
         if (ruleTemplateCategoryObj.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.WTA)) {
-            return updateWTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
+            ruleTemplateAndCategoryResponseDTO =  updateWTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
         } else {
-            return updateCTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
+            ruleTemplateAndCategoryResponseDTO =  updateCTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
         }
+        ruleTemplateAndCategoryResponseDTO.setCategory(null);
+        return ruleTemplateAndCategoryResponseDTO;
     }
 
     private RuleTemplateAndCategoryResponseDTO updateWTADefaultCategory(Long countryId, RuleTemplateCategory ruleTemplateCategoryObj, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {

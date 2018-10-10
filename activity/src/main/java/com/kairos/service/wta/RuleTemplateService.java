@@ -7,6 +7,7 @@ import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTa
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.activity.wta.templates.WTAForCareDaysDTO;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.WTATemplateType;
@@ -233,6 +234,8 @@ public class RuleTemplateService extends MongoBaseService {
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
+        WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");
+        wtaBaseRuleTemplates1.add(careDays);
         save(wtaBaseRuleTemplates1);
 
 
