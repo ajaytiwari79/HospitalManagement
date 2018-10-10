@@ -132,7 +132,7 @@ public class PhaseTemplateValue implements Serializable {
     }
 
     public List<ActivityShiftStatusSettings> getActivityShiftStatusSettings() {
-        return activityShiftStatusSettings;
+        return Optional.ofNullable(activityShiftStatusSettings).orElse(new ArrayList<>());
     }
 
     public void setActivityShiftStatusSettings(List<ActivityShiftStatusSettings> activityShiftStatusSettings) {
