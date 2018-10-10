@@ -771,9 +771,15 @@ public class UnitPositionService {
     }
 
 
-    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionId, Organization organization, Long countryId) {
-        List<StaffUnitPositionDetails> unitPosition = unitPositionGraphRepository.getUnitPositionsByIds(unitPositionId);
-        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetailsList=ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition,StaffUnitPositionDetails.class);
+    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionIds, Organization organization, Long countryId) {
+        List<UnitPositionQueryResult> unitPositions = unitPositionGraphRepository.getUnitPositionByIds(unitPositionIds);
+        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetailsList=new ArrayList<>();
+        unitPositions.forEach(unitPosition->{
+            com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail=new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            convertUnitPositionObject(unitPosition,unitPositionDetail);
+            unitPositionDetail.setStaffId(unitPosition.getStaffId());
+            unitPositionDetailsList.add(unitPositionDetail);
+        });
         unitPositionDetailsList.forEach(unitPositionDetails -> {
             unitPositionDetails.setCountryId(countryId);
             unitPositionDetails.setUnitTimeZone(organization.getTimeZone());

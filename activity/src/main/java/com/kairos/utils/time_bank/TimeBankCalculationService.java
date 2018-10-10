@@ -106,7 +106,7 @@ public class TimeBankCalculationService {
      */
     public DailyTimeBankEntry getTimeBankByInterval(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Interval interval, List<ShiftWithActivityDTO> shifts) {
         DailyTimeBankEntry dailyTimeBank = null;
-        if (shifts != null && !shifts.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(shifts)) {
             //shifts = filterSubshifts(shifts);
             dailyTimeBank = calculateDailyTimebank(interval, staffAdditionalInfoDTO, shifts);
         }
@@ -206,47 +206,47 @@ public class TimeBankCalculationService {
                 Interval shiftInterval = new Interval(shiftActivity.getStartDate().getTime(),shiftActivity.getEndDate().getTime());
                 if (interval.overlaps(shiftInterval)) {
                     shiftInterval = interval.overlap(shiftInterval);
-                    for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
-                        if (validateCTARuleTemplateDTO(ruleTemplate,staffAdditionalInfoDTO.getUserAccessRoleDTO(),ctaDto.getEmploymentType(),shift.getPhaseId())&&ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
-                            int ctaTimeBankMin = 0;
-                            boolean activityValid = ruleTemplate.getActivityIds().contains(shiftActivity.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
-                            if (activityValid) {
-                                java.time.LocalDate shiftDate = ZonedDateTime.ofInstant(shiftInterval.getStart().toDate().toInstant(), ZoneId.systemDefault()).toLocalDate();
-                                boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId()));
-                                if (ruleTemplateValid) {
-                                    if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
-                                        dailyScheduledMin += shiftActivity.getScheduledMinutes();
-                                        totalDailyTimebank += dailyScheduledMin;
-                                    }
-                                    else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-                                        for (CompensationTableInterval ctaInterval : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
-                                            Interval intervalOfCTA = getCTAInterval(ctaInterval, interval.getStart());
-                                            if (intervalOfCTA.overlaps(shiftInterval)) {
-                                                int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
-                                                if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
-                                                    ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
-                                                    totalDailyTimebank += ctaTimeBankMin;
-                                                    break;
-                                                } else if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
-                                                    ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
-                                                    totalDailyTimebank += ctaTimeBankMin;
-                                                    break;
-                                                }
+                    if(ctaDto.getCtaRuleTemplates().size()>0) {
+                        for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
+                            if (validateCTARuleTemplateDTO(ruleTemplate, staffAdditionalInfoDTO.getUserAccessRoleDTO(), ctaDto.getEmploymentType(), shift.getPhaseId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
+                                int ctaTimeBankMin = 0;
+                                boolean activityValid = ruleTemplate.getActivityIds().contains(shiftActivity.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
+                                if (activityValid) {
+                                    java.time.LocalDate shiftDate = ZonedDateTime.ofInstant(shiftInterval.getStart().toDate().toInstant(), ZoneId.systemDefault()).toLocalDate();
+                                    boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId()));
+                                    if (ruleTemplateValid) {
+                                        if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
+                                            dailyScheduledMin += shiftActivity.getScheduledMinutes();
+                                            totalDailyTimebank += dailyScheduledMin;
+                                        } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
+                                            for (CompensationTableInterval ctaInterval : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
+                                                Interval intervalOfCTA = getCTAInterval(ctaInterval, interval.getStart());
+                                                if (intervalOfCTA.overlaps(shiftInterval)) {
+                                                    int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
+                                                    if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
+                                                        ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
+                                                        totalDailyTimebank += ctaTimeBankMin;
+                                                        break;
+                                                    } else if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
+                                                        ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
+                                                        totalDailyTimebank += ctaTimeBankMin;
+                                                        break;
+                                                    }
 
+                                                }
+                                            }
+                                        } else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
+                                            if (ruleTemplate.getStaffFunctions().contains(ctaDto.getFunctionId())) {
+                                                float value = ctaDto.getHourlyCost() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / ctaDto.getHourlyCost() * 60 : 0;
+                                                ctaTimeBankMin += value;
+                                                totalDailyTimebank += ctaTimeBankMin;
                                             }
                                         }
                                     }
-                                    else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
-                                        if(ruleTemplate.getStaffFunctions().contains(ctaDto.getFunctionId())){
-                                            float value=ctaDto.getHourlyCost()>0?(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount())/ctaDto.getHourlyCost()*60:0;
-                                            ctaTimeBankMin += value;
-                                            totalDailyTimebank += ctaTimeBankMin;
-                                        }
-                                    }
                                 }
-                            }
-                            if (!ruleTemplate.isCalculateScheduledHours()) {
-                                ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.containsKey(ruleTemplate.getId()) ? ctaTimeBankMinMap.get(ruleTemplate.getId()) + ctaTimeBankMin : ctaTimeBankMin);
+                                if (!ruleTemplate.isCalculateScheduledHours()) {
+                                    ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.containsKey(ruleTemplate.getId()) ? ctaTimeBankMinMap.get(ruleTemplate.getId()) + ctaTimeBankMin : ctaTimeBankMin);
+                                }
                             }
                         }
                     }

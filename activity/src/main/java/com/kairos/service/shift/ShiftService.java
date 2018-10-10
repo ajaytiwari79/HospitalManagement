@@ -5,6 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
@@ -595,18 +596,24 @@ public class ShiftService extends MongoBaseService {
 //        List<ActivityWrapper> activityWrappers = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         TimeBankStaffAndUnitPositionDTO timeBankStaffAndUnitPositionDTO=new TimeBankStaffAndUnitPositionDTO(staffIds,unitPositionIds);
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(timeBankStaffAndUnitPositionDTO,unitId,true,IntegrationOperation.CREATE,"/staff/verifyUnitEmployments/",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){});
-        timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
+
         //        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
 //        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
 //        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
 //        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-//        List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
-       // Date startDate=shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get();
-       // Date endDate=shifts.stream().map(shift -> shift.getEndDate()).max(Date::compareTo).get();
-       // List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
-     //   Map<Long,List<CTAResponseDTO>> unitPositionAndCTAResponseMap=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
-
-
+        //List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
+        Date startDate=shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get();
+        Date endDate=shifts.stream().map(shift -> shift.getEndDate()).max(Date::compareTo).get();
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
+        Map<Long,List<CTAResponseDTO>> unitPositionAndCTAResponseMap=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
+        staffAdditionalInfoDTOS.stream().forEach(staffAdditionalInfoDTO -> {
+            if(unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getUnitPosition().getId())!=null){
+                List<CTAResponseDTO> ctaResponseDTOSList=unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getUnitPosition().getId());
+                List<CTARuleTemplateDTO> ctaRuleTemplateDTOS=ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+                staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaRuleTemplateDTOS);
+            }
+        });
+        timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
     }
 
 
