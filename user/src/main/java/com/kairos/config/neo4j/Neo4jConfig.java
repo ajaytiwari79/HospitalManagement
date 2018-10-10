@@ -51,7 +51,7 @@ public class Neo4jConfig implements EnvironmentAware {
         org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration.Builder()
                 .connectionPoolSize(Integer.parseInt(this.environment.getProperty(CONNECTION_POOL_SIZE)))
                 .uri(this.environment.getProperty(NEO4J_URI))
-                .credentials(this.environment.getProperty(NEO4J_USER_NAME), this.environment.getProperty(NEO4J_PASSWORD))
+               .credentials(this.environment.getProperty(NEO4J_USER_NAME), this.environment.getProperty(NEO4J_PASSWORD))
                 .verifyConnection(true)
                 .build();
 
