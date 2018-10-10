@@ -104,10 +104,8 @@ public class SchedulerPanelService extends MongoBaseService {
                 //    IntegrationSettings integrationSettings = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
                 if(integrationConfigurationOpt.isPresent()) {
                     exceptionService.dataNotFoundByIdException("message.integrationsettings.notfound",schedulerPanelDTO.getIntegrationConfigurationId());
-
                 }
                 schedulerPanel.setIntegrationConfigurationId(schedulerPanelDTO.getIntegrationConfigurationId());
-
             }
 
             //schedulerPanel.setProcessType(integrationConfiguration.getName());
@@ -138,7 +136,7 @@ public class SchedulerPanelService extends MongoBaseService {
             schedulerPanels.add(schedulerPanel);
         }
         save(schedulerPanels);
-        String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
+        String timezone = "Asia/Kolkata";//userIntegrationService.getTimeZoneOfUnit(unitId);
 
         //schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone));
         for(SchedulerPanel schedulerPanel:schedulerPanels) {

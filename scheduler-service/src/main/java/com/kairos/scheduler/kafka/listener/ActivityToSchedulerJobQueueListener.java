@@ -26,9 +26,8 @@ public class ActivityToSchedulerJobQueueListener {
     public void processMessage(String message) {
         try {
             KairosScheduleJobDTO job = objectMapper.readValue(message,KairosScheduleJobDTO.class);
-            activityToSchedulerQueueService.handleJob(job);
-
             logger.info("received content = '{}'", job.toString());
+            activityToSchedulerQueueService.handleJob(job);
             //storage.put(content);
         }
         catch(Exception e) {

@@ -5,4 +5,5 @@ import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 public interface JobQueueHandler {
 
      void handleJob(KairosScheduleJobDTO job);
+
 }

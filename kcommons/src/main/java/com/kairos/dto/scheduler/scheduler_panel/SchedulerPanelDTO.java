@@ -1,5 +1,6 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
@@ -35,6 +36,7 @@ public class SchedulerPanelDTO {
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
+    private List<ActivityReminderSettings> reminderSettings;
 
 
     public SchedulerPanelDTO() {
@@ -279,5 +281,13 @@ public class SchedulerPanelDTO {
 
     public void setSelectedHours(List<String> selectedHours) {
         this.selectedHours = selectedHours;
+    }
+
+    public List<ActivityReminderSettings> getReminderSettings() {
+        return reminderSettings;
+    }
+
+    public void setReminderSettings(List<ActivityReminderSettings> reminderSettings) {
+        this.reminderSettings = reminderSettings;
     }
 }

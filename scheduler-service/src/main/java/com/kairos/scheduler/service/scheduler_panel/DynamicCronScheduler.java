@@ -1,7 +1,9 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -20,6 +22,7 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
@@ -172,6 +175,15 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 }
                 else if(activitySubTypes.contains(jobToExecute.getJobSubType())) {
                     kafkaProducer.pushToActivityQueue(jobToExecute);
+                }
+                if (jobToExecute.getJobSubType().equals(JobSubType.SHIFT_REMINDER)){
+                    // register the next JOB
+                    LocalDateTime executionDateTime=schedulerPanel.getOneTimeTriggerDate();
+                    for (ActivityReminderSettings reminderSettings:schedulerPanel.getReminderSettings()) {
+                        if (reminderSettings.isRepeatAllowed()){
+
+                        }
+                    }
                 }
             }
         };

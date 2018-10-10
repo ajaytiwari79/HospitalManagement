@@ -1,5 +1,6 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel;
 
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
@@ -45,6 +46,7 @@ public class SchedulerPanel extends MongoBaseEntity {
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
+    private List<ActivityReminderSettings> reminderSettings;
 
 
 
@@ -239,5 +241,13 @@ public class SchedulerPanel extends MongoBaseEntity {
 
     public void setRunOnce(LocalTime runOnce) {
         this.runOnce = runOnce;
+    }
+
+    public List<ActivityReminderSettings> getReminderSettings() {
+        return reminderSettings;
+    }
+
+    public void setReminderSettings(List<ActivityReminderSettings> reminderSettings) {
+        this.reminderSettings = reminderSettings;
     }
 }
