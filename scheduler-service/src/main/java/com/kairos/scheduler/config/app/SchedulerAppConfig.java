@@ -36,7 +36,7 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "com.kairos.scheduler")
+@ComponentScan(basePackages = "com.kairos")
 @EnableAsync
 @EnableScheduling
 @SpringBootApplication

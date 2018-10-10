@@ -79,11 +79,11 @@ public class SchedulerPanelController {
     public ResponseEntity<Map<String, Object>> getAllJobDetails(@PathVariable Long unitId,@RequestParam("offset") int offset) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getAllJobDetailsByUnitId(unitId,offset));
     }
-    @GetMapping("/authToken")
+    /*@GetMapping("/authToken")
     @ApiOperation("Get job details ")
     public ResponseEntity<Map<String, Object>> getAuthToken() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getAuthToken());
-    }
+    }*/
     @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {

@@ -247,5 +247,9 @@ public class PriorityGroupService extends MongoBaseService {
 
     }
 
+    public void getException() {
+        exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+
+    }
 }
 

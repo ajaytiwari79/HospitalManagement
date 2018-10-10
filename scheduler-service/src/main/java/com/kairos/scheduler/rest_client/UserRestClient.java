@@ -1,18 +1,15 @@
 package com.kairos.scheduler.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.service.exception.TokenAuthService;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.scheduler.config.EnvConfig;
-import com.kairos.scheduler.service.AuthService;
 import com.kairos.scheduler.service.exception.ExceptionService;
-import com.kairos.scheduler.utils.user_context.UserContext;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,14 +17,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static com.kairos.scheduler.rest_client.RestClientUrlUtil.getBaseUrl;
 
@@ -44,7 +38,7 @@ public class UserRestClient {
     private RestTemplate schedulerServiceRestTemplate;
 
     @Inject
-    private AuthService authService;
+    private TokenAuthService tokenAuthService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -74,16 +68,16 @@ public class UserRestClient {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange;
             if(withoutAuth) {
                 HttpHeaders headers = new HttpHeaders();
-                headers.add("Authorization","bearer "+authService.getAuthToken());
+                headers.add("Authorization","bearer "+ tokenAuthService.getAuthToken());
                 HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
                 restExchange = schedulerServiceRestTemplate.exchange(
                         url,
                         getHttpMethod(integrationOperation),
                         httpEntity, typeReference,pathParams);
                 if(restExchange.getStatusCode().value()==401) {
-                    authService.getNewAuthToken();
+                    tokenAuthService.getNewAuthToken();
                 headers.remove("Authorization");
-                headers.add("Authorization","bearer "+authService.getAuthToken());
+                headers.add("Authorization","bearer "+ tokenAuthService.getAuthToken());
                     httpEntity= new HttpEntity<T>(t,headers);
                     restExchange = schedulerServiceRestTemplate.exchange(
                             url,

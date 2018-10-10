@@ -1,54 +1,43 @@
-package com.kairos.scheduler.rest_client;
+package com.kairos.commons.utils;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.user.auth.AccessTokenDTO;
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.scheduler.config.EnvConfig;
-import com.kairos.scheduler.service.exception.ExceptionService;
-import com.mongodb.util.JSONParseException;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.scheduler.rest_client.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.commons.utils.RestClientUrlUtil.getBaseUrl;
+import org.apache.http.client.utils.URIBuilder;
+
+
 
 @Component
 public class UserRestClientAuth {
 
-    private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
+    private static Logger logger = LoggerFactory.getLogger(UserRestClientAuth.class);
 
     @Inject
     @Qualifier("restTemplateWithoutAuth")
     private RestTemplate restTemplate;
-    @Inject
-    private ExceptionService exceptionService;
-    @Inject
-    private EnvConfig env ;
+       @Inject
+    private EnvConfigCommon env ;
 
 
     public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
@@ -91,15 +80,15 @@ public <V> Map<String,Object> publishRequest( Long id, boolean isUnit, Integrati
                             url,
                             getHttpMethod(integrationOperation),
                             httpEntity, responseType);
-                      /* if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                       if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 logger.error("not valid code"+restExchange.getStatusCode());
-                exceptionService.internalError(response.getMessage());
-            }*/
+                throw new InternalError((String)restExchange.getBody().get("message"));
+            }
             return restExchange.getBody();
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+            throw new RuntimeException("exception occurred while getting authtoken " + e.getMessage());
         }
         /*catch (JsonMappingException | JSONParseException e) {
             throw new RuntimeException("exception occurred while parsing " + e.getMessage());
@@ -110,18 +99,17 @@ public <V> Map<String,Object> publishRequest( Long id, boolean isUnit, Integrati
         }*/
     }
 
-
     public String getURIWithParam(List<NameValuePair> queryParam){
         try {
             URIBuilder builder = new URIBuilder();
-            if(queryParam!=null && !queryParam.isEmpty()) {
+            if(CollectionUtils.isEmpty(queryParam)) {
                 builder.setParameters(queryParam);
             }
             return builder.build().toString();
         } catch (URISyntaxException e) {
-            exceptionService.internalError(e.getMessage());
+            throw new InternalError("error while creating URI");
+            //commonsExceptionService.internalError(e.getMessage());
         }
-        return null;
     }
 
 

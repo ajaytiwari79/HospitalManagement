@@ -1,12 +1,12 @@
 package com.kairos.scheduler.service;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.UserRestClientAuth;
 import com.kairos.dto.user.auth.AccessTokenDTO;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.scheduler.config.EnvConfig;
 import com.kairos.scheduler.rest_client.UserRestClient;
-import com.kairos.scheduler.rest_client.UserRestClientAuth;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -42,21 +42,7 @@ public class UserIntegrationService {
 
     }
 
-    public String getAuthToken() {
 
-        MultiValueMap<String,String> formParameters = new LinkedMultiValueMap<String,String>();
-        formParameters.add("username",envConfig.getUserServiceAuthUsername());
-        formParameters.add("password",envConfig.getUserServiceAuthPassword());
-        formParameters.add("grant_type","password");
-        Map<String,Object> accessTokenMap = userRestClientAuth.publishRequest(null,false,IntegrationOperation.CREATE,formParameters);
-
-        if(accessTokenMap.containsKey("access_token")) {
-            return (String)accessTokenMap.get("access_token");
-        }
-        else {
-            return null;
-        }
-    }
 
 
 }

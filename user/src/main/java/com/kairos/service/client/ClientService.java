@@ -1,5 +1,6 @@
 package com.kairos.service.client;
 
+import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
 import com.kairos.dto.activity.task.EscalateTaskWrapper;
 import com.kairos.dto.activity.task.EscalatedTasksWrapper;
 import com.kairos.dto.user.client.ClientExceptionDTO;
@@ -7,7 +8,6 @@ import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;

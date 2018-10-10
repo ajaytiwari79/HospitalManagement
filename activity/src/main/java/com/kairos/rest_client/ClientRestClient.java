@@ -35,7 +35,7 @@ public class ClientRestClient {
     @Autowired
     RestTemplate restTemplate;
     @Autowired
-    @Qualifier("schedulerRestTemplate")
+    @Qualifier("restTemplateWithoutAuth")
     private RestTemplate schedulerRestTemplate;
 
 
