@@ -117,11 +117,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
         switch (filterType) {
             case ACCOUNT_TYPES:
-                List<BigInteger> ids = new ArrayList<>();
-                for (Long id : filterSelection.getValue()) {
-                    ids.add(BigInteger.valueOf(id));
-                }
-                return Criteria.where("accountTypes" + ID).in(ids);
+                return Criteria.where("accountTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_TYPES:
                 return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 

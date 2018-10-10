@@ -702,8 +702,9 @@ public class UnitPositionService {
         result.setEditable(unitPosition.isEditable());
         result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
-        Map<String, Object> reasonCode = new HashMap();
+        Map<String, Object> reasonCode = null;
         if (Optional.ofNullable(unitPosition.getReasonCode()).isPresent()) {
+            reasonCode = new HashMap();
             reasonCode.put("name", unitPosition.getReasonCode().getName());
             reasonCode.put("id", unitPosition.getReasonCode().getId());
         }
@@ -1165,5 +1166,20 @@ public class UnitPositionService {
 
         }
         return matchedDates;
+    }
+
+
+    public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
+        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        unitPositionDetails.setCountryId(countryId);
+        convertUnitPositionObject(unitPosition, unitPositionDetails);
+        unitPositionDetails.setCountryId(countryId);
+        unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+        return unitPositionDetails;
+
     }
 }

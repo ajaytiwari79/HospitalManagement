@@ -214,6 +214,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'remarks' : 1,\n" +
                 "    'staffId' : 1,\n" +
                 "    'unitId' : 1,\n" +
+                "    'phaseId' : 1,\n" +
                 "    'scheduledMinutes' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
                 "    'unitPositionId' : 1,\n" +
@@ -255,6 +256,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'remarks' : '$remarks',\n" +
                 "    'staffId' : '$staffId',\n" +
                 "    'unitId' : '$unitId',\n" +
+                "    'phaseId' : '$phaseId',\n" +
                 "    'scheduledMinutes' : '$scheduledMinutes',\n" +
                 "    'durationMinutes' :'$durationMinutes',\n" +
                 "    'unitPositionId' : '$unitPositionId'\n" +
@@ -285,6 +287,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    '_id.remarks' : 1,\n" +
                 "    '_id.staffId' : 1,\n" +
                 "    '_id.unitId' : 1,\n" +
+                "    '_id.phaseId' : 1,\n" +
                 "    '_id.scheduledMinutes' : 1,\n" +
                 "    '_id.durationMinutes' :1,\n" +
                 "    '_id.unitPositionId' : 1,\n" +

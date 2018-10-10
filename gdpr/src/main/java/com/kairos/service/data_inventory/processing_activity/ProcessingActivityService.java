@@ -7,6 +7,7 @@ import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
@@ -231,7 +232,15 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        delete(processingActivity);
+        Set<BigInteger> riskIds = new HashSet<>();
+        riskIds.addAll(processingActivity.getRisks());
+        List<ProcessingActivity> subProcessingActivities = processingActivityMongoRepository.findSubProcessingActivitiesByIds(unitId, new HashSet<>(processingActivity.getSubProcessingActivities()));
+        if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
+            processingActivityMongoRepository.safeDelete(subProcessingActivities);
+            subProcessingActivities.forEach(subProcessingActivity -> riskIds.addAll(subProcessingActivity.getRisks()));
+        }
+        if (CollectionUtils.isNotEmpty(riskIds)) riskMongoRepository.safeDelete(riskIds);
+        processingActivityMongoRepository.safeDelete(processingActivityId);
         return true;
 
     }
@@ -243,11 +252,12 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, subProcessingActivityId);
+        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.safeDelete(subProcessingActivityId);
         if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
         }
-        delete(subProcessingActivity);
+        if (CollectionUtils.isNotEmpty(subProcessingActivity.getRisks()))
+            riskMongoRepository.safeDelete(subProcessingActivity.getRisks());
         processingActivity.getSubProcessingActivities().remove(subProcessingActivityId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
@@ -471,25 +481,34 @@ public class ProcessingActivityService extends MongoBaseService {
      */
     public ProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivities(Long unitId, BigInteger processingActivityId, ProcessingActivityRiskDTO processingActivityRiskDTO) {
 
-
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivity);
         }
         List<ProcessingActivity> processingActivityList = new ArrayList<>();
         processingActivityList.add(processingActivity);
-        Map<ProcessingActivity, List<OrganizationLevelRiskDTO>> riskListCorrespondingToProcessingActivity = new HashMap<>();
-        riskListCorrespondingToProcessingActivity.put(processingActivity, processingActivityRiskDTO.getRisks());
+        Map<ProcessingActivity, List<OrganizationLevelRiskDTO>> riskDTOListCorrespondingToProcessingActivity = new HashMap<>();
+        riskDTOListCorrespondingToProcessingActivity.put(processingActivity, processingActivityRiskDTO.getRisks());
         if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {
             Map<BigInteger, List<OrganizationLevelRiskDTO>> subProcessingActivityAndRiskDtoListMap = new HashMap<>();
             processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivityRiskDTO -> subProcessingActivityAndRiskDtoListMap.put(subProcessingActivityRiskDTO.getId(), subProcessingActivityRiskDTO.getRisks()));
             List<ProcessingActivity> subProcessingActivityList = processingActivityMongoRepository.findSubProcessingActivitiesByIds(unitId, subProcessingActivityAndRiskDtoListMap.keySet());
-            subProcessingActivityList.stream().forEach(subProcessingActivity -> riskListCorrespondingToProcessingActivity.put(subProcessingActivity, subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId())));
+            subProcessingActivityList.stream().forEach(subProcessingActivity -> riskDTOListCorrespondingToProcessingActivity.put(subProcessingActivity, subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId())));
             processingActivityList.addAll(subProcessingActivityList);
         }
-        if (!riskListCorrespondingToProcessingActivity.isEmpty()) {
-            Map<ProcessingActivity, List<BigInteger>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskListCorrespondingToProcessingActivity);
-            processingActivityList.forEach(processingActivityWithRisk -> processingActivityWithRisk.setRisks(riskIdListCorresponsingProcessingActivities.get(processingActivity)));
+        if (!riskDTOListCorrespondingToProcessingActivity.isEmpty()) {
+            Map<ProcessingActivity, List<Risk>> riskListRelatedProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTOListCorrespondingToProcessingActivity);
+            List<Risk> risks = new ArrayList<>();
+            processingActivityList.forEach(processingActivityWithRisk -> {
+                processingActivityWithRisk.setRisks(riskListRelatedProcessingActivities.get(processingActivity).stream().map(Risk::getId).collect(Collectors.toSet()));
+                riskListRelatedProcessingActivities.get(processingActivity).forEach(risk -> {
+                    risk.setProcessingActivity(processingActivity.getId());
+                    risks.add(risk);
+                });
+
+            });
+            riskMongoRepository.saveAll(getNextSequence(risks));
+
         }
         processingActivityMongoRepository.saveAll(getNextSequence(processingActivityList));
         return processingActivityRiskDTO;

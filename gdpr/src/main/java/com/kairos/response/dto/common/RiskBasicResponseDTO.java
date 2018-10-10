@@ -1,7 +1,7 @@
 package com.kairos.response.dto.common;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -12,9 +12,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RiskResponseDTO {
-
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class RiskBasicResponseDTO {
 
     private BigInteger id;
     @NotBlank(message = "Name can't be Empty")
@@ -29,13 +28,15 @@ public class RiskResponseDTO {
     @NotNull(message = "Risk Level can't be empty")
     private RiskSeverity riskLevel;
     private Staff riskOwner;
-    private AssetTypeBasicResponseDTO assetType;
-    private ProcessingActivityBasicDTO processingActivity;
 
 
     public BigInteger getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id;}
+    public void setId(BigInteger id) { this.id = id; }
+
+    public Staff getRiskOwner() { return riskOwner; }
+
+    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
 
     public String getName() { return name; }
 
@@ -64,17 +65,4 @@ public class RiskResponseDTO {
     public RiskSeverity getRiskLevel() { return riskLevel; }
 
     public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
-
-    public Staff getRiskOwner() { return riskOwner; }
-
-    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
-
-    public AssetTypeBasicResponseDTO getAssetType() { return assetType; }
-
-    public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType;}
-
-
-    public ProcessingActivityBasicDTO getProcessingActivity() { return processingActivity; }
-
-    public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
 }
