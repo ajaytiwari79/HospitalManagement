@@ -1,6 +1,7 @@
 package com.kairos.controller.staff;
 
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.time_bank.TimeBankStaffAndUnitPositionDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.staff.*;
@@ -586,12 +587,11 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
 
-    @RequestMapping(value = "/{staffIds}/verifyUnitEmployment/{unitPositionIds}", method = RequestMethod.GET)
+    @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.POST)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData( @PathVariable long unitId, @PathVariable List<Long> staffIds,
-                                                                      @PathVariable List<Long> unitPositionIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds, unitPositionIds, unitId, ORGANIZATION));
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestBody TimeBankStaffAndUnitPositionDTO timeBankStaffAndUnitPositionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(timeBankStaffAndUnitPositionDTO, unitId, ORGANIZATION));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

@@ -9,6 +9,7 @@ import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.time_bank.TimeBankStaffAndUnitPositionDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
@@ -592,7 +593,8 @@ public class ShiftService extends MongoBaseService {
         List<Long> unitPositionIds=shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
 //        List<BigInteger> activityIds=shifts.stream().map(shift-> shift.getActivities().get(0).getActivityId()).collect(Collectors.toList());
 //        List<ActivityWrapper> activityWrappers = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/{staffIds}/verifyUnitEmployment/{unitPositionIds}",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){},staffIds,unitPositionIds);
+        TimeBankStaffAndUnitPositionDTO timeBankStaffAndUnitPositionDTO=new TimeBankStaffAndUnitPositionDTO(staffIds,unitPositionIds);
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(timeBankStaffAndUnitPositionDTO,unitId,true,IntegrationOperation.CREATE,"/staff/verifyUnitEmployments/",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){});
         timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
         //        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
 //        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);

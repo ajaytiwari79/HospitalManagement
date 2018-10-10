@@ -11,6 +11,7 @@ import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.time_bank.TimeBankStaffAndUnitPositionDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
@@ -1683,7 +1684,9 @@ public class StaffService {
     }
 
 
-    public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds, List<Long> unitPositionIds, long id, String type) {
+    public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(TimeBankStaffAndUnitPositionDTO timeBankStaffAndUnitPositionDTO, long id, String type) {
+        List<Long> staffIds=timeBankStaffAndUnitPositionDTO.getStaffIds();
+        List<Long> unitPositionIds=timeBankStaffAndUnitPositionDTO.getUnitPositionIds();
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
