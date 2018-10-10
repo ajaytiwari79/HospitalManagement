@@ -2,7 +2,7 @@ package com.kairos.config.javers;
 
 
 import com.google.common.collect.ImmutableMap;
-import com.kairos.config.mongoEnv.EnvConfig;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.config.codec.BigIntegerCodecProvider;
 import com.kairos.config.codec.BigIntegerTransformer;
 import com.mongodb.*;
