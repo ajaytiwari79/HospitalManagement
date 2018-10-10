@@ -39,13 +39,9 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
     @Inject
     private FilterMongoRepository filterMongoRepository;
 
-    @Inject
-    private S3BucketService  s3BucketService;
-
     @Override
     public void run(String... args) {
 
-        s3BucketService.getListOfBuckets();
         LOGGER.info("creating filter group data");
 
         Query clauseQuery = new Query(Criteria.where(COUNTRY_ID).is(4L).and("accessModule.active").is(true).and("accessModule.moduleId").is(CLAUSE_MODULE_ID));
