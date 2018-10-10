@@ -1,4 +1,4 @@
-package com.kairos.scheduler.config;
+package com.kairos.commons.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 @Configuration
-public class EnvConfig {
+public class EnvConfigCommon {
 
     @Value("${gateway.userservice.url}")
     private String userServiceUrl;
