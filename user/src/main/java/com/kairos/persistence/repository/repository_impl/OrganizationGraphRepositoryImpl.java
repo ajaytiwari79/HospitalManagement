@@ -84,7 +84,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, Boolean fetchStaffHavingUnitPosition,
+    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,
                                          Map<FilterType, List<String>> filters, String searchText, String imagePath) {
 
         Map<String, Object> queryParameters = new HashMap();
@@ -111,13 +111,15 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             queryParameters.put("expertiseIds",
                     convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
         }
+
         if (StringUtils.isNotBlank(searchText)) {
             queryParameters.put("searchText", searchText);
         }
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
-        if (fetchStaffHavingUnitPosition) {
+        boolean isStaffHavingUnitPositionRequired=Optional.ofNullable(filters.get(FilterType.UNITPOSITION)).isPresent();
+        if (isStaffHavingUnitPositionRequired) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos";
         } else {
@@ -126,7 +128,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos ";
         }
 
-        query += getMatchQueryForRelationshipOfStaffByFilters(filters, fetchStaffHavingUnitPosition);
+        query += getMatchQueryForRelationshipOfStaffByFilters(filters, isStaffHavingUnitPositionRequired);
 
         query += " Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) WITH engineerType, staff, user, contactAddress,expertiseList,employmentList";
 
