@@ -23,35 +23,34 @@ public class StaffUnitPositionDetails {
     private Staff staff;
     private EmploymentType employmentType;
     private WTAResponseDTO workingTimeAgreement;
-    private Long startDateMillis;
     private int workingDaysInWeek;
-    private Long endDateMillis;
+    private LocalDate endDate;
+    private LocalDate StartDate;
     private Long lastModificationDate;
-    private int totalWeeklyHours;
-    private int fullTimeWeeklyMinutes;
-    private float avgDailyWorkingHours;
-    private float hourlyWages;
-    private long id;
+    private Integer totalWeeklyHours;
+    private Integer fullTimeWeeklyMinutes;
+    private Float avgDailyWorkingHours;
+    private Float hourlyWages;
+    private Long id;
     private Long staffId;
-    private float salary;
+    private Float salary;
     private int totalWeeklyMinutes;
-    private BigInteger workingTimeAgreementId;
-    private BigInteger costTimeAgreementId;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private ZoneId unitTimeZone;
     private Long countryId;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private LocalDate unitPositionStartDate;
-    private LocalDate unitPositionEndDate;
     private BigInteger excludedPlannedTime;
     private BigInteger includedPlannedTime;
-    private Date startDate;
-    private Date endDate;
     private Long unitId;
-    private float hourlyCost;
+    private Float hourlyCost;
+    private Long functionId;
 
     public StaffUnitPositionDetails() {
 
+    }
+
+    public StaffUnitPositionDetails(Long unitId) {
+        this.unitId = unitId;
     }
 
     public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyMinutes) {
@@ -60,196 +59,15 @@ public class StaffUnitPositionDetails {
     }
 
 
-    public StaffUnitPositionDetails(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getUnitPositionStartDate() {
-        return unitPositionStartDate;
-    }
-
-    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
-    }
-
-    public LocalDate getUnitPositionEndDate() {
-        return unitPositionEndDate;
-    }
-
-    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
-        this.unitPositionEndDate = unitPositionEndDate;
-    }
-
-
-    public BigInteger getCostTimeAgreementId() {
-        return costTimeAgreementId;
-    }
-
-    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
-        this.costTimeAgreementId = costTimeAgreementId;
-    }
-
-    public ZoneId getUnitTimeZone() {
-        return unitTimeZone;
-    }
-
-    public void setUnitTimeZone(ZoneId unitTimeZone) {
-        this.unitTimeZone = unitTimeZone;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
-        return ctaRuleTemplates;
-    }
-
     public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
-
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
+    public List<AppliedFunctionDTO> getAppliedFunctions() {
+        return appliedFunctions;
     }
 
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
-    }
-
-
-
-    public float getHourlyCost() {
-        return hourlyCost;
-    }
-
-    public void setHourlyCost(float hourlyCost) {
-        this.hourlyCost = hourlyCost;
-    }
-
-
-    public int getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
-    public Long getLastModificationDate() {
-        return lastModificationDate;
-    }
-
-    public void setLastModificationDate(Long lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
-    }
-
-    public int getTotalWeeklyHours() {
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
-    }
-
-    public float getAvgDailyWorkingHours() {
-        return avgDailyWorkingHours;
-    }
-
-    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-    }
-
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public float getSalary() {
-        return salary;
-    }
-
-    public void setSalary(float salary) {
-        this.salary = salary;
-    }
-
-    public int getTotalWeeklyMinutes() {
-        return totalWeeklyMinutes;
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public EmploymentType getEmploymentType() {
-        return employmentType;
-    }
-
-    public void setEmploymentType(EmploymentType employmentType) {
-        this.employmentType = employmentType;
-    }
-
-    public WTAResponseDTO getWorkingTimeAgreement() {
-        return workingTimeAgreement;
-    }
-
-    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
+    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
     }
 
     public Expertise getExpertise() {
@@ -268,12 +86,92 @@ public class StaffUnitPositionDetails {
         this.staff = staff;
     }
 
-    public List<AppliedFunctionDTO> getAppliedFunctions() {
-        return appliedFunctions;
+    public EmploymentType getEmploymentType() {
+        return employmentType;
     }
 
-    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
-        this.appliedFunctions = appliedFunctions;
+    public void setEmploymentType(EmploymentType employmentType) {
+        this.employmentType = employmentType;
+    }
+
+    public WTAResponseDTO getWorkingTimeAgreement() {
+        return workingTimeAgreement;
+    }
+
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
+    }
+
+    public int getWorkingDaysInWeek() {
+        return workingDaysInWeek;
+    }
+
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getStartDate() {
+        return StartDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        StartDate = startDate;
+    }
+
+    public Long getLastModificationDate() {
+        return lastModificationDate;
+    }
+
+    public void setLastModificationDate(Long lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
+    }
+
+    public Integer getTotalWeeklyHours() {
+        return totalWeeklyHours;
+    }
+
+    public void setTotalWeeklyHours(Integer totalWeeklyHours) {
+        this.totalWeeklyHours = totalWeeklyHours;
+    }
+
+    public Integer getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(Integer fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
+
+    public Float getAvgDailyWorkingHours() {
+        return avgDailyWorkingHours;
+    }
+
+    public void setAvgDailyWorkingHours(Float avgDailyWorkingHours) {
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+    }
+
+    public Float getHourlyWages() {
+        return hourlyWages;
+    }
+
+    public void setHourlyWages(Float hourlyWages) {
+        this.hourlyWages = hourlyWages;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getStaffId() {
@@ -282,6 +180,42 @@ public class StaffUnitPositionDetails {
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
+    }
+
+    public Float getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Float salary) {
+        this.salary = salary;
+    }
+
+    public int getTotalWeeklyMinutes() {
+        return totalWeeklyMinutes;
+    }
+
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
+    public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
+        return ctaRuleTemplates;
+    }
+
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     public BigInteger getExcludedPlannedTime() {
@@ -306,5 +240,21 @@ public class StaffUnitPositionDetails {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public Float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(Float hourlyCost) {
+        this.hourlyCost = hourlyCost;
+    }
+
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
     }
 }

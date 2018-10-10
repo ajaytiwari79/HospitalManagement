@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface RiskMongoRepository extends MongoBaseRepository<Risk,BigInteger> {
+public interface RiskMongoRepository extends MongoBaseRepository<Risk,BigInteger> ,CustomRiskRepository{
 
 
     @Query("{deleted:false,countryId:?0,_id:?1}")

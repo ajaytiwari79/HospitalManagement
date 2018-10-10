@@ -2,9 +2,9 @@ package com.kairos.dto.user.employment;
 
 public class UnitPositionIdDTO {
 
-    Long oldUnitPositionID;
-    Long newUnitPositionID;
-
+    private Long oldUnitPositionID;
+    private Long newUnitPositionID;
+    private Long positionLineId;
     public UnitPositionIdDTO() {
 
     }
@@ -12,6 +12,12 @@ public class UnitPositionIdDTO {
 
         this.oldUnitPositionID = oldUnitPositionID;
         this.newUnitPositionID = newUnitPositionID;
+    }
+
+    public UnitPositionIdDTO(Long oldUnitPositionID, Long newUnitPositionID, Long positionLineId) {
+        this.oldUnitPositionID = oldUnitPositionID;
+        this.newUnitPositionID = newUnitPositionID;
+        this.positionLineId = positionLineId;
     }
 
     public Long getOldUnitPositionID() {
@@ -30,7 +36,11 @@ public class UnitPositionIdDTO {
         this.newUnitPositionID = newUnitPositionID;
     }
 
+    public Long getPositionLineId() {
+        return positionLineId;
+    }
 
-
-
+    public void setPositionLineId(Long positionLineId) {
+        this.positionLineId = positionLineId;
+    }
 }

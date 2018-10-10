@@ -23,8 +23,7 @@ public class Assessment extends MongoBaseEntity {
     private String comment;
     private BigInteger assetId;
     private BigInteger processingActivityId;
-    private List<AssetAssessmentAnswerVO> assetAssessmentAnswers;
-    private List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers;
+    private List<AssessmentAnswerValueObject> assessmentAnswers;
     @NotNull
     private Staff assignee;
     @NotNull
@@ -80,13 +79,7 @@ public class Assessment extends MongoBaseEntity {
 
     public void setProcessingActivityId(BigInteger processingActivityId) { this.processingActivityId = processingActivityId; }
 
-     public List<AssetAssessmentAnswerVO> getAssetAssessmentAnswers() { return assetAssessmentAnswers;}
+    public List<AssessmentAnswerValueObject> getAssessmentAnswers() { return assessmentAnswers; }
 
-    public void setAssetAssessmentAnswers(List<AssetAssessmentAnswerVO> assetAssessmentAnswers) { this.assetAssessmentAnswers = assetAssessmentAnswers; }
-
-    public List<ProcessingActivityAssessmentAnswerVO> getProcessingActivityAssessmentAnswers() { return processingActivityAssessmentAnswers; }
-
-    public void setProcessingActivityAssessmentAnswers(List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers) { this.processingActivityAssessmentAnswers = processingActivityAssessmentAnswers; }
-
-
+    public void setAssessmentAnswers(List<AssessmentAnswerValueObject> assessmentAnswers) { this.assessmentAnswers = assessmentAnswers; }
 }

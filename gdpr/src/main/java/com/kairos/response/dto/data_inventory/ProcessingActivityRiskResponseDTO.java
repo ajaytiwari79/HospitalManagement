@@ -2,7 +2,7 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.common.RiskResponseDTO;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -13,10 +13,10 @@ public class ProcessingActivityRiskResponseDTO {
     private BigInteger id;
     private String name;
     private Boolean mainParent;
-    private List<RiskResponseDTO> risks;
+    private List<RiskBasicResponseDTO> risks;
     private List<ProcessingActivityRiskResponseDTO> processingActivities;
 
-    public ProcessingActivityRiskResponseDTO(BigInteger id, String name, Boolean mainParent, List<RiskResponseDTO> risks) {
+    public ProcessingActivityRiskResponseDTO(BigInteger id, String name, Boolean mainParent, List<RiskBasicResponseDTO> risks) {
         this.id = id;
         this.name = name;
         this.mainParent = mainParent;
@@ -39,7 +39,7 @@ public class ProcessingActivityRiskResponseDTO {
 
     public void setName(String name) { this.name = name; }
 
-    public List<RiskResponseDTO> getRisks() { return risks; }
+    public List<RiskBasicResponseDTO> getRisks() { return risks; }
 
-    public void setRisks(List<RiskResponseDTO> risks) { this.risks = risks; }
+    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 }

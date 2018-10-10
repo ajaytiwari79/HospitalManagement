@@ -2,7 +2,7 @@ package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.common.RiskResponseDTO;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,7 +17,7 @@ public class AssetTypeRiskResponseDTO {
     private BigInteger id;
     @NotBlank
     private String name;
-    private List<RiskResponseDTO> risks=new ArrayList<>();
+    private List<RiskBasicResponseDTO> risks=new ArrayList<>();
     private Boolean hasSubAsset;
     private List<AssetTypeRiskResponseDTO> subAssetTypes=new ArrayList<>();
 
@@ -30,9 +30,9 @@ public class AssetTypeRiskResponseDTO {
 
     public void setName(String name) { this.name = name; }
 
-    public List<RiskResponseDTO> getRisks() { return risks; }
+    public List<RiskBasicResponseDTO> getRisks() { return risks; }
 
-    public void setRisks(List<RiskResponseDTO> risks) { this.risks = risks; }
+    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 
     public Boolean getHasSubAsset() { return hasSubAsset; }
 

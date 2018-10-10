@@ -42,4 +42,8 @@ public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRe
     @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND any(x IN rel.appliedDates WHERE x IN {1}) return id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates")
     List<UnitPositionFunctionRelationshipQueryResult> findAllByAppliedDatesIn(Long unitPositionId, Set<String> appliedDates);
 
+    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates  return id(function)" )
+    Long getApplicableFunction(Long unitPositionId, String localDate);
+
+
 }
