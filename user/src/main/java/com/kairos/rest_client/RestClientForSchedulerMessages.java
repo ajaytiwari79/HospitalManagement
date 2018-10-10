@@ -58,7 +58,7 @@ public class RestClientForSchedulerMessages {
             if(restExchange.getStatusCode().value()==401) {
                 tokenAuthService.getNewAuthToken();
                 headers.remove("Authorization");
-                headers.add("Authorization", "bearer " + tokenAuthService.getAuthToken());
+                headers.add("Authorization", "bearer " + tokenAuthService.getNewAuthToken());
                 httpEntity = new HttpEntity<T>(t, headers);
                 restExchange = restTemplateWithoutAuth.exchange(
                         baseUrl  + getURI(t,uri,queryParams,pathParams),
