@@ -7,6 +7,8 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
@@ -47,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -190,9 +193,9 @@ public class ShiftValidatorService {
 
 
     public void validateStatusOfShiftOnUpdate(Shift shift,ShiftDTO shiftDTO){
-        for (ShiftActivity updateShiftActivitiy : shiftDTO.getActivities()) {
+        for (ShiftActivity updateShiftActivity : shiftDTO.getActivities()) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
-                boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivitiy==null || updateShiftActivitiy.getStartDate().equals(shift.getStartDate()) || updateShiftActivitiy.getEndDate().equals(shift.getEndDate()));
+                boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivity==null || updateShiftActivity.getStartDate().equals(shift.getStartDate()) || updateShiftActivity.getEndDate().equals(shift.getEndDate()));
                 if (notValid) {
                     exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
                 }
@@ -200,6 +203,30 @@ public class ShiftValidatorService {
         }
 
     }
+
+   public void verifyShiftActivities(Set<AccessGroupRole> roles,Long employmentTypeId, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue, ShiftActivityIdsDTO shiftActivityIdsDTO){
+        boolean staff=roles.contains(AccessGroupRole.STAFF);
+        boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
+        ArrayList<Integer> integers=new ArrayList<>();
+        phaseTemplateValue.forEach((k,v)->{
+            if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
+                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){
+                    exceptionService.actionNotPermittedException("error.shift.not.authorised.phase");
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
+                if(!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),roles)){
+                    exceptionService.actionNotPermittedException("error.shift.not.editable.phase");
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
+                if((management && v.isManagementCanDelete()) || (staff && v.isStaffCanDelete())){
+                    exceptionService.actionNotPermittedException("error.shift.not.deletable.phase");
+                }
+            }
+
+        });
+   }
 
     public void validateStatusOfShiftOnDelete(Shift shift){
         for (ShiftActivity shiftActivity : shift.getActivities()) {

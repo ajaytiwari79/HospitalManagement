@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PARENT_ACCESS_GROUP;
 
 /**
  * Created by prabjot on 9/27/16.
@@ -40,6 +41,9 @@ public class AccessGroup extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<DayType> dayTypes;
+    @Relationship(type = HAS_PARENT_ACCESS_GROUP)
+    private AccessGroup parentAccessGroup;
+
 
     public AccessGroup() {
         //Default Constructor
@@ -143,4 +147,11 @@ public class AccessGroup extends UserBaseEntity {
         this.dayTypes = dayTypes;
     }
 
+    public AccessGroup getParentAccessGroup() {
+        return parentAccessGroup;
+    }
+
+    public void setParentAccessGroup(AccessGroup parentAccessGroup) {
+        this.parentAccessGroup = parentAccessGroup;
+    }
 }
