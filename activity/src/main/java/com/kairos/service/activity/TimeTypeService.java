@@ -120,7 +120,7 @@ public class TimeTypeService extends MongoBaseService {
         if (Optional.ofNullable(timeType).isPresent()) {
             if (timeType.getUpperLevelTimeTypeId() == null && timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
                 //User Cannot Update TimeType of Second Level
-                exceptionService.actionNotPermittedException("message.timetype.deletion.notAllowed", timeType.getLabel());
+                exceptionService.actionNotPermittedException("message.timetype.rename.notAllowed", timeType.getLabel());
             }
                 timeType.setLabel(timeTypeDTO.getLabel());
                 timeType.setDescription(timeTypeDTO.getDescription());
