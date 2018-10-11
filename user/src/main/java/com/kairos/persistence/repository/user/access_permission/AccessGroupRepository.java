@@ -315,7 +315,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
    AccessGroupQueryResult findByAccessGroupId(long unitId,long accessGroupId);
 
    @Query("MATCH(countryAccessGroup:AccessGroup{deleted:false})<-[:"+HAS_PARENT_ACCESS_GROUP+"]-(unitAccessGroup:AccessGroup{deleted:false})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(org:Organization) where id(org) ={0} AND id(countryAccessGroup) IN {1} " +
-           "return {id(countryAccessGroup):id(unitAccessGroup)} as responseMap")
+           "RETURN apoc.map.fromValues([id(countryAccessGroup), id(unitAccessGroup)])  AS responseMap")
    Map<Long,Long> getAccessGroupIdsUsingParentIds(Long unitId,Set<Long> parentIds);
 
 }
