@@ -2,7 +2,7 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.dto.gdpr.master_data.AgreementSectionDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;

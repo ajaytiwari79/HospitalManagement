@@ -29,6 +29,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
     private BigInteger templateType;
+    private String coverPageHeader;
+    private String coverPageFooter;
+    private String coverPageImageUrl;
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -100,4 +103,16 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
     public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
+
+    public String getCoverPageHeader() { return coverPageHeader; }
+
+    public void setCoverPageHeader(String coverPageHeader) { this.coverPageHeader = coverPageHeader; }
+
+    public String getCoverPageFooter() { return coverPageFooter; }
+
+    public void setCoverPageFooter(String coverPageFooter) { this.coverPageFooter = coverPageFooter; }
+
+    public String getCoverPageImageUrl() { return coverPageImageUrl; }
+
+    public void setCoverPageImageUrl(String coverPageImageUrl) { this.coverPageImageUrl = coverPageImageUrl; }
 }

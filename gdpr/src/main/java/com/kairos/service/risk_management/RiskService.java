@@ -11,6 +11,7 @@ import com.kairos.response.dto.common.RiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -71,7 +72,7 @@ public class RiskService extends MongoBaseService {
         if (!existingRisksRelatedToObject.isEmpty()) {
             risks.addAll(updateExistingRisk(countryIdOrUnitId, isUnitId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
         }
-        riskMongoRepository.saveAll(getNextSequence(risks));
+        if (CollectionUtils.isNotEmpty(risks)) riskMongoRepository.saveAll(getNextSequence(risks));
         return riskListRelatedToObjectMap;
     }
 

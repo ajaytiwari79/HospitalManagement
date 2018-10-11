@@ -80,7 +80,8 @@ public class AssetTypeService extends MongoBaseService {
             for (AssetType subAssetType : subAssetTypeList) {
                 subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+            if (riskIdsCoresspondingToAssetAndSubAssetType.containsKey(assetType))
+                assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
         if (!subAssetTypeList.isEmpty()) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
@@ -219,7 +220,8 @@ public class AssetTypeService extends MongoBaseService {
             for (AssetType subAssetType : subAssetTypeList) {
                 subAssetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            assetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+            if (riskRelatedToSubAssetTypeOrAssetType.containsKey(assetType))
+                assetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
         if (!subAssetTypeList.isEmpty()) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
