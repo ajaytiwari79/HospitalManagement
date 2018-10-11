@@ -1,5 +1,6 @@
-package com.kairos.scheduler.service.locale;
+package com.kairos.commons.service.exception.locale;
 
+import com.kairos.commons.service.exception.locale.LocaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -12,7 +13,7 @@ import java.util.Locale;
  * Locale service implementation
  */
 @Service
-public class LocaleServiceImpl implements LocaleService{
+public class LocaleServiceImpl implements LocaleService {
 
     @Autowired
     private MessageSource messageSource;

@@ -1,5 +1,6 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
+
 import com.kairos.dto.scheduler.JobDetailsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
@@ -18,10 +19,10 @@ import com.kairos.scheduler.persistence.repository.scheduler_panel.SchedulerPane
 import com.kairos.scheduler.service.MongoBaseService;
 
 import com.kairos.scheduler.service.UserIntegrationService;
-import com.kairos.scheduler.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 
+import com.kairos.scheduler.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -177,12 +178,13 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
+            panel.setOneTimeTriggerDate(null);
 
         }
         else {
             panel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
         }
-
+        panel.setOneTimeTrigger(schedulerPanelDTO.isOneTimeTrigger());
         save(panel);
         String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
