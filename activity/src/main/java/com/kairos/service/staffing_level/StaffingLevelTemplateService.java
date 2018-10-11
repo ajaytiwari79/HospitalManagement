@@ -1,6 +1,6 @@
 package com.kairos.service.staffing_level;
 
-import com.kairos.commons.service.exception.locale.LocaleService;
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;

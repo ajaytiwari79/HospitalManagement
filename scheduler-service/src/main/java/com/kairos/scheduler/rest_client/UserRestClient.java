@@ -1,7 +1,7 @@
 package com.kairos.scheduler.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.service.exception.TokenAuthService;
+import com.kairos.commons.service.TokenAuthService;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.scheduler.config.EnvConfig;
 import com.kairos.scheduler.service.exception.ExceptionService;

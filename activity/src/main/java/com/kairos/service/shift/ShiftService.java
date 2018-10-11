@@ -1,6 +1,6 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.service.exception.locale.LocaleService;
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
