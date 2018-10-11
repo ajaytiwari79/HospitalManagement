@@ -10,12 +10,14 @@ import java.math.BigInteger;
 public class AssetTypeBasicResponseDTO {
 
     private BigInteger id;
-
     private String name;
-
     private Long organizationId;
-
     private SuggestedDataStatus suggestedDataStatus;
+    private boolean subAsset;
+
+    public boolean isSubAsset() { return subAsset; }
+
+    public void setSubAsset(boolean subAsset) { this.subAsset = subAsset; }
 
     public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 

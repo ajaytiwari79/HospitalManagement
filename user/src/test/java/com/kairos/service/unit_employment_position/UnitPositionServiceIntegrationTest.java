@@ -73,7 +73,7 @@ public class UnitPositionServiceIntegrationTest {
         staffGraphRepository.updateStaffExpertiseRelation(13316L,7799L,expertiseStartDate);
         unitPositionGraphRepository.deleteUnitPositionSeniorityLevel(13316L,7799L);
         unitPositionGraphRepository.createUnitPositionSeniorityLevelRelatioship(13316L,7799L,7796L);
-        unitPositionService.updateSeniorityLevelOnJobTrigger();
+        //unitPositionService.updateSeniorityLevelOnJobTrigger();
         UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult = unitPositionGraphRepository.getSeniorityLevelFromStaffUnitPosition(13316L,7799L);
         Assert.assertTrue(unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getFrom()==3&&
                 unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getId()==7797);

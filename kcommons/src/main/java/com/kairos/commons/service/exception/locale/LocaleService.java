@@ -1,4 +1,4 @@
-package com.kairos.scheduler.service.locale;
+package com.kairos.commons.service.exception.locale;
 
 /**
  * Created by vipul on 10/5/18.

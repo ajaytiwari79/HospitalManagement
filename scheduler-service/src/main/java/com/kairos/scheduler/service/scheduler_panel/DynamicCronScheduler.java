@@ -1,5 +1,9 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
+
+import com.kairos.commons.utils.BeanFactoryUtil;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
@@ -8,9 +12,6 @@ import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
-import com.kairos.scheduler.utils.BeanFactoryUtil;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -23,7 +24,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 
 import static com.kairos.scheduler.constants.AppConstants.activitySubTypes;

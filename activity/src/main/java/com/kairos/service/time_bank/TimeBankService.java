@@ -4,7 +4,6 @@ package com.kairos.service.time_bank;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 
 import com.kairos.dto.activity.time_bank.TimeBankAndPayoutDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDTO;
@@ -88,7 +87,7 @@ public class TimeBankService extends MongoBaseService {
      */
     public void saveTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
         staffAdditionalInfoDTO.getUnitPosition().setStaffId(shift.getStaffId());
-        List<DailyTimeBankEntry> dailyTimeBanks = renewDailyTimeBank(staffAdditionalInfoDTO.getUnitPosition(), shift);
+        List<DailyTimeBankEntry> dailyTimeBanks = renewDailyTimeBank(staffAdditionalInfoDTO, shift);
         if (!dailyTimeBanks.isEmpty()) {
             save(dailyTimeBanks);
         }
@@ -102,7 +101,7 @@ public class TimeBankService extends MongoBaseService {
         staffAdditionalInfoDTO.getUnitPosition().setStaffId(shifts.get(0).getStaffId());
         List<DailyTimeBankEntry> updatedDailyTimeBankEntries = new ArrayList<>();
         for (Shift shift : shifts) {
-            List<DailyTimeBankEntry> dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTO.getUnitPosition(), shift);
+            List<DailyTimeBankEntry> dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTO, shift);
             updatedDailyTimeBankEntries.addAll(dailyTimeBankEntries);
         }
         if (!updatedDailyTimeBankEntries.isEmpty()) {
@@ -111,22 +110,22 @@ public class TimeBankService extends MongoBaseService {
     }
 
     /**
-     * @param unitPositionWithCtaDetailsDTO
+     * @param staffAdditionalInfoDTO
      * @param shift
      * @return List<DailyTimeBankEntry>
      */
-    private List<DailyTimeBankEntry> renewDailyTimeBank(StaffUnitPositionDetails unitPositionWithCtaDetailsDTO, Shift shift) {
+    private List<DailyTimeBankEntry> renewDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = new DateTime(shift.getEndDate()).plusDays(1).withTimeAtStartOfDay();
-        timeBankRepository.deleteDailyTimeBank(unitPositionWithCtaDetailsDTO.getId(), startDate.toDate(), endDate.toDate());
+        timeBankRepository.deleteDailyTimeBank(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate.toDate(), endDate.toDate());
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>();
         DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(shift.getUnitPositionId(),shift.getStartDate());
         long accumulatedTimeBank = dailyTimeBankEntry!=null ? dailyTimeBankEntry.getAccumultedTimeBankMin() : 0;
         int totalTimeBank = 0;
         while (startDate.isBefore(endDate)) {
             Interval interval = new Interval(startDate, startDate.plusDays(1).withTimeAtStartOfDay());
-            List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionWithCtaDetailsDTO.getId(), startDate.toDate(), startDate.plusDays(1).toDate());
-            DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(unitPositionWithCtaDetailsDTO, interval, shifts);
+            List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate.toDate(), startDate.plusDays(1).toDate());
+            DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO, interval, shifts);
             if (dailyTimeBank != null) {
                 accumulatedTimeBank = accumulatedTimeBank+dailyTimeBank.getTotalTimeBankMin();
                 dailyTimeBank.setAccumultedTimeBankMin(accumulatedTimeBank);
@@ -168,8 +167,8 @@ public class TimeBankService extends MongoBaseService {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId,startDate,endDate);
         long totalTimeBankBeforeStartDate = 0;
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeTypeByCountryId(unitPositionWithCtaDetailsDTO.getCountryId());
-        if (new DateTime(startDate).isAfter(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()))) {
-            Interval interval = new Interval(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()), new DateTime(startDate));
+        if (new DateTime(startDate).isAfter(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate()))) {
+            Interval interval = new Interval(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate()), new DateTime(startDate));
             //totaltimebank is timebank without daily timebank entries
             DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(unitPositionId,startDate);
 
@@ -237,8 +236,8 @@ public class TimeBankService extends MongoBaseService {
     private Interval getIntervalByDateTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Integer year) {
         ZonedDateTime startDate = ZonedDateTime.now().withYear(year).with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = startDate.with(TemporalAdjusters.lastDayOfYear());
-        Date unitPositionStartDate = unitPositionWithCtaDetailsDTO.getUnitPositionStartDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : DateUtils.asDate(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate());
-        Date unitPositionEndDate = unitPositionWithCtaDetailsDTO.getUnitPositionEndDate()==null || unitPositionWithCtaDetailsDTO.getUnitPositionEndDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : DateUtils.asDate(unitPositionWithCtaDetailsDTO.getUnitPositionEndDate());
+        Date unitPositionStartDate = unitPositionWithCtaDetailsDTO.getStartDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : DateUtils.asDate(unitPositionWithCtaDetailsDTO.getStartDate());
+        Date unitPositionEndDate = unitPositionWithCtaDetailsDTO.getEndDate()==null || unitPositionWithCtaDetailsDTO.getEndDate().isAfter(LocalDate.now()) ? new DateTime().withTimeAtStartOfDay().toDate() : DateUtils.asDate(unitPositionWithCtaDetailsDTO.getEndDate());
         Interval unitPositionInterval = new Interval(unitPositionStartDate.getTime(),unitPositionEndDate.getTime());
         Interval selectedInterval = new Interval(startDate.toInstant().toEpochMilli(),endDate.toInstant().toEpochMilli());
         Interval interval = selectedInterval.overlap(unitPositionInterval);

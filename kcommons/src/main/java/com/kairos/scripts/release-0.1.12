@@ -1,5 +1,6 @@
 // questionnaire template script gdpr
 db.getCollection('questionnaire_template').updateMany({'deleted':false,'defaultAssetTemplate':{ $exists: false}},{$set:{"defaultAssetTemplate":false}})
+<<<<<<< HEAD
 
 match(e:UnitPosition) where e.deleted=true
 detach delete e
@@ -39,3 +40,8 @@ MATCH(u)-[employmentRel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType)
 merge(pl)-[newRel:HAS_EMPLOYMENT_TYPE]->(employmentType)
 set newRel.employmentTypeCategory=employmentRel.employmentTypeCategory
 detach delete employmentRel
+=======
+//set systemUser property
+match(user:User) where user.userName<>"systemuser" set user.systemUser=false;
+create(user:User{userName:"systemuser",password:"$2a$10$480/B8N6VnpNLdjPKGPw7OqCu2e85bUMBOAKxYtsbzp11kJTLMkKu",systemUser:true})
+>>>>>>> f345eb570bda554dd735267cf55c6ebd4cee8286

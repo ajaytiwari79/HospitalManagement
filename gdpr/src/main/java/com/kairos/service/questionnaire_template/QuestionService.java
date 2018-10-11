@@ -159,7 +159,8 @@ public class QuestionService extends MongoBaseService {
         }
         questionnaireSection.getQuestions().remove(questionId);
         questionnaireSectionRepository.save(questionnaireSection);
-        return questionMongoRepository.safeDelete(questionId);
+        questionMongoRepository.safeDelete(questionId);
+        return true;
     }
 
 
@@ -170,7 +171,8 @@ public class QuestionService extends MongoBaseService {
         }
         questionnaireSection.getQuestions().remove(questionId);
         questionnaireSectionRepository.save(questionnaireSection);
-        return questionMongoRepository.safeDelete(questionId);
+        questionMongoRepository.safeDelete(questionId);
+        return true;
     }
 
 
