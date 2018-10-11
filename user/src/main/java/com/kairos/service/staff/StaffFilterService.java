@@ -235,7 +235,7 @@ public class StaffFilterService {
         return mapOfFilters;
     }
 
-    public StaffEmploymentWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO) {
+    public StaffEmploymentWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
@@ -250,7 +250,7 @@ public class StaffFilterService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
         staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
-        staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),
+        staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);

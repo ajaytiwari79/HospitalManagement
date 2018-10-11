@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.enums.FilterType;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.enums.ModuleId;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;
@@ -84,7 +85,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,
+    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
                                          Map<FilterType, List<String>> filters, String searchText, String imagePath) {
 
         Map<String, Object> queryParameters = new HashMap();
@@ -118,7 +119,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
-        if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent()) {
+        if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent() || ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos";
         } else {

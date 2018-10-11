@@ -60,8 +60,8 @@ public class StaffFilterController {
     @RequestMapping(value = UNIT_URL+"/staff_list_with_filter", method = RequestMethod.POST)
     @ApiOperation("Get All staff List available in Org")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestBody StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestBody StaffFilterDTO staffFilterDTO,@RequestParam String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId));
     }
 
 }
