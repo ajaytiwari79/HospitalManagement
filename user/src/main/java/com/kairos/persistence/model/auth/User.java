@@ -70,6 +70,7 @@ public class User extends UserBaseEntity {
 
     //define, first time password changed or not
     private boolean isPasswordUpdated;
+    private boolean systemUser;
 
     private Long kmdExternalId;
 
@@ -506,5 +507,13 @@ public class User extends UserBaseEntity {
         this.setCprNumber(nextToKinDTO.getCprNumber());
         Integer ageVariable = Integer.valueOf(nextToKinDTO.getCprNumber().substring(nextToKinDTO.getCprNumber().length() - 1));
         this.setGender((ageVariable % 2 == 0) ? Gender.FEMALE : Gender.MALE);
+    }
+
+    public boolean isSystemUser() {
+        return systemUser;
+    }
+
+    public void setSystemUser(boolean systemUser) {
+        this.systemUser = systemUser;
     }
 }
