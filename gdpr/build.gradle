@@ -8,7 +8,7 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven{url "https://plugins.gradle.org/m2/"}
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -30,7 +30,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url "https://plugins.gradle.org/m2/" }
-    maven{url "https://repo.spring.io/plugins-release"}
+    maven { url "https://repo.spring.io/plugins-release" }
 
 }
 
@@ -41,22 +41,24 @@ dependencies {
 
     compile project(':kcommons')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
-   compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile('org.slf4j:slf4j-api:1.7.7')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-   // compile('org.apache.jackrabbit:jackrabbit-jcr-commons:2.17.2')
+    // compile('org.apache.jackrabbit:jackrabbit-jcr-commons:2.17.2')
     //compile('org.apache.jackrabbit:jackrabbit-jcr2dav:2.10.1')
     //compile('javax.jcr:jcr:2.0')
     //compile('org.apache.jackrabbit:oak-jcr:1.7.6')
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.424'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.424'
     compile('org.apache.commons:commons-lang3:3.0')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     // swagger
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.6.1'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.6.1'
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile ('org.javers:javers-spring-boot-starter-mongo:3.10.0')
+    compile('org.javers:javers-spring-boot-starter-mongo:3.10.0')
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 
