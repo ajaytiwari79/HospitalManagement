@@ -77,7 +77,7 @@ public class UserRestClient {
                 if(restExchange.getStatusCode().value()==401) {
                     tokenAuthService.getNewAuthToken();
                 headers.remove("Authorization");
-                headers.add("Authorization","bearer "+ tokenAuthService.getAuthToken());
+                headers.add("Authorization","bearer "+ tokenAuthService.getNewAuthToken());
                     httpEntity= new HttpEntity<T>(t,headers);
                     restExchange = schedulerServiceRestTemplate.exchange(
                             url,

@@ -178,12 +178,13 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
+            panel.setOneTimeTriggerDate(null);
 
         }
         else {
             panel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
         }
-
+        panel.setOneTimeTrigger(schedulerPanelDTO.isOneTimeTrigger());
         save(panel);
         String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
