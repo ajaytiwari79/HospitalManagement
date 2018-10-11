@@ -40,7 +40,6 @@ public class ShiftController {
     @Inject
     private ShiftService shiftService;
 
-
     @Inject
     private ShiftSickService shiftSickService;
     @Inject private ShiftTemplateService shiftTemplateService;
@@ -193,7 +192,7 @@ public class ShiftController {
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
-    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO){
+    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam boolean validated){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShift(unitId,shiftDTO,type));
     }
 
@@ -201,7 +200,7 @@ public class ShiftController {
     @ApiOperation("validate shift by detail view")
     @PostMapping("/shift/validate_shift_by_details_view")
     public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestParam BigInteger shiftId,@RequestParam Boolean validatedByStaff){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftId,validatedByStaff,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftId,validatedByStaff,unitId,type));
     }
 
     @ApiOperation("shifts details by date")

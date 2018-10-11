@@ -7,6 +7,7 @@ import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class WTAForCareDaysDTO extends WTABaseRuleTemplateDTO{
         wtaTemplateType = WTATemplateType.WTA_FOR_CARE_DAYS;
     }
 
-    private List<ActivityCareDayCount> careDayCounts;
+    private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();
 
     public List<ActivityCareDayCount> getCareDayCounts() {
         return careDayCounts;

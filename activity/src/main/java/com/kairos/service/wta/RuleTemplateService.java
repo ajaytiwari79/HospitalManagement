@@ -205,13 +205,13 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
 
-        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range), new ArrayList<>(), localDate, 12L);
+        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range));
         seniorDaysPerYearWTATemplate.setCountryId(countryDTO.getId());
         seniorDaysPerYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         seniorDaysPerYearWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(seniorDaysPerYearWTATemplate);
 
-        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range), new ArrayList<>(), 5, localDate, 12);
+        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range));
         careDaysCheck.setCountryId(countryDTO.getId());
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);

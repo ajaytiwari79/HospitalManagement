@@ -1,0 +1,23 @@
+
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequence"},{$inc: { sequenceNumber: 1 }});
+
+db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
+
+db.wtaBaseRuleTemplate.update({"wtaTemplateType":{$in:["CHILD_CARE_DAYS_CHECK","SENIOR_DAYS_PER_YEAR"]}}, {$unset: {validationStartDate:1,numberOfWeeks:1}}, false, true);
+
+
+db.wtaBaseRuleTemplate.insert({
+    "_id" : "20638",
+    "name" : "WTA For Care Days",
+    "description" : "WTA For Care Days",
+    "disabled" : false,
+    "ruleTemplateCategoryId" : "4",
+    "countryId" : NumberLong(4),
+    "lastUpdatedBy" : "Ulrik",
+    "wtaTemplateType" : "WTA_FOR_CARE_DAYS",
+    "phaseTemplateValues" : [],
+    "createdAt" : ISODate("2018-07-03T12:20:07.417Z"),
+    "updatedAt" : ISODate("2018-07-03T12:20:07.417Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays"
+});

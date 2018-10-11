@@ -4,6 +4,7 @@ import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class WTAForCareDays extends WTABaseRuleTemplate{
 
-    private List<ActivityCareDayCount> careDayCounts;
+    private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();
 
     public WTAForCareDays(String name, String description) {
         super(name, description);
