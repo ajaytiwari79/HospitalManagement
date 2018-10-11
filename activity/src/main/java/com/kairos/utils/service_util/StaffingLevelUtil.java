@@ -104,7 +104,7 @@ public class StaffingLevelUtil {
             Map<BigInteger,StaffingLevelActivity> staffingLevelActivityMap=staffingLevelTimeSlotDTO.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId,Function.identity()));
             StaffingLevelActivity staffingLevelActivities[]=new StaffingLevelActivity[staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()];
             activitiesRankMap.forEach((activityId,rank)->{
-                staffingLevelActivities[rank]=staffingLevelActivityMap.get(activityId);
+                staffingLevelActivities[rank-1]=staffingLevelActivityMap.get(activityId);
             });
             staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
 
