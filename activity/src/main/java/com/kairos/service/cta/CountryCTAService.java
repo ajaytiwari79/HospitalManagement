@@ -11,6 +11,7 @@ import com.kairos.persistence.model.wta.Expertise;
 import com.kairos.persistence.model.wta.Organization;
 import com.kairos.persistence.model.wta.OrganizationType;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
@@ -48,7 +49,7 @@ public class CountryCTAService extends MongoBaseService {
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
     @Inject private ExceptionService exceptionService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject private GenericRestClient genericRestClient;
+    @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private ActivityService activityService;
 
     /**
@@ -66,7 +67,7 @@ public class CountryCTAService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, CTA_BASIC_INFO, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTABasicDetailsDTO>>() {});
+        CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         buildCTA(costTimeAgreement, collectiveTimeAgreementDTO,  false, true,ctaBasicDetailsDTO);
@@ -186,8 +187,7 @@ public class CountryCTAService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, CTA_BASIC_INFO, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTABasicDetailsDTO>>() {});
-
+        CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
 
         CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);

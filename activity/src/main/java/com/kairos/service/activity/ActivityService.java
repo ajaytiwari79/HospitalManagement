@@ -143,6 +143,7 @@ public class ActivityService extends MongoBaseService {
     private CounterRepository counterRepository;
     @Inject
     private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+
     @Inject
     private GenericRestClient genericRestClient;
 
@@ -903,8 +904,7 @@ public class ActivityService extends MongoBaseService {
 
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
                                                                  List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
-
-        OrganizationDTO organizationDTO = genericRestClient.publishRequest(null,unitId, RestClientUrlType.UNIT, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {});
+        OrganizationDTO organizationDTO = genericIntegrationService.getOrganizationDTO(unitId);
         if (organizationDTO == null) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }

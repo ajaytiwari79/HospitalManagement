@@ -46,8 +46,6 @@ public class SickService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject
-    private GenericRestClient genericRestClient;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
@@ -65,9 +63,7 @@ public class SickService {
         if (unitId == null) {
             Long userId = UserContext.getUserDetails().getId();
             BasicNameValuePair sickSettingsRequired = new BasicNameValuePair("sickSettingsRequired", "YES");
-            List<StaffResultDTO> staffAndOrganizationDetails =
-                    genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, "/user/{userId}/unit_sick_settings", Collections.singletonList(sickSettingsRequired), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffResultDTO>>>() {
-                    }, userId);
+            List<StaffResultDTO> staffAndOrganizationDetails =genericIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
             if (!Optional.ofNullable(staffAndOrganizationDetails).isPresent() && staffAndOrganizationDetails.isEmpty()) {
                 exceptionService.actionNotPermittedException("message.staff.notfound");
             }
@@ -77,8 +73,7 @@ public class SickService {
             }
             userSickDataWrapper.setStaffOrganizations(staffAndOrganizationDetails);
         } else {
-            Set<BigInteger> sickTimeTypeIds = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET.GET, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {
-            }, unitId);
+            Set<BigInteger> sickTimeTypeIds =genericIntegrationService.getSickTimeTypeIds(unitId);
             List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(sickTimeTypeIds, unitId);
             userSickDataWrapper.setActivities(activities);
         }

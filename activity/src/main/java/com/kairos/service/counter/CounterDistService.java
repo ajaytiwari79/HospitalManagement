@@ -64,8 +64,6 @@ public class CounterDistService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-    @Inject
-    private GenericRestClient genericRestClient;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -167,8 +165,7 @@ public class CounterDistService extends MongoBaseService {
     public List<BigInteger> getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level) {
         Long countryId = null;
         if (ConfLevel.UNIT.equals(level)) {
-            countryId = genericRestClient.publishRequest(null, refId, RestClientUrlType.UNIT, HttpMethod.GET, "/countryId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
-            });
+            countryId = genericIntegrationService.getCountryId(refId);
         }
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIIdsByTabIds(moduleId, refId, countryId, level);
         List<TabKPIDTO> tabKPIDTOSResult = filterTabKpiDate(tabKPIDTOS);
@@ -388,8 +385,7 @@ public class CounterDistService extends MongoBaseService {
             if (!Optional.ofNullable(accessGroupKPIEntry).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.accessgroup.kpi.notfound");
             }
-            List<AccessGroupPermissionCounterDTO> staffAndAccessGroups = genericRestClient.publishRequest(Arrays.asList(accessGroupKPIEntry.getAccessGroupId()), accessGroupKPIEntry.getUnitId(), RestClientUrlType.UNIT, HttpMethod.POST, "/staffs/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessGroupPermissionCounterDTO>>>() {
-            });
+            List<AccessGroupPermissionCounterDTO> staffAndAccessGroups = genericIntegrationService.getStaffAndAccessGroups(accessGroupKPIEntry);
             Set<Long> accessGroupsIds = staffAndAccessGroups.stream().flatMap(accessGroupDTO -> accessGroupDTO.getAccessGroupIds().stream().filter(accessGroup -> !(accessGroup.equals(accessGroupMappingDTO.getAccessGroupId())))).collect(toSet());
             List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupAndKpiId(accessGroupsIds, level, refId);
             Map<Long, List<BigInteger>> staffKpiMap = staffAndAccessGroups.stream().collect(Collectors.toMap(k -> k.getStaffId(), v -> new ArrayList<>()));
