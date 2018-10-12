@@ -398,6 +398,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("ctaAndWtaSettingsActivityTab").as("activity.ctaAndWtaSettingsActivityTab")
                         .and("locationActivityTab").as("activity.locationActivityTab")
                         .and("permissionsActivityTab").as("activity.permissionsActivityTab")
+                        .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);

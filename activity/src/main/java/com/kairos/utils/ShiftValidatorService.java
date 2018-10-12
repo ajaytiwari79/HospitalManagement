@@ -207,7 +207,6 @@ public class ShiftValidatorService {
    public void verifyShiftActivities(Set<AccessGroupRole> roles,Long employmentTypeId, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue, ShiftActivityIdsDTO shiftActivityIdsDTO){
         boolean staff=roles.contains(AccessGroupRole.STAFF);
         boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
-        ArrayList<Integer> integers=new ArrayList<>();
         phaseTemplateValue.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
                 if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){

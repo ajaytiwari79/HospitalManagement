@@ -142,7 +142,7 @@ public class GenericIntegrationService {
     }
 
     public Map<Long,Long> getAccessGroupForUnit(Long unitId,  Set<Long> parentAccessGroupIds) {
-        return genericRestClient.publishRequest(parentAccessGroupIds, unitId, true, IntegrationOperation.GET, "/access_groups_by_parent", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>>() {});
+        return genericRestClient.publishRequest(parentAccessGroupIds, unitId, true, IntegrationOperation.CREATE, "/access_groups_by_parent", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>>() {});
     }
 
 

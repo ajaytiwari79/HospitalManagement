@@ -508,7 +508,9 @@ public class ShiftService extends MongoBaseService {
         //List<Activity> allActivities = activityRepository.findAllActivitiesByIds(allActivitiesIds);
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(allActivitiesIds));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
-        Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v -> v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
+        Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=getMap(phase,activities);
+        //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v->v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()));
+                //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v -> v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
         //Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = activities.stream().collect(Collectors.toMap(k->k.getActivity(), v -> v..getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(),staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap,shiftActivityIdsDTO);
 
@@ -1267,6 +1269,20 @@ public class ShiftService extends MongoBaseService {
             }
         }
         return new ShiftActivityIdsDTO(activitiesToAdd,activitiesToEdit,activitiesToDelete);
+    }
+
+    private Map<BigInteger,PhaseTemplateValue>  getMap(Phase phase,List<ActivityWrapper> activities){
+        Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
+        for(ActivityWrapper activityWrapper:activities){
+            for(PhaseTemplateValue phaseTemplateValue:activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()){
+                if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
+                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(),phaseTemplateValue);
+                    break;
+                }
+            }
+        }
+        return phaseTemplateValueMap;
+
     }
 
 }
