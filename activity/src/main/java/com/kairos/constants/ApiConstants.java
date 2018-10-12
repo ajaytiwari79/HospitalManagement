@@ -41,7 +41,7 @@ public final class ApiConstants {
     public static final String ACCESS_GROUP="/access_group";
     public static final String ORG_TYPE="/org_type";
     //RestClientURL
-    public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
+    public static final String CTA_BASIC_INFO = "/cta_basic_info";
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
     public static final String GET_REASONCODE = "/reason_codes";
 

@@ -26,6 +26,7 @@ import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -39,6 +40,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -165,7 +167,7 @@ public class CounterDistService extends MongoBaseService {
     public List<BigInteger> getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level) {
         Long countryId = null;
         if (ConfLevel.UNIT.equals(level)) {
-            countryId = genericRestClient.publishRequest(null, refId, true, IntegrationOperation.GET, "/countryId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+            countryId = genericRestClient.publishRequest(null, refId, RestClientUrlType.UNIT, HttpMethod.GET, "/countryId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
             });
         }
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIIdsByTabIds(moduleId, refId, countryId, level);
@@ -386,7 +388,7 @@ public class CounterDistService extends MongoBaseService {
             if (!Optional.ofNullable(accessGroupKPIEntry).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.accessgroup.kpi.notfound");
             }
-            List<AccessGroupPermissionCounterDTO> staffAndAccessGroups = genericRestClient.publishRequest(Arrays.asList(accessGroupKPIEntry.getAccessGroupId()), accessGroupKPIEntry.getUnitId(), true, IntegrationOperation.CREATE, "/staffs/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessGroupPermissionCounterDTO>>>() {
+            List<AccessGroupPermissionCounterDTO> staffAndAccessGroups = genericRestClient.publishRequest(Arrays.asList(accessGroupKPIEntry.getAccessGroupId()), accessGroupKPIEntry.getUnitId(), RestClientUrlType.UNIT, HttpMethod.POST, "/staffs/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessGroupPermissionCounterDTO>>>() {
             });
             Set<Long> accessGroupsIds = staffAndAccessGroups.stream().flatMap(accessGroupDTO -> accessGroupDTO.getAccessGroupIds().stream().filter(accessGroup -> !(accessGroup.equals(accessGroupMappingDTO.getAccessGroupId())))).collect(toSet());
             List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupAndKpiId(accessGroupsIds, level, refId);

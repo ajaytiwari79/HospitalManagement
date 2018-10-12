@@ -32,86 +32,11 @@ public class GenericRestClient {
 
     @Autowired
     RestTemplate restTemplate;
-    @Inject private ExceptionService exceptionService;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit,id);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl +  getURI(t,uri,queryParams),
-                            getHttpMethod(integrationOperation),
-                            t==null?null:new HttpEntity<>(t), typeReference,pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
-    }
-
-    public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
-        switch (integrationOperation) {
-            case CREATE:
-                return HttpMethod.POST;
-            case DELETE:
-                return HttpMethod.DELETE;
-            case UPDATE:
-                return HttpMethod.PUT;
-            case GET:
-                return HttpMethod.GET;
-            default:return null;
-
-        }
-    }
-
+//=================================Usable Code==========================================
     /**
-     * Currently this will be used
-     * @param t
-     * @param id
-     * @param isUnit
-     * @param integrationOperation
-     * @param uri
-     * @param queryParam
-     * @param typeReference
-     * @param pathParams
-     * @param <T>
-     * @param <V>
-     * @return
-     */
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit,id)+uri;
-        String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
-        try {
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            url,
-                            getHttpMethod(integrationOperation),
-                            new HttpEntity<>(t), typeReference,pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                exceptionService.internalError(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
-    }
-
-
-    /**
-     * Currently this will be used
      * @param t
      * @param id
      * @param restClientUrlType
@@ -123,16 +48,18 @@ public class GenericRestClient {
      * @param <T>
      * @param <V>
      * @return
+     * @author mohit
+     * @date 12-10-2018
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType,id)+uri;
-        String url = baseUrl+getURIWithParam(queryParam);
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        String url = baseUrl + getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
                             url,
                             httpMethod,
-                            new HttpEntity<>(t), typeReference,pathParams);
+                            new HttpEntity<>(t), typeReference, pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalError(response.getMessage());
@@ -147,12 +74,12 @@ public class GenericRestClient {
     }
 
 
-    public String getURIWithParam(List<NameValuePair> queryParam){
+    public String getURIWithParam(List<NameValuePair> queryParam) {
         try {
-        URIBuilder builder = new URIBuilder();
-            if(CollectionUtils.isNotEmpty(queryParam)) {
+            URIBuilder builder = new URIBuilder();
+            if (CollectionUtils.isNotEmpty(queryParam)) {
                 for (NameValuePair nameValuePair : queryParam) {
-                    builder.addParameter(nameValuePair.getName(),nameValuePair.getValue().replace("[","").replace("]",""));
+                    builder.addParameter(nameValuePair.getName(), nameValuePair.getValue().replace("[", "").replace("]", ""));
                 }
             }
             return builder.build().toString();
@@ -163,21 +90,63 @@ public class GenericRestClient {
     }
 
 
-
-
-    public static <T> String getURI(T t,String uri,Map<String,Object> queryParams){
+    public static <T> String getURI(T t, String uri, Map<String, Object> queryParams) {
         URIBuilder builder = new URIBuilder();
 
-        if(Optional.ofNullable(queryParams).isPresent()){
-            queryParams.entrySet().forEach(e->{
-                builder.addParameter(e.getKey(),e.getValue().toString());
+        if (Optional.ofNullable(queryParams).isPresent()) {
+            queryParams.entrySet().forEach(e -> {
+                builder.addParameter(e.getKey(), e.getValue().toString());
             });
         }
         try {
-            uri= uri+builder.build().toString();
+            uri = uri + builder.build().toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return uri;
     }
+
+    // ============================Unusable code TODO Remove
+    //TODO Remove
+    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String, Object> queryParams, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isUnit, id);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + getURI(t, uri, queryParams),
+                            getHttpMethod(integrationOperation),
+                            t == null ? null : new HttpEntity<>(t), typeReference, pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException(response.getMessage());
+            }
+            return response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+        }
+
+    }
+
+    //TODO Remove
+    public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
+        switch (integrationOperation) {
+            case CREATE:
+                return HttpMethod.POST;
+            case DELETE:
+                return HttpMethod.DELETE;
+            case UPDATE:
+                return HttpMethod.PUT;
+            case GET:
+                return HttpMethod.GET;
+            default:
+                return null;
+
+        }
+    }
+
 }

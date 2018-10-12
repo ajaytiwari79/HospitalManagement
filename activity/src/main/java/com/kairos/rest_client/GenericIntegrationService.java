@@ -10,6 +10,7 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -20,6 +21,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,17 +126,17 @@ public class GenericIntegrationService {
 
     public Long removeFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Date shiftDate){
         BasicNameValuePair appliedDate=new BasicNameValuePair("appliedDate",DateUtils.asLocalDate(shiftDate).toString());
-        Long functionId= genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/applyFunction", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
+        Long functionId= genericRestClient.publishRequest(null,unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, "/unit_position/{unitPositionId}/applyFunction", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
         return functionId;
     }
 
     public Boolean restoreFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Map<Long,Set<LocalDate>> dateAndFunctionIdMap){
-        return genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/restore_functions",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
+        return genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/unit_position/{unitPositionId}/restore_functions",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
 
     }
 
     public Map<LocalDate,Long> removeFunctionFromUnitPositionByDates(Long unitId,Long unitPositionId,Set<LocalDate> dates){
-         return genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
+         return genericRestClient.publishRequest(dates,unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
          }
 
 
