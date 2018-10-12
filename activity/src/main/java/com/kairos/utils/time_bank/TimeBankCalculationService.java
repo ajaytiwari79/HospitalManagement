@@ -887,7 +887,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
+                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
                         }
