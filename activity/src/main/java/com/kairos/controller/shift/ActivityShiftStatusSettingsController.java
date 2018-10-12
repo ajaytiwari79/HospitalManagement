@@ -57,8 +57,8 @@ public class ActivityShiftStatusSettingsController {
     @ApiOperation("job for reminder")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setReminderTrigger(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
-        activityShiftStatusSettingsService.setReminderTrigger(activityId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityShiftStatusSettingsService.setReminderTrigger(activityId));
     }
 
 

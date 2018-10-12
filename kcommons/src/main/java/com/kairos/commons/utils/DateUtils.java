@@ -551,16 +551,16 @@ public class DateUtils {
         }
         return localDateTime;
     }
-    public static LocalDateTime substractDurationInLocalDateTime(LocalDateTime localDateTime, int duration, DurationType durationType, int recurringNumber) {
+    public static LocalDateTime substractDurationInLocalDateTime(LocalDateTime localDateTime, int duration, DurationType durationType) {
         switch (durationType) {
             case DAYS: {
-                return localDateTime.minusDays(duration * recurringNumber);
+                return localDateTime.minusDays(duration);
             }
             case HOURS: {
-                return localDateTime.minusHours(duration * recurringNumber);
+                return localDateTime.minusHours(duration );
             }
             case MINUTES: {
-                return localDateTime.minusMinutes(duration * recurringNumber);
+                return localDateTime.minusMinutes(duration );
             }
 
 

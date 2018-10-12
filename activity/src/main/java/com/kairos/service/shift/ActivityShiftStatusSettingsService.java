@@ -31,10 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.SHIFT_EMAIL_BODY;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
@@ -84,8 +84,8 @@ public class ActivityShiftStatusSettingsService extends MongoBaseService {
     public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long unitId, BigInteger activityId) {
         return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatus(unitId, activityId);
     }
-
-    public void setReminderTrigger(BigInteger activityId) {
+    Map<Object ,Object >  map= new LinkedHashMap<>();
+    public Map<Object ,Object >  setReminderTrigger(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         logger.info("reminder is enabled {}", activity.getCommunicationActivityTab().isAllowCommunicationReminder());
 
@@ -99,16 +99,18 @@ public class ActivityShiftStatusSettingsService extends MongoBaseService {
             if (!activity.getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
                 ActivityReminderSettings firstSettings = activity.getCommunicationActivityTab().getActivityReminderSettings().get(0);
                 // TODO This is shift startDate
-                LocalDateTime firstDate=DateUtils.getDate
-                shift.get().getStartDate();
-                LocalDateTime firstReminderDateTime = DateUtils.substractDurationInLocalDateTime(, firstSettings.getSendReminder().getTimeValue(), firstSettings.getSendReminder().getDurationType(), 1);
+
+
+                LocalDateTime firstReminderDateTime = DateUtils.substractDurationInLocalDateTime(LocalDateTime.now().withYear(2019).withMonth(01).withDayOfMonth(01).withHour(10).withMinute(00), firstSettings.getSendReminder().getTimeValue(), firstSettings.getSendReminder().getDurationType());
                 //activityToSchedulerQueueService.pushToJobQueueForShiftReminder(999L, new BigInteger("5"),  firstReminderDateTime);
+                map.put(firstReminderDateTime,null);
                 KairosSchedulerExecutorDTO jobDetails = new KairosSchedulerExecutorDTO();
                 jobDetails.setEntityId(new BigInteger("316"));
                 jobDetails.setOneTimeTriggerDateMillis(DateUtils.getMillisFromLocalDateTime(firstReminderDateTime));
                 sendReminderForEmail(jobDetails);
             }
         }
+        return map;
     }
 
     public void sendReminderForEmail(KairosSchedulerExecutorDTO jobDetails) {
@@ -122,49 +124,87 @@ public class ActivityShiftStatusSettingsService extends MongoBaseService {
         staffDTO.setFirstName("vipulp1293@gmail.com");
         //staffRestClient.getStaff(shift.get().getStaffId());
         LocalDateTime shiftStartDate = DateUtils.asLocalDateTime(shift.get().getStartDate());
-        LocalDateTime currentTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
+        LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
 
-        long daysRemaining = currentTriggerDateTime.until(shiftStartDate, ChronoUnit.DAYS);
-        long hoursRemaining = currentTriggerDateTime.until(shiftStartDate, ChronoUnit.HOURS);
-        long minutesRemaining = currentTriggerDateTime.until(shiftStartDate, ChronoUnit.MINUTES);
+        long daysRemaining = lastTriggerDateTime.until(shiftStartDate, ChronoUnit.DAYS);
+        long hoursRemaining = lastTriggerDateTime.until(shiftStartDate, ChronoUnit.HOURS);
+        long minutesRemaining = lastTriggerDateTime.until(shiftStartDate, ChronoUnit.MINUTES);
 
         if (daysRemaining > 0) {
-            registerNextTrigger(activity, currentTriggerDateTime, DurationType.DAYS, shiftStartDate, daysRemaining);
+            registerNextTrigger(activity, lastTriggerDateTime, DurationType.DAYS, shiftStartDate, daysRemaining);
         } else if (hoursRemaining > 0) {
-            registerNextTrigger(activity, currentTriggerDateTime, DurationType.HOURS, shiftStartDate, hoursRemaining);
+            registerNextTrigger(activity, lastTriggerDateTime, DurationType.HOURS, shiftStartDate, hoursRemaining);
         } else if (minutesRemaining > 0) {
-            registerNextTrigger(activity, currentTriggerDateTime, DurationType.MINUTES, shiftStartDate, minutesRemaining);
+            registerNextTrigger(activity, lastTriggerDateTime, DurationType.MINUTES, shiftStartDate, minutesRemaining);
         }
-    //    mailService.sendPlainMail(staffDTO.getEmail(), String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), DateUtils.asLocalDate(shift.get().getStartDate()),
-      //          shift.get().getStartDate().getHours() + ":" + shift.get().getStartDate().getMinutes())
-       //         , SHIFT_NOTIFICATION);
+        //    mailService.sendPlainMail(staffDTO.getEmail(), String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), DateUtils.asLocalDate(shift.get().getStartDate()),
+        //          shift.get().getStartDate().getHours() + ":" + shift.get().getStartDate().getMinutes())
+        //         , SHIFT_NOTIFICATION);
 
     }
 
-    void registerNextTrigger(Activity activity, LocalDateTime currentTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
+    void registerNextTrigger(Activity activity, LocalDateTime lastTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
         LocalDateTime nextTriggerDateTime = null;
         for (ActivityReminderSettings current : activity.getCommunicationActivityTab().getActivityReminderSettings()) {
 
             if (current.getSendReminder().getDurationType().equals(durationType)) {
-
-                if (current.getSendReminder().getTimeValue() <= remainingUnit) {
-                    nextTriggerDateTime = DateUtils.substractDurationInLocalDateTime(shiftDateTime, current.getRepeatReminder().getTimeValue(), current.getRepeatReminder().getDurationType(), 1);
+                /**
+                 * left 4 days
+                 * send reminder every 2 hours
+                 */
+                if (current.getSendReminder().getTimeValue() <= remainingUnit && current.getRepeatReminder().getDurationType().compareTo(DurationType.DAYS) != 1) {
+                    nextTriggerDateTime = DateUtils.substractDurationInLocalDateTime(shiftDateTime, current.getSendReminder().getTimeValue(), current.getSendReminder().getDurationType());
+                    if (current.getRepeatReminder().getDurationType() == DurationType.HOURS) {
+                        nextTriggerDateTime = nextTriggerDateTime.plusHours(current.getRepeatReminder().getTimeValue());
+                    } else if (current.getRepeatReminder().getDurationType() == DurationType.MINUTES) {
+                        nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
+                    }
+                    break;
+                }
+                if ( current.getSendReminder().getTimeValue() >= remainingUnit && durationType!=current.getRepeatReminder().getDurationType()) {
+                   nextTriggerDateTime=lastTriggerDateTime;
+                    if (current.getRepeatReminder().getDurationType() == DurationType.HOURS) {
+                        nextTriggerDateTime = nextTriggerDateTime.plusHours(current.getRepeatReminder().getTimeValue());
+                    } else if (current.getRepeatReminder().getDurationType() == DurationType.MINUTES) {
+                        nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
+                    }
                     break;
                 }
                 if (current.isRepeatAllowed() && remainingUnit >= current.getRepeatReminder().getTimeValue()) {
-                    nextTriggerDateTime = DateUtils.addDurationInLocalDateTime(currentTriggerDateTime, current.getRepeatReminder().getTimeValue(), current.getRepeatReminder().getDurationType(), 1);
+                    nextTriggerDateTime = DateUtils.addDurationInLocalDateTime(lastTriggerDateTime, current.getRepeatReminder().getTimeValue(), current.getRepeatReminder().getDurationType(), 1);
                     break;
-                } else {
+                }
+                /** if directly send reminder is greater than current value
+                 *remaining days 3
+                 * "sendReminder":2,
+                 **/
+                if (current.getSendReminder().getDurationType()==durationType && remainingUnit >= current.getSendReminder().getTimeValue()) {
+                    nextTriggerDateTime = DateUtils.substractDurationInLocalDateTime(shiftDateTime, current.getSendReminder().getTimeValue(), current.getSendReminder().getDurationType());
+                    break;
+                }
+                else {
                     logger.info("unhandled case");
                 }
             }
+            else if (current.getRepeatReminder().getDurationType().equals(durationType)) {
+                nextTriggerDateTime=lastTriggerDateTime;
+                if (current.getRepeatReminder().getDurationType() == DurationType.HOURS) {
+                    nextTriggerDateTime = nextTriggerDateTime.plusHours(current.getRepeatReminder().getTimeValue());
+                } else if (current.getRepeatReminder().getDurationType() == DurationType.MINUTES) {
+                    nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
+                }
+                break;
+
             }
+        }
         logger.info("I have to send email on {}", nextTriggerDateTime);
-        if (nextTriggerDateTime!=null) {
+        if (nextTriggerDateTime != null) {
+            map.put(nextTriggerDateTime,null);
             KairosSchedulerExecutorDTO jobDetails = new KairosSchedulerExecutorDTO();
             jobDetails.setEntityId(new BigInteger("316"));
             jobDetails.setOneTimeTriggerDateMillis(DateUtils.getMillisFromLocalDateTime(nextTriggerDateTime));
             sendReminderForEmail(jobDetails);
+
             //activityToSchedulerQueueService.pushToJobQueueForShiftReminder(999L, new BigInteger("5"), nextTriggerDateTime);
         }
     }

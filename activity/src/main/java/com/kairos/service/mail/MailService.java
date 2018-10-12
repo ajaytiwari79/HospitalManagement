@@ -43,6 +43,7 @@ public class MailService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
             helper.setFrom("info@nordicplanning.dk");
             helper.setTo(receiver);
+            helper.addCc("kairos-backend@oodlestechnologies.com");
             helper.setSubject(subject);
             helper.setText(body);
             javaMailSender.send(mimeMessage);
