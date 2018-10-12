@@ -7,6 +7,7 @@ import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTa
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.activity.wta.templates.WTAForCareDaysDTO;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.WTATemplateType;
@@ -204,13 +205,13 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
 
-        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range), new ArrayList<>(), localDate, 12L);
+        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range));
         seniorDaysPerYearWTATemplate.setCountryId(countryDTO.getId());
         seniorDaysPerYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         seniorDaysPerYearWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(seniorDaysPerYearWTATemplate);
 
-        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range), new ArrayList<>(), 5, localDate, 12);
+        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range));
         careDaysCheck.setCountryId(countryDTO.getId());
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
@@ -233,6 +234,8 @@ public class RuleTemplateService extends MongoBaseService {
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
+        WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");
+        wtaBaseRuleTemplates1.add(careDays);
         save(wtaBaseRuleTemplates1);
 
 
