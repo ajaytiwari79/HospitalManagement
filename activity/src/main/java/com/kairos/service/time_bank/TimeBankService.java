@@ -153,8 +153,7 @@ public class TimeBankService extends MongoBaseService {
     }
 
     private List<DailyTimeBankEntry> renewDailyTimeBanks(List<StaffAdditionalInfoDTO> unitPositionWithCtaDetailsDTOS, List<Shift> shifts) {
-        shifts.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
-        DateTime startDate = new DateTime(shifts.get(0).getStartDate());
+        DateTime startDate = new DateTime(shifts.get(0).getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = new DateTime(shifts.get(shifts.size() - 1).getEndDate()).plusDays(1).withTimeAtStartOfDay();
         List<Long> unitPositionIds = new ArrayList<>(unitPositionWithCtaDetailsDTOS.stream().map(staffAdditionalInfoDTO  -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toSet()));
         timeBankRepository.deleteDailyTimeBankByIds(unitPositionIds, startDate.toDate(), endDate.toDate());
@@ -181,7 +180,6 @@ public class TimeBankService extends MongoBaseService {
                 if (totalTimeBank != 0) {
                     unitPositionAndTimeBank.put(unitPositionWithCtaDetailsDTO.getUnitPosition().getId(), totalTimeBank);
                 }
-
             }
             startDate = startDate.plusDays(1);
         }
@@ -194,8 +192,9 @@ public class TimeBankService extends MongoBaseService {
      */
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId, Date startDate, Date endDate) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdBetweenDate(unitPositionId, startDate, endDate);
-        List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream().filter(ObjectUtils.distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName()))).collect(Collectors.toList());
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdBetweenDate(unitPositionId,startDate,endDate);
+        List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+        ruleTemplates = ruleTemplates.stream().filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO ::getName)).collect(Collectors.toList());
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(ruleTemplates);
         return unitPositionWithCtaDetailsDTO;
     }

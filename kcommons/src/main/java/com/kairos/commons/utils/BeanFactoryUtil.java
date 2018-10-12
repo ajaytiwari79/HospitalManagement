@@ -1,6 +1,6 @@
-package com.kairos.scheduler.utils;
+package com.kairos.commons.utils;
 
-import com.kairos.scheduler.config.ApplicationContextProviderNonManageBean;
+import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;

@@ -1,5 +1,6 @@
 package com.kairos.config.mongoEnv;
 
+import com.kairos.config.env.EnvConfig;
 import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
 package com.kairos.utils;
 
-import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
+import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;

@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.service.exception.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -65,7 +66,6 @@ import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
@@ -605,8 +605,9 @@ public class ShiftService extends MongoBaseService {
 //        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
 //        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         //List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
-        Date startDate=shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get();
-        Date endDate=shifts.stream().map(shift -> shift.getEndDate()).max(Date::compareTo).get();
+        shifts.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+        Date startDate=shifts.get(0).getStartDate();
+        Date endDate=shifts.get(shifts.size()-1).getEndDate();
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
         Map<Long,List<CTAResponseDTO>> unitPositionAndCTAResponseMap=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
         staffAdditionalInfoDTOS.stream().forEach(staffAdditionalInfoDTO -> {
@@ -616,6 +617,7 @@ public class ShiftService extends MongoBaseService {
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaRuleTemplateDTOS);
             }
         });
+        staffAdditionalInfoDTOS.forEach(s->setDayTypeTOCTARuleTemplate(s));
         timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
     }
 
