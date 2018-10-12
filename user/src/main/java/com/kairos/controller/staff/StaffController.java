@@ -580,7 +580,7 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment/{unitPositionId}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate, @PathVariable long unitId, @PathVariable long staffId,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @RequestParam(value = "shiftDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate, @PathVariable long unitId, @PathVariable long staffId,
                                                                       @PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
