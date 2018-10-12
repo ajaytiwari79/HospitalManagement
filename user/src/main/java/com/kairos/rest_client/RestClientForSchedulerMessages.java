@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.service.exception.TokenAuthService;
+import com.kairos.commons.service.TokenAuthService;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;

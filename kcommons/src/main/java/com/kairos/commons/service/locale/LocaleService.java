@@ -1,4 +1,4 @@
-package com.kairos.commons.service.exception.locale;
+package com.kairos.commons.service.locale;
 
 /**
  * Created by vipul on 10/5/18.

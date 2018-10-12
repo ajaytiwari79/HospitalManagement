@@ -10,7 +10,6 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.staff.unit_position.PositionLineChangeResultDTO;
@@ -61,6 +60,7 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -85,7 +85,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -684,7 +683,6 @@ public class UnitPositionService {
         }
         updateDTO.setId(wtaId);
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
-        unitPositionGraphRepository.save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
         return unitPositionQueryResult;
     }
@@ -693,8 +691,8 @@ public class UnitPositionService {
                                                     Long parentOrganizationId, String parentOrganizationName, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
 
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
-                unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDate(),
-                null, wtaResponseDTO);
+                unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
+                , wtaResponseDTO);
 
         result.setUnitId(unitPosition.getUnit().getId());
 
@@ -743,8 +741,9 @@ public class UnitPositionService {
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(),
                 unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDate(), null, null/*unitPosition.getWorkingTimeAgreement()*/);
+                unitPosition.getLastWorkingDate(),  wtaResponseDTO);
         result.setUnitId(unitPositionQueryResult.getUnitId());
+
         result.setEditable(unitPosition.isEditable());
         result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
