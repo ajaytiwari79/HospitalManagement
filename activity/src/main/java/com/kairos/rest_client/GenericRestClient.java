@@ -1,7 +1,9 @@
 package com.kairos.rest_client;
 
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.service.exception.ExceptionService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 
 @Service
 public class GenericRestClient {
@@ -70,7 +73,20 @@ public class GenericRestClient {
         }
     }
 
-
+    /**
+     * Currently this will be used
+     * @param t
+     * @param id
+     * @param isUnit
+     * @param integrationOperation
+     * @param uri
+     * @param queryParam
+     * @param typeReference
+     * @param pathParams
+     * @param <T>
+     * @param <V>
+     * @return
+     */
     public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit,id)+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
@@ -94,11 +110,50 @@ public class GenericRestClient {
     }
 
 
+    /**
+     * Currently this will be used
+     * @param t
+     * @param id
+     * @param restClientUrlType
+     * @param httpMethod
+     * @param uri
+     * @param queryParam
+     * @param typeReference
+     * @param pathParams
+     * @param <T>
+     * @param <V>
+     * @return
+     */
+    public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType,id)+uri;
+        String url = baseUrl+getURIWithParam(queryParam);
+        try {
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    restTemplate.exchange(
+                            url,
+                            httpMethod,
+                            new HttpEntity<>(t), typeReference,pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                exceptionService.internalError(response.getMessage());
+            }
+            return response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in User micro service " + e.getMessage());
+        }
+
+    }
+
+
     public String getURIWithParam(List<NameValuePair> queryParam){
         try {
         URIBuilder builder = new URIBuilder();
-            if(queryParam!=null && !queryParam.isEmpty()) {
-                builder.setParameters(queryParam);
+            if(CollectionUtils.isNotEmpty(queryParam)) {
+                for (NameValuePair nameValuePair : queryParam) {
+                    builder.addParameter(nameValuePair.getName(),nameValuePair.getValue().replace("[","").replace("]",""));
+                }
             }
             return builder.build().toString();
         } catch (URISyntaxException e) {
