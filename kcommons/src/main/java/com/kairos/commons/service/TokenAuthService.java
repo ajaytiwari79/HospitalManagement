@@ -1,4 +1,4 @@
-package com.kairos.commons.service.exception;
+package com.kairos.commons.service;
 
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.utils.BeanFactoryUtil;
