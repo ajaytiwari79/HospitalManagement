@@ -125,7 +125,7 @@ public class PlanningPeriodService extends MongoBaseService {
             // Set flipping dates
             FlippingDateDTO flippingDateDTO = null;
             for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
-                int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
+                    int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
                 switch (phaseSequence) {
                     case 4: {
                         flippingDateDTO = setFlippingDateAndTime(flippingDateDTO, flippingDateTime);
@@ -547,21 +547,18 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
-        restoreShifts(shiftStates);
-        List<Shift> shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(),unitId);
-        //List<Shift> shifts=shiftMongoRepository.findShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
-        shiftService.deleteAllShift(shifts, unitId);
-        //shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
+        restoreShifts(shiftStates,unitId);
+        shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
 
     public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId) {
         List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
-        restoreShifts(shiftStates);
+        restoreShifts(shiftStates,unitId);
         return true;
     }
 
-    public void restoreShifts(List<ShiftState> shiftStates) {
+    public void restoreShifts(List<ShiftState> shiftStates,Long unitId) {
         if (shiftStates.isEmpty()) {
             return;
         }
@@ -572,6 +569,7 @@ public class PlanningPeriodService extends MongoBaseService {
             shifts.add(shift);
         });
         save(shifts);
+        shiftService.UpdateShiftDailyTimeBankAndPaidOut(shifts, unitId);
     }
 
 

@@ -585,27 +585,21 @@ public class ShiftService extends MongoBaseService {
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
 
-    public void deleteAllShift(List<Shift> shifts,Long unitId){
+    public void UpdateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, Long unitId){
         if (!Optional.ofNullable(shifts).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.ids");
         }
         List<Long> staffIds=shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
         List<Long> unitPositionIds=shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
-        List<Long> userIds=shifts.stream().map(shift -> shift.getCreatedBy()).collect(Collectors.toList());
-//        List<BigInteger> activityIds=shifts.stream().map(shift-> shift.getActivities().get(0).getActivityId()).collect(Collectors.toList());
-//        List<ActivityWrapper> activityWrappers = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("staffIds",staffIds.toString()));
         requestParam.add(new BasicNameValuePair("unitPositionIds",unitPositionIds.toString()));
-        requestParam.add(new BasicNameValuePair("userIds",userIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/verifyUnitEmployments",requestParam,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){});
-
-        //        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
-//        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
-//        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
-//        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        //List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
-        shifts.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
+          List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
+          List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
+          Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        shifts.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
         Date startDate=shifts.get(0).getStartDate();
         Date endDate=shifts.get(shifts.size()-1).getEndDate();
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
@@ -618,7 +612,8 @@ public class ShiftService extends MongoBaseService {
             }
         });
         staffAdditionalInfoDTOS.forEach(s->setDayTypeTOCTARuleTemplate(s));
-        timeBankService.saveTimeBanks(staffAdditionalInfoDTOS, shifts);
+        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, shifts,activityWrapperMap);
+
     }
 
 

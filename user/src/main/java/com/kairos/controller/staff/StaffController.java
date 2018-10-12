@@ -588,8 +588,8 @@ public class StaffController {
     @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds,@RequestParam("unitPositionIds") List<Long> unitPositionIds,@RequestParam("userIds") List<Long> userIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds,unitPositionIds,userIds, unitId, ORGANIZATION));
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds,@RequestParam("unitPositionIds") List<Long> unitPositionIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds,unitPositionIds, unitId, ORGANIZATION));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

@@ -1683,7 +1683,7 @@ public class StaffService {
     }
 
 
-    public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds,List<Long> unitPositionIds,List<Long> userIds,long id, String type) {
+    public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds,List<Long> unitPositionIds,long id, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
@@ -1696,7 +1696,6 @@ public class StaffService {
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
         Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().filter(d->d.get("dayTypeId")!=null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO->{
             staffAdditionalInfoDTO.setUnitId(organization.getId());
             staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
@@ -1708,7 +1707,6 @@ public class StaffService {
                 staffAdditionalInfoDTO.setUnitPosition((unitPositionDetailsMap.get(Long.valueOf(staffAdditionalInfoDTO.getId()))));
             }
         });
-
         return  staffAdditionalInfoDTOS;
     }
 

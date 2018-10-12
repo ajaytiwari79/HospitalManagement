@@ -23,11 +23,11 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     @Query("{unitPositionId:?0,date:{$gte:?1 , $lt:?2}}")
     List<DailyTimeBankEntry> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
 
-    @Query(value = "{unitPositionId:?0,date:{$gte:?1 , $lt:?2}}",delete = true)
-    void deleteDailyTimeBank(Long unitPositionId, Date startDate, Date endDate);
+    @Query(value = "{unitPositionId:?0,date:{$gte:?1 , $lt:?2}}")
+    List<DailyTimeBankEntry> findAllDailyTimeBankByUnitPositionIdAndBetweenDates(Long unitPositionId, Date startDate, Date endDate);
 
-    @Query(value = "{unitPositionId:{$in:?0},date:{$gte:?1 , $lt:?2}}",delete = true)
-    void deleteDailyTimeBankByIds(List<Long> unitPositionIds, Date startDate, Date endDate);
+    @Query(value = "{unitPositionId:{$in:?0},date:{$gte:?1 , $lt:?2}}")
+    List<DailyTimeBankEntry> findAllDailyTimeBankByIdsAndBetweenDates(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$lt:?1}}")
     List<DailyTimeBankEntry> findAllByUnitPositionAndBeforeDate(Long unitPositionId, Date timeBankDate);
