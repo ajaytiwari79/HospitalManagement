@@ -44,8 +44,23 @@ public final class ApiConstants {
     public static final String CTA_BASIC_INFO = "/cta_basic_info";
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
     public static final String GET_REASONCODE = "/reason_codes";
-
-
+    public static final String REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/remove_functions";
+    public static final String APPLY_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/applyFunction";
+    public static final String STAFF_USER_ACCESS_GROUP ="/staff/user/accessgroup";
+    public static final String USER_STAFF_ID ="/user/staffId";
+    public static final String STAFF_DETAILS ="/staff/details";
+    public static final String ACCESS_GROUP_STAFFS ="/access_group/staffs";
+    public static final String ORGANIZATION_TYPE_GET_ORGANIZATION_IDS ="/orgtype/get_organization_ids";
+    public static final String KPI_DETAILS ="/kpi_details";
+    public static final String UNIT_PARENT_ORGANIZATION_AND_COUNTRY ="/unit/parent_org_and_country";
+    public static final String USER_USERID_STAFFS ="/user/{userId}/staffs";
+    public static final String DAY_TYPES_AND_EMPLOYEMENT_TYPES ="/day_types_and_employment_types";
+    public static final String STAFF_ACCESS_ROLES ="/staff/access_roles";
+    public static final String EXPERTIZE_WITHID_STAFF_AND_UNIT_POSITIONS ="/expertise/{expertiseId}/staff_and_unit_positions";
+    public static final String STAFF_EMAILS ="/staff/emails";
+    public static final String EXPERTIZE_WITHID_UNIT_POSITIONS ="/expertise/{expertiseId}/unitPositions";
+    public static final String EMPLOYEMENT_TYPE_AND_EXPERTIZE ="/employment_type_and_expertise";
+    public static final String STAFF_EMAILS ="/staff/emails";
 
 
 }
