@@ -868,6 +868,9 @@ public class AccessGroupService {
     }
 
     public Map<Long,Long> getAccessGroupUsingParentId(Long unitId,Set<Long> accessGroupIds){
-        return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
+        //intentionally return blank
+        return new HashMap<>();
+                //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
+                //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
     }
 }

@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -66,7 +67,6 @@ import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
@@ -508,7 +508,9 @@ public class ShiftService extends MongoBaseService {
         //List<Activity> allActivities = activityRepository.findAllActivitiesByIds(allActivitiesIds);
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(allActivitiesIds));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
-        Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v -> v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
+        Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=getMap(phase,activities);
+        //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v->v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()));
+                //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v -> v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
         //Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = activities.stream().collect(Collectors.toMap(k->k.getActivity(), v -> v..getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(),staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap,shiftActivityIdsDTO);
 
@@ -1157,6 +1159,7 @@ public class ShiftService extends MongoBaseService {
         if (shiftDTO.getShiftId() == null) {
             shiftDTO.setShiftId(shiftDTO.getId());
         }
+        shiftDTO.getActivities().forEach(a->a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
         shiftDTO.setId(null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId, shiftDTO, type, true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
@@ -1164,15 +1167,21 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO validateShift(BigInteger shiftId, Boolean validatedByStaff, Long unitId) {
+    public ShiftDTO validateShift(BigInteger shiftId, Boolean validatedByStaff, Long unitId,String type) {
         ShiftState shiftState = shiftStateMongoRepository.findOne(shiftId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftState.getActivities().get(0).getStartDate()),shiftState.getStaffId(), type, shiftState.getUnitPositionId());
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
         shiftValidatorService.validateGracePeriod(shiftDTO, validatedByStaff, unitId);
         if (validatedByStaff) {
             shiftState.setValidatedByStaffDate(LocalDate.now());
             save(shiftState);
         } else {
+            shiftState.setShiftId(null);
+            save(shiftState);
             shiftState.setValidatedByPlannerDate(LocalDate.now());
+        }
+        if((!staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && validatedByStaff) || !(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && validatedByStaff)){
+            exceptionService.actionNotPermittedException("message.shift.validation.access");
         }
         shiftState.setId(null);
         shiftState.setShiftId(null);
@@ -1267,6 +1276,20 @@ public class ShiftService extends MongoBaseService {
             }
         }
         return new ShiftActivityIdsDTO(activitiesToAdd,activitiesToEdit,activitiesToDelete);
+    }
+
+    private Map<BigInteger,PhaseTemplateValue>  getMap(Phase phase,List<ActivityWrapper> activities){
+        Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
+        for(ActivityWrapper activityWrapper:activities){
+            for(PhaseTemplateValue phaseTemplateValue:activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()){
+                if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
+                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(),phaseTemplateValue);
+                    break;
+                }
+            }
+        }
+        return phaseTemplateValueMap;
+
     }
 
 }

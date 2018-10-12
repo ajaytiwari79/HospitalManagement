@@ -246,6 +246,9 @@ public class FunctionalPaymentService{
         if (!functionalPayment.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalPaymentDTO.getId());
         }
+        if (functionalPayment.get().getFunctionalPaymentMatrices().isEmpty()){
+            exceptionService.actionNotPermittedException("message_functional_Payment_empty_matrix");
+        }
         if (functionalPayment.get().isPublished()) {
             exceptionService.dataNotFoundByIdException("message.functionalPayment.alreadyPublished");
         }

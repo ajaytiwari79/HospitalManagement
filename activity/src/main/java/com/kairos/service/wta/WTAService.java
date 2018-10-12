@@ -433,15 +433,15 @@ public class WTAService extends MongoBaseService {
     }
 
     public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId) {
-        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId,DateUtils.getCurrentDayStart());
+        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
         CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
         CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
         if (Optional.ofNullable(wta).isPresent()) {
-            WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(),wta.getParentId());
+            WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());
             ctawtaWrapper.setWta(Collections.singletonList(wtaResponseDTO));
         }
         if (Optional.ofNullable(cta).isPresent()) {
-            CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(), cta.getId(),cta.getParentId());
+            CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId());
             ctawtaWrapper.setCta(Collections.singletonList(ctaResponseDTO));
         }
         return ctawtaWrapper;
@@ -610,8 +610,10 @@ public class WTAService extends MongoBaseService {
         newWta.setParentId(oldWta.getId());
         save(newWta);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        WTAResponseDTO olWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
         wtaResponseDTO.setParentId(oldWta.getId());
+        wtaResponseDTO.setVersions(Collections.singletonList(olWTA));
         return wtaResponseDTO;
     }
 

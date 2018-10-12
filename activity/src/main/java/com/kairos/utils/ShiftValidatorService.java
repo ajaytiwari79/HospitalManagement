@@ -207,10 +207,9 @@ public class ShiftValidatorService {
    public void verifyShiftActivities(Set<AccessGroupRole> roles,Long employmentTypeId, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue, ShiftActivityIdsDTO shiftActivityIdsDTO){
         boolean staff=roles.contains(AccessGroupRole.STAFF);
         boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
-        ArrayList<Integer> integers=new ArrayList<>();
         phaseTemplateValue.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
-                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){
+                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && !v.isEligibleForManagement() ){
                     exceptionService.actionNotPermittedException("error.shift.not.authorised.phase");
                 }
             }
@@ -220,7 +219,7 @@ public class ShiftValidatorService {
                 }
             }
             if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
-                if((management && v.isManagementCanDelete()) || (staff && v.isStaffCanDelete())){
+                if((management && !v.isManagementCanDelete()) || (staff && !v.isStaffCanDelete())){
                     exceptionService.actionNotPermittedException("error.shift.not.deletable.phase");
                 }
             }
@@ -478,7 +477,7 @@ public class ShiftValidatorService {
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shiftsInIntervalWTATemplate.getIntervalUnit(), shiftsInIntervalWTATemplate.getIntervalLength()));
 
                     break;
-                case SENIOR_DAYS_PER_YEAR:
+                /*case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, seniorDaysPerYearWTATemplate.getNumberOfWeeks().intValue(), seniorDaysPerYearWTATemplate.getValidationStartDate()));
 
@@ -486,7 +485,7 @@ public class ShiftValidatorService {
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, childCareDaysCheckWTATemplate.getNumberOfWeeks(), childCareDaysCheckWTATemplate.getValidationStartDate()));
-                    break;
+                    break;*/
             }
         }
         return interval;
