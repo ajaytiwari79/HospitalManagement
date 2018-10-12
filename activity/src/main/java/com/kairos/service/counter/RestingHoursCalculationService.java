@@ -1,23 +1,23 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.chart.DataUnit;
-import com.kairos.dto.activity.counter.data.*;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.service.activity.TimeTypeService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Future;
 
 @Service
 public class RestingHoursCalculationService implements CounterService{
@@ -39,7 +39,6 @@ public class RestingHoursCalculationService implements CounterService{
         return staffRestingHours;
     }
 
-
     private List<BigInteger> getFilterredActivities(List<FilterCriteria> filters){
         ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
         for(FilterCriteria criteria: filters){
@@ -55,7 +54,6 @@ public class RestingHoursCalculationService implements CounterService{
                 default: break;
             }
         }
-
         return null;
     }
 
@@ -86,28 +84,7 @@ public class RestingHoursCalculationService implements CounterService{
             if(dateTimeInterval.overlaps(shiftInterval)){
                 totalrestingMinutes-=dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
             }
-
-            /*if (initTs >= shift.getStartDate().getTime() && initTs >= shift.getEndDate().getTime()) {
-                durationMillis -= 0;
-                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-            } else if (initTs >= shift.getStartDate().getTime() && initTs < shift.getEndDate().getTime()) {
-                durationMillis -= (shift.getEndDate().getTime() - initTs);
-                initTs = shift.getEndDate().getTime();
-                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-            } else if (initTs < shift.getStartDate().getTime() && endTs > shift.getEndDate().getTime()) {
-                durationMillis -= (shift.getEndDate().getTime() - shift.getStartDate().getTime());
-                initTs = shift.getEndDate().getTime();
-                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-                //setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
-            } else if (initTs < shift.getStartDate().getTime() && endTs < shift.getEndDate().getTime()) {
-                durationMillis -= (endTs - shift.getStartDate().getTime());
-                initTs = endTs;
-                //setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
-            }*/
         }
-//        if (dayOffAllowed) {
-//            durationMillis -= (shiftDayCollisionMap.entrySet().size() * (24 * 3600 * 1000));
-//        }
         return totalrestingMinutes;
     }
 
@@ -127,17 +104,17 @@ public class RestingHoursCalculationService implements CounterService{
     }
 
     @Override
-    public RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
-        //filterCriteria.getFilters().add(getTimeTypeCriteriaForRestingHours(filterCriteria.getCurrentCountryId()));
-        //List<BigInteger> activityIds = activityMongoRepository.getActivityIdsByFilter(filterCriteria.getFilters());
+    public Future<RawRepresentationData> getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterCriteria);
-        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
-        //return representationService.getRepresentationData(basicData);
+        new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
+        return null;
     }
 
     @Override
-    public RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
+    public Future<RawRepresentationData> getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterCriteriaDTO);
-        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
+        new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
+        Future<RawRepresentationData> data;
+        return null;
     }
 }

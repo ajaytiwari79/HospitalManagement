@@ -1,7 +1,6 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
@@ -11,6 +10,7 @@ import com.kairos.persistence.model.counter.KPI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /*
@@ -38,7 +38,7 @@ public interface CounterService {
     }
 
     //map -> { data: [ {} ] }
-    RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi);
+    Future<RawRepresentationData> getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi);
 
-    RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi);
+    Future<RawRepresentationData> getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi);
 }

@@ -5,6 +5,8 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.kairos.counter.CounterServiceMapping;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -12,12 +14,14 @@ import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.TaskDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
+import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.chart.PieChart;
 import com.kairos.dto.activity.counter.chart.DataUnit;
 import com.kairos.dto.activity.counter.chart.SingleNumberChart;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
@@ -50,6 +54,10 @@ public class CounterDataService {
     ExceptionService exceptionService;
     @Inject
     GenericIntegrationService genericIntegrationService;
+    @Inject
+    CounterRepository counterRepository;
+    @Inject
+    CounterServiceMapping counterServiceMapping;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
@@ -308,9 +316,16 @@ public class CounterDataService {
         return Math.round(value*100)/100.0;
     }
 
-    //TODO: scope in future, for collecting counters common separatly
+    //TODO: scope in future, for collecting counters common separately
     public void getCounterMetadataForVRP(){//list of KPIs
 
+    }
+
+    public void generateCounterData(FilterCriteriaDTO filters){
+        List<KPI> kpis = counterRepository.getKPIsByIds(filters.getCounterIds());
+        for(KPI kpi : kpis){
+            counterServiceMapping.getService(kpi.getType()).getCalculatedKPI(filters, kpi);
+        }
     }
 
 
