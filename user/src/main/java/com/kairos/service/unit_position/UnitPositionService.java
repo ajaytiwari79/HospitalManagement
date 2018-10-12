@@ -85,7 +85,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -684,7 +683,6 @@ public class UnitPositionService {
         }
         updateDTO.setId(wtaId);
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
-        unitPositionGraphRepository.save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
         return unitPositionQueryResult;
     }
@@ -693,8 +691,8 @@ public class UnitPositionService {
                                                     Long parentOrganizationId, String parentOrganizationName, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
 
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
-                unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDate(),
-                null, wtaResponseDTO);
+                unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
+                , wtaResponseDTO);
 
         result.setUnitId(unitPosition.getUnit().getId());
 
@@ -743,8 +741,9 @@ public class UnitPositionService {
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(),
                 unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDate(), null, null/*unitPosition.getWorkingTimeAgreement()*/);
+                unitPosition.getLastWorkingDate(),  wtaResponseDTO);
         result.setUnitId(unitPositionQueryResult.getUnitId());
+
         result.setEditable(unitPosition.isEditable());
         result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());

@@ -4,6 +4,7 @@
     <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
     <logger name="org.springframework.kafka" level="OFF"/>
     <logger name="org.apache.kafka" level="OFF"/>
+    <logger name="org.apache.kafka.clients.NetworkClient" level="OFF"/>
     <springProfile name="default">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
