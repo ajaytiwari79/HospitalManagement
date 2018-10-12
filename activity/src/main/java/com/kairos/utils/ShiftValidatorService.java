@@ -209,7 +209,7 @@ public class ShiftValidatorService {
         boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
         phaseTemplateValue.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
-                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && v.isManagementCanDelete() ){
+                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && !v.isEligibleForManagement() ){
                     exceptionService.actionNotPermittedException("error.shift.not.authorised.phase");
                 }
             }
@@ -219,7 +219,7 @@ public class ShiftValidatorService {
                 }
             }
             if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
-                if((management && v.isManagementCanDelete()) || (staff && v.isStaffCanDelete())){
+                if((management && !v.isManagementCanDelete()) || (staff && !v.isStaffCanDelete())){
                     exceptionService.actionNotPermittedException("error.shift.not.deletable.phase");
                 }
             }
