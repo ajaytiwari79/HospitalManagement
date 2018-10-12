@@ -148,7 +148,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
         } else {
             List<DataElement> dataElementList = dataElementMongoRepository.findAllDataElementByUnitIdAndIds(unitId, dataCategory.getDataElements());
             if (!dataElementList.isEmpty()) {
-                deleteAll(dataElementList);
+                dataElementMongoRepository.safeDelete(dataElementList);
             }
             delete(dataCategory);
             result.put(IS_SUCCESS, true);

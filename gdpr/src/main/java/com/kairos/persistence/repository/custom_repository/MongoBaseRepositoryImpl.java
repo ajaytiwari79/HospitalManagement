@@ -1,9 +1,10 @@
 package com.kairos.persistence.repository.custom_repository;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
+import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -15,7 +16,9 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable>
@@ -64,12 +67,12 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
     @Override
     public T findOne(ID id) {
         Assert.notNull(id, "The given id must not be null!");
-       return mongoOperations.findOne(new Query(Criteria.where("deleted").is(false).and("_id").is(id)),entityInformation.getJavaType());
+        return mongoOperations.findOne(new Query(Criteria.where("deleted").is(false).and("_id").is(id)), entityInformation.getJavaType());
     }
 
 
     @Override
-    public boolean safeDelete(ID id) {
+    public T safeDelete(ID id) {
         Assert.notNull(id, "The given id must not be null!");
         Query query = new Query(Criteria.where("_id").is(id).and("deleted").is(false));
         Update update = new Update().set("deleted", true);
@@ -78,6 +81,29 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         if (!Optional.ofNullable(entity).isPresent()) {
             throw new DataNotFoundByIdException("invalid request " + entityInformation.getJavaType().getSimpleName() + " id " + id);
         }
+        return entity;
+    }
+
+
+    @Override
+    public boolean safeDelete(Set<ID> ids) {
+        Assert.notEmpty(ids, "Id List cant be Empty !");
+        Update update = new Update().set("deleted", true);
+        update.set("updatedAt", DateUtils.getDate());
+        mongoOperations.updateMulti(new Query(Criteria.where("_id").in(ids).and("deleted").is(false)), update, entityInformation.getJavaType());
         return true;
     }
+
+
+    @Override
+    public <T extends MongoBaseEntity> List<T> safeDelete(List<T> entities) {
+
+        Assert.notNull(entities, "Entity must not be null!");
+        //  Get class name for sequence class
+
+        entities.forEach(entity -> entity.setDeleted(true));
+        mongoOperations.save(entities);
+        return entities;
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -7,6 +8,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,11 +16,19 @@ import java.util.List;
  */
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     private List<AgeRange> ageRange;
-    private List<BigInteger> activityIds;
-    private LocalDate validationStartDate;
-    private Long numberOfWeeks;
+    private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
     private boolean carryForwardLeave;
+    private CutOffIntervalUnit cutOffIntervalUnit;
+
+
+    public CutOffIntervalUnit getCutOffIntervalUnit() {
+        return cutOffIntervalUnit;
+    }
+
+    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -56,14 +66,10 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
 
     }
 
-    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,
-                                        LocalDate validationStartDate, Long numberOfWeeks) {
+    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange) {
         super(name , description);
         this.disabled=disabled;
         this.ageRange = ageRange;
-        this.activityIds = activityIds;
-        this.validationStartDate = validationStartDate;
-        this.numberOfWeeks = numberOfWeeks;
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
 
@@ -83,21 +89,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         this.activityIds = activityIds;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
-
-    public Long getNumberOfWeeks() {
-        return numberOfWeeks;
-    }
-
-    public void setNumberOfWeeks(Long numberOfWeeks) {
-        this.numberOfWeeks = numberOfWeeks;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

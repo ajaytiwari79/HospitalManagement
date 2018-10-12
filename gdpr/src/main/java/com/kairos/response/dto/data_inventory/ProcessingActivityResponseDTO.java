@@ -26,7 +26,7 @@ public class ProcessingActivityResponseDTO {
     private List<TransferMethodResponseDTO> transferMethods;
     private List<ProcessingLegalBasisResponseDTO> processingLegalBasis;
     private List<ResponsibilityTypeResponseDTO>responsibilityType;
-    private List<RiskResponseDTO> risks;
+    private List<RiskBasicResponseDTO> risks;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
@@ -38,9 +38,9 @@ public class ProcessingActivityResponseDTO {
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
 
 
-    public List<RiskResponseDTO> getRisks() { return risks; }
+    public List<RiskBasicResponseDTO> getRisks() { return risks; }
 
-    public void setRisks(List<RiskResponseDTO> risks) { this.risks = risks; }
+    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 
     public List<ProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
 

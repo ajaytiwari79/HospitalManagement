@@ -9,7 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "processing_activity")
 public class ProcessingActivity extends MongoBaseEntity {
@@ -37,7 +39,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     private Integer dataRetentionPeriod;
     private boolean active = true;
     private boolean subProcess;
-    private List<BigInteger> risks = new ArrayList<>();
+    private Set<BigInteger> risks = new HashSet<>();
     private boolean suggested;
 
     public ProcessingActivity() {
@@ -60,9 +62,9 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
-    public List<BigInteger> getRisks() { return risks; }
+    public Set<BigInteger> getRisks() { return risks; }
 
-    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
+    public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
 
     public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
     public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }

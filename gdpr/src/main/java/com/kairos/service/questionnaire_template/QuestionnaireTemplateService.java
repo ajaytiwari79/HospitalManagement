@@ -1,8 +1,8 @@
 package com.kairos.service.questionnaire_template;
 
 
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.dto.gdpr.QuestionnaireTemplateDTO;
@@ -272,7 +272,8 @@ public class QuestionnaireTemplateService extends MongoBaseService {
 
 
     public boolean deleteQuestionnaireTemplate(Long unitId, BigInteger questionnaireTemplateId) {
-        return questionnaireTemplateMongoRepository.safeDelete(questionnaireTemplateId);
+        questionnaireTemplateMongoRepository.safeDelete(questionnaireTemplateId);
+        return true;
     }
 
     /**

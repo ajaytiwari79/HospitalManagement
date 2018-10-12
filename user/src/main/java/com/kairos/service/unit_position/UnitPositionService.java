@@ -407,7 +407,7 @@ public class UnitPositionService {
             List<UnitPosition> oldUnitPositions
                     = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
             validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
-
+            UnitPositionLine unitPositionLine = createPositionLine(oldUnitPosition, currentUnitPositionLine, unitPositionDTO);
             CTAWTAWrapper newCTAWTAWrapper = null;
             if (changeResultDTO.getCtaId() != null || changeResultDTO.getWtaId() != null) {
                 changedParams.add(new BasicNameValuePair("startDate", unitPositionDTO.getStartDate() + ""));
@@ -416,8 +416,6 @@ public class UnitPositionService {
                         }, unitPositionId);
 
             }
-
-            UnitPositionLine unitPositionLine = createPositionLine(oldUnitPosition, currentUnitPositionLine, unitPositionDTO);
             oldUnitPosition.getUnitPositionLines().add(unitPositionLine);
             unitPositionGraphRepository.save(oldUnitPosition);
             linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
@@ -643,8 +641,10 @@ public class UnitPositionService {
                         positionLine.setWorkingTimeAgreement(wta);
                     }
                 });
-
-            });
+                if (u.getEndDate() != null) {
+                    u.setEndDate(positionLine.getEndDate());
+                }
+                });
         });
 
 
@@ -949,6 +949,14 @@ public class UnitPositionService {
 
     }
 
+    /**
+     * @Desc This method is used to veify the unit position of staff while copy shift
+     * @param unitId
+     * @param staffId
+     * @param dateInMillis
+     * @param expertiseId
+     * @return
+     */
     public Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long dateInMillis, Long expertiseId) {
         return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId, DateUtils.getLocalDate(dateInMillis));
     }
@@ -1166,5 +1174,20 @@ public class UnitPositionService {
 
         }
         return matchedDates;
+    }
+
+
+    public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
+        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        unitPositionDetails.setCountryId(countryId);
+        convertUnitPositionObject(unitPosition, unitPositionDetails);
+        unitPositionDetails.setCountryId(countryId);
+        unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+        return unitPositionDetails;
+
     }
 }

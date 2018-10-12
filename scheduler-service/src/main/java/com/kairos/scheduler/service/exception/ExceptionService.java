@@ -1,9 +1,9 @@
 package com.kairos.scheduler.service.exception;
 
+import com.kairos.commons.service.exception.locale.LocaleService;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.custom_exception.DuplicateDataException;
 import com.kairos.scheduler.custom_exception.InvalidRequestException;
-import com.kairos.scheduler.service.locale.LocaleService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -43,4 +43,4 @@ public class ExceptionService {
     public void internalError(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
     }
-    }
+}

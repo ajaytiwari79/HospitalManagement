@@ -1,7 +1,7 @@
 package com.kairos.service.filter;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.gdpr.FilterType;

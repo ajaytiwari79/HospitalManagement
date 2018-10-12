@@ -6,6 +6,8 @@ import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
+import com.kairos.response.dto.common.RiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -36,7 +38,7 @@ public class RiskService extends MongoBaseService {
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
      * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of Risk Ids generated after save operation
      */
-    public <T extends MongoBaseEntity, E extends BasicRiskDTO> Map<T, List<BigInteger>> saveRiskAtCountryLevelOrOrganizationLevel(Long countryIdOrUnitId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
+    public <T extends MongoBaseEntity, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long countryIdOrUnitId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
 
         Assert.notEmpty(risksRelatedToObject, "list can' t be empty");
         List<Risk> risks = new ArrayList<>();
@@ -70,13 +72,7 @@ public class RiskService extends MongoBaseService {
             risks.addAll(updateExistingRisk(countryIdOrUnitId, isUnitId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
         }
         riskMongoRepository.saveAll(getNextSequence(risks));
-        Map<T, List<BigInteger>> objectAndRiskIdsMap = new HashMap<>();
-        riskListRelatedToObjectMap.forEach((objectToWhichRiskRelated, riskList) -> {
-            List<BigInteger> riskIdList = new ArrayList<>();
-            riskList.forEach(risk -> riskIdList.add(risk.getId()));
-            objectAndRiskIdsMap.put(objectToWhichRiskRelated, riskIdList);
-        });
-        return objectAndRiskIdsMap;
+        return riskListRelatedToObjectMap;
     }
 
 
@@ -149,6 +145,11 @@ public class RiskService extends MongoBaseService {
             }
             riskNames.add(riskDTO.getName().toLowerCase());
         }
+    }
+
+
+    public List<RiskResponseDTO> getAllRiskByUnitId(Long unitId) {
+        return riskMongoRepository.getAllRiskByUnitId(unitId);
     }
 
 

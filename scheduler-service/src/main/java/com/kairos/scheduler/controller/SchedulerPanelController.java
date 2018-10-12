@@ -1,5 +1,7 @@
 package com.kairos.scheduler.controller;
 
+
+import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
@@ -27,6 +29,8 @@ public class SchedulerPanelController {
 
     @Inject
     private SchedulerPanelService schedulerPanelService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
     @GetMapping("/{schedulerPanelId}")
     @ApiOperation("Get Scheduler Panel ")
@@ -75,6 +79,11 @@ public class SchedulerPanelController {
     public ResponseEntity<Map<String, Object>> getAllJobDetails(@PathVariable Long unitId,@RequestParam("offset") int offset) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getAllJobDetailsByUnitId(unitId,offset));
     }
+    /*@GetMapping("/authToken")
+    @ApiOperation("Get job details ")
+    public ResponseEntity<Map<String, Object>> getAuthToken() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getAuthToken());
+    }*/
     @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {
