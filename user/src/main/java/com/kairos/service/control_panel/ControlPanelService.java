@@ -1,7 +1,7 @@
 package com.kairos.service.control_panel;
+
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.dto.activity.control_panel.ControlPanelDTO;
-import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.control_panel.jobDetails.JobDetails;
@@ -52,8 +52,6 @@ public class ControlPanelService{
     JobDetailsRepository jobDetailsRepository;
     @Inject
     IntegrationService integrationService;
-    @Inject
-    private KafkaProducer kafkaProducer;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ControlPanelService.class);

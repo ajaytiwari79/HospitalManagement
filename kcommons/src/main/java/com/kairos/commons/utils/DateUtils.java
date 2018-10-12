@@ -473,6 +473,7 @@ public class DateUtils {
     }
 
     public static String getDateStringWithFormat(Date date, String dateFormat) {
+
         org.joda.time.format.DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
         DateTime dateTime = new DateTime(date);
         return dateTime.toString(formatter);
@@ -544,6 +545,22 @@ public class DateUtils {
             }
             case MINUTES: {
                 return localDateTime.plusMinutes(duration * recurringNumber);
+            }
+
+
+        }
+        return localDateTime;
+    }
+    public static LocalDateTime substractDurationInLocalDateTime(LocalDateTime localDateTime, int duration, DurationType durationType, int recurringNumber) {
+        switch (durationType) {
+            case DAYS: {
+                return localDateTime.minusDays(duration * recurringNumber);
+            }
+            case HOURS: {
+                return localDateTime.minusHours(duration * recurringNumber);
+            }
+            case MINUTES: {
+                return localDateTime.minusMinutes(duration * recurringNumber);
             }
 
 
@@ -711,5 +728,7 @@ public class DateUtils {
 
     }
 
-
+    public static LocalDateTime getLocalDateTimeFromMillis(Long longValue) {
+        return (longValue == null) ? null : LocalDateTime.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault());
+    }
 }

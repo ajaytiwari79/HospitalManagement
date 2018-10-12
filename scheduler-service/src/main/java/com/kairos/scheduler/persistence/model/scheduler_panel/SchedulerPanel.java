@@ -46,7 +46,6 @@ public class SchedulerPanel extends MongoBaseEntity {
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
-    private List<ActivityReminderSettings> reminderSettings;
 
 
 
@@ -243,11 +242,4 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.runOnce = runOnce;
     }
 
-    public List<ActivityReminderSettings> getReminderSettings() {
-        return reminderSettings;
-    }
-
-    public void setReminderSettings(List<ActivityReminderSettings> reminderSettings) {
-        this.reminderSettings = reminderSettings;
-    }
 }

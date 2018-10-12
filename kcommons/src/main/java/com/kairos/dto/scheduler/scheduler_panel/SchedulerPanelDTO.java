@@ -36,7 +36,7 @@ public class SchedulerPanelDTO {
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
-    private List<ActivityReminderSettings> reminderSettings;
+
 
 
     public SchedulerPanelDTO() {
@@ -283,11 +283,5 @@ public class SchedulerPanelDTO {
         this.selectedHours = selectedHours;
     }
 
-    public List<ActivityReminderSettings> getReminderSettings() {
-        return reminderSettings;
-    }
 
-    public void setReminderSettings(List<ActivityReminderSettings> reminderSettings) {
-        this.reminderSettings = reminderSettings;
-    }
 }
