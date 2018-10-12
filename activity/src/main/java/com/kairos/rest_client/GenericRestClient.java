@@ -98,7 +98,9 @@ public class GenericRestClient {
         try {
         URIBuilder builder = new URIBuilder();
             if(queryParam!=null && !queryParam.isEmpty()) {
-                builder.setParameters(queryParam);
+                for (NameValuePair nameValuePair : queryParam) {
+                    builder.addParameter(nameValuePair.getName(),nameValuePair.getValue().replace("[","").replace("]",""));
+                }
             }
             return builder.build().toString();
         } catch (URISyntaxException e) {

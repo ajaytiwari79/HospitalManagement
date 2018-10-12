@@ -61,6 +61,7 @@ public class Shift extends MongoBaseEntity {
     private LocalDate validatedByStaffDate;
     private LocalDate validatedByPlannerDate;
     private Long createdBy = UserContext.getUserDetails().getId();
+    private Long updatedBy = UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
     private Long functionId;
 
@@ -130,6 +131,15 @@ public class Shift extends MongoBaseEntity {
 
     public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
         this.attendanceDuration = attendanceDuration;
+    }
+
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public Long getCreatedBy() {

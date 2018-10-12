@@ -12,6 +12,8 @@ import com.kairos.dto.activity.time_bank.TimeBankVisualViewDTO;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.user.staff.StaffAndAccessRollInfoDto;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOut;
@@ -112,13 +114,6 @@ public class TimeBankService extends MongoBaseService {
     }
 
     public void saveTimeBanks(List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, List<Shift> shifts) {
-        shifts.forEach(shift -> {
-            staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
-                if (shift.getUnitPositionId().equals(staffAdditionalInfoDTO.getId())) {
-                    staffAdditionalInfoDTO.getUnitPosition().setStaffId(shift.getStaffId());
-                }
-            });
-        });
         List<DailyTimeBankEntry> dailyTimeBankEntries = renewDailyTimeBanks(staffAdditionalInfoDTOS, shifts);
         if (!dailyTimeBankEntries.isEmpty()) {
             save(dailyTimeBankEntries);
@@ -160,7 +155,7 @@ public class TimeBankService extends MongoBaseService {
     private List<DailyTimeBankEntry> renewDailyTimeBanks(List<StaffAdditionalInfoDTO> unitPositionWithCtaDetailsDTOS, List<Shift> shifts) {
         shifts.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
         DateTime startDate = new DateTime(shifts.get(0).getStartDate());
-        DateTime endDate = new DateTime(shifts.get(shifts.size() - 1).getEndDate());
+        DateTime endDate = new DateTime(shifts.get(shifts.size() - 1).getEndDate()).plusDays(1).withTimeAtStartOfDay();
         List<Long> unitPositionIds = new ArrayList<>(unitPositionWithCtaDetailsDTOS.stream().map(staffAdditionalInfoDTO  -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toSet()));
         timeBankRepository.deleteDailyTimeBankByIds(unitPositionIds, startDate.toDate(), endDate.toDate());
         List<ShiftWithActivityDTO> shiftsList = shiftMongoRepository.findAllShiftsBetweenDurationByUEPS(unitPositionIds, startDate.toDate(), endDate.toDate());
@@ -173,7 +168,6 @@ public class TimeBankService extends MongoBaseService {
             int totalTimeBank = 0;
             for (StaffAdditionalInfoDTO unitPositionWithCtaDetailsDTO : unitPositionWithCtaDetailsDTOS) {
                 List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftDateMap.getOrDefault(unitPositionWithCtaDetailsDTO.getUnitPosition().getId() + "" + DateUtils.asLocalDate(startDate.toDate()), new ArrayList<>());
-                if (dailyTimeBankEntryMap.containsKey(unitPositionWithCtaDetailsDTO.getUnitPosition().getId())) {
                     DailyTimeBankEntry dailyTimeBankEntry = dailyTimeBankEntryMap.get(unitPositionWithCtaDetailsDTO.getUnitPosition().getId());
                     long accumulatedTimeBank = dailyTimeBankEntry != null ? dailyTimeBankEntry.getAccumultedTimeBankMin() : 0;
                     Interval interval = new Interval(startDate, startDate.plusDays(1).withTimeAtStartOfDay());
@@ -184,7 +178,6 @@ public class TimeBankService extends MongoBaseService {
                         totalTimeBank += dailyTimeBank.getTotalTimeBankMin();
                         dailyTimeBanks.add(dailyTimeBank);
                     }
-                }
                 if (totalTimeBank != 0) {
                     unitPositionAndTimeBank.put(unitPositionWithCtaDetailsDTO.getUnitPosition().getId(), totalTimeBank);
                 }
@@ -192,7 +185,6 @@ public class TimeBankService extends MongoBaseService {
             }
             startDate = startDate.plusDays(1);
         }
-        //timeBankRepository.updateAccumulatedTimeBank(unitPositionAndTimeBank);
         return dailyTimeBanks;
     }
 

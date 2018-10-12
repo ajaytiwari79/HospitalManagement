@@ -1,7 +1,6 @@
 package com.kairos.controller.staff;
 
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.dto.activity.time_bank.TimeBankStaffAndUnitPositionDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.staff.*;
@@ -28,7 +27,6 @@ import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -587,11 +585,11 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
 
-    @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.POST)
+    @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestBody TimeBankStaffAndUnitPositionDTO timeBankStaffAndUnitPositionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(timeBankStaffAndUnitPositionDTO, unitId, ORGANIZATION));
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds,@RequestParam("unitPositionIds") List<Long> unitPositionIds,@RequestParam("userIds") List<Long> userIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds,unitPositionIds,userIds, unitId, ORGANIZATION));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

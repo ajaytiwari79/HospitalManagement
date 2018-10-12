@@ -208,7 +208,7 @@ public class TimeBankCalculationService {
                     shiftInterval = interval.overlap(shiftInterval);
                     if(ctaDto.getCtaRuleTemplates().size()>0) {
                         for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
-                            if (validateCTARuleTemplateDTO(ruleTemplate, staffAdditionalInfoDTO.getUserAccessRoleDTO(), ctaDto.getEmploymentType(), shift.getPhaseId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
+                            if (validateCTARuleTemplateDTO(ruleTemplate, ctaDto.getEmploymentType(), shift.getPhaseId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
                                 int ctaTimeBankMin = 0;
                                 boolean activityValid = ruleTemplate.getActivityIds().contains(shiftActivity.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
                                 if (activityValid) {
@@ -268,20 +268,19 @@ public class TimeBankCalculationService {
     /**
      *Called by @link {calculateDailyTimebank}
      * @param ruleTemplate
-     * @param userAccessRoleDTO
      * @param employmentType
      * @param shiftPhaseId
      * @return
      * @author mohit
      * @date 6-10-2018
      */
-    public boolean validateCTARuleTemplateDTO(CTARuleTemplateDTO ruleTemplate, UserAccessRoleDTO userAccessRoleDTO, EmploymentType employmentType, BigInteger shiftPhaseId)
+    public boolean validateCTARuleTemplateDTO(CTARuleTemplateDTO ruleTemplate, EmploymentType employmentType, BigInteger shiftPhaseId)
     {
         if      (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null) return false;
         //else if (!ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) return false;
         else if (CollectionUtils.isNotEmpty(ruleTemplate.getEmploymentTypes()) && !ruleTemplate.getEmploymentTypes().contains(employmentType.getId())) return false;
         else if (CollectionUtils.isNotEmpty(ruleTemplate.getPhaseInfo()) && !(ruleTemplate.getPhaseInfo().stream().filter(p->p.getPhaseId().equals(shiftPhaseId)).findFirst().isPresent())) return false;
-        else if (CollectionUtils.isNotEmpty(ruleTemplate.getCalculateValueIfPlanned()) &&!((ruleTemplate.getCalculateValueIfPlanned().stream().filter(cvpf-> (cvpf.equals(CalculateValueIfPlanned.STAFF) && userAccessRoleDTO.getStaff()) || (cvpf.equals(CalculateValueIfPlanned.MANAGER) && userAccessRoleDTO.getManagement())).findFirst().isPresent()))) return false;
+        //else if (CollectionUtils.isNotEmpty(ruleTemplate.getCalculateValueIfPlanned()) &&!((ruleTemplate.getCalculateValueIfPlanned().stream().filter(cvpf-> (cvpf.equals(CalculateValueIfPlanned.STAFF) && userAccessRoleDTO.getStaff()) || (cvpf.equals(CalculateValueIfPlanned.MANAGER) && userAccessRoleDTO.getManagement())).findFirst().isPresent()))) return false;
        return true;
     }
     /**
