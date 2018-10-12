@@ -407,7 +407,7 @@ public class UnitPositionService {
             List<UnitPosition> oldUnitPositions
                     = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
             validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
-
+            UnitPositionLine unitPositionLine = createPositionLine(oldUnitPosition, currentUnitPositionLine, unitPositionDTO);
             CTAWTAWrapper newCTAWTAWrapper = null;
             if (changeResultDTO.getCtaId() != null || changeResultDTO.getWtaId() != null) {
                 changedParams.add(new BasicNameValuePair("startDate", unitPositionDTO.getStartDate() + ""));
@@ -416,8 +416,6 @@ public class UnitPositionService {
                         }, unitPositionId);
 
             }
-
-            UnitPositionLine unitPositionLine = createPositionLine(oldUnitPosition, currentUnitPositionLine, unitPositionDTO);
             oldUnitPosition.getUnitPositionLines().add(unitPositionLine);
             unitPositionGraphRepository.save(oldUnitPosition);
             linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
@@ -646,7 +644,7 @@ public class UnitPositionService {
                 if (u.getEndDate() != null) {
                     u.setEndDate(positionLine.getEndDate());
                 }
-            });
+                });
         });
 
 
