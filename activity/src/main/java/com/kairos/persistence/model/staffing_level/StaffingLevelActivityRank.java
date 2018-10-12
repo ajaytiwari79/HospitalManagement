@@ -9,24 +9,24 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
-public class StaffingLevelActivityRanking extends MongoBaseEntity {
+public class StaffingLevelActivityRank extends MongoBaseEntity {
     private BigInteger activityId;
     private LocalDate staffingLevelDate;
     private BigInteger staffingLevelId;
     private int rank;
 
-    public StaffingLevelActivityRanking() {
+    public StaffingLevelActivityRank() {
         //Default Constructor
     }
 
-    public StaffingLevelActivityRanking(BigInteger activityId, LocalDate staffingLevelDate, BigInteger staffingLevelId, int rank) {
+    public StaffingLevelActivityRank(BigInteger activityId, LocalDate staffingLevelDate, BigInteger staffingLevelId, int rank) {
         this.activityId = activityId;
         this.staffingLevelDate = staffingLevelDate;
         this.staffingLevelId = staffingLevelId;
         this.rank = rank;
     }
 
-    public StaffingLevelActivityRanking(BigInteger id,BigInteger activityId, LocalDate staffingLevelDate, BigInteger staffingLevelId, int rank) {
+    public StaffingLevelActivityRank(BigInteger id, BigInteger activityId, LocalDate staffingLevelDate, BigInteger staffingLevelId, int rank) {
         this.id=id;
         this.activityId = activityId;
         this.staffingLevelDate = staffingLevelDate;
