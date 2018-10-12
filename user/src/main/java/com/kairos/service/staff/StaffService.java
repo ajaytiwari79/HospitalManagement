@@ -1738,7 +1738,7 @@ public class StaffService {
         }
         List<Map<Long,Float>> data=unitPositionGraphRepository.findFunctionalHourlyWages(Collections.singletonList(unitPosition.getId()));
         logger.info(data.toString());
-        unitPosition.getPositionLines().get(0).setHourlyWages(data.get(0).get(unitPosition.getPositionLines().get(0).getId()));
+        unitPositionDetails.setHourlyWages(data.size()>0?data.get(0).get(unitPosition.getPositionLines().get(0).getId()):0.0f);
         return unitPositionDetails;
     }
 

@@ -256,7 +256,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
 
-    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0}\n" +
+    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) = {0}\n" +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +
             "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(payGrade:PayGrade) \n" +
             "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{published:true}) \n" +
