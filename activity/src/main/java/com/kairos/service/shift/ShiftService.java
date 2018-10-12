@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -66,7 +67,6 @@ import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
@@ -1159,6 +1159,7 @@ public class ShiftService extends MongoBaseService {
         if (shiftDTO.getShiftId() == null) {
             shiftDTO.setShiftId(shiftDTO.getId());
         }
+        shiftDTO.getActivities().forEach(a->a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
         shiftDTO.setId(null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId, shiftDTO, type, true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
@@ -1166,15 +1167,21 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO validateShift(BigInteger shiftId, Boolean validatedByStaff, Long unitId) {
+    public ShiftDTO validateShift(BigInteger shiftId, Boolean validatedByStaff, Long unitId,String type) {
         ShiftState shiftState = shiftStateMongoRepository.findOne(shiftId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftState.getActivities().get(0).getStartDate()),shiftState.getStaffId(), type, shiftState.getUnitPositionId());
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
         shiftValidatorService.validateGracePeriod(shiftDTO, validatedByStaff, unitId);
         if (validatedByStaff) {
             shiftState.setValidatedByStaffDate(LocalDate.now());
             save(shiftState);
         } else {
+            shiftState.setShiftId(null);
+            save(shiftState);
             shiftState.setValidatedByPlannerDate(LocalDate.now());
+        }
+        if((!staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && validatedByStaff) || !(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && validatedByStaff)){
+            exceptionService.actionNotPermittedException("message.shift.validation.access");
         }
         shiftState.setId(null);
         shiftState.setShiftId(null);

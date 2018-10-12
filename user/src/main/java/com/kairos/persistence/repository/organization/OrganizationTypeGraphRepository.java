@@ -86,7 +86,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     void addSkillInOrgType(long orgTypeId, long skillId, Long creationDate, Long lastModificationDate);
 
     @Query("Match (orgType:OrganizationType),(skill:Skill) where id(orgType)={0} AND id(skill)={1} " +
-            "match (orgType)-[r:" + ORG_TYPE_HAS_SKILL + "]->(skill) set r.deleted=true,r.lastModificationDate={2} return r")
+            "match (orgType)-[r:" + ORG_TYPE_HAS_SKILL + "]->(skill) set r.deleted=true,r.lastModificationDate={2} ")
     void deleteSkillFromOrgType(long orgTypeId, long skillId, Long lastModificationDate);
 
     @Query("Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_SKILL{deleted:false}]->(skill) where id(orgType)={0} " +
@@ -165,10 +165,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     * created by bobby
     * */
     @Query("Match (organization:Organization{isEnable:true}) where id(organization)={0}\n" +
-            "            Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) \n" +
-            "            optional match(organizationType)-[:"+HAS_SUB_TYPE+"]->(organizationSubType:OrganizationType{isEnable:true})\n" +
-            "            with DISTINCT organizationType, organizationSubType\n" +
-            "            optional match  (organizationSubType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->( organizationSubService:OrganizationService{isEnabled:true}) with  DISTINCT organizationType, organizationSubType ,organizationSubService      \n" +
+            " Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) \n" +
+            " optional match(organizationType)-[:"+HAS_SUB_TYPE+"]->(organizationSubType:OrganizationType{isEnable:true})\n" +
+            " with DISTINCT organizationType, organizationSubType\n" +
+            " optional match  (organizationSubType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->( organizationSubService:OrganizationService{isEnabled:true}) with  DISTINCT organizationType, organizationSubType ,organizationSubService      \n" +
             "optional match (organizationSubService)<-[:"+ORGANIZATION_SUB_SERVICE+"]-(organizationService:OrganizationService {isEnabled:true} )             \n" +
             "return id(organizationType) as id, organizationType.name as name , " +
             "CASE WHEN organizationSubType IS NOT NULL THEN  collect(distinct { id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as organizationSubTypes ,\n" +

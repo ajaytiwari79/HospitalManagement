@@ -2,6 +2,7 @@ package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.Gender;
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.client.NextToKinDTO;
@@ -72,6 +73,7 @@ public class User extends UserBaseEntity {
     private boolean isPasswordUpdated;
 
     private Long kmdExternalId;
+    private UserType userType;
 
     @Transient
     private Boolean hubMember;
@@ -506,5 +508,14 @@ public class User extends UserBaseEntity {
         this.setCprNumber(nextToKinDTO.getCprNumber());
         Integer ageVariable = Integer.valueOf(nextToKinDTO.getCprNumber().substring(nextToKinDTO.getCprNumber().length() - 1));
         this.setGender((ageVariable % 2 == 0) ? Gender.FEMALE : Gender.MALE);
+    }
+
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }

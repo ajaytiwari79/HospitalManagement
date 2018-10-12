@@ -50,9 +50,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 
 import static com.kairos.dto.activity.cta.AccountType.TIMEBANK_ACCOUNT;
@@ -654,10 +652,10 @@ public class TimeBankCalculationService {
         DateTime startDate = interval.getStart();
         DateTime endDate = interval.getEnd();
         Interval updatedInterval = null;
-        DateTime unitPositionStartDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate());
+        DateTime unitPositionStartDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate());
         DateTime unitPositionEndDate = null;
-        if (unitPositionWithCtaDetailsDTO.getUnitPositionEndDate() != null) {
-            unitPositionEndDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionEndDate());
+        if (unitPositionWithCtaDetailsDTO.getEndDate() != null) {
+            unitPositionEndDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getEndDate());
         }
         if (startDate.toLocalDate().isBefore(new DateTime().toLocalDate()) && (startDate.isAfter(unitPositionStartDate) || endDate.isAfter(unitPositionStartDate))) {
             if (startDate.isBefore(unitPositionStartDate)) {
@@ -684,9 +682,9 @@ public class TimeBankCalculationService {
      */
     private Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
         Interval updatedInterval = null;
-        DateTime unitPositionStartTime = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate());
+        DateTime unitPositionStartTime = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate());
         if (interval.contains(unitPositionStartTime) || interval.getStart().isAfter(unitPositionStartTime)) {
-            DateTime unitPositionEndTime = unitPositionWithCtaDetailsDTO.getUnitPositionEndDate() != null ? DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionEndDate()) : null;
+            DateTime unitPositionEndTime = unitPositionWithCtaDetailsDTO.getEndDate() != null ? DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getEndDate()) : null;
             Interval unitPositionInterval = new Interval(unitPositionStartTime, unitPositionEndTime == null ? interval.getEnd() : unitPositionEndTime);
             if (interval.overlaps(unitPositionInterval)) {
                 updatedInterval = interval.overlap(unitPositionInterval);
@@ -889,7 +887,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
+                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
                         }
@@ -968,7 +966,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
+                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
                         }
@@ -990,7 +988,7 @@ public class TimeBankCalculationService {
     private List<CTADistributionDTO> getBlankTimeBankDistribution(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<CTADistributionDTO> timeBankCTADistributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
-            if (!cta.isCalculateScheduledHours()) {
+            if (!cta.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && cta.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
                 timeBankCTADistributionDTOS.add(new CTADistributionDTO(cta.getId(), cta.getName(), 0));
             }
         });

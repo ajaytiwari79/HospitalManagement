@@ -119,7 +119,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 
 	@Profile({"development","qa","production"})
 	@LoadBalanced
-	@Bean(name ="schedulerRestTemplate")
+	@Bean(name ="restTemplateWithoutAuth")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
 		RestTemplate template =restTemplateBuilder
 				.messageConverters(mappingJackson2HttpMessageConverter())
@@ -139,7 +139,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
     }
 
 	@Profile({"local", "test"})
-    @Bean(name ="schedulerRestTemplate")
+    @Bean(name ="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())

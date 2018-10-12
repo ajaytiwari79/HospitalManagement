@@ -477,7 +477,7 @@ public class ShiftValidatorService {
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shiftsInIntervalWTATemplate.getIntervalUnit(), shiftsInIntervalWTATemplate.getIntervalLength()));
 
                     break;
-                case SENIOR_DAYS_PER_YEAR:
+                /*case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, seniorDaysPerYearWTATemplate.getNumberOfWeeks().intValue(), seniorDaysPerYearWTATemplate.getValidationStartDate()));
 
@@ -485,7 +485,7 @@ public class ShiftValidatorService {
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, childCareDaysCheckWTATemplate.getNumberOfWeeks(), childCareDaysCheckWTATemplate.getValidationStartDate()));
-                    break;
+                    break;*/
             }
         }
         return interval;

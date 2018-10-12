@@ -1,5 +1,6 @@
 package com.kairos.service.staff_settings;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.dto.activity.shift.StaffActivityResponse;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
@@ -12,7 +13,6 @@ import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;

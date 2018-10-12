@@ -1,7 +1,7 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;

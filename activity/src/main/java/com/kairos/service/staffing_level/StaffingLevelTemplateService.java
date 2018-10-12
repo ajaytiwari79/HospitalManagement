@@ -1,5 +1,6 @@
 package com.kairos.service.staffing_level;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
@@ -11,7 +12,6 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRep
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
