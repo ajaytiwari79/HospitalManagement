@@ -1292,6 +1292,4 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-
-
 }
