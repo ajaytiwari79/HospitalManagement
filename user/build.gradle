@@ -1,7 +1,8 @@
 
 buildscript {
     ext {
-        springBootVersion = '2.0.0.M7'
+    //    springBootVersion = '2.0.0.M7'
+	springBootVersion='2.0.0.RELEASE'
         swaggerVersion = '2.5.0'
         jacksonVersion = '2.9.2'
         projectVersion = "0.0.1"
@@ -51,7 +52,7 @@ repositories {
 task wrapper(type: Wrapper) { gradleVersion = '4.4' }
 
 ext {
-    springCloudVersion = 'Finchley.M5'
+    springCloudVersion = 'Finchley.RELEASE'
 
 }
 
