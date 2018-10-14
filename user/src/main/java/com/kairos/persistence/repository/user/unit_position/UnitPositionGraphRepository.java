@@ -256,7 +256,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
 
-    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) = {0}\n" +
+    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0}\n" +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +
             "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(payGrade:PayGrade) \n" +
             "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{published:true}) \n" +
@@ -267,7 +267,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " OPTIONAL MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix) \n" +
             " OPTIONAL MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]->(seniorityLevel) \n" +
             " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +
-            " return {id:id(positionLine), hourlyCost : case hourlyCost when null then 0.0 else hourlyCost end} as hourlyWagesMap")
-    List<Map<Long,Float>> findFunctionalHourlyWages(List<Long> unitPositionIds);
+            " return id(positionLine) as id,  case hourlyCost when null then 0.0 else hourlyCost end as hourlyWages")
+    List<UnitPositionLinesQueryResult> findFunctionalHourlyWages(List<Long> unitPositionIds);
 
 }
