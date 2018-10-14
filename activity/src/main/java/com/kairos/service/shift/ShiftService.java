@@ -1292,4 +1292,13 @@ public class ShiftService extends MongoBaseService {
 
     }
 
+
+    public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(1439));
+        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+        Shift shift = new Shift(startDate,endDate,unitPositionId);
+        timeBankService.saveTimeBank(staffAdditionalInfoDTO,shift);
+        return true;
+    }
+
 }

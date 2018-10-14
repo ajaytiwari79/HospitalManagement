@@ -270,4 +270,5 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " return id(positionLine) as id,  case hourlyCost when null then 0.0 else hourlyCost end as hourlyWages")
     List<UnitPositionLinesQueryResult> findFunctionalHourlyWages(List<Long> unitPositionIds);
 
+
 }

@@ -10,6 +10,7 @@ import com.kairos.dto.user.staff.staff.Staff;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -199,7 +200,7 @@ public class StaffUnitPositionDetails {
     }
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
-        return ctaRuleTemplates;
+        return ctaRuleTemplates!=null?ctaRuleTemplates:new ArrayList<>();
     }
 
     public ZoneId getUnitTimeZone() {
