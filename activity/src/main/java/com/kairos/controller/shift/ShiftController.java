@@ -210,10 +210,4 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
 
-    @ApiOperation("shifts details by date")
-    @GetMapping("/shift/appy")
-    public ResponseEntity<Map<String,Object>> applyFuntionByDate(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.applyFuntionByDate(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
-    }
-
 }
