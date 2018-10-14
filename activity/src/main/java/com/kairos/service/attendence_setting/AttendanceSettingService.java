@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -202,7 +200,7 @@ public class AttendanceSettingService extends MongoBaseService {
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(shift.getUnitId()).getFlexibleTimeSettings();
         if (flexibleTimeSettingDTO != null) {
             Short checkInFlexibleTime = flexibleTimeSettingDTO.getCheckInFlexibleTime();
-            if (Math.abs((shift.getStartDate().getTime() - DateUtils.getCurrentMillis()) / ONE_MINUTE) < checkInFlexibleTime || reasonCodeId != null) {
+            if (Math.abs((Duration.between(LocalDateTime.from(Instant.ofEpochMilli(shift.getStartDate().getTime())),dateTime)).toMinutes()) < checkInFlexibleTime || reasonCodeId != null) {
                 AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
                 attendanceSetting = new AttendanceSetting(shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
             }
