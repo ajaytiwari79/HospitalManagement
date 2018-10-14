@@ -1,11 +1,7 @@
 package com.kairos.commons.utils;
 
 import com.kairos.commons.custom_exception.*;
-import com.kairos.commons.service.exception.locale.LocaleService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
-import org.springframework.stereotype.Service;
+import com.kairos.commons.service.locale.LocaleService;
 
 import javax.inject.Inject;
 

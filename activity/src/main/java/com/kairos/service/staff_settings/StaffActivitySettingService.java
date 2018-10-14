@@ -1,6 +1,6 @@
 package com.kairos.service.staff_settings;
 
-import com.kairos.commons.service.exception.locale.LocaleService;
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.dto.activity.shift.StaffActivityResponse;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;

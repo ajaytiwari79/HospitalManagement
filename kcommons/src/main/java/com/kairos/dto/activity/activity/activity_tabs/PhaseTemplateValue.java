@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import com.kairos.enums.shift.ShiftStatus;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
@@ -20,6 +22,26 @@ public class PhaseTemplateValue implements Serializable {
     private boolean staffCanSell;
     private boolean managementCanSell;
     private int sequence;
+    private AllowedSettings allowedSettings;
+    private List<ActivityShiftStatusSettings> activityShiftStatusSettings;
+
+    public PhaseTemplateValue() {
+        //Default Constructor
+    }
+
+    public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement,
+                              boolean staffCanDelete, boolean managementCanDelete, boolean staffCanSell, boolean managementCanSell,AllowedSettings allowedSettings) {
+        this.phaseId = phaseId;
+        this.name = name;
+        this.description = description;
+        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
+        this.eligibleForManagement = eligibleForManagement;
+        this.staffCanDelete = staffCanDelete;
+        this.managementCanDelete = managementCanDelete;
+        this.staffCanSell = staffCanSell;
+        this.managementCanSell = managementCanSell;
+        this.allowedSettings=allowedSettings;
+    }
 
     public BigInteger getPhaseId() {
         return phaseId;
@@ -61,23 +83,6 @@ public class PhaseTemplateValue implements Serializable {
         this.eligibleForManagement = eligibleForManagement;
     }
 
-    public PhaseTemplateValue() {
-
-    }
-
-    public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement,
-                              boolean staffCanDelete, boolean managementCanDelete, boolean staffCanSell, boolean managementCanSell) {
-        this.phaseId = phaseId;
-        this.name = name;
-        this.description = description;
-        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
-        this.eligibleForManagement = eligibleForManagement;
-        this.staffCanDelete = staffCanDelete;
-        this.managementCanDelete = managementCanDelete;
-        this.staffCanSell = staffCanSell;
-        this.managementCanSell = managementCanSell;
-    }
-
     public boolean isStaffCanDelete() {
         return staffCanDelete;
     }
@@ -116,5 +121,21 @@ public class PhaseTemplateValue implements Serializable {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    public AllowedSettings getAllowedSettings() {
+        return allowedSettings;
+    }
+
+    public void setAllowedSettings(AllowedSettings allowedSettings) {
+        this.allowedSettings = allowedSettings;
+    }
+
+    public List<ActivityShiftStatusSettings> getActivityShiftStatusSettings() {
+        return Optional.ofNullable(activityShiftStatusSettings).orElse(new ArrayList<>());
+    }
+
+    public void setActivityShiftStatusSettings(List<ActivityShiftStatusSettings> activityShiftStatusSettings) {
+        this.activityShiftStatusSettings = activityShiftStatusSettings;
     }
 }

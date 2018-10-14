@@ -10,7 +10,6 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.staff.unit_position.PositionLineChangeResultDTO;
@@ -61,6 +60,7 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -75,6 +75,7 @@ import com.kairos.wrapper.PositionWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -761,7 +762,6 @@ public class UnitPositionService {
         unitPositionDetails.setStartDate(unitPosition.getStartDate());
         unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
-        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
         unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
@@ -781,7 +781,6 @@ public class UnitPositionService {
         if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
             unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
             unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-
         }
         unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
         return unitPositionDetails;
@@ -1161,6 +1160,7 @@ public class UnitPositionService {
      * @Auther Pavan
      * @Desc This method will return the Matched or common dates from two sets
      */
+
     private Set<LocalDate> getIntersectedDates(Set<LocalDate> first, Set<LocalDate> second) {
         Set<LocalDate> matchedDates = new HashSet<>();
         if (CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)) {
