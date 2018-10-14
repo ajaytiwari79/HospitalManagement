@@ -140,7 +140,7 @@ public class ShiftSickService extends MongoBaseService {
 
     private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts, Set<LocalDate> dates) {
         Map<LocalDate, Long> dateLongMap = new HashMap<>();
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shifts.get(0).getStartDate()),shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(null,shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         if (staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions() != null) {
             dateLongMap = genericIntegrationService.removeFunctionFromUnitPositionByDates(staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getUnitPosition().getId(), dates);
         }

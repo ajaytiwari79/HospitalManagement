@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
@@ -298,6 +299,7 @@ public class StaffRestClient {
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate,Long staffId, String type, Long unitEmploymentId) {
         final String baseUrl = getBaseUrl(true);
+        if(shiftDate==null) shiftDate=DateUtils.getCurrentLocalDate();
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };
