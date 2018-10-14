@@ -21,6 +21,9 @@ public interface UnitSettingRepository extends MongoBaseRepository<UnitSetting,B
     @Query(value = "{'deleted' : false, 'unitId':?0}",fields = "{'flexibleTimeSettings': 1}")
     UnitSettingDTO getFlexibleTimingByUnit(Long unitId);
 
+    @Query(value="{'deleted':false,'unitId':{'$in':?0}}",fields ="{'flexibleTimeSettings': 1,'unitId':1}")
+    List<UnitSettingDTO> getFlexibleTimingByUnitIds(List<Long> unitIds);
+
     UnitSetting findByUnitIdAndDeletedFalse(Long unitId);
 
 
