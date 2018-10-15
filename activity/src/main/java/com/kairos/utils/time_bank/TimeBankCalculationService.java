@@ -966,7 +966,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
+                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
                         }
@@ -988,7 +988,7 @@ public class TimeBankCalculationService {
     private List<CTADistributionDTO> getBlankTimeBankDistribution(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<CTADistributionDTO> timeBankCTADistributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
-            if (!cta.isCalculateScheduledHours()) {
+            if (!cta.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && cta.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
                 timeBankCTADistributionDTOS.add(new CTADistributionDTO(cta.getId(), cta.getName(), 0));
             }
         });

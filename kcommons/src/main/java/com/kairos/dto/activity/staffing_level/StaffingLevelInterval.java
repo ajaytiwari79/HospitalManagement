@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 public class StaffingLevelInterval {
     private int sequence;
@@ -12,7 +13,7 @@ public class StaffingLevelInterval {
     private int maxNoOfStaff;
     private int availableNoOfStaff;
     private Duration staffingLevelDuration;
-    private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
+    private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
 
     public StaffingLevelInterval() {

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.clause;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.clause.Clause;

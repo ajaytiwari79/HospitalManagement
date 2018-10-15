@@ -17,7 +17,8 @@ public class CustomAggregationQuery {
                 "'hasSubProcessingActivity':1," +
                 "'organizationSubTypes':1," +
                 "'organizationTypes':1," +
-                "'countryId':1}}";
+                "'suggestedDate':1," +
+                "'suggestedDataStatus':1}}";
 
     }
 
@@ -61,7 +62,8 @@ public class CustomAggregationQuery {
                 "'description':{$first:'$description'}," +
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
-                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}" +
+                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}," +
+                "'templateStatus':{'$first':'$templateStatus'}" +
                 "}}";
     }
 
