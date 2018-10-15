@@ -1,0 +1,8 @@
+//To set phase setting data from rules tab to phase wise setting tab all previous activities
+
+db.activities.find().forEach(function (elem) {
+    db.activities.update({_id: elem._id}, {
+         $set:{"phaseSettingsActivityTab.phaseTemplateValues": elem.rulesActivityTab.eligibleForSchedules},
+        $unset:{"rulesActivityTab.eligibleForSchedules":null}
+        });
+    });
