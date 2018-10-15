@@ -1307,26 +1307,4 @@ public class ShiftService extends MongoBaseService {
         return phaseTemplateValueMap;
 
     }
-
-    /**
-     *
-     * @param unitPositionId
-     * @param startDate
-     * @param staffAdditionalInfoDTO
-     * @Desc to update Time Bank after applying function in Unit position
-     * @return
-     */
-    public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId( staffAdditionalInfoDTO.getUnitPosition().getId(),startDate);
-        if(ctaResponseDTO==null){
-            exceptionService.dataNotFoundException("message.cta.notFound");
-        }
-        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-        Shift shift = new Shift(startDate,endDate,unitPositionId);
-        timeBankService.saveTimeBank(staffAdditionalInfoDTO,shift);
-        return true;
-    }
-
 }
