@@ -20,6 +20,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -922,8 +923,7 @@ public class ActivityService extends MongoBaseService {
 
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
                                                                  List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
-
-        OrganizationDTO organizationDTO = genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {});
+        OrganizationDTO organizationDTO = genericIntegrationService.getOrganizationDTO(unitId);
         if (organizationDTO == null) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }

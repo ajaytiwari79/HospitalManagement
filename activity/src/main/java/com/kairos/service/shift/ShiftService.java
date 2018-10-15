@@ -17,11 +17,10 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
+import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.enums.shift.BreakPaymentSetting;
@@ -61,7 +60,8 @@ import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
@@ -87,7 +87,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -102,7 +101,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
-import static com.kairos.constants.ApiConstants.GET_REASONCODE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 
@@ -127,8 +125,7 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private ApplicationContext applicationContext;
-    @Inject
-    private CountryRestClient countryRestClient;
+
 
     @Inject
     private PhaseService phaseService;
@@ -184,8 +181,6 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject
-    private GenericRestClient genericRestClient;
     @Inject
     private ActivityService activityService;
     @Inject
@@ -908,8 +903,9 @@ public class ShiftService extends MongoBaseService {
         if (!shifts.isEmpty() && objects[1] != null) {
             Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
-            StaffAccessGroupDTO staffAccessGroupDTO = genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {
-            });
+
+            List<BigInteger> phaseIds = phaseListByDate.values().stream().map(p -> p.getId()).collect(Collectors.toList());
+            StaffAccessGroupDTO staffAccessGroupDTO =genericIntegrationService.getStaffAccessGroupDTO(unitId);
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
                     if (shiftActivitiyIds.contains(shiftActivity.getId())) {
@@ -1140,9 +1136,9 @@ public class ShiftService extends MongoBaseService {
         shiftStates.forEach(shiftState -> shiftState.setDurationMinutes((int) shiftState.getInterval().getMinutes()));
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
-        List<ReasonCodeDTO> reasonCodeDTOS = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_REASONCODE, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ReasonCodeDTO>>>() {
-        });
-        ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeAttendanceGracePeriod, shifts, shiftStates);
+
+        List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId,requestParam);
+        ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeAttendanceGracePeriod,shifts, shiftStates);
         return new DetailViewDTO(shiftDetailViewDTO, reasonCodeDTOS);
     }
 
@@ -1245,12 +1241,12 @@ public class ShiftService extends MongoBaseService {
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
 
-        List<ReasonCodeDTO> reasonCodeDTOS = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_REASONCODE, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ReasonCodeDTO>>>() {
-        });
-        Map<Long, List<Shift>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
-        Map<Long, List<ShiftState>> shiftStateMap = shiftStates.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
-        Map<Long, ShiftDetailViewDTO> shiftDetailViewDTOMap = staffIds.stream().collect(Collectors.toMap(staffId -> staffId, staffId -> getShiftDetailsOfStaff(timeAttendanceGracePeriod, shiftsMap.getOrDefault(staffId, new ArrayList<>()), shiftStateMap.getOrDefault(staffId, new ArrayList<>()))));
-        return new CompactViewDTO(shiftDetailViewDTOMap, reasonCodeDTOS);
+        List<ReasonCodeDTO> reasonCodeDTOS =genericIntegrationService.getReasonCodeDTOList(unitId,requestParam);
+        Map<Long,List<Shift>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId,Collectors.toList()));
+        Map<Long,List<ShiftState>> shiftStateMap = shiftStates.stream().collect(Collectors.groupingBy(Shift::getStaffId,Collectors.toList()));
+        Map<Long,ShiftDetailViewDTO> shiftDetailViewDTOMap = staffIds.stream().collect(Collectors.toMap(staffId->staffId,staffId->getShiftDetailsOfStaff(timeAttendanceGracePeriod,shiftsMap.getOrDefault(staffId,new ArrayList<>()),shiftStateMap.getOrDefault(staffId,new ArrayList<>()))));
+        return new CompactViewDTO(shiftDetailViewDTOMap,reasonCodeDTOS);
+
     }
 
 
@@ -1301,4 +1297,23 @@ public class ShiftService extends MongoBaseService {
         return phaseTemplateValueMap;
 
     }
+
+
+    /**
+     *
+     * @param unitPositionId
+     * @param startDate
+     * @param staffAdditionalInfoDTO
+     * @Desc to update Time Bank after pplying function in Unit position
+     * @return
+     */
+    public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+        Shift shift = new Shift(startDate,endDate,unitPositionId);
+        timeBankService.saveTimeBank(staffAdditionalInfoDTO,shift);
+        return true;
+
+    }
+
 }
