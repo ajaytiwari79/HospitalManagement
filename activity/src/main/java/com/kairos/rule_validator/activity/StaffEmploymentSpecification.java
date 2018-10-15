@@ -30,7 +30,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
             return true;
         }
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getRulesActivityTab().getEligibleForSchedules();
+            List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues();
             PhaseTemplateValue phaseTemplateValue1 = null;
             for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
                 if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
@@ -44,28 +44,27 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                 }
             }
         }
+
         return true;
     }
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        if(!(Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement())){
-            for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-                List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getRulesActivityTab().getEligibleForSchedules();
-                PhaseTemplateValue phaseTemplateValue1 = null;
-                for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-                    if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
-                        phaseTemplateValue1 = phaseTemplateValue;
-                        break;
-                    }
+        for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+            List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues();
+            PhaseTemplateValue phaseTemplateValue1 = null;
+            for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+                if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
+                    phaseTemplateValue1 = phaseTemplateValue;
+                    break;
                 }
-                if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                    if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()){
-                        ShiftValidatorService.throwException("message.management.authority.phase");
-                    }
-                    if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
-                        ShiftValidatorService.throwException("message.staff.employmentType.absent");
-                    }
+            }
+            if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
+                if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()){
+                    ShiftValidatorService.throwException("message.management.authority.phase");
+                }
+                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
+                    ShiftValidatorService.throwException("message.staff.employmentType.absent");
                 }
             }
         }

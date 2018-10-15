@@ -2,7 +2,6 @@ package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.open_shift.DurationField;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 
@@ -25,7 +24,6 @@ public class RulesActivityTab implements Serializable{
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
     private List<Long> dayTypes= new ArrayList<>();
-    private List<PhaseTemplateValue> eligibleForSchedules;
     private boolean eligibleForStaffingLevel;
 
     private boolean breakAllowed = false;
@@ -51,12 +49,10 @@ public class RulesActivityTab implements Serializable{
         //Default Constructor
     }
 
-    public RulesActivityTab(List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForSchedules = eligibleForSchedules;
-    }
+
 
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean breakAllowed, boolean approvalAllowed
+                            List<Long> dayTypes, boolean eligibleForStaffingLevel, boolean breakAllowed, boolean approvalAllowed
             , LocalTime earliestStartTime, LocalTime latestStartTime, Short shortestTime, Short longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,PQLSettings pqlSettings,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
@@ -65,7 +61,6 @@ public class RulesActivityTab implements Serializable{
         this.lockLengthPresent = lockLengthPresent;
         this.eligibleToBeForced = eligibleToBeForced;
         this.dayTypes = dayTypes;
-        this.eligibleForSchedules = eligibleForSchedules;
         this.eligibleForStaffingLevel=eligibleForStaffingLevel;
         this.breakAllowed = breakAllowed;
         this.approvalAllowed = approvalAllowed;
@@ -171,14 +166,6 @@ public class RulesActivityTab implements Serializable{
 
     public void setDayTypes(List<Long> dayTypes) {
         this.dayTypes = dayTypes;
-    }
-
-    public List<PhaseTemplateValue> getEligibleForSchedules() {
-        return eligibleForSchedules;
-    }
-
-    public void setEligibleForSchedules(List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForSchedules = eligibleForSchedules;
     }
 
     public boolean isBreakAllowed() {

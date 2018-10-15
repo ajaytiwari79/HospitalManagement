@@ -6,6 +6,7 @@ import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -24,6 +25,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +46,6 @@ public class SickService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject
-    private GenericRestClient genericRestClient;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
@@ -63,9 +63,7 @@ public class SickService {
         if (unitId == null) {
             Long userId = UserContext.getUserDetails().getId();
             BasicNameValuePair sickSettingsRequired = new BasicNameValuePair("sickSettingsRequired", "YES");
-            List<StaffResultDTO> staffAndOrganizationDetails =
-                    genericRestClient.publishRequest(null, null, false, IntegrationOperation.GET, "/user/{userId}/unit_sick_settings", Collections.singletonList(sickSettingsRequired), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffResultDTO>>>() {
-                    }, userId);
+            List<StaffResultDTO> staffAndOrganizationDetails =genericIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
             if (!Optional.ofNullable(staffAndOrganizationDetails).isPresent() && staffAndOrganizationDetails.isEmpty()) {
                 exceptionService.actionNotPermittedException("message.staff.notfound");
             }
@@ -75,8 +73,7 @@ public class SickService {
             }
             userSickDataWrapper.setStaffOrganizations(staffAndOrganizationDetails);
         } else {
-            Set<BigInteger> sickTimeTypeIds = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {
-            }, unitId);
+            Set<BigInteger> sickTimeTypeIds =genericIntegrationService.getSickTimeTypeIds(unitId);
             List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(sickTimeTypeIds, unitId);
             userSickDataWrapper.setActivities(activities);
         }
