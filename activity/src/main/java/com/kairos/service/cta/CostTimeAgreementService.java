@@ -62,7 +62,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
-    private CountryRestClient countryRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private CTARuleTemplateRepository ctaRuleTemplateRepository;
     @Inject
@@ -75,8 +75,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
     private TableSettingService tableSettingService;
-    @Inject
-    private GenericIntegrationService genericIntegrationService;
+
 
 
     /**
@@ -110,7 +109,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         if (ctaRuleTemplateRepository.isCTARuleTemplateExistWithSameName(countryId, ctaRuleTemplateDTO.getName())) {
             exceptionService.dataNotFoundByIdException("message.cta.ruleTemplate.alreadyExist", ctaRuleTemplateDTO.getName());
         }
-        CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
+        CountryDTO countryDTO = genericIntegrationService.getCountryById(countryId);
         ctaRuleTemplateDTO.setId(null);
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
         CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
@@ -434,7 +433,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @return CTARuleTemplateDTO
      */
     public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId, BigInteger id, CTARuleTemplateDTO ctaRuleTemplateDTO) {
-        CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
+        CountryDTO countryDTO = genericIntegrationService.getCountryById(countryId);
         CTARuleTemplate ctaRuleTemplate = ctaRuleTemplateRepository.findOne(id);
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplate.getRuleTemplateType());
         CTARuleTemplate udpdateCtaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);

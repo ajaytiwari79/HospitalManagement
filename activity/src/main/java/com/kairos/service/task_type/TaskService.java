@@ -150,7 +150,7 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
     @Inject
-    private CountryRestClient countryRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private IntegrationRestClient integrationServiceRestClient;
     @Inject
@@ -1575,7 +1575,7 @@ public class TaskService extends MongoBaseService {
         boolean preferredEmployees = taskType.getEmployees().contains(PREFERRED_EMPLOYEES);
         TaskSpecification<Task> taskStaffSpecification = new TaskStaffTypeSpecification(excludeEmployees, preferredEmployees);
 
-        List<DayType> dayTypes = countryRestClient.getDayTypes(taskType.getForbiddenDayTypeIds());
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
 
         Set<Day> days = new HashSet<>();
         for (DayType dayType : dayTypes) {

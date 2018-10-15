@@ -7,20 +7,28 @@ import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
-import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
+import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +36,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -37,12 +50,12 @@ import static com.kairos.constants.ApiConstants.*;
 
 @Service
 @Transactional
+
 public class GenericIntegrationService {
     @Autowired
     GenericRestClient genericRestClient;
     @Autowired
     ExceptionService exceptionService;
-
 
     public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId, Long dateInMillis) {
         BasicNameValuePair basicNameValuePair=new BasicNameValuePair("dateInMillis",dateInMillis.toString());
@@ -63,7 +76,7 @@ public class GenericIntegrationService {
     }
 
     public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
         },expertiseId);
 
     }
@@ -200,10 +213,10 @@ public class GenericIntegrationService {
         });
     }
 
-   public  List<AccessGroupPermissionCounterDTO> getStaffAndAccessGroups(AccessGroupKPIEntry accessGroupKPIEntry) {
-       return genericRestClient.publishRequest(Arrays.asList(accessGroupKPIEntry.getAccessGroupId()), accessGroupKPIEntry.getUnitId(), RestClientUrlType.UNIT, HttpMethod.POST, STAFFS_ACCESS_GROUPS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessGroupPermissionCounterDTO>>>() {
-       });
-   }
+    public  List<AccessGroupPermissionCounterDTO> getStaffAndAccessGroups(AccessGroupKPIEntry accessGroupKPIEntry) {
+        return genericRestClient.publishRequest(Arrays.asList(accessGroupKPIEntry.getAccessGroupId()), accessGroupKPIEntry.getUnitId(), RestClientUrlType.UNIT, HttpMethod.POST, STAFFS_ACCESS_GROUPS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessGroupPermissionCounterDTO>>>() {
+        });
+    }
 
     public Long getCountryId(Long refId) {
         return genericRestClient.publishRequest(null, refId, RestClientUrlType.UNIT, HttpMethod.GET, COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -214,5 +227,51 @@ public class GenericIntegrationService {
 
     }
 
+    // PriortyGroupRestClient
+    public List<StaffUnitPositionQueryResult> getStaffIdsByPriorityGroupIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
+        return genericRestClient.publishRequest(staffIncludeFilterDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_PRIORTY_GROUP, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionQueryResult>>>() {
+        });
+    }
 
+    //AbsenceTypeRestClient
+    //TODO Remove in future because On User MicroService this API is not currently Active
+    public Map<String,Object> getAbsenceTypeByName(String title){
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, ABSENCE_TYPES_TITLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+        },title);
+    }
+
+    //CountryRestClient
+    public Object getAllContractType(Long countryId) {
+        return genericRestClient.publishRequest(null,countryId,RestClientUrlType.COUNTRY,HttpMethod.GET,CONTRACT_TYPE,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>(){});
+    }
+    public CountryDTO getCountryByOrganizationService(Long organizationServiceId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, COUNTRY_ORGANIZATION_SERVICE_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
+        },organizationServiceId);
+    }
+    public OrganizationTypeHierarchyQueryResult getOrgTypesHierarchy(Long countryId, Set<Long> organizationSubTypes) {
+        return genericRestClient.publishRequest(organizationSubTypes, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, ORGANIZATION_TYPES_HIERARCHY, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationTypeHierarchyQueryResult>>() {
+        });
+    }
+    public List<Map<String,Object>> getSkillsByCountryForTaskType(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, TASK_TYPES_SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
+        });
+    }
+    public List<TimeSlot> getTimeSlotSetsOfCountry(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, TIME_SLOTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlot>>>() {
+        });
+    }
+
+    public CountryDTO getCountryById(long countryId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, null, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
+        });
+    }
+    public boolean isCountryExists(long countryId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, null, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
+    }
+
+    public List<DayType> getDayTypes(List<Long> dayTypes) {
+        return genericRestClient.publishRequest(dayTypes, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, DAY_TYPES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayType>>>() {
+        });
+    }
 }

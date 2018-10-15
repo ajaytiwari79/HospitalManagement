@@ -39,6 +39,7 @@ public class RestClientUrlUtil {
    //~ ================================for {userServiceUrl}======================================
 
     //TODO Remove
+    @Deprecated
     public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
         boolean idExists=Optional.ofNullable(id).isPresent();
         if (hasUnitInUrl && idExists) {
@@ -80,6 +81,7 @@ public class RestClientUrlUtil {
     //~ ======================================================================
 
     //TODO FIX
+    @Deprecated
     public static final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
             String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();

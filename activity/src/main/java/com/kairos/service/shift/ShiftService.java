@@ -17,14 +17,12 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
+import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
@@ -62,7 +60,8 @@ import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
@@ -88,8 +87,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -104,7 +101,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
-import static com.kairos.constants.ApiConstants.GET_REASONCODE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 
@@ -129,8 +125,7 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private ApplicationContext applicationContext;
-    @Inject
-    private CountryRestClient countryRestClient;
+
 
     @Inject
     private PhaseService phaseService;
@@ -186,7 +181,6 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
-    private GenericRestClient genericRestClient;
     @Inject
     private ActivityService activityService;
     @Inject
