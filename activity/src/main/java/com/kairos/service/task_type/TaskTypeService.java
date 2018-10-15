@@ -71,7 +71,7 @@ public class TaskTypeService extends MongoBaseService {
     private   SkillRestClient skillRestClient;
     @Autowired private OrganizationRestClient organizationRestClient;
 
-    @Autowired private CountryRestClient countryRestClient;
+    @Autowired private GenericIntegrationService genericIntegrationService;
 
     @Autowired private TimeSlotRestClient timeSlotRestClient;
 
@@ -136,8 +136,8 @@ public class TaskTypeService extends MongoBaseService {
         save(taskType);
 
         Map<String,Object> agreementSettings = taskType.getAgreementSettings();
-        CountryDTO countryDTO = countryRestClient.getCountryByOrganizationService(taskType.getSubServiceId());
-        agreementSettings.put("contractTypes",countryRestClient.getAllContractType(countryDTO.getId()));
+        CountryDTO countryDTO = genericIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
+        agreementSettings.put("contractTypes",genericIntegrationService.getAllContractType(countryDTO.getId()));
         return agreementSettings;
     }
 
@@ -326,9 +326,9 @@ public class TaskTypeService extends MongoBaseService {
             OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult = organizationTypeGraphRepository.getOrganizationTypeHierarchy(country.getId(),taskType.getOrganizationSubTypes());
             organizationTypes = organizationTypeHierarchyQueryResult.getOrganizationTypes();
         }*/
-        CountryDTO countryDTO = countryRestClient.getCountryByOrganizationService(taskType.getSubServiceId());
+        CountryDTO countryDTO = genericIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
         OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult =
-                countryRestClient.getOrgTypesHierarchy(countryDTO.getId(),taskType.getOrganizationSubTypes());
+                genericIntegrationService.getOrgTypesHierarchy(countryDTO.getId(),taskType.getOrganizationSubTypes());
         Map<String ,Object> generalSettings = taskType.getGeneralSettings(filePath);
         List<TagDTO> tags = new ArrayList<>();
         if(type != null  && type.equals("Organization")){
@@ -554,8 +554,8 @@ public class TaskTypeService extends MongoBaseService {
         //anil maurya move this code in user micro service and call via rest template
         List<Map<String,Object>> skills;
         if(taskType.getOrganizationId() == 0){
-            CountryDTO countryDTO = countryRestClient.getCountryByOrganizationService(taskType.getSubServiceId());
-            skills = countryRestClient.getSkillsByCountryForTaskType(countryDTO.getId());
+            CountryDTO countryDTO = genericIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
+            skills = genericIntegrationService.getSkillsByCountryForTaskType(countryDTO.getId());
         } else {
             skills = skillRestClient.getSkillsOfOrganization(taskType.getOrganizationId());
         }
@@ -946,7 +946,7 @@ public class TaskTypeService extends MongoBaseService {
         }
         TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(taskType.getOrganizationId(),taskTypeId,taskTypeSlaConfigDTO.getTimeSlotId());
         if(taskTypeSlaConfig == null){
-            List<TimeSlot> timeSlots = countryRestClient.getTimeSlotSetsOfCountry(countryId);
+            List<TimeSlot> timeSlots = genericIntegrationService.getTimeSlotSetsOfCountry(countryId);
             Optional<TimeSlot> result = timeSlots.stream().filter(timeSlot -> timeSlot.getId().equals(taskTypeSlaConfigDTO.getTimeSlotId())).findFirst();
             if(result.isPresent()){
                 taskTypeSlaConfig = new TaskTypeSlaConfig(taskTypeId,taskType.getOrganizationId(),
@@ -1028,7 +1028,7 @@ public class TaskTypeService extends MongoBaseService {
             exceptionService.internalError("task type not found");
         }
 
-        List<TimeSlot> currentTimeSlots = countryRestClient.getTimeSlotSetsOfCountry(countryId);
+        List<TimeSlot> currentTimeSlots = genericIntegrationService.getTimeSlotSetsOfCountry(countryId);
         List<Long> timeSlotIds = currentTimeSlots.stream().map(currentTimeSlot -> currentTimeSlot.getId()).collect(Collectors.toList());
 
         List<TaskTypeSlaConfig> taskTypeSlaConfigList = taskTypeSlaConfigMongoRepository.findAllByUnitIdAndTaskTypeIdAndTimeSlotIdIn(taskType.getOrganizationId(),
