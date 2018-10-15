@@ -20,9 +20,8 @@ public class ActivityToSchedulerQueueService {
     @Inject
     private KafkaProducer kafkaProducer;
 
-    public void pushToJobQueueForShiftReminder(Long unitId, BigInteger shiftId, LocalDateTime triggerDateTime) {
-        KairosScheduleJobDTO
-        scheduledJob = new KairosScheduleJobDTO(unitId, JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftId, IntegrationOperation.CREATE, DateUtils.getMillisFromLocalDateTime(triggerDateTime), true);
-        kafkaProducer.pushToJobQueue(scheduledJob);
+    public void pushToJobQueueForShiftReminder(List<KairosScheduleJobDTO> scheduleJobDTOS) {
+
+        //kafkaProducer.pushToJobQueue(scheduledJob);
     }
 }

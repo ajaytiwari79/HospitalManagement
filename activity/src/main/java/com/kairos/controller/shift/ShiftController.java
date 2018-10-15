@@ -210,4 +210,5 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
 
+
 }

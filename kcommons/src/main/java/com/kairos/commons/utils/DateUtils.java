@@ -45,6 +45,10 @@ public class DateUtils {
         return LocalTime.now();
 
     }
+    public static LocalDateTime getCurrentLocalDateTime() {
+        return LocalDateTime.now();
+
+    }
 
     public static LocalDate getLocalDateFromDate(Date date) {
 

@@ -1,6 +1,7 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
@@ -67,7 +68,18 @@ public class SchedulerPanelDTO {
         this.oneTimeTriggerDate = oneTimeTriggerDate;
         this.entityId = entityId;
     }
+    public SchedulerPanelDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
+                             LocalDateTime oneTimeTriggerDate, boolean oneTimeTrigger,String filterId) {
 
+        this.unitId = unitId;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
+        this.entityId = entityId;
+        this.oneTimeTrigger = oneTimeTrigger;
+        this.filterId=filterId;
+
+    }
     public SchedulerPanelDTO(BigInteger id, LocalDateTime oneTimeTriggerDate) {
         this.id = id;
         this.oneTimeTriggerDate = oneTimeTriggerDate;

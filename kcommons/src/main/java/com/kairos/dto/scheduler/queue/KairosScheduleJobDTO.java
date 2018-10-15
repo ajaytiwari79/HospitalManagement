@@ -41,7 +41,6 @@ public class KairosScheduleJobDTO {
     private IntegrationOperation integrationOperation;
     private boolean oneTimeTrigger;
     private Long oneTimeTriggerDateMillis;
-    private List<ActivityReminderSettings> reminderSettings;
 
     public KairosScheduleJobDTO() {
 
@@ -57,7 +56,19 @@ public class KairosScheduleJobDTO {
         this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
         this.oneTimeTrigger = oneTimeTrigger;
     }
+    public KairosScheduleJobDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,IntegrationOperation operation,
+                                Long oneTimeTriggerDateMillis, boolean oneTimeTrigger,String filterId) {
 
+        this.unitId = unitId;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.entityId = entityId;
+        this.integrationOperation = operation;
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+        this.oneTimeTrigger = oneTimeTrigger;
+        this.filterId=filterId;
+
+    }
     public Long getOneTimeTriggerDateMillis() {
         return oneTimeTriggerDateMillis;
     }
@@ -267,11 +278,5 @@ public class KairosScheduleJobDTO {
         this.runOnce = runOnce;
     }
 
-    public List<ActivityReminderSettings> getReminderSettings() {
-        return reminderSettings;
-    }
 
-    public void setReminderSettings(List<ActivityReminderSettings> reminderSettings) {
-        this.reminderSettings = reminderSettings;
-    }
 }

@@ -5,11 +5,13 @@ package com.kairos.controller.shift;
  */
 
 import com.kairos.dto.activity.shift.ActivityShiftStatusSettingsDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.service.shift.ActivityShiftStatusSettingsService;
 import com.kairos.service.shift.ShiftReminderService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
@@ -54,13 +57,13 @@ public class ActivityShiftStatusSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityShiftStatusSettingsService.updateActivityAndShiftStatusSettings(unitId, id, activityShiftStatusSettingsDTO));
     }
 
-    //TODO DO NOT REMOVE Its for test
-    @PutMapping(value = UNIT_URL + "/activity/{activityId}/reminder")
-    @ApiOperation("job for reminder")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> setReminderTrigger(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, setReminderService.setReminderTrigger(activityId));
+    /**
+     * DO NOT REMOVE ITS FOR TEST
+     */
+    @PostMapping(UNIT_URL + "/shift-reminder")
+    public ResponseEntity<Map<String, Object>> sendReminderForEmail(@RequestBody  KairosSchedulerExecutorDTO jobDetails) {
+        setReminderService.sendReminderForEmail(jobDetails);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 

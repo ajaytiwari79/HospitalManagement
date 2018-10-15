@@ -141,7 +141,6 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
 
-
     }
 
     /**
@@ -179,15 +178,6 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 }
                 else if(activitySubTypes.contains(jobToExecute.getJobSubType())) {
                     kafkaProducer.pushToActivityQueue(jobToExecute);
-                }
-                if (jobToExecute.getJobSubType().equals(JobSubType.SHIFT_REMINDER)){
-                    // register the next JOB
-                    LocalDateTime executionDateTime=schedulerPanel.getOneTimeTriggerDate();
-                    for (ActivityReminderSettings reminderSettings:schedulerPanel.getReminderSettings()) {
-                        if (reminderSettings.isRepeatAllowed()){
-
-                        }
-                    }
                 }
             }
         };

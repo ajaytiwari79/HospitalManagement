@@ -202,7 +202,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private ShiftBreakActivityService shiftBreakActivityService;
 
-
+    @Inject private ShiftReminderService shiftReminderService;
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         Activity activity = activityWrapper.getActivity();
@@ -273,6 +273,7 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, byTandAPhase);
         Shift mainShift = byTandAPhase ? ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class) : ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         mainShift.setPlanningPeriodId(planningPeriod.getId());
+        mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
         validateStaffingLevel(phase, mainShift, activityWrapper.getActivity(), true, staffAdditionalInfoDTO);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
             List<BigInteger> activityIds = mainShift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
@@ -288,6 +289,7 @@ public class ShiftService extends MongoBaseService {
 
         }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
+        shiftReminderService.setReminderTrigger( activityWrapper,mainShift);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -338,7 +340,7 @@ public class ShiftService extends MongoBaseService {
             shift.getActivities().remove(0);
             shift.getActivities().addAll(breakActvities);
         }
-        shift.setPhaseId(phase.getId());
+
         shiftMongoRepository.save(shift);
         updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
@@ -615,6 +617,7 @@ public class ShiftService extends MongoBaseService {
         shift.setFunctionId(functionId);
         saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
         payOutService.deletePayOut(shift.getId());
+        shiftReminderService.deleteReminderTrigger(shiftId,shift.getUnitId());
 
     }
 

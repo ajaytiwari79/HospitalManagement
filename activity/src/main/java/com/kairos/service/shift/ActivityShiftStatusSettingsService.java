@@ -4,18 +4,10 @@ package com.kairos.service.shift;
  *
  */
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.activity.shift.ActivityAndShiftStatusWrapper;
 import com.kairos.dto.activity.shift.ActivityShiftStatusSettingsDTO;
-import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -31,13 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-
-import static com.kairos.constants.AppConstants.SHIFT_EMAIL_BODY;
-import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional

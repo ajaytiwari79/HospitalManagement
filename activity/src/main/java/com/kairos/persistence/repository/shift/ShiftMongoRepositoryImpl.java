@@ -304,6 +304,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return Document.parse(replaceRootForShift);
     }
 
+
    /* public List<ShiftTimeDTO> getShiftTimeDTO(List<FilterCriteria> filters){
         ShiftFilterCriteria shiftFilterCriteria = ShiftFilterCriteria.getInstance();
         for(FilterCriteria filter: filters){

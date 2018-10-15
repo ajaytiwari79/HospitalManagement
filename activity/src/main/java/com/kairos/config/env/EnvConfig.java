@@ -56,6 +56,9 @@ public class EnvConfig {
     @Value("${spring.data.mongodb.password}")
     private  String mongoPassword;
 
+    @Value("${spring.profiles.active}")
+    private  String currentProfile;
+
 
     public String getGoogleCalendarAPIV3Url(String vCardId) {
         return googleCalendarAPIV3Url.replace("{countryVCard}", vCardId); }
@@ -110,4 +113,8 @@ public class EnvConfig {
     public String getMongoUserName() { return mongoUserName; }
 
     public String getMongoPassword() { return mongoPassword; }
+
+    public String getCurrentProfile() {
+        return currentProfile;
+    }
 }
