@@ -1265,11 +1265,13 @@ public class ShiftService extends MongoBaseService {
      */
     private ShiftActivityIdsDTO getActivitiesToProcess(List<ShiftActivity> existingShiftActivities, List<ShiftActivity> arrivedShiftActivities) {
         Set<BigInteger> allExistingShiftActivities = existingShiftActivities.stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet());
+        List<BigInteger> allExistingShiftActivitiesList = existingShiftActivities.stream().map(ShiftActivity::getActivityId).collect(Collectors.toList());
         Set<BigInteger> allArrivedShiftActivities = arrivedShiftActivities.stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet());
         Map<BigInteger, ShiftActivity> existingShiftActivityMap = existingShiftActivities.stream().collect(Collectors.toMap(ShiftActivity::getActivityId, Function.identity()));
         Set<BigInteger> activitiesToEdit = new HashSet<>();
         Set<BigInteger> activitiesToAdd = new HashSet<>();
         Set<BigInteger> activitiesToDelete = new HashSet<>();
+        int index=0;
         for (ShiftActivity shiftActivity : arrivedShiftActivities) {
             if (allExistingShiftActivities.contains(shiftActivity.getActivityId())) {
                 ShiftActivity existingActivity = existingShiftActivityMap.get(shiftActivity.getActivityId());
@@ -1279,6 +1281,10 @@ public class ShiftService extends MongoBaseService {
             } else {
                 activitiesToAdd.add(shiftActivity.getActivityId());
             }
+            if(allExistingShiftActivitiesList.indexOf(shiftActivity.getActivityId())==index){
+
+            }
+            index++;
         }
         for (BigInteger current : allExistingShiftActivities) {
             if (!allArrivedShiftActivities.contains(current)) {
@@ -1312,6 +1318,10 @@ public class ShiftService extends MongoBaseService {
      */
     public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId( staffAdditionalInfoDTO.getUnitPosition().getId(),startDate);
+        if(ctaResponseDTO!=null){
+            staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        }
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         Shift shift = new Shift(startDate,endDate,unitPositionId);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO,shift);
