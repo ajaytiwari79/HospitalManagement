@@ -62,7 +62,8 @@ public class CustomAggregationQuery {
                 "'description':{$first:'$description'}," +
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
-                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}" +
+                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}," +
+                "'templateStatus':{'$first':'$templateStatus'}" +
                 "}}";
     }
 
