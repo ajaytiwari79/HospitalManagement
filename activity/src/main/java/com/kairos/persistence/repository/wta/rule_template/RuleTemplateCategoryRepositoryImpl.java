@@ -7,9 +7,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -18,6 +20,12 @@ public class RuleTemplateCategoryRepositoryImpl implements CustomRuleTemplateCat
     @Inject
     private MongoTemplate mongoTemplate;
 
+
+    @Override
+    public RuleTemplateCategory findByName(Long countryId, String name, RuleTemplateCategoryType ruleTemplateCategoryType) {
+        Criteria criteria = Criteria.where("name").regex(Pattern.compile("^" + name.trim() + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId).and("ruleTemplateCategoryType").is(ruleTemplateCategoryType);
+        return mongoTemplate.findOne(new Query(criteria),RuleTemplateCategory.class);
+    }
 
     public List<RuleTemplateCategoryTagDTO> findAllUsingCountryId(Long countryId) {
 

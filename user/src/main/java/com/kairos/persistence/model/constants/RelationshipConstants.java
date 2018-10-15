@@ -265,6 +265,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_POSITION_LINES="HAS_POSITION_LINES";
 
     public static final String DAY_TYPES="DAY_TYPES";
+    public static final String HAS_PARENT_ACCESS_GROUP="HAS_PARENT_ACCESS_GROUP";
 
     /**
      * Default constructor

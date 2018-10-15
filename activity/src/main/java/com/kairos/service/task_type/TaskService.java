@@ -159,8 +159,6 @@ public class TaskService extends MongoBaseService {
     private TasksMergingService tasksMergingService;
 
     @Inject
-    private ControlPanelRestClient controlPanelRestClient;
-    @Inject
     private OrganizationRestClient organizationRestClient;
     @Inject
     private TimeCareRestClient timeCareRestClient;

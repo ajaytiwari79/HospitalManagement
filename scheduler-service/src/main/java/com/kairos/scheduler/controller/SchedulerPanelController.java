@@ -86,10 +86,15 @@ public class SchedulerPanelController {
     }*/
     @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelIds));
+    public ResponseEntity<Map<String, Object>> deleteJobs(@RequestBody Set<BigInteger> schedulerPanelIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJobs(schedulerPanelIds));
     }
 
+    @DeleteMapping("/{schedulerPanelId}")
+    @ApiOperation("Delete Scheduler Panel ")
+    public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
+    }
     @GetMapping("/default_data")
     @ApiOperation("Get default data")
     public ResponseEntity<Map<String, Object>> getDefaultData() {

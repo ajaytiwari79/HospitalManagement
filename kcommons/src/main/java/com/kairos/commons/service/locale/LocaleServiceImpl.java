@@ -1,6 +1,5 @@
-package com.kairos.commons.service.exception.locale;
+package com.kairos.commons.service.locale;
 
-import com.kairos.commons.service.exception.locale.LocaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

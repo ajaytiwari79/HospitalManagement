@@ -66,6 +66,7 @@ public final class ApiConstants {
     public static final String STAFFS_ACCESS_GROUPS ="/staffs/access_groups";
     public static final String COUNTRY_ID ="/countryId";
     public static final String STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID ="/staff/{staffId}/expertise/{expertiseId}/unitPositionId";
+    public static final String ACCESS_GROUPS_BY_PARENT = "/access_groups_by_parent";
 
 
 }
