@@ -27,6 +27,7 @@ public class ShiftActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
+    private BigInteger jobId;  // This is job Id which is used to send reminder specific to activity.
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
 
@@ -174,5 +175,13 @@ public class ShiftActivity {
 
     public void setActivityName(String activityName) {
         this.activityName = activityName;
+    }
+
+    public BigInteger getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(BigInteger jobId) {
+        this.jobId = jobId;
     }
 }

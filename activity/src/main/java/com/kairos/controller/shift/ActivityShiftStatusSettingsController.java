@@ -6,6 +6,7 @@ package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.ActivityShiftStatusSettingsDTO;
 import com.kairos.service.shift.ActivityShiftStatusSettingsService;
+import com.kairos.service.shift.ShiftReminderService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +30,8 @@ public class ActivityShiftStatusSettingsController {
 
     @Inject
     private ActivityShiftStatusSettingsService activityShiftStatusSettingsService;
-
+    @Inject
+    private ShiftReminderService setReminderService;
 
     @PostMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("create Activity and shift status setting")
@@ -58,7 +60,7 @@ public class ActivityShiftStatusSettingsController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setReminderTrigger(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityShiftStatusSettingsService.setReminderTrigger(activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, setReminderService.setReminderTrigger(activityId));
     }
 
 
