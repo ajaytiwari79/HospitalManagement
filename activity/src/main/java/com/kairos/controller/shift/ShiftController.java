@@ -3,6 +3,7 @@ package com.kairos.controller.shift;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.dto.activity.shift.CopyShiftDTO;
@@ -207,6 +208,12 @@ public class ShiftController {
     @GetMapping("/shift/compact_view_details_by_date")
     public ResponseEntity<Map<String,Object>> getShiftsDetailsForComapactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
+    }
+
+    @ApiOperation("Update time bank after applying function")
+    @PutMapping("/shift/update_time_bank")
+    public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
     }
 
 }
