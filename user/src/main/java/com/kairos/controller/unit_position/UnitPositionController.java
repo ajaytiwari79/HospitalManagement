@@ -81,8 +81,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId, @RequestBody Map<String, Object> payload) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.applyFunction(unitPositionId, payload));
+    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Object> payload) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.applyFunction(unitPositionId, payload,unitId));
     }
 
     @ApiOperation(value = "apply function to unit position")
@@ -147,6 +147,12 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
         unitPositionService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"),999L);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
+    @ApiOperation(value = "get unit_position's CTA")
+    @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
+    public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
 }

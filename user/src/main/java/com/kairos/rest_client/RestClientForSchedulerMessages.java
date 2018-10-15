@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.service.TokenAuthService;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,22 +34,38 @@ import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 public class RestClientForSchedulerMessages {
     private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
     @Inject
-    @Qualifier("schedulerServiceRestTemplate")
-    private RestTemplate schedulerServiceRestTemplate;
+    @Qualifier("restTemplateWithoutAuth")
+    private RestTemplate restTemplateWithoutAuth;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private TokenAuthService tokenAuthService;
 
     public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit, id);
+        final String baseUrl = getBaseUrl(isUnit, id)+getURI(t,uri,queryParams,pathParams);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization","bearer "+ tokenAuthService.getAuthToken());
+            HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    schedulerServiceRestTemplate.exchange(
-                            baseUrl  + getURI(t,uri,queryParams,pathParams),
+                    restTemplateWithoutAuth.exchange(
+                            baseUrl,
                             getHttpMethod(integrationOperation),
-                            t==null?null:new HttpEntity<>(t), typeReference);
+                            httpEntity, typeReference);
+            if(restExchange.getStatusCode().value()==401) {
+                tokenAuthService.getNewAuthToken();
+                headers.remove("Authorization");
+                headers.add("Authorization", "bearer " + tokenAuthService.getNewAuthToken());
+                httpEntity = new HttpEntity<T>(t, headers);
+                restExchange = restTemplateWithoutAuth.exchange(
+                        baseUrl,
+                        getHttpMethod(integrationOperation),
+                        httpEntity, typeReference);
+
+            }
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException(response.getMessage());
@@ -66,7 +84,7 @@ public class RestClientForSchedulerMessages {
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    schedulerServiceRestTemplate.exchange(
+                    restTemplateWithoutAuth.exchange(
                             url,
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference,pathParams);

@@ -99,14 +99,14 @@ public class ShiftValidatorService {
         DateTimeInterval graceInterval;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getStartDate(), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         } else {
             if (shiftDTO.getValidatedByStaffDate() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
         }
-        if (!graceInterval.contains(shiftDTO.getStartDate())) {
+        if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
     }
@@ -477,7 +477,7 @@ public class ShiftValidatorService {
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shiftsInIntervalWTATemplate.getIntervalUnit(), shiftsInIntervalWTATemplate.getIntervalLength()));
 
                     break;
-                case SENIOR_DAYS_PER_YEAR:
+                /*case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, seniorDaysPerYearWTATemplate.getNumberOfWeeks().intValue(), seniorDaysPerYearWTATemplate.getValidationStartDate()));
 
@@ -485,7 +485,7 @@ public class ShiftValidatorService {
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, childCareDaysCheckWTATemplate.getNumberOfWeeks(), childCareDaysCheckWTATemplate.getValidationStartDate()));
-                    break;
+                    break;*/
             }
         }
         return interval;

@@ -24,7 +24,10 @@ public enum WTATemplateType {
     CHILD_CARE_DAYS_CHECK("Child Care Day Check"),
     DAYS_OFF_AFTER_A_SERIES("days off after a series"),
     NO_OF_SEQUENCE_SHIFT("no of sequence shift"),
-    EMPLOYEES_WITH_INCREASE_RISK("employees with increase risk");
+    EMPLOYEES_WITH_INCREASE_RISK("employees with increase risk"),
+    WTA_FOR_CARE_DAYS("WTA for Care days");
+
+
     private String value;
 
     WTATemplateType(String value) {
