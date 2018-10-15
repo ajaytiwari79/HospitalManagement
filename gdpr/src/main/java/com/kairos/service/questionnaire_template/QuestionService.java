@@ -1,6 +1,6 @@
 package com.kairos.service.questionnaire_template;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
@@ -159,7 +159,8 @@ public class QuestionService extends MongoBaseService {
         }
         questionnaireSection.getQuestions().remove(questionId);
         questionnaireSectionRepository.save(questionnaireSection);
-        return questionMongoRepository.safeDelete(questionId);
+        questionMongoRepository.safeDelete(questionId);
+        return true;
     }
 
 
@@ -170,7 +171,8 @@ public class QuestionService extends MongoBaseService {
         }
         questionnaireSection.getQuestions().remove(questionId);
         questionnaireSectionRepository.save(questionnaireSection);
-        return questionMongoRepository.safeDelete(questionId);
+        questionMongoRepository.safeDelete(questionId);
+        return true;
     }
 
 

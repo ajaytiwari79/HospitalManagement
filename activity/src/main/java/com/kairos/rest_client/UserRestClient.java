@@ -20,6 +20,7 @@ import java.util.Optional;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Service
+@Deprecated
 public class UserRestClient {
     private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
 

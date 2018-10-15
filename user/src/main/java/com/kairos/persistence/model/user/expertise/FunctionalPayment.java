@@ -8,7 +8,9 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_FOR_EXPERTISE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.FUNCTIONAL_PAYMENT_MATRIX;
@@ -81,7 +83,7 @@ public class FunctionalPayment extends UserBaseEntity {
     }
 
     public List<FunctionalPaymentMatrix> getFunctionalPaymentMatrices() {
-        return functionalPaymentMatrices;
+        return Optional.ofNullable(functionalPaymentMatrices).orElse(new ArrayList<>());
     }
 
     public void setFunctionalPaymentMatrices(List<FunctionalPaymentMatrix> functionalPaymentMatrices) {

@@ -1,12 +1,12 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
+import com.kairos.commons.utils.BeanFactoryUtil;
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
-import com.kairos.scheduler.utils.BeanFactoryUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;

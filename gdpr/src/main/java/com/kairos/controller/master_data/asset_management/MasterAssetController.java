@@ -74,7 +74,7 @@ public class MasterAssetController {
 
     @ApiOperation(value = "Update Suggest Status of Master Assets")
     @PutMapping("/master_asset/status")
-    public ResponseEntity<Object> updateStatusOfMasterAssetByIds(@PathVariable Long countryId, @PathVariable Set<BigInteger> assetIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateStatusOfMasterAssetByIds(@PathVariable Long countryId, @RequestBody Set<BigInteger> assetIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(assetIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Provider is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

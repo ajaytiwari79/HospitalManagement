@@ -1,12 +1,11 @@
 package com.kairos.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.Day;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.phase.PhaseType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -44,13 +43,15 @@ public class Phase extends MongoBaseEntity {
     private DayOfWeek untilNextDay;
     private int realtimeDuration;
     private String shortName;
+
     public Phase() {
         //default constructor
     }
-    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color,LocalTime flippingDefaultTime) {
+
+    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color, LocalTime flippingDefaultTime) {
         this.name = name;
         this.description = description;
-        this.phaseEnum=phaseEnum;
+        this.phaseEnum = phaseEnum;
         this.duration = duration;
         this.durationType = durationType;
         this.sequence = sequence;
@@ -59,8 +60,28 @@ public class Phase extends MongoBaseEntity {
         this.parentCountryPhaseId = parentCountryPhaseId;
         this.phaseType = phaseType;
         this.status = ShiftStatus.getListByValue(status);
-        this.color=color;
+        this.color = color;
         this.flippingDefaultTime = flippingDefaultTime;
+    }
+
+    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color, LocalTime flippingDefaultTimeprivate, int gracePeriodByStaff, int gracePeriodByManagement, DayOfWeek untilNextDay, int realtimeDuration) {
+        this.name = name;
+        this.description = description;
+        this.phaseEnum = phaseEnum;
+        this.duration = duration;
+        this.durationType = durationType;
+        this.sequence = sequence;
+        this.countryId = countryId;
+        this.organizationId = organizationId;
+        this.parentCountryPhaseId = parentCountryPhaseId;
+        this.phaseType = phaseType;
+        this.status = ShiftStatus.getListByValue(status);
+        this.color = color;
+        this.flippingDefaultTime = flippingDefaultTime;
+        this.gracePeriodByStaff = gracePeriodByStaff;
+        this.gracePeriodByManagement = gracePeriodByManagement;
+        this.untilNextDay = untilNextDay;
+        this.realtimeDuration = realtimeDuration;
     }
 
     public Long getOrganizationId() {

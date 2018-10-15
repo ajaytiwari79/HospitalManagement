@@ -1,8 +1,8 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.custom_exception.*;
 import com.kairos.wrapper.ResponseEnvelope;
-import com.kairos.service.locale.LocaleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
