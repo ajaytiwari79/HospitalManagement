@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -200,7 +201,7 @@ public class StaffUnitPositionDetails {
     }
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
-        return ctaRuleTemplates!=null?ctaRuleTemplates:new ArrayList<>();
+        return ctaRuleTemplates=Optional.ofNullable(ctaRuleTemplates).orElse(new ArrayList<>());
     }
 
     public ZoneId getUnitTimeZone() {

@@ -279,7 +279,7 @@ public class ShiftService extends MongoBaseService {
             List<BigInteger> activityIds = mainShift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+            setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO);
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
@@ -385,7 +385,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("error.cta.notFound", ctaResponseDTO.getId());
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -438,7 +438,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    private void setDayTypeTOCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
@@ -485,7 +485,7 @@ public class ShiftService extends MongoBaseService {
             shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, false);
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO, Shift.class);
             shifts.add(shift);
-            setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+            setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         }
         saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
         ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
@@ -548,7 +548,7 @@ public class ShiftService extends MongoBaseService {
             List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
 
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+            setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
 
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
@@ -626,7 +626,7 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         Long functionId = null;
         if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions()) && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
                 && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
@@ -755,7 +755,7 @@ public class ShiftService extends MongoBaseService {
             List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+            setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
@@ -1301,8 +1301,8 @@ public class ShiftService extends MongoBaseService {
      * @return
      */
     public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(1439));
-        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         Shift shift = new Shift(startDate,endDate,unitPositionId);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO,shift);
         return true;
