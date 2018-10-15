@@ -113,7 +113,7 @@ public class ActivityIntegrationService {
         List<NameValuePair> param =new ArrayList<>();
         param.add(unitPosition);
         param.add(startDate);
-        genericRestClient.publishRequest(staffAdditionalInfoDTO,staffAdditionalInfoDTO.getUnitId(),true,IntegrationOperation.CREATE,"/shift/update_time_bank",param,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+        genericRestClient.publishRequest(staffAdditionalInfoDTO,staffAdditionalInfoDTO.getUnitId(),true,IntegrationOperation.UPDATE,"/shift/update_time_bank",param,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
 
     }
 

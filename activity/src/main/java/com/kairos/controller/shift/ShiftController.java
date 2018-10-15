@@ -210,8 +210,8 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
 
-    @ApiOperation("Update time bank for function")
-    @PostMapping("/shift/update_time_bank")
+    @ApiOperation("Update time bank after applying function")
+    @PutMapping("/shift/update_time_bank")
     public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
     }
