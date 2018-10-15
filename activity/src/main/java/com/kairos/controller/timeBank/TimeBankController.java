@@ -28,8 +28,6 @@ public class TimeBankController {
 
     @Autowired
     private TimeBankService timeBankService;
-    @Inject
-    private ShiftService shiftService;
 
     /*@RequestMapping(value = "/createTimeBank", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createTimeBank(TimeBankDTO timeBankDTO) {
