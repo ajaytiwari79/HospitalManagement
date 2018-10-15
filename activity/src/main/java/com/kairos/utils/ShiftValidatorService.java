@@ -99,14 +99,14 @@ public class ShiftValidatorService {
         DateTimeInterval graceInterval;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getStartDate(), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         } else {
             if (shiftDTO.getValidatedByStaffDate() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
         }
-        if (!graceInterval.contains(shiftDTO.getStartDate())) {
+        if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
     }

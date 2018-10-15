@@ -71,13 +71,7 @@ public class AttendanceSettingService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }
         Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-        Map<Long,LocalDateTime> unitIdAndDateTimeMap=new HashMap<>();
-        for (StaffResultDTO staffAndOrganizationId : staffAndOrganizationIds) {
-            if(staffAndOrganizationId.getTimeZone()!=null)
-            unitIdAndDateTimeMap.put(staffAndOrganizationId.getUnitId(),DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
-        }
         List<Long> staffIds=staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
-        //ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
         Shift shift=null;//shiftMongoRepository.findShiftToBeDone(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         List<Shift> shifts=shiftMongoRepository.findShiftsToBeDone(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         Map<Long,FlexibleTimeSettingDTO> unitIdAndFlexibleTimeMap=new HashMap<>();
@@ -89,7 +83,7 @@ public class AttendanceSettingService extends MongoBaseService {
         }
         for (Shift checkInshift : shifts) {
             if (unitIdAndFlexibleTimeMap.containsKey(checkInshift.getUnitId())) {
-                boolean result = checkInHavingShiftByUnitTime(checkInshift, reasonCodeId, unitIdAndStaffResultMap.get(checkInshift.getUnitId()), unitIdAndDateTimeMap.get(checkInshift.getUnitId()), unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()));
+                boolean result = checkInHavingShiftByUnitTime(checkInshift, reasonCodeId, unitIdAndStaffResultMap.get(checkInshift.getUnitId()), unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()));
                 if (result) {
                     shift = checkInshift;
                     break;
@@ -99,6 +93,8 @@ public class AttendanceSettingService extends MongoBaseService {
                 }
             }
         }
+
+        //ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
         //If shift is not found
         if(shift==null && checkIn){
             attendanceSetting =  checkInWithoutHavingShift(unitId, reasonCodeId, staffAndOrganizationIds);
@@ -223,9 +219,8 @@ public class AttendanceSettingService extends MongoBaseService {
         return validateFlexibleTime(shift, reasonCodeId, staffAndOrganizationId);
     }
 
-    private boolean checkInHavingShiftByUnitTime(Shift shift,Long reasonCodeId,StaffResultDTO staffAndOrganizationId,LocalDateTime dateTime,FlexibleTimeSettingDTO flexibleTimeSettingDTO){
-        Short checkInFlexibleTime = flexibleTimeSettingDTO.getCheckInFlexibleTime();
-        return (Math.abs((Duration.between(LocalDateTime.ofInstant(Instant.ofEpochMilli(shift.getStartDate().getTime()),ZoneId.of(staffAndOrganizationId.getTimeZone())),dateTime)).toMinutes()) < checkInFlexibleTime || reasonCodeId != null)?true:false;
+    private boolean checkInHavingShiftByUnitTime(Shift shift,Long reasonCodeId,StaffResultDTO staffAndOrganizationId,FlexibleTimeSettingDTO flexibleTimeSettingDTO){
+        return (Math.abs((Duration.between(LocalDateTime.ofInstant(Instant.ofEpochMilli(shift.getStartDate().getTime()),ZoneId.systemDefault()),LocalDateTime.now(ZoneId.of(staffAndOrganizationId.getTimeZone())))).toMinutes()) < flexibleTimeSettingDTO.getCheckInFlexibleTime() || reasonCodeId != null)?true:false;
     }
 
 
