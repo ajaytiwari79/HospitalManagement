@@ -493,7 +493,6 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftWithViolatedInfoDTO updateShift(ShiftDTO shiftDTO, String type) {
-
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
@@ -1155,51 +1154,62 @@ public class ShiftService extends MongoBaseService {
         if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
-        shiftStateMongoRepository.deleteShiftStateByShiftId(shiftDTO.getShiftId());
-        if (shiftDTO.getShiftId() == null) {
+        shiftStateMongoRepository.deleteById(shiftDTO.getId());
+        if(shiftDTO.getShiftId()==null){
             shiftDTO.setShiftId(shiftDTO.getId());
         }
         shiftDTO.getActivities().forEach(a->a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
-        shiftDTO.setId(null);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId, shiftDTO, type, true);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId,shiftDTO, type,true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setDurationMinutes((int) shiftWithViolatedInfoDTO.getShifts().get(0).getInterval().getMinutes());
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO validateShift(BigInteger shiftId, Boolean validatedByStaff, Long unitId,String type) {
-        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftId);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftState.getActivities().get(0).getStartDate()),shiftState.getStaffId(), type, shiftState.getUnitPositionId());
-        ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
+    public ShiftDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId,String type) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()),shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         shiftValidatorService.validateGracePeriod(shiftDTO, validatedByStaff, unitId);
-        if (validatedByStaff) {
-            shiftState.setValidatedByStaffDate(LocalDate.now());
-            save(shiftState);
-        } else {
-            shiftState.setShiftId(null);
-            save(shiftState);
-            shiftState.setValidatedByPlannerDate(LocalDate.now());
-        }
-        if((!staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && validatedByStaff) || !(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && validatedByStaff)){
+        if(!staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && validatedByStaff){
             exceptionService.actionNotPermittedException("message.shift.validation.access");
         }
-        shiftState.setId(null);
-        shiftState.setShiftId(null);
-        shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
-        save(shiftState);
-        ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
-        if (validatedByStaff) {
-            shiftDTO1.setEditable(true);
+        else if(!staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !validatedByStaff){
+            exceptionService.actionNotPermittedException("message.shift.validation.access");
         }
-        shiftDTO1.setDurationMinutes((int) shiftDTO1.getInterval().getMinutes());
-        return shiftDTO1;
+        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftDTO.getId());
+        if(shiftState==null){
+            Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+            if(shift!=null){
+                shiftDTO.setId(null);
+            }
+        }
+        shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftState.class);
+        shiftState.setShiftId(shiftDTO.getShiftId());
+        shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
+        shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size()-1).getEndDate());
+        shiftState.getActivities().forEach(a->a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+        save(shiftState);
+        if (validatedByStaff) {
+            shiftState.setValidatedByStaffDate(LocalDate.now());
+        }else {
+            shiftState.setValidatedByStaffDate(null);
+            shiftState.setValidatedByPlannerDate(LocalDate.now());
+        }
+        shiftState.setAttendanceDuration(null);
+        shiftState.setId(null);
+        shiftState.getActivities().forEach(a->a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+        save(shiftState);
+        shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
+        if(validatedByStaff){
+            shiftDTO.setEditable(true);
+        }
+        shiftDTO.setDurationMinutes((int)shiftDTO.getInterval().getMinutes());
+        return shiftDTO;
     }
 
     private ShiftDetailViewDTO getShiftDetailsOfStaff(TimeAttendanceGracePeriod timeAttendanceGracePeriod, List<Shift> shifts, List<ShiftState> shiftStates) {
         List<ShiftDTO> plannedShifts = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
         List<ShiftDTO> realTimeShift = plannedShifts.stream().filter(s -> s.getAttendanceDuration() != null).collect(Collectors.toList());
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStates, ShiftDTO.class);
-        Map<BigInteger, ShiftDTO> shiftDTOMap = shiftStateDTOs.stream().filter(s -> s.getShiftId() != null).collect(Collectors.toMap(ShiftDTO::getShiftId, v -> v));
+        Map<BigInteger, ShiftDTO> shiftDTOMap = shiftStateDTOs.stream().filter(s->s.getShiftId()!=null && s.getValidatedByStaffDate()==null && s.getValidatedByPlannerDate()==null).collect(Collectors.toMap(ShiftDTO::getShiftId, v -> v));
         DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.getDate(), true);
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         for (ShiftDTO shift : realTimeShift) {
@@ -1213,8 +1223,8 @@ public class ShiftService extends MongoBaseService {
             }
             updateRealTime.add(shiftDTO);
         }
-        List<ShiftDTO> staffValidatedShifts = shiftStateDTOs.stream().filter(s -> s.getShiftId() == null && s.getValidatedByStaffDate() != null && s.getValidatedByPlannerDate() == null).collect(Collectors.toList());
-        if (!staffValidatedShifts.isEmpty()) {
+        List<ShiftDTO> staffValidatedShifts = shiftStateDTOs.stream().filter(s -> s.getValidatedByStaffDate() != null).collect(Collectors.toList());
+        if(!staffValidatedShifts.isEmpty()) {
             graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, staffValidatedShifts.get(0).getStartDate(), false);
             for (ShiftDTO staffValidatedShift : staffValidatedShifts) {
                 if (graceInterval.contains(staffValidatedShift.getStartDate())) {
