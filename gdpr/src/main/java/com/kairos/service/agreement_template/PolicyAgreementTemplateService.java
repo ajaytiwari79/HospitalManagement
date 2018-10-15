@@ -14,6 +14,7 @@ import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseD
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -173,11 +174,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     public boolean updateAgreementTemplateOldClauseWithNewVersionOfClause(Long countryId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
 
         List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(countryId, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
-        agreementSectionsAndSubSectionsContainingClause.forEach(agreementSection -> {
-            int clauseIndex = agreementSection.getClauseIdOrderedIndex().indexOf(agreementTemplateClauseUpdateDTO.getPreviousClauseId());
-            agreementSection.getClauseIdOrderedIndex().set(clauseIndex, agreementTemplateClauseUpdateDTO.getNewClauseId());
-        });
-        agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionsAndSubSectionsContainingClause));
+        if (CollectionUtils.isNotEmpty(agreementSectionsAndSubSectionsContainingClause)) {
+            agreementSectionsAndSubSectionsContainingClause.forEach(agreementSection -> {
+                int clauseIndex = agreementSection.getClauseIdOrderedIndex().indexOf(agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+                agreementSection.getClauseIdOrderedIndex().set(clauseIndex, agreementTemplateClauseUpdateDTO.getNewClauseId());
+            });
+            agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionsAndSubSectionsContainingClause));
+        }
         return true;
     }
 

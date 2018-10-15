@@ -133,4 +133,5 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         AggregationResults<AgreementSection> result=mongoTemplate.aggregate(aggregation,PolicyAgreementTemplate.class,AgreementSection.class);
         return result.getMappedResults();
     }
+
 }

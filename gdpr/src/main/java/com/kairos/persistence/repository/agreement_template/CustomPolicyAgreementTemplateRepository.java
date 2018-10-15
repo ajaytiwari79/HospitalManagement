@@ -24,5 +24,4 @@ public interface CustomPolicyAgreementTemplateRepository {
 
     List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds,BigInteger clauseId);
 
-
 }
