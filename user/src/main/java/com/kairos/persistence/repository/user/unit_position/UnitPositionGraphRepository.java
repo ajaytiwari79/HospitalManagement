@@ -267,7 +267,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " OPTIONAL MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix) \n" +
             " OPTIONAL MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]->(seniorityLevel) \n" +
             " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +
-            " return {id:id(positionLine), hourlyCost : case hourlyCost when null then 0.0 else hourlyCost end} as hourlyWagesMap")
-    List<Map<Long,Float>> findFunctionalHourlyWages(List<Long> unitPositionIds);
+            " return id(positionLine) as id,  case hourlyCost when null then 0.0 else hourlyCost end as hourlyWages")
+    List<UnitPositionLinesQueryResult> findFunctionalHourlyWages(List<Long> unitPositionIds);
+
 
 }
