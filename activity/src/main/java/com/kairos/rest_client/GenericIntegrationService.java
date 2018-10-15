@@ -7,27 +7,20 @@ import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
-import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
-import com.kairos.dto.user.organization.TimeSlot;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
-import com.kairos.enums.rest_client.RestClientUrlType;
-import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.RestClientUrlType;
+import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
+import com.kairos.service.exception.ExceptionService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +29,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -72,7 +63,7 @@ public class GenericIntegrationService {
     }
 
     public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
         },expertiseId);
 
     }
