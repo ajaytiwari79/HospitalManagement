@@ -10,7 +10,10 @@ import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.enums.IntegrationOperation;
@@ -61,15 +64,15 @@ public class GenericIntegrationService {
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmployment(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET,  EMPLOYEMENT_TYPE_AND_EXPERTIZE, null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<PriorityGroupDefaultData>>(){});
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET,  EMPLOYEMENT_TYPE_AND_EXPERTISE, null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<PriorityGroupDefaultData>>(){});
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmploymentForUnit(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, EMPLOYEMENT_TYPE_AND_EXPERTIZE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PriorityGroupDefaultData>>(){});
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, EMPLOYEMENT_TYPE_AND_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PriorityGroupDefaultData>>(){});
     }
 
     public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EXPERTIZE_WITHID_UNIT_POSITIONS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
         },expertiseId);
 
     }
@@ -80,7 +83,7 @@ public class GenericIntegrationService {
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EXPERTIZE_WITHID_STAFF_AND_UNIT_POSITIONS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
         },expertiseId);
 
     }

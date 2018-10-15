@@ -56,15 +56,16 @@ public final class ApiConstants {
     public static final String USER_USERID_STAFFS ="/user/{userId}/staffs";
     public static final String DAY_TYPES_AND_EMPLOYEMENT_TYPES ="/day_types_and_employment_types";
     public static final String STAFF_ACCESS_ROLES ="/staff/access_roles";
-    public static final String EXPERTIZE_WITHID_STAFF_AND_UNIT_POSITIONS ="/expertise/{expertiseId}/staff_and_unit_positions";
+    public static final String STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID ="/expertise/{expertiseId}/staff_and_unit_positions";
     public static final String STAFF_EMAILS ="/staff/emails";
     public static final String EXPERTIZE_WITHID_UNIT_POSITIONS ="/expertise/{expertiseId}/unitPositions";
-    public static final String EMPLOYEMENT_TYPE_AND_EXPERTIZE ="/employment_type_and_expertise";
+    public static final String EMPLOYEMENT_TYPE_AND_EXPERTISE ="/employment_type_and_expertise";
     public static final String STAFF_ACCESS_GROUPS ="/staff/access_groups";
     public static final String USER_WITH_ID_UNIT_SICK_SETTINGS ="/user/{userId}/unit_sick_settings";
     public static final String SICK_SETTINGS_DEFAULT ="/sick_settings/default";
     public static final String STAFFS_ACCESS_GROUPS ="/staffs/access_groups";
     public static final String COUNTRY_ID ="/countryId";
+
 
 
 }
