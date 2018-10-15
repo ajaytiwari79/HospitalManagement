@@ -262,11 +262,11 @@ public class GenericIntegrationService {
     }
 
     public CountryDTO getCountryById(long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, null, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
         });
     }
     public boolean isCountryExists(long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, null, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
