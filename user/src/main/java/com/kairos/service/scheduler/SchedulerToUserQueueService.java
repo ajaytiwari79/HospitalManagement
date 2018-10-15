@@ -3,7 +3,7 @@ package com.kairos.service.scheduler;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.dto.scheduler.queue.kafka.JobQueueExecutor;
+import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.unit_position.UnitPositionService;
 import org.slf4j.Logger;

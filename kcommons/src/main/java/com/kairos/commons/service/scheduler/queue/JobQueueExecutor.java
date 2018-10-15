@@ -1,4 +1,4 @@
-package com.kairos.dto.scheduler.queue.kafka;
+package com.kairos.commons.service.scheduler.queue;
 
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 

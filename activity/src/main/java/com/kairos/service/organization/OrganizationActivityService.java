@@ -4,9 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
@@ -18,6 +16,9 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -126,7 +127,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private CounterRepository counterRepository;
     @Inject
     private StaffActivitySettingRepository staffActivitySettingRepository;
-    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -141,22 +143,30 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a->a.getActivityShiftStatusSettings().stream().flatMap(b->b.getAccessGroupIds().stream())).collect(Collectors.toSet());
+            Map<Long,Long> accessGroupIdsMap=genericIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
-                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
-                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
-                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
+                List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings=activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
+                List<ActivityShiftStatusSettings> activityShiftStatusSettings=new ArrayList<>();
+                Set<Long> agIds=new HashSet<>();
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
+                        activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
+                        activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
+                for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
+                    List<Long> accessGroupIds=new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
+                    accessGroupIds.forEach(a->{if(accessGroupIdsMap.get(a)!=null){agIds.add(accessGroupIdsMap.get(a));}});
+                    activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(),agIds));
+                }
+                phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
                 phaseTemplateValues.add(phaseTemplateValue);
             }
-            activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
+            activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
-            activityService.deleteActivityAndShiftStatusOfThisActivity(activityCopied.getId());
-
-
         }
         save(activityCopied);
         return retrieveBasicDetails(activityCopied);
@@ -219,7 +229,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
-       // activityCopied.setCompositeActivities(null);
+        // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
 
@@ -277,9 +287,8 @@ public class OrganizationActivityService extends MongoBaseService {
         List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
-        List<Long> rulesTabDayTypes= activity.getRulesActivityTab().getDayTypes();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes,rulesTabDayTypes);
-        return activityTabsWrapper;
+        List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();
+        return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
@@ -287,9 +296,17 @@ public class OrganizationActivityService extends MongoBaseService {
         List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
-        rulesActivityTab.getEligibleForSchedules().sort(Comparator.comparingInt(PhaseTemplateValue::getSequence));
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes, dayTypeEmploymentTypeWrapper.getEmploymentTypes());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(rulesActivityTab, dayTypes, dayTypeEmploymentTypeWrapper.getEmploymentTypes());
+    }
+
+    public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long unitId) {
+        Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
+        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
+        Activity activity = activityMongoRepository.findOne(activityId);
+        PhaseSettingsActivityTab phaseSettingsActivityTab = activity.getPhaseSettingsActivityTab();
+        return new ActivityTabsWrapper(roles, phaseSettingsActivityTab, dayTypes, employmentTypeDTOS);
     }
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
@@ -316,9 +333,6 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
-
-        // copying activity and shift status settings of this activity
-        activityService.copyActivityAndShiftStatusOfThisActivity(activityId, activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -370,12 +384,11 @@ public class OrganizationActivityService extends MongoBaseService {
                 logger.info("I am act {}", activity.getName());
                 List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
                 for (int i = 0; i < phases.size(); i++) {
-                    PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
-                            activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
-                            activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
+                    PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
+                            activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
+                            activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
                     phaseTemplateValues.add(phaseTemplateValue);
                 }
-                activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }
             save(activityCopiedList);
@@ -390,19 +403,20 @@ public class OrganizationActivityService extends MongoBaseService {
      * after update all composite activities will be updated
      * as per Organizational level composite activities Ids.
      * CalledBy {#createDefaultDataForOrganization}
+     *
+     * @param activities{after copied into database}
      * @author mohit
      * @date 5-10-2018
-     * @param activities{after copied into database}
      */
-    private void updateCompositeActivitiesIds(List<Activity> activities){
-       Map<BigInteger,BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k->k.getParentId(),v->v.getId()));
+    private void updateCompositeActivitiesIds(List<Activity> activities) {
+        Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
         for (Activity activity : activities) {
             Iterator<CompositeActivity> compositeActivityIterator = activity.getCompositeActivities().iterator();
-            while (compositeActivityIterator.hasNext()){
+            while (compositeActivityIterator.hasNext()) {
                 CompositeActivity compositeActivity = compositeActivityIterator.next();
-                if(activityIdMap.containsKey(compositeActivity.getActivityId())) {
+                if (activityIdMap.containsKey(compositeActivity.getActivityId())) {
                     compositeActivity.setActivityId(activityIdMap.get(compositeActivity.getActivityId()));
-                }else {
+                } else {
                     compositeActivityIterator.remove();
                 }
             }

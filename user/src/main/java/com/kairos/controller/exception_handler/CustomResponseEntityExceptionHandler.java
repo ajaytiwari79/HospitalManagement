@@ -1,6 +1,6 @@
 package com.kairos.controller.exception_handler;
 
-import com.kairos.commons.service.exception.locale.LocaleService;
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.custom_exception.*;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;

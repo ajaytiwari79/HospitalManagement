@@ -64,7 +64,7 @@ public class GenericIntegrationService {
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, List<Long> staffIds, Long expertiseId) {
-        List<StaffUnitPositionDetails> staffData = ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true,IntegrationOperation.CREATE, "/expertise/{expertiseId}/staff_and_unit_positions", null, expertiseId), StaffUnitPositionDetails.class);
+        List<StaffUnitPositionDetails> staffData = ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/expertise/{expertiseId}/staff_and_unit_positions", null, expertiseId), StaffUnitPositionDetails.class);
         return staffData;
     }
 
@@ -77,12 +77,12 @@ public class GenericIntegrationService {
     }
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypesAtUnit(Long unitId) {
-        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true,IntegrationOperation.GET, "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsByUserId(Long userId){
-        List<StaffResultDTO> staffResultDTOS=genericRestClient.publish(null,null,false,IntegrationOperation.GET,"/user/{userId}/staffs",null,userId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffResultDTOS,StaffResultDTO.class);
+    public List<StaffResultDTO> getStaffIdsByUserId(Long userId) {
+        List<StaffResultDTO> staffResultDTOS = genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/user/{userId}/staffs", null, userId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffResultDTOS, StaffResultDTO.class);
 
     }
 
@@ -90,27 +90,28 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/unit/parent_org_and_country", null), UnitAndParentOrganizationAndCountryDTO.class);
     }
 
-    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForCountry(Long countryId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/{countryId}/kpi_details", null,countryId), KPIAccessPageDTO.class);
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForCountry(Long countryId) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/{countryId}/kpi_details", null, countryId), KPIAccessPageDTO.class);
     }
 
-    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForUnit(Long unitId){
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForUnit(Long unitId) {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/kpi_details", null), KPIAccessPageDTO.class);
     }
 
-    public List<OrgTypeDTO> getOrganizationIdsBySubOrgId(List<Long> orgTypeId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(orgTypeId, null, false, IntegrationOperation.CREATE, "/orgtype/get_organization_ids", null),OrgTypeDTO.class);
-    }
-    public List<StaffIdsDTO> getStaffIdsByunitAndAccessGroupId(Long unitId, List<Long> accessGroupId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(accessGroupId,unitId,true,IntegrationOperation.CREATE,"/access_group/staffs",null),StaffIdsDTO.class);
+    public List<OrgTypeDTO> getOrganizationIdsBySubOrgId(List<Long> orgTypeId) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(orgTypeId, null, false, IntegrationOperation.CREATE, "/orgtype/get_organization_ids", null), OrgTypeDTO.class);
     }
 
-    public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds){
+    public List<StaffIdsDTO> getStaffIdsByunitAndAccessGroupId(Long unitId, List<Long> accessGroupId) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(accessGroupId, unitId, true, IntegrationOperation.CREATE, "/access_group/staffs", null), StaffIdsDTO.class);
+    }
+
+    public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/staff/details", null), StaffDTO.class);
     }
 
     public Long getStaffIdByUserId(Long unitId) {
-        Integer value = genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null,Long.class);
+        Integer value = genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, Long.class);
         if (value == null) {
             exceptionService.dataNotFoundByIdException("message.staff.notFound");
         }
@@ -118,24 +119,31 @@ public class GenericIntegrationService {
     }
 
 
-    public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
-            return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);
+    public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId) {
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/staff/user/accessgroup", null), AccessGroupPermissionCounterDTO.class);
     }
 
-    public Long removeFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Date shiftDate){
-        BasicNameValuePair appliedDate=new BasicNameValuePair("appliedDate",DateUtils.asLocalDate(shiftDate).toString());
-        Long functionId= genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/applyFunction", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
+    public Long removeFunctionFromUnitPositionByDate(Long unitId, Long unitPositionId, Date shiftDate) {
+        BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", DateUtils.asLocalDate(shiftDate).toString());
+        Long functionId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/applyFunction", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        }, unitPositionId);
         return functionId;
     }
 
-    public Boolean restoreFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Map<Long,Set<LocalDate>> dateAndFunctionIdMap){
-        return genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/restore_functions",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
+    public Boolean restoreFunctionFromUnitPositionByDate(Long unitId, Long unitPositionId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
+        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/restore_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        }, unitPositionId);
 
     }
 
-    public Map<LocalDate,Long> removeFunctionFromUnitPositionByDates(Long unitId,Long unitPositionId,Set<LocalDate> dates){
-         return genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
-         }
+    public Map<LocalDate, Long> removeFunctionFromUnitPositionByDates(Long unitId, Long unitPositionId, Set<LocalDate> dates) {
+        return genericRestClient.publishRequest(dates, unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
+        }, unitPositionId);
+    }
+
+    public Map<Long,Long> getAccessGroupForUnit(Long unitId,  Set<Long> parentAccessGroupIds) {
+        return genericRestClient.publishRequest(parentAccessGroupIds, unitId, true, IntegrationOperation.CREATE, "/access_groups_by_parent", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>>() {});
+    }
 
 
- }
+}

@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.wta.templates;
 
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.WTATemplateType;
@@ -14,11 +15,9 @@ import java.util.List;
 public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
-    private LocalDate validationStartDate;
-    private Long numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
-
+    private CutOffIntervalUnit cutOffIntervalUnit;
     public float getRecommendedValue() {
         return recommendedValue;
     }
@@ -48,12 +47,12 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.carryForwardLeave = carryForwardLeave;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
+    public CutOffIntervalUnit getCutOffIntervalUnit() {
+        return cutOffIntervalUnit;
     }
 
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
+    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
     }
 
     public List<AgeRange> getAgeRange() {
@@ -72,14 +71,6 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-
-    public Long getNumberOfWeeks() {
-        return numberOfWeeks;
-    }
-
-    public void setNumberOfWeeks(Long numberOfWeeks) {
-        this.numberOfWeeks = numberOfWeeks;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
