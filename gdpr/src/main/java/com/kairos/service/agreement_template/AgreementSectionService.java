@@ -2,7 +2,7 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.dto.gdpr.master_data.AgreementSectionDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
@@ -150,13 +150,12 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     /**
-     * @description
-     * newAgreementSectionDTOList  - for first time call of save operation Section list equals to newAgreementSectionDTOList,
-     * and if save call is second time and section contain id then sections with no id equals to newAgreementSectionDTOList.
-     * method create section ,Sub Section clause and update clauses,section ,sub section.
      * @param countryId
      * @param agreementSectionDTOS
      * @param policyAgreementTemplate
+     * @description newAgreementSectionDTOList  - for first time call of save operation Section list equals to newAgreementSectionDTOList,
+     * and if save call is second time and section contain id then sections with no id equals to newAgreementSectionDTOList.
+     * method create section ,Sub Section clause and update clauses,section ,sub section.
      */
     public List<BigInteger> createOrupdateSectionAndSubSectionOfAgreementTemplate(Long countryId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
@@ -212,7 +211,7 @@ public class AgreementSectionService extends MongoBaseService {
     /**
      * @param agreementSections
      * @param agreementSectionDTOMap
-     * @param newSubSectionListCoresspondingToSection                - sub section list coressponding to exisitng agreement section id
+     * @param newSubSectionListCoresspondingToSection                - sub section list coressponding to existing agreement section id
      * @param globalAgreementSectionAndClauseDTOListHashMap          - Clause DTO list coressponding to sections and sub sections
      * @param agreementSubSectionListCoresspondingToAgreementSection list of agreement sub section coressponding to section
      */
@@ -398,6 +397,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
+
     /**
      * @param countryId
      * @param sectionId
@@ -439,16 +439,14 @@ public class AgreementSectionService extends MongoBaseService {
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOS) {
             if (titles.contains(agreementSectionDTO.getTitle().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", "Agreement Section ", agreementSectionDTO.getTitle());
-            }
-            if (Optional.ofNullable(agreementSectionDTO.getClauses()).isPresent() && !agreementSectionDTO.getClauses().isEmpty()) {
+            } else if (CollectionUtils.isNotEmpty(agreementSectionDTO.getClauses())) {
                 checkDuplicateClauseInAgreementSection(agreementSectionDTO.getClauses(), clauseTitles, agreementSectionDTO.getTitle());
-            }
-            if (Optional.ofNullable(agreementSectionDTO.getSubSections()).isPresent()) {
+            } else if (Optional.ofNullable(agreementSectionDTO.getSubSections()).isPresent()) {
                 agreementSectionDTO.getSubSections().forEach(agreementSubSectionDTO -> {
                     if (titles.contains(agreementSubSectionDTO.getTitle().toLowerCase())) {
                         exceptionService.duplicateDataException("message.duplicate", "Agreement Sub section", agreementSubSectionDTO.getTitle());
                     }
-                    if (Optional.ofNullable(agreementSubSectionDTO.getClauses()).isPresent() && !agreementSubSectionDTO.getClauses().isEmpty()) {
+                    if (CollectionUtils.isNotEmpty(agreementSectionDTO.getClauses())) {
                         checkDuplicateClauseInAgreementSection(agreementSubSectionDTO.getClauses(), clauseTitles, agreementSubSectionDTO.getTitle());
                     }
                     titles.add(agreementSubSectionDTO.getTitle().toLowerCase());
