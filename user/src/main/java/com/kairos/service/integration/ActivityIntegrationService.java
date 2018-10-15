@@ -10,10 +10,13 @@ import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,9 +27,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
@@ -104,6 +105,16 @@ public class ActivityIntegrationService {
         });
 
         return ctawtaResponseDTOS;
+    }
+
+    public void updateTimeBank(Long unitPositionId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        BasicNameValuePair startDate=new BasicNameValuePair("shiftStartDate",shiftStartDate.toString());
+        BasicNameValuePair unitPosition=new BasicNameValuePair("unitPositionId", unitPositionId + "");
+        List<NameValuePair> param =new ArrayList<>();
+        param.add(unitPosition);
+        param.add(startDate);
+        genericRestClient.publishRequest(staffAdditionalInfoDTO,staffAdditionalInfoDTO.getUnitId(),true,IntegrationOperation.UPDATE,"/shift/update_time_bank",param,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+
     }
 
 }
