@@ -49,10 +49,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.kairos.constants.ApiConstants.*;
 
-/*@Service
-@Transactional*/
-@RestController
-@RequestMapping("/api/v1")
+@Service
+@Transactional
 public class GenericIntegrationService {
     @Autowired
     GenericRestClient genericRestClient;
@@ -291,8 +289,7 @@ public class GenericIntegrationService {
         });
     }
 
-    //IntegrationRestClient
-    @RequestMapping("getFLS_Credentials")
+
     public Map<String, String> getFLS_Credentials(Long citizenUnitId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, String>>>() {
         },citizenUnitId);
