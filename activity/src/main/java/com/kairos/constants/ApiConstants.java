@@ -60,7 +60,11 @@ public final class ApiConstants {
     public static final String STAFF_EMAILS ="/staff/emails";
     public static final String EXPERTIZE_WITHID_UNIT_POSITIONS ="/expertise/{expertiseId}/unitPositions";
     public static final String EMPLOYEMENT_TYPE_AND_EXPERTIZE ="/employment_type_and_expertise";
-    //public static final String STAFF_EMAILS ="/staff/emails";
+    public static final String STAFF_ACCESS_GROUPS ="/staff/access_groups";
+    public static final String USER_WITH_ID_UNIT_SICK_SETTINGS ="/user/{userId}/unit_sick_settings";
+    public static final String SICK_SETTINGS_DEFAULT ="/sick_settings/default";
+    public static final String STAFFS_ACCESS_GROUPS ="/staffs/access_groups";
+    public static final String COUNTRY_ID ="/countryId";
 
 
 }
