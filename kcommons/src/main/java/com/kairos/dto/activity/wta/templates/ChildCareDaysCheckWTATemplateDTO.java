@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.wta.templates;
 
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.enums.wta.WTATemplateType;
@@ -15,13 +16,12 @@ import java.util.List;
 public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private List<AgeRange> ageRange;
-    private List<BigInteger> activityIds;
+    private List<BigInteger> activityIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
-    private LocalDate validationStartDate;
-    private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
+    private CutOffIntervalUnit cutOffIntervalUnit;
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -77,6 +77,13 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.plannedTimeIds = plannedTimeIds;
     }
 
+    public CutOffIntervalUnit getCutOffIntervalUnit() {
+        return cutOffIntervalUnit;
+    }
+
+    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+    }
 
     public List<AgeRange> getAgeRange() {
         return ageRange;
@@ -87,21 +94,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
-
-    public int getNumberOfWeeks() {
-        return numberOfWeeks;
-    }
-
-    public void setNumberOfWeeks(int numberOfWeeks) {
-        this.numberOfWeeks = numberOfWeeks;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

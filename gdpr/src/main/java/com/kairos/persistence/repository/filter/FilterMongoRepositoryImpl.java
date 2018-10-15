@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.filter;
-
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.enums.gdpr.FilterType;

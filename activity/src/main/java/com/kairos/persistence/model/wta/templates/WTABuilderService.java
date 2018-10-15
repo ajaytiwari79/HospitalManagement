@@ -105,6 +105,9 @@ public class WTABuilderService extends MongoBaseService {
             case EMPLOYEES_WITH_INCREASE_RISK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, EmployeesWithIncreasedRiskWTATemplate.class);
                 break;
+            case WTA_FOR_CARE_DAYS:
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
+                break;
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
@@ -120,7 +123,6 @@ public class WTABuilderService extends MongoBaseService {
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = new ArrayList<>();
         for (WTABaseRuleTemplate ruleTemplate : WTARuleTemplates) {
             wtaBaseRuleTemplates.add(ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTABaseRuleTemplateDTO.class));
-
         }
         //List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates  = ObjectMapperUtils.copyPropertiesByMapper(WTARuleTemplates,new WTABaseRuleTemplateDTO());
         return wtaBaseRuleTemplates;

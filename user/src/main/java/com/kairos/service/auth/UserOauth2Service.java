@@ -1,5 +1,6 @@
 package com.kairos.service.auth;
 
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -44,7 +45,7 @@ public class UserOauth2Service implements UserDetailsService {
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
         String password=HttpRequestHolder.getCurrentRequest().getParameter("password");
-        if (passwordEncoder.matches(password, user.getPassword()) && user.isSystemUser()){
+        if (passwordEncoder.matches(password, user.getPassword())&&user.getUserType().toString().equals(UserType.SYSTEM_ACCOUNT.toString())){
             return new UserPrincipal(user,getPermission(user));
         }
          Optional<Integer>optInt=OptionalUtility.stringToInt(otpString);

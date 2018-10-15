@@ -1,7 +1,8 @@
 package com.kairos.service.master_data.asset_management;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;

@@ -74,6 +74,8 @@ public class AttendanceSettingService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }
         List<Long> staffIds=staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
+
+
         //ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
         Shift shift=shiftMongoRepository.findShiftToBeDone(staffIds, DateUtils.getCurrentDayStart(), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         //If shift is not found
