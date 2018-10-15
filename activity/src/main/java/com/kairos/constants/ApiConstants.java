@@ -65,6 +65,7 @@ public final class ApiConstants {
     public static final String SICK_SETTINGS_DEFAULT ="/sick_settings/default";
     public static final String STAFFS_ACCESS_GROUPS ="/staffs/access_groups";
     public static final String COUNTRY_ID ="/countryId";
+    public static final String STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID ="/staff/{staffId}/expertise/{expertiseId}/unitPositionId";
 
 
 }

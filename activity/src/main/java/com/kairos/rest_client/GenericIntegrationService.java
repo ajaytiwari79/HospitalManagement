@@ -43,11 +43,11 @@ public class GenericIntegrationService {
     @Autowired
     ExceptionService exceptionService;
 
-//TODO FIX Me @Param {Long dateInMillis} needs to be send in String as query Param
+
     public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId, Long dateInMillis) {
-        Map<String, Object> queryParam = new HashMap<>();
-        queryParam.put("dateInMillis", dateInMillis);
-        Integer value = genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/expertise/{expertiseId}/unitPositionId", queryParam, staffId, expertiseId);
+        BasicNameValuePair basicNameValuePair=new BasicNameValuePair("dateInMillis",dateInMillis.toString());
+        Long value=genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        },staffId,expertiseId);
         if (value == null) {
             exceptionService.dataNotFoundByIdException("message.unitPosition.notFound", expertiseId);
         }
