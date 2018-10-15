@@ -4,7 +4,7 @@ package com.kairos.controller.exception_handler;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
-import com.kairos.commons.service.exception.locale.LocaleService;
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.custom_exception.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
