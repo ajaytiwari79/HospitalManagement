@@ -83,8 +83,6 @@ public class AbsencePlanningService {
     OrganizationRestClient organizationRestClient;
     private @Autowired
     GenericIntegrationService genericIntegrationService;
-    private @Autowired
-    IntegrationRestClient integrationServiceRestClient;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -488,7 +486,7 @@ public class AbsencePlanningService {
         try {
             // Organization organization = organizationGraphRepository.findOne(unitId, 2);
             OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
-            Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+            Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
             //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
             for (TaskDTO task : taskList) {
                 syncPresentFullDayAbsencesTask(task, flsCredentials, organization);
@@ -511,7 +509,7 @@ public class AbsencePlanningService {
         try {
             OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
             // Organization organization = organizationGraphRepository.findOne(unitId, 2);
-            Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+            Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
             //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
             for (TaskDTO task : taskList) {
                 TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(task.getTaskTypeId().toString()));
@@ -644,7 +642,7 @@ public class AbsencePlanningService {
         Map<String, String> flsCredentials = null;
         if (tasks != null && tasks.size() > 0) {
             TaskType taskType = taskTypeMongoRepository.findOne(tasks.get(0).getTaskTypeId());
-            flsCredentials = integrationServiceRestClient.getFLS_Credentials(taskType.getOrganizationId());
+            flsCredentials = genericIntegrationService.getFLS_Credentials(taskType.getOrganizationId());
             //flsCredentials = integrationService.getFLS_Credentials(taskType.getUnitID());
         }
         for (Task task : tasks) {
@@ -687,7 +685,7 @@ public class AbsencePlanningService {
         Date date = DateUtils.getDate();
         for (Map data : unitTasks) {
             Long organizationId = Long.valueOf(data.get("_id").toString());
-            Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(organizationId);
             // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(organizationId);
             OrganizationDTO organization = organizationRestClient.getOrganization(organizationId);
             //Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -773,7 +771,7 @@ public class AbsencePlanningService {
      */
     public void syncPartialAbsencesTask(TaskDTO task, OrganizationDTO organization) {
         Task task1 = taskMongoRepository.findOne(new BigInteger(task.getId()));
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(organization.getId());
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(organization.getId());
         // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(organization.getId());
         int vtID;
         if (task.getActive() != null && task.getActive() == false) {
