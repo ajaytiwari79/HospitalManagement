@@ -7,7 +7,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FUNCTION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SENIORITY_LEVEL;
@@ -50,7 +52,7 @@ public class UnitPositionLine extends UserBaseEntity {
     }
 
     public List<Function> getFunctions() {
-        return functions;
+        return Optional.ofNullable(functions).orElse(new ArrayList<>());
     }
 
     public LocalDate getStartDate() {
