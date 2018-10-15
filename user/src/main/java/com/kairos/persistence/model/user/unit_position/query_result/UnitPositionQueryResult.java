@@ -43,6 +43,13 @@ public class UnitPositionQueryResult {
         return unitInfo;
     }
 
+    /**
+     *  Please do not use in backend its just only for FE compactibility
+     */
+    private WTAResponseDTO workingTimeAgreement;
+
+
+
     public void setUnitInfo(Map<String, Object> unitInfo) {
         this.unitInfo = unitInfo;
     }
@@ -174,6 +181,15 @@ public class UnitPositionQueryResult {
         this.appliedFunctions = appliedFunctions;
     }
 
+    public WTAResponseDTO getWorkingTimeAgreement() {
+        return workingTimeAgreement;
+    }
+
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
+    }
+
+
     public UnitPositionQueryResult() {
         //default cons
     }
@@ -186,7 +202,7 @@ public class UnitPositionQueryResult {
         this.staffId = staffId;
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate, CTAResponseDTO cta, WTAResponseDTO wta) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -194,6 +210,8 @@ public class UnitPositionQueryResult {
         this.id = id;
         this.positionCode = positionCode;
         this.union = union;
+        this.workingTimeAgreement=wta;
+
     }
 
 }

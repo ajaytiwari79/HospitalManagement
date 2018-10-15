@@ -39,6 +39,7 @@ public class ActivityDTO {
     private LocalDate endDate;
     private BigInteger parentId;
     private PermissionsActivityTabDTO permissionsActivityTab;
+    private PhaseSettingsActivityTab phaseSettingsActivityTab;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -48,6 +49,41 @@ public class ActivityDTO {
         //default constructor
     }
 
+    public ActivityDTO(BigInteger id, String name, BigInteger parentId) {
+        this.id = id;
+        this.name = name;
+        this.parentId = parentId;
+    }
+
+    public ActivityDTO(BigInteger id, String name, BigInteger parentId,PermissionsActivityTabDTO permissionsActivityTab) {
+        this.id = id;
+        this.name = name;
+        this.parentId = parentId;
+        this.permissionsActivityTab=permissionsActivityTab;
+    }
+
+    public ActivityDTO(String name, String description, Long countryId, String categoryName, Long unitId, boolean isParentActivity) {
+        this.name = name;
+        this.description = description;
+        this.countryId = countryId;
+        this.categoryName = categoryName;
+        this.unitId = unitId;
+        this.isParentActivity = isParentActivity;
+    }
+
+    public ActivityDTO(BigInteger id, String name, String description, Long countryId, BigInteger categoryId, String categoryName, Long unitId, boolean isParentActivity,
+                       GeneralActivityTabDTO generalActivityTab, List<Long> tags) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.countryId = countryId;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.unitId = unitId;
+        this.isParentActivity = isParentActivity;
+        this.generalActivityTab = generalActivityTab;
+        this.tags = tags;
+    }
 
     public List<Long> getEmploymentTypes() {
         return employmentTypes;
@@ -234,40 +270,15 @@ public class ActivityDTO {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 
-
-    public ActivityDTO(String name, String description, Long countryId, String categoryName, Long unitId, boolean isParentActivity) {
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.categoryName = categoryName;
-        this.unitId = unitId;
-        this.isParentActivity = isParentActivity;
+    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
+        return phaseSettingsActivityTab;
     }
 
-    public ActivityDTO(BigInteger id, String name, String description, Long countryId, BigInteger categoryId, String categoryName, Long unitId, boolean isParentActivity,
-                       GeneralActivityTabDTO generalActivityTab, List<Long> tags) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-        this.unitId = unitId;
-        this.isParentActivity = isParentActivity;
-        this.generalActivityTab = generalActivityTab;
-        this.tags = tags;
+    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
+        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
     }
 
-    public ActivityDTO(BigInteger id, String name,BigInteger parentId,PermissionsActivityTabDTO permissionsActivityTab) {
 
-    }
-
-    public ActivityDTO(BigInteger id, String name, BigInteger parentId) {
-        this.id = id;
-        this.name = name;
-        this.parentId = parentId;
-        this.permissionsActivityTab=permissionsActivityTab;
-    }
 }
 
 

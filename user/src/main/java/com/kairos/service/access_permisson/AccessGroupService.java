@@ -220,8 +220,11 @@ public class AccessGroupService {
 
         List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
         for (AccessGroupQueryResult currentAccessGroup : accessGroupList) {
+            AccessGroup parent=new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(),currentAccessGroup.getDayTypes(),company?DateUtils.getCurrentLocalDate():currentAccessGroup.getStartDate(),currentAccessGroup.getEndDate());
+            parent.setId(currentAccessGroup.getId());
             AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(),currentAccessGroup.getDayTypes(),company?DateUtils.getCurrentLocalDate():currentAccessGroup.getStartDate(),currentAccessGroup.getEndDate());
             accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
+            accessGroup.setParentAccessGroup(parent);
             accessGroup.setLastModificationDate(accessGroup.getCreationDate());
             countryAndOrgAccessGroupIdsMap.put(currentAccessGroup.getId(), null);
             newAccessGroupList.add(accessGroup);
@@ -863,5 +866,12 @@ public class AccessGroupService {
         Long staffId=staffService.getStaffIdOfLoggedInUser(unitId);
         return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
 
+    }
+
+    public Map<Long,Long> getAccessGroupUsingParentId(Long unitId,Set<Long> accessGroupIds){
+        //intentionally return blank
+        return new HashMap<>();
+                //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
+                //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
     }
 }

@@ -3,6 +3,7 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -55,6 +56,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
     private LocationActivityTab locationActivityTab;
     private PermissionsActivityTab permissionsActivityTab;
+    private PhaseSettingsActivityTab phaseSettingsActivityTab;
     @JsonIgnore
     private boolean disabled;
 
@@ -328,6 +330,13 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.externalId = externalId;
     }
 
+    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
+        return phaseSettingsActivityTab;
+    }
+
+    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
+        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
+    }
 
     @Override
     public String toString() {
