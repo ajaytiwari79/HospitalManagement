@@ -1292,7 +1292,14 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-
+    /**
+     *
+     * @param unitPositionId
+     * @param startDate
+     * @param staffAdditionalInfoDTO
+     * @Desc to update Time Bank after pplying function in Unit position
+     * @return
+     */
     public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(1439));
         setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
