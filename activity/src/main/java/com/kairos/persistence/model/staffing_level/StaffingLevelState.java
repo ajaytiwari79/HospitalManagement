@@ -1,7 +1,10 @@
 package com.kairos.persistence.model.staffing_level;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.math.BigInteger;
 
+@Document
 public class StaffingLevelState extends StaffingLevel {
     private BigInteger staffingLevelId;
     private BigInteger staffingLevelStatePhaseId;

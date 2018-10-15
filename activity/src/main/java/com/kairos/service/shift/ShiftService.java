@@ -274,6 +274,7 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, byTandAPhase);
         Shift mainShift = byTandAPhase ? ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class) : ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         mainShift.setPlanningPeriodId(planningPeriod.getId());
+        mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
         validateStaffingLevel(phase, mainShift, activityWrapper.getActivity(), true, staffAdditionalInfoDTO);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
             List<BigInteger> activityIds = mainShift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
@@ -339,7 +340,7 @@ public class ShiftService extends MongoBaseService {
             shift.getActivities().remove(0);
             shift.getActivities().addAll(breakActvities);
         }
-        shift.setPhaseId(phase.getId());
+       // shift.setPhaseId(phase.getId());
         shiftMongoRepository.save(shift);
         updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }

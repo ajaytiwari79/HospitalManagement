@@ -496,7 +496,7 @@ public class PlanningPeriodService extends MongoBaseService {
         periodPhaseFlippingDate.setFlippingDate(DateUtils.getCurrentLocalDate());
         periodPhaseFlippingDate.setFlippingTime(DateUtils.getCurrentLocalTime());
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
-        createStaffingLevelState(staffingLevels,planningPeriod.getCurrentPhaseId());
+        createStaffingLevelState(staffingLevels,planningPeriod.getCurrentPhaseId(),planningPeriod.getId());
         save(planningPeriod);
         schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
@@ -546,17 +546,18 @@ public class PlanningPeriodService extends MongoBaseService {
             save(shiftStates);
     }
 
-    public void createStaffingLevelState(List<StaffingLevel> staffingLevels,BigInteger currentPhaseId){
+    public void createStaffingLevelState(List<StaffingLevel> staffingLevels,BigInteger currentPhaseId,BigInteger planningPeriodId){
         if(!staffingLevels.isEmpty()){
             List<StaffingLevelState> staffingLevelStates=new ArrayList<>();
-            staffingLevels.stream().forEach(shift ->{
-                StaffingLevelState staffingLevelState = ObjectMapperUtils.copyPropertiesByMapper(staffingLevels,StaffingLevelState.class);
-                staffingLevelState.setStaffingLevelId(staffingLevelState.getId());
+            staffingLevels.stream().forEach(staffingLevel  ->{
+                StaffingLevelState staffingLevelState = ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,StaffingLevelState.class);
+                staffingLevelState.setStaffingLevelId(staffingLevel.getId());
                 staffingLevelState.setStaffingLevelStatePhaseId(currentPhaseId);
+                staffingLevelState.setPlanningPeriodId(planningPeriodId);
                 staffingLevelState.setId(null);
                 staffingLevelStates.add(staffingLevelState);
             } );
-            save(staffingLevelStates);
+            staffingLevelStateMongoRepository.saveAll(staffingLevelStates);
         }
     }
     /**
@@ -571,6 +572,7 @@ public class PlanningPeriodService extends MongoBaseService {
         List<StaffingLevelState> staffingLevelStates=staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()));
         restoreShifts(shiftStates);
+        restoreStaffingLevel(staffingLevels,staffingLevelStates);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
