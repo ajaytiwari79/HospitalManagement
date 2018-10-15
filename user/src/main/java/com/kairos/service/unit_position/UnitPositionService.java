@@ -721,7 +721,7 @@ public class UnitPositionService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         seniorityLevel = objectMapper.convertValue(unitPositionLine.getSeniorityLevel(), Map.class);
-        seniorityLevel.put("functions", unitPositionDTO.getFunctionIds());
+        seniorityLevel.put("functions", unitPositionLine.getFunctions());
         seniorityLevel.put("payGrade", Optional.ofNullable(unitPositionLine.getSeniorityLevel().getPayGrade()).isPresent() ? unitPositionLine.getSeniorityLevel().getPayGrade() : payGradeGraphRepository.getPayGradeBySeniorityLevelId(unitPositionLine.getSeniorityLevel().getId()));
 
         UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
