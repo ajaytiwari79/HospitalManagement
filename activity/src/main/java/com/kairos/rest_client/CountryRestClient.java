@@ -22,6 +22,7 @@ import java.util.Set;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class CountryRestClient {
     private static final Logger logger = LoggerFactory.getLogger(CountryRestClient.class);
 

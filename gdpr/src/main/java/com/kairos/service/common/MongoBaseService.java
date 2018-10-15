@@ -1,6 +1,6 @@
 package com.kairos.service.common;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;

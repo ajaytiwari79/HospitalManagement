@@ -1,14 +1,17 @@
 package com.kairos.service.wta;
 
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
-import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.wta.PartOfDay;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
+import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -16,14 +19,11 @@ import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.user_context.CurrentUserDetails;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ import java.util.Optional;
 @Service
 public class RuleTemplateService extends MongoBaseService {
     @Inject
-    private CountryRestClient countryRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Autowired
     private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
     @Inject
@@ -66,7 +66,7 @@ public class RuleTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public boolean createRuleTemplate(long countryId) {
-        CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
+        CountryDTO countryDTO = genericIntegrationService.getCountryById(countryId);
 
         if (countryDTO == null) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
@@ -204,13 +204,13 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
 
-        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range), new ArrayList<>(), localDate, 12L);
+        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range));
         seniorDaysPerYearWTATemplate.setCountryId(countryDTO.getId());
         seniorDaysPerYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         seniorDaysPerYearWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(seniorDaysPerYearWTATemplate);
 
-        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range), new ArrayList<>(), 5, localDate, 12);
+        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range));
         careDaysCheck.setCountryId(countryDTO.getId());
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
@@ -233,6 +233,8 @@ public class RuleTemplateService extends MongoBaseService {
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
+        WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");
+        wtaBaseRuleTemplates1.add(careDays);
         save(wtaBaseRuleTemplates1);
 
 
@@ -293,7 +295,7 @@ public class RuleTemplateService extends MongoBaseService {
 
 
     public WTABaseRuleTemplateDTO updateRuleTemplate(long countryId, BigInteger ruleTemplateId, WTABaseRuleTemplateDTO templateDTO) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
+        CountryDTO country = genericIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -312,7 +314,7 @@ public class RuleTemplateService extends MongoBaseService {
 
 
     public WTABaseRuleTemplateDTO copyRuleTemplate(Long countryId, WTABaseRuleTemplateDTO wtaRuleTemplateDTO) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
+        CountryDTO country = genericIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }

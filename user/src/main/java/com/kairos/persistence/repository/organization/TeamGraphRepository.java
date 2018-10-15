@@ -102,10 +102,10 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} return count(r) as countOfRel")
     int countOfServices(long teamId, long organizationServiceId);
 
-    @Query("Match (team:Team),(organizationService:OrganizationService) where id(team)={0} AND id(organizationService) IN {1} create unique (team)-[r:"+TEAM_HAS_SERVICES+"{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService) return r")
+    @Query("Match (team:Team),(organizationService:OrganizationService) where id(team)={0} AND id(organizationService) IN {1} create unique (team)-[r:"+TEAM_HAS_SERVICES+"{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService) ")
     void addServiceInTeam(long teamId, long organizationServiceId, long creationDate, long lastModificationDate);
 
-    @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.isEnabled={2},r.lastModificationDate={3},r.customName=os.name return r")
+    @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.isEnabled={2},r.lastModificationDate={3},r.customName=os.name ")
     void updateOrganizationService(long teamId, long organizationServiceId, boolean isEnabled, long lastModificationDate);
 
     @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.customName={2} \n"+
@@ -150,7 +150,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("Match (team:Team),(skill:Skill) where id (team)={0} AND id(skill)={1} with team,skill\n" +
             "Merge (team)-[r:"+TEAM_HAS_SKILLS+"]->(skill)\n" +
             "ON CREATE SET r.visitourId={2},r.creationDate={3},r.lastModificationDate={4},r.isEnabled={5}\n" +
-            "ON MATCH SET r.visitourId={2},r.lastModificationDate={3},r.isEnabled={5} return true")
+            "ON MATCH SET r.visitourId={2},r.lastModificationDate={3},r.isEnabled={5} ")
     void addSkillInTeam(long teamId, long skillId, String visitourId, long creationDate, long lastModificationDate, boolean isEnabled);
 
     @Query("Match (organization:Organization)-[:"+HAS_GROUP+"]->(g:Group)-[:"+HAS_TEAM+"]->(team:Team) where id(organization)={0} return team")

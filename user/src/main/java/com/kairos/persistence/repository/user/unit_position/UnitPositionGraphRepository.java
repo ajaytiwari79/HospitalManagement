@@ -2,8 +2,11 @@ package com.kairos.persistence.repository.user.unit_position;
 
 
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
-import com.kairos.persistence.model.user.unit_position.*;
-import com.kairos.persistence.model.user.unit_position.query_result.*;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -150,10 +153,10 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union, positionCode as positionCode")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
 
-    @Query("MATCH(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
-            "MATCH(unitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
-            "MATCH(unitPosition)-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={0} AND id(staff)={1} and id(expertise)={2} \n" +
-            "AND unitPosition.startDate<={3} AND  (unitPosition.startDate IS NULL or unitPosition.startDate>={3})  \n" +
+    @Query("MATCH(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) where id(expertise)={2}\n" +
+            " MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())\n"+
+            "MATCH(unitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) where id(staff)={1}" +
+            "MATCH(unitPosition)-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={0}  \n" +
             "return id(unitPosition)")
     Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId, LocalDate requestedDate);
 
@@ -240,17 +243,17 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) " +
             "MATCH(positionLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(payGrade:PayGrade) " +
             "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) " +
-            "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function) with unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel,collect(function) as functionData "+
+            "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function) "+
             "OPTIONAL MATCH(unitPosition)-[:" + IN_UNIT + "]-(org:Organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) " +
-            " with  unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel, functionData ,CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost "+
+            " with  unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel,pgaRel, case function when  null  then [] else collect({id:id(function),name:function.name}) end as functionData "+
             "return id(positionLine) as id,id(unitPosition) as unitPositionId," +
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
-            " freeChoiceToPension:seniorityLevel.freeChoiceToPension,to:seniorityLevel.to,functions:functionData," +
+            " freeChoiceToPension:seniorityLevel.freeChoiceToPension,to:seniorityLevel.to,functions:collect(functionData[0])," +
             "payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevel, "+
             " {employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType," +
             "positionLine.workingDaysInWeek as workingDaysInWeek,positionLine.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, \n" +
             "(positionLine.totalWeeklyMinutes % 60) as totalWeeklyMinutes,(positionLine.totalWeeklyMinutes / 60) as  totalWeeklyHours," +
-            " positionLine.startDate as startDate, positionLine.endDate as endDate, \n" +
+            " positionLine.startDate as startDate, positionLine.endDate as endDate, CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost,\n" +
             "positionLine.hourlyWages as hourlyWages,positionLine.avgDailyWorkingHours as avgDailyWorkingHours ORDER BY positionLine.startDate"
     )
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
@@ -267,7 +270,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " OPTIONAL MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix) \n" +
             " OPTIONAL MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]->(seniorityLevel) \n" +
             " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +
-            " return {id:id(positionLine), hourlyCost : case hourlyCost when null then 0.0 else hourlyCost end} as hourlyWagesMap")
-    List<Map<Long,Float>> findFunctionalHourlyWages(List<Long> unitPositionIds);
+            " return id(positionLine) as id,  case hourlyCost when null then 0.0 else hourlyCost end as hourlyWages")
+    List<UnitPositionLinesQueryResult> findFunctionalHourlyWages(List<Long> unitPositionIds);
+
 
 }

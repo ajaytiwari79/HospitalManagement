@@ -184,6 +184,8 @@ public class AppConstants {
     public static final int STAFF_GRACE_PERIOD_DAYS=2;
     public static final int MANAGEMENT_GRACE_PERIOD_DAYS=2;
     public static final String SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC= "SchedulerToActivityQueue";
+
     public static final String ACTIVITY_TO_SCHEDULER_JOB_QUEUE_TOPIC="activityToSchedulerJobQueue";
     public static final String ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC="activityToSchedulerLogQueue";
+    public static final long ONE_DAY_MINUTES=1439;
 }

@@ -1,10 +1,12 @@
 package com.kairos.service.wta;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateAndCategoryResponseDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
@@ -12,15 +14,13 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     @Inject
     private CTARuleTemplateRepository ctaRuleTemplateRepository;
     @Inject
-    private CountryRestClient countryRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private OrganizationRestClient organizationRestClient;
     @Autowired
@@ -67,7 +67,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
      */
     //TODO need to modified this method
     public RuleTemplateAndCategoryResponseDTO createRuleTemplateCategory(long countryId, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
+        CountryDTO country = genericIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -122,7 +122,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
 
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
+        CountryDTO country = genericIntegrationService.getCountryById(countryId);
         if (country == null) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -186,11 +186,14 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
         save(ruleTemplateCategoryObj);
+        RuleTemplateAndCategoryResponseDTO ruleTemplateAndCategoryResponseDTO;
         if (ruleTemplateCategoryObj.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.WTA)) {
-            return updateWTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
+            ruleTemplateAndCategoryResponseDTO =  updateWTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
         } else {
-            return updateCTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
+            ruleTemplateAndCategoryResponseDTO =  updateCTADefaultCategory(countryId, ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
         }
+        ruleTemplateAndCategoryResponseDTO.setCategory(null);
+        return ruleTemplateAndCategoryResponseDTO;
     }
 
     private RuleTemplateAndCategoryResponseDTO updateWTADefaultCategory(Long countryId, RuleTemplateCategory ruleTemplateCategoryObj, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
@@ -213,7 +216,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
 
     public RuleTemplateCategoryRequestDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
+        CountryDTO country = genericIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }

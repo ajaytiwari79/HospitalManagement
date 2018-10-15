@@ -10,6 +10,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRepository;
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
+import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.utils.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
