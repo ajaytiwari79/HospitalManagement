@@ -4,10 +4,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
-import com.kairos.rest_client.AbsenceTypeRestClient;
-import com.kairos.rest_client.IntegrationRestClient;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.task.Task;
@@ -85,7 +82,7 @@ public class AbsencePlanningService {
     private @Autowired
     OrganizationRestClient organizationRestClient;
     private @Autowired
-    AbsenceTypeRestClient absenceTypeRestClient;
+    GenericIntegrationService genericIntegrationService;
     private @Autowired
     IntegrationRestClient integrationServiceRestClient;
 
@@ -735,7 +732,7 @@ public class AbsencePlanningService {
         Map<String, Object> workScheduleMetaData = new HashMap<>();
         workScheduleMetaData.put("fmvtid", staff.getId());
         if (taskType.getTaskTypeVisibility() == "Absent") {
-            Map<String, Object> response = absenceTypeRestClient.getAbsenceTypeByName(taskType.getTitle());
+            Map<String, Object> response = genericIntegrationService.getAbsenceTypeByName(taskType.getTitle());
           /*  AbsenceTypes absenceTypes = absenceTypesService.getAbsenceTypeByName(taskType.getTitle());
             logger.info("absenceTypes--ATVTID---> " + absenceTypes.getATVTID());
             if (absenceTypes == null) workScheduleMetaData.put("type", 6);

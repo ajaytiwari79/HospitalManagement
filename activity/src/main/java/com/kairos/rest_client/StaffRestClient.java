@@ -299,6 +299,9 @@ public class StaffRestClient {
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate,Long staffId, String type, Long unitEmploymentId) {
         final String baseUrl = getBaseUrl(true);
+         if(shiftDate==null){
+             shiftDate=DateUtils.getCurrentLocalDate();
+         }
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };

@@ -41,11 +41,42 @@ public final class ApiConstants {
     public static final String ACCESS_GROUP="/access_group";
     public static final String ORG_TYPE="/org_type";
     //RestClientURL
-    public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
+    public static final String CTA_BASIC_INFO = "/cta_basic_info";
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
     public static final String GET_REASONCODE = "/reason_codes";
-
-
+    public static final String REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/remove_functions";
+    public static final String RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/restore_functions";
+    public static final String APPLY_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/applyFunction";
+    public static final String STAFF_USER_ACCESS_GROUP ="/staff/user/accessgroup";
+    public static final String USER_STAFF_ID ="/user/staffId";
+    public static final String STAFF_DETAILS ="/staff/details";
+    public static final String ACCESS_GROUP_STAFFS ="/access_group/staffs";
+    public static final String ORGANIZATION_TYPE_GET_ORGANIZATION_IDS ="/orgtype/get_organization_ids";
+    public static final String KPI_DETAILS ="/kpi_details";
+    public static final String UNIT_PARENT_ORGANIZATION_AND_COUNTRY ="/unit/parent_org_and_country";
+    public static final String USER_USERID_STAFFS ="/user/{userId}/staffs";
+    public static final String DAY_TYPES_AND_EMPLOYEMENT_TYPES ="/day_types_and_employment_types";
+    public static final String STAFF_ACCESS_ROLES ="/staff/access_roles";
+    public static final String STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID ="/expertise/{expertiseId}/staff_and_unit_positions";
+    public static final String STAFF_EMAILS ="/staff/emails";
+    public static final String UNIT_POSITIONS_BY_EXPERTISE_ID ="/expertise/{expertiseId}/unitPositions";
+    public static final String EMPLOYEMENT_TYPE_AND_EXPERTISE ="/employment_type_and_expertise";
+    public static final String STAFF_ACCESS_GROUPS ="/staff/access_groups";
+    public static final String USER_WITH_ID_UNIT_SICK_SETTINGS ="/user/{userId}/unit_sick_settings";
+    public static final String SICK_SETTINGS_DEFAULT ="/sick_settings/default";
+    public static final String STAFFS_ACCESS_GROUPS ="/staffs/access_groups";
+    public static final String COUNTRY_ID ="/countryId";
+    public static final String STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID ="/staff/{staffId}/expertise/{expertiseId}/unitPositionId";
+    public static final String ACCESS_GROUPS_BY_PARENT = "/access_groups_by_parent";
+    public static final String STAFF_PRIORTY_GROUP ="/staff/priority_group";
+    public static final String ABSENCE_TYPES_TITLE=" /absenceTypes/{title}";
+    public static final String CONTRACT_TYPE="/contractType";
+    public static final String COUNTRY_ORGANIZATION_SERVICE_URL="/country/organizaton_service/{organizationServiceId}";
+    public static final String ORGANIZATION_TYPES_HIERARCHY="/organization_types/hierarchy";
+    public static final String TASK_TYPES_SKILLS="/task_type/skills";
+    public static final String TIME_SLOTS="/time_slots";
+    public static final String DAY_TYPES="/day_types";
+    public static final String COUNTRY_COUNTRY_ID=COUNTRY_ID+"/{countryId}";
 
 
 }
