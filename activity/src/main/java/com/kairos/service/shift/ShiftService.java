@@ -1284,12 +1284,12 @@ public class ShiftService extends MongoBaseService {
         return new ShiftActivityIdsDTO(activitiesToAdd,activitiesToEdit,activitiesToDelete);
     }
 
-    private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,List<ActivityWrapper> activities){
-        Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
-        for(ActivityWrapper activityWrapper:activities){
-            for(PhaseTemplateValue phaseTemplateValue:activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()){
-                if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
-                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(),phaseTemplateValue);
+    private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,List<ActivityWrapper> activities) {
+        Map<BigInteger, PhaseTemplateValue> phaseTemplateValueMap = new HashMap<>();
+        for (ActivityWrapper activityWrapper : activities) {
+            for (PhaseTemplateValue phaseTemplateValue : activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()) {
+                if (phaseTemplateValue.getPhaseId().equals(phase.getId())) {
+                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(), phaseTemplateValue);
                     break;
                 }
             }
@@ -1297,5 +1297,4 @@ public class ShiftService extends MongoBaseService {
         return phaseTemplateValueMap;
 
     }
-
 }
