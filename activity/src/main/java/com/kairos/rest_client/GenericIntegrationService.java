@@ -295,4 +295,16 @@ public class GenericIntegrationService {
         },citizenUnitId);
     }
 
+    //OrganizationServiceRestClient
+    public Map<String, Object> getOrganizationServices(Long unitId, String organizationType){
+        BasicNameValuePair basicNameValuePair = new BasicNameValuePair("type", organizationType);
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SERVICE_DATA,Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+        });
+    }
+
+    //SkillRestClient
+    public List<Map<String,Object>> getSkillsOfOrganization(Long unitId) {
+      return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
+      });
+    }
 }
