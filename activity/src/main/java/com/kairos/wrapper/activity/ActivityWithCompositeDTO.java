@@ -2,6 +2,7 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -27,6 +28,7 @@ public class ActivityWithCompositeDTO {
     private List<Long> employmentTypes= new ArrayList<>();
     private RulesActivityTab rulesActivityTab;
     private SkillActivityTab skillActivityTab;
+    private PhaseSettingsActivityTab phaseSettingsActivityTab;
 
 
 
@@ -108,4 +110,11 @@ public class ActivityWithCompositeDTO {
         this.skillActivityTab = skillActivityTab;
     }
 
+    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
+        return phaseSettingsActivityTab;
+    }
+
+    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
+        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
+    }
 }

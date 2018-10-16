@@ -17,7 +17,8 @@ public class CustomAggregationQuery {
                 "'hasSubProcessingActivity':1," +
                 "'organizationSubTypes':1," +
                 "'organizationTypes':1," +
-                "'countryId':1}}";
+                "'suggestedDate':1," +
+                "'suggestedDataStatus':1}}";
 
     }
 
@@ -54,7 +55,6 @@ public class CustomAggregationQuery {
     }
 
 
-
     public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
                 "'_id':'$_id','sections':{'$push':{ '$cond': [ { '$eq': [ '$sections.deleted',false ] }, '$sections', {} ] }}," +
@@ -62,7 +62,8 @@ public class CustomAggregationQuery {
                 "'description':{$first:'$description'}," +
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
-                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}" +
+                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}," +
+                "'templateStatus':{'$first':'$templateStatus'}" +
                 "}}";
     }
 
@@ -75,7 +76,8 @@ public class CustomAggregationQuery {
                 "        'sections':1," +
                 "      'description':1," +
                 "     'templateType':1," +
-                "'defaultAssetTemplate':1" +
+                "'defaultAssetTemplate':1," +
+                "'templateStatus':1" +
                 "            }}";
     }
 
@@ -147,7 +149,9 @@ public class CustomAggregationQuery {
                 "       'organizationSubTypes':1," +
                 "       'organizationTypes':1," +
                 "       'organizationServices':1," +
-                "       'organizationSubServices':1" +
+                "       'organizationSubServices':1," +
+                "'suggestedDate':1," +
+                "'suggestedDataStatus':1" +
 
                 "            }}";
     }
@@ -225,8 +229,6 @@ public class CustomAggregationQuery {
     public static String metaDataReplaceRoot() {
         return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
     }
-
-
 
 
 }

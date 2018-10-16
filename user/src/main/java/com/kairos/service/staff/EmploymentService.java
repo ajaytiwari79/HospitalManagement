@@ -11,7 +11,6 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
@@ -37,6 +36,7 @@ import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -710,8 +710,8 @@ public class EmploymentService {
 
     
     public boolean moveToReadOnlyAccessGroup(List<Long> employmentIds) {
-        Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
-        Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisStart = DateUtils.getStartOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisEnd = DateUtils.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
         List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
@@ -765,21 +765,21 @@ public class EmploymentService {
 
     private Long getMaxEmploymentEndDate(Long staffId) {
         Long employmentEndDate = null;
-        List<Long> unitPositionsEndDateMillis = unitPositionGraphRepository.getAllUnitPositionsByStaffId(staffId);
+        List<LocalDate> unitPositionsEndDateMillis = unitPositionGraphRepository.getAllUnitPositionsByStaffId(staffId);
             if(!unitPositionsEndDateMillis.isEmpty()) {
-                Long maxEndDate = unitPositionsEndDateMillis.get(0);
+                LocalDate maxEndDate = unitPositionsEndDateMillis.get(0);
                 boolean isEndDateBlank = false;
                 //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
-                for (Long unitPositionEndDateMillis : unitPositionsEndDateMillis) {
+                for (LocalDate unitPositionEndDateMillis : unitPositionsEndDateMillis) {
                     if (!Optional.ofNullable(unitPositionEndDateMillis).isPresent()) {
                         isEndDateBlank = true;
                         break;
                     }
-                    if (maxEndDate < unitPositionEndDateMillis) {
+                    if (maxEndDate.isBefore( unitPositionEndDateMillis)) {
                         maxEndDate = unitPositionEndDateMillis;
                     }
                 }
-                employmentEndDate = isEndDateBlank ? null : maxEndDate;
+                employmentEndDate = isEndDateBlank ? null : DateUtils.getLongFromLocalDate(maxEndDate);
             }
         return employmentEndDate;
 

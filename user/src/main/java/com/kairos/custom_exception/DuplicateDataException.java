@@ -8,4 +8,5 @@ package com.kairos.custom_exception;
     public DuplicateDataException(String message) {
         super(message);
     }
+
 }

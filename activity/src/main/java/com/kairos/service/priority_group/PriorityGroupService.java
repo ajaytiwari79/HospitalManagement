@@ -246,6 +246,5 @@ public class PriorityGroupService extends MongoBaseService {
         return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
 
     }
-
 }
 

@@ -45,6 +45,7 @@ public class PlannerSyncService {
     public void publishWTA(Long unitId, Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
         plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,unitPositionId);
     }
+    /*
     //@Async
     public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
         if(integrationOperation.equals(IntegrationOperation.CREATE)){
@@ -72,7 +73,7 @@ public class PlannerSyncService {
         else if(integrationOperation.equals(IntegrationOperation.DELETE)){
             plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
         }
-    }*/
+    }
 
 
     private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType, Long unitId, WTAResponseDTO wtaResponseDTO) {
@@ -95,7 +96,7 @@ public class PlannerSyncService {
         });
         return unitPositionWtaDTOS;
     }
-
+*/
     private List<Staff> createStaffList(List<Staff> staff) {
         List<Staff> dtos= new ArrayList<>();
         for(Staff s:staff){

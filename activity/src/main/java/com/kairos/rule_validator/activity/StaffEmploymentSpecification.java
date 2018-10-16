@@ -30,7 +30,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
         if(Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()){
             return true;
         }
-        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
+        List<PhaseTemplateValue> phaseTemplateValues = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues();
         PhaseTemplateValue phaseTemplateValue1 = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
@@ -48,7 +48,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
+        List<PhaseTemplateValue> phaseTemplateValues = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues();
         PhaseTemplateValue phaseTemplateValue1 = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {

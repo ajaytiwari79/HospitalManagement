@@ -1,5 +1,6 @@
 package com.kairos.service.staffing_level;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
@@ -11,7 +12,6 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRep
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -166,9 +166,6 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
                 if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
-                }
-                if(!activity.getRulesActivityTab().isEligibleForPresence()){
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
                 }
                 if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getRulesActivityTab().getDayTypes())){
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));

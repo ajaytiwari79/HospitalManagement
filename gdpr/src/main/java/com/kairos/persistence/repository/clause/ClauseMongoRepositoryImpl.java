@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.clause;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
@@ -132,11 +132,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
         switch (filterType) {
             case ACCOUNT_TYPES:
-                List<BigInteger> ids = new ArrayList<>();
-                for (Long id : filterSelection.getValue()) {
-                    ids.add(BigInteger.valueOf(id));
-                }
-                return Criteria.where("accountTypes" + ID).in(ids);
+                return Criteria.where("accountTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_TYPES:
                 return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 

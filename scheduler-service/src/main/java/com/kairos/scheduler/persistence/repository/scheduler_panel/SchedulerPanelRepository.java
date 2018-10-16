@@ -22,4 +22,6 @@ public interface SchedulerPanelRepository extends MongoRepository<SchedulerPanel
     @Query("{_id:{$in:?0}, deleted:false}")
     List<SchedulerPanel> findByIdsIn(Set<BigInteger> schedulerPanelIds);
 
+    SchedulerPanel findByIdAndDeletedFalse(BigInteger schedulerPanelId);
+
 }

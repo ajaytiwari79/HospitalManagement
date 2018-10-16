@@ -10,6 +10,11 @@ public class ProcessingActivityBasicDTO {
 
     private BigInteger id;
     private String name;
+    private boolean subProcess;
+
+    public boolean isSubProcess() { return subProcess; }
+
+    public void setSubProcess(boolean subProcess) { this.subProcess = subProcess; }
 
     public BigInteger getId() { return id; }
 

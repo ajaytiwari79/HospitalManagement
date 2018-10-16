@@ -3,7 +3,7 @@ package com.kairos.service.unit_employment_position;
 import com.kairos.UserServiceApplication;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.unit_position.UnitPositionSeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -73,7 +73,7 @@ public class UnitPositionServiceIntegrationTest {
         staffGraphRepository.updateStaffExpertiseRelation(13316L,7799L,expertiseStartDate);
         unitPositionGraphRepository.deleteUnitPositionSeniorityLevel(13316L,7799L);
         unitPositionGraphRepository.createUnitPositionSeniorityLevelRelatioship(13316L,7799L,7796L);
-        unitPositionService.updateSeniorityLevelOnJobTrigger();
+        //unitPositionService.updateSeniorityLevelOnJobTrigger();
         UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult = unitPositionGraphRepository.getSeniorityLevelFromStaffUnitPosition(13316L,7799L);
         Assert.assertTrue(unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getFrom()==3&&
                 unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getId()==7797);
