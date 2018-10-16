@@ -45,6 +45,7 @@ public final class ApiConstants {
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
     public static final String GET_REASONCODE = "/reason_codes";
     public static final String REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/remove_functions";
+    public static final String RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/restore_functions";
     public static final String APPLY_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/applyFunction";
     public static final String STAFF_USER_ACCESS_GROUP ="/staff/user/accessgroup";
     public static final String USER_STAFF_ID ="/user/staffId";

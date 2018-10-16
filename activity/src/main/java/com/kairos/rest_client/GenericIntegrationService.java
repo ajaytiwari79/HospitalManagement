@@ -164,7 +164,7 @@ public class GenericIntegrationService {
 
     public Boolean restoreFunctionFromUnitPositionByDate(Long unitId, Long unitPositionId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
 
-        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, unitPositionId);
 
     }
