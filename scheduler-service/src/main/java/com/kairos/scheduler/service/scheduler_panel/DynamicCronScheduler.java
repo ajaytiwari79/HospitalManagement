@@ -160,12 +160,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(),schedulerPanel.getUnitId(),schedulerPanel.getJobType(), schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
                         integrationSettingsDTO,DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
 
-                if(userSubTypes.contains(jobToExecute.getJobSubType())) {
-                    kafkaProducer.pushToUserQueue(jobToExecute);
-                }
-                else if(activitySubTypes.contains(jobToExecute.getJobSubType())) {
-                    kafkaProducer.pushToActivityQueue(jobToExecute);
-                }
+                kafkaProducer.pushToQueue(jobToExecute);
             }
         };
 

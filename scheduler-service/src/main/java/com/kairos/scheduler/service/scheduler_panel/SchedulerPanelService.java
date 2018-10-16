@@ -468,19 +468,13 @@ public class SchedulerPanelService extends MongoBaseService {
      */
     public Boolean deleteJob(BigInteger schedulerPanelId){
 
-            SchedulerPanel schedulerPanel = schedulerPanelRepository.findByIdAndDeletedFalse(schedulerPanelId);
+        if(!Optional.ofNullable(schedulerPanelRepository.safeDeleteById(schedulerPanelId)).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+        }
 
-            if(!Optional.ofNullable(schedulerPanel).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
-            }
+        dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelId);
 
-                schedulerPanel.setDeleted(true);
-                dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanel.getId());
-                schedulerPanel.setActive(false);
-
-            save(schedulerPanel);
-            return true;
-
+        return true;
     }
 
     /**
