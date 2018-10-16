@@ -1559,7 +1559,7 @@ public class TaskService extends MongoBaseService {
     public Task assignGivenTaskToUser(BigInteger taskId) {
         Task pickTask = taskMongoRepository.findOne(taskId);
         Long userId = UserContext.getUserDetails().getId();
-        StaffDTO staffDTO = staffRestClient.getStaffByUser(userId);
+        StaffDTO staffDTO = genericIntegrationService.getStaffByUser(userId);
         List<Long> assignedStaffIds = pickTask.getAssignedStaffIds();
         if (!assignedStaffIds.contains(staffDTO.getId())) assignedStaffIds.add(staffDTO.getId());
         pickTask.setAssignedStaffIds(assignedStaffIds);

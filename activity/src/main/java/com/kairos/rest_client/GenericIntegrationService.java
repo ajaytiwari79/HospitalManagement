@@ -53,10 +53,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.kairos.constants.ApiConstants.*;
 
-/*@Service
-@Transactional*/
-@RestController
-@RequestMapping("api/v1")
+@Service
+@Transactional
 public class GenericIntegrationService {
     @Autowired
     GenericRestClient genericRestClient;
@@ -361,14 +359,29 @@ public class GenericIntegrationService {
     public StaffUnitPositionDetails verifyUnitEmploymentOfStaff(Long staffId, Long unitId, String type) {
         BasicNameValuePair basicNameValuePair = new BasicNameValuePair("type", type);
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>>() {
-        },staffId);
+        }, staffId);
     }
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
-     List<NameValuePair> queryParamList=new ArrayList<>();
-        queryParamList.add(new BasicNameValuePair("type",type));
-        queryParamList.add(new BasicNameValuePair("shiftDate",shiftDate.toString()));
-      return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET,VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID , queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
-      },staffId,unitEmploymentId);
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("type", type));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate.toString()));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, staffId, unitEmploymentId);
+    }
+
+    public StaffDTO getStaffByUser(Long userId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
+        }, userId);
+    }
+
+    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId,List<Long> expertiesIdList) {
+        return genericRestClient.publishRequest(expertiesIdList, unitId, RestClientUrlType.UNIT, HttpMethod.POST,STAFF_GET_STAFF_BY_EXPERTISES ,null , new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+        });
+    }
+
+    public UserAccessRoleDTO getAccessOfCurrentLoggedInStaff() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_USER_ACCESS_ROLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
+        });
     }
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class StaffRestClient {
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);
 
