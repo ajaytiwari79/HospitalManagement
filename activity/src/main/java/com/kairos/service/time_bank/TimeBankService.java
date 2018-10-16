@@ -28,10 +28,12 @@ import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.pay_out.PayOutCalculationService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.lang.StringUtils;
@@ -52,6 +54,8 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.constants.AppConstants.ONE_DAY_MINUTES;
 
 /*
 * Created By Pradeep singh rajawat
@@ -82,9 +86,12 @@ public class TimeBankService extends MongoBaseService {
     private PayOutRepository payOutRepository;
     @Inject
     private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
-    @Inject
-    private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private PayOutCalculationService payOutCalculationService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject
+    private ShiftService shiftService;
+    @Inject
+    private ExceptionService exceptionService;
 
 
     /**
@@ -312,6 +319,28 @@ public class TimeBankService extends MongoBaseService {
         }
         return interval;
     }
+    /**
+     *
+     * @param unitPositionId
+     * @param startDate
+     * @param staffAdditionalInfoDTO
+     * @Desc to update Time Bank after applying function in Unit position
+     * @return
+     */
+    public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId( staffAdditionalInfoDTO.getUnitPosition().getId(),startDate);
+        if(ctaResponseDTO==null){
+            exceptionService.dataNotFoundException("message.cta.notFound");
+        }
+        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+        Shift shift = new Shift(startDate,endDate,unitPositionId);
+        saveTimeBank(staffAdditionalInfoDTO,shift);
+        return true;
+    }
+
+
 
 
 }

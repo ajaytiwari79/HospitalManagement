@@ -17,7 +17,7 @@ import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class TimeCareRestClient {
-    private static final Logger logger = LoggerFactory.getLogger(CountryRestClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(TimeCareRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;

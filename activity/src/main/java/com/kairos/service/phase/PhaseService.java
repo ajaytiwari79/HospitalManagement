@@ -1,19 +1,18 @@
 package com.kairos.service.phase;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.period.PlanningPeriod;
-import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.rest_client.CountryRestClient;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.enums.phase.PhaseType;
-import com.kairos.dto.activity.phase.PhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -45,8 +44,7 @@ public class PhaseService extends MongoBaseService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private OrganizationRestClient organizationRestClient;
-    @Inject
-    private CountryRestClient countryRestClient;
+
     @Inject
     private ExceptionService exceptionService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;

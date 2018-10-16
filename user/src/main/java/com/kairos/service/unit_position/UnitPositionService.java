@@ -14,6 +14,7 @@ import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.staff.unit_position.PositionLineChangeResultDTO;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -97,6 +98,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -719,7 +721,7 @@ public class UnitPositionService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         seniorityLevel = objectMapper.convertValue(unitPositionLine.getSeniorityLevel(), Map.class);
-        seniorityLevel.put("functions", unitPositionDTO.getFunctionIds());
+        seniorityLevel.put("functions", unitPositionLine.getFunctions());
         seniorityLevel.put("payGrade", Optional.ofNullable(unitPositionLine.getSeniorityLevel().getPayGrade()).isPresent() ? unitPositionLine.getSeniorityLevel().getPayGrade() : payGradeGraphRepository.getPayGradeBySeniorityLevelId(unitPositionLine.getSeniorityLevel().getId()));
 
         UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
@@ -992,7 +994,7 @@ public class UnitPositionService {
     }
 
     // TODO FIX
-    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload) {
+    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload,Long unitId) {
 
         String dateAsString = new ArrayList<>(payload.keySet()).get(0);
 
@@ -1006,6 +1008,8 @@ public class UnitPositionService {
         } else if (unitPositionFunctionRelationship) {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO=staffService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString),unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId),unitPositionId,unitId,ORGANIZATION);
+        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString),staffAdditionalInfoDTO);
         return true;
     }
 
