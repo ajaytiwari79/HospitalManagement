@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -20,7 +21,7 @@ import javax.validation.constraints.NotNull;
 @NodeEntity
 public class Tag extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Tag.name.notEmptyOrNotNull") @NotNull(message = "error.Tag.name.notEmptyOrNotNull")
+    @NotBlank(message = "error.Tag.name.notEmptyOrNotNull")
     private String name;
 
     @Property(name = "masterDataType")

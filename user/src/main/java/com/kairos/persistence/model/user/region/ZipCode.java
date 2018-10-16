@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Range;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
@@ -20,11 +21,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MUNIC
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ZipCode extends UserBaseEntity {
 
-    @NotEmpty(message = "error.ZipCode.name.notEmpty") @NotNull(message = "error.ZipCode.name.notnull")
+    @NotBlank(message = "error.ZipCode.name.notEmpty")
     private String name;
     @Range(min=1,message = "error.ZipCode.zipCode.notnull")
     private int zipCode;
-    @NotEmpty(message = "error.ZipCode.geoFence.notEmpty") @NotNull(message = "error.ZipCode.geoFence.notnull")
+    @NotBlank(message = "error.ZipCode.geoFence.notEmpty")
     private String geoFence;
 
     private boolean isEnable = true;
