@@ -7,6 +7,7 @@ import com.kairos.dto.activity.period.PeriodPhaseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
@@ -572,7 +573,7 @@ public class PlanningPeriodService extends MongoBaseService {
         List<StaffingLevelState> staffingLevelStates=staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()));
         restoreShifts(shiftStates);
-        restoreStaffingLevel(staffingLevels,staffingLevelStates);
+        restoreAvailabilityCount(staffingLevels,staffingLevelStates);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
@@ -596,17 +597,16 @@ public class PlanningPeriodService extends MongoBaseService {
         save(shifts);
     }
 
-    public void restoreStaffingLevel(List<StaffingLevel> staffingLevels,List<StaffingLevelState> staffingLevelStates) {
+    public void restoreAvailabilityCount(List<StaffingLevel> staffingLevels, List<StaffingLevelState> staffingLevelStates) {
         if (!staffingLevels.isEmpty() && !staffingLevelStates.isEmpty()) {
         Map<Date,StaffingLevelState> dateStaffingLevelStateMap=staffingLevelStates.stream().collect(Collectors.toMap(k->k.getCurrentDate(),v->v));
             staffingLevels.forEach(staffingLevel -> {
                 if(dateStaffingLevelStateMap.get(staffingLevel.getCurrentDate())!=null){
+                  Map<Integer,StaffingLevelInterval> staffingLevelIntervalMap=dateStaffingLevelStateMap.get(staffingLevel.getCurrentDate()).getPresenceStaffingLevelInterval().stream().collect(Collectors.toMap(k->k.getSequence(),v->v));
                     staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
-                        dateStaffingLevelStateMap.get(staffingLevel.getCurrentDate()).getPresenceStaffingLevelInterval().forEach(staffingLevelInterval1 -> {
-                            if(staffingLevelInterval.getSequence()==staffingLevelInterval1.getSequence()){
-                                staffingLevelInterval.setAvailableNoOfStaff(staffingLevelInterval1.getAvailableNoOfStaff());
+                            if(staffingLevelIntervalMap.get(staffingLevelInterval.getSequence())!=null){
+                                staffingLevelInterval.setAvailableNoOfStaff(staffingLevelIntervalMap.get(staffingLevelInterval.getSequence()).getAvailableNoOfStaff());
                             }
-                        });
                     });
                 }else{
                     staffingLevel.getAbsenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
