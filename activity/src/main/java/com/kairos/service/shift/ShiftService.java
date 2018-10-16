@@ -1284,12 +1284,12 @@ public class ShiftService extends MongoBaseService {
         return new ShiftActivityIdsDTO(activitiesToAdd,activitiesToEdit,activitiesToDelete);
     }
 
-    private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,List<ActivityWrapper> activities){
-        Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
-        for(ActivityWrapper activityWrapper:activities){
-            for(PhaseTemplateValue phaseTemplateValue:activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()){
-                if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
-                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(),phaseTemplateValue);
+    private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,List<ActivityWrapper> activities) {
+        Map<BigInteger, PhaseTemplateValue> phaseTemplateValueMap = new HashMap<>();
+        for (ActivityWrapper activityWrapper : activities) {
+            for (PhaseTemplateValue phaseTemplateValue : activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()) {
+                if (phaseTemplateValue.getPhaseId().equals(phase.getId())) {
+                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(), phaseTemplateValue);
                     break;
                 }
             }
@@ -1297,23 +1297,4 @@ public class ShiftService extends MongoBaseService {
         return phaseTemplateValueMap;
 
     }
-
-
-    /**
-     *
-     * @param unitPositionId
-     * @param startDate
-     * @param staffAdditionalInfoDTO
-     * @Desc to update Time Bank after pplying function in Unit position
-     * @return
-     */
-    public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
-        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-        Shift shift = new Shift(startDate,endDate,unitPositionId);
-        timeBankService.saveTimeBank(staffAdditionalInfoDTO,shift);
-        return true;
-
-    }
-
 }
