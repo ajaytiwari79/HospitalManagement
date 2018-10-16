@@ -79,7 +79,15 @@ public final class ApiConstants {
     public static final String COUNTRY_COUNTRY_ID=COUNTRY_ID+"/{countryId}";
     public static final String SERVICE_DATA="/service/data";
     public static final String SKILLS ="/skills";
-
-
+    public static final String STAFF_AND_SKILL="/staff/getsfAndsfSkill";
+   public static final String STAFF_WITH_STAFF_ID="/staff/{staffId}";
+    public static final String STAFF_UNIT_WISE="/staff/unitwise";
+    public static final String UNIT_POSITION_EXPERTISE="/unit_position/expertise";
+    public static final String STAFF_GET_STAFF_INFO="/staff/getStaffInfo";
+    public static final String STAFF_GET_STAFF_BY_UNIT="/staff/get_Staff_By_Unit";
+    public static final String UNIT_MANAGER_IDS_UNIT_ID="/unit_manager_ids/{unitId}";
+    public static final String COUNTRY_ADMINS_IDS_OF_UNIT="/country_admins_ids/{countryAdminsOfUnitId}";
+    public static final String VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID=STAFF_WITH_STAFF_ID+"/verifyUnitEmployment";
+    public static final String VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID=VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID+"/{unitEmploymentId}";
 
 }

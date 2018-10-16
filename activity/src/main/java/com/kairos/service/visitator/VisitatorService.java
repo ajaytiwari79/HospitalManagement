@@ -88,7 +88,7 @@ public class VisitatorService{
     GenericIntegrationService genericIntegrationService;
     @Autowired
     ClientRestClient clientRestClient;
-    @Autowired private StaffRestClient staffRestClient;
+
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
     @Autowired
@@ -376,7 +376,7 @@ public class VisitatorService{
             }
 
             //Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
-            ClientStaffInfoDTO clientStaffInfoDTO = staffRestClient.getStaffInfo();
+            ClientStaffInfoDTO clientStaffInfoDTO = genericIntegrationService.getStaffInfo();
             updatedTaskDemand.setCreatedAt(existingTaskDemand.getCreatedAt());
             updatedTaskDemand.setCitizenId(existingTaskDemand.getCitizenId());
             updatedTaskDemand.setUnitId(existingTaskDemand.getUnitId());
