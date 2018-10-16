@@ -167,8 +167,6 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private LocaleService localeService;
     @Inject
-    private GenericIntegrationService genericIntegrationService;
-    @Inject
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private ShiftTemplateRepository shiftTemplateRepository;
@@ -200,6 +198,8 @@ public class ShiftService extends MongoBaseService {
     private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
     @Inject
     private ShiftBreakActivityService shiftBreakActivityService;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
@@ -609,7 +609,7 @@ public class ShiftService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("staffIds",staffIds.toString()));
         requestParam.add(new BasicNameValuePair("unitPositionIds",unitPositionIds.toString()));
-        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/verifyUnitEmployments",requestParam,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){});
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericIntegrationService.getStaffAditionalDTOS(unitId,requestParam);
         Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
           List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
           List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
@@ -624,9 +624,10 @@ public class ShiftService extends MongoBaseService {
                 List<CTAResponseDTO> ctaResponseDTOSList=unitPositionAndCTAResponseMap.get(staffAdditionalInfoDTO.getUnitPosition().getId());
                 List<CTARuleTemplateDTO> ctaRuleTemplateDTOS=ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaRuleTemplateDTOS);
+                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             }
         });
-        staffAdditionalInfoDTOS.forEach(s->setDayTypeTOCTARuleTemplate(s));
+        //staffAdditionalInfoDTOS.forEach(s->setDayTypeToCTARuleTemplate(s));
         timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, shifts,activityWrapperMap);
 
     }

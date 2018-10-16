@@ -779,12 +779,11 @@ public class UnitPositionService {
             com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail=new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
             convertUnitPositionObject(unitPosition,unitPositionDetail);
             unitPositionDetail.setStaffId(unitPosition.getStaffId());
+            unitPositionDetail.setCountryId(countryId);
+            unitPositionDetail.setUnitTimeZone(organization.getTimeZone());
             unitPositionDetailsList.add(unitPositionDetail);
         });
-        unitPositionDetailsList.forEach(unitPositionDetails -> {
-            unitPositionDetails.setCountryId(countryId);
-            unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
-        });
+
         // convertUnitPositionObject(unitPosition, unitPositionDetails);
 //  com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
 //        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());

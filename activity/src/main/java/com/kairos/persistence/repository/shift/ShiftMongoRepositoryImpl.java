@@ -88,9 +88,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEPS(List<Long> unitEmploymentPositionIds, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEPS(List<Long> unitPositionIds, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitPositionId").in(unitEmploymentPositionIds).and("disabled").is(false)
+                match(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).and("disabled").is(false)
                         .and("startDate").lte(endDate).and("endDate").gte(startDate)),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activities.activity"),

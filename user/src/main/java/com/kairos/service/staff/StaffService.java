@@ -1714,6 +1714,7 @@ public class StaffService {
 
     public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate,long staffId, Long unitPositionId, long organizationId, String type) {
         Organization organization = organizationService.getOrganizationDetail(organizationId, type);
+
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());

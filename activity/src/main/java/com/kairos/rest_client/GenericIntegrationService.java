@@ -17,6 +17,7 @@ import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
@@ -306,5 +307,10 @@ public class GenericIntegrationService {
     public List<Map<String,Object>> getSkillsOfOrganization(Long unitId) {
       return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
       });
+    }
+    //shift service
+    public List<StaffAdditionalInfoDTO> getStaffAditionalDTOS(Long unitId,List<NameValuePair> requestParam) {
+       return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/verifyUnitEmployments", requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {
+        });
     }
 }
