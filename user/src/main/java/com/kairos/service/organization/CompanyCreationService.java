@@ -142,6 +142,7 @@ public class CompanyCreationService {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
             organization.setAccountType(accountType);
+            accessGroupService.createDefaultAccessGroupsInOrganization(organization, null,true);
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
@@ -193,12 +194,23 @@ public class CompanyCreationService {
             if (!Optional.ofNullable(accountType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
-            organization.setAccountType(accountType);
-            //accountType is Changed for parent organization We need to add this account type to child organization as well
-            if (!organization.getChildren().isEmpty())
+            if (organization.getAccountType()==null || !organization.getAccountType().getId().equals( orgDetails.getAccountTypeId())) {
+                organization.setAccountType(accountType);
 
-                organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
+                //accountType is Changed for parent organization We need to add this account type to child organization as well
 
+                List<Long> organizationIds= new ArrayList<>();
+                organizationIds.addAll(organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList()));
+                organizationIds.add(organization.getId());
+                accessGroupService.removeDefaultCopiedAccessGroup(organizationIds);
+
+
+                if (!organization.getChildren().isEmpty()) {
+                    organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
+                }
+
+                accessGroupService.createDefaultAccessGroupsInOrganization(organization,null,true);
+            }
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
@@ -559,6 +571,7 @@ public class CompanyCreationService {
 
         // if more than 2 default things needed make a  async service Please
         List<AccessGroupQueryResult> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
+
         Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups,true);
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
