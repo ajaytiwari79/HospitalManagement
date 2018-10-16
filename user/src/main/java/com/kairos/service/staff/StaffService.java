@@ -51,7 +51,7 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -476,7 +476,7 @@ public class StaffService {
     }
 
 
-    public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, Boolean allStaffRequired, StaffFilterDTO staffFilterDTO) {
+    public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, StaffFilterDTO staffFilterDTO,String moduleId) {
 
         List<StaffPersonalDetailDTO> staff = null;
         Long countryId = null;
@@ -485,7 +485,7 @@ public class StaffService {
         Map<String, Object> map = new HashMap();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 //            staff = getStaffWithBasicInfo(id, allStaffRequired);
-            map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, allStaffRequired, staffFilterDTO).getStaffList());
+            map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId).getStaffList());
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
@@ -1685,8 +1685,8 @@ public class StaffService {
 
     }
 
-    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate,long staffId, Long unitPositionId, long id, String type) {
-        Organization organization = organizationService.getOrganizationDetail(id, type);
+    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate,long staffId, Long unitPositionId, long organizationId, String type) {
+        Organization organization = organizationService.getOrganizationDetail(organizationId, type);
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
@@ -1740,9 +1740,9 @@ public class StaffService {
             unitPositionDetails = new StaffUnitPositionDetails(unitId);
             unitPositionService.convertUnitPositionObject(unitPosition, unitPositionDetails);
         }
-        List<Map<Long,Float>> data=unitPositionGraphRepository.findFunctionalHourlyWages(Collections.singletonList(unitPosition.getId()));
+        List<UnitPositionLinesQueryResult> data=unitPositionGraphRepository.findFunctionalHourlyWages(Collections.singletonList(unitPosition.getId()));
         logger.info(data.toString());
-        unitPosition.getPositionLines().get(0).setHourlyWages(data.get(0).get(unitPosition.getPositionLines().get(0).getId()));
+        unitPositionDetails.setHourlyWages(data.size()>0?data.get(0).getHourlyWages():0.0f);
         return unitPositionDetails;
     }
 

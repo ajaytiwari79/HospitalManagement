@@ -3,8 +3,11 @@ package com.kairos.controller.timeBank;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.controller.task.TaskController;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
 import java.util.Date;
 import java.util.Map;
 
@@ -58,6 +62,12 @@ public class TimeBankController {
     public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long unitPositionId,@RequestParam(value = "query",required = false) String query,@RequestParam(value = "value",required = false) Integer value,@RequestParam(value = "startDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getTimeBankForVisualView
                 (unitId,unitPositionId,query,value,startDate,endDate));
+    }
+
+    @ApiOperation("Update time bank after applying function")
+    @PutMapping("/update_time_bank")
+    public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
     }
 
 

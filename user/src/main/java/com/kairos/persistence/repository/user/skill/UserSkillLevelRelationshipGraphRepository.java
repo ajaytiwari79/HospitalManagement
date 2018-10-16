@@ -27,7 +27,7 @@ public interface UserSkillLevelRelationshipGraphRepository extends Neo4jBaseRepo
     @Query("Match (staff:Staff),(skill:Skill) where id(staff)={0} AND id(skill) IN {1} with staff,skill\n" +
             "Match (unit:Organization)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) WHERE id(unit) = {2} with staff,skill,orgSkillRelation\n" +
             "MATCH (staff)-[r:STAFF_HAS_SKILLS]->(skill)-[:HAS_CATEGORY]->(skillCategory:SkillCategory)\n" +
-            "return {name:orgSkillRelation.customName,skillId:id(skill),startDate:r.startDate,endDate:r.endDate,level:r.skillLevel,skillCategory:skillCategory.name,status:r.isEnabled} as data")
+            "return {name:case when orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end,skillId:id(skill),startDate:r.startDate,endDate:r.endDate,level:r.skillLevel,skillCategory:skillCategory.name,status:r.isEnabled} as data")
     List<Map<String,Object>> getStaffSkillRelationship(long staffId, List<Long> skillId, long unitId);
 
 

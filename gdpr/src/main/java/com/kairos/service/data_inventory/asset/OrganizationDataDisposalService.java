@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;

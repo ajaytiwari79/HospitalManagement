@@ -7,6 +7,8 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
@@ -47,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -96,14 +99,14 @@ public class ShiftValidatorService {
         DateTimeInterval graceInterval;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getStartDate(), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         } else {
             if (shiftDTO.getValidatedByStaffDate() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
         }
-        if (!graceInterval.contains(shiftDTO.getStartDate())) {
+        if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
     }
@@ -190,9 +193,9 @@ public class ShiftValidatorService {
 
 
     public void validateStatusOfShiftOnUpdate(Shift shift,ShiftDTO shiftDTO){
-        for (ShiftActivity updateShiftActivitiy : shiftDTO.getActivities()) {
+        for (ShiftActivity updateShiftActivity : shiftDTO.getActivities()) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
-                boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivitiy==null || updateShiftActivitiy.getStartDate().equals(shift.getStartDate()) || updateShiftActivitiy.getEndDate().equals(shift.getEndDate()));
+                boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivity==null || updateShiftActivity.getStartDate().equals(shift.getStartDate()) || updateShiftActivity.getEndDate().equals(shift.getEndDate()));
                 if (notValid) {
                     exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
                 }
@@ -200,6 +203,29 @@ public class ShiftValidatorService {
         }
 
     }
+
+   public void verifyShiftActivities(Set<AccessGroupRole> roles,Long employmentTypeId, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue, ShiftActivityIdsDTO shiftActivityIdsDTO){
+        boolean staff=roles.contains(AccessGroupRole.STAFF);
+        boolean management=roles.contains(AccessGroupRole.MANAGEMENT);
+        phaseTemplateValue.forEach((k,v)->{
+            if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
+                if((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && !v.isEligibleForManagement() ){
+                    exceptionService.actionNotPermittedException("error.shift.not.authorised.phase");
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
+                if(!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),roles)){
+                    exceptionService.actionNotPermittedException("error.shift.not.editable.phase");
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
+                if((management && !v.isManagementCanDelete()) || (staff && !v.isStaffCanDelete())){
+                    exceptionService.actionNotPermittedException("error.shift.not.deletable.phase");
+                }
+            }
+
+        });
+   }
 
     public void validateStatusOfShiftOnDelete(Shift shift){
         for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -451,7 +477,7 @@ public class ShiftValidatorService {
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shiftsInIntervalWTATemplate.getIntervalUnit(), shiftsInIntervalWTATemplate.getIntervalLength()));
 
                     break;
-                case SENIOR_DAYS_PER_YEAR:
+                /*case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, seniorDaysPerYearWTATemplate.getNumberOfWeeks().intValue(), seniorDaysPerYearWTATemplate.getValidationStartDate()));
 
@@ -459,7 +485,7 @@ public class ShiftValidatorService {
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, childCareDaysCheckWTATemplate.getNumberOfWeeks(), childCareDaysCheckWTATemplate.getValidationStartDate()));
-                    break;
+                    break;*/
             }
         }
         return interval;

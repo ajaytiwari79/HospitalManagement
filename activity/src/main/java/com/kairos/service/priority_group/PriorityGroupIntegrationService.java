@@ -13,6 +13,7 @@ import java.util.List;
 
 @Service
 @Transactional
+@Deprecated
 public class PriorityGroupIntegrationService {
     @Autowired
     UserRestClient userRestClient;

@@ -1,7 +1,8 @@
 package com.kairos.service.clause;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
@@ -53,7 +54,7 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param clauseDto contain data about clause and template type which belong to clause
      * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
-     * @throws DuplicateDataException: if clause already exist for id ,{@link com.kairos.custom_exception.InvalidRequestException if account type is not selected}
+     * @throws DuplicateDataException : if clause already exist for id ,{@link com.kairos.custom_exception.InvalidRequestException if account type is not selected}
      * @desciption this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
     public ClauseDTO createClause(Long countryId, ClauseDTO clauseDto) {

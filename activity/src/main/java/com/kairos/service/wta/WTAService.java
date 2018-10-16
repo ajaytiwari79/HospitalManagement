@@ -1,13 +1,15 @@
 package com.kairos.service.wta;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
@@ -18,10 +20,9 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.WTADetailRestClient;
 import com.kairos.service.MongoBaseService;
@@ -32,8 +33,6 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +59,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
 public class WTAService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository wtaRepository;
-    @Inject
-    private CountryRestClient countryRestClient;
+
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
@@ -433,15 +431,15 @@ public class WTAService extends MongoBaseService {
     }
 
     public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId) {
-        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId,DateUtils.getCurrentDayStart());
+        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
         CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
         CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
         if (Optional.ofNullable(wta).isPresent()) {
-            WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(),wta.getParentId());
+            WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());
             ctawtaWrapper.setWta(Collections.singletonList(wtaResponseDTO));
         }
         if (Optional.ofNullable(cta).isPresent()) {
-            CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(), cta.getId(),cta.getParentId());
+            CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId());
             ctawtaWrapper.setCta(Collections.singletonList(ctaResponseDTO));
         }
         return ctawtaWrapper;
@@ -610,8 +608,10 @@ public class WTAService extends MongoBaseService {
         newWta.setParentId(oldWta.getId());
         save(newWta);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        WTAResponseDTO olWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
         wtaResponseDTO.setParentId(oldWta.getId());
+        wtaResponseDTO.setVersions(Collections.singletonList(olWTA));
         return wtaResponseDTO;
     }
 

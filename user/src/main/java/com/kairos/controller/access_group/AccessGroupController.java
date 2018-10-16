@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -248,5 +249,12 @@ public class AccessGroupController {
     @PostMapping(value = UNIT_URL+"/staffs/access_groups")
     public ResponseEntity<Map<String, Object>> getStaffIdAndAccessGroupsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffAndAccessGroupsByUnitId(unitId,accessGroupId));
+    }
+
+    @ApiOperation("Get country Access Groups by account type")
+    @PostMapping(value = UNIT_URL + "/access_groups_by_parent" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessGroupUsingParentId(@PathVariable Long unitId, @RequestBody Set<Long> accessGroupIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupUsingParentId(unitId, accessGroupIds));
     }
 }
