@@ -103,9 +103,8 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOS;
     }
 
-    public List<TimeTypeDTO> updateSingleTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
+    public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
         List<TimeType> timeTypes = new ArrayList<>();
-        TimeTypeDTO timeTypeDTO = timeTypeDTOS.get(0);
         Boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
         if (timeTypesExists) {
             exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
@@ -118,8 +117,8 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeType> leafTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
         Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
         if (Optional.ofNullable(timeType).isPresent()) {
-            if (timeType.getUpperLevelTimeTypeId() == null && timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
-                //User Cannot Update TimeType of Second Level
+            if (timeType.getUpperLevelTimeTypeId() == null && !timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
+                //User Cannot Update NAME for TimeTypes of Second Level
                 exceptionService.actionNotPermittedException("message.timetype.rename.notAllowed", timeType.getLabel());
             }
                 timeType.setLabel(timeTypeDTO.getLabel());
@@ -145,7 +144,7 @@ public class TimeTypeService extends MongoBaseService {
                 }
             }
         save(timeTypes);
-        return timeTypeDTOS;
+        return timeTypeDTO;
     }
 
     public List<TimeTypeDTO> getAllTimeType(BigInteger timeTypeId, Long countryId) {
