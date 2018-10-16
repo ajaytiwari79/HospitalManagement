@@ -67,6 +67,15 @@ public final class ApiConstants {
     public static final String COUNTRY_ID ="/countryId";
     public static final String STAFF_ID_EXPERTISE_ID_UNIT_POSITION_ID ="/staff/{staffId}/expertise/{expertiseId}/unitPositionId";
     public static final String ACCESS_GROUPS_BY_PARENT = "/access_groups_by_parent";
+    public static final String STAFF_PRIORTY_GROUP ="/staff/priority_group";
+    public static final String ABSENCE_TYPES_TITLE=" /absenceTypes/{title}";
+    public static final String CONTRACT_TYPE="/contractType";
+    public static final String COUNTRY_ORGANIZATION_SERVICE_URL="/country/organizaton_service/{organizationServiceId}";
+    public static final String ORGANIZATION_TYPES_HIERARCHY="/organization_types/hierarchy";
+    public static final String TASK_TYPES_SKILLS="/task_type/skills";
+    public static final String TIME_SLOTS="/time_slots";
+    public static final String DAY_TYPES="/day_types";
+    public static final String COUNTRY_COUNTRY_ID=COUNTRY_ID+"/{countryId}";
 
 
 }

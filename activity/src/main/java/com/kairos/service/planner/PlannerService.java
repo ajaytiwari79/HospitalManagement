@@ -166,7 +166,7 @@ public class PlannerService extends MongoBaseService {
     @Autowired
     IntegrationRestClient integrationServiceRestClient;
     @Autowired
-    CountryRestClient countryRestClient;
+    GenericIntegrationService genericIntegrationService;
 
 
     private int getWeekFrequencyAsInt(String frequency) {
@@ -843,7 +843,7 @@ public class PlannerService extends MongoBaseService {
     }
 
     private boolean validateDaySpecification(TaskType taskType,Task task){
-        List<DayType> dayTypes = countryRestClient.getDayTypes(taskType.getForbiddenDayTypeIds());
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
 
         Set<Day> days = new HashSet<>();
         for(DayType dayType : dayTypes){

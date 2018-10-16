@@ -128,8 +128,7 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private ApplicationContext applicationContext;
-    @Inject
-    private CountryRestClient countryRestClient;
+
 
     @Inject
     private PhaseService phaseService;
@@ -185,8 +184,6 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject
-    private GenericRestClient genericRestClient;
     @Inject
     private ActivityService activityService;
     @Inject
@@ -434,7 +431,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    private void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
@@ -829,8 +826,6 @@ public class ShiftService extends MongoBaseService {
         if (!shifts.isEmpty() && objects[1] != null) {
             Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
-
-            List<BigInteger> phaseIds = phaseListByDate.values().stream().map(p -> p.getId()).collect(Collectors.toList());
             StaffAccessGroupDTO staffAccessGroupDTO =genericIntegrationService.getStaffAccessGroupDTO(unitId);
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -905,7 +900,7 @@ public class ShiftService extends MongoBaseService {
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
             boolean paid = staffUnitPosition.getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID);
             // TODO PAVAN handle error
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activityMap, copyShiftDTO, breakSettings, breakActivitiesMap, paid);
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activityMap, copyShiftDTO);
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
             unCopiedShiftCount += response.get("error").size();
@@ -917,7 +912,7 @@ public class ShiftService extends MongoBaseService {
         return copyShiftResponse;
     }
 
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<DateWiseShiftResponse> shifts, StaffUnitPositionDetails staffUnitPosition, Map<BigInteger, Activity> activityMap, CopyShiftDTO copyShiftDTO, List<BreakSettings> breakSettings, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Boolean paid) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<DateWiseShiftResponse> shifts, StaffUnitPositionDetails staffUnitPosition, Map<BigInteger, Activity> activityMap, CopyShiftDTO copyShiftDTO) {
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
