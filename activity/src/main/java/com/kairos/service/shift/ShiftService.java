@@ -507,7 +507,6 @@ public class ShiftService extends MongoBaseService {
                 //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v -> v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
         //Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = activities.stream().collect(Collectors.toMap(k->k.getActivity(), v -> v..getPhaseTemplateValues().stream().filter(i -> i.getPhaseId().equals(phase.getId())).findAny().orElse(null)));
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(),staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap,shiftActivityIdsDTO);
-        ShiftActivity shiftActivity= findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
 
 
 
@@ -1299,13 +1298,4 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-    private ShiftActivity findShiftActivityToValidateStaffingLevel(List<ShiftActivity> existingShiftActivities,List<ShiftActivity> arrivedShiftActivities){
-        for (int i = 0; i <arrivedShiftActivities.size() ; i++) {
-            ShiftActivity currentShiftActivity=arrivedShiftActivities.get(i);
-            if(!currentShiftActivity.getActivityId().equals(existingShiftActivities.get(i).getActivityId())){
-
-            }
-
-        }
-    }
 }
