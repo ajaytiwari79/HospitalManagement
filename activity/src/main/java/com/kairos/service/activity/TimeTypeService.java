@@ -103,6 +103,7 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOS;
     }
 
+    //TODO By Yasir:- CO-ordinate with front-end to send and receive single time type in api and use below method instead of above.
     public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
         List<TimeType> timeTypes = new ArrayList<>();
         Boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
