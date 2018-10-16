@@ -270,7 +270,6 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftWithViolatedInfoDTO saveShift(ActivityWrapper activityWrapper, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO,Phase phase, boolean byTandAPhase) {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-        ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityWrapper.getActivity(), ActivityDTO.class);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate()));
         Shift mainShift = byTandAPhase ? ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class) : ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         List<BigInteger> activityIds = mainShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList());
