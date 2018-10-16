@@ -178,7 +178,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.updateMulti(query, update, Shift.class);
 
     }
+        @Override
+    public Shift findShiftByShiftActivityId(BigInteger shiftActivityId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("activities._id").is(shiftActivityId));
+        return mongoTemplate.findOne(query,  Shift.class);
 
+    }
     @Override
     public Shift findShiftToBeDone(List<Long> staffIds, Date startDate,Date endDate) {
         Query query=new Query();

@@ -3,7 +3,10 @@ package com.kairos.dto.activity.shift;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -27,7 +30,7 @@ public class ShiftActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
-    private BigInteger jobId;  // This is job Id which is used to send reminder specific to activity.
+
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
 
@@ -177,11 +180,5 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public BigInteger getJobId() {
-        return jobId;
-    }
 
-    public void setJobId(BigInteger jobId) {
-        this.jobId = jobId;
-    }
 }

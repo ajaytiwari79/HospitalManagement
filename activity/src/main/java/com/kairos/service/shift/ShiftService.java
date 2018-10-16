@@ -635,7 +635,8 @@ public class ShiftService extends MongoBaseService {
         shift.setFunctionId(functionId);
         saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
         payOutService.deletePayOut(shift.getId());
-        shiftReminderService.deleteReminderTrigger(shiftId,shift.getUnitId());
+        List<BigInteger> jobIds=shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
+        shiftReminderService.deleteReminderTrigger(jobIds,shift.getUnitId());
 
     }
 

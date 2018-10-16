@@ -47,5 +47,5 @@ public interface CustomShiftMongoRepository {
     Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis);
 
     void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
-
+     Shift findShiftByShiftActivityId(BigInteger shiftActivityId) ;
 }

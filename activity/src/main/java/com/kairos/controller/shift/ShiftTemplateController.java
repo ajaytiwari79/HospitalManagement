@@ -2,6 +2,8 @@ package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
+import com.kairos.service.shift.ShiftReminderService;
 import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -22,7 +24,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @Api(API_ORGANIZATION_UNIT_URL)
 public class ShiftTemplateController {
     @Inject private ShiftTemplateService shiftTemplateService;
-
+    @Inject private ShiftReminderService shiftReminderService;
     @ApiOperation("Create Shift template for a staff")
     @PostMapping(value = "/shift_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -75,4 +77,13 @@ public class ShiftTemplateController {
     public ResponseEntity<Map<String, Object>> deleteIndividualShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @PathVariable BigInteger individualShiftTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.deleteIndividualShiftTemplate(shiftTemplateId, individualShiftTemplateId));
     }
+
+    // TODO DONT REMOVE ITS FOR TEST VIPUL
+    @PostMapping(value = "/shift-reminder")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> sendReminderForEmail( @RequestBody @Valid KairosSchedulerExecutorDTO job) {
+        shiftReminderService.sendReminderForEmail(job);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
 }
