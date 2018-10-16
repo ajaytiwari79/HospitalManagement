@@ -11,7 +11,6 @@ import java.util.Date;
 public class StaffEmploymentDetail {
 
     private String cardNumber;
-    //@NotEmpty(message = "error.Staff.cardnumber.notnull") @NotNull(message = "error.Staff.cardnumber.notnull")
     private String sendNotificationBy;
     private String email;
     private boolean copyKariosMailToLogin;

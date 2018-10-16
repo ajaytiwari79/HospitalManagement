@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -15,9 +16,8 @@ public class EquipmentDTO {
 
     private Long id;
 
-    @NotEmpty(message = "error.equipment.name.notNullAndEmpty") @NotNull(message = "error.equipment.name.notNullAndEmpty")
+    @NotBlank(message = "error.equipment.name.notNullAndEmpty")
     private String name;
-    //@NotEmpty(message = "error.equipment.description.notNullAndEmpty") @NotNull(message = "error.equipment.description.notNullAndEmpty")
     private String description;
     public EquipmentCategoryDTO equipmentCategory;
 

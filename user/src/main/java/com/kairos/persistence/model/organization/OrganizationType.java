@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
@@ -26,22 +27,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class OrganizationType extends UserBaseEntity {
 
     private boolean isEnable = true;
-    @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
+    @NotBlank(message = "error.OrganizationType.name.notEmpty")
     private String name;
-
-    //    @NotEmpty(message = "error.OrganizationType.description.notEmpty") @NotNull(message = "error.OrganizationType.description.notnull")
     private String description;
-
-
     @Relationship(type = HAS_SUB_TYPE)
     private List<OrganizationType> organizationTypeList;
-
     @Relationship(type = ORGANIZATION_TYPE_HAS_SERVICES)
     List<OrganizationService> organizationServiceList;
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     @Relationship(type = HAS_LEVEL)
     private List<Level> levels;
 
