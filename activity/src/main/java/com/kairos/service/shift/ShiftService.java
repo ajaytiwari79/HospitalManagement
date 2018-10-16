@@ -285,7 +285,9 @@ public class ShiftService extends MongoBaseService {
 
         }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
-        shiftReminderService.setReminderTrigger( activityWrapper,mainShift);
+        Map<BigInteger,ActivityWrapper> activityWrapperMap= new HashMap<>();
+        activityWrapperMap.put(activityWrapper.getActivity().getId(),activityWrapper);
+        shiftReminderService.setReminderTrigger( activityWrapperMap,mainShift);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -548,6 +550,7 @@ public class ShiftService extends MongoBaseService {
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
 
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
+            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             boolean presenceTypeShift = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
             if (activityWrapper.getTimeType().equals(TimeTypes.WORKING_TYPE.toString())) {
