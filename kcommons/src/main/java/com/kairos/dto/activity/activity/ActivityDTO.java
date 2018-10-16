@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityDTO {
     private BigInteger id;
+    @NotBlank(message = "message.activity.name.notEmpty")
     private String name;
     private List<Long> expertises;
     private String description;
@@ -51,38 +54,17 @@ public class ActivityDTO {
 
     public ActivityDTO(BigInteger id, String name, BigInteger parentId) {
         this.id = id;
-        this.name = name;
+        this.name = StringUtils.trim(name);
         this.parentId = parentId;
-    }
-
-    public ActivityDTO(BigInteger id, String name, BigInteger parentId,PermissionsActivityTabDTO permissionsActivityTab) {
-        this.id = id;
-        this.name = name;
-        this.parentId = parentId;
-        this.permissionsActivityTab=permissionsActivityTab;
     }
 
     public ActivityDTO(String name, String description, Long countryId, String categoryName, Long unitId, boolean isParentActivity) {
-        this.name = name;
-        this.description = description;
+        this.name = StringUtils.trim(name);
+        this.description = StringUtils.trim(description);
         this.countryId = countryId;
         this.categoryName = categoryName;
         this.unitId = unitId;
         this.isParentActivity = isParentActivity;
-    }
-
-    public ActivityDTO(BigInteger id, String name, String description, Long countryId, BigInteger categoryId, String categoryName, Long unitId, boolean isParentActivity,
-                       GeneralActivityTabDTO generalActivityTab, List<Long> tags) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-        this.unitId = unitId;
-        this.isParentActivity = isParentActivity;
-        this.generalActivityTab = generalActivityTab;
-        this.tags = tags;
     }
 
     public List<Long> getEmploymentTypes() {
@@ -131,7 +113,7 @@ public class ActivityDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getDescription() {
@@ -139,7 +121,7 @@ public class ActivityDTO {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public Long getCountryId() {

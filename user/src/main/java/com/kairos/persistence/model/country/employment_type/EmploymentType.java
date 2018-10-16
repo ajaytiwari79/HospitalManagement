@@ -8,6 +8,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import java.util.Set;
 @NodeEntity
 public class EmploymentType extends UserBaseEntity {
 
-    @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull") @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
+    @NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
     private boolean allowedForContactPerson;
@@ -33,7 +34,7 @@ public class EmploymentType extends UserBaseEntity {
         //Default Constructor
     }
 
-    public EmploymentType(@NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull") @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson,
+    public EmploymentType(@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson,
                           boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency) {
         this.name = name;
         this.description = description;
