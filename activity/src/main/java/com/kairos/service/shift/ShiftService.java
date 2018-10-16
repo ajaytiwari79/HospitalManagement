@@ -433,7 +433,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    private void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
@@ -1297,6 +1297,7 @@ public class ShiftService extends MongoBaseService {
         return phaseTemplateValueMap;
 
     }
+
 
     /**
      *
