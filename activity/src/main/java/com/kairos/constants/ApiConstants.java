@@ -95,4 +95,5 @@ public final class ApiConstants {
     public static final String CURRENT_USER_ACCESS_ROLE="/current_user/access_role";
     public static final String TIME_SLOT_URL="/time_slot/{timeSlotId}";
     public static final String CURRENT_TIME_SLOTS="/current/time_slots";
+    public static final String GET_CTA_BY_UNIT_POSITION_ID="/getCTAbyUnitPosition/{unitPositionId}";
 }

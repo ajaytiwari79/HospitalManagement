@@ -9,6 +9,7 @@ import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -389,13 +390,19 @@ public class GenericIntegrationService {
     }
 
     //TimeSlotRestClient
-    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
+    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long timeSlotId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, TIME_SLOT_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
         }, timeSlotId);
     }
 
-    public List<TimeSlotWrapper> getCurrentTimeSlot(Long unitId) {
-     return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_TIME_SLOTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotWrapper>>>() {
-     });
+    public List<TimeSlotWrapper> getCurrentTimeSlot() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_TIME_SLOTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotWrapper>>>() {
+        });
+    }
+
+    //TimeBankRestClient
+    public UnitPositionWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CTA_BY_UNIT_POSITION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>>() {
+        },unitPositionId);
     }
 }
