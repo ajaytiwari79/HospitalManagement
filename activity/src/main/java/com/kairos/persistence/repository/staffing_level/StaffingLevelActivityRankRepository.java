@@ -14,5 +14,5 @@ public interface StaffingLevelActivityRankRepository extends MongoBaseRepository
 
    List<StaffingLevelActivityRank> findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse();
 
-   int findByStaffingLevelDateAndActivityId(LocalDate staffingLevelDate,BigInteger activityId);
+   Integer findByStaffingLevelDateAndActivityId(LocalDate staffingLevelDate,BigInteger activityId);
 }
