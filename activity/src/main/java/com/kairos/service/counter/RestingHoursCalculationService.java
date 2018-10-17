@@ -104,17 +104,14 @@ public class RestingHoursCalculationService implements CounterService{
     }
 
     @Override
-    public Future<RawRepresentationData> getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
+    public RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterCriteria);
-        new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
-        return null;
+        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
     }
 
     @Override
-    public Future<RawRepresentationData> getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
+    public RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterCriteriaDTO);
-        new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
-        Future<RawRepresentationData> data;
-        return null;
+        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
     }
 }

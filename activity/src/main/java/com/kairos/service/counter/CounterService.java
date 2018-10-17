@@ -38,7 +38,7 @@ public interface CounterService {
     }
 
     //map -> { data: [ {} ] }
-    Future<RawRepresentationData> getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi);
+    RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi);
 
-    Future<RawRepresentationData> getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi);
+    RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi);
 }

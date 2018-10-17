@@ -6,7 +6,9 @@ package com.kairos.service.counter;
  */
 
 import com.kairos.counter.CounterServiceMapping;
+import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -14,7 +16,6 @@ import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.TaskDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.chart.PieChart;
@@ -37,8 +38,12 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -58,6 +63,8 @@ public class CounterDataService {
     CounterRepository counterRepository;
     @Inject
     CounterServiceMapping counterServiceMapping;
+    @Inject
+    ExecutorService executorService;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
@@ -322,10 +329,28 @@ public class CounterDataService {
     }
 
     public void generateCounterData(FilterCriteriaDTO filters){
-        List<KPI> kpis = counterRepository.getKPIsByIds(filters.getCounterIds());
-        for(KPI kpi : kpis){
-            counterServiceMapping.getService(kpi.getType()).getCalculatedKPI(filters, kpi);
+        List<BigInteger> kpiIds = filters.getDataRequestList().stream().map(requestData -> requestData.getCounterId()).collect(toList());
+        List<KPI> kpis = counterRepository.getKPIsByIds(kpiIds);
+        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
+        List<Future<RawRepresentationData>> kpiResults = new ArrayList<>();
+        List<Future<RawRepresentationData>> counterResults = new ArrayList<>();
+        for(BasicRequirementDTO dataRequest : filters.getDataRequestList()){
+            if(dataRequest.isKpiDataRequired()) {
+                Callable<RawRepresentationData> data = () ->{
+                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedKPI(filters, kpiMap.get(dataRequest.getCounterId()));
+                };
+                Future<RawRepresentationData> responseData = executorService.submit(data);
+                kpiResults.add(responseData);
+            }
+            if(dataRequest.isCounterDataRequired()){
+                Callable<RawRepresentationData> data = () ->{
+                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedCounter(filters, kpiMap.get(dataRequest.getCounterId()));
+                };
+                Future<RawRepresentationData> responseData = executorService.submit(data);
+                counterResults.add(responseData);
+            }
         }
+
     }
 
 
