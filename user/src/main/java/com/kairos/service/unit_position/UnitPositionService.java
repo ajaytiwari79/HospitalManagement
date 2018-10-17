@@ -759,6 +759,20 @@ public class UnitPositionService {
         UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
+        unitPositionDetails.setStartDate(unitPosition.getStartDate());
+        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
+        unitPositionDetails.setEndDate(unitPosition.getEndDate());
+        unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
+        unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
+        unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
+        unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
+        unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
+    }
+    public void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
+        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
+        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
+        unitPositionDetails.setId(unitPosition.getId());
 
         unitPositionDetails.setStartDate(unitPosition.getStartDate());
         unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
@@ -1016,9 +1030,15 @@ public class UnitPositionService {
         return localDateAndFunctionIdMap;
     }
 
-    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
-        List<StaffUnitPositionDetails> staffData = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
-        return staffData;
+    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
+List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetails = new ArrayList<>();
+       staffData.forEach(currentData->{
+           com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+           convertUnitPositionObject(currentData,unitPositionDetail);
+       });
+
+        return unitPositionDetails;
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
