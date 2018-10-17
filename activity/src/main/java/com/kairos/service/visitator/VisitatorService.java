@@ -128,7 +128,7 @@ public class VisitatorService{
         }*/
 
         List<Long> citizenIds = taskDemandIdList.stream().map(demand -> demand.getCitizenId()).collect(Collectors.toList());
-        clientList = clientRestClient.getCitizensByIdsInList(citizenIds);
+        clientList = genericIntegrationService.getCitizensByIdsInList(citizenIds);
 
         return clientList;
     }
@@ -248,7 +248,7 @@ public class VisitatorService{
 
     public Map<String, Object> createTaskDemand( long unitId, long clientId, TaskDemandDTO taskDemandDTO) {
         logger.info("taskDemand to create  " + taskDemandDTO);
-        ClientStaffInfoDTO  clientStaffInfoDTO=clientRestClient.getClientStaffInfo(clientId);
+        ClientStaffInfoDTO  clientStaffInfoDTO=genericIntegrationService.getClientStaffInfo(clientId);
 
         if (clientStaffInfoDTO.getClientId() == null) {
             logger.info("No Citizen Found with Id " + clientId);
@@ -591,7 +591,7 @@ public class VisitatorService{
         taskDemandMap.put("recurrencePattern", taskDemand.getRecurrencePattern());
         //taskDemandMap.put("citizenHouseholds", clientService.getPeopleInHousehold(taskDemand.getCitizenId()));
         if(Optional.ofNullable(taskDemand.getLastModifiedByStaffId()).isPresent() && taskDemand.getLastModifiedByStaffId() != 0){
-            Map<String, Object> staffAndCitizenHouseholds = clientRestClient.getStaffAndCitizenHouseholds(taskDemand.getCitizenId(),taskDemand.getLastModifiedByStaffId());
+            Map<String, Object> staffAndCitizenHouseholds = genericIntegrationService.getStaffAndCitizenHouseholds(taskDemand.getCitizenId(),taskDemand.getLastModifiedByStaffId());
             logger.info("staffAndCitizenHouseholds "+staffAndCitizenHouseholds);
             taskDemandMap.put("lastModifiedBy", staffAndCitizenHouseholds.get("lastModifiedBy"));
             taskDemandMap.put("citizenHouseholds", staffAndCitizenHouseholds.get("citizenHouseholds"));
@@ -617,7 +617,7 @@ public class VisitatorService{
             }
 
         //used rest template to get citizen details from user micro service
-        Map<String,Object> citizenDetails=clientRestClient.getClientDetails(citizenId);
+        Map<String,Object> citizenDetails=genericIntegrationService.getClientDetails(citizenId);
 
        /* Client citizen = clientGraphRepository.findById(citizenId);
 

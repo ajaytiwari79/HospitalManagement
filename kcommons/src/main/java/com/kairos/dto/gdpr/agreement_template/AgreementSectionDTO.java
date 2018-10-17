@@ -1,12 +1,12 @@
-package com.kairos.dto.gdpr.master_data;
+package com.kairos.dto.gdpr.agreement_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

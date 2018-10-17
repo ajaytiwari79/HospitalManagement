@@ -100,7 +100,7 @@ public class TasksMergingService extends MongoBaseService {
         List<Task> taskList = new ArrayList<>();
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        TaskDemandVisitWrapper taskDemandVisitWrapper=clientRestClient.
+        TaskDemandVisitWrapper taskDemandVisitWrapper=genericIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId,unitId);
 
         Map<String, String> flsCredentials = taskDemandVisitWrapper.getFlsCredentials();
