@@ -500,7 +500,7 @@ public class ShiftService extends MongoBaseService {
         // Validating Shift to eligibility
 
         //List<Activity> allActivities = activityRepository.findAllActivitiesByIds(allActivitiesIds);
-        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(allActivitiesIds));
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(shiftDTO.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v->v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()));
