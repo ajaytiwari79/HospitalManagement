@@ -80,7 +80,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return id(c)")
     Long  getCountryOfUser(Long userId);
 
-    @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage)")
+    @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage) LIMIT 1")
     Long getUserSelectedLanguageId(Long userId);
 
 
