@@ -4,6 +4,7 @@ package com.kairos.persistence.repository.user.unit_position;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
@@ -42,10 +43,11 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
             " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
             "match (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "return staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
+            "with expertise,staff,unit,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
+            "return id(staff) as staffId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
             "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyWages:positionLine.hourlyWages,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
-            ",id(unitPosition) as id,unitPosition.startDate as startDate")
+            "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
 
