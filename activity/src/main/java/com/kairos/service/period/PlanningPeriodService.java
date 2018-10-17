@@ -7,6 +7,7 @@ import com.kairos.dto.activity.period.PeriodPhaseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
@@ -18,10 +19,14 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevelState;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
+import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
+import com.kairos.persistence.repository.staffing_level.StaffingLevelStateMongoRepository;
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -73,7 +78,10 @@ public class PlanningPeriodService extends MongoBaseService {
     private GenericRestClient genericRestClient;
     @Inject
     private SchedulerServiceRestClient schedulerRestClient;
-
+    @Inject
+    private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    @Inject
+    private StaffingLevelStateMongoRepository staffingLevelStateMongoRepository;
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
         List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
@@ -480,6 +488,7 @@ public class PlanningPeriodService extends MongoBaseService {
         Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
         List<PhaseDTO> toBeNextPhase = phaseMongoRepository.getNextApplicablePhasesOfUnitBySequence(unitId, initialNextPhase.getSequence());
         List<Shift> shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(periodId,unitId);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()));
         planningPeriod.setCurrentPhaseId(initialNextPhase.getId());
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
         PeriodPhaseFlippingDate periodPhaseFlippingDate=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
@@ -488,6 +497,7 @@ public class PlanningPeriodService extends MongoBaseService {
         periodPhaseFlippingDate.setFlippingDate(DateUtils.getCurrentLocalDate());
         periodPhaseFlippingDate.setFlippingTime(DateUtils.getCurrentLocalTime());
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
+        createStaffingLevelState(staffingLevels,planningPeriod.getCurrentPhaseId(),planningPeriod.getId());
         save(planningPeriod);
         schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
@@ -537,6 +547,20 @@ public class PlanningPeriodService extends MongoBaseService {
             save(shiftStates);
     }
 
+    public void createStaffingLevelState(List<StaffingLevel> staffingLevels,BigInteger currentPhaseId,BigInteger planningPeriodId){
+        if(!staffingLevels.isEmpty()){
+            List<StaffingLevelState> staffingLevelStates=new ArrayList<>();
+            staffingLevels.stream().forEach(staffingLevel  ->{
+                StaffingLevelState staffingLevelState = ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,StaffingLevelState.class);
+                staffingLevelState.setStaffingLevelId(staffingLevel.getId());
+                staffingLevelState.setStaffingLevelStatePhaseId(currentPhaseId);
+                staffingLevelState.setPlanningPeriodId(planningPeriodId);
+                staffingLevelState.setId(null);
+                staffingLevelStates.add(staffingLevelState);
+            } );
+            staffingLevelStateMongoRepository.saveEntities(staffingLevelStates);
+        }
+    }
     /**
      * for restore shift initial data
      */
@@ -546,7 +570,10 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
+        List<StaffingLevelState> staffingLevelStates=staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()));
         restoreShifts(shiftStates);
+        restoreAvailabilityCount(staffingLevels,staffingLevelStates);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
@@ -570,5 +597,24 @@ public class PlanningPeriodService extends MongoBaseService {
         save(shifts);
     }
 
-
+    public void restoreAvailabilityCount(List<StaffingLevel> staffingLevels, List<StaffingLevelState> staffingLevelStates) {
+        if (!staffingLevels.isEmpty() && !staffingLevelStates.isEmpty()) {
+        Map<Date,StaffingLevelState> dateStaffingLevelStateMap=staffingLevelStates.stream().collect(Collectors.toMap(k->k.getCurrentDate(),v->v));
+            staffingLevels.forEach(staffingLevel -> {
+                if(dateStaffingLevelStateMap.get(staffingLevel.getCurrentDate())!=null){
+                  Map<Integer,StaffingLevelInterval> staffingLevelIntervalMap=dateStaffingLevelStateMap.get(staffingLevel.getCurrentDate()).getPresenceStaffingLevelInterval().stream().collect(Collectors.toMap(k->k.getSequence(),v->v));
+                    staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+                            if(staffingLevelIntervalMap.get(staffingLevelInterval.getSequence())!=null){
+                                staffingLevelInterval.setAvailableNoOfStaff(staffingLevelIntervalMap.get(staffingLevelInterval.getSequence()).getAvailableNoOfStaff());
+                            }
+                    });
+                }else{
+                    staffingLevel.getAbsenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+                            staffingLevelInterval.setAvailableNoOfStaff(0);
+                    });
+                }
+            });
+            staffingLevelMongoRepository.saveEntities(staffingLevels);
+        }
+    }
 }
