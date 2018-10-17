@@ -614,7 +614,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     });
                 }
             });
-            staffingLevelMongoRepository.saveAll(staffingLevels);
+            staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
     }
 }
