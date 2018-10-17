@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +24,9 @@ public class SkillCategory extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     Country country;
 
-    @NotEmpty(message = "error.SkillCategory.name.notEmpty") @NotNull(message = "error.SkillCategory.name.notnull")
+    @NotBlank(message = "error.SkillCategory.name.notEmpty")
     private String name;
 
-    //@NotEmpty(message = "error.SkillCategory.description.notEmpty") @NotNull(message = "error.SkillCategory.description.notnull")
     private String description;
 
 

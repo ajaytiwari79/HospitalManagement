@@ -40,7 +40,7 @@ public class ReasonCodeService {
             exceptionService.duplicateDataException("message.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
 
         }
-        ReasonCode reasonCode=new ReasonCode(reasonCodeDTO.getName().trim(),reasonCodeDTO.getCode(),reasonCodeDTO.getDescription(),reasonCodeDTO.getReasonCodeType(),country);
+        ReasonCode reasonCode=new ReasonCode(reasonCodeDTO.getName(),reasonCodeDTO.getCode(),reasonCodeDTO.getDescription(),reasonCodeDTO.getReasonCodeType(),country);
         reasonCodeGraphRepository.save(reasonCode);
 
         return new ReasonCodeDTO(reasonCode.getId(),reasonCode.getName(),reasonCode.getCode(),reasonCode.getDescription(),reasonCode.getReasonCodeType());
@@ -56,7 +56,7 @@ public class ReasonCodeService {
     }
 
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
-        boolean isNameAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,reasonCodeDTO.getId(),"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
+        boolean isNameAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,reasonCodeDTO.getId(),"(?i)"+reasonCodeDTO.getName(),reasonCodeDTO.getReasonCodeType());
         if(isNameAlreadyExists){
             exceptionService.duplicateDataException("message.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
 
@@ -66,7 +66,7 @@ public class ReasonCodeService {
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound",reasonCodeDTO.getId());
 
         }
-        reasonCode.setName(reasonCodeDTO.getName().trim());
+        reasonCode.setName(reasonCodeDTO.getName());
         reasonCode.setCode(reasonCodeDTO.getCode());
         reasonCode.setDescription(reasonCodeDTO.getDescription());
         reasonCodeGraphRepository.save(reasonCode);

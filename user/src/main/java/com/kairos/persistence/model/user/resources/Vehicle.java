@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.country.feature.Feature;
+import org.apache.commons.lang.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -18,11 +20,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Vehicle extends UserBaseEntity {
-    @NotNull(message = "error.name.notnull")
+    @NotBlank(message = "error.name.notnull")
     private String name;
-    //@NotNull(message = "error.description.notnull")
     private String description;
-    @NotNull(message = "error.Resource.icon.notnull")
+    @NotBlank(message = "error.Resource.icon.notnull")
     private String icon;
     private boolean enabled = true;
 
@@ -34,7 +35,7 @@ public class Vehicle extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getDescription() {
@@ -42,7 +43,7 @@ public class Vehicle extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public boolean isEnabled() {
@@ -58,7 +59,7 @@ public class Vehicle extends UserBaseEntity {
     }
 
     public void setIcon(String icon) {
-        this.icon = icon;
+        this.icon = StringUtils.trim(icon);
     }
 
     public List<Feature> getFeatures() {

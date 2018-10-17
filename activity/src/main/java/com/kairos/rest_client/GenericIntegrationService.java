@@ -16,6 +16,8 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.staff.ClientStaffInfoDTO;
+import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -37,6 +39,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -277,7 +280,7 @@ public class GenericIntegrationService {
 
     public CountryDTO getCountryById(long countryId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, COUNTRY_COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
-        },countryId);
+        }, countryId);
     }
 
     public boolean isCountryExists(long countryId) {
@@ -293,20 +296,93 @@ public class GenericIntegrationService {
 
     public Map<String, String> getFLS_Credentials(Long citizenUnitId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, String>>>() {
-        },citizenUnitId);
+        }, citizenUnitId);
     }
 
     //OrganizationServiceRestClient
-    public Map<String, Object> getOrganizationServices(Long unitId, String organizationType){
+    public Map<String, Object> getOrganizationServices(Long unitId, String organizationType) {
         BasicNameValuePair basicNameValuePair = new BasicNameValuePair("type", organizationType);
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SERVICE_DATA,Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SERVICE_DATA, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
         });
     }
 
     //SkillRestClient
-    public List<Map<String,Object>> getSkillsOfOrganization(Long unitId) {
-      return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
-      });
+    public List<Map<String, Object>> getSkillsOfOrganization(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
+        });
+    }
+
+    //StaffRestClient
+    public Map<String, Object> getTeamStaffAndStaffSkill(List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, null, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_AND_SKILL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+        });
+    }
+
+    public StaffDTO getStaff(Long staffId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
+        }, staffId);
+    }
+
+    public List<UnitStaffResponseDTO> getUnitWiseStaffList() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_UNIT_WISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitStaffResponseDTO>>>() {
+        });
+    }
+
+    //Previously this API didn't match with any API on user micro-service (corrected)
+    public Map<Long, Long> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, UNIT_POSITION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, Long>>>() {
+        });
+    }
+
+    public ClientStaffInfoDTO getStaffInfo() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_GET_STAFF_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ClientStaffInfoDTO>>() {
+        });
+    }
+
+    public List<com.kairos.dto.user.staff.staff.StaffDTO> getStaffListByUnit() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_GET_STAFF_BY_UNIT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.dto.user.staff.staff.StaffDTO>>>() {
+        });
+    }
+
+    //Previously this API didn't match with any API on user micro-service (corrected)
+    public List<Long> getUnitManagerIds(Long unitId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, UNIT_MANAGER_IDS_UNIT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {
+        }, unitId);
+    }
+
+    public List<Long> getCountryAdminsIds(Long countryAdminsOfUnitId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, COUNTRY_ADMINS_IDS_OF_UNIT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {
+        }, countryAdminsOfUnitId);
+    }
+
+    //On user micro-service query Param is not applicable
+    public StaffUnitPositionDetails verifyUnitEmploymentOfStaff(Long staffId, Long unitId, String type) {
+        BasicNameValuePair basicNameValuePair = new BasicNameValuePair("type", type);
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID, Arrays.asList(basicNameValuePair), new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>>() {
+        }, staffId);
+    }
+
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("type", type));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate.toString()));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, staffId, unitEmploymentId);
+    }
+
+    public StaffDTO getStaffByUser(Long userId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
+        }, userId);
+    }
+
+    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId,List<Long> expertiesIdList) {
+        return genericRestClient.publishRequest(expertiesIdList, unitId, RestClientUrlType.UNIT, HttpMethod.POST,STAFF_GET_STAFF_BY_EXPERTISES ,null , new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+        });
+    }
+
+    public UserAccessRoleDTO getAccessOfCurrentLoggedInStaff() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_USER_ACCESS_ROLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
+        });
     }
     //shift service
     public List<StaffAdditionalInfoDTO> getStaffAditionalDTOS(Long unitId,List<NameValuePair> requestParam) {
