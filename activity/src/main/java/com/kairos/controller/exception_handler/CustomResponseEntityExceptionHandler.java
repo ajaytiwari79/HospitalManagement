@@ -1,5 +1,6 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.custom_exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -48,6 +50,20 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		super();
 	}
 
+	@Inject
+	private LocaleService localeService;
+
+	private String convertMessage(String message, Object... params) {
+		for (int i = 0; i < params.length; i++) {
+			try {
+				params[i] = localeService.getMessage(params[i].toString());
+			} catch (Exception e) {
+				// intentionally left empty
+			}
+		}
+		return localeService.getMessage(message, params);
+	}
+
 	@Override
 	public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 		logger.error("exception in activity service",ex);
@@ -56,11 +72,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
 		//  String error;
 		for (FieldError fieldError : fieldErrors) {
-			FieldErrorDTO error=new FieldErrorDTO(fieldError.getField(),fieldError.getDefaultMessage());
+			FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
 			errors.add(error);
 		}
 		for (ObjectError objectError : globalErrors) {
-			FieldErrorDTO error=new FieldErrorDTO(objectError.getObjectName(),objectError.getDefaultMessage());
+			FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
 			errors.add(error);
 		}
 

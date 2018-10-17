@@ -3,10 +3,12 @@ package com.kairos.persistence.model.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,25 +24,19 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class KairosStatus extends UserBaseEntity {
 
-    @NotEmpty(message = "error.KairosStatus.name.notEmpty") @NotNull(message = "error.KairosStatus.name.notnull")
+    @NotBlank(message = "error.KairosStatus.name.notEmpty")
     private String name;
-
-    //@NotEmpty(message = "error.KairosStatus.description.notEmpty") @NotNull(message = "error.KairosStatus.description.notnull")
     private String description;
-
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     private boolean isEnabled = true;
-
 
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public String getName() {
@@ -48,7 +44,7 @@ public class KairosStatus extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
 

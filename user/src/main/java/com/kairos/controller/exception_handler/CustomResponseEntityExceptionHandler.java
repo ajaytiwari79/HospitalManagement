@@ -50,6 +50,16 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @Autowired
     private LocaleService localeService;
 
+    private String convertMessage(String message, Object... params) {
+        for (int i = 0; i < params.length; i++) {
+            try {
+                params[i] = localeService.getMessage(params[i].toString());
+            } catch (Exception e) {
+                // intentionally left empty
+            }
+        }
+        return localeService.getMessage(message, params);
+    }
     public CustomResponseEntityExceptionHandler() {
         super();
     }
@@ -62,11 +72,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
         //  String error;
         for (FieldError fieldError : fieldErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), fieldError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
             errors.add(error);
         }
         for (ObjectError objectError : globalErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), objectError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
             errors.add(error);
         }
 

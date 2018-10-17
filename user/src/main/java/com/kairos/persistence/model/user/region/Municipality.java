@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,16 +20,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PROVI
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Municipality extends UserBaseEntity {
-    @NotEmpty(message = "error.Municipality.name.notEmpty")
-    @NotNull(message = "error.Municipality.name.notnull")
+    @NotBlank(message = "error.Municipality.name.notEmpty")
     private String name;
 
-    @NotEmpty(message = "error.Municipality.geoFence.notEmpty")
-    @NotNull(message = "error.Municipality.geoFence.notnull")
+    @NotBlank(message = "error.Municipality.geoFence.notEmpty")
     private String geoFence;
 
-    @NotEmpty(message = "error.Municipality.code.notEmpty")
-    @NotNull(message = "error.Municipality.code.notnull")
+    @NotBlank(message = "error.Municipality.code.notEmpty")
     private String code;
 
     private float latitude;

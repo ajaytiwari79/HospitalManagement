@@ -2,10 +2,12 @@ package com.kairos.persistence.model.user.language;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,18 +20,14 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class Language extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Language.name.notEmpty") @NotNull(message = "error.Language.name.notnull")
+    @NotBlank(message = "error.Language.name.notEmpty")
     private String name;
-
-
-    //@NotEmpty(message = "error.Language.description.notEmpty") @NotNull(message = "error.Language.description.notnull")
     private String description;
-
     @Relationship(type =  BELONGS_TO)
     private Country country;
 
     public Language(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     private boolean inactive;
@@ -68,7 +66,7 @@ public class Language extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public boolean isInactive() {
@@ -98,7 +96,7 @@ public class Language extends UserBaseEntity {
     public Language(){}
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getName() {
