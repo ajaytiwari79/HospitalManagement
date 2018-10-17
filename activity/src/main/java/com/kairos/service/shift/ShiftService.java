@@ -37,6 +37,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
@@ -1329,14 +1330,13 @@ public class ShiftService extends MongoBaseService {
             List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shiftActivities.get(0).getStartDate(), shiftActivities.get(0).getEndDate(), unitId);
             Activity existing = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(0).getActivityId())).findFirst().get().getActivity();
             Activity arrived = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(1).getActivityId())).findFirst().get().getActivity();
-            Integer rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
-            Integer rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
+            StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
+            StaffingLevelActivityRank rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
             String staffingLevelForExistingActivity = getStaffingLevel(existing, staffingLevels, shifts);
             String staffingLevelForReplacedActivity = getStaffingLevel(arrived, staffingLevels, shifts);
             if (rankOfExisting != null && rankOfReplaced != null) {
-                if ((rankOfExisting < rankOfReplaced && staffingLevelForExistingActivity.equals(UNDERSTAFFING) && staffingLevelForReplacedActivity.equals(UNDERSTAFFING) ||
-                        rankOfExisting > rankOfReplaced && staffingLevelForReplacedActivity.equals(UNDERSTAFFING))) {
-                } else {
+                if (!(rankOfExisting.getRank() < rankOfReplaced.getRank() && staffingLevelForExistingActivity.equals(UNDERSTAFFING) && staffingLevelForReplacedActivity.equals(UNDERSTAFFING) ||
+                        rankOfExisting.getRank() > rankOfReplaced.getRank() && staffingLevelForReplacedActivity.equals(UNDERSTAFFING))) {
                     exceptionService.actionNotPermittedException("can't move the shift due to", staffingLevelForReplacedActivity);
                 }
             }
@@ -1346,7 +1346,7 @@ public class ShiftService extends MongoBaseService {
     private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts) {
         String staffing = null;
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
-            outer:
+
             for (StaffingLevel staffingLevel : staffingLevels) {
                 List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
                         activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
@@ -1364,10 +1364,10 @@ public class ShiftService extends MongoBaseService {
                         }
                         if (shiftsCount >= staffingLevelActivity.get().getMaxNoOfStaff()) {
                             staffing = OVERSTAFFING;
-                            break outer;
-                        } else if (shiftsCount <= staffingLevelActivity.get().getMaxNoOfStaff()) {
+                            break;
+                        } else if (shiftsCount <= staffingLevelActivity.get().getMinNoOfStaff()) {
                             staffing = UNDERSTAFFING;
-                            break outer;
+                            break;
                         } else {
                             staffing = BALANCED;
                         }

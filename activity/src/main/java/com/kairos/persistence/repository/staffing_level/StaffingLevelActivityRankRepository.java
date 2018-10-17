@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface StaffingLevelActivityRankRepository extends MongoBaseRepository<StaffingLevelActivityRank,BigInteger> {
 
-   List<StaffingLevelActivityRank> findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse();
+   List<StaffingLevelActivityRank> findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse(BigInteger staffingLevelId,LocalDate localDate);
 
-   Integer findByStaffingLevelDateAndActivityId(LocalDate staffingLevelDate,BigInteger activityId);
+   StaffingLevelActivityRank findByStaffingLevelDateAndActivityId(LocalDate staffingLevelDate,BigInteger activityId);
 }
