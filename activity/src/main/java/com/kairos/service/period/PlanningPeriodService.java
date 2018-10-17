@@ -558,7 +558,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 staffingLevelState.setId(null);
                 staffingLevelStates.add(staffingLevelState);
             } );
-            staffingLevelStateMongoRepository.saveAll(staffingLevelStates);
+            staffingLevelStateMongoRepository.saveEntities(staffingLevelStates);
         }
     }
     /**
