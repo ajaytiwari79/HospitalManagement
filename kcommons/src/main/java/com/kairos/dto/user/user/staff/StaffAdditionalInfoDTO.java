@@ -161,11 +161,11 @@ public class StaffAdditionalInfoDTO {
 
     public Set<AccessGroupRole> getRoles() {
         Set<AccessGroupRole> roles = new HashSet<>();
-        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getManagement()) {
+        if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
             roles.add(AccessGroupRole.MANAGEMENT);
-            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
-                roles.add(AccessGroupRole.STAFF);
-            }
+        }
+        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+            roles.add(AccessGroupRole.STAFF);
         }
         return roles;
     }

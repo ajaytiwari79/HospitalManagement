@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Document(collection = "processing_activity")
+@Document
 public class ProcessingActivity extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")

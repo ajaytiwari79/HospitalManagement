@@ -73,7 +73,6 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
     public List<BigInteger> createAndUpdateQuestionnaireSectionsAndQuestions(Long referenceId, boolean isReferenceIdUnitId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
 
-        List<BigInteger> existingSectionIdList = new ArrayList<>();
         Map<BigInteger, QuestionnaireSectionDTO> questionnaireSectionIdDTOMap = new HashMap<>();
         Map<QuestionnaireSection, List<QuestionDTO>> questionDTOListCoresspondingToSection = new HashMap<>();
         List<QuestionnaireSection> globalQuestionnaireSections = new ArrayList<>();
@@ -82,7 +81,6 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
         for (QuestionnaireSectionDTO questionnaireSectionDTO : questionnaireSectionDTOS) {
             if (Optional.ofNullable(questionnaireSectionDTO.getId()).isPresent()) {
-                existingSectionIdList.add(questionnaireSectionDTO.getId());
                 questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
             } else {
                 QuestionnaireSection questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO, referenceId, isReferenceIdUnitId);
@@ -92,8 +90,8 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 }
             }
         }
-        if (CollectionUtils.isNotEmpty(existingSectionIdList)) {
-            List<QuestionnaireSection> previousQuestionnaireSections = isReferenceIdUnitId ? questionnaireSectionRepository.findSectionByUnitIdAndIds(referenceId, existingSectionIdList) : questionnaireSectionRepository.findSectionByCountryIdAndIds(referenceId, existingSectionIdList);
+        if (CollectionUtils.isNotEmpty(questionnaireSectionIdDTOMap.keySet())) {
+            List<QuestionnaireSection> previousQuestionnaireSections = isReferenceIdUnitId ? questionnaireSectionRepository.findSectionByUnitIdAndIds(referenceId, questionnaireSectionIdDTOMap.keySet()) : questionnaireSectionRepository.findSectionByCountryIdAndIds(referenceId, questionnaireSectionIdDTOMap.keySet());
             previousQuestionnaireSections.forEach(questionnaireSection -> {
                 QuestionnaireSectionDTO questionnaireSectionDTO = questionnaireSectionIdDTOMap.get(questionnaireSection.getId());
                 questionnaireSection.setTitle(questionnaireSectionDTO.getTitle());

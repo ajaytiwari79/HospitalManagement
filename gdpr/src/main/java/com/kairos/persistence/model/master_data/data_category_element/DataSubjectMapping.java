@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
-@Document(collection = "data_subject_mapping")
+@Document
 public class DataSubjectMapping extends MongoBaseEntity {
 
 

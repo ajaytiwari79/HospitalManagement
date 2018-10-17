@@ -61,7 +61,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("asset", "assetId", "_id", "asset"),
-                lookup("processing_activity", "processingActivityId", "_id", "processingActivity"),
+                lookup("processingActivity", "processingActivityId", "_id", "processingActivity"),
                 new CustomAggregationOperation(Document.parse(projectionOpertaion))
 
         );

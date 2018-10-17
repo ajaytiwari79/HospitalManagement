@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
-@Document(collection = "asset")
+@Document
 public class Asset extends MongoBaseEntity {
 
     @NotBlank(message = "Name can 't be empty")
