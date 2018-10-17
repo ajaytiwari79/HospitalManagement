@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document(collection = "hosting_type")
+@Document
 public class HostingType extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")

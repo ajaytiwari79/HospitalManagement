@@ -31,8 +31,8 @@ public class RiskMongoRepositoryImpl implements CustomRiskRepository {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("processing_activity", "processingActivity", "_id", "processingActivity")
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("processingActivity", "processingActivity", "_id", "processingActivity")
                 , sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(Document.parse(projectionOperationForRisk))
 
