@@ -155,6 +155,9 @@ public class TimeBankService extends MongoBaseService {
      */
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId,Date startDate,Date endDate) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
+        if (!Optional.ofNullable(unitPositionWithCtaDetailsDTO).isPresent()){
+            exceptionService.dataNotFoundException("message.staffUnitPosition.notFound");
+        }
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdBetweenDate(unitPositionId,startDate,endDate);
         List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
         ruleTemplates = ruleTemplates.stream().filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO ::getName)).collect(Collectors.toList());

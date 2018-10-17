@@ -86,6 +86,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1182,14 +1183,17 @@ public class UnitPositionService {
 
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
-        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        unitPositionDetails.setCountryId(countryId);
-        convertUnitPositionObject(unitPosition, unitPositionDetails);
-        unitPositionDetails.setCountryId(countryId);
-        unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails=null;
+        if (Optional.ofNullable(unitPosition).isPresent()) {
+            Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+            Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
+            unitPositionDetails= new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+            unitPositionDetails.setCountryId(countryId);
+            convertUnitPositionObject(unitPosition, unitPositionDetails);
+            unitPositionDetails.setCountryId(countryId);
+            unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+        }
         return unitPositionDetails;
 
     }
