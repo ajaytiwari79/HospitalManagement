@@ -40,6 +40,7 @@ public class KafkaProducer {
             throw new Exception("Unable to register scheduled job, Please try again.");
         } catch (ExecutionException e) {
             logger.error(e.getMessage());
+            throw new Exception("Unable to register scheduled job, Please try again.");
         }
     }
 
