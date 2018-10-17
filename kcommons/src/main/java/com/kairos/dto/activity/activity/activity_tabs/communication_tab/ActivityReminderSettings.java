@@ -3,6 +3,7 @@ package com.kairos.dto.activity.activity.activity_tabs.communication_tab;
 import com.kairos.enums.DurationType;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Comparator;
 
 /**
@@ -10,12 +11,21 @@ import java.util.Comparator;
  **/
 public class ActivityReminderSettings implements Serializable,Comparator<ActivityReminderSettings> {
     private byte sequence;
+    private BigInteger id;
     private FrequencySettings sendReminder; // this is used for settings before days and value settings
     private boolean repeatAllowed;
     private FrequencySettings repeatReminder;
 
     public ActivityReminderSettings() {
         // DC
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public byte getSequence() {

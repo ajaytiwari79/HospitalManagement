@@ -77,7 +77,7 @@ public class ShiftReminderService extends MongoBaseService {
                 }
             }
         });
-        // MIGHT WE DONT NEED
+        // TODO FUTURE REMOVE VIPUL MIGHT WE DONT NEED
         List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(scheduledJobs, shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
         save(shift);

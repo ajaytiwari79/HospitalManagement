@@ -32,6 +32,7 @@ import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
+import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
@@ -144,6 +145,7 @@ public class ActivityService extends MongoBaseService {
     private CounterRepository counterRepository;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject private MongoSequenceRepository mongoSequenceRepository;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -581,7 +583,7 @@ public class ActivityService extends MongoBaseService {
         NotesActivityTab notesActivityTab = new NotesActivityTab();
         ObjectMapperUtils.copyProperties(notesActivityDTO, notesActivityTab);
 
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(notesActivityDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(notesActivityDTO.getActivityId());
         if (Optional.ofNullable(activity.getNotesActivityTab().getModifiedDocumentName()).isPresent()) {
             notesActivityTab.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
         }
@@ -606,7 +608,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab();
         validateReminderSettings(communicationActivityDTO);
         ObjectMapperUtils.copyProperties(communicationActivityDTO, communicationActivityTab);
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(communicationActivityDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(communicationActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", communicationActivityDTO.getActivityId());
         }
@@ -627,7 +629,7 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO) {
 
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(bonusActivityDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(bonusActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", bonusActivityDTO.getActivityId());
         }
@@ -649,7 +651,7 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updatePermissionsTabOfActivity(PermissionsActivityTabDTO permissionsActivityTabDTO) {
         PermissionsActivityTab permissionsActivityTab = new PermissionsActivityTab(permissionsActivityTabDTO.isEligibleForCopy());
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(permissionsActivityTabDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(permissionsActivityTabDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", permissionsActivityTabDTO.getActivityId());
         }
@@ -668,7 +670,7 @@ public class ActivityService extends MongoBaseService {
 
     // skills
     public ActivityTabsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO) {
-        Activity activity = activityMongoRepository.findOne(new BigInteger(skillActivityDTO.getActivityId().toString()));
+        Activity activity = activityMongoRepository.findOne(skillActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", skillActivityDTO.getActivityId());
         }
@@ -1197,19 +1199,14 @@ public class ActivityService extends MongoBaseService {
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {
-        Collections.sort(communicationActivityDTO.getActivityReminderSettings(), Comparator.comparing(ActivityReminderSettings::getSequence));
+        //Collections.sort(communicationActivityDTO.getActivityReminderSettings(), Comparator.comparing(ActivityReminderSettings::getSequence));
         int counter = 0;
         if (!communicationActivityDTO.getActivityReminderSettings().isEmpty()) {
-            byte lastSequence = communicationActivityDTO.getActivityReminderSettings().get(communicationActivityDTO.getActivityReminderSettings().size() - 1).getSequence();
+          //  byte lastSequence = communicationActivityDTO.getActivityReminderSettings().get(communicationActivityDTO.getActivityReminderSettings().size() - 1).getSequence();
             for (ActivityReminderSettings currentSettings : communicationActivityDTO.getActivityReminderSettings()) {
 
-                if (currentSettings.getSendReminder().getDurationType() == DurationType.HOURS
-                        && currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS) {
-                    exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
-                }
                 if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
-                        (currentSettings.getRepeatReminder().getDurationType() == DurationType.HOURS
-                                || currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS)) {
+                        (currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS)) {
                     exceptionService.actionNotPermittedException("repeat_value_cant_be", currentSettings.getRepeatReminder().getDurationType());
                 }
                 // if both are same ie days or minute and reminder value id greater than time value
@@ -1227,12 +1224,10 @@ public class ActivityService extends MongoBaseService {
                         validateWithPreviousFrequency(currentSettings, previousSettings.getSendReminder());
                     }
                 }
-                if (currentSettings.getSequence() == 0) {
-                    currentSettings.setSequence(++lastSequence);
+                if (currentSettings.getId()==null) {
+                    currentSettings.setId(mongoSequenceRepository.nextSequence(ActivityReminderSettings.class.getSimpleName()));
                 }
                 counter++;
-
-
             }
         }
         return true;
@@ -1254,8 +1249,7 @@ public class ActivityService extends MongoBaseService {
                     currentSettings.getSendReminder().getTimeValue(),currentSettings.getSendReminder().getDurationType(),frequencySettings.getTimeValue(),frequencySettings.getDurationType());
         }
         if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
-                (currentSettings.getSendReminder().getDurationType() == DurationType.HOURS
-                        || currentSettings.getSendReminder().getDurationType() == DurationType.DAYS)) {
+                (currentSettings.getSendReminder().getDurationType() == DurationType.DAYS)) {
             exceptionService.actionNotPermittedException("new_value_cant_be_greater_than_previous",
                     currentSettings.getSendReminder().getTimeValue(),currentSettings.getSendReminder().getDurationType(),frequencySettings.getTimeValue(),frequencySettings.getDurationType());
         }
