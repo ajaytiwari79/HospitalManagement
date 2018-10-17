@@ -76,7 +76,6 @@ import com.kairos.wrapper.PositionWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1205,14 +1204,17 @@ public class UnitPositionService {
 
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
-        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        unitPositionDetails.setCountryId(countryId);
-        convertUnitPositionObject(unitPosition, unitPositionDetails);
-        unitPositionDetails.setCountryId(countryId);
-        unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails=null;
+        if (Optional.ofNullable(unitPosition).isPresent()) {
+            Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+            Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
+            unitPositionDetails= new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+            unitPositionDetails.setCountryId(countryId);
+            convertUnitPositionObject(unitPosition, unitPositionDetails);
+            unitPositionDetails.setCountryId(countryId);
+            unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
+        }
         return unitPositionDetails;
 
     }

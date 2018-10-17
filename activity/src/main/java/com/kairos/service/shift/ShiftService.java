@@ -503,7 +503,7 @@ public class ShiftService extends MongoBaseService {
         // Validating Shift to eligibility
 
         //List<Activity> allActivities = activityRepository.findAllActivitiesByIds(allActivitiesIds);
-        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(allActivitiesIds));
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(shiftDTO.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         //activities.stream().collect(Collectors.toMap(k->k.getActivity().getId(),v->v.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()));
@@ -600,7 +600,7 @@ public class ShiftService extends MongoBaseService {
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
 
-    public void UpdateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, Long unitId){
+    public void UpdateShiftDailyTimeBankAndPaidOut(List<Shift> shifts,List<Shift> shiftsList, Long unitId){
         if (!Optional.ofNullable(shifts).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.ids");
         }
@@ -615,8 +615,13 @@ public class ShiftService extends MongoBaseService {
           List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
           Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         shifts.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
+        shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
         Date startDate=shifts.get(0).getStartDate();
         Date endDate=shifts.get(shifts.size()-1).getEndDate();
+        Date shiftStartDate=shiftsList.get(0).getStartDate();
+        Date shiftEndDate =shiftsList.get(shiftsList.size()-1).getEndDate();
+        startDate=startDate.before(shiftStartDate)?startDate:shiftStartDate;
+        endDate=endDate.after(shiftEndDate)?endDate:shiftEndDate;
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
         Map<Long,List<CTAResponseDTO>> unitPositionAndCTAResponseMap=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
         staffAdditionalInfoDTOS.stream().forEach(staffAdditionalInfoDTO -> {
@@ -627,7 +632,7 @@ public class ShiftService extends MongoBaseService {
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             }
         });
-        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, shifts,activityWrapperMap);
+        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, shifts,activityWrapperMap,startDate,endDate);
 
     }
 

@@ -6,3 +6,33 @@ db.activities.find().forEach(function (elem) {
         $unset:{"rulesActivityTab.eligibleForSchedules":null}
         });
     });
+
+ // to set new property template status at organization Level
+ db.getCollection('questionnaireTemplate').updateMany({'organizationId':{$exists:true}},{$set:{'templateStatus':"PUBLISHED"}});
+
+ // rename collection gdpr
+ db.clause_tag.renameCollection("clauseTag");
+db.template_type.renameCollection("templateType");
+db.asset_type.renameCollection("assetType");
+db.data_disposal.renameCollection("dataDisposal");
+db.technical_security_measure.renameCollection("technicalSecurityMeasure");
+db.storage_format.renameCollection("storageFormat");
+db.hosting_provider.renameCollection("hostingProvider");
+db.hosting_type.renameCollection("hostingType");
+db.organization_security_measure.renameCollection("organizationalSecurityMeasure");
+db.master_asset.renameCollection("masterAsset");
+db.master_processing_activity.renameCollection("masterProcessingActivity");
+db.responsibility_type.renameCollection("responsibilityType");
+db.transfer_method.renameCollection("transferMethod");
+db.processing_purpose.renameCollection("processingPurpose");
+db.accessor_party.renameCollection("accessorParty");
+db.questionnaire_template.renameCollection("questionnaireTemplate");
+db.questionnaire_section.renameCollection("questionnaireSection");
+db.data_category.renameCollection("dataCategory");
+db.data_element.renameCollection("dataElement");
+db.data_subject_mapping.renameCollection("dataSubjectMapping");
+db.processing_activity.renameCollection("processingActivity");
+db.agreement_section.renameCollection("agreementSection");
+db.agreement_template.renameCollection("policyAgreementTemplate");
+
+

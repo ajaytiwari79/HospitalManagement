@@ -56,7 +56,7 @@ public class GenericRestClient {
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
-        String url = baseUrl + getURIWithParam(queryParam);
+        String url = baseUrl +getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
@@ -78,14 +78,15 @@ public class GenericRestClient {
 
 
     public String getURIWithParam(List<NameValuePair> queryParam) {
+        String path="";
             if (CollectionUtils.isNotEmpty(queryParam)) {
                 StringBuilder stringBuilder = new StringBuilder("?");
                 for (NameValuePair nameValuePair : queryParam) {
                     stringBuilder.append("&").append(nameValuePair.getName()).append("=").append(nameValuePair.getValue().replace("[", "").replace("]", ""));
                 }
-                return stringBuilder.toString();//.replace("%2C+","");
+                path= stringBuilder.toString();//.replace("%2C+","");
             }
-        return null;
+        return path;
     }
 
 

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import static com.kairos.constants.Neo4jConstant.*;
  */
 @Configuration
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+@EnableTransactionManagement
 public class Neo4jConfig  implements EnvironmentAware {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -73,4 +75,6 @@ public class Neo4jConfig  implements EnvironmentAware {
         this.environment = environment;
     }
 
-  }
+
+
+}

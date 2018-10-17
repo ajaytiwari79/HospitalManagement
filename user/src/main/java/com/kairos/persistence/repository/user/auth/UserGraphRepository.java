@@ -80,16 +80,16 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return id(c)")
     Long  getCountryOfUser(Long userId);
 
-    @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage)")
+    @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage) LIMIT 1")
     Long getUserSelectedLanguageId(Long userId);
 
 
     // This is used to get the very first user of the organization
     @Query("Match (org:Organization) where id(org)={0}" +
             "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with org,unitPermission,emp\n" +
-            "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with org,unitPermission,emp,r1,ag\n" +
+            "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) with org,unitPermission,emp,r1,ag,parentAG\n" +
             "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            "return  id(org) as organizationId ,id(user) as id, user.email as email,user.firstName as firstName,ag.name as accessGroupName,id(ag) as accessGroupId,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+            "return  id(org) as organizationId ,id(user) as id, user.email as email,user.firstName as firstName,ag.name as accessGroupName,id(parentAG) as parentAccessGroupId,id(ag) as accessGroupId,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
 
     @Query("Match (org:Organization) where id(org)  = {1}" +

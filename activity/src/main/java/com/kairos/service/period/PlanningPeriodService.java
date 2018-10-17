@@ -541,18 +541,20 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
-        restoreShifts(shiftStates,unitId);
+        List<Shift> shiftList=shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(),unitId);
+        restoreShifts(shiftStates,shiftList,unitId);
+
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
 
     public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId) {
         List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
-        restoreShifts(shiftStates,unitId);
+        restoreShifts(shiftStates,new ArrayList(),unitId);
         return true;
     }
 
-    public void restoreShifts(List<ShiftState> shiftStates,Long unitId) {
+    public void restoreShifts(List<ShiftState> shiftStates,List<Shift> shiftList,Long unitId) {
         if (shiftStates.isEmpty()) {
             return;
         }
@@ -563,7 +565,7 @@ public class PlanningPeriodService extends MongoBaseService {
             shifts.add(shift);
         });
         save(shifts);
-        shiftService.UpdateShiftDailyTimeBankAndPaidOut(shifts, unitId);
+        shiftService.UpdateShiftDailyTimeBankAndPaidOut(shifts,shiftList, unitId);
     }
 
 
