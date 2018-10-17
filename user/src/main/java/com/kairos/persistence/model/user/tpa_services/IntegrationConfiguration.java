@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
@@ -16,15 +17,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class IntegrationConfiguration extends UserBaseEntity {
 
-    @NotEmpty(message = "name can not be null") @NotNull(message = "name can not be null")
+    @NotBlank(message = "name can not be null")
     private String name;
-    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
-
-    @NotEmpty(message = "unique key can not be null") @NotNull(message = "unique key can not be null")
+    @NotBlank(message = "unique key can not be null")
     private String uniqueKey;
     private boolean isEnabled = true;
-
     @Relationship(type = BELONGS_TO)
     private Country country;
 

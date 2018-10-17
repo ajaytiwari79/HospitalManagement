@@ -3,8 +3,11 @@ package com.kairos.dto.user.reason_code;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * Created by pavan on 23/3/18.
@@ -13,6 +16,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReasonCodeDTO {
     private Long id;
+    @NotBlank(message = "message.reasonCode.name.notEmpty")
     private String name;
     private String code;
     private String description;
@@ -35,7 +39,7 @@ public class ReasonCodeDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getCode() {
@@ -43,7 +47,7 @@ public class ReasonCodeDTO {
     }
 
     public void setCode(String code) {
-        this.code = code;
+        this.code = StringUtils.trim(code);
     }
 
     public String getDescription() {
@@ -51,7 +55,7 @@ public class ReasonCodeDTO {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public ReasonCodeType getReasonCodeType() {

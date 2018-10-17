@@ -67,18 +67,15 @@ public class TaskTypeService extends MongoBaseService {
     private TaskTypeSlaConfigMongoRepository taskTypeSlaConfigMongoRepository;
     @Inject
     private EnvConfig envConfig;
-    @Autowired
-    private   SkillRestClient skillRestClient;
+
     @Autowired private OrganizationRestClient organizationRestClient;
 
     @Autowired private GenericIntegrationService genericIntegrationService;
 
-    @Autowired private TimeSlotRestClient timeSlotRestClient;
-
     @Autowired
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
 
-    @Inject private OrganizationServiceRestClient organizationServiceRestClient;
+
 
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -557,7 +554,7 @@ public class TaskTypeService extends MongoBaseService {
             CountryDTO countryDTO = genericIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
             skills = genericIntegrationService.getSkillsByCountryForTaskType(countryDTO.getId());
         } else {
-            skills = skillRestClient.getSkillsOfOrganization(taskType.getOrganizationId());
+            skills = genericIntegrationService.getSkillsOfOrganization(taskType.getOrganizationId());
         }
 
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
@@ -930,7 +927,7 @@ public class TaskTypeService extends MongoBaseService {
         TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(unitId,new BigInteger(taskTypeId),
                 taskTypeSlaConfigDTO.getTimeSlotId());
         if(taskTypeSlaConfig == null){
-            Map<String, Object> timeSlotMap = timeSlotRestClient.getTimeSlotByUnitIdAndTimeSlotId(unitId,taskTypeSlaConfigDTO.getTimeSlotId());
+            Map<String, Object> timeSlotMap = genericIntegrationService.getTimeSlotByUnitIdAndTimeSlotId(taskTypeSlaConfigDTO.getTimeSlotId());
             taskTypeSlaConfig = new TaskTypeSlaConfig(new BigInteger(taskTypeId),unitId, taskTypeSlaConfigDTO.getTimeSlotId(), timeSlotMap.get("name").toString());
         }
 
@@ -991,7 +988,7 @@ public class TaskTypeService extends MongoBaseService {
         //anil maurya call this code via rest template
         //List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
 
-        List<TimeSlotWrapper> currentTimeSlots=timeSlotRestClient.getCurrentTimeSlot(unitId);
+        List<TimeSlotWrapper> currentTimeSlots=genericIntegrationService.getCurrentTimeSlot();
         List<TimeSlotWrapper> timeSlots = new ArrayList<>(currentTimeSlots.size());
         List<Long> timeSlotIds = new ArrayList<>(currentTimeSlots.size());
         for(TimeSlotWrapper standredTimeSlot : currentTimeSlots){
@@ -1341,7 +1338,7 @@ public class TaskTypeService extends MongoBaseService {
 
     public List<Long> getServiceIds(Long organisationId){
         List<Long> serviceIds = new ArrayList<>();
-        Map<String, Object> services = organizationServiceRestClient.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
+        Map<String, Object> services = genericIntegrationService.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
         List<Map> service = (List<Map>)services.get("selectedServices");
         service.get(0).get("children");
         service.forEach(t->{

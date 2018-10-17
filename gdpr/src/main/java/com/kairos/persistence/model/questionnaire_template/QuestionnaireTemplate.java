@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "questionnaire_template")
+@Document
 public class QuestionnaireTemplate extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")

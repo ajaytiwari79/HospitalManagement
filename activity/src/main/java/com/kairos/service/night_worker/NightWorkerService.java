@@ -11,6 +11,7 @@ import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.night_worker.StaffQuestionnaireMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -44,7 +45,7 @@ public class NightWorkerService extends MongoBaseService {
     private StaffQuestionnaireMongoRepository staffQuestionnaireMongoRepository;
 
     @Inject
-    private StaffRestClient staffRestClient;
+    private GenericIntegrationService genericIntegrationService;
 
     @Inject
     private UnitAgeSettingMongoRepository unitAgeSettingMongoRepository;
@@ -204,7 +205,7 @@ public class NightWorkerService extends MongoBaseService {
 
     // Method to be triggered when job will be executed for updating eligibility of Staff for being night worker
     public boolean updateNightWorkerEligibilityOfStaff(){
-        List<UnitStaffResponseDTO> unitStaffResponseDTOs = staffRestClient.getUnitWiseStaffList();
+        List<UnitStaffResponseDTO> unitStaffResponseDTOs = genericIntegrationService.getUnitWiseStaffList();
         List<Long> listOfUnitIds = new ArrayList<Long>();
         unitStaffResponseDTOs.stream().forEach(unitStaffResponseDTO ->{
             listOfUnitIds.add(unitStaffResponseDTO.getUnitId());

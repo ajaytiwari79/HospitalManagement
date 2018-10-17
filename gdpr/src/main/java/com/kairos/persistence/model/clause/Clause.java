@@ -11,6 +11,7 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.javers.core.metamodel.annotation.*;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@TypeName("clause")
+@Document
 public class Clause extends MongoBaseEntity {
 
     @NotBlank

@@ -49,11 +49,11 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(agreementTemplateId).and(DELETED).is(false)),
-                lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
+                lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
                 new CustomAggregationOperation(replaceRootOperation),
                 lookup("clause", "clauseIdOrderedIndex", "_id", "clauses"),
-                lookup("agreement_section", "subSections", "_id", "subSections"),
+                lookup("agreementSection", "subSections", "_id", "subSections"),
                 unwind("subSections", true),
                 lookup("clause", "subSections.clauseIdOrderedIndex", "_id", "subSections.clauses"),
                 new CustomAggregationOperation(sortSubSectionsOperation),
@@ -85,7 +85,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("template_type", "templateType", "_id", "templateType"),
+                lookup("templateType", "templateType", "_id", "templateType"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation),
                 sort(Sort.Direction.DESC, "createdAt")
@@ -101,7 +101,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         String projectionOperation="{'$project':{ '_id':1,'name':1 }}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
+                lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 match(Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId).and("agreementSections.deleted").is(false)),
                 new CustomAggregationOperation(Document.parse(projectionOperation))
         );

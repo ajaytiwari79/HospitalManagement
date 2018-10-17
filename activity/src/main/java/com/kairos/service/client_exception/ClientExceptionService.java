@@ -2,6 +2,7 @@ package com.kairos.service.client_exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.dto.user.client.Client;
 import com.kairos.dto.user.client.ClientExceptionCountWrapper;
@@ -93,7 +94,7 @@ public class ClientExceptionService extends MongoBaseService {
     @Inject
     private ClientRestClient clientRestClient;
     @Inject
-    IntegrationRestClient integrationServiceRestClient;
+    GenericIntegrationService genericIntegrationService;
     @Inject
     private TaskExceptionService taskExceptionService;
     @Inject
@@ -121,7 +122,7 @@ public class ClientExceptionService extends MongoBaseService {
         logger.info("client exception dto :: " + clientExceptionDto.toString());
 
         // Client client = clientGraphRepository.findById(clientId, 0);
-        Client client = clientRestClient.getClient(clientId);
+        Client client = genericIntegrationService.getClient(clientId);
         if (client == null) {
             exceptionService.internalError("error.client.notfound");
         }
@@ -198,7 +199,7 @@ public class ClientExceptionService extends MongoBaseService {
             }
             case CHANGE_LOCATION: {
 
-                ClientTemporaryAddress clientTemporaryAddress = clientRestClient.updateClientTemporaryAddress(clientExceptionDto, unitId, clientId);
+                ClientTemporaryAddress clientTemporaryAddress = genericIntegrationService.updateClientTemporaryAddress(clientExceptionDto, unitId, clientId);
                 return createChangeLocationException(unitId, clientId, clientExceptionDto, clientExceptionType, clientTemporaryAddress);
             }
             case DO_NOT_DISTURB: {
@@ -392,7 +393,7 @@ public class ClientExceptionService extends MongoBaseService {
                 updateTaskAddress(unhandledTask, clientTemporaryAddress);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(unhandledTasks, flsCredentials);
         return unhandledTasks;
     }
@@ -759,7 +760,7 @@ public class ClientExceptionService extends MongoBaseService {
         List<Long> houseHoldMembers = new ArrayList<>(clientExceptionDTO.getHouseHoldMembers());
         houseHoldMembers.add(exceptionOfCitizen.getClientId());
         validateTimeSlotsForException(clientExceptionDTO,exceptionOfCitizen,houseHoldMembers,exceptionIds);
-        ClientTemporaryAddress clientTemporaryAddress = clientRestClient.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getUnitId(), exceptionOfCitizen.getClientId());
+        ClientTemporaryAddress clientTemporaryAddress = genericIntegrationService.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getUnitId(), exceptionOfCitizen.getClientId());
         List<Task> updatedTasks = updateTasksOnCreatingChangeLocationException(houseHoldMembers,exceptionOfCitizen,clientExceptionDTO,clientTemporaryAddress,exceptionsOfHouseHoldMembers);
         for(ClientException exceptionsOfHouseHoldMember : exceptionsOfHouseHoldMembers){
             exceptionsOfHouseHoldMember.setTemporaryAddressId(clientTemporaryAddress.getId());
@@ -839,7 +840,7 @@ public class ClientExceptionService extends MongoBaseService {
                 tasksByNewDate.add(oldTask);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }
@@ -882,7 +883,7 @@ public class ClientExceptionService extends MongoBaseService {
                 tasksByNewDate.add(oldTask);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(exceptionOfCitizen.getUnitId());
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(exceptionOfCitizen.getUnitId());
         taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }
