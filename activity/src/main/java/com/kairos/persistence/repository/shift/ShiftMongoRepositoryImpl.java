@@ -193,7 +193,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<Shift> findShiftsToBeDone(List<Long> staffIds, Date startDate,Date endDate) {
+    public List<Shift> findShiftsForCheckIn(List<Long> staffIds, Date startDate, Date endDate) {
         Query query=new Query();
         Criteria startDateCriteria=Criteria.where("startDate").gte(startDate).lte(endDate);
         Criteria endDateCriteria=Criteria.where("endDate").gte(startDate).lte(endDate);

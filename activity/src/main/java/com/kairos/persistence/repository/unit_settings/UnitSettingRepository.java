@@ -22,7 +22,7 @@ public interface UnitSettingRepository extends MongoBaseRepository<UnitSetting,B
     UnitSettingDTO getFlexibleTimingByUnit(Long unitId);
 
     @Query(value="{'deleted':false,'unitId':{'$in':?0}}",fields ="{'flexibleTimeSettings': 1,'unitId':1}")
-    List<UnitSettingDTO> getFlexibleTimingByUnitIds(List<Long> unitIds);
+    List<UnitSettingDTO> getGlideTimeByUnitIds(List<Long> unitIds);
 
     UnitSetting findByUnitIdAndDeletedFalse(Long unitId);
 

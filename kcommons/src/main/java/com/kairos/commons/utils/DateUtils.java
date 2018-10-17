@@ -35,6 +35,9 @@ public class DateUtils {
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
         return localDateTimeToDate(endOfDay);
     }
+    public static LocalDateTime getLocalDateTimeFromDate(Date date ){
+       return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
+    }
 
     public static LocalDate getCurrentLocalDate() {
         return LocalDate.now();

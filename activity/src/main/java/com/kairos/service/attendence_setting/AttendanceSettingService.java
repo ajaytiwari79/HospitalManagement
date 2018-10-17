@@ -76,11 +76,11 @@ public class AttendanceSettingService extends MongoBaseService {
         Map<Long,FlexibleTimeSettingDTO> unitIdAndFlexibleTimeMap=new HashMap<>();
 
         Shift shift=null;
-        List<Shift> shifts=shiftMongoRepository.findShiftsToBeDone(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
+        List<Shift> shifts=shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         List<OrganizationCommonDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new OrganizationCommonDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
-        Set<ReasonCodeDTO> reasonCodes = staffAndOrganizationIds.stream().flatMap(s -> s.getReasonCodes().stream()).collect(Collectors.toSet());
+        List<ReasonCodeDTO> reasonCodes=staffAndOrganizationIds.get(0).getReasonCodes();
         if(!shifts.isEmpty()) {
-            List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getFlexibleTimingByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
+            List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
             for (UnitSettingDTO unitSettingDTO : unitSettingDTOS) {
                 unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
             }
@@ -90,13 +90,14 @@ public class AttendanceSettingService extends MongoBaseService {
                 boolean result = false;
                 if (unitIdAndFlexibleTimeMap.containsKey(checkInshift.getUnitId())) {
                     DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
+                    result=(Math.abs((Duration.between(DateUtils.getLocalDateTimeFromDate(checkInshift.getStartDate()), DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime());
                     if (interval.contains(Timestamp.valueOf(LocalDateTime.now(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))).getTime())) {
-                        result = (Math.abs((Duration.between(LocalDateTime.ofInstant(Instant.ofEpochMilli(checkInshift.getStartDate().getTime()), ZoneId.systemDefault()), LocalDateTime.now(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime() || reasonCodeId != null) ? true : false;
+                        result = (result || reasonCodeId != null) ? true : false;
                         if (!result) {
                             attendanceDTO = new AttendanceDTO(reasonCodes);
                         }
                     } else {
-                        result = (Math.abs((Duration.between(LocalDateTime.ofInstant(Instant.ofEpochMilli(checkInshift.getStartDate().getTime()), ZoneId.systemDefault()), LocalDateTime.now(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime()) ? true : false;
+                        result = result ? true : false;
                         if (!result ) {
                             attendanceDTO = new AttendanceDTO(unitIdAndNames, reasonCodes);
                         }
@@ -108,7 +109,7 @@ public class AttendanceSettingService extends MongoBaseService {
                 }
             }
             if(shift==null) {
-                attendanceSetting = checkInWithoutHavingShift(unitId, reasonCodeId, staffAndOrganizationIds);
+                attendanceSetting = checkInWithoutShift(unitId, reasonCodeId, staffAndOrganizationIds);
                 if (attendanceSetting == null) {
                     return (attendanceDTO!=null)?attendanceDTO:new AttendanceDTO(unitIdAndNames,reasonCodes);
                 }
@@ -149,7 +150,7 @@ public class AttendanceSettingService extends MongoBaseService {
         return attendanceDTO;
     }
 
-    private AttendanceSetting checkInWithoutHavingShift(Long unitId, Long reasonCodeId, List<StaffResultDTO> staffAndOrganizationIds) {
+    private AttendanceSetting checkInWithoutShift(Long unitId, Long reasonCodeId, List<StaffResultDTO> staffAndOrganizationIds) {
         AttendanceSetting attendanceSetting = null;
         StaffResultDTO staffAndOrganizationId;
         if (Optional.ofNullable(unitId).isPresent() && !Optional.ofNullable(reasonCodeId).isPresent()) {
