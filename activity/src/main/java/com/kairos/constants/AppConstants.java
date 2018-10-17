@@ -169,7 +169,7 @@ public class AppConstants {
             " PlannedHoursweek- %s";
     public static final String SHIFT_EMAIL_BODY = "Hi, %s, \n shift will start on %s at %s";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
-    public static final String SHIFT_NOTIFICATION="SHIFT_NOTIFICATION";
+    public static final String SHIFT_NOTIFICATION="Shift Reminder";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";
