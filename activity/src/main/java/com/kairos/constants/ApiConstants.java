@@ -96,4 +96,7 @@ public final class ApiConstants {
     public static final String TIME_SLOT_URL="/time_slot/{timeSlotId}";
     public static final String CURRENT_TIME_SLOTS="/current/time_slots";
     public static final String GET_CTA_BY_UNIT_POSITION_ID="/getCTAbyUnitPosition/{unitPositionId}";
+    public static final String WTA_RULE_INFO="/WTARelatedInfo";
+    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO="/getWtaTemplateDefaultDataInfo";
+    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID=GET_WTA_TEMPLATE_DEFAULT_DATA_INFO+"ByUnitId";
 }
