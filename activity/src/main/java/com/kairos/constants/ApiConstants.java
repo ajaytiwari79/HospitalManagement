@@ -45,6 +45,7 @@ public final class ApiConstants {
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
     public static final String GET_REASONCODE = "/reason_codes";
     public static final String REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/remove_functions";
+    public static final String RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/restore_functions";
     public static final String APPLY_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/applyFunction";
     public static final String STAFF_USER_ACCESS_GROUP ="/staff/user/accessgroup";
     public static final String USER_STAFF_ID ="/user/staffId";
@@ -75,7 +76,21 @@ public final class ApiConstants {
     public static final String TASK_TYPES_SKILLS="/task_type/skills";
     public static final String TIME_SLOTS="/time_slots";
     public static final String DAY_TYPES="/day_types";
-
-
-
+    public static final String INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED="/integration/unit/{citizenUnitId}/flsCred";
+    public static final String COUNTRY_COUNTRY_ID=COUNTRY_ID+"/{countryId}";
+    public static final String SERVICE_DATA="/service/data";
+    public static final String SKILLS ="/skills";
+    public static final String STAFF_AND_SKILL="/staff/getsfAndsfSkill";
+   public static final String STAFF_WITH_STAFF_ID="/staff/{staffId}";
+    public static final String STAFF_UNIT_WISE="/staff/unitwise";
+    public static final String UNIT_POSITION_EXPERTISE="/unit_position/expertise";
+    public static final String STAFF_GET_STAFF_INFO="/staff/getStaffInfo";
+    public static final String STAFF_GET_STAFF_BY_UNIT="/staff/get_Staff_By_Unit";
+    public static final String UNIT_MANAGER_IDS_UNIT_ID="/unit_manager_ids/{unitId}";
+    public static final String COUNTRY_ADMINS_IDS_OF_UNIT="/country_admins_ids/{countryAdminsOfUnitId}";
+    public static final String VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID=STAFF_WITH_STAFF_ID+"/verifyUnitEmployment";
+    public static final String VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID=VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID+"/{unitEmploymentId}";
+    public static final String STAFF_CURRENT_USER_ID="/staff/current_user/{userId}";
+    public static final String STAFF_GET_STAFF_BY_EXPERTISES="/staff/getStaffByExperties";
+    public static final String CURRENT_USER_ACCESS_ROLE="/current_user/access_role";
 }

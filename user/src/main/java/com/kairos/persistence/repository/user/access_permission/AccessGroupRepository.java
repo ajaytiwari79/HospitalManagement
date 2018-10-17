@@ -314,9 +314,17 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN id(accessGroup) as id, accessGroup.name as name, accessGroup.description as description, accessGroup.typeOfTaskGiver as typeOfTaskGiver, accessGroup.deleted as deleted, accessGroup.role as role, accessGroup.enabled as enabled,accessGroup.startDate as startDate, accessGroup.endDate as endDate, collect(dayType) as dayTypes")
    AccessGroupQueryResult findByAccessGroupId(long unitId,long accessGroupId);
 
-   @Query("MATCH(countryAccessGroup:AccessGroup{deleted:false})<-[:"+HAS_PARENT_ACCESS_GROUP+"]-(unitAccessGroup:AccessGroup{deleted:false})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(org:Organization) where id(org) ={0} AND id(countryAccessGroup) IN {1} " +
-           "RETURN apoc.map.fromValues([id(countryAccessGroup), id(unitAccessGroup)])  AS responseMap")
-   Map<Long,Long> getAccessGroupIdsUsingParentIds(Long unitId,Set<Long> parentIds);
+   @Query("MATCH(countryAccessGroup:AccessGroup{deleted:false})<-[:"+HAS_PARENT_ACCESS_GROUP+"]-(unitAccessGroup:AccessGroup{deleted:false})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(org:Organization) where id(org) ={0} AND id(countryAccessGroup) ={1} " +
+           "RETURN unitAccessGroup")
+   AccessGroup getAccessGroupByParentId(Long unitId,Long parentId);
+
+   @Query("MATCH (organization:Organization) where id(organization) IN {0}\n" +
+           "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) detach delete accessGroup")
+    void removeDefaultCopiedAccessGroup(List<Long> organizationId);
+
+   @Query("MATCH (organization:Organization) where id(organization) = {0}\n" +
+            "match(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) return id(ag) as id,id(pag) as parentId")
+    List<AccessPageQueryResult> findAllAccessGroupWithParentOfOrganization(Long organizationId);
 
 }
 

@@ -799,7 +799,7 @@ public class ActivityService extends MongoBaseService {
 
         // Set access Role of staff
 
-        UserAccessRoleDTO userAccessRoleDTO = staffRestClient.getAccessOfCurrentLoggedInStaff();
+        UserAccessRoleDTO userAccessRoleDTO = genericIntegrationService.getAccessOfCurrentLoggedInStaff();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {

@@ -209,12 +209,4 @@ public class ShiftController {
     public ResponseEntity<Map<String,Object>> getShiftsDetailsForComapactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
-
-    @ApiOperation("Update time bank after applying function")
-    @PutMapping("/shift/update_time_bank")
-    public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
-    }
-
-
 }

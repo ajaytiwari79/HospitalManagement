@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,20 +23,14 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class VatType extends UserBaseEntity {
 
-    @NotEmpty(message = "error.VatType.name.notEmpty") @NotNull(message = "error.VatType.name.notnull")
+    @NotBlank(message = "error.VatType.name.notEmpty")
     private String name;
-
     private int code;
-
-    //@NotEmpty(message = "error.VatType.description.notEmpty") @NotNull(message = "error.VatType.description.notnull")
     private String description;
-
-    @NotEmpty(message = "error.VatType.percentage.notEmpty") @NotNull(message = "error.VatType.percentage.notnull")
+    @NotBlank(message = "error.VatType.percentage.notEmpty")
     private String percentage;
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     private boolean isEnabled = true;
 
     public int getCode() {
