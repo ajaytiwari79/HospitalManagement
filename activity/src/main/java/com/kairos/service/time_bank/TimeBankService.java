@@ -21,6 +21,7 @@ import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.service.MongoBaseService;
@@ -69,7 +70,7 @@ public class TimeBankService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private TimeBankRestClient timeBankRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
@@ -154,7 +155,8 @@ public class TimeBankService extends MongoBaseService {
      * @return UnitPositionWithCtaDetailsDTO
      */
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId,Date startDate,Date endDate) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
+
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = genericIntegrationService.getCTAbyUnitEmployementPosition(unitPositionId);
         if (!Optional.ofNullable(unitPositionWithCtaDetailsDTO).isPresent()){
             exceptionService.dataNotFoundException("message.staffUnitPosition.notFound");
         }
@@ -199,7 +201,7 @@ public class TimeBankService extends MongoBaseService {
      * @return TimeBankDTO
      */
     public TimeBankDTO getOverviewTimeBank(Long unitPositionId, Integer year) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = genericIntegrationService.getCTAbyUnitEmployementPosition(unitPositionId);
         Interval interval = getIntervalByDateTimeBank(unitPositionWithCtaDetailsDTO, year);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
         if (interval.getStart().getYear() <= new DateTime().getYear()) {

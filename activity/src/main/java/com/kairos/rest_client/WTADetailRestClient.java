@@ -20,6 +20,7 @@ import javax.inject.Inject;
  */
 
 @Service
+@Deprecated
 public class WTADetailRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);

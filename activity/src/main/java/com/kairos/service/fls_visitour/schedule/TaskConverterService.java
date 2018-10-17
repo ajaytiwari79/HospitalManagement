@@ -1,6 +1,7 @@
 package com.kairos.service.fls_visitour.schedule;
 
 import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.dto.user.client.Client;
 import com.kairos.persistence.model.task.SkillExpertise;
@@ -45,6 +46,8 @@ public class TaskConverterService {
     IntegrationRestClient integrationServiceRestClient;
     @Autowired
     ClientRestClient clientRestClient;
+    @Inject
+    GenericIntegrationService genericIntegrationService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskConverterService.class);
 
@@ -61,7 +64,7 @@ public class TaskConverterService {
 
         /*Map<String,Object> citizenDetails=taskServiceRestClient.getCitizenDetails(task.getCitizenId());*/
        // Client client = clientGraphRepository.findById(task.getCitizenId());
-        Client client = clientRestClient.getClient(task.getCitizenId());
+        Client client = genericIntegrationService.getClient(task.getCitizenId());
 
 
         Map<String, Object> callMetaData = new HashMap<>();

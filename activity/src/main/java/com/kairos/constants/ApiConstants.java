@@ -93,4 +93,24 @@ public final class ApiConstants {
     public static final String STAFF_CURRENT_USER_ID="/staff/current_user/{userId}";
     public static final String STAFF_GET_STAFF_BY_EXPERTISES="/staff/getStaffByExperties";
     public static final String CURRENT_USER_ACCESS_ROLE="/current_user/access_role";
+    public static final String TIME_SLOT_URL="/time_slot/{timeSlotId}";
+    public static final String CURRENT_TIME_SLOTS="/current/time_slots";
+    public static final String GET_CTA_BY_UNIT_POSITION_ID="/getCTAbyUnitPosition/{unitPositionId}";
+    public static final String WTA_RULE_INFO="/WTARelatedInfo";
+    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO="/getWtaTemplateDefaultDataInfo";
+    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID=GET_WTA_TEMPLATE_DEFAULT_DATA_INFO+"ByUnitId";
+    public static final String CLIENT_ID_URL="/client/{clientId}";
+    public static final String UPDATE_CLIENT_TEMP_ADDRESS_BY_CLIENT_ID=CLIENT_ID_URL+"/updateClientTempAddress";
+    public static final String CLIENT_CITIZEN_ID="/client/{citizenId}";
+    public static final String CLIENT_CITIZEN_ID_INFO=CLIENT_CITIZEN_ID+"/info";
+    public static final String CLIENT_CITIZEN_ID_ADDRESS_INFO=CLIENT_CITIZEN_ID+"/addressInfo";
+    public static final String GET_CLIENT_INFO="/client/getClientInfo";
+    public static final String CLIENT_CITIZEN_ID_UNIT_ID_TASK_PREREQUISITES=CLIENT_CITIZEN_ID+"/{unitId}/task_prerequisites";
+    public static final String CLIENT_ORGANIZATION_CLIENTS="/client/organization_clients";
+    public static final String ORGANIZATION_CLIENTS_IDS= "/client/organization_clients/ids";
+    public static final String CLIENT_CLIENT_IDS="/client/client_ids";
+    public static final String GET_CLIENT_STAFF_INFO_BY_CLIENT_ID=CLIENT_ID_URL+"/getClientStaffInfo";
+    public static final String GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID=CLIENT_CITIZEN_ID+STAFF_WITH_STAFF_ID+"/getStaffCitizenHouseholds";
+    public static final String CLIENT_BY_IDS="/client/clientsByIds";
+    public static final String GET_UNIT_IDS_BY_CLIENT_IDS="/client/client_ids_by_unitIds";
 }
