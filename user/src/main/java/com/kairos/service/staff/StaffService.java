@@ -1260,7 +1260,7 @@ public class StaffService {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
 
             unitPermission=unitPermission==null?new UnitPermission():unitPermission;
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            AccessGroup accessGroup = accessGroupRepository.getAccessGroupByParentId(organizationId,accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
             }
@@ -1285,7 +1285,7 @@ public class StaffService {
         staff.setUser(user);
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
-        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+        employment.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
         // if the organization is not parent organization then adding employment in parent organization.
         if (!parentOrganization) {
             Organization
@@ -1299,7 +1299,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            AccessGroup accessGroup = accessGroupRepository.getAccessGroupByParentId(organization.getId(),accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
