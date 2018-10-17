@@ -2,6 +2,9 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FunctionDTO {
     private Long id;
+    @NotBlank(message = "error.function.name.notEmpty")
     private String name;
     private String description;
     private Date startDate;
@@ -43,7 +47,7 @@ public class FunctionDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getDescription() {
@@ -51,7 +55,7 @@ public class FunctionDTO {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public Date getStartDate() {
@@ -91,6 +95,6 @@ public class FunctionDTO {
     }
 
     public void setIcon(String icon) {
-        this.icon = icon;
+        this.icon = StringUtils.trim(icon);
     }
 }

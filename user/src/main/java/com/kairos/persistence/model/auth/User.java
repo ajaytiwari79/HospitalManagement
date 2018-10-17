@@ -34,8 +34,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class User extends UserBaseEntity {
     protected String cprNumber;
 
-    //    @NotNull(message = "error.User.userName.notnull")
-//    @Size(min = 5, max = 20, message = "error.User.userName.size")
     private String userName;
     protected String nickName;
     protected String firstName;

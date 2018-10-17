@@ -3,10 +3,12 @@ package com.kairos.persistence.model.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,16 +25,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class HousingType extends UserBaseEntity {
 
-    @NotEmpty(message = "error.HousingType.name.notEmpty") @NotNull(message = "error.HousingType.name.notnull")
+    @NotBlank(message = "error.HousingType.name.notEmpty")
     private String name;
-
-    //@NotEmpty(message = "error.HousingType.description.notEmpty") @NotNull(message = "error.HousingType.description.notnull")
     private String description;
-
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     private boolean isEnabled = true;
 
 
@@ -41,7 +38,7 @@ public class HousingType extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public String getName() {
@@ -49,7 +46,7 @@ public class HousingType extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
 

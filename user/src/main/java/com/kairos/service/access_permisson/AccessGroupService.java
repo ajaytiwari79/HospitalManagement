@@ -185,7 +185,7 @@ public class AccessGroupService {
             List<AccessGroupQueryResult> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(organization.getCompanyType()).toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroupQueryResult countryAccessGroup : countryAccessGroups) {
-                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypes(),countryAccessGroup.getStartDate(),countryAccessGroup.getEndDate());
+                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypes(), countryAccessGroup.getStartDate(), countryAccessGroup.getEndDate());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 accessGroupRepository.save(accessGroup);
@@ -209,20 +209,34 @@ public class AccessGroupService {
         return countryAndOrgAccessGroupIdsMap;
     }
 
+    public void removeDefaultCopiedAccessGroup(List<Long> organizationIds) {
+        accessGroupRepository.removeDefaultCopiedAccessGroup(organizationIds);
+    }
+
+    public void createDefaultAccessGroups(Organization parentOrg, List<Organization> organizations) {
+        List<AccessGroupQueryResult> accessGroupList = accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId());
+        createDefaultAccessGroupsInOrganization(parentOrg, accessGroupList, true);
+        organizations.forEach(org -> {
+            createDefaultAccessGroupsInOrganization(org, accessGroupList, false);
+        });
+    }
+
     /**
      * @param organization,accountTypeId
      * @author vipul
      * this method will create accessgroup to the organization
+     * @Extra Need to optimize
      */
-    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroupQueryResult> accessGroupList,boolean company) {
+    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroupQueryResult> accessGroupList, boolean company) {
+
 
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
 
         List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
         for (AccessGroupQueryResult currentAccessGroup : accessGroupList) {
-            AccessGroup parent=new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(),currentAccessGroup.getDayTypes(),company?DateUtils.getCurrentLocalDate():currentAccessGroup.getStartDate(),currentAccessGroup.getEndDate());
+            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             parent.setId(currentAccessGroup.getId());
-            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(),currentAccessGroup.getDayTypes(),company?DateUtils.getCurrentLocalDate():currentAccessGroup.getStartDate(),currentAccessGroup.getEndDate());
+            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
             accessGroup.setParentAccessGroup(parent);
             accessGroup.setLastModificationDate(accessGroup.getCreationDate());
@@ -612,7 +626,7 @@ public class AccessGroupService {
 
         }
 
-        AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) ? new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), accountType, dayTypes,accessGroupDTO.getStartDate(),accessGroupDTO.getEndDate()) : new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), dayTypes,accessGroupDTO.getStartDate(),accessGroupDTO.getEndDate());
+        AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) ? new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), accountType, dayTypes, accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate()) : new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), dayTypes, accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate());
 
         CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country, accessGroup, accessGroupDTO.getOrganizationCategory());
         accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -767,12 +781,12 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName().trim());
 
         }
-        AccessGroupQueryResult currentAccessGroup = accessGroupRepository.findByAccessGroupId(organizationId,accessGroupDTO.getId());
-        if (currentAccessGroup==null) {
+        AccessGroupQueryResult currentAccessGroup = accessGroupRepository.findByAccessGroupId(organizationId, accessGroupDTO.getId());
+        if (currentAccessGroup == null) {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(),currentAccessGroup.getStartDate(),currentAccessGroup.getEndDate());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
         accessGroupRepository.save(accessGroup);
         organization.get().getAccessGroups().add(accessGroup);
         organizationGraphRepository.save(organization.get());
@@ -802,7 +816,7 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", countryAccessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), currentAccessGroup.get().getRole(), currentAccessGroup.get().getAccountType(), currentAccessGroup.get().getDayTypes(),currentAccessGroup.get().getStartDate(),currentAccessGroup.get().getEndDate());
+        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), currentAccessGroup.get().getRole(), currentAccessGroup.get().getAccountType(), currentAccessGroup.get().getDayTypes(), currentAccessGroup.get().getStartDate(), currentAccessGroup.get().getEndDate());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -857,20 +871,29 @@ public class AccessGroupService {
     }
 
 
-    public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsBy(unitId,accessGroupId),StaffAccessGroupDTO.class);
+    public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId) {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsBy(unitId, accessGroupId), StaffAccessGroupDTO.class);
     }
 
-    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId){
-        Long staffId=staffService.getStaffIdOfLoggedInUser(unitId);
-        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
+        Long staffId = staffService.getStaffIdOfLoggedInUser(unitId);
+        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
 
     }
 
-    public Map<Long,Long> getAccessGroupUsingParentId(Long unitId,Set<Long> accessGroupIds){
+    public Map<Long, Long> getAccessGroupUsingParentId(Long unitId, Set<Long> accessGroupIds) {
         //intentionally return blank
         return new HashMap<>();
-                //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
-                //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
+        //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
+        //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
+    }
+// Substitute of above Query
+    public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
+        List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(organizationId);
+        Map<Long, Long > response=new HashMap<>();
+        accessPageQueryResults.forEach(accessPageQueryResult -> {
+            response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
+        });
+        return response;
     }
 }
