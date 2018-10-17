@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "agreement_section")
+@Document
 public class AgreementSection extends MongoBaseEntity {
 
 

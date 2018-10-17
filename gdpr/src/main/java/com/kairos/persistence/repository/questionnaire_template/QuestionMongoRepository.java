@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface QuestionMongoRepository extends MongoBaseRepository<Question, BigInteger> {
@@ -23,10 +24,10 @@ public interface QuestionMongoRepository extends MongoBaseRepository<Question, B
     List<Question> getAllMasterQuestion(Long countryId);
 
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<Question> getMasterQuestionByCountryIdAndIds(Long countryId, List<BigInteger> questionIds);
+    List<Question> getMasterQuestionByCountryIdAndIds(Long countryId, Set<BigInteger> questionIds);
 
     @Query("{organizationId:?0,_id:{$in:?1},deleted:false}")
-    List<Question> getQuestionByUnitIdAndIds(Long unitId, List<BigInteger> questionIds);
+    List<Question> getQuestionByUnitIdAndIds(Long unitId, Set<BigInteger> questionIds);
 
 
 }

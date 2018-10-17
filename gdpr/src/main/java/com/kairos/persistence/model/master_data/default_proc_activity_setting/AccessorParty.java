@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-@Document(collection = "accessor_party")
+@Document
 public class AccessorParty extends MongoBaseEntity {
 
 

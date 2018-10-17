@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Document(collection = "filterGroup")
+@Document
 public class FilterGroup extends MongoBaseEntity {
 
 
