@@ -16,13 +16,14 @@ import org.springframework.web.client.RestTemplate;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class TimeCareRestClient {
     private static final Logger logger = LoggerFactory.getLogger(TimeCareRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;
 
-
+//Not used anywhere
     public TimeCareOrganizationDTO getPrerequisitesForTimeCareTask(GetWorkShiftsFromWorkPlaceByIdResult workShift){
         final String baseUrl=getBaseUrl(false);
 
