@@ -36,14 +36,18 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " case appliedFunction when NULL then [] else  Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions")
     UnitPositionQueryResult getUnitPositionById(Long unitPositionId);
 
+    @Query("Match(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
+            "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
+            "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+            " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
+            "match (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+            "return staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyWages:positionLine.hourlyWages,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
+            ",id(unitPosition) as id,unitPosition.startDate as startDate")
+    List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
-
-    /*@Query("Match (org:Organization) where id(org)={0} WITH org\n" +
-            "Match (e:Expertise) where id(e)={1} WITH e,org\n" +
-            "OPTIONAL Match (org)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement{disabled:false}) WITH  wta,org,e\n" +
-            "MATCH (wta)-[:" + HAS_EXPERTISE_IN + "]->(e) \n" +
-            "return collect(wta)")
-    List<WorkingTimeAgreement> getWtaByExpertise(Long organizationId, Long expertiseId);*/
 
 
     @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false,published:true})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
@@ -257,6 +261,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "positionLine.hourlyWages as hourlyWages,positionLine.avgDailyWorkingHours as avgDailyWorkingHours ORDER BY positionLine.startDate"
     )
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
+
 
 
     @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0}\n" +
