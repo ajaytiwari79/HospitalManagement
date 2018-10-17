@@ -1,6 +1,7 @@
 package com.kairos.service.activity_stream;
 
 import com.kairos.dto.activity.response.RequestComponent;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.activity_stream.Notification;
@@ -25,14 +26,14 @@ public class NotificationService {
     @Inject
     NotificationMongoRepository notificationMongoRepository;
     @Inject
-    private StaffRestClient staffRestClient;
+    private GenericIntegrationService genericIntegrationService;
 
     @Inject
     MailService mailService;
 
     public List<Notification> fetchUnreadNotifications(Long unitId, String module){
         UserContext.setUnitId(unitId);
-        ClientStaffInfoDTO clientStaffInfoDTO = staffRestClient.getStaffInfo();
+        ClientStaffInfoDTO clientStaffInfoDTO = genericIntegrationService.getStaffInfo();
         return notificationMongoRepository.findNotificationByOrganizationIdAndUserIdAndSource(unitId, clientStaffInfoDTO.getStaffId(), module);
     }
 

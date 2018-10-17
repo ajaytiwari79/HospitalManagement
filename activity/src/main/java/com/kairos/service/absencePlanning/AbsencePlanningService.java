@@ -136,7 +136,7 @@ public class AbsencePlanningService {
                 teamStaffList.add(anonymousData);
             }
             //call via rest API anilm2
-            Map<String, Object> teamStaffAndStaffSkill = staffRestClient.getTeamStaffAndStaffSkill(staffIds);
+            Map<String, Object> teamStaffAndStaffSkill = genericIntegrationService.getTeamStaffAndStaffSkill(staffIds);
             data.putAll(teamStaffAndStaffSkill);
             data.put("tasks", taskAggregationData((List<BigInteger>) object.get("taskLists")));
             data.put("staffs", staffList);
@@ -404,7 +404,7 @@ public class AbsencePlanningService {
                         task.setEndAddress(AddressCode.valueOf(taskData.getEndAddress()));
                     // 0 - home address, -1 - unit address
                     if (taskData.getEndAddress() != null && task.getEndAddress().toString() == "0") {
-                        StaffDTO staff = staffRestClient.getStaff(taskData.getResource());
+                        StaffDTO staff = genericIntegrationService.getStaff(taskData.getResource());
                         // Staff staff = staffGraphRepository.findOne(taskData.getResource());
                         if (staff != null) {
                             TaskAddress taskAddress = new TaskAddress();
@@ -722,7 +722,7 @@ public class AbsencePlanningService {
      */
     public void syncPresentFullDayAbsencesTask(TaskDTO task, Map<String, String> flsCredentials, OrganizationDTO organization) {
 
-        StaffDTO staff = staffRestClient.getStaff(task.getResource());
+        StaffDTO staff = genericIntegrationService.getStaff(task.getResource());
         // Staff staff = staffGraphRepository.findOne(Long.valueOf(task.getResource()));
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(task.getTaskTypeId().toString()));
         int workScheduleResult;
@@ -788,7 +788,7 @@ public class AbsencePlanningService {
             }
 
         } else {
-            StaffDTO staff = staffRestClient.getStaff(task.getResource());
+            StaffDTO staff = genericIntegrationService.getStaff(task.getResource());
             //Staff staff = staffGraphRepository.findOne(Long.valueOf(task.getResource()));
 
             checkFullDayPresence(task.getStartDate(), staff.getId(), flsCredentials, organization);
