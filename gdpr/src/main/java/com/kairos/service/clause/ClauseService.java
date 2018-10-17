@@ -55,7 +55,7 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param clauseDto contain data about clause and template type which belong to clause
      * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
-     * @throws DuplicateDataException : if clause already exist for id , if account type is not selected}
+     * @throws DuplicateDataException : if clause already exist for id ,if account type is not selected}
      * @desciption this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
     public ClauseDTO createClause(Long countryId, ClauseDTO clauseDto) {

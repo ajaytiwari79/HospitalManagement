@@ -1,9 +1,8 @@
 package com.kairos.controller.questionnaire_template;
 
-import com.kairos.dto.gdpr.QuestionnaireSectionDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDTO;
 import com.kairos.service.questionnaire_template.QuestionnaireSectionService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -32,12 +31,12 @@ public class QuestionnaireSectionController {
 
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping(COUNTRY_URL + "/questionnaire_template/{templateId}/section")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateRequestBodyList<QuestionnaireSectionDTO> questionnaireSectionsDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
 
-        if (CollectionUtils.isEmpty(questionnaireSectionsDto.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Section List Must Not Be Empty\"" );
+        if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
+            return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, templateId, questionnaireSectionsDto.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, templateId, questionnaireSectionsDto));
     }
 
 
@@ -50,11 +49,11 @@ public class QuestionnaireSectionController {
 
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping(UNIT_URL + "/questionnaire_template/{templateId}/section")
-    public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateRequestBodyList<QuestionnaireSectionDTO> questionnaireSectionsDto) {
-        if (CollectionUtils.isEmpty(questionnaireSectionsDto.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Section List Must Not Be Empty" );
+    public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
+        if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
+            return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(unitId, templateId, questionnaireSectionsDto.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(unitId, templateId, questionnaireSectionsDto));
     }
 
     @ApiOperation("delete questionnaire section by id ")
