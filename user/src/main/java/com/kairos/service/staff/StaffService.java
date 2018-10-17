@@ -1263,8 +1263,9 @@ public class StaffService {
         AccessGroup accessGroup = accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
+            linkAccessOfModules(accessGroup, unitPermission);
         }
-        linkAccessOfModules(accessGroup, unitPermission);
+
         unitPermissionGraphRepository.save(unitPermission);
 
     }
@@ -1695,7 +1696,7 @@ public class StaffService {
             functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
         }
 
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Long countryId = organization.getCountry().getId();
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
         //Todo it should calculate dynamically
         unitPosition.setHourlyCost(14.5f);

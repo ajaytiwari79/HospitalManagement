@@ -424,6 +424,8 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
+
+        accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
 
