@@ -564,10 +564,7 @@ public class CompanyCreationService {
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
 
-        // if more than 2 default things needed make a  async service Please
-        List<AccessGroupQueryResult> accessGroups = accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
-
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroupsInOrganization(organization, accessGroups, true);
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
@@ -578,7 +575,7 @@ public class CompanyCreationService {
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots, accessGroups);
+                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
         CompletableFuture.allOf(createdInUnit).join();
 
         return true;

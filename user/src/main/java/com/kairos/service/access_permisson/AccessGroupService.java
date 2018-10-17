@@ -887,4 +887,13 @@ public class AccessGroupService {
         //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
         //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
     }
+// Substitute of above Query
+    public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
+        List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(organizationId);
+        Map<Long, Long > response=new HashMap<>();
+        accessPageQueryResults.forEach(accessPageQueryResult -> {
+            response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
+        });
+        return response;
+    }
 }
