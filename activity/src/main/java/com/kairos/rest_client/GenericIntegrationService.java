@@ -12,6 +12,7 @@ import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.dto.user.organization.TimeSlot;
@@ -55,6 +56,8 @@ import static com.kairos.constants.ApiConstants.*;
 
 @Service
 @Transactional
+/*@RestController
+@RequestMapping("api/v1")*/
 public class GenericIntegrationService {
     @Autowired
     GenericRestClient genericRestClient;
@@ -375,13 +378,24 @@ public class GenericIntegrationService {
         }, userId);
     }
 
-    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId,List<Long> expertiesIdList) {
-        return genericRestClient.publishRequest(expertiesIdList, unitId, RestClientUrlType.UNIT, HttpMethod.POST,STAFF_GET_STAFF_BY_EXPERTISES ,null , new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId, List<Long> expertiesIdList) {
+        return genericRestClient.publishRequest(expertiesIdList, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 
     public UserAccessRoleDTO getAccessOfCurrentLoggedInStaff() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_USER_ACCESS_ROLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
         });
+    }
+
+    //TimeSlotRestClient
+    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, TIME_SLOT_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+        }, timeSlotId);
+    }
+
+    public List<TimeSlotWrapper> getCurrentTimeSlot(Long unitId) {
+     return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_TIME_SLOTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotWrapper>>>() {
+     });
     }
 }
