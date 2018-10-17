@@ -67,8 +67,7 @@ public class TaskTypeService extends MongoBaseService {
     private TaskTypeSlaConfigMongoRepository taskTypeSlaConfigMongoRepository;
     @Inject
     private EnvConfig envConfig;
-    @Autowired
-    private   SkillRestClient skillRestClient;
+
     @Autowired private OrganizationRestClient organizationRestClient;
 
     @Autowired private GenericIntegrationService genericIntegrationService;
@@ -78,7 +77,7 @@ public class TaskTypeService extends MongoBaseService {
     @Autowired
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
 
-    @Inject private OrganizationServiceRestClient organizationServiceRestClient;
+
 
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -557,7 +556,7 @@ public class TaskTypeService extends MongoBaseService {
             CountryDTO countryDTO = genericIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
             skills = genericIntegrationService.getSkillsByCountryForTaskType(countryDTO.getId());
         } else {
-            skills = skillRestClient.getSkillsOfOrganization(taskType.getOrganizationId());
+            skills = genericIntegrationService.getSkillsOfOrganization(taskType.getOrganizationId());
         }
 
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
@@ -1341,7 +1340,7 @@ public class TaskTypeService extends MongoBaseService {
 
     public List<Long> getServiceIds(Long organisationId){
         List<Long> serviceIds = new ArrayList<>();
-        Map<String, Object> services = organizationServiceRestClient.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
+        Map<String, Object> services = genericIntegrationService.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
         List<Map> service = (List<Map>)services.get("selectedServices");
         service.get(0).get("children");
         service.forEach(t->{

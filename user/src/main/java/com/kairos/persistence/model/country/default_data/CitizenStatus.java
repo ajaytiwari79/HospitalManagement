@@ -3,10 +3,12 @@ package com.kairos.persistence.model.country.default_data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CIVIL
 @NodeEntity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CitizenStatus extends UserBaseEntity {
-    @NotEmpty(message = "error.CitizenStatus.name.notEmpty") @NotNull(message = "error.CitizenStatus.name.notnull")
+    @NotBlank(message = "error.CitizenStatus.name.notEmpty")
     String name;
 
     //@NotEmpty(message = "error.CitizenStatus.description.notEmpty") @NotNull(message = "error.CitizenStatus.description.notnull")
@@ -45,7 +47,7 @@ public class CitizenStatus extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getDescription() {
@@ -53,7 +55,7 @@ public class CitizenStatus extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
 

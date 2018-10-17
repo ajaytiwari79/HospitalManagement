@@ -3,6 +3,7 @@ package com.kairos.dto.user.country.time_slot;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -10,7 +11,7 @@ import javax.validation.constraints.NotNull;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeSlotDTO {
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
+    @NotBlank(message = "error.name.notnull")
     private String name;
     private int startHour;
     private int startMinute;

@@ -2,6 +2,7 @@ package com.kairos.wrapper;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public class UpdateOrganizationTypeDTO {
 
     private Long id;
-    @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
+    @NotBlank(message = "error.OrganizationType.name.notEmpty")
     private String name;
 
     private List<Long> levelsToUpdate;

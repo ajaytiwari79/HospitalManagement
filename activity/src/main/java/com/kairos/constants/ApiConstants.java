@@ -76,7 +76,11 @@ public final class ApiConstants {
     public static final String TASK_TYPES_SKILLS="/task_type/skills";
     public static final String TIME_SLOTS="/time_slots";
     public static final String DAY_TYPES="/day_types";
+    public static final String INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED="/integration/unit/{citizenUnitId}/flsCred";
     public static final String COUNTRY_COUNTRY_ID=COUNTRY_ID+"/{countryId}";
+    public static final String SERVICE_DATA="/service/data";
+    public static final String SKILLS ="/skills";
+
 
 
 }

@@ -7,6 +7,7 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
@@ -18,9 +19,9 @@ import java.util.Set;
 public class StaffPersonalDetail {
 
     private Long id;
-    @NotEmpty(message = "error.Staff.firstname.notnull") @NotNull(message = "error.Staff.firstname.notnull")
+    @NotBlank(message = "error.Staff.firstname.notnull")
     private String firstName;
-    @NotEmpty(message = "error.Staff.lastname.notnull") @NotNull(message = "error.Staff.lastname.notnull")
+    @NotBlank(message = "error.Staff.lastname.notnull")
     private String lastName;
     private String signature;
     private long visitourId;
@@ -30,9 +31,7 @@ public class StaffPersonalDetail {
     private long languageId;
     private List<Long> expertiseIds;
     private List<StaffExperienceInExpertiseDTO> expertiseWithExperience;
-   // @NotEmpty(message = "error.cprnumber.notnull") @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
-   // @NotEmpty(message = "error.Staff.familyname.notnull") @NotNull(message = "error.Staff.familyname.notnull")
     private String familyName;
 
     // Visitour Speed Profile

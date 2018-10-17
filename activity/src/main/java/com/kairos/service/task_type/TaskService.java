@@ -151,8 +151,7 @@ public class TaskService extends MongoBaseService {
     private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-    @Inject
-    private IntegrationRestClient integrationServiceRestClient;
+
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -1098,7 +1097,7 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
-        Map<String, String> flsCredential = integrationServiceRestClient.getFLS_Credentials(organizationId);
+        Map<String, String> flsCredential = genericIntegrationService.getFLS_Credentials(organizationId);
        /* Visitour visitour = visitourGraphRepository.findByOrganizationId(organizationId);
         Map<String, String> credentials = new HashMap<>();
         String url = (visitour != null) ? visitour.getServerName() : "";

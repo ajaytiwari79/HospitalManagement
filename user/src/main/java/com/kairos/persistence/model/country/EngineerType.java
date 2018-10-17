@@ -3,10 +3,12 @@ package com.kairos.persistence.model.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,26 +24,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class EngineerType extends UserBaseEntity {
 
-    @NotEmpty(message = "error.EngineerType.name.notEmpty") @NotNull(message = "error.EngineerType.name.notnull")
+    @NotBlank(message = "error.EngineerType.name.notEmpty")
     private String name;
-
-
-    //@NotEmpty(message = "error.EngineerType.description.notEmpty") @NotNull(message = "error.EngineerType.description.notnull")
     private String description;
-
     private String visitourCode;
-
-    public String getVisitourCode() {
-        return visitourCode;
-    }
-
-    public void setVisitourCode(String visitourCode) {
-        this.visitourCode = visitourCode;
-    }
-
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     private boolean isEnabled = true;
 
     public String getName() {
@@ -49,7 +37,7 @@ public class EngineerType extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
 
@@ -58,7 +46,7 @@ public class EngineerType extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public Country getCountry() {
@@ -75,6 +63,14 @@ public class EngineerType extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public String getVisitourCode() {
+        return visitourCode;
+    }
+
+    public void setVisitourCode(String visitourCode) {
+        this.visitourCode = StringUtils.trim(visitourCode);
     }
 
     public EngineerType() {

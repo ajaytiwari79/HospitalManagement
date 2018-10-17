@@ -2,10 +2,7 @@ package com.kairos.service.visitator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
-import com.kairos.rest_client.ClientRestClient;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.OrganizationServiceRestClient;
-import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user.client.Client;
 import com.kairos.persistence.model.task.Task;
@@ -88,7 +85,7 @@ public class VisitatorService{
     @Autowired
     OrganizationRestClient organizationRestClient;
     @Autowired
-    OrganizationServiceRestClient organizationServiceRestClient;
+    GenericIntegrationService genericIntegrationService;
     @Autowired
     ClientRestClient clientRestClient;
     @Autowired private StaffRestClient staffRestClient;
@@ -105,7 +102,7 @@ public class VisitatorService{
     }
 
     public Object getUnitProvidedServices(long unitId) {
-        Map<String, Object> services = organizationServiceRestClient.getOrganizationServices(unitId,ORGANIZATION);
+        Map<String, Object> services = genericIntegrationService.getOrganizationServices(unitId,ORGANIZATION);
         //Map<String,Object> services = organizationServiceService.organizationServiceData(unitId,ORGANIZATION);
         return services.get("selectedServices");
     }
@@ -219,7 +216,7 @@ public class VisitatorService{
     private List<Map<String, Object>> getServiceHierarchy(long unitId){
         //Map<String, Object> organizationServices = organizationServiceService.organizationServiceData(unitId, ORGANIZATION);
         // Map<String, Object> organizationServices = organizationServiceService.organizationServiceData(unitId, ORGANIZATION);
-          Map<String, Object> organizationServices=organizationServiceRestClient.getOrganizationServices(unitId,ORGANIZATION);
+          Map<String, Object> organizationServices=genericIntegrationService.getOrganizationServices(unitId,ORGANIZATION);
         List<Map<String, Object>> orgSelectedServices = (List<Map<String,Object>>) organizationServices.get("selectedServices");
         List<Map<String, Object>> mainServiceList = new ArrayList<>(orgSelectedServices.size());
         Map<String, Object> mainServiceMap;
