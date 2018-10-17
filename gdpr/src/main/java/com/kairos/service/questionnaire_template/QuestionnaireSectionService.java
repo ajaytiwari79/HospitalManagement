@@ -2,14 +2,18 @@ package com.kairos.service.questionnaire_template;
 
 
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
+import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
@@ -55,6 +59,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
     @Inject
     private AssessmentMongoRepository assessmentMongoRepository;
+
+    @Inject
+    private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
     /**
@@ -182,7 +189,52 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 exceptionService.invalidRequestException("message.questionnaire.cannotbe.edit", new StringBuilder(inProgressAssessmentsLinkedWithQuestionnaireTemplate.stream().map(Assessment::getName).map(String::toString).collect(Collectors.joining(","))));
             }
         }
+        switch (questionnaireTemplate.getTemplateType()) {
+            case ASSET_TYPE:
+                checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(unitId, questionnaireTemplate);
+                break;
+            default:
+                QuestionnaireTemplate previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(unitId, questionnaireTemplate.getTemplateType());
+                if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                    exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType());
+                }
+                break;
+        }
+
     }
+
+
+    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long untiId, QuestionnaireTemplate questionnaireTemplate) {
+
+        QuestionnaireTemplate previousTemplate = null;
+        if (questionnaireTemplate.isDefaultAssetTemplate()) {
+            previousTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(untiId);
+            if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                exceptionService.duplicateDataException("duplicate.questionnaire.template.assetType.defaultTemplate");
+            }
+        } else {
+            if (!Optional.ofNullable(questionnaireTemplate.getAssetType()).isPresent()) {
+                exceptionService.invalidRequestException("message.invalid.request", "asset type is not selected");
+            }
+            AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(untiId, questionnaireTemplate.getAssetType());
+            if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
+                previousTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByUnitId(untiId, questionnaireTemplate.getAssetType());
+                if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                    exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
+                }
+            } else {
+                if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(questionnaireTemplate.getAssetSubType()))) {
+                    exceptionService.invalidRequestException("message.invalid.request", "Sub Asset Type is Not Selected");
+                } else {
+                    previousTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(untiId, questionnaireTemplate.getAssetType(), Collections.singletonList(questionnaireTemplate.getAssetSubType()));
+                    if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                        exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
+                    }
+                }
+            }
+        }
+    }
+
 
     public boolean deleteQuestionnaireSectionByUnitId(Long unitId, BigInteger templateId, BigInteger questionnaireSectionId) {
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByUnitIdAndId(unitId, templateId);

@@ -106,7 +106,6 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             }
             questionnaireTemplate.setDefaultAssetTemplate(true);
         } else {
-
             if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
                 exceptionService.invalidRequestException("message.invalid.request", "asset type is not selected");
             }
