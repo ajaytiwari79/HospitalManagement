@@ -87,7 +87,7 @@ public class ShiftSickService extends MongoBaseService {
         if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffUnitPositionDetails.getId(), DateUtils.getDateFromLocalDate(null));
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffUnitPositionDetails.getId(), DateUtils.getDateFromLocalDate(null));
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.cta.notFound");
         }

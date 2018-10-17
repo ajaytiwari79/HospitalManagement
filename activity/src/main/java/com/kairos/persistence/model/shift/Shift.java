@@ -63,6 +63,15 @@ public class Shift extends MongoBaseEntity {
     private Long createdBy = UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
     private Long functionId;
+    private Long staffUserId;
+
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public Shift() {
         //Default Constructor

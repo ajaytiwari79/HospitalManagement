@@ -712,7 +712,7 @@ public class TaskService extends MongoBaseService {
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));

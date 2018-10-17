@@ -72,11 +72,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "return id(staffs) as id,staffs.firstName+\" \" +staffs.lastName as name,staffs.profilePic as profilePic,teams,skills order by name")
     List<StaffAdditionalInfoQueryResult> getStaffAndCitizenDetailsOfUnit(long unitId);
 
-    @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization\n" +
-            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) where id(staff)={1} with staff,organization\n" +
-            "OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization\n" +
-            "OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization\n" +
-            "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
+    @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) where id(staff)={1} with staff,organization Match (staff)-[:BELONGS_TO]->(user:User) with staff,organization,user OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization,user OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization,user return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId,id(user) as staffUserId order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId);
 
     @Query("MATCH (staff:Staff) where id(staff)={0} Match (team)-[r:TEAM_HAS_MEMBER]->(staff) SET r.isEnabled=false return r")

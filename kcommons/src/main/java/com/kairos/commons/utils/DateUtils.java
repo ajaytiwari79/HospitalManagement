@@ -678,6 +678,10 @@ public class DateUtils {
         return LocalDateTime.of(localDate, LocalTime.of(hours, minutes,seconds));
     }
 
+    public static Date getStartOfTheDay(Date date){
+        return asDate(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
+    }
+
     public static int getWeekNumberByLocalDate(LocalDate localDate) {
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         return localDate.get(woy);

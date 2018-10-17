@@ -26,7 +26,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-        if(Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()){
+        if (Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             return true;
         }
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
@@ -39,7 +39,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                 }
             }
             if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
+                if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())){
                     return false;
                 }
             }
@@ -60,7 +60,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                 }
             }
             if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()){
+                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()) {
                     ShiftValidatorService.throwException("message.management.authority.phase");
                 }
                 if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
