@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.rest_client.SchedulerRestClient;
 import com.kairos.service.MongoBaseService;
@@ -70,7 +71,7 @@ public class AggregatorService extends MongoBaseService {
     @Inject
     private Scheduler scheduler;
     @Inject
-    private IntegrationRestClient integrationServiceRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
     @Inject
@@ -136,7 +137,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -211,7 +212,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -267,7 +268,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -314,7 +315,7 @@ public class AggregatorService extends MongoBaseService {
             Long  citizenId = Long.valueOf(map.get("_id").toString());
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                  clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);

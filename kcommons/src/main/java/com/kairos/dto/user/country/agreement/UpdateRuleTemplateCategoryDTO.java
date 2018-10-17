@@ -3,6 +3,7 @@ package com.kairos.dto.user.country.agreement;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
@@ -12,14 +13,9 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateRuleTemplateCategoryDTO {
-    @NotEmpty(message = "error.RuleTemplate.description.notEmpty")
-    @NotNull(message = "error.RuleTemplate.description.notnull")
+    @NotBlank(message = "error.RuleTemplate.description.notEmpty")
     private String name;
-    //@NotEmpty(message = "error.RuleTemplate.description.notEmpty")
-    //@NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
-
-    //    private List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates;
     private List<Long> tags;
     private BigInteger id;
 
