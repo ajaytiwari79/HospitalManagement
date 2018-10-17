@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface QuestionnaireSectionRepository extends MongoBaseRepository<QuestionnaireSection, BigInteger>,CustomQuestionSectionRepository {
+public interface QuestionnaireSectionRepository extends MongoBaseRepository<QuestionnaireSection, BigInteger> {
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")

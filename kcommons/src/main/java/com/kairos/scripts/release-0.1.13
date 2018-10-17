@@ -6,3 +6,6 @@ db.activities.find().forEach(function (elem) {
         $unset:{"rulesActivityTab.eligibleForSchedules":null}
         });
     });
+
+ // to set new property template status at organization Level
+ db.getCollection('questionnaireTemplate').updateMany({'organizationId':{$exists:true}},{$set:{'templateStatus':"PUBLISHED"}});
