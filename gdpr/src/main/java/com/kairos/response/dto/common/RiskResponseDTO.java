@@ -2,6 +2,7 @@ package com.kairos.response.dto.common;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -12,6 +13,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskResponseDTO {
 
 
