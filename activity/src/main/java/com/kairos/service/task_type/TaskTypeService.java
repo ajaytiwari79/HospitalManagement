@@ -744,7 +744,7 @@ public class TaskTypeService extends MongoBaseService {
     public TaskTypeDTO linkTaskTypesWithOrg(String taskTypeId, long organizationId,
                                             long subServiceId) throws CloneNotSupportedException {
 
-        boolean exist=organizationRestClient.isExistOrganization(organizationId);
+        boolean exist=genericIntegrationService.isExistOrganization(organizationId);
         if (!exist) {
             return null;
         }

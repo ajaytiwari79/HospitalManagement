@@ -112,7 +112,7 @@ public class TagService extends MongoBaseService {
         if(type.equalsIgnoreCase("team")){
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
@@ -126,7 +126,7 @@ public class TagService extends MongoBaseService {
         if(type.equalsIgnoreCase("team")){
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
@@ -146,7 +146,7 @@ public class TagService extends MongoBaseService {
         if(type.equalsIgnoreCase("team")){
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
@@ -179,7 +179,7 @@ public class TagService extends MongoBaseService {
         if(type.equalsIgnoreCase("team")){
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         Tag tag = tagMongoRepository.findTagByIdAndOrganizationIdAndDeletedAndCountryTagFalse(tagId, organizationId, false);
