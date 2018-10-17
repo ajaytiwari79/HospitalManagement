@@ -2,6 +2,7 @@ package com.kairos.service.client_exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.dto.user.client.Client;
 import com.kairos.dto.user.client.ClientExceptionCountWrapper;
@@ -93,7 +94,7 @@ public class ClientExceptionService extends MongoBaseService {
     @Inject
     private ClientRestClient clientRestClient;
     @Inject
-    IntegrationRestClient integrationServiceRestClient;
+    GenericIntegrationService genericIntegrationService;
     @Inject
     private TaskExceptionService taskExceptionService;
     @Inject
@@ -392,7 +393,7 @@ public class ClientExceptionService extends MongoBaseService {
                 updateTaskAddress(unhandledTask, clientTemporaryAddress);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(unhandledTasks, flsCredentials);
         return unhandledTasks;
     }
@@ -839,7 +840,7 @@ public class ClientExceptionService extends MongoBaseService {
                 tasksByNewDate.add(oldTask);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }
@@ -882,7 +883,7 @@ public class ClientExceptionService extends MongoBaseService {
                 tasksByNewDate.add(oldTask);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(exceptionOfCitizen.getUnitId());
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(exceptionOfCitizen.getUnitId());
         taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }

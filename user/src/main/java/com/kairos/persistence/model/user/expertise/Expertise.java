@@ -243,7 +243,7 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
+    public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
         this.name = name;
         this.id = id;
         this.description = description;
@@ -269,7 +269,7 @@ public class Expertise extends UserBaseEntity {
         this.history = history;
     }
 
-    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
+    public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description) {
 
         this.name = name;
         this.id = id;

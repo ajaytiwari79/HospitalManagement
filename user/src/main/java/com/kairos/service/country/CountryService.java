@@ -346,7 +346,7 @@ public class CountryService {
         Level levelToUpdate = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToUpdate == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",levelId);
 
         }
         levelToUpdate.setName(level.getName());
@@ -360,7 +360,7 @@ public class CountryService {
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToDelete == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",levelId);
 
         }
 

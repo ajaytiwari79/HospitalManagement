@@ -25,6 +25,7 @@ import java.util.Map;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class StaffRestClient {
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);
 
@@ -38,9 +39,9 @@ public class StaffRestClient {
      * @auther anil maurya
      * map endpoint in staff controller in user micro service
      */
+
     public Map<String, Object> getTeamStaffAndStaffSkill(List<Long> staffIds) {
         final String baseUrl = getBaseUrl(true);
-
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
             };
@@ -120,6 +121,7 @@ public class StaffRestClient {
         }
     }
 
+    //Actually on user microservice this API will never be resolved because of wrong url
     public Map<Long,Long> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
 
         final String baseUrl = getBaseUrl(organizationId, unitId, null);
