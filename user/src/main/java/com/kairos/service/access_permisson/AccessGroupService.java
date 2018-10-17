@@ -209,19 +209,27 @@ public class AccessGroupService {
         return countryAndOrgAccessGroupIdsMap;
     }
 
-    public void removeDefaultCopiedAccessGroup(List<Long> organizationIds){
+    public void removeDefaultCopiedAccessGroup(List<Long> organizationIds) {
         accessGroupRepository.removeDefaultCopiedAccessGroup(organizationIds);
     }
+
+    public void createDefaultAccessGroups(Organization parentOrg, List<Organization> organizations) {
+        List<AccessGroupQueryResult> accessGroupList = accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId());
+        createDefaultAccessGroupsInOrganization(parentOrg, accessGroupList, true);
+        organizations.forEach(org -> {
+            createDefaultAccessGroupsInOrganization(org, accessGroupList, false);
+        });
+    }
+
     /**
      * @param organization,accountTypeId
      * @author vipul
      * this method will create accessgroup to the organization
+     * @Extra Need to optimize
      */
     public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroupQueryResult> accessGroupList, boolean company) {
 
-        if (accessGroupList == null) {
-            accessGroupList = accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
-        }
+
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
 
         List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
