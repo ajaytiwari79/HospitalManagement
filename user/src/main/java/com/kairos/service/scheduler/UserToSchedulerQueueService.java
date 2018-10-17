@@ -18,7 +18,7 @@ public class UserToSchedulerQueueService {
 
     @Inject
     private KafkaProducer kafkaProducer;
-    public void pushToJobQueueOnEmploymentEnd(Long employmentEndDate, Long currentEmploymentEndDate,Long organiationId,Long employmentId, ZoneId unitTimeZone) {
+    public void pushToJobQueueOnEmploymentEnd(Long employmentEndDate, Long currentEmploymentEndDate,Long organiationId,Long employmentId, ZoneId unitTimeZone) throws Exception {
 
         if ((Optional.ofNullable(employmentEndDate).isPresent() && !employmentEndDate.equals(currentEmploymentEndDate)) ||
                 (!Optional.ofNullable(employmentEndDate).isPresent() && Optional.ofNullable(currentEmploymentEndDate).isPresent())) {

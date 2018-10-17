@@ -1100,7 +1100,6 @@ public class StaffService {
 
         if (!Optional.ofNullable(user).isPresent()) {
             user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
-            user.setUserType(UserType.USER_ACCOUNT);
         }
 
         Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
@@ -1134,7 +1133,6 @@ public class StaffService {
             SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
             user = new User();
             user.setUserLanguage(systemLanguage);
-            user.setUserType(UserType.USER_ACCOUNT);
             setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
@@ -1849,7 +1847,6 @@ public class StaffService {
             String email = (timeCareStaffDTO.getEmail() == null) ? timeCareStaffDTO.getFirstName() + KAIROS_EMAIL : timeCareStaffDTO.getEmail();
             User user = Optional.ofNullable(userGraphRepository.findByEmail(email.trim())).orElse(new User());
             user.setUserLanguage(systemLanguage);
-            user.setUserType(UserType.USER_ACCOUNT);
             if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
                 exceptionService.duplicateDataException("message.staff.alreadyexist");
 
