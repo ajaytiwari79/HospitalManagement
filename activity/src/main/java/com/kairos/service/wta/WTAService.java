@@ -1,13 +1,15 @@
 package com.kairos.service.wta;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
@@ -18,10 +20,10 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.WTADetailRestClient;
 import com.kairos.service.MongoBaseService;
@@ -32,8 +34,6 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +60,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
 public class WTAService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository wtaRepository;
-    @Inject
-    private CountryRestClient countryRestClient;
+
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
@@ -96,6 +95,8 @@ public class WTAService extends MongoBaseService {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -126,7 +127,7 @@ public class WTAService extends MongoBaseService {
             endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
             wta.setEndDate(endDate);
         }
-        WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
+        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
@@ -230,7 +231,7 @@ public class WTAService extends MongoBaseService {
             logger.info("wta not found while updating at unit %d", wtaId);
             exceptionService.dataNotFoundByIdException("message.wta.id", wtaId);
         }
-        WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(updateDTO.getExpertiseId(), updateDTO.getOrganizationSubType(), countryId, 0l, updateDTO.getOrganizationType());
+        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(updateDTO.getExpertiseId(), updateDTO.getOrganizationSubType(), countryId, 0l, updateDTO.getOrganizationType());
         oldWta = prepareWtaWhileUpdate(oldWta, updateDTO, wtaBasicDetailsDTO);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
@@ -373,7 +374,7 @@ public class WTAService extends MongoBaseService {
     public Map<String, Object> setWtaWithOrganizationType(Long countryId, BigInteger wtaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
         /*List<WTARuleTemplateDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTARuleTemplateDTO>();*/
-        WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(0L, organizationSubTypeId, countryId, 0L, 0L);
+        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(0L, organizationSubTypeId, countryId, 0L, 0L);
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.subtype.id", organizationSubTypeId);
         }
@@ -410,14 +411,14 @@ public class WTAService extends MongoBaseService {
     public WTADefaultDataInfoDTO getDefaultWtaInfo(Long countryId) {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndCountryId(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
-        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfo(countryId);
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = genericIntegrationService.getWtaTemplateDefaultDataInfo(countryId);
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activityDTOS);
         return wtaDefaultDataInfoDTO;
     }
 
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
-        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfoByUnitId();
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = genericIntegrationService.getWtaTemplateDefaultDataInfoByUnitId();
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);

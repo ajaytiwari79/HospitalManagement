@@ -3,6 +3,7 @@ package com.kairos.commons.utils;
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.enums.IntegrationOperation;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.commons.utils.RestClientUrlUtil.getBaseUrl;
-import org.apache.http.client.utils.URIBuilder;
 
 
 

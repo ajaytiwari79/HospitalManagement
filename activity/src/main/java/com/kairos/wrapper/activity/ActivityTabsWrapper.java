@@ -2,16 +2,20 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.persistence.model.unit_settings.PhaseSettings;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -42,22 +46,9 @@ public class ActivityTabsWrapper {
     private PermissionsActivityTab permissionsActivityTab;
     private List<EmploymentTypeDTO> employmentTypes;
     private List<Long> rulesTabDayTypes= new ArrayList<>();
+    private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private Set<AccessGroupRole> roles;
 
-    public List<TimeTypeDTO> getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
-        this.timeTypes = timeTypes;
-    }
-
-    public List<DayType> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<DayType> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
 
     public ActivityTabsWrapper(OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
         this.optaPlannerSettingActivityTab = optaPlannerSettingActivityTab;
@@ -97,6 +88,13 @@ public class ActivityTabsWrapper {
 
     public ActivityTabsWrapper(RulesActivityTab rulesTab, List<DayType> dayTypes,List<EmploymentTypeDTO> employmentTypes) {
         this.rulesTab = rulesTab;
+        this.dayTypes = dayTypes;
+        this.employmentTypes=employmentTypes;
+    }
+
+    public ActivityTabsWrapper(Set<AccessGroupRole> accessGroupRoles,PhaseSettingsActivityTab phaseSettingsActivityTab, List<DayType> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
+        this.roles=accessGroupRoles;
+        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
         this.dayTypes = dayTypes;
         this.employmentTypes=employmentTypes;
     }
@@ -297,5 +295,37 @@ public class ActivityTabsWrapper {
 
     public void setRulesTabDayTypes(List<Long> rulesTabDayTypes) {
         this.rulesTabDayTypes = rulesTabDayTypes;
+    }
+
+    public List<TimeTypeDTO> getTimeTypes() {
+        return timeTypes;
+    }
+
+    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
+        this.timeTypes = timeTypes;
+    }
+
+    public List<DayType> getDayTypes() {
+        return dayTypes;
+    }
+
+    public void setDayTypes(List<DayType> dayTypes) {
+        this.dayTypes = dayTypes;
+    }
+
+    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
+        return phaseSettingsActivityTab;
+    }
+
+    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
+        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
+    }
+
+    public Set<AccessGroupRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<AccessGroupRole> roles) {
+        this.roles = roles;
     }
 }

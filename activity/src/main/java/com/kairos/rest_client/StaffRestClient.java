@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
@@ -24,6 +25,7 @@ import java.util.Map;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class StaffRestClient {
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);
 
@@ -37,9 +39,9 @@ public class StaffRestClient {
      * @auther anil maurya
      * map endpoint in staff controller in user micro service
      */
+
     public Map<String, Object> getTeamStaffAndStaffSkill(List<Long> staffIds) {
         final String baseUrl = getBaseUrl(true);
-
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
             };
@@ -119,6 +121,7 @@ public class StaffRestClient {
         }
     }
 
+    //Actually on user microservice this API will never be resolved because of wrong url
     public Map<Long,Long> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
 
         final String baseUrl = getBaseUrl(organizationId, unitId, null);
@@ -298,12 +301,15 @@ public class StaffRestClient {
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate,Long staffId, String type, Long unitEmploymentId) {
         final String baseUrl = getBaseUrl(true);
+         if(shiftDate==null){
+             shiftDate=DateUtils.getCurrentLocalDate();
+         }
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&shiftDate="+shiftDate,
+                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}?type=" + type+"&shiftDate="+shiftDate,
                             HttpMethod.GET, null, typeReference, staffId, unitEmploymentId);
             RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

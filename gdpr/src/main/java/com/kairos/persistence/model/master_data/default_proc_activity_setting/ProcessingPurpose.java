@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document(collection = "processing_purpose")
+@Document
 public class ProcessingPurpose extends MongoBaseEntity {
 
 

@@ -8,6 +8,7 @@ import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.enums.FixedValueType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -16,10 +17,7 @@ import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
-import com.kairos.rest_client.CountryRestClient;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
@@ -33,6 +31,7 @@ import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +62,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
-    private CountryRestClient countryRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private CTARuleTemplateRepository ctaRuleTemplateRepository;
     @Inject
@@ -75,9 +74,8 @@ public class CostTimeAgreementService extends MongoBaseService {
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
-    private GenericRestClient genericRestClient;
-    @Inject
     private TableSettingService tableSettingService;
+
 
 
     /**
@@ -111,7 +109,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         if (ctaRuleTemplateRepository.isCTARuleTemplateExistWithSameName(countryId, ctaRuleTemplateDTO.getName())) {
             exceptionService.dataNotFoundByIdException("message.cta.ruleTemplate.alreadyExist", ctaRuleTemplateDTO.getName());
         }
-        CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
+        CountryDTO countryDTO = genericIntegrationService.getCountryById(countryId);
         ctaRuleTemplateDTO.setId(null);
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
         CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
@@ -242,8 +240,7 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
     public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
-        UnitPositionDTO unitPosition = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionDTO>>() {
-        }, unitEmploymentPositionId);
+        UnitPositionDTO unitPosition = genericIntegrationService.getUnitPositionDTO(unitId,unitEmploymentPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitEmploymentPositionId);
 
@@ -252,8 +249,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     public UnitPositionDTO updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
-        UnitPositionDTO unitPosition = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionDTO>>() {
-        }, unitPositionId);
+        UnitPositionDTO unitPosition = genericIntegrationService.getUnitPositionDTO(unitId,unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
@@ -437,7 +433,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @return CTARuleTemplateDTO
      */
     public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId, BigInteger id, CTARuleTemplateDTO ctaRuleTemplateDTO) {
-        CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
+        CountryDTO countryDTO = genericIntegrationService.getCountryById(countryId);
         CTARuleTemplate ctaRuleTemplate = ctaRuleTemplateRepository.findOne(id);
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplate.getRuleTemplateType());
         CTARuleTemplate udpdateCtaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);

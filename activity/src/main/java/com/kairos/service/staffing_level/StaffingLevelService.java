@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
@@ -112,7 +113,7 @@ public class StaffingLevelService extends MongoBaseService {
     @Autowired
     com.fasterxml.jackson.databind.ObjectMapper objectMapper;
     @Autowired
-    private StaffRestClient staffRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Autowired
     private ActivityMongoRepositoryImpl activityMongoRepositoryImpl;
     @Autowired
@@ -125,6 +126,8 @@ public class StaffingLevelService extends MongoBaseService {
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
     @Inject
     private StaffingLevelTemplateService staffingLevelTemplateService;
+    @Inject
+    private StaffingLevelActivityRankService staffingLevelActivityRankService;
 
 
     /**
@@ -135,7 +138,7 @@ public class StaffingLevelService extends MongoBaseService {
         logger.debug("saving staffing level organizationId {}", unitId);
         StaffingLevel staffingLevel = null;
         staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(presenceStaffingLevelDTO.getCurrentDate()));
-
+        StaffingLevelUtil.sortStaffingLevelActivities(presenceStaffingLevelDTO,presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank());
         if (Optional.ofNullable(staffingLevel).isPresent()) {
             if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
@@ -156,13 +159,13 @@ public class StaffingLevelService extends MongoBaseService {
 
         }
         this.save(staffingLevel);
+        boolean activitiesRankUpdate= staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()),staffingLevel.getId(),staffingLevel.getStaffingLevelSetting().getActivitiesRank());
         BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO, new String[]{"presenceStaffingLevelInterval", "absenceStaffingLevelInterval"});
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.CREATE);
-
-        return presenceStaffingLevelDTO;
+        return  presenceStaffingLevelDTO;
     }
 
     /**
@@ -204,6 +207,7 @@ public class StaffingLevelService extends MongoBaseService {
      */
     public PresenceStaffingLevelDto updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId
             , PresenceStaffingLevelDto presenceStaffingLevelDTO) {
+        StaffingLevelUtil.sortStaffingLevelActivities(presenceStaffingLevelDTO,presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank());
         logger.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
         if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
@@ -674,7 +678,7 @@ public class StaffingLevelService extends MongoBaseService {
         shiftPlanningInfo.put("unitId", unitId);
         shiftPlanningInfo.put("activities", activityDTOS);
         List<Long> expertiesId = new ArrayList<>(activityDTOS.stream().flatMap(a -> a.getExpertises().stream()).collect(Collectors.toSet()));
-        shiftPlanningInfo.put("staffs", staffRestClient.getStaffInfo(unitId, expertiesId));
+        shiftPlanningInfo.put("staffs", genericIntegrationService.getStaffInfo(unitId, expertiesId));
         submitShiftPlanningProblemToPlanner(shiftPlanningInfo);
     }
 
