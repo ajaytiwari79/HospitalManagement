@@ -259,12 +259,6 @@ public class PlanningPeriodService extends MongoBaseService {
                     planningPeriods, applicablePhases, planningPeriodDTO, --recurringNumber);
         }
     }
-//  if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
-//        startDate = startDate.withDayOfMonth(1);
-//    }else{
-//        startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
-//    }
-    //DateUtils.addDurationInLocalDate(startDate, planningPeriodDTO.getDuration(), planningPeriodDTO.getDurationType(), 1),
 
     public List<LocalDate> getListOfStartDateInWeekOrMonths(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
         List<LocalDate> startDateList = new ArrayList<>();
@@ -490,7 +484,7 @@ public class PlanningPeriodService extends MongoBaseService {
         periodPhaseFlippingDate.setFlippingTime(DateUtils.getCurrentLocalTime());
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         save(planningPeriod);
-        //      schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
+        //schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 

@@ -35,5 +35,7 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     @Query("{unitPositionId:{$in:?0},date:{ $lte:?1}}")
     List<DailyTimeBankEntry> findAllByUnitPositionsAndBeforDate(List<Long> unitPositionIds, Date endDate);
 
+    @Query(value = "{unitPositionId:{$in:?0},date:{$gte:?1 , $lt:?2}}",delete = true)
+    void deleteDailyTimeBank(List<Long> unitPositionIds, Date startDate, Date endDate);
 
 }

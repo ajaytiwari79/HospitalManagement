@@ -13,6 +13,10 @@ public enum AccessGroupRole {
     STAFF("Staff"), MANAGEMENT("Management");
     private String accessGroupRole;
 
+    AccessGroupRole() {
+
+    }
+
     AccessGroupRole(String accessGroupRole) {
         this.accessGroupRole = accessGroupRole;
     }

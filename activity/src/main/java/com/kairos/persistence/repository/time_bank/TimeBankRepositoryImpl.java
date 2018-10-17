@@ -33,6 +33,7 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
     public List<DailyTimeBankEntry> findLastTimeBankByUnitPositionIds(List<Long> unitPositionId, Date date) {
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(Criteria.where("unitPositionId").in(unitPositionId).and("date").lt(date).and("deleted").is(false)),
+                Aggregation.sort(Sort.Direction.ASC,"date"),
                 Aggregation.group("unitPositionId").addToSet("$$ROOT").as("data"),
                 Aggregation.project().and("data").arrayElementAt(0),
                 Aggregation.replaceRoot("data")

@@ -14,7 +14,7 @@ public interface CustomPayOutRepository {
 
     PayOut findLastPayoutByUnitPositionId(Long unitPositionId, Date date);
 
-    List<PayOut> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionId, Date startDate,Date endDate);
+    List<PayOut> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionId, Date startDate);
 
     void updatePayOut(Long unitPositionId,int payOut);
 }

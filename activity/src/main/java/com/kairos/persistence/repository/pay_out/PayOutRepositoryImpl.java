@@ -34,9 +34,9 @@ public class PayOutRepositoryImpl implements CustomPayOutRepository {
     }
 
     @Override
-    public List<PayOut> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionIds, Date startDate, Date endDate) {
+    public List<PayOut> findAllLastPayoutByUnitPositionIds(List<Long> unitPositionIds, Date startDate) {
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where("unitPositionId").in(unitPositionIds).and("date").gte(startDate).and("deleted").is(false)),
+          Aggregation.match(Criteria.where("unitPositionId").in(unitPositionIds).and("date").lt(startDate).and("deleted").is(false)),
           Aggregation.sort(Sort.Direction.ASC,"date"),
                 Aggregation.group("unitPositionId").addToSet("$$ROOT").as("data"),
                 Aggregation.project().and("data").arrayElementAt(0),

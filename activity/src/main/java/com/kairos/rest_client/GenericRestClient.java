@@ -25,6 +25,8 @@ import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
+import static org.apache.commons.codec.Charsets.UTF_16;
+import static org.apache.commons.codec.Charsets.UTF_8;
 
 @Service
 public class GenericRestClient {
@@ -76,17 +78,13 @@ public class GenericRestClient {
 
 
     public String getURIWithParam(List<NameValuePair> queryParam) {
-        try {
-            URIBuilder builder = new URIBuilder();
             if (CollectionUtils.isNotEmpty(queryParam)) {
+                StringBuilder stringBuilder = new StringBuilder("?");
                 for (NameValuePair nameValuePair : queryParam) {
-                    builder.addParameter(nameValuePair.getName(), nameValuePair.getValue().replace("[", "").replace("]", ""));
+                    stringBuilder.append("&").append(nameValuePair.getName()).append("=").append(nameValuePair.getValue().replace("[", "").replace("]", ""));
                 }
+                return stringBuilder.toString();//.replace("%2C+","");
             }
-            return builder.build().toString();
-        } catch (URISyntaxException e) {
-            exceptionService.internalError(e.getMessage());
-        }
         return null;
     }
 
