@@ -17,6 +17,7 @@ import java.util.Map;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class TimeSlotRestClient {
     private static final Logger logger = LoggerFactory.getLogger(TimeSlotRestClient.class);
 

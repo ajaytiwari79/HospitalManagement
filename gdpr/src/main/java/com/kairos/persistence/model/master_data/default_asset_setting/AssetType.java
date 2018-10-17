@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 
-@Document(collection = "asset_type")
+@Document
 public class AssetType extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty or null")

@@ -4,6 +4,7 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Date;
@@ -15,11 +16,11 @@ import java.util.List;
 public class StaffDTO {
 
     private Long id;
-    @NotEmpty(message = "error.StaffDTO.firstName.notEmpty") @NotNull(message = "error.StaffDTO.firstName.notnull")
+    @NotBlank(message = "error.StaffDTO.firstName.notEmpty")
     private String firstName;
-    @NotEmpty(message = "error.StaffDTO.lastName.notEmpty") @NotNull(message = "error.StaffDTO.lastName.notnull")
+    @NotBlank(message = "error.StaffDTO.lastName.notEmpty")
     private String lastName;
-    @NotEmpty(message = "error.StaffDTO.cprNumber.notEmpty") @NotNull(message = "error.StaffDTO.cprNumber.notnull")
+    @NotBlank(message = "error.StaffDTO.cprNumber.notEmpty")
     private BigInteger cprNumber;
     private String familyName;
 

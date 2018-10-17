@@ -254,7 +254,7 @@ public class AccessGroupController {
     @ApiOperation("Get country Access Groups by account type")
     @PostMapping(value = UNIT_URL + "/access_groups_by_parent" )
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAccessGroupUsingParentId(@PathVariable Long unitId, @RequestBody Set<Long> accessGroupIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupUsingParentId(unitId, accessGroupIds));
+    public ResponseEntity<Map<String, Object>> getAccessGroupUsingParentId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.findAllAccessGroupWithParentOfOrganization(unitId));
     }
 }

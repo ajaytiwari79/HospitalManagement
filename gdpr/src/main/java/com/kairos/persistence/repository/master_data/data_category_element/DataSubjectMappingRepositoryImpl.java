@@ -71,9 +71,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(dataSubjectId).and(DELETED).is(false)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
@@ -97,9 +97,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
@@ -124,9 +124,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 sort(Sort.Direction.DESC, "createdAt"),
@@ -152,9 +152,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where("_id").is(dataSubjectId).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")

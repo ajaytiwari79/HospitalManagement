@@ -1,8 +1,7 @@
 package com.kairos.dto.user.user.password;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
 
@@ -11,9 +10,9 @@ import java.util.Arrays;
  */
 public class PasswordUpdateDTO {
 
-    @NotEmpty
+    @NotBlank
     private char[] oldPassword;
-    @NotEmpty
+    @NotBlank
     private char[] confirmPassword;
 
     @Size(min = 6)

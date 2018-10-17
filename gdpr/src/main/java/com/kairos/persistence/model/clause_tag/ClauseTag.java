@@ -7,8 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 
 
-@Document(collection = "clause_tag")
-@TypeName("clause_tag")
+@Document
 public class ClauseTag extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be  empty")
