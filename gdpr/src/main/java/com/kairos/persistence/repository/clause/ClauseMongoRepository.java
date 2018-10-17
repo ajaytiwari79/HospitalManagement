@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -20,7 +21,7 @@ public interface ClauseMongoRepository extends MongoBaseRepository<Clause, BigIn
     Clause findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<Clause> findClauseByCountryIdAndIdList(Long countryId, List<BigInteger> ClauseIds);
+    List<Clause> findClauseByCountryIdAndIdList(Long countryId, Set<BigInteger> ClauseIds);
 
 
 }
