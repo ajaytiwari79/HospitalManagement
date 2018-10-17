@@ -122,7 +122,7 @@ public class ClientExceptionService extends MongoBaseService {
         logger.info("client exception dto :: " + clientExceptionDto.toString());
 
         // Client client = clientGraphRepository.findById(clientId, 0);
-        Client client = clientRestClient.getClient(clientId);
+        Client client = genericIntegrationService.getClient(clientId);
         if (client == null) {
             exceptionService.internalError("error.client.notfound");
         }
@@ -199,7 +199,7 @@ public class ClientExceptionService extends MongoBaseService {
             }
             case CHANGE_LOCATION: {
 
-                ClientTemporaryAddress clientTemporaryAddress = clientRestClient.updateClientTemporaryAddress(clientExceptionDto, unitId, clientId);
+                ClientTemporaryAddress clientTemporaryAddress = genericIntegrationService.updateClientTemporaryAddress(clientExceptionDto, unitId, clientId);
                 return createChangeLocationException(unitId, clientId, clientExceptionDto, clientExceptionType, clientTemporaryAddress);
             }
             case DO_NOT_DISTURB: {
@@ -760,7 +760,7 @@ public class ClientExceptionService extends MongoBaseService {
         List<Long> houseHoldMembers = new ArrayList<>(clientExceptionDTO.getHouseHoldMembers());
         houseHoldMembers.add(exceptionOfCitizen.getClientId());
         validateTimeSlotsForException(clientExceptionDTO,exceptionOfCitizen,houseHoldMembers,exceptionIds);
-        ClientTemporaryAddress clientTemporaryAddress = clientRestClient.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getUnitId(), exceptionOfCitizen.getClientId());
+        ClientTemporaryAddress clientTemporaryAddress = genericIntegrationService.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getUnitId(), exceptionOfCitizen.getClientId());
         List<Task> updatedTasks = updateTasksOnCreatingChangeLocationException(houseHoldMembers,exceptionOfCitizen,clientExceptionDTO,clientTemporaryAddress,exceptionsOfHouseHoldMembers);
         for(ClientException exceptionsOfHouseHoldMember : exceptionsOfHouseHoldMembers){
             exceptionsOfHouseHoldMember.setTemporaryAddressId(clientTemporaryAddress.getId());

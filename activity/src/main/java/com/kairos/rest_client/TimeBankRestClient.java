@@ -20,6 +20,7 @@ import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 * */
 
 @Service
+@Deprecated
 public class TimeBankRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeBankRestClient.class);
