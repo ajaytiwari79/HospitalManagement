@@ -636,6 +636,7 @@ public class AccessGroupService {
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
         accessGroupDTO.setId(accessGroup.getId());
+        accessGroupDTO.setEnabled(true);
         return accessGroupDTO;
     }
 
