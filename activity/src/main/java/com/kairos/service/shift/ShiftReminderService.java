@@ -76,10 +76,13 @@ public class ShiftReminderService extends MongoBaseService {
                     }
             }
         });
-        // TODO FUTURE REMOVE VIPUL MIGHT WE DONT NEED
-        List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(scheduledJobs, shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-        });
-        save(shift);
+        if (!scheduledJobs.isEmpty()) {
+            // TODO FUTURE REMOVE VIPUL MIGHT WE DONT NEED
+            List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest
+                    (scheduledJobs, shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+                    });
+            //save(shift);
+        }
     }
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
