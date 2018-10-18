@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.unit_position;
 
 
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -51,6 +53,14 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
+    @Query("MATCH (staff:Staff) where id(staff) IN {0} " +
+            "MATCH(staff)-[rel:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise) " +
+            "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)"+
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) " +
+            "match (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+            "return id(staff) as id,collect(id(expertise)) as expertiseIds,id(et) as employmentTypeId")
+    List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffId, LocalDate currentDate);
+
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition) IN {0} \n" +
             "MATCH(unitPosition)-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) \n"+
@@ -85,14 +95,14 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     WorkingTimeAgreement getOneDefaultWTA(Long organizationId, Long expertiseId);*/
 
 
-    @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
-            "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
-            "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization)  \n" +
-            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
-            "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
-            "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-            "OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
-            "optional match (expertise)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
+    @Query("MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0}\n" +
+            "match(staff)<-[:"+BELONGS_TO+"]-(employment:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(org:Organization) \n" +
+            "match(org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Organization)  \n" +
+            "optional match(subOrg)<-[:"+IN_UNIT+"]-(unitPosition:UnitPosition{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
+            "match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
+            "match(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode{deleted:false}) \n" +
+            "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
+            "optional match (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "return expertise as expertise,unionData as union, positionCode as positionCode, id(unitPosition) as id,\n" +
             " unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
