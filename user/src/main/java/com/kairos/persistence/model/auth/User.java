@@ -71,7 +71,7 @@ public class User extends UserBaseEntity {
     private boolean isPasswordUpdated;
 
     private Long kmdExternalId;
-    private UserType userType;
+    private UserType userType = UserType.USER_ACCOUNT;
 
     @Transient
     private Boolean hubMember;
