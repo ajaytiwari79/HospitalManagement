@@ -40,3 +40,10 @@ db.agreement_section.renameCollection("agreementSection");
 db.agreement_template.renameCollection("policyAgreementTemplate");
 
 
+
+
+// To update existing Activity reminder setting tab
+
+db.activities.updateMany({},{$set:{"communicationActivityTab" : { "allowCommunicationReminder" : false, "notifyAfterDeleteActivity" : true, "activityReminderSettings" : [] }}});
+
+
