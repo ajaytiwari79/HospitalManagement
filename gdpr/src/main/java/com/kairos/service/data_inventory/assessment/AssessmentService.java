@@ -313,6 +313,17 @@ public class AssessmentService extends MongoBaseService {
         return assessmentMongoRepository.getAllAssessmentByUnitId(unitId);
     }
 
+
+    public boolean deleteAssessmentbyId(Long unitId, BigInteger assessmentId) {
+
+        Assessment assessment = assessmentMongoRepository.findByUnitIdAndIdAndAssessmentStatus(unitId, assessmentId, AssessmentStatus.IN_PROGRESS);
+        if (Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.invalidRequestException("message.assessment.inprogress.cannot.delete", assessment.getName());
+        }
+        assetMongoRepository.safeDelete(assessmentId);
+        return true;
+    }
+
     /**
      * @param unitId
      * @param assessmentId
@@ -479,7 +490,7 @@ public class AssessmentService extends MongoBaseService {
             case NAME:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getName());
             case DESCRIPTION:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(),questionBasicDTO.getAttributeName(), assetResponseDTO.getDescription());
+                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDescription());
             case HOSTING_LOCATION:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getHostingLocation());
             case HOSTING_TYPE:
