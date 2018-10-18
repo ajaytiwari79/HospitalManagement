@@ -3,6 +3,7 @@ package com.kairos.controller.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
@@ -111,13 +112,6 @@ public class ActivityController {
     }
 
 
-    @ApiOperation("get Rules Tab of Activity")
-    @GetMapping(value = "/activity/{activityId}/rules")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getRulesTab(@PathVariable Long countryId, @PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getRulesTabOfActivity(activityId,countryId));
-    }
-
     @ApiOperation("get getTime Calculation Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/timeCalculation")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -160,12 +154,34 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.deleteCountryActivity(activityId));
     }
 
+    @ApiOperation("get Rules Tab of Activity")
+    @GetMapping(value = "/activity/{activityId}/rules")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getRulesTab(@PathVariable Long countryId, @PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getRulesTabOfActivity(activityId,countryId));
+    }
 
     @ApiOperation("Update Rules Tab of Activity")
     @PutMapping(value = "/activity/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO));
+    }
+
+    //Phase Settings
+
+    @ApiOperation("get Phase setting Tab of Activity")
+    @GetMapping(value = "/activity/{activityId}/phase_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getPhaseSettingTab(@PathVariable Long countryId, @PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getPhaseSettingTabOfActivity(activityId,countryId));
+    }
+
+    @ApiOperation("Update Phase setting Tab of Activity")
+    @PutMapping(value = "/activity/phase_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(phaseSettingsActivityTab));
     }
 
 

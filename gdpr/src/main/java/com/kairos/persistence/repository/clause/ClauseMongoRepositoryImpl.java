@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.clause;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.clause.Clause;
@@ -64,7 +64,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 sort(Sort.Direction.DESC, "createdAt")
         );
@@ -76,7 +76,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
 
@@ -101,7 +101,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 sort(Sort.Direction.DESC, "createdAt")
 
@@ -117,11 +117,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
         switch (filterType) {
             case ACCOUNT_TYPES:
-                List<BigInteger> ids = new ArrayList<>();
-                for (Long id : filterSelection.getValue()) {
-                    ids.add(BigInteger.valueOf(id));
-                }
-                return Criteria.where("accountTypes" + ID).in(ids);
+                return Criteria.where("accountTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_TYPES:
                 return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 

@@ -5,6 +5,7 @@ import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.wrapper.wta.CTAWTADTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +47,8 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date);
 
-    public List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date);
-
+    List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date);
+    WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId,Date date);
+    void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
 }

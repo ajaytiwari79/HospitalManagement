@@ -61,7 +61,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("asset", "assetId", "_id", "asset"),
-                lookup("processing_activity", "processingActivityId", "_id", "processingActivity"),
+                lookup("processingActivity", "processingActivityId", "_id", "processingActivity"),
                 new CustomAggregationOperation(Document.parse(projectionOpertaion))
 
         );
@@ -80,5 +80,12 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId).and("assessmentStatus").in(assessmentStatusList));
         return mongoTemplate.findOne(query, Assessment.class);
+    }
+
+
+    @Override
+    public List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("questionnaireTemplateId").is(templateId).and("assessmentStatus").in(assessmentStatusList));
+        return mongoTemplate.find(query, Assessment.class);
     }
 }

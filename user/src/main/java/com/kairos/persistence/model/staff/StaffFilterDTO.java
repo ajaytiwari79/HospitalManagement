@@ -17,7 +17,6 @@ public class StaffFilterDTO {
     private List<FilterSelection> filtersData;
     private long id;
     private String searchText;
-//    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
 
     public long getId() {

@@ -10,6 +10,7 @@ import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -20,10 +21,12 @@ import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
@@ -44,17 +47,20 @@ import static com.kairos.constants.AppConstants.*;
 @Component
 public class PayOutCalculationService {
 
-
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
+//~ ======================================================================================================================
     /**
      *
      * @param interval
-     * @param unitPositionDetails
+     * @param staffAdditionalInfoDTO
      * @param shift
      * @param activityWrapperMap
      * @param payOut
      * @return PayOut
      */
-    public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffUnitPositionDetails unitPositionDetails, Shift shift, Map<BigInteger,ActivityWrapper> activityWrapperMap, PayOut payOut) {
+    public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger,ActivityWrapper> activityWrapperMap, PayOut payOut) {
+        StaffUnitPositionDetails unitPositionDetails=staffAdditionalInfoDTO.getUnitPosition();
         int totalPayOut = 0;
         int scheduledMin = 0;
         int contractualMin = interval.getStart().get(ChronoField.DAY_OF_WEEK) <= unitPositionDetails.getWorkingDaysInWeek() ? unitPositionDetails.getTotalWeeklyMinutes() / unitPositionDetails.getWorkingDaysInWeek() : 0;
@@ -65,7 +71,7 @@ public class PayOutCalculationService {
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
                 for (CTARuleTemplateDTO ruleTemplate : unitPositionDetails.getCtaRuleTemplates()) {
-                    if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() != null && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
+                    if ((timeBankCalculationService.validateCTARuleTemplateDTO(ruleTemplate,unitPositionDetails.getEmploymentType(),shift.getPhaseId() )&& ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT))) {
                         int ctaPayOutMin = 0;
                         boolean activityValid = ruleTemplate.getActivityIds().contains(activity.getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(activity.getBalanceSettingsActivityTab().getTimeTypeId()));
                         if (activityValid) {

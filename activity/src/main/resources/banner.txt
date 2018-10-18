@@ -22,4 +22,4 @@
                             K:::::::K    K:::::K a::::::::::aa:::a i::::i  r::::r              o:::::::::::oo    s:::::::::::ss
                             KKKKKKKKK    KKKKKKK  aaaaaaaaaa  aaaa iiiiii  rrrrrr                ooooooooooo       sssssssssss
 
-                                        ${Ansi.RED} :: Spring Boot${spring-boot.formatted-version} :: ${Ansi.DEFAULT}
+                                            ${Ansi.RED} :: Spring Boot${spring-boot.formatted-version} :: ${Ansi.DEFAULT}

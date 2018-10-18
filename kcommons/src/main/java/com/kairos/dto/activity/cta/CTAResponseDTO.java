@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.cta;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
@@ -16,11 +17,11 @@ import java.util.Map;
 /**
  * Created by pavan on 16/4/18.
  */
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CTAResponseDTO {
     @NotNull
     private BigInteger id;
-    private BigInteger parentCTAId;
+    private BigInteger parentId;
     private String name;
     private String description;
     private ExpertiseResponseDTO expertise;
@@ -40,7 +41,11 @@ public class CTAResponseDTO {
     public CTAResponseDTO() {
         //Default constructor
     }
-
+    public CTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
+        this.name = name;
+        this.id = id;
+        this.parentId = parentId;
+    }
     public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description,PositionCodeDTO positionCodeDTO) {
         this.id = id;
         this.name = name;
@@ -110,12 +115,12 @@ public class CTAResponseDTO {
         this.id = id;
     }
 
-    public BigInteger getParentCTAId() {
-        return parentCTAId;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setParentCTAId(BigInteger parentCTAId) {
-        this.parentCTAId = parentCTAId;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public String getName() {

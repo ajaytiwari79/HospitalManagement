@@ -1,6 +1,7 @@
 package com.kairos.service.planner;
 
 import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
@@ -58,7 +59,7 @@ public class TasksMergingService extends MongoBaseService {
     @Inject
     TaskConverterService taskConverterService;
     @Autowired
-    IntegrationRestClient integrationServiceRestClient;
+    GenericIntegrationService genericIntegrationService;
     @Autowired private ClientRestClient clientRestClient;
 
     private static final Logger logger = LoggerFactory.getLogger(TasksMergingService.class);
@@ -99,7 +100,7 @@ public class TasksMergingService extends MongoBaseService {
         List<Task> taskList = new ArrayList<>();
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        TaskDemandVisitWrapper taskDemandVisitWrapper=clientRestClient.
+        TaskDemandVisitWrapper taskDemandVisitWrapper=genericIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId,unitId);
 
         Map<String, String> flsCredentials = taskDemandVisitWrapper.getFlsCredentials();
@@ -388,7 +389,7 @@ public class TasksMergingService extends MongoBaseService {
             }
         }
 
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {

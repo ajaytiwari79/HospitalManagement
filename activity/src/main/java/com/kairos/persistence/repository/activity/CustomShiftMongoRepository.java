@@ -26,6 +26,8 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate);
 
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEPS(List<Long> unitEmploymentPositionIds, Date startDate, Date endDate);
+
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
     List<Long> getUnitIdListOfShiftBeforeDate(Date date);
@@ -46,6 +48,15 @@ public interface CustomShiftMongoRepository {
 
     Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis);
 
+    List<Shift> findShiftsForCheckIn(List<Long> staffIds, Date startDateMillis, Date endDateMillis);
+
     void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
+
+     Shift findShiftByShiftActivityId(BigInteger shiftActivityId) ;
+
+
+    List<Shift> findShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
+
+
 
 }

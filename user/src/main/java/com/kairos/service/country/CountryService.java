@@ -7,10 +7,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
@@ -38,6 +40,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.rest_client.PhaseRestClient;
 import com.kairos.rest_client.PlannedTimeTypeRestClient;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
+import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
@@ -52,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +65,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 
 /**
@@ -102,6 +107,7 @@ public class CountryService {
     @Inject private LevelGraphRepository levelGraphRepository;
     @Inject private RelationTypeGraphRepository relationTypeGraphRepository;
     @Inject private VehicalGraphRepository vehicalGraphRepository;
+    @Inject private GenericRestClient genericRestClient;
     /**
      * @param country
      * @return
@@ -340,7 +346,7 @@ public class CountryService {
         Level levelToUpdate = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToUpdate == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",levelId);
 
         }
         levelToUpdate.setName(level.getName());
@@ -354,7 +360,7 @@ public class CountryService {
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToDelete == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",levelId);
 
         }
 
@@ -467,11 +473,14 @@ public class CountryService {
     //TODO Reduce web service calls/multiple calls
     public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId){
         List<ActivityTypeDTO> activityTypeDTOS;
-         if(Optional.ofNullable(unitId).isPresent()){
+        List<PhaseResponseDTO> phases;
+        if(Optional.ofNullable(unitId).isPresent()){
             countryId = organizationService.getCountryIdOfOrganization(unitId);
              activityTypeDTOS = activityTypesRestClient.getActivitiesForUnit(unitId);
+             phases = genericRestClient.publishRequest(null,unitId,true, IntegrationOperation.GET,API_ALL_PHASES_URL,null,new  ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {});
          } else {
              activityTypeDTOS=activityTypesRestClient.getActivitiesForCountry(countryId);
+            phases = phaseRestClient.getPhases(countryId);
 
          }
 
@@ -484,7 +493,7 @@ public class CountryService {
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
          List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
-         List<PhaseResponseDTO> phases = phaseRestClient.getPhases(countryId);
+
          List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
 
          //wrap data into wrapper class

@@ -15,8 +15,8 @@ public class UnitPositionWithCtaDetailsDTO {
     private int totalWeeklyMinutes;
     private int workingDaysInWeek;
     private Long staffId;
-    private LocalDate unitPositionStartDate;
-    private LocalDate unitPositionEndDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long countryId;
     private int minutesFromCta;
     private ZoneId unitTimeZone;
@@ -31,12 +31,12 @@ public class UnitPositionWithCtaDetailsDTO {
     public UnitPositionWithCtaDetailsDTO() {
     }
 
-    public UnitPositionWithCtaDetailsDTO(Long id, int totalWeeklyMinutes, int workingDaysInWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+    public UnitPositionWithCtaDetailsDTO(Long id, int totalWeeklyMinutes, int workingDaysInWeek, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.workingDaysInWeek = workingDaysInWeek;
-        this.unitPositionStartDate = unitPositionStartDate;
-        this.unitPositionEndDate = unitPositionEndDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
 
@@ -64,12 +64,12 @@ public class UnitPositionWithCtaDetailsDTO {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public LocalDate getUnitPositionEndDate() {
-        return unitPositionEndDate;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
-        this.unitPositionEndDate = unitPositionEndDate;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public int getMinutesFromCta() {
@@ -80,8 +80,8 @@ public class UnitPositionWithCtaDetailsDTO {
         this.minutesFromCta = minutesFromCta;
     }
 
-    public UnitPositionWithCtaDetailsDTO(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
+    public UnitPositionWithCtaDetailsDTO(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
     public Long getCountryId() {
@@ -92,12 +92,12 @@ public class UnitPositionWithCtaDetailsDTO {
         this.countryId = countryId;
     }
 
-    public LocalDate getUnitPositionStartDate() {
-        return unitPositionStartDate;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
-        this.unitPositionStartDate = unitPositionStartDate;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
 

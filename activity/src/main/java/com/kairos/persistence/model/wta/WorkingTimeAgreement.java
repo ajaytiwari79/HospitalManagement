@@ -44,7 +44,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     private List<BigInteger> ruleTemplateIds;
 
     // to make a history
-    private BigInteger parentWTA;
+    private BigInteger parentId;
 
     private BigInteger countryParentWTA;
 
@@ -116,12 +116,12 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public BigInteger getParentWTA() {
-        return parentWTA;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setParentWTA(BigInteger parentWTA) {
-        this.parentWTA = parentWTA;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
 

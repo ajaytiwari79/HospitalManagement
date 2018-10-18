@@ -1,8 +1,8 @@
 package com.kairos.service.clause_tag;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;

@@ -20,6 +20,6 @@ public class SchedulerBootstrapListener implements ApplicationListener<Applicati
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
-        schedulerPanelService.initSchedulerPanels();
+      //  schedulerPanelService.initSchedulerPanels();
     }
 }

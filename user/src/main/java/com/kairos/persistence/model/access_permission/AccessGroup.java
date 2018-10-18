@@ -11,11 +11,13 @@ import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PARENT_ACCESS_GROUP;
 
 /**
  * Created by prabjot on 9/27/16.
@@ -24,13 +26,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 @NodeEntity
 public class AccessGroup extends UserBaseEntity {
 
-    @NotEmpty(message = "error.name.notnull")
-    @NotNull(message = "error.name.notnull")
+    @NotBlank(message = "error.name.notnull")
     private String name;
     private boolean enabled = true;
     private boolean typeOfTaskGiver;
     private String description;
-
     @Property(name = "role")
     @EnumString(AccessGroupRole.class)
     private AccessGroupRole role;
@@ -40,12 +40,14 @@ public class AccessGroup extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<DayType> dayTypes;
+    @Relationship(type = HAS_PARENT_ACCESS_GROUP)
+    private AccessGroup parentAccessGroup;
 
     public AccessGroup() {
         //Default Constructor
     }
 
-    public AccessGroup(@NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role) {
+    public AccessGroup(@NotBlank(message = "error.name.notnull") String name, String description, AccessGroupRole role) {
         this.name = name;
         this.description = description;
         this.role = role;
@@ -60,7 +62,7 @@ public class AccessGroup extends UserBaseEntity {
         this.endDate=endDate;
     }
 
-    public AccessGroup(@NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
+    public AccessGroup(@NotBlank(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.description = description;
         this.role = role;
@@ -143,4 +145,11 @@ public class AccessGroup extends UserBaseEntity {
         this.dayTypes = dayTypes;
     }
 
+    public AccessGroup getParentAccessGroup() {
+        return parentAccessGroup;
+    }
+
+    public void setParentAccessGroup(AccessGroup parentAccessGroup) {
+        this.parentAccessGroup = parentAccessGroup;
+    }
 }

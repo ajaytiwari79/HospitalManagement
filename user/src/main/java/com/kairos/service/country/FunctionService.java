@@ -43,7 +43,7 @@ public class FunctionService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
-        Function isAlreadyExists=functionGraphRepository.findByNameIgnoreCase(countryId,functionDTO.getName().trim());
+        Function isAlreadyExists=functionGraphRepository.findByNameIgnoreCase(countryId,functionDTO.getName());
         if(Optional.ofNullable(isAlreadyExists).isPresent()){
             exceptionService.duplicateDataException("message.function.name.alreadyExist",functionDTO.getName());
 

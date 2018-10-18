@@ -8,6 +8,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.pay_out.PayOutRestClient;
@@ -66,7 +67,7 @@ public class PayOutService extends MongoBaseService {
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
     @Inject private ExceptionService exceptionService;
-    @Inject private TimeBankRestClient timeBankRestClient;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
 
     /**
@@ -86,7 +87,7 @@ public class PayOutService extends MongoBaseService {
             if(lastPayOut!=null) {
                 payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
             }
-            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activityWrapperMap, payOut);
+            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOut);
             if(payOut.getTotalPayOutMin()>0) {
                 payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
                 payOuts.add(payOut);
@@ -118,9 +119,10 @@ public class PayOutService extends MongoBaseService {
                 if(lastPayOut!=null) {
                     payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
                 }
-                payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activityWrapperMap, payOut);
+                payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOut);
                 if(payOut.getTotalPayOutMin()>0) {
-                    payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
+                    //Todo Pradeep should reafctor this method so that we can calculate accumulated payout
+                    //payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
                     payOuts.add(payOut);
                 }
                 startDate = startDate.plusDays(1);
@@ -130,6 +132,7 @@ public class PayOutService extends MongoBaseService {
             save(payOuts);
         }
     }
+
 
     /**
      *
@@ -158,7 +161,7 @@ public class PayOutService extends MongoBaseService {
      * @return boolean
      */
     public boolean requestPayOut(Long staffId,Long unitPositionId,int amount){
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = genericIntegrationService.getCTAbyUnitEmployementPosition(unitPositionId);
         if(unitPositionWithCtaDetailsDTO==null){
             exceptionService.invalidRequestException("message.unit.position");
         }
@@ -187,7 +190,7 @@ public class PayOutService extends MongoBaseService {
             if(lastPayOut!=null) {
                 payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
             }
-            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activityWrapperMap, payOut);
+            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOut);
             if(payOut.getTotalPayOutMin()>0) {
                 payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
                 payOuts.add(payOut);
