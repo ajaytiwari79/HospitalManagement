@@ -371,18 +371,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return staff")
     Staff findByUserId(Long userId, Long unitId);
 
-    @Query("Match(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
-            "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
-            "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
-            " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
-            "match (unitPosition)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "return staff as staff,expertise as expertise,unitPosition.workingTimeAgreementId as workingTimeAgreementId,et as employmentType,unit.unitTimeZone as unitTimeZone," +
-            "unitPosition.totalWeeklyHours as totalWeeklyHours, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis," +
-            "unitPosition.salary as salary,unitPosition.workingDaysInWeek as workingDaysInWeek," +
-            "unitPosition.hourlyWages as hourlyWages,id(unitPosition) as id,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
-            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
-    List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
+
 
 
     @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(user:User)where id(staff)={0} with staff,user\n" +

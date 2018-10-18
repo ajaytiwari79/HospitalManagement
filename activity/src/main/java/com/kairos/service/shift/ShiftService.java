@@ -201,7 +201,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
 
-
+    @Inject private ShiftReminderService shiftReminderService;
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         Activity activity = activityWrapper.getActivity();
@@ -288,6 +288,9 @@ public class ShiftService extends MongoBaseService {
 
         }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
+        Map<BigInteger,ActivityWrapper> activityWrapperMap= new HashMap<>();
+        activityWrapperMap.put(activityWrapper.getActivity().getId(),activityWrapper);
+        shiftReminderService.setReminderTrigger( activityWrapperMap,mainShift);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -549,6 +552,7 @@ public class ShiftService extends MongoBaseService {
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
 
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
+            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             boolean presenceTypeShift = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
             if (activityWrapper.getTimeType().equals(TimeTypes.WORKING_TYPE.toString())) {
@@ -671,6 +675,8 @@ public class ShiftService extends MongoBaseService {
         shift.setFunctionId(functionId);
         saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
         payOutService.deletePayOut(shift.getId());
+        List<BigInteger> jobIds=shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
+        shiftReminderService.deleteReminderTrigger(jobIds,shift.getUnitId());
 
 
     }

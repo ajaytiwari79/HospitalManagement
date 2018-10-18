@@ -645,7 +645,7 @@ public class UnitPositionService {
                 if (u.getEndDate() != null) {
                     u.setEndDate(positionLine.getEndDate());
                 }
-                });
+            });
         });
 
 
@@ -699,8 +699,6 @@ public class UnitPositionService {
         result.setUnitId(unitPosition.getUnit().getId());
 
         result.setParentUnitId(parentOrganizationId);
-        result.setEditable(unitPosition.isEditable());
-        result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
         Map<String, Object> reasonCode = null;
         if (Optional.ofNullable(unitPosition.getReasonCode()).isPresent()) {
@@ -743,11 +741,8 @@ public class UnitPositionService {
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(),
                 unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDate(),  wtaResponseDTO);
+                unitPosition.getLastWorkingDate(), wtaResponseDTO);
         result.setUnitId(unitPositionQueryResult.getUnitId());
-
-        result.setEditable(unitPosition.isEditable());
-        result.setHistory(unitPosition.isHistory());
         result.setPublished(unitPosition.isPublished());
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
         return result;
@@ -756,6 +751,22 @@ public class UnitPositionService {
 
     public void convertUnitPositionObject(UnitPositionQueryResult unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
+        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
+        unitPositionDetails.setId(unitPosition.getId());
+        unitPositionDetails.setStartDate(unitPosition.getStartDate());
+        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
+        unitPositionDetails.setEndDate(unitPosition.getEndDate());
+        unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
+        unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
+        unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
+        unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
+        unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
+    }
+
+    public void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
+        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        unitPositionDetails.setStaff(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
         UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
@@ -973,12 +984,12 @@ public class UnitPositionService {
     }
 
     /**
-     * @Desc This method is used to veify the unit position of staff while copy shift
      * @param unitId
      * @param staffId
      * @param dateInMillis
      * @param expertiseId
      * @return
+     * @Desc This method is used to veify the unit position of staff while copy shift
      */
     public Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long dateInMillis, Long expertiseId) {
         return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId, DateUtils.getLocalDate(dateInMillis));
@@ -992,7 +1003,7 @@ public class UnitPositionService {
     }
 
     // TODO FIX
-    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload,Long unitId) {
+    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload, Long unitId) {
 
         String dateAsString = new ArrayList<>(payload.keySet()).get(0);
 
@@ -1006,8 +1017,8 @@ public class UnitPositionService {
         } else if (unitPositionFunctionRelationship) {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO=staffService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString),unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId),unitPositionId,unitId,ORGANIZATION);
-        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString),staffAdditionalInfoDTO);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION);
+        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
         return true;
     }
 
@@ -1040,9 +1051,16 @@ public class UnitPositionService {
         return localDateAndFunctionIdMap;
     }
 
-    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
-        List<StaffUnitPositionDetails> staffData = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
-        return staffData;
+    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
+        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetails = new ArrayList<>();
+        staffData.forEach(currentData -> {
+            com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            convertUnitPositionObject(currentData, unitPositionDetail);
+            unitPositionDetails.add(unitPositionDetail);
+        });
+
+        return unitPositionDetails;
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
@@ -1204,11 +1222,11 @@ public class UnitPositionService {
 
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails=null;
+        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
             Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
-            unitPositionDetails= new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
             unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
             unitPositionDetails.setCountryId(countryId);
             convertUnitPositionObject(unitPosition, unitPositionDetails);

@@ -10,16 +10,16 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
-import static com.kairos.scheduler.constants.AppConstants.USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC;
+import static com.kairos.scheduler.constants.AppConstants.ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC;
 
 @Component
-public class UserToSchedulerLogsQueueListener {
+public class ActivityToSchedulerLogsQueueListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerLogsQueueListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActivityToSchedulerLogsQueueListener.class);
     @Inject
     private SchedulerPanelService schedulerPanelService;
 
-    @KafkaListener(topics=USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC)
+    @KafkaListener(topics=ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC)
     public void processMessage(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

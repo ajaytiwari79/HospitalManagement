@@ -48,8 +48,6 @@ public class UnitPosition extends UserBaseEntity {
     private LocalDate endDate;
     private LocalDate lastWorkingDate;
     private Long timeCareExternalId;
-    private boolean history;
-    private boolean editable;
     private boolean published;
     @Relationship(type = HAS_POSITION_LINES)
     private List<UnitPositionLine> unitPositionLines;
@@ -63,8 +61,6 @@ public class UnitPosition extends UserBaseEntity {
         this.unit = unit;
         this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;
-        this.editable=true;
-        this.history=false;
         this.published=published;
     }
 
@@ -150,22 +146,6 @@ public class UnitPosition extends UserBaseEntity {
         this.reasonCode = reasonCode;
     }
 
-    public boolean isHistory() {
-        return history;
-    }
-
-    public void setHistory(boolean history) {
-        this.history = history;
-    }
-
-    public boolean isEditable() {
-        return editable;
-    }
-
-    public void setEditable(boolean editable) {
-        this.editable = editable;
-    }
-
     public boolean isPublished() {
         return published;
     }
@@ -197,8 +177,6 @@ public class UnitPosition extends UserBaseEntity {
                 ", unit=" + unit +
                 ", reasonCode=" + reasonCode +
                 ", timeCareExternalId=" + timeCareExternalId +
-                ", history=" + history +
-                ", editable=" + editable +
                 ", published=" + published +
                 '}';
     }

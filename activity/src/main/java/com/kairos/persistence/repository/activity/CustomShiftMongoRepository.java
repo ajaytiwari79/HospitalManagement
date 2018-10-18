@@ -50,7 +50,11 @@ public interface CustomShiftMongoRepository {
 
     void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
 
+     Shift findShiftByShiftActivityId(BigInteger shiftActivityId) ;
+
+
     List<Shift> findShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
+
 
 
 }

@@ -1,20 +1,28 @@
-package com.kairos.persistence.model.activity.tabs;
+package com.kairos.dto.activity.activity.activity_tabs.communication_tab;
 
-import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by vipul on 24/8/17.
  */
-public class CommunicationActivityTab implements Serializable {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CommunicationActivityDTO {
+    private BigInteger activityId;
     private boolean allowCommunicationReminder;
     private boolean notifyAfterDeleteActivity;
     private List<ActivityReminderSettings> activityReminderSettings;
 
-    public CommunicationActivityTab() {
+    public BigInteger getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
     }
 
     public boolean isAllowCommunicationReminder() {
@@ -24,6 +32,7 @@ public class CommunicationActivityTab implements Serializable {
     public void setAllowCommunicationReminder(boolean allowCommunicationReminder) {
         this.allowCommunicationReminder = allowCommunicationReminder;
     }
+
     public boolean isNotifyAfterDeleteActivity() {
         return notifyAfterDeleteActivity;
     }
@@ -33,17 +42,10 @@ public class CommunicationActivityTab implements Serializable {
     }
 
     public List<ActivityReminderSettings> getActivityReminderSettings() {
-        return activityReminderSettings;
+        return Optional.ofNullable(activityReminderSettings).orElse(new ArrayList<>());
     }
 
     public void setActivityReminderSettings(List<ActivityReminderSettings> activityReminderSettings) {
         this.activityReminderSettings = activityReminderSettings;
     }
-
-    public CommunicationActivityTab(boolean allowCommunicationReminder, boolean notifyAfterDeleteActivity) {
-        this.allowCommunicationReminder = allowCommunicationReminder;
-        this.notifyAfterDeleteActivity = notifyAfterDeleteActivity;
-    }
-
-
 }

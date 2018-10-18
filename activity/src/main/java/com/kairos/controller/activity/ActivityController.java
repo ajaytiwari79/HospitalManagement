@@ -3,6 +3,7 @@ package com.kairos.controller.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
