@@ -1,12 +1,8 @@
 package com.kairos.service.counter;
 
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import org.springframework.data.mongodb.core.query.Criteria;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /*
@@ -16,42 +12,43 @@ import java.util.List;
 
 public class ShiftFilterCriteria {
     private Criteria matchCriteria;
-    private List<AggregationOperation> operations;
 
     private ShiftFilterCriteria(){
-        operations = new ArrayList<>();
         matchCriteria = Criteria.where("deleted").is(false);
-        operations.add(Aggregation.match(matchCriteria));
     }
 
     public static ShiftFilterCriteria getInstance(){
         return new ShiftFilterCriteria();
     }
 
-    public ShiftFilterCriteria setTimeInterval(List timeInterval){
-        matchCriteria = matchCriteria.and("startDate").gt(timeInterval.get(0)).and("startDate").lt(timeInterval.get(1));
-        return this;
+    private void setTimeInterval(List timeInterval){
+        matchCriteria.and("startDate").gt(timeInterval.get(0)).and("startDate").lt(timeInterval.get(1));
     }
 
-    public ShiftFilterCriteria setActivityIds(List activityIds){
+    private void setActivityIds(List activityIds){
         if(activityIds !=null && !activityIds.isEmpty())
-            matchCriteria = matchCriteria.and("activityId").in(activityIds);
-        return this;
+            matchCriteria.and("activityId").in(activityIds);
     }
 
-    public ShiftFilterCriteria setUnitId(List unitIds) {
-        if(unitIds != null && !unitIds.isEmpty())
-            matchCriteria = matchCriteria.and("unitId").in(unitIds);
-        return this;
+    private void setUnitIds(List unitIds){
+        if(unitIds !=null && !unitIds.isEmpty())
+            matchCriteria.and("unitPositionId").in(unitIds);
     }
 
-    public ShiftFilterCriteria setStaffIds(List staffIds) {
-        if(staffIds != null && !staffIds.isEmpty())
-            matchCriteria = matchCriteria.and("staffId").in(staffIds);
-        return this;
+    private void setPlanningPeriodIds(List planningPeriodIds){
+        if(planningPeriodIds != null && !planningPeriodIds.isEmpty())
+            matchCriteria.and("planningPeriodId").is(planningPeriodIds);
     }
 
-    public List<AggregationOperation> getMatchOperations(){
-        return operations;
+    public Criteria getMatchCriteria(List<FilterCriteria> criterias){
+        criterias.forEach(criteria -> {
+            switch(criteria.getType()){
+                case ACTIVITY_IDS: setActivityIds(criteria.getValues()); break;
+                case TIME_INTERVAL: setTimeInterval(criteria.getValues()); break;
+                case UNIT_IDS: setUnitIds(criteria.getValues()); break;
+                // add planning period criteria
+            }
+        });
+        return matchCriteria;
     }
 }
