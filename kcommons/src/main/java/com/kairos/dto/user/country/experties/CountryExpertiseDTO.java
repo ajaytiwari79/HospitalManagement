@@ -117,7 +117,8 @@ public class CountryExpertiseDTO {
     }
 
     public void setEndDateMillis(Date endDateMillis) {
-        this.endDateMillis =DateUtils.getEndOfDay(endDateMillis);
+        this.endDateMillis =endDateMillis==null?null: DateUtils.getEndOfDay(endDateMillis);
+
     }
 
     public Long getOrganizationLevelId() {
