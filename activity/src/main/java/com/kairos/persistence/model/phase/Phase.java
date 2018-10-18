@@ -64,7 +64,7 @@ public class Phase extends MongoBaseEntity {
         this.flippingDefaultTime = flippingDefaultTime;
     }
 
-    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color, LocalTime flippingDefaultTimeprivate, int gracePeriodByStaff, int gracePeriodByManagement, DayOfWeek untilNextDay, int realtimeDuration) {
+    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color, LocalTime flippingDefaultTime, int gracePeriodByStaff, int gracePeriodByManagement, DayOfWeek untilNextDay, int realtimeDuration) {
         this.name = name;
         this.description = description;
         this.phaseEnum = phaseEnum;

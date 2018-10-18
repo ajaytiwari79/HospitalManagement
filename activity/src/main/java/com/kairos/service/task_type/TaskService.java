@@ -731,7 +731,7 @@ public class TaskService extends MongoBaseService {
         if (!shiftsToCreate.isEmpty()) {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftsToCreate.get(0).getUnitId(), shiftsToCreate.get(0).getActivities().get(0).getStartDate());
             shiftService.saveShiftWithActivity(phase,shiftsToCreate,staffAdditionalInfoDTO);
-            timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
+            timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }
     }

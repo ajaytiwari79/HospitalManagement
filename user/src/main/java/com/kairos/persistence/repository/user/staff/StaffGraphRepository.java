@@ -79,6 +79,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId);
 
+    @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization\n" +
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) where id(staff) IN {1} with staff,organization\n" +
+            "OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization\n" +
+            "OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization\n" +
+            "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
+    List<StaffAdditionalInfoQueryResult> getStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds);
+
     @Query("MATCH (staff:Staff) where id(staff)={0} Match (team)-[r:TEAM_HAS_MEMBER]->(staff) SET r.isEnabled=false return r")
     List<StaffRelationship> removeStaffFromAllTeams(long staffId);
 

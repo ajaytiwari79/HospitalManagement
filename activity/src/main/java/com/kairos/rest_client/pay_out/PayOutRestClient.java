@@ -21,6 +21,7 @@ import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 * */
 
 @Service
+@Deprecated
 public class PayOutRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(PayOutRestClient.class);

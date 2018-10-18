@@ -29,27 +29,16 @@ public class Clause extends MongoBaseEntity {
     private List<ClauseTag> tags = new ArrayList<>();
     @NotNull
     private String description;
-
     private List<OrganizationType> organizationTypes;
-
     private List<OrganizationSubType> organizationSubTypes;
-
     private List<ServiceCategory> organizationServices;
-
     private List<SubServiceCategory> organizationSubServices;
-
     private List<AccountTypeVO> accountTypes;
-
     private Long countryId;
-
     private Boolean isDefault = true;
-
     private List<Long> organizationList;
-
     private BigInteger parentClauseId;
-
     private List<BigInteger> templateTypes;
-
     @Transient
     private Integer orderedIndex;
 
@@ -65,9 +54,7 @@ public class Clause extends MongoBaseEntity {
         return templateTypes;
     }
 
-    public void setTemplateTypes(List<BigInteger> templateTypes) {
-        this.templateTypes = templateTypes;
-    }
+    public void setTemplateTypes(List<BigInteger> templateTypes) { this.templateTypes = templateTypes; }
 
     public Long getCountryId() {
         return countryId;

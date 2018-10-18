@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.access_permission;
 
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -46,6 +47,19 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("Match (organization:Organization) where id(organization)={0}\n" +
             "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') return accessGroup")
     List<AccessGroup> getAccessGroups(long unitId);
+
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user) IN {0} \n"+
+            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission) \n" +
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) return DISTINCT\n" +
+            "apoc.map.fromValues([id(staff), {role:ag.role,userId:id(user)}]) AS map")
+    List<Map<String,Object>>  getUserAccessRoleByUserIds(List<Long> userIds);
+
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user) IN {0} AND id(organization) ={1} \n"+
+            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission) \n" +
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup)  return DISTINCT \n" +
+            "Case when ag.role={2} then true else false END as staff,Case when ag.role={3} then true else false END as management ,\n"+
+            "id(user) as userId,id(staff) as staffId,id(organization) as unitId")
+    List<UserAccessRoleQueryResult>  getUsersAccessRoleByUserIds(Long unitId,List<Long> userIds,String staffRole,String managementRoll);
 
     @Query("Match (organization:Organization) where id(organization)={0}\n" +
             "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false})-[:"+DAY_TYPES+"]-(dayType:DayType) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') " +

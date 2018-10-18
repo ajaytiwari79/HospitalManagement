@@ -298,7 +298,7 @@ public class SchedulerPanelService extends MongoBaseService {
      */
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
-        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitId(unitId);
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitIdAndDeletedFalse(unitId);
         List<SchedulerPanelDTO> schedulerPanelDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanelDTO.class);
         return schedulerPanelDTOS;
 
@@ -466,19 +466,13 @@ public class SchedulerPanelService extends MongoBaseService {
      */
     public Boolean deleteJob(BigInteger schedulerPanelId){
 
-            SchedulerPanel schedulerPanel = schedulerPanelRepository.findByIdAndDeletedFalse(schedulerPanelId);
+        if(!Optional.ofNullable(schedulerPanelRepository.safeDeleteById(schedulerPanelId)).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+        }
 
-            if(!Optional.ofNullable(schedulerPanel).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
-            }
+        dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelId);
 
-                schedulerPanel.setDeleted(true);
-                dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanel.getId());
-                schedulerPanel.setActive(false);
-
-            save(schedulerPanel);
-            return true;
-
+        return true;
     }
 
     /**

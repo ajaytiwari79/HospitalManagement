@@ -9,6 +9,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -25,17 +26,23 @@ import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
+import static org.apache.commons.codec.Charsets.UTF_16;
+import static org.apache.commons.codec.Charsets.UTF_8;
 
 @Service
 public class GenericRestClient {
     private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
-    @Autowired
+    @Inject
     RestTemplate restTemplate;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    @Qualifier("restTemplateWithoutAuth")
+    private RestTemplate schedulerRestTemplate;
 
 //=================================Usable Code==========================================
+
     /**
      * @param t
      * @param id
@@ -53,7 +60,7 @@ public class GenericRestClient {
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
-        String url = baseUrl + getURIWithParam(queryParam);
+        String url = baseUrl +getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
@@ -74,19 +81,53 @@ public class GenericRestClient {
     }
 
 
-    public String getURIWithParam(List<NameValuePair> queryParam) {
+    /**
+     * @param t
+     * @param id
+     * @param restClientUrlType
+     * @param httpMethod
+     * @param uri
+     * @param queryParam
+     * @param typeReference
+     * @param pathParams
+     * @param <T>
+     * @param <V>
+     * @return
+     * @author mohit
+     * @date 12-10-2018
+     */
+    public <T extends Object, V> V publishRequestWithoutAuth(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        String url = baseUrl + getURIWithParam(queryParam);
         try {
-            URIBuilder builder = new URIBuilder();
-            if (CollectionUtils.isNotEmpty(queryParam)) {
-                for (NameValuePair nameValuePair : queryParam) {
-                    builder.addParameter(nameValuePair.getName(), nameValuePair.getValue().replace("[", "").replace("]", ""));
-                }
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    schedulerRestTemplate.exchange(
+                            url,
+                            httpMethod,
+                            new HttpEntity<>(t), typeReference, pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                exceptionService.internalError(response.getMessage());
             }
-            return builder.build().toString();
-        } catch (URISyntaxException e) {
-            exceptionService.internalError(e.getMessage());
+            return response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in User micro service " + e.getMessage());
         }
-        return null;
+
+    }
+
+    public String getURIWithParam(List<NameValuePair> queryParam) {
+        String path="";
+            if (CollectionUtils.isNotEmpty(queryParam)) {
+                StringBuilder stringBuilder = new StringBuilder("?");
+                for (NameValuePair nameValuePair : queryParam) {
+                    stringBuilder.append("&").append(nameValuePair.getName()).append("=").append(nameValuePair.getValue().replace("[", "").replace("]", ""));
+                }
+                path= stringBuilder.toString();//.replace("%2C+","");
+            }
+        return path;
     }
 
 
@@ -145,8 +186,6 @@ public class GenericRestClient {
                 return HttpMethod.GET;
             default:
                 return null;
-
         }
     }
-
 }

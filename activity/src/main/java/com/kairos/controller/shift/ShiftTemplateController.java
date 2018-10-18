@@ -82,8 +82,8 @@ public class ShiftTemplateController {
     @PostMapping(value = "/shift-reminder")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> sendReminderForEmail( @RequestBody @Valid KairosSchedulerExecutorDTO job) {
-        shiftReminderService.sendReminderForEmail(job);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftReminderService.sendReminderForEmail(job));
     }
 
 }

@@ -31,7 +31,7 @@ public class UnitPositionQueryResult {
     private LocalDate lastWorkingDate;
     private Long parentUnitId;
     private Long unitId;
-
+    private Long staffId;
     private Map<String, Object> reasonCode;
     private Map<String, Object> unitInfo;
     private List<UnitPositionLinesQueryResult> positionLines;
@@ -192,6 +192,14 @@ public class UnitPositionQueryResult {
 
     public UnitPositionQueryResult() {
         //default cons
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 
     public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta) {

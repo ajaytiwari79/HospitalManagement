@@ -1,4 +1,4 @@
-package com.kairos.dto.gdpr;
+package com.kairos.dto.gdpr.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
