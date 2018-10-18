@@ -72,8 +72,6 @@ public class TaskTypeService extends MongoBaseService {
 
     @Autowired private GenericIntegrationService genericIntegrationService;
 
-    @Autowired private TimeSlotRestClient timeSlotRestClient;
-
     @Autowired
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
 
@@ -929,7 +927,7 @@ public class TaskTypeService extends MongoBaseService {
         TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(unitId,new BigInteger(taskTypeId),
                 taskTypeSlaConfigDTO.getTimeSlotId());
         if(taskTypeSlaConfig == null){
-            Map<String, Object> timeSlotMap = timeSlotRestClient.getTimeSlotByUnitIdAndTimeSlotId(unitId,taskTypeSlaConfigDTO.getTimeSlotId());
+            Map<String, Object> timeSlotMap = genericIntegrationService.getTimeSlotByUnitIdAndTimeSlotId(taskTypeSlaConfigDTO.getTimeSlotId());
             taskTypeSlaConfig = new TaskTypeSlaConfig(new BigInteger(taskTypeId),unitId, taskTypeSlaConfigDTO.getTimeSlotId(), timeSlotMap.get("name").toString());
         }
 
@@ -990,7 +988,7 @@ public class TaskTypeService extends MongoBaseService {
         //anil maurya call this code via rest template
         //List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
 
-        List<TimeSlotWrapper> currentTimeSlots=timeSlotRestClient.getCurrentTimeSlot(unitId);
+        List<TimeSlotWrapper> currentTimeSlots=genericIntegrationService.getCurrentTimeSlot();
         List<TimeSlotWrapper> timeSlots = new ArrayList<>(currentTimeSlots.size());
         List<Long> timeSlotIds = new ArrayList<>(currentTimeSlots.size());
         for(TimeSlotWrapper standredTimeSlot : currentTimeSlots){

@@ -1,7 +1,7 @@
 package com.kairos.controller.questionnaire_template;
 
 
-import com.kairos.dto.gdpr.QuestionnaireTemplateDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import com.kairos.utils.ResponseHandler;
@@ -78,19 +78,12 @@ public class QuestionnaireTemplateController {
     @ApiOperation(value = "save  questionnaire template basic data at organization level ")
     @PostMapping(UNIT_URL + "/questionnaire_template")
     public ResponseEntity<Object> saveQuestionnaireTemplate(@PathVariable Long unitId, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
-        if (!Optional.ofNullable(templateDto.getTemplateStatus()).isPresent()) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Template Status in Null");
-
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.saveQuestionnaireTemplate(unitId, templateDto));
     }
 
     @ApiOperation(value = "update basic detail of Questionnaire template at organization level ")
     @PutMapping(UNIT_URL + "/questionnaire_template/{questionnaireTemplateId}")
     public ResponseEntity<Object> updateQuestionnaireTemplate(@PathVariable Long unitId, @PathVariable BigInteger questionnaireTemplateId, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
-        if (!Optional.ofNullable(templateDto.getTemplateStatus()).isPresent()) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Template Status in Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.updateQuestionnaireTemplate(unitId, questionnaireTemplateId, templateDto));
     }
 

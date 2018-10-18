@@ -2,8 +2,7 @@ package com.kairos.scheduler.persistence.repository.scheduler_panel;
 
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
-import org.bouncycastle.util.test.FixedSecureRandom;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.kairos.scheduler.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -12,9 +11,9 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface SchedulerPanelRepository extends MongoRepository<SchedulerPanel, BigInteger> {
+public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerPanel, BigInteger> {
 
-    List<SchedulerPanel> findByUnitId(long unitId);
+    List<SchedulerPanel> findByUnitIdAndDeletedFalse(long unitId);
     List<SchedulerPanel> findByActive(boolean active);
 
     List<SchedulerPanel> findAllByDeletedFalse();

@@ -1,8 +1,12 @@
-package com.kairos.dto.gdpr;
+package com.kairos.dto.gdpr.agreement_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 

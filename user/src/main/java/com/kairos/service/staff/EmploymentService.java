@@ -703,7 +703,7 @@ public class EmploymentService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public Employment updateEmploymentEndDate(Organization unit, Long staffId) {
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId) throws Exception {
         Long employmentEndDate = getMaxEmploymentEndDate(staffId);
         return saveEmploymentEndDate(unit,employmentEndDate, staffId,null,null,null);
     }
@@ -753,7 +753,7 @@ public class EmploymentService {
         return true;
     }
 
-    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) {
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
         Long employmentEndDate = null;
         if(Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
@@ -785,7 +785,7 @@ public class EmploymentService {
 
     }
 
-    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId,Long reasonCodeId, Long endDateMillis,Long accessGroupId) {
+    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId,Long reasonCodeId, Long endDateMillis,Long accessGroupId) throws Exception {
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         ReasonCode reasonCode = null;

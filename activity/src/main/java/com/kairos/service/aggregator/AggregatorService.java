@@ -108,7 +108,7 @@ public class AggregatorService extends MongoBaseService {
         logger.info("Aggregator Job Starts on time---> " + DateUtils.getDate());
         try {
             List<Long> organizations = schedulerRestClient.getAllOrganizationIds();
-            logger.info("Aggregator Job Starts on time---> " + clientRestClient.getCitizenIdsByUnitIds(organizations));
+            logger.info("Aggregator Job Starts on time---> " + genericIntegrationService.getCitizenIdsByUnitIds(organizations));
             for (Long organizationId : organizations) {
                 aggregatorOneWeek(organizationId);
                 aggregatorTwoWeek(organizationId);
@@ -616,7 +616,7 @@ public class AggregatorService extends MongoBaseService {
     public void countCitizenTaskDemandsHoursAndTasks(){
 
         List<Long> organizations = schedulerRestClient.getAllOrganizationIds();
-        List<ClientOrganizationIds> clientOrganizationIdsList = clientRestClient.getCitizenIdsByUnitIds(organizations);
+        List<ClientOrganizationIds> clientOrganizationIdsList = genericIntegrationService.getCitizenIdsByUnitIds(organizations);
         for(ClientOrganizationIds clientOrganizationIds : clientOrganizationIdsList ){
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(clientOrganizationIds.getOrganizationId(), clientOrganizationIds.getCitizenId());
             if(!Optional.ofNullable(clientAggregator).isPresent()) clientAggregator = new ClientAggregator();
@@ -763,7 +763,7 @@ public class AggregatorService extends MongoBaseService {
             clientAggregators.addAll(clientAggregatorMongoRepository.getAggregateDataByUnit(unitId,skip,MONOGDB_QUERY_RECORD_LIMIT));
         }
         List<Long> citizenIds = clientAggregators.stream().map(clientAggregator -> clientAggregator.getCitizenId()).collect(Collectors.toList());
-        List<Client> clients = clientRestClient.getCitizensByIdsInList(citizenIds);
+        List<Client> clients = genericIntegrationService.getCitizensByIdsInList(citizenIds);
         List<ClientExceptionCountWrapper> clientExceptionCountWrappers = new ArrayList<>();
 
         int clientAggregatorPos = 0;

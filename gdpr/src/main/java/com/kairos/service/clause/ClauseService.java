@@ -10,6 +10,7 @@ import com.kairos.persistence.repository.agreement_template.PolicyAgreementTempl
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -54,7 +55,7 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param clauseDto contain data about clause and template type which belong to clause
      * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
-     * @throws DuplicateDataException : if clause already exist for id ,{@link com.kairos.custom_exception.InvalidRequestException if account type is not selected}
+     * @throws DuplicateDataException : if clause already exist for id ,if account type is not selected}
      * @desciption this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
     public ClauseDTO createClause(Long countryId, ClauseDTO clauseDto) {
@@ -133,9 +134,9 @@ public class ClauseService extends MongoBaseService {
      */
     public Boolean deleteClause(Long countryId, BigInteger clauseId) {
 
-        List<PolicyAgreementTemplate> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplatesByCurrentClauseIdAndCountryId(countryId, clauseId);
+        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplateListByCountryIdAndClauseId(countryId, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
-            exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(PolicyAgreementTemplate::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
         clauseMongoRepository.safeDelete(clauseId);
         return true;

@@ -1,7 +1,7 @@
 package com.kairos.controller.agreement_template;
 
 
-import com.kairos.dto.gdpr.master_data.AgreementSectionDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
 import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
