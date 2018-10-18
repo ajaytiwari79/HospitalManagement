@@ -1,6 +1,5 @@
 package com.kairos.service.period;
 
-
 import com.kairos.dto.activity.period.FlippingDateDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PeriodPhaseDTO;
@@ -33,6 +32,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.service.shift.ShiftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -63,7 +63,8 @@ public class PlanningPeriodService extends MongoBaseService {
 
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
-
+    @Inject
+    private ShiftService shiftService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
@@ -132,7 +133,7 @@ public class PlanningPeriodService extends MongoBaseService {
             // Set flipping dates
             FlippingDateDTO flippingDateDTO = null;
             for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
-                int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
+                    int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
                 switch (phaseSequence) {
                     case 4: {
                         flippingDateDTO = setFlippingDateAndTime(flippingDateDTO, flippingDateTime);
@@ -266,12 +267,6 @@ public class PlanningPeriodService extends MongoBaseService {
                     planningPeriods, applicablePhases, planningPeriodDTO, --recurringNumber);
         }
     }
-//  if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
-//        startDate = startDate.withDayOfMonth(1);
-//    }else{
-//        startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
-//    }
-    //DateUtils.addDurationInLocalDate(startDate, planningPeriodDTO.getDuration(), planningPeriodDTO.getDurationType(), 1),
 
     public List<LocalDate> getListOfStartDateInWeekOrMonths(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
         List<LocalDate> startDateList = new ArrayList<>();
@@ -570,9 +565,10 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
+        List<Shift> shiftList=shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(),unitId);
         List<StaffingLevelState> staffingLevelStates=staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()));
-        restoreShifts(shiftStates);
+        restoreShifts(shiftStates,shiftList,unitId);
         restoreAvailabilityCount(staffingLevels,staffingLevelStates);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
@@ -580,11 +576,11 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId) {
         List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
-        restoreShifts(shiftStates);
+        restoreShifts(shiftStates,new ArrayList(),unitId);
         return true;
     }
 
-    public void restoreShifts(List<ShiftState> shiftStates) {
+    public void restoreShifts(List<ShiftState> shiftStates,List<Shift> shiftList,Long unitId) {
         if (shiftStates.isEmpty()) {
             return;
         }
@@ -595,6 +591,7 @@ public class PlanningPeriodService extends MongoBaseService {
             shifts.add(shift);
         });
         save(shifts);
+        shiftService.UpdateShiftDailyTimeBankAndPaidOut(shifts,shiftList, unitId);
     }
 
     public void restoreAvailabilityCount(List<StaffingLevel> staffingLevels, List<StaffingLevelState> staffingLevelStates) {
