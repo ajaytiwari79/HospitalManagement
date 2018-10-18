@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.unit_position;
 
 
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -50,6 +52,14 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
             "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
+
+    @Query("MATCH (staff:Staff) where id(staff) IN {0} " +
+            "MATCH(staff)-[rel:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise) " +
+            "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)"+
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) " +
+            "match (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+            "return id(staff) as id,collect(id(expertise)) as expertiseIds,id(et) as employmentTypeId")
+    List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffId, LocalDate currentDate);
 
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition) IN {0} \n" +
