@@ -673,7 +673,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
-    @Query("Match (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) where id(orgType) IN {0} return id(orgType) as orgTypeId, collect(id(org)) as unitIds ")
+    @Query("Match (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) where id(orgType) IN {0} \n" +
+            "MATCH(org)-[:" + SUB_TYPE_OF + "]->(organizationType:OrganizationType) \n" +
+            "return id(org) as unitId, collect(id(organizationType)) as orgTypeIds")
     List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
     @Query("Match (child:Organization) \n" +

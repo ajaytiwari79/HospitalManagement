@@ -483,7 +483,7 @@ public class CounterDistService extends MongoBaseService {
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         Map<Long, Map<BigInteger, BigInteger>> unitIdKpiMap = new HashMap<>();
         List<OrgTypeDTO> orgTypeDTOS = genericIntegrationService.getOrganizationIdsBySubOrgId(orgTypeKPIConf.getOrgTypeIds());
-        List<Long> unitIds = orgTypeDTOS.stream().flatMap(orgTypeDTO -> orgTypeDTO.getUnitIds().stream()).collect(toList());
+        List<Long> unitIds = orgTypeDTOS.stream().map(orgTypeDTO -> orgTypeDTO.getUnitId()).collect(toList());
         unitIds.forEach(unitId -> {
             unitIdKpiMap.put(unitId, new HashMap<BigInteger, BigInteger>());
         });
@@ -510,16 +510,35 @@ public class CounterDistService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.orgtype.kpi.notfound");
         }
         List<OrgTypeDTO> orgTypeDTOS = genericIntegrationService.getOrganizationIdsBySubOrgId(Arrays.asList(orgTypeKPIEntry.getOrgTypeId()));
-        List<Long> unitIds = orgTypeDTOS.stream().flatMap(orgTypeDTO -> orgTypeDTO.getUnitIds().stream()).collect(toList());
-        counterRepository.removeCategoryKPIEntry(unitIds, orgTypeKPIEntry.getKpiId());
-        counterRepository.removeAccessGroupKPIEntry(unitIds, orgTypeKPIEntry.getKpiId());
-        counterRepository.removeTabKPIEntry(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()), ConfLevel.UNIT);
-        // counterRepository.removeDashboardKPIEntry(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.STAFF);
-        counterRepository.removeApplicableKPI(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()), null, ConfLevel.UNIT);
+        Set<Long> subOrgTypeIds=orgTypeDTOS.stream().flatMap(orgTypeDTO -> orgTypeDTO.getOrgTypeIds().stream().filter(orgTypeId->!orgTypeId.equals(orgTypeMappingDTO.getOrgTypeId()))).collect(toSet());
+        List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(new ArrayList<>(subOrgTypeIds), new ArrayList<>());
+        Map<Long,List<BigInteger>> subOrgTypeOrKPIMap=orgTypeMappingDTOS.stream().collect(Collectors.groupingBy(OrgTypeMappingDTO::getOrgTypeId,Collectors.mapping(OrgTypeMappingDTO::getKpiId,Collectors.toList())));
+        Map<Long,List<BigInteger>> unitIdOrKpiMap=new HashMap<>();
+        orgTypeDTOS.forEach(orgTypeDTO -> {
+            orgTypeDTO.getOrgTypeIds().forEach(subOrgType->{
+               if(subOrgTypeOrKPIMap.get(subOrgType)!=null){
+                   unitIdOrKpiMap.put(orgTypeDTO.getUnitId(),subOrgTypeOrKPIMap.get(subOrgType));
+               }
+            });
+        });
+        List<Long> unitIds=new ArrayList<>();
+        unitIdOrKpiMap.entrySet().forEach(k->{
+            if(!unitIdOrKpiMap.get(k.getKey()).contains(orgTypeMappingDTO.getKpiId())){
+                unitIds.add(k.getKey());
+            }
+        });
+        if(!unitIds.isEmpty()) {
+            counterRepository.removeCategoryKPIEntry(unitIds, orgTypeKPIEntry.getKpiId());
+            counterRepository.removeAccessGroupKPIEntry(unitIds, orgTypeKPIEntry.getKpiId());
+            counterRepository.removeTabKPIEntry(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()), ConfLevel.UNIT);
+            // counterRepository.removeDashboardKPIEntry(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.STAFF);
+            counterRepository.removeApplicableKPI(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()), null, ConfLevel.UNIT);
+        }
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(), OrgTypeKPIEntry.class);
     }
 
     //dashboard setting for all level
+
 
 
 
