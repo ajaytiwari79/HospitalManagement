@@ -68,7 +68,7 @@ public class AssessmentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
     }
 
-    @ApiOperation(value = "get All Assessment of unit")
+    @ApiOperation(value = "delete Assessment by id")
     @DeleteMapping("/assessment/{assessmentId}")
     public ResponseEntity<Object> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.deleteAssessmentbyId(unitId,assessmentId));
