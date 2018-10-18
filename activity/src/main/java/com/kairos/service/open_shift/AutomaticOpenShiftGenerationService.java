@@ -102,7 +102,7 @@ public class AutomaticOpenShiftGenerationService {
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, allOpenShiftRuleTemplateLocalDates);
         LocalDateTime minLocalDateTime = DateUtils.getStartOfDayFromLocalDate(allOpenShiftRuleTemplateLocalDates.stream().min(LocalDate::compareTo).get());
         LocalDateTime maxLocalDateTime = DateUtils.getEndOfDayFromLocalDate(allOpenShiftRuleTemplateLocalDates.stream().min(LocalDate::compareTo).get());
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(minLocalDateTime, maxLocalDateTime, unitId);
+        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(minLocalDateTime, maxLocalDateTime, unitId);
 
         Map<LocalDate, Set<Shift>> shiftsLocalDateMap = getShiftsLocalDateMap(shifts);
 
