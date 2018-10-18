@@ -884,12 +884,10 @@ public class AccessGroupService {
     }
 
     public Map<Long, Long> getAccessGroupUsingParentId(Long unitId, Set<Long> accessGroupIds) {
-        List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(unitId);
-        Map<Long, Long > response=new HashMap<>();
-        accessPageQueryResults.forEach(accessPageQueryResult -> {
-            response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
-        });
-        return response;
+        //intentionally return blank
+        return new HashMap<>();
+        //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
+        //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
     }
 // Substitute of above Query
     public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
