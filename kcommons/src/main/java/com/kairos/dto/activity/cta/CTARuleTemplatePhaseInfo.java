@@ -1,18 +1,20 @@
 package com.kairos.dto.activity.cta;
 
+import java.math.BigInteger;
+
 public class CTARuleTemplatePhaseInfo{
-    private Long phaseId;
+    private BigInteger phaseId;
     private phaseType type;
     private int beforeStart;
     public enum  phaseType{
         DAYS,HOURS;
     }
 
-    public Long getPhaseId() {
+    public BigInteger getPhaseId() {
         return phaseId;
     }
 
-    public void setPhaseId(Long phaseId) {
+    public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
     }
 

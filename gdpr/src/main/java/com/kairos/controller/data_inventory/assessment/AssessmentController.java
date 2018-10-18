@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
@@ -68,8 +70,8 @@ public class AssessmentController {
 
     @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody AssessmentAnswerValueObject assessmentAnswerValueObject) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObject));
+    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody()));
     }
 
 

@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Document(collection = "question")
+@Document
 public class Question extends MongoBaseEntity {
 
     @NotBlank(message = "Question cant'be empty")

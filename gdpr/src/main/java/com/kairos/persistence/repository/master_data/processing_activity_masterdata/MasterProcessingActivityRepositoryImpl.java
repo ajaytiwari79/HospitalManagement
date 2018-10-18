@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
@@ -137,7 +137,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getTypeId())
-                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getSubServiceCategoryIds())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds()))
 
         );

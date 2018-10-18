@@ -8,6 +8,7 @@ import java.math.BigInteger;
 public class IntegrationSettingsDTO {
 
 
+    private BigInteger id;
     @NotEmpty(message = "name can not be null") @NotNull(message = "name can not be null")
     private String name;
     //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
@@ -60,4 +61,17 @@ public class IntegrationSettingsDTO {
     public void setUniqueKey(String uniqueKey) {
         this.uniqueKey = uniqueKey;
     }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
+
+
+
+
 }

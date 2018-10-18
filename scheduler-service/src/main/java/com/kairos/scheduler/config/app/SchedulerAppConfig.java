@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 //import com.planner.appConfig.UserContextInterceptor;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.kairos.scheduler.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.scheduler.utils.user_context.SchedulerUserContextInterceptor;
 import com.kairos.scheduler.utils.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
@@ -36,13 +37,15 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "com.kairos.scheduler")
+@ComponentScan(basePackages = "com.kairos")
 @EnableAsync
 @EnableScheduling
 @SpringBootApplication
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableMongoRepositories(basePackages ={"com.kairos.scheduler.persistence.repository"})
+@EnableMongoRepositories(basePackages ={"com.kairos.scheduler.persistence.repository"},
+repositoryBaseClass = MongoBaseRepositoryImpl.class)
+
 public class SchedulerAppConfig implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerAppConfig.class);
@@ -122,7 +125,7 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
     @Profile({"development","qa","production"})
     @LoadBalanced
     @Primary
-    @Bean
+    @Bean(name="restTemplate")
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
@@ -133,7 +136,7 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
 
     @Profile({"local", "test"})
     @Primary
-    @Bean
+    @Bean(name="restTemplate")
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
@@ -153,13 +156,33 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
         return template;
     }
 
-    @Profile({"development","qa","production"})
+   /* @Profile({"development","qa","production"})
     @LoadBalanced
     @Bean(name="schedulerServiceRestTemplate")
     public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
         RestTemplate template =restTemplateBuilder
-                .interceptors(new SchedulerUserContextInterceptor(authorization))
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }*/
+
+    @Profile({"development","qa","production"})
+    @LoadBalanced
+    @Primary
+    @Bean(name="restTemplateWithoutAuth")
+    public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
+    @Profile({"local", "test"})
+    @Primary
+    @Bean(name="restTemplateWithoutAuth")
+    public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
         return template;

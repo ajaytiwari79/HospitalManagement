@@ -15,6 +15,7 @@ import java.util.Map;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class OrganizationServiceRestClient {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationServiceRestClient.class);
 

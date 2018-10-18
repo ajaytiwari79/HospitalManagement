@@ -1,2 +1,53 @@
 // questionnaire template script gdpr
 db.getCollection('questionnaire_template').updateMany({'deleted':false,'defaultAssetTemplate':{ $exists: false}},{$set:{"defaultAssetTemplate":false}})
+<<<<<<< HEAD
+
+match(e:UnitPosition) where e.deleted=true
+detach delete e
+
+match(e:UnitPosition)
+with e,datetime({ epochMillis: e.startDateMillis }) as startDateTime
+set e.startDate=toString(date(startDateTime))
+remove  e.startDateMillis
+return e
+
+match(e:UnitPosition) where exists(e.endDateMillis)
+with e,datetime({ epochMillis: e.endDateMillis }) as endDateTime
+set e.endDate= toString(date(endDateTime))
+remove e.endDateMillis
+return e
+
+MATCH (n:UnitPosition) where NOT (n)-[:HAS_POSITION_LINES]-(:UnitPositionLine)
+with collect (n) as allL
+forEach(n IN (allL)|
+merge(n)-[:HAS_POSITION_LINES]-(npl:UnitPositionLine)
+  set npl.avgDailyWorkingHours=n.avgDailyWorkingHours
+  set npl.workingDaysInWeek= n.workingDaysInWeek
+  set npl.hourlyWages= n.hourlyWages
+  set npl.totalWeeklyMinutes= n.totalWeeklyMinutes
+  set npl.startDate= n.startDate
+  set npl.endDate= n.endDate
+  set npl.fullTimeWeeklyMinutes= n.fullTimeWeeklyMinutes
+);
+
+MATCH (n:UnitPosition)-[:HAS_POSITION_LINES]->(pl:UnitPositionLine)
+MATCH(n)-[rel:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel)
+merge(pl)-[:HAS_SENIORITY_LEVEL]->(sl)
+detach delete rel
+
+MATCH (n:UnitPosition)-[:HAS_POSITION_LINES]->(pl:UnitPositionLine)
+MATCH(u)-[employmentRel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType)
+merge(pl)-[newRel:HAS_EMPLOYMENT_TYPE]->(employmentType)
+set newRel.employmentTypeCategory=employmentRel.employmentTypeCategory
+detach delete employmentRel
+=======
+//set systemUser property
+<<<<<<< HEAD
+match(user:User) where user.userName<>"systemuser" set user.systemUser=false;
+create(user:User{userName:"systemuser",password:"$2a$10$480/B8N6VnpNLdjPKGPw7OqCu2e85bUMBOAKxYtsbzp11kJTLMkKu",systemUser:true})
+>>>>>>> f345eb570bda554dd735267cf55c6ebd4cee8286
+=======
+match(user:User) where user.userName<>"systemuser" set user.userType="USER_ACCOUNT";
+create(user:User{userName:"systemuser@kairos.com",password:"$2a$10$480/B8N6VnpNLdjPKGPw7OqCu2e85bUMBOAKxYtsbzp11kJTLMkKu",userType:"SYSTEM_ACCOUNT",email:"systemuser@kairos.com"})
+
+>>>>>>> 824de21d413ee09e0f1a13a942ff9e10588a1c2d

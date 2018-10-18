@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.dto.planner.solverconfig.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
@@ -50,7 +51,7 @@ import static java.util.stream.Collectors.*;
 public class VRPPlanningService extends MongoBaseService{
 
     @Inject private SolverConfigRepository solverConfigRepository;
-    @Inject private StaffRestClient staffRestClient;
+    @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private TaskService taskService;
     @Inject private TaskTypeService taskTypeService;
     @Inject private TaskTypeSettingMongoRepository taskTypeSettingMongoRepository;
@@ -255,7 +256,7 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
     private Object[] getEmployees(){
-        List<StaffDTO> staffs = staffRestClient.getStaffListByUnit();
+        List<StaffDTO> staffs = genericIntegrationService.getStaffListByUnit();
         List<Long> staffIds = staffs.stream().map(st->st.getId()).collect(toList());
         List<TaskTypeSettingDTO> taskTypeSettingDTOS = taskTypeSettingMongoRepository.findByStaffIds(staffIds);
         if(taskTypeSettingDTOS.isEmpty()){

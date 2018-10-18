@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.enums.FilterType;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.enums.ModuleId;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;
@@ -48,13 +49,15 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return matchQueryForStaff;
     }
 
-    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters, Boolean fetchStaffHavingUnitPosition) {
+    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " MATCH (unitPos)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
+            matchRelationshipQueryForStaff += "MATCH(unitPos)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+                    "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  ";
         } else {
-            matchRelationshipQueryForStaff += " OPTIONAL MATCH (unitPos)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  ";
+            matchRelationshipQueryForStaff += " optional MATCH(unitPos)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+                    "OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  ";
         }
 
         matchRelationshipQueryForStaff += " with staff, user, " +
@@ -84,7 +87,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, Boolean fetchStaffHavingUnitPosition,
+    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
                                          Map<FilterType, List<String>> filters, String searchText, String imagePath) {
 
         Map<String, Object> queryParameters = new HashMap();
@@ -111,13 +114,14 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             queryParameters.put("expertiseIds",
                     convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
         }
+
         if (StringUtils.isNotBlank(searchText)) {
             queryParameters.put("searchText", searchText);
         }
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
-        if (fetchStaffHavingUnitPosition) {
+        if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent() || ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos";
         } else {
@@ -126,7 +130,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos ";
         }
 
-        query += getMatchQueryForRelationshipOfStaffByFilters(filters, fetchStaffHavingUnitPosition);
+        query += getMatchQueryForRelationshipOfStaffByFilters(filters);
 
         query += " Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) WITH engineerType, staff, user, contactAddress,expertiseList,employmentList";
 

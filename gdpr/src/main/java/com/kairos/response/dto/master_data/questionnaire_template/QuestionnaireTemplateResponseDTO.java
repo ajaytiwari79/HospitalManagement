@@ -2,6 +2,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 
@@ -19,6 +20,7 @@ public class QuestionnaireTemplateResponseDTO {
     private boolean defaultAssetTemplate;
     private AssetType assetType;
     private AssetType assetSubType;
+    private QuestionnaireTemplateStatus templateStatus;
     private List<QuestionnaireSectionResponseDTO> sections;
 
 
@@ -29,6 +31,10 @@ public class QuestionnaireTemplateResponseDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    public QuestionnaireTemplateStatus getTemplateStatus() { return templateStatus; }
+
+    public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
 
     public AssetType getAssetSubType() { return assetSubType; }
 

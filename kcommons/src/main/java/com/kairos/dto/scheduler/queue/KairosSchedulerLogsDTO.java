@@ -30,6 +30,14 @@ public class KairosSchedulerLogsDTO {
         this.stoppedDate = stoppedDate;
         this.jobSubType = jobSubType;
     }
+    public KairosSchedulerLogsDTO(Result result, String log, BigInteger schedulerPanelId, Long unitId, JobSubType jobSubType) {
+        this.result = result;
+        this.log = log;
+        this.schedulerPanelId = schedulerPanelId;
+        this.unitId = unitId;
+        this.jobSubType = jobSubType;
+    }
+
     public Long getStartedDate() {
         return startedDate;
     }

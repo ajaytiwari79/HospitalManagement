@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class IntegrationRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrationRestClient.class);
@@ -32,6 +33,7 @@ public class IntegrationRestClient {
      * @param citizenUnitId
      * @return
      */
+    @Deprecated
     public Map<String, String> getFLS_Credentials(Long citizenUnitId){
 
         final String baseUrl=getBaseUrl(true);
@@ -57,7 +59,7 @@ public class IntegrationRestClient {
 
 
     }
-
+//Not Used
     public ConcurrentMap<Long,ConcurrentMap<String,String>> getFLSCredentials(List<Long> credentialsForUnitIds){
 
         final String baseUrl=getBaseUrl(true);

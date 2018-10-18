@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
-@Document(collection = "master_asset")
+@Document
 public class MasterAsset extends MongoBaseEntity {
 
 

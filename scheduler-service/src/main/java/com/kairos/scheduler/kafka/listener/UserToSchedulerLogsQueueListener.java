@@ -15,7 +15,7 @@ import static com.kairos.scheduler.constants.AppConstants.USER_TO_SCHEDULER_LOGS
 @Component
 public class UserToSchedulerLogsQueueListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerJobQueueListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerLogsQueueListener.class);
     @Inject
     private SchedulerPanelService schedulerPanelService;
 

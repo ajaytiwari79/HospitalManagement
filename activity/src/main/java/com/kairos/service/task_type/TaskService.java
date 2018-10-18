@@ -150,16 +150,13 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
     @Inject
-    private CountryRestClient countryRestClient;
-    @Inject
-    private IntegrationRestClient integrationServiceRestClient;
+    private GenericIntegrationService genericIntegrationService;
+
     @Inject
     private EnvConfig envConfig;
     @Inject
     private TasksMergingService tasksMergingService;
 
-    @Inject
-    private ControlPanelRestClient controlPanelRestClient;
     @Inject
     private OrganizationRestClient organizationRestClient;
     @Inject
@@ -713,7 +710,7 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
@@ -734,7 +731,7 @@ public class TaskService extends MongoBaseService {
         if (!shiftsToCreate.isEmpty()) {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftsToCreate.get(0).getUnitId(), shiftsToCreate.get(0).getActivities().get(0).getStartDate());
             shiftService.saveShiftWithActivity(phase,shiftsToCreate,staffAdditionalInfoDTO);
-            timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
+            timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }
     }
@@ -1100,7 +1097,7 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
-        Map<String, String> flsCredential = integrationServiceRestClient.getFLS_Credentials(organizationId);
+        Map<String, String> flsCredential = genericIntegrationService.getFLS_Credentials(organizationId);
        /* Visitour visitour = visitourGraphRepository.findByOrganizationId(organizationId);
         Map<String, String> credentials = new HashMap<>();
         String url = (visitour != null) ? visitour.getServerName() : "";
@@ -1562,7 +1559,7 @@ public class TaskService extends MongoBaseService {
     public Task assignGivenTaskToUser(BigInteger taskId) {
         Task pickTask = taskMongoRepository.findOne(taskId);
         Long userId = UserContext.getUserDetails().getId();
-        StaffDTO staffDTO = staffRestClient.getStaffByUser(userId);
+        StaffDTO staffDTO = genericIntegrationService.getStaffByUser(userId);
         List<Long> assignedStaffIds = pickTask.getAssignedStaffIds();
         if (!assignedStaffIds.contains(staffDTO.getId())) assignedStaffIds.add(staffDTO.getId());
         pickTask.setAssignedStaffIds(assignedStaffIds);
@@ -1577,7 +1574,7 @@ public class TaskService extends MongoBaseService {
         boolean preferredEmployees = taskType.getEmployees().contains(PREFERRED_EMPLOYEES);
         TaskSpecification<Task> taskStaffSpecification = new TaskStaffTypeSpecification(excludeEmployees, preferredEmployees);
 
-        List<DayType> dayTypes = countryRestClient.getDayTypes(taskType.getForbiddenDayTypeIds());
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
 
         Set<Day> days = new HashSet<>();
         for (DayType dayType : dayTypes) {

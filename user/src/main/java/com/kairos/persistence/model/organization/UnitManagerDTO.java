@@ -3,9 +3,9 @@ package com.kairos.persistence.model.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.client.ContactDetail;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -15,9 +15,9 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitManagerDTO {
 
-    @NotEmpty(message = "error.firstname.notnull") @NotNull(message = "error.firstname.notnull")
+    @NotBlank(message = "error.firstname.notnull")
     String firstName;
-    @NotEmpty(message = "error.lastname.notnull") @NotNull(message = "error.lastname.notnull")
+    @NotBlank(message = "error.lastname.notnull")
     String lastName;
     @Email
     String email;

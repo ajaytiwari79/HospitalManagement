@@ -2,14 +2,13 @@ package com.kairos.dto.user.user.staff;
 
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by oodles on 28/11/17.
@@ -25,7 +24,7 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    private Map<Long,List<LocalDate>> publicHoliday;
+    private Map<Long, List<LocalDate>> publicHoliday;
     //These are the all day type of country
     private List<DayTypeDTO> dayTypes;
     private UserAccessRoleDTO user;
@@ -57,6 +56,7 @@ public class StaffAdditionalInfoDTO {
     public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
         this.timeSlotSets = timeSlotSets;
     }
+
     private UserAccessRoleDTO userAccessRoleDTO;
 
     public ZoneId getUnitTimeZone() {
@@ -157,5 +157,17 @@ public class StaffAdditionalInfoDTO {
 
     public void setUserAccessRoleDTO(UserAccessRoleDTO userAccessRoleDTO) {
         this.userAccessRoleDTO = userAccessRoleDTO;
+    }
+
+    public Set<AccessGroupRole> getRoles() {
+        Set<AccessGroupRole> roles = new HashSet<>();
+        if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+            roles.add(AccessGroupRole.MANAGEMENT);
+        }
+        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+                roles.add(AccessGroupRole.STAFF);
+        }
+
+        return roles;
     }
 }

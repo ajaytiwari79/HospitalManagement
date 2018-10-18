@@ -19,12 +19,6 @@ public interface RuleTemplateCategoryRepository extends MongoBaseRepository<Rule
     @Query("{countryId:?0,ruleTemplateCategoryType:?1,deleted:false}")
     List<RuleTemplateCategory> getRuleTemplateCategoryByCountry(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType);
 
-    @Query("{countryId:?0,ruleTemplateCategoryType:?2,deleted:false}")
-    RuleTemplateCategory checkDuplicateRuleTemplateCategory(Long countryId,RuleTemplateCategoryType type,String name);
 
-
-
-    @Query("{countryId:?0,name:?1,ruleTemplateCategoryType:?2,deleted:false}")
-    RuleTemplateCategory findByName(Long countryId, String name, RuleTemplateCategoryType ruleTemplateCategoryType);
 
 }

@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,22 +23,17 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DayType  extends UserBaseEntity {
-    @NotEmpty(message = "error.DayType.name.notEmpty") @NotNull(message = "error.DayType.name.notnull")
+    @NotBlank(message = "error.DayType.name.notEmpty")
     private String name;
     @NotNull
     int code;
-
-    // @NotEmpty(message = "error.DayType.description.notEmpty") @NotNull(message = "error.DayType.description.notnull")
     private String description;
-
     private String colorCode;
-
     @Relationship(type = BELONGS_TO)
     private Country country;
     private List<Day> validDays=new ArrayList<>();
     private boolean holidayType;
     private boolean isEnabled = true;
-
     private boolean allowTimeSettings = false;
 
     // Constructor

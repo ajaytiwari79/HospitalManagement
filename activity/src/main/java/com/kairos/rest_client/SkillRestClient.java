@@ -19,8 +19,9 @@ import java.util.Set;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class SkillRestClient {
-    private static final Logger logger = LoggerFactory.getLogger(CountryRestClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(SkillRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;
