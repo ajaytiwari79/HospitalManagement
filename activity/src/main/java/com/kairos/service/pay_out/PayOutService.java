@@ -121,7 +121,8 @@ public class PayOutService extends MongoBaseService {
                 }
                 payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOut);
                 if(payOut.getTotalPayOutMin()>0) {
-                    payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
+                    //Todo Pradeep should reafctor this method so that we can calculate accumulated payout
+                    //payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
                     payOuts.add(payOut);
                 }
                 startDate = startDate.plusDays(1);
@@ -131,6 +132,7 @@ public class PayOutService extends MongoBaseService {
             save(payOuts);
         }
     }
+
 
     /**
      *

@@ -107,7 +107,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
     public QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("templateType").is(templateType));
-        query.fields().include("id").include("name");
+        query.fields().include("id").include("name").include("templateStatus").include("templateType");
         return mongoTemplate.findOne(query,QuestionnaireTemplate.class);
     }
 
