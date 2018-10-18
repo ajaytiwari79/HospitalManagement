@@ -560,7 +560,7 @@ public class ShiftValidatorService {
     }
 
     private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts) {
-        String staffing = null;
+        String staffingLevelStatus = null;
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
             for (StaffingLevel staffingLevel : staffingLevels) {
                 List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
@@ -581,13 +581,13 @@ public class ShiftValidatorService {
                         }
                         if(overlapped) {
                             if (shiftsCount >= staffingLevelActivity.get().getMaxNoOfStaff()) {
-                                staffing = OVERSTAFFING;
+                                staffingLevelStatus = OVERSTAFFING;
                                 break;
                             } else if (shiftsCount <= staffingLevelActivity.get().getMinNoOfStaff()) {
-                                staffing = UNDERSTAFFING;
+                                staffingLevelStatus = UNDERSTAFFING;
                                 break;
                             } else {
-                                staffing = BALANCED;
+                                staffingLevelStatus = BALANCED;
                             }
                         }
                     } else {
@@ -597,7 +597,7 @@ public class ShiftValidatorService {
                 }
             }
         }
-        return staffing;
+        return staffingLevelStatus;
 
     }
 
