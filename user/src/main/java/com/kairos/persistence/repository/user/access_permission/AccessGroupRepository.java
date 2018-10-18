@@ -336,9 +336,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
            "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) detach delete accessGroup")
     void removeDefaultCopiedAccessGroup(List<Long> organizationId);
 
-   @Query("MATCH (organization:Organization) where id(organization) = {0}\n" +
+   @Query("MATCH (organization:Organization) where id(organization) = {0} \n" +
             "match(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) return id(ag) as id,id(pag) as parentId")
     List<AccessPageQueryResult> findAllAccessGroupWithParentOfOrganization(Long organizationId);
+
+    @Query("MATCH (organization:Organization) where id(organization) = {0} \n" +
+            "MATCH(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) WHERE ID(pag) IN {1} return id(ag) as id,id(pag) as parentId")
+    List<AccessPageQueryResult> findAllAccessGroupWithParentIds(Long organizationId,Set<Long> parentAccessGroupsIds);
 
 }
 
