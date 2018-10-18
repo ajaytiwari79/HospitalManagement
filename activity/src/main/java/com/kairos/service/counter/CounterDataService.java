@@ -63,8 +63,8 @@ public class CounterDataService {
     CounterRepository counterRepository;
     @Inject
     CounterServiceMapping counterServiceMapping;
-    @Inject
-    ExecutorService executorService;
+//    @Inject
+//    ExecutorService executorService;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
@@ -334,22 +334,22 @@ public class CounterDataService {
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
         List<Future<RawRepresentationData>> kpiResults = new ArrayList<>();
         List<Future<RawRepresentationData>> counterResults = new ArrayList<>();
-        for(BasicRequirementDTO dataRequest : filters.getDataRequestList()){
-            if(dataRequest.isKpiDataRequired()) {
-                Callable<RawRepresentationData> data = () ->{
-                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedKPI(filters, kpiMap.get(dataRequest.getCounterId()));
-                };
-                Future<RawRepresentationData> responseData = executorService.submit(data);
-                kpiResults.add(responseData);
-            }
-            if(dataRequest.isCounterDataRequired()){
-                Callable<RawRepresentationData> data = () ->{
-                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedCounter(filters, kpiMap.get(dataRequest.getCounterId()));
-                };
-                Future<RawRepresentationData> responseData = executorService.submit(data);
-                counterResults.add(responseData);
-            }
-        }
+//        for(BasicRequirementDTO dataRequest : filters.getDataRequestList()){
+//            if(dataRequest.isKpiDataRequired()) {
+//                Callable<RawRepresentationData> data = () ->{
+//                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedKPI(filters, kpiMap.get(dataRequest.getCounterId()));
+//                };
+//                Future<RawRepresentationData> responseData = executorService.submit(data);
+//                kpiResults.add(responseData);
+//            }
+//            if(dataRequest.isCounterDataRequired()){
+//                Callable<RawRepresentationData> data = () ->{
+//                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedCounter(filters, kpiMap.get(dataRequest.getCounterId()));
+//                };
+//                Future<RawRepresentationData> responseData = executorService.submit(data);
+//                counterResults.add(responseData);
+//            }
+//        }
 
     }
 
