@@ -120,6 +120,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return (Long)result.getMappedResults().get(0).get("count");
     }
 
+
     public List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("startDate").lt(endDate).and("endDate").gt(startDate)),
@@ -219,6 +220,17 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return mongoTemplate.findOne(query,Shift.class);
     }
 
+    @Override
+    public List<Shift> findShiftsForCheckIn(List<Long> staffIds, Date startDate, Date endDate) {
+        Query query=new Query();
+        Criteria startDateCriteria=Criteria.where("startDate").gte(startDate).lte(endDate);
+        Criteria endDateCriteria=Criteria.where("endDate").gte(startDate).lte(endDate);
+        query.addCriteria(Criteria.where("staffId").in(staffIds).and("deleted").is(false)
+                .and("disabled").is(false).orOperator(startDateCriteria,endDateCriteria));
+        sort(Sort.Direction.ASC,"startDate");
+        //query.limit(1);
+        return mongoTemplate.find(query,Shift.class);
+    }
     @Override
     public void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId){
         Query query=new Query(Criteria.where("planningPeriodId").is(planningPeriodId).and("phaseId").is(phaseId));

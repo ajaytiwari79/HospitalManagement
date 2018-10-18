@@ -6,6 +6,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,7 +36,12 @@ public class DateUtils {
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
         return localDateTimeToDate(endOfDay);
     }
-
+    public static LocalDateTime getLocalDateTimeFromDate(Date date ){
+       return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
+    }
+    public static long getCurrentMillistByTimeZone(String timeZone){
+        return Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime();
+    }
     public static LocalDate getCurrentLocalDate() {
         return LocalDate.now();
 
