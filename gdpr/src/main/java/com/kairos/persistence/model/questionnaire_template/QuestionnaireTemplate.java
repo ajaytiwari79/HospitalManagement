@@ -36,6 +36,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
     public QuestionnaireTemplate(@NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
         this.name = name;
         this.description = description;
+        this.templateStatus=templateStatus;
     }
 
     public BigInteger getAssetType() { return assetType; }

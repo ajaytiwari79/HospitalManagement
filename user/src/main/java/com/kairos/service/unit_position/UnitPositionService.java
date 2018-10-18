@@ -771,6 +771,30 @@ public class UnitPositionService {
     }
 
 
+    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionIds, Organization organization, Long countryId) {
+        List<UnitPositionQueryResult> unitPositions = unitPositionGraphRepository.getUnitPositionByIds(unitPositionIds);
+        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetailsList=new ArrayList<>();
+        unitPositions.forEach(unitPosition->{
+            com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail=new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            convertUnitPositionObject(unitPosition,unitPositionDetail);
+            unitPositionDetail.setStaffId(unitPosition.getStaffId());
+            unitPositionDetail.setCountryId(countryId);
+            unitPositionDetail.setUnitTimeZone(organization.getTimeZone());
+            unitPositionDetailsList.add(unitPositionDetail);
+        });
+
+        // convertUnitPositionObject(unitPosition, unitPositionDetails);
+//  com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+//        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());
+//        if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
+//            unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
+//            unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
+//
+//        }
+                return unitPositionDetailsList;
+    }
+
+
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
 
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
@@ -1177,7 +1201,6 @@ public class UnitPositionService {
         }
         return matchedDates;
     }
-
 
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);

@@ -207,7 +207,17 @@ public class AssetService extends MongoBaseService {
                 }
             }
         }
-        ObjectMapperUtils.copyProperties(assetDTO, asset);
+        asset.setHostingProvider(assetDTO.getHostingProvider());
+        asset.setHostingType(assetDTO.getHostingType());
+        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setDataDisposal(assetDTO.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        asset.setSuggested(assetDTO.isSuggested());
         assetMongoRepository.save(asset);
         return assetDTO;
     }
