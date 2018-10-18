@@ -7,6 +7,7 @@ import java.math.BigInteger;
  **/
 public class PositionLineChangeResultDTO {
     boolean calculativeChanged;
+    boolean employmentTypeChanged;
     private BigInteger ctaId;
     private BigInteger oldctaId;
     private BigInteger wtaId;
@@ -54,5 +55,13 @@ public class PositionLineChangeResultDTO {
 
     public void setOldwtaId(BigInteger oldwtaId) {
         this.oldwtaId = oldwtaId;
+    }
+
+    public boolean isEmploymentTypeChanged() {
+        return employmentTypeChanged;
+    }
+
+    public void setEmploymentTypeChanged(boolean employmentTypeChanged) {
+        this.employmentTypeChanged = employmentTypeChanged;
     }
 }
