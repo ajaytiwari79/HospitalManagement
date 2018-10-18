@@ -5,8 +5,6 @@
     <logger name="org.springframework.kafka" level="OFF"/>
     <logger name="org.apache.kafka" level="OFF"/>
 
-    <logger name="org.neo4j.ogm" level="DEBUG"/>
-
     <springProfile name="default">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
