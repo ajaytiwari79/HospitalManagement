@@ -2,7 +2,7 @@ package com.kairos.persistence.model.counter;
 
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.CounterSize;
-import com.kairos.persistence.model.counter.chart.BaseChart;
+import com.kairos.dto.activity.counter.chart.BaseChart;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;

@@ -5,6 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.activity.Activity;
@@ -112,7 +113,7 @@ public class SickService {
             sickSettings.forEach(currentSickSettings -> {
                 logger.info("Processing on sickSetting {} with activityId {}" ,currentSickSettings.getId(),currentSickSettings.getActivityId());
                 Activity activity = activityMap.get(currentSickSettings.getActivityId());
-                int differenceOfDaysFromCurrentDateToLastSickDate = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), DateUtils.getCurrentLocalDate());
+                int differenceOfDaysFromCurrentDateToLastSickDate = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), DateUtils.getCurrentLocalDate(),DurationType.DAYS);
                 List<Integer> validRepetitionDays = new ArrayList<>();
                 if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || differenceOfDaysFromCurrentDateToLastSickDate < 0) {
                     logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), differenceOfDaysFromCurrentDateToLastSickDate);

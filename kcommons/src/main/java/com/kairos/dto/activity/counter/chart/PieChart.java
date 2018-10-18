@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter.chart;
+package com.kairos.dto.activity.counter.chart;
 
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -13,7 +13,7 @@ import java.util.List;
 public class PieChart extends BaseChart {
     private RepresentationUnit unit;
     private String displayUnit;
-    private List<PieDataUnit> dataList;
+    private List<DataUnit> dataList;
 
     public PieChart(RepresentationUnit unit, String displayUnit, List dataList) {
         super(ChartType.PIE);

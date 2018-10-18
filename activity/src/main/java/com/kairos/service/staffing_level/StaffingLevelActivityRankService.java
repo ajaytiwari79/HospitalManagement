@@ -23,8 +23,8 @@ public class StaffingLevelActivityRankService extends MongoBaseService {
     private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
 
      boolean updateStaffingLevelActivityRank(LocalDate staffingLevelDate, BigInteger staffingLevelId, Map<BigInteger, Integer> activitiesRankMap) {
-        List<StaffingLevelActivityRank> staffingLevelActivityRank = staffingLevelActivityRankRepository.findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse();
-        Map<BigInteger, StaffingLevelActivityRank> staffingLevelActivityRankingMap = staffingLevelActivityRank.stream().collect(Collectors.toMap(StaffingLevelActivityRank::getId, Function.identity()));
+        List<StaffingLevelActivityRank> staffingLevelActivityRank = staffingLevelActivityRankRepository.findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse(staffingLevelId,staffingLevelDate);
+        Map<BigInteger, StaffingLevelActivityRank> staffingLevelActivityRankingMap = staffingLevelActivityRank.stream().collect(Collectors.toMap(StaffingLevelActivityRank::getActivityId, Function.identity(),(current,previous)->current));
         List<StaffingLevelActivityRank> staffingLevelActivityRanks = constructObjects(activitiesRankMap, staffingLevelActivityRankingMap,staffingLevelId,staffingLevelDate);
         if(!staffingLevelActivityRanks.isEmpty()){
             save(staffingLevelActivityRanks);

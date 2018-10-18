@@ -79,6 +79,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId);
 
+    @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization\n" +
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) where id(staff) IN {1} with staff,organization\n" +
+            "OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization\n" +
+            "OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization\n" +
+            "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
+    List<StaffAdditionalInfoQueryResult> getStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds);
+
     @Query("MATCH (staff:Staff) where id(staff)={0} Match (team)-[r:TEAM_HAS_MEMBER]->(staff) SET r.isEnabled=false return r")
     List<StaffRelationship> removeStaffFromAllTeams(long staffId);
 
@@ -364,18 +371,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return staff")
     Staff findByUserId(Long userId, Long unitId);
 
-    @Query("Match(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
-            "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
-            "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
-            " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
-            "match (unitPosition)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "return staff as staff,expertise as expertise,unitPosition.workingTimeAgreementId as workingTimeAgreementId,et as employmentType,unit.unitTimeZone as unitTimeZone," +
-            "unitPosition.totalWeeklyHours as totalWeeklyHours, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis," +
-            "unitPosition.salary as salary,unitPosition.workingDaysInWeek as workingDaysInWeek," +
-            "unitPosition.hourlyWages as hourlyWages,id(unitPosition) as id,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
-            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
-    List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
+
 
 
     @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(user:User)where id(staff)={0} with staff,user\n" +

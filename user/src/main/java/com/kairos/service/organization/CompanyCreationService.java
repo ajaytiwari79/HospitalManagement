@@ -142,7 +142,7 @@ public class CompanyCreationService {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
             organization.setAccountType(accountType);
-            accessGroupService.createDefaultAccessGroupsInOrganization(organization, null, true);
+            accessGroupService.createDefaultAccessGroups(organization, Collections.emptyList());
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));

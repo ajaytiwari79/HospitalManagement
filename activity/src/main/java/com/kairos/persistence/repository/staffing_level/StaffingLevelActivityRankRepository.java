@@ -7,9 +7,12 @@ import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface StaffingLevelActivityRankRepository extends MongoBaseRepository<StaffingLevelActivityRank,BigInteger> {
 
-   List<StaffingLevelActivityRank> findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse();
+   List<StaffingLevelActivityRank> findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse(BigInteger staffingLevelId,LocalDate localDate);
+
+   StaffingLevelActivityRank findByStaffingLevelDateAndActivityId(LocalDate staffingLevelDate,BigInteger activityId);
 }

@@ -165,8 +165,9 @@ public class StaffAdditionalInfoDTO {
             roles.add(AccessGroupRole.MANAGEMENT);
         }
         if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
-            roles.add(AccessGroupRole.STAFF);
+                roles.add(AccessGroupRole.STAFF);
         }
+
         return roles;
     }
 }

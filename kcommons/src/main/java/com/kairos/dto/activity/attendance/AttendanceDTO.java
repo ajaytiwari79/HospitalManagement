@@ -10,7 +10,7 @@ public class AttendanceDTO {
 
     private AttendanceDurationDTO duration;
     private List<OrganizationCommonDTO> organizationIdAndNameResults;
-    private Set<ReasonCodeDTO> reasonCode;
+    private List<ReasonCodeDTO> reasonCode;
     private SickSettingsDTO sickSettings;
 
     public AttendanceDTO() {
@@ -21,12 +21,12 @@ public class AttendanceDTO {
         this.sickSettings = sickSettings;
     }
 
-    public AttendanceDTO(List<OrganizationCommonDTO> organizationIdAndNameResults, Set<ReasonCodeDTO> reasonCode) {
+    public AttendanceDTO(List<OrganizationCommonDTO> organizationIdAndNameResults, List<ReasonCodeDTO> reasonCode) {
         this.organizationIdAndNameResults = organizationIdAndNameResults;
         this.reasonCode = reasonCode;
     }
 
-    public AttendanceDTO(Set<ReasonCodeDTO> reasonCode) {
+    public AttendanceDTO(List<ReasonCodeDTO> reasonCode) {
         this.reasonCode = reasonCode;
     }
 
@@ -46,11 +46,11 @@ public class AttendanceDTO {
         this.duration = duration;
     }
 
-    public Set<ReasonCodeDTO> getReasonCode() {
+    public List<ReasonCodeDTO> getReasonCode() {
         return reasonCode;
     }
 
-    public void setReasonCode(Set<ReasonCodeDTO> reasonCode) {
+    public void setReasonCode(List<ReasonCodeDTO> reasonCode) {
         this.reasonCode = reasonCode;
     }
 

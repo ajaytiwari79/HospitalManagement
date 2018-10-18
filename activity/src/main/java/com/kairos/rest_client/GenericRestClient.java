@@ -26,6 +26,8 @@ import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
+import static org.apache.commons.codec.Charsets.UTF_16;
+import static org.apache.commons.codec.Charsets.UTF_8;
 
 @Service
 public class GenericRestClient {
@@ -40,6 +42,7 @@ public class GenericRestClient {
     private RestTemplate schedulerRestTemplate;
 
 //=================================Usable Code==========================================
+
     /**
      * @param t
      * @param id
@@ -57,7 +60,7 @@ public class GenericRestClient {
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
-        String url = baseUrl + getURIWithParam(queryParam);
+        String url = baseUrl +getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
@@ -116,18 +119,15 @@ public class GenericRestClient {
     }
 
     public String getURIWithParam(List<NameValuePair> queryParam) {
-        try {
-            URIBuilder builder = new URIBuilder();
+        String path="";
             if (CollectionUtils.isNotEmpty(queryParam)) {
+                StringBuilder stringBuilder = new StringBuilder("?");
                 for (NameValuePair nameValuePair : queryParam) {
-                    builder.addParameter(nameValuePair.getName(), nameValuePair.getValue().replace("[", "").replace("]", ""));
+                    stringBuilder.append("&").append(nameValuePair.getName()).append("=").append(nameValuePair.getValue().replace("[", "").replace("]", ""));
                 }
+                path= stringBuilder.toString();//.replace("%2C+","");
             }
-            return builder.build().toString();
-        } catch (URISyntaxException e) {
-            exceptionService.internalError(e.getMessage());
-        }
-        return null;
+        return path;
     }
 
 
@@ -186,8 +186,6 @@ public class GenericRestClient {
                 return HttpMethod.GET;
             default:
                 return null;
-
         }
     }
-
 }

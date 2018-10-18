@@ -40,15 +40,10 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
 
-    Activity findByNameIgnoreCaseAndUnitIdAndDeletedFalse(String unpaidBreak, Long unitId);
-
-    List<Activity> findAllByUnitIdAndNameInIgnoreCaseAndDeletedFalse( Long unitId,String... unpaidBreak);
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
 
-    @Query("{_id:{$in:?0}, deleted:false}")
-    List<ActivityDTO> findAllActivitiesByIds(List<BigInteger> activityIds);
 
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "'_id':1, 'phaseSettingsActivityTab':1")
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);

@@ -72,7 +72,10 @@ public class PriorityGroupRulesDataGetterService {
         Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap =  new HashMap<BigInteger, List<StaffUnitPositionQueryResult>>();
         Map<BigInteger, OpenShift> openShiftMap = new HashMap<BigInteger, OpenShift>();
         for(OpenShift openShift:openShifts) {
-            openShiftStaffMap.put(openShift.getId(),new ArrayList<>(staffsUnitPositions));
+
+            List<StaffUnitPositionQueryResult> staffUnitPositionQueryResults = new ArrayList<>(staffsUnitPositions);
+            staffUnitPositionQueryResults.stream().filter(staffUnitPositionQueryResult -> staffUnitPositionQueryResult.getStartDate()<openShift.getStartDate().getTime());
+            openShiftStaffMap.put(openShift.getId(),staffUnitPositionQueryResults);
             openShiftMap.put(openShift.getId(),openShift);
         }
         calculateTimeBankAndPlannedHours(unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
