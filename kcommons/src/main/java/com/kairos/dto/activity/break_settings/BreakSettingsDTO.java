@@ -6,9 +6,9 @@ import java.math.BigInteger;
 public class BreakSettingsDTO {
     private BigInteger id;
     private Long unitId;
-    @Min(value = 1, message = "shift duration cant be zero")
+    @Min(value = 1, message = "error.breakSettings.shiftDuration.must.greaterThanZero")
     private Long shiftDurationInMinute;
-    @Min(value = 1, message = "Break duration cant be zero")
+    @Min(value = 1, message = "error.breakSettings.breakDuration.must.greaterThanZero")
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
     private BigInteger paidActivityId;
