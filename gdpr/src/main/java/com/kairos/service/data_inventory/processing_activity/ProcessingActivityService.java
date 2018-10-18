@@ -130,6 +130,7 @@ public class ProcessingActivityService extends MongoBaseService {
         }
         processingActivity.setResponsibilityType(processingActivityDTO.getResponsibilityType());
         processingActivity.setTransferMethods(processingActivityDTO.getTransferMethods());
+        processingActivity.setDataSources(processingActivityDTO.getDataSources());
         processingActivity.setProcessingPurposes(processingActivityDTO.getProcessingPurposes());
         processingActivity.setAccessorParties(processingActivityDTO.getAccessorParties());
         processingActivity.setProcessingPurposes(processingActivityDTO.getProcessingPurposes());
