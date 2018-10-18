@@ -81,9 +81,7 @@ public class AttendanceSettingService extends MongoBaseService {
         List<ReasonCodeDTO> reasonCodes=staffAndOrganizationIds.get(0).getReasonCodes();
         if(!shifts.isEmpty()) {
             List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
-            for (UnitSettingDTO unitSettingDTO : unitSettingDTOS) {
-                unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
-            }
+            unitIdAndFlexibleTimeMap=unitSettingDTOS.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v.getFlexibleTimeSettings()));
         }
         if(checkIn) {
             for (Shift checkInshift : shifts) {
@@ -91,7 +89,7 @@ public class AttendanceSettingService extends MongoBaseService {
                 if (unitIdAndFlexibleTimeMap.containsKey(checkInshift.getUnitId())) {
                     DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
                     result=(Math.abs((Duration.between(DateUtils.getLocalDateTimeFromDate(checkInshift.getStartDate()), DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime());
-                    if (interval.contains(Timestamp.valueOf(LocalDateTime.now(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))).getTime())) {
+                    if (interval.contains(DateUtils.getMillisInstantFromTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
                         result = (result || reasonCodeId != null) ? true : false;
                         if (!result) {
                             attendanceDTO = new AttendanceDTO(reasonCodes);
