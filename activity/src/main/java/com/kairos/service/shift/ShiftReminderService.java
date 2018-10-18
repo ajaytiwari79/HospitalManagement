@@ -103,7 +103,7 @@ public class ShiftReminderService extends MongoBaseService {
         return firstTriggerDateTime;
     }
 
-    public String sendReminderForEmail(KairosSchedulerExecutorDTO jobDetails) {
+    public void sendReminderForEmail(KairosSchedulerExecutorDTO jobDetails) {
         Shift shift = shiftMongoRepository.findShiftByShiftActivityId(jobDetails.getEntityId());
         if (!Optional.ofNullable(shift).isPresent()) {
             logger.info("Unable to find shift by id {}", jobDetails.getEntityId());
@@ -118,19 +118,17 @@ public class ShiftReminderService extends MongoBaseService {
 
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
-        String s=nextTriggerDateTime+" ";
+
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {
             logger.info("next email on {} to staff {}", nextTriggerDateTime,staffDTO.getFirstName());
-            jobDetails.setOneTimeTriggerDateMillis(DateUtils.getMillisFromLocalDateTime(nextTriggerDateTime));
-            s=s+" \n "+nextTriggerDateTime;
-            sendReminderForEmail(jobDetails);
-            //List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)), shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+
+            List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)), shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
         }
-        String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
-                shiftActivity.get().getStartDate().getHours() + ":" + shiftActivity.get().getStartDate().getMinutes());
-       // mailService.sendPlainMail(staffDTO.getEmail(), content+s, SHIFT_NOTIFICATION);
-        return s;
+        String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(),DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
+                shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
+       mailService.sendPlainMail(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
+
     }
 
     LocalDateTime calculateNextTrigger(Activity activity, LocalDateTime lastTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
