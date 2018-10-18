@@ -274,7 +274,7 @@ public class BootDataService {
         createCTARuleTemplateCategory();
         startRegisteredCronJobs();
         createEquipmentCategories();
-*/
+
 
     }
 
@@ -286,6 +286,7 @@ public class BootDataService {
                 dynamicCronScheduler.setCronScheduling(controlPanel);
             }
         }
+        */
     }
 
     private void createStandardTimeSlots() {
