@@ -93,16 +93,16 @@ public class ShiftReminderService extends MongoBaseService {
         LocalDateTime shiftStartDateTime = DateUtils.asLocalDateTime(shiftStartDate);
         long daysRemaining = currentLocalDateTime.until(shiftStartDateTime, ChronoUnit.DAYS);
         long minutesRemaining = currentLocalDateTime.until(shiftStartDateTime, ChronoUnit.MINUTES);
-        LocalDateTime firstTriggerDateTime = null;
+        LocalDateTime triggerDateTime = null;
         if (daysRemaining > 0) {
-            firstTriggerDateTime = calculateNextTrigger(activity, currentLocalDateTime, DurationType.DAYS, shiftStartDateTime, daysRemaining);
+            triggerDateTime = calculateNextTrigger(activity, currentLocalDateTime, DurationType.DAYS, shiftStartDateTime, daysRemaining);
         } else if (minutesRemaining > 0) {
-            firstTriggerDateTime = calculateNextTrigger(activity, currentLocalDateTime, DurationType.MINUTES, shiftStartDateTime, minutesRemaining);
+            triggerDateTime = calculateNextTrigger(activity, currentLocalDateTime, DurationType.MINUTES, shiftStartDateTime, minutesRemaining);
         }
-        return firstTriggerDateTime;
+        return triggerDateTime;
     }
 
-    public void sendReminderForEmail(KairosSchedulerExecutorDTO jobDetails) {
+    public void sendReminderViaEmail(KairosSchedulerExecutorDTO jobDetails) {
         Shift shift = shiftMongoRepository.findShiftByShiftActivityId(jobDetails.getEntityId());
         if (!Optional.ofNullable(shift).isPresent()) {
             logger.info("Unable to find shift by id {}", jobDetails.getEntityId());

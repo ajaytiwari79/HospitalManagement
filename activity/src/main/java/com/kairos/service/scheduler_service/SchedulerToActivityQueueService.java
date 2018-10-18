@@ -36,7 +36,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case SHIFT_REMINDER:
                 logger.info("Job to update sick absence user and if user is not sick then add more sick shifts");
-                shiftReminderService.sendReminderForEmail(job);
+                shiftReminderService.sendReminderViaEmail(job);
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");
