@@ -6,6 +6,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -22,6 +24,8 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
@@ -31,6 +35,8 @@ import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
+import com.kairos.persistence.repository.staffing_level.StaffingLevelActivityRankRepository;
+import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
@@ -86,6 +92,10 @@ public class ShiftValidatorService {
     private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
     @Inject
     private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject
+    private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    @Inject
+    private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
 
     private static ExceptionService exceptionService;
 
@@ -521,6 +531,74 @@ public class ShiftValidatorService {
                 exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
             }
         });
+    }
+
+    public void verifyRankOrStaffingLevel(List<ShiftActivity> shiftActivities, Long unitId, List<ActivityWrapper> activities) {
+        if (!shiftActivities.isEmpty()) {
+            Activity existing = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(0).getActivityId())).findFirst().get().getActivity();
+            Activity arrived = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(1).getActivityId())).findFirst().get().getActivity();
+            if(existing.getRulesActivityTab().isEligibleForStaffingLevel() && arrived.getRulesActivityTab().isEligibleForStaffingLevel()) {
+                Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftActivities.get(0).getStartDate()).truncatedTo(ChronoUnit.DAYS));
+                Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftActivities.get(0).getEndDate()).truncatedTo(ChronoUnit.DAYS));
+                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
+                if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
+                    exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+                }
+                List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shiftActivities.get(0).getStartDate(), shiftActivities.get(0).getEndDate(), unitId);
+                StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
+                StaffingLevelActivityRank rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
+                String staffingLevelForExistingActivity = getStaffingLevel(existing, staffingLevels, shifts);
+                String staffingLevelForReplacedActivity = getStaffingLevel(arrived, staffingLevels, shifts);
+                if (rankOfExisting != null && rankOfReplaced != null) {
+                    if (!(rankOfExisting.getRank() > rankOfReplaced.getRank() && staffingLevelForExistingActivity.equals(UNDERSTAFFING) && staffingLevelForReplacedActivity.equals(UNDERSTAFFING) ||
+                            rankOfExisting.getRank() > rankOfReplaced.getRank() && (staffingLevelForReplacedActivity.equals(UNDERSTAFFING) || staffingLevelForReplacedActivity.equals(BALANCED)))) {
+                        exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
+                    }
+                }
+            }
+        }
+    }
+
+    private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts) {
+        String staffing = null;
+        if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
+            for (StaffingLevel staffingLevel : staffingLevels) {
+                List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
+                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
+                for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
+                    int shiftsCount = 0;
+                    Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(activity.getId())).findFirst();
+                    if (staffingLevelActivity.isPresent()) {
+                        ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getFrom());
+                        ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getTo());
+                        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+                        boolean overlapped=false;
+                        for (Shift shift : shifts) {
+                            if (shift.getActivities().get(0).getActivityId().equals(activity.getId()) && interval.overlaps(shift.getInterval())) {
+                                shiftsCount++;
+                                overlapped=true;
+                            }
+                        }
+                        if(overlapped) {
+                            if (shiftsCount >= staffingLevelActivity.get().getMaxNoOfStaff()) {
+                                staffing = OVERSTAFFING;
+                                break;
+                            } else if (shiftsCount <= staffingLevelActivity.get().getMinNoOfStaff()) {
+                                staffing = UNDERSTAFFING;
+                                break;
+                            } else {
+                                staffing = BALANCED;
+                            }
+                        }
+                    } else {
+                        exceptionService.actionNotPermittedException("message.staffingLevel.activity");
+                    }
+
+                }
+            }
+        }
+        return staffing;
+
     }
 
 

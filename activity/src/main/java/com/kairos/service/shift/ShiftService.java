@@ -514,9 +514,8 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = constructMapOfActivityAndPhaseTemplateValue(phase, activities);
 
         List<ShiftActivity> shiftActivities = findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
-
-        verifyRankOrStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities);
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(), staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap, shiftActivityIdsDTO);
+        shiftValidatorService.verifyRankOrStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities);
 
 
         // End Here
@@ -1362,73 +1361,4 @@ public class ShiftService extends MongoBaseService {
         }
         return shiftActivities;
     }
-
-
-    private void verifyRankOrStaffingLevel(List<ShiftActivity> shiftActivities, Long unitId, List<ActivityWrapper> activities) {
-        if (!shiftActivities.isEmpty()) {
-            Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftActivities.get(0).getStartDate()).truncatedTo(ChronoUnit.DAYS));
-            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftActivities.get(0).getEndDate()).truncatedTo(ChronoUnit.DAYS));
-            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
-            if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
-                exceptionService.actionNotPermittedException("message.staffingLevel.absent");
-            }
-            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shiftActivities.get(0).getStartDate(), shiftActivities.get(0).getEndDate(), unitId);
-            Activity existing = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(0).getActivityId())).findFirst().get().getActivity();
-            Activity arrived = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(1).getActivityId())).findFirst().get().getActivity();
-            StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
-            StaffingLevelActivityRank rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
-            String staffingLevelForExistingActivity = getStaffingLevel(existing, staffingLevels, shifts);
-            String staffingLevelForReplacedActivity = getStaffingLevel(arrived, staffingLevels, shifts);
-            if (rankOfExisting != null && rankOfReplaced != null) {
-                if (!(rankOfExisting.getRank() > rankOfReplaced.getRank() && staffingLevelForExistingActivity.equals(UNDERSTAFFING) && staffingLevelForReplacedActivity.equals(UNDERSTAFFING) ||
-                        rankOfExisting.getRank() > rankOfReplaced.getRank() && (staffingLevelForReplacedActivity.equals(UNDERSTAFFING)|| staffingLevelForReplacedActivity.equals(BALANCED)))) {
-                    exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
-                }
-            }
-        }
-    }
-
-    private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts) {
-        String staffing = null;
-        if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
-            for (StaffingLevel staffingLevel : staffingLevels) {
-                List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
-                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
-                for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
-                    int shiftsCount = 0;
-                    Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(activity.getId())).findFirst();
-                    if (staffingLevelActivity.isPresent()) {
-                        ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getFrom());
-                        ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getTo());
-                        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-                        boolean overlapped=false;
-                        for (Shift shift1 : shifts) {
-                            if (shift1.getActivities().get(0).getActivityId().equals(activity.getId()) && interval.overlaps(shift1.getInterval())) {
-                                shiftsCount++;
-                                overlapped=true;
-                            }
-                        }
-                        if(overlapped) {
-                            if (shiftsCount >= staffingLevelActivity.get().getMaxNoOfStaff()) {
-                                staffing = OVERSTAFFING;
-                                break;
-                            } else if (shiftsCount <= staffingLevelActivity.get().getMinNoOfStaff()) {
-                                staffing = UNDERSTAFFING;
-                                break;
-                            } else {
-                                staffing = BALANCED;
-                            }
-                        }
-                    } else {
-                        exceptionService.actionNotPermittedException("message.staffingLevel.activity");
-                    }
-
-                }
-            }
-        }
-        return staffing;
-
-    }
-
-
 }
