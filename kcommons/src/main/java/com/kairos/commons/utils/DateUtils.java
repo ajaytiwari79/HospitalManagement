@@ -39,7 +39,7 @@ public class DateUtils {
     public static LocalDateTime getLocalDateTimeFromDate(Date date ){
        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
     }
-    public static long getMillisInstantFromTimeZone(String timeZone){
+    public static long getCurrentMillistByTimeZone(String timeZone){
         return Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime();
     }
     public static LocalDate getCurrentLocalDate() {
