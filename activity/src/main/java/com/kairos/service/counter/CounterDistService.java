@@ -517,7 +517,11 @@ public class CounterDistService extends MongoBaseService {
         orgTypeDTOS.forEach(orgTypeDTO -> {
             orgTypeDTO.getOrgTypeIds().forEach(subOrgType->{
                if(subOrgTypeOrKPIMap.get(subOrgType)!=null){
-                   unitIdOrKpiMap.put(orgTypeDTO.getUnitId(),subOrgTypeOrKPIMap.get(subOrgType));
+                    if(!unitIdOrKpiMap.containsKey(orgTypeDTO.getUnitId())){
+                        unitIdOrKpiMap.put(orgTypeDTO.getUnitId(),subOrgTypeOrKPIMap.get(subOrgType));
+                    }else{
+                        unitIdOrKpiMap.get(orgTypeDTO.getUnitId()).addAll(subOrgTypeOrKPIMap.get(subOrgType));
+                    }
                }
             });
         });
