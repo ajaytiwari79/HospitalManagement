@@ -1363,7 +1363,7 @@ public class ShiftService extends MongoBaseService {
                 }
 
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             //Intentionally left blank to avoid ArrayIndexOutOfBoundsException
         }
         return shiftActivities;

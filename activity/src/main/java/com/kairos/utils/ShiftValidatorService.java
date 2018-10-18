@@ -529,6 +529,12 @@ public class ShiftValidatorService {
         });
     }
 
+    /**
+     *
+     * @param shiftActivities
+     * @param unitId
+     * @param activities
+     */
     public void verifyRankAndStaffingLevel(List<ShiftActivity> shiftActivities, Long unitId, List<ActivityWrapper> activities) {
         if (!shiftActivities.isEmpty()) {
             Activity existing = activities.stream().filter(k -> k.getActivity().getId().equals(shiftActivities.get(0).getActivityId())).findFirst().get().getActivity();
@@ -555,6 +561,13 @@ public class ShiftValidatorService {
         }
     }
 
+    /**
+     *
+     * @param activity
+     * @param staffingLevels
+     * @param shifts
+     * @return
+     */
     private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts) {
         String staffingLevelStatus = null;
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
