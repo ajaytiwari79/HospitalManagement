@@ -512,8 +512,8 @@ public class CounterDistService extends MongoBaseService {
         List<OrgTypeDTO> orgTypeDTOS = genericIntegrationService.getOrganizationIdsBySubOrgId(Arrays.asList(orgTypeKPIEntry.getOrgTypeId()));
         Set<Long> subOrgTypeIds=orgTypeDTOS.stream().flatMap(orgTypeDTO -> orgTypeDTO.getOrgTypeIds().stream().filter(orgTypeId->!orgTypeId.equals(orgTypeMappingDTO.getOrgTypeId()))).collect(toSet());
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(new ArrayList<>(subOrgTypeIds), new ArrayList<>());
-        Map<Long,List<BigInteger>> subOrgTypeOrKPIMap=orgTypeMappingDTOS.stream().collect(Collectors.groupingBy(OrgTypeMappingDTO::getOrgTypeId,Collectors.mapping(OrgTypeMappingDTO::getKpiId,Collectors.toList())));
-        Map<Long,List<BigInteger>> unitIdOrKpiMap=new HashMap<>();
+        Map<Long,Set<BigInteger>> subOrgTypeOrKPIMap=orgTypeMappingDTOS.stream().collect(Collectors.groupingBy(OrgTypeMappingDTO::getOrgTypeId,Collectors.mapping(OrgTypeMappingDTO::getKpiId,Collectors.toSet())));
+        Map<Long,Set<BigInteger>> unitIdOrKpiMap=new HashMap<>();
         orgTypeDTOS.forEach(orgTypeDTO -> {
             orgTypeDTO.getOrgTypeIds().forEach(subOrgType->{
                if(subOrgTypeOrKPIMap.get(subOrgType)!=null){
