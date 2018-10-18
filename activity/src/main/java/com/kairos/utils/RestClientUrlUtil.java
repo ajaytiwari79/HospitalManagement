@@ -93,6 +93,7 @@ public class RestClientUrlUtil {
 
     }
     //TODO FIX
+    @Deprecated
     public static final String getBaseUrl(Long organizationId, Long unitId, Long countryId){
         StringBuilder baseUrl=new StringBuilder(userServiceUrl+"organization/"+organizationId);
         if(Optional.ofNullable(unitId).isPresent()){

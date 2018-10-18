@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document(collection = "transfer_method")
+@Document
 public class TransferMethod extends MongoBaseEntity {
 
 
