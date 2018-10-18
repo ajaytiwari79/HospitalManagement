@@ -2,7 +2,9 @@ package com.kairos.service.counter;
 
 import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RepresentationService {
     public BaseChart getRepresentationData(RawRepresentationData data){
         switch (data.getChartType()){
