@@ -2190,7 +2190,7 @@ public class StaffService {
     }
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
-        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds, DateUtil.getCurrentDateMillis());
+        return unitPositionGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
     }
 
     public Long getStaffIdOfLoggedInUser(Long unitId) {
