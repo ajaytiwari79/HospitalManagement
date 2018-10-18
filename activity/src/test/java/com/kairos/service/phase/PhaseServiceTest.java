@@ -5,6 +5,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.dto.user.organization.OrganizationDTO;
@@ -52,7 +53,7 @@ public class PhaseServiceTest {
     @Mock
     private PhaseMongoRepository phaseMongoRepository;
     @Mock
-    private OrganizationRestClient organizationRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Autowired
     private PhaseService phaseService;
 
@@ -77,7 +78,7 @@ public class PhaseServiceTest {
 
         OrganizationDTO unitOrganization = new OrganizationDTO();
         List<PhaseDTO> phaseDTOList = new ArrayList<PhaseDTO>();
-        when(organizationRestClient.getOrganization(Mockito.anyLong())).thenReturn(unitOrganization);
+        when(genericIntegrationService.getOrganization()).thenReturn(unitOrganization);
         when(phaseMongoRepository.getPhasesByUnit(Mockito.anyLong(), Sort.Direction.DESC)).thenReturn(phaseDTOList);
         phaseService.getUnitPhaseByDate(Mockito.anyLong(), new Date("2017/11/15"));
         assertEquals(false, false);

@@ -662,7 +662,7 @@ public class TaskService extends MongoBaseService {
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
             exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
         }
-        OrganizationStaffWrapper organizationStaffWrapper = organizationRestClient.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
+        OrganizationStaffWrapper organizationStaffWrapper = genericIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 

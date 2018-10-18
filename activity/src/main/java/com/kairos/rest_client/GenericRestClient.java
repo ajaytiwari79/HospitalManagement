@@ -35,7 +35,7 @@ public class GenericRestClient {
     RestTemplate restTemplate;
     @Inject
     private ExceptionService exceptionService;
-    @Inject
+    @Autowired
     @Qualifier("restTemplateWithoutAuth")
     private RestTemplate schedulerRestTemplate;
 
