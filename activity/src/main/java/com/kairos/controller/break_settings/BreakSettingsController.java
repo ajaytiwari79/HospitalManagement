@@ -1,16 +1,16 @@
 package com.kairos.controller.break_settings;
 
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.service.break_settings.BreakSettingsService;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public class BreakSettingsController {
     @ApiOperation("Create break settings ")
     @PostMapping(value = "/break")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long unitId, @RequestBody @Valid BreakSettingsDTO breakSettingsDTO) {
+    public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long unitId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, breakSettingsService.createBreakSettings(unitId, breakSettingsDTO));
     }
 
@@ -46,7 +46,7 @@ public class BreakSettingsController {
     }
     @ApiOperation("update a particular break settings for unit")
     @PutMapping(value = "/break/{breakSettingsId}")
-    public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long unitId,@PathVariable BigInteger breakSettingsId, @RequestBody @Valid BreakSettingsDTO breakSettingsDTO){
+    public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long unitId,@PathVariable BigInteger breakSettingsId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true,breakSettingsService.updateBreakSettings(unitId,breakSettingsId,breakSettingsDTO));
     }
 }
