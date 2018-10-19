@@ -386,7 +386,6 @@ public class OrganizationActivityService extends MongoBaseService {
             for (Activity activity : existingActivities) {
                 logger.info("I am act {}", activity.getName());
                 List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-                //Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a -> a.getActivityShiftStatusSettings().stream().flatMap(b -> b.getAccessGroupIds().stream())).collect(Collectors.toSet());
                 for (int i = 0; i < phases.size(); i++) {
                     List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
                     List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
