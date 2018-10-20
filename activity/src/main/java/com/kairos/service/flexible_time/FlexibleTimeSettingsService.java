@@ -23,7 +23,6 @@ public class FlexibleTimeSettingsService extends MongoBaseService {
         FlexibleTimeSettings flexibleTimeSettings=ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingsDTO,FlexibleTimeSettings.class);
         flexibleTimeSettings.setCountryId(countryId);
         flexibleTimeSettings.setUnitId(null);
-        flexibleTimeSettings.setActivityId(null);
         save(flexibleTimeSettings);
         return flexibleTimeSettingsDTO;
     }
@@ -36,7 +35,6 @@ public class FlexibleTimeSettingsService extends MongoBaseService {
         FlexibleTimeSettings flexibleTimeSettings=ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingsDTO,FlexibleTimeSettings.class);
         flexibleTimeSettings.setUnitId(unitId);
         flexibleTimeSettings.setCountryId(null);
-        flexibleTimeSettings.setActivityId(null);
         save(flexibleTimeSettings);
         return flexibleTimeSettingsDTO;
     }
