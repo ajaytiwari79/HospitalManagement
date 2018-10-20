@@ -67,13 +67,13 @@ public class ShiftReminderService extends MongoBaseService {
         List<SchedulerPanelDTO> scheduledJobs = new ArrayList<>(shift.getActivities().size());
         shift.getActivities().forEach(currentShift -> {
             if (activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().isAllowCommunicationReminder()
-                &&  !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
-                    LocalDateTime firstReminderDateTime = calculateTriggerTime(activityWrapperMap.get(currentShift.getActivityId()).getActivity(), shift.getStartDate(), DateUtils.getCurrentLocalDateTime());
-                    if (firstReminderDateTime != null) {
-                        scheduledJobs.add(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, currentShift.getId(), firstReminderDateTime, true, null));
-                    } else {
-                        logger.info("Unable to get notify time for shift {}", shift.getId());
-                    }
+                    && !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
+                LocalDateTime firstReminderDateTime = calculateTriggerTime(activityWrapperMap.get(currentShift.getActivityId()).getActivity(), shift.getStartDate(), DateUtils.getCurrentLocalDateTime());
+                if (firstReminderDateTime != null) {
+                    scheduledJobs.add(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, currentShift.getId(), firstReminderDateTime, true, null));
+                } else {
+                    logger.info("Unable to get notify time for shift {}", shift.getId());
+                }
             }
         });
         if (!scheduledJobs.isEmpty()) {
@@ -116,20 +116,26 @@ public class ShiftReminderService extends MongoBaseService {
             logger.info("Unable to find current shift Activity by id {}", jobDetails.getEntityId());
         }
         Activity activity = activityMongoRepository.findOne(shiftActivity.get().getActivityId());
-        StaffDTO staffDTO = staffRestClient.getStaff(shift.getStaffId());
-
+        StaffDTO staffDTO = new StaffDTO();//staffRestClient.getStaff(shift.getStaffId());
+        staffDTO.setFirstName("abhi");
+        staffDTO.setEmail("abhimanyu.garg@oodlestechnologies.com");
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {
-            logger.info("next email on {} to staff {}", nextTriggerDateTime,staffDTO.getFirstName());
-
-            List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)), shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+            logger.info("next email on {} to staff {}", nextTriggerDateTime, staffDTO.getFirstName());
+            String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
+                    shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
+            mailService.sendPlainMail(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
+            try {
+                List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)), shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+                });
+            } catch (Exception e) {
+                // will remove immediate
+            }
         }
-        String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(),DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
-                shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
-       mailService.sendPlainMail(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
+
 
     }
 
