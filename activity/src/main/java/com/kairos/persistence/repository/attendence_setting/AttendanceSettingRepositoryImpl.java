@@ -21,7 +21,7 @@ public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingR
    public AttendanceSetting findMaxAttendanceCheckIn(Long userId, Date date){
        Aggregation aggregation = Aggregation.newAggregation(
                match(Criteria.where("userId").is(userId).and("createdAt").gte(date)),
-               sort(Sort.Direction.DESC,"attendanceDuration.from"),
+               sort(Sort.Direction.DESC,"createdAt"),
                limit(1)
        );
 
