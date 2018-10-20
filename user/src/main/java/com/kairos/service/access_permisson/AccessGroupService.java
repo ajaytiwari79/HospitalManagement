@@ -832,6 +832,7 @@ public class AccessGroupService {
     }
 
     // Method to fetch list of access group by Organization category ( Hub, Organization and Union)
+    //TODO all three db calls can be combined in one
     public Map<String, List<AccessGroupQueryResult>> getCountryAccessGroupsForOrganizationCreation(Long countryId) {
         Map<String, List<AccessGroupQueryResult>> accessGroupForParentOrganizationCreation = new HashMap<>();
         accessGroupForParentOrganizationCreation.put("hub",
