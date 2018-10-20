@@ -7,6 +7,7 @@ import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.flexible_time.FlexibleTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -42,6 +43,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.flexible_time.FlexibleTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
@@ -129,6 +131,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private FlexibleTimeSettingsService flexibleTimeSettingsService;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -143,6 +147,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            FlexibleTimeSettingsDTO flexibleTimeSettingsDTO=flexibleTimeSettingsService.getFlexibleTimeSettingsForUnit(unitId);
             Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a->a.getActivityShiftStatusSettings().stream().flatMap(b->b.getAccessGroupIds().stream())).collect(Collectors.toSet());
             Map<Long,Long> accessGroupIdsMap=genericIntegrationService.getAccessGroupForUnit(unitId,parentAccessGroupIds);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
@@ -162,6 +167,8 @@ public class OrganizationActivityService extends MongoBaseService {
                 phaseTemplateValues.add(phaseTemplateValue);
             }
             activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
+            activity.getLocationActivityTab().setFlexibleTimeForCheckIn(flexibleTimeSettingsDTO.getFlexibleTimeForCheckIn());
+            activity.getLocationActivityTab().setFlexibleTimeForCheckOut(flexibleTimeSettingsDTO.getFlexibleTimeForCheckOut());
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
         } else {
@@ -372,6 +379,8 @@ public class OrganizationActivityService extends MongoBaseService {
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        FlexibleTimeSettingsDTO flexibleTimeSettings=flexibleTimeSettingsService.getFlexibleTimeSettings(orgTypeAndSubTypeDTO.getCountryId());
+        FlexibleTimeSettingsDTO flexibleTimeSettingsDTO=flexibleTimeSettingsService.saveFlexibleTimeSettingsForUnit(unitId,flexibleTimeSettings);
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
             existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
@@ -405,6 +414,8 @@ public class OrganizationActivityService extends MongoBaseService {
                     phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
                     phaseTemplateValues.add(phaseTemplateValue);
                 }
+                activity.getLocationActivityTab().setFlexibleTimeForCheckIn(flexibleTimeSettingsDTO.getFlexibleTimeForCheckIn());
+                activity.getLocationActivityTab().setFlexibleTimeForCheckOut(flexibleTimeSettingsDTO.getFlexibleTimeForCheckOut());
                 activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }

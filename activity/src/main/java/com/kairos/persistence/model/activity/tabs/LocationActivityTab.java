@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.dto.activity.flexible_time.FlexibleTimeDetails;
 import com.kairos.enums.LocationEnum;
 
 import java.io.Serializable;
@@ -11,9 +12,11 @@ import java.util.List;
 public class LocationActivityTab implements Serializable {
     private List<LocationEnum> canBeStartAt;
     private List<LocationEnum> canBeEndAt;
+    private FlexibleTimeDetails flexibleTimeForCheckIn;
+    private FlexibleTimeDetails flexibleTimeForCheckOut;
 
     public LocationActivityTab() {
-        //dc
+        //Default Constructor
     }
 
     public List<LocationEnum> getCanBeStartAt() {
@@ -32,8 +35,26 @@ public class LocationActivityTab implements Serializable {
         this.canBeEndAt = canBeEndAt;
     }
 
-    public LocationActivityTab(List<LocationEnum> canBeStartAt, List<LocationEnum> canBeEndAt) {
+    public FlexibleTimeDetails getFlexibleTimeForCheckIn() {
+        return flexibleTimeForCheckIn;
+    }
+
+    public void setFlexibleTimeForCheckIn(FlexibleTimeDetails flexibleTimeForCheckIn) {
+        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
+    }
+
+    public FlexibleTimeDetails getFlexibleTimeForCheckOut() {
+        return flexibleTimeForCheckOut;
+    }
+
+    public void setFlexibleTimeForCheckOut(FlexibleTimeDetails flexibleTimeForCheckOut) {
+        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+    }
+
+    public LocationActivityTab(List<LocationEnum> canBeStartAt, List<LocationEnum> canBeEndAt, FlexibleTimeDetails flexibleTimeForCheckIn, FlexibleTimeDetails flexibleTimeForCheckOut) {
         this.canBeStartAt = canBeStartAt;
         this.canBeEndAt = canBeEndAt;
+        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
+        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
     }
 }

@@ -113,4 +113,6 @@ public final class ApiConstants {
     public static final String GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID=CLIENT_CITIZEN_ID+STAFF_WITH_STAFF_ID+"/getStaffCitizenHouseholds";
     public static final String CLIENT_BY_IDS="/client/clientsByIds";
     public static final String GET_UNIT_IDS_BY_CLIENT_IDS="/client/client_ids_by_unitIds";
+    public static final String COUNTRY_FLEXI_TIME_SETTINGS="/country/{country}/flexible_time";
+    public static final String UNIT_FLEXI_TIME_SETTINGS="/unit/{unitId}/flexible_time";
 }
