@@ -711,7 +711,7 @@ public class TaskService extends MongoBaseService {
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));
@@ -1097,7 +1097,7 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
-        Map<String, String> flsCredential = integrationServiceRestClient.getFLS_Credentials(organizationId);
+        Map<String, String> flsCredential = genericIntegrationService.getFLS_Credentials(organizationId);
        /* Visitour visitour = visitourGraphRepository.findByOrganizationId(organizationId);
         Map<String, String> credentials = new HashMap<>();
         String url = (visitour != null) ? visitour.getServerName() : "";

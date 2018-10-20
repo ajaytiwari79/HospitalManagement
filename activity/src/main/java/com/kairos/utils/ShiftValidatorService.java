@@ -443,12 +443,12 @@ public class ShiftValidatorService {
         if (infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()) {
             counterValue = ruleTemplate.getStaffCanIgnoreCounter();
             if(counterValue==null){
-                throwException("message.ruleTemplate.counter.value.notNull");
+                throwException("message.ruleTemplate.counter.value.notNull",ruleTemplate.getName());
             }
         } else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
             counterValue = ruleTemplate.getManagementCanIgnoreCounter();
             if(counterValue==null){
-                throwException("message.ruleTemplate.counter.value.notNull");
+                throwException("message.ruleTemplate.counter.value.notNull",ruleTemplate.getName());
             }
         }
         return counterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getName(), counterValue) : null;
