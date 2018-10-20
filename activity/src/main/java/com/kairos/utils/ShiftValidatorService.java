@@ -543,19 +543,26 @@ public class ShiftValidatorService {
                 List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftActivities.get(0).getStartDate(), shiftActivities.get(0).getEndDate(), unitId);
                 StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
                 StaffingLevelActivityRank rankOfReplaced = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(DateUtils.asLocalDate(shiftActivities.get(1).getStartDate()), shiftActivities.get(1).getActivityId());
-                String staffingLevelForExistingActivity = getStaffingLevel(existing, staffingLevels, shifts);
-                String staffingLevelForReplacedActivity = getStaffingLevel(arrived, staffingLevels, shifts);
+                String staffingLevelForExistingActivity = getStaffingLevel(existing, staffingLevels, shifts,false);
+                String staffingLevelForReplacedActivity = getStaffingLevel(arrived, staffingLevels, shifts,true);
                 if (rankOfExisting != null && rankOfReplaced != null) {
-                    if (!(rankOfExisting.getRank() > rankOfReplaced.getRank() && staffingLevelForExistingActivity.equals(UNDERSTAFFING) && staffingLevelForReplacedActivity.equals(UNDERSTAFFING) ||
-                            rankOfExisting.getRank() > rankOfReplaced.getRank() && (staffingLevelForReplacedActivity.equals(UNDERSTAFFING) || staffingLevelForReplacedActivity.equals(BALANCED)))) {
+                    logger.info("validating ranking of activities");
+                    if((rankOfExisting.getRank() > rankOfReplaced.getRank() && UNDERSTAFFING.equals(staffingLevelForExistingActivity) && UNDERSTAFFING.equals(staffingLevelForReplacedActivity))
+                            || (rankOfExisting.getRank() > rankOfReplaced.getRank() && BALANCED.equals(staffingLevelForReplacedActivity))
+                            || (BALANCED.equals(staffingLevelForReplacedActivity) && BALANCED.equals(staffingLevelForExistingActivity))
+                            || (staffingLevelForReplacedActivity==null)
+                            ){
+                        logger.info("shift can be replaced");
+                    }else {
                         exceptionService.actionNotPermittedException("shift.can.not.move", staffingLevelForReplacedActivity);
                     }
+
                 }
             }
         }
     }
 
-    private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts) {
+    private String getStaffingLevel(Activity activity, List<StaffingLevel> staffingLevels, List<Shift> shifts,boolean addShift) {
         String staffingLevelStatus = null;
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
             for (StaffingLevel staffingLevel : staffingLevels) {
@@ -576,10 +583,11 @@ public class ShiftValidatorService {
                             }
                         }
                         if(overlapped) {
-                            if (shiftsCount >= staffingLevelActivity.get().getMaxNoOfStaff()) {
+                            shiftsCount=addShift?shiftsCount+1:shiftsCount-1;
+                            if (shiftsCount > staffingLevelActivity.get().getMaxNoOfStaff()) {
                                 staffingLevelStatus = OVERSTAFFING;
                                 break;
-                            } else if (shiftsCount <= staffingLevelActivity.get().getMinNoOfStaff()) {
+                            } else if (shiftsCount < staffingLevelActivity.get().getMinNoOfStaff()) {
                                 staffingLevelStatus = UNDERSTAFFING;
                                 break;
                             } else {
