@@ -80,12 +80,17 @@ public class AttendanceSettingService extends MongoBaseService {
         List<ReasonCodeDTO> reasonCodes=staffAndOrganizationIds.get(0).getReasonCodes();
         if(!shifts.isEmpty()) {
             List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
-            unitIdAndFlexibleTimeMap=unitSettingDTOS.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v.getFlexibleTimeSettings()));
+            for(UnitSettingDTO unitSettingDTO:unitSettingDTOS){
+                    unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
+            }
         }
         if(checkIn) {
             for (Shift checkInshift : shifts) {
                 boolean result = false;
                 if (unitIdAndFlexibleTimeMap.containsKey(checkInshift.getUnitId())) {
+                    if(unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId())==null){
+                        exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getUnitId());
+                    }
                     DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
                     result=(Math.abs((Duration.between(DateUtils.getLocalDateTimeFromDate(checkInshift.getStartDate()), DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime());
                     if (interval.contains(DateUtils.getCurrentMillistByTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
@@ -112,7 +117,7 @@ public class AttendanceSettingService extends MongoBaseService {
                 }
             }
         }else{
-            shift=shifts.stream().filter(shift1 -> shift1.getAttendanceDuration().getFrom()!=null&&shift1.getAttendanceDuration().getTo()==null).findAny().orElse(null);
+            shift=shifts.stream().filter(shift1 -> shift1.getAttendanceDuration()!=null&&shift1.getAttendanceDuration().getFrom()!=null&&shift1.getAttendanceDuration().getTo()==null).findAny().orElse(null);
         }
 
 
