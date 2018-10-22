@@ -2,16 +2,13 @@ package com.kairos.service.attendence_setting;
 
 import com.kairos.commons.utils.DateTimeInterval;
 
+import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
-import com.kairos.dto.activity.attendance.AttendanceDuration;
-import com.kairos.dto.activity.attendance.AttendanceDTO;
-import com.kairos.dto.activity.attendance.AttendanceDurationDTO;
-import com.kairos.dto.activity.attendance.SickSettingsDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;

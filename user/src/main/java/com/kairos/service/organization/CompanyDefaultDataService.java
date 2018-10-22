@@ -9,6 +9,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.VRPClientService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.commons.utils.DateUtils;
@@ -40,6 +41,8 @@ public class CompanyDefaultDataService {
     private VRPClientService vrpClientService;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
 
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) throws InterruptedException, ExecutionException {
@@ -54,11 +57,10 @@ public class CompanyDefaultDataService {
     }
 
     public CompletableFuture<Boolean> createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
-                                                                             List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) throws InterruptedException, ExecutionException {
+                                                                             List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO,Long countryId) throws InterruptedException, ExecutionException {
         asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO));
         asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(organization));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId()));
-
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
                 new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(),
                         organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId()));
@@ -67,6 +69,8 @@ public class CompanyDefaultDataService {
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
+        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForUnit(organization,countryId));
+
         return CompletableFuture.completedFuture(true);
     }
 }
