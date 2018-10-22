@@ -7,7 +7,7 @@ public class ContactAddressDTO {
 
     private String houseNumber;
     private Integer floorNumber;
-    private String street1;
+    private String street;
     private Long zipCodeId;
     private String city;
     private Long municipalityId;
@@ -25,11 +25,11 @@ public class ContactAddressDTO {
     public ContactAddressDTO() {
     }
 
-    public ContactAddressDTO(String houseNumber, Integer floorNumber, String street1, String city, String regionName, String country, Float latitude, Float longitude,
+    public ContactAddressDTO(String houseNumber, Integer floorNumber, String street, String city, String regionName, String country, Float latitude, Float longitude,
                              String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
         this.houseNumber = houseNumber;
         this.floorNumber = floorNumber;
-        this.street1 = street1;
+        this.street = street;
         this.city = city;
         this.regionName = regionName;
         this.country = country;
@@ -57,12 +57,12 @@ public class ContactAddressDTO {
         this.floorNumber = floorNumber;
     }
 
-    public String getStreet1() {
-        return street1;
+    public String getStreet() {
+        return street;
     }
 
-    public void setStreet1(String street1) {
-        this.street1 = street1;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     public Long getZipCodeId() {
