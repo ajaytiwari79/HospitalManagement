@@ -30,7 +30,11 @@ public class SchedulerConfig implements SchedulingConfigurer,AsyncConfigurer {
         return Executors.newScheduledThreadPool(20);
     }
 
-    ExecutorService executor = Executors.newWorkStealingPool();
+    @Bean(name ="executorService",destroyMethod ="shutdown")
+    public ExecutorService executorService(){
+        return  Executors.newWorkStealingPool();
+    }
+
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
