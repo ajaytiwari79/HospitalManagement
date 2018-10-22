@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.StaffRestClient;
+import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.mail.MailService;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class ShiftReminderService extends MongoBaseService {
     @Inject
     private SchedulerServiceRestClient schedulerServiceRestClient;
     @Inject
-    EnvConfig envConfig;
+    ActivityToSchedulerQueueService activityToSchedulerQueueService;
 
     private final static Logger logger = LoggerFactory.getLogger(ShiftReminderService.class);
 
@@ -128,7 +129,9 @@ public class ShiftReminderService extends MongoBaseService {
             String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
                     shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
             mailService.sendPlainMail(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
+
             try {
+
                 List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest(Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, null)), shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
                 });
             } catch (Exception e) {
