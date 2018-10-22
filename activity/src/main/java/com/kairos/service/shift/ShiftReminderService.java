@@ -105,7 +105,7 @@ public class ShiftReminderService extends MongoBaseService {
     }
 
     public void sendReminderViaEmail(KairosSchedulerExecutorDTO jobDetails) {
-        Shift shift = shiftMongoRepository.findShiftByShiftActivityId(jobDetails.getEntityId());
+         Shift shift = shiftMongoRepository.findShiftByShiftActivityId(jobDetails.getEntityId());
         if (!Optional.ofNullable(shift).isPresent()) {
             logger.info("Unable to find shift by id {}", jobDetails.getEntityId());
         }
