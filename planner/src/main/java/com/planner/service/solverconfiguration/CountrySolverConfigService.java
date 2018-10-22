@@ -7,6 +7,7 @@ import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.domain.common.solverconfig.SolverConfig;
 import com.planner.domain.country.solverconfig.CountrySolverConfig;
+import com.planner.domain.organization.solverconfig.OrganizationSolverConfig;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
@@ -36,13 +37,13 @@ public class CountrySolverConfigService {
      * @param countrySolverConfigDTO
      */
     public void createCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
-        boolean nameExists = solverConfigRepository.isNameExists(countrySolverConfigDTO.getName());
+        boolean nameExists = solverConfigRepository.isNameExists(countrySolverConfigDTO.getName(),null);
         if (!nameExists) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             solverConfigRepository.saveObject(countrySolverConfig);
             if (countrySolverConfigDTO.getOrganizationSubServiceId() != null) {
                 //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
-                copyUnitSolverConfigByOrganizationSubService(countrySolverConfigDTO.getOrganizationServiceId(),countrySolverConfigDTO.getOrganizationSubServiceId(), countrySolverConfig);
+                copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfigDTO.getOrganizationServiceId(),countrySolverConfigDTO.getOrganizationSubServiceId(), countrySolverConfig);
             }
         }
         else
@@ -62,11 +63,15 @@ public class CountrySolverConfigService {
      * @param organizationSubServiceId
      * @param countrySolverConfig
      */
-    private void copyUnitSolverConfigByOrganizationSubService(Long organizationServiceId, Long organizationSubServiceId, CountrySolverConfig countrySolverConfig) {
+    private void copyUnitSolverConfigByOrganizationServiceAndSubService(Long organizationServiceId, Long organizationSubServiceId, CountrySolverConfig countrySolverConfig) {
         List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationServiceAndSubServiceId(organizationServiceId,organizationSubServiceId);
-        for (Long countryId : applicableUnitIdForSolverConfig) {
-            countrySolverConfig.setIdBuilder(null);//Unset Id
-            solverConfigRepository.saveObject(countrySolverConfig);
+        if(!applicableUnitIdForSolverConfig.isEmpty()) {
+            OrganizationSolverConfig organizationSolverConfig=ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig,OrganizationSolverConfig.class);
+            for (Long unitId : applicableUnitIdForSolverConfig) {
+                organizationSolverConfig.setIdBuilder(null);//Unset Id
+                organizationSolverConfig.setUnitId(unitId);
+                solverConfigRepository.saveObject(organizationSolverConfig);
+            }
         }
     }
 
@@ -88,13 +93,14 @@ public class CountrySolverConfigService {
     }
 
     /***************************************************************/
-    public CountrySolverConfigDTO getCountrySolverConfig(BigInteger solverConfigId) {
+    public CountrySolverConfigDTO getCountrySolverConfigById(BigInteger solverConfigId) {
         CountrySolverConfigDTO countrySolverConfigDTO = null;
         Optional<SolverConfig> countrySolverConfigOptional = solverConfigRepository.findById(solverConfigId);
         if (countrySolverConfigOptional.isPresent()) {
             CountrySolverConfig countrySolverConfig =(CountrySolverConfig) countrySolverConfigOptional.get();
             countrySolverConfigDTO = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, CountrySolverConfigDTO.class);
         }
+        else exceptionService.dataNotFoundByIdException("");
         return countrySolverConfigDTO;
     }
 
@@ -108,7 +114,7 @@ public class CountrySolverConfigService {
     //Only update if present
     public CountrySolverConfigDTO updateCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
         Optional<SolverConfig> countrySolverConfigOptional = solverConfigRepository.findById(countrySolverConfigDTO.getId());
-        boolean nameExists = solverConfigRepository.isNameExists(countrySolverConfigDTO.getName());
+        boolean nameExists = solverConfigRepository.isNameExists(countrySolverConfigDTO.getName(),countrySolverConfigDTO.getId());
         if (countrySolverConfigOptional.isPresent() && !nameExists) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             solverConfigRepository.saveObject(countrySolverConfig);

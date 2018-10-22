@@ -21,7 +21,7 @@ public interface MongoBaseRepository<T, ID> extends MongoRepository<T, ID> {
 
     boolean safeDeleteById(BigInteger id);
 
-    boolean isNameExists(String name);
+    boolean isNameExists(String name,BigInteger idNotApplicableForCheck);
 
     <T extends MongoBaseEntity> boolean safeDeleteByObject(T o);
 }

@@ -19,7 +19,7 @@ public class ConstraintService {
 
     //==========================================================================
     public void createConstraint(ConstraintDTO constraintDTO) {
-        boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName());
+        boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName(),null);
         if (!nameExists) {
             Constraint constraint = ObjectMapperUtils.copyPropertiesByMapper(constraintDTO, Constraint.class);
             constraintsRepository.saveObject(constraint);
@@ -45,7 +45,7 @@ public class ConstraintService {
     //Only update if present
     public ConstraintDTO updateConstraint(ConstraintDTO constraintDTO) {
         Optional<Constraint> constraintOptional = constraintsRepository.findById(constraintDTO.getId());
-        boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName());
+        boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName(),constraintDTO.getId());
 
         if (constraintOptional.isPresent() && !nameExists) {
             Constraint constraint = ObjectMapperUtils.copyPropertiesByMapper(constraintDTO, Constraint.class);

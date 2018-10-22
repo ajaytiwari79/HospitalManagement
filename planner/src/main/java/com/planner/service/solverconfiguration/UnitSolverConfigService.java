@@ -24,7 +24,7 @@ public class UnitSolverConfigService {
     private ActivityMongoRepository activityMongoRepository;
 
     public void createUnitSolverConfig(OrganizationSolverConfigDTO organizationSolverConfigDTO) {
-        boolean nameExists = solverConfigRepository.isNameExists(organizationSolverConfigDTO.getName());
+        boolean nameExists = solverConfigRepository.isNameExists(organizationSolverConfigDTO.getName(),null);
         if (!nameExists) {
             OrganizationSolverConfig organizationSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(organizationSolverConfigDTO, OrganizationSolverConfig.class);
             solverConfigRepository.saveObject(organizationSolverConfig);
@@ -61,7 +61,7 @@ public class UnitSolverConfigService {
     //Only update if present
     public OrganizationSolverConfigDTO updateUnitSolverConfig(OrganizationSolverConfigDTO OrganizationSolverConfigDTO) {
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(OrganizationSolverConfigDTO.getId());
-        boolean nameExists = solverConfigRepository.isNameExists(OrganizationSolverConfigDTO.getName());
+        boolean nameExists = solverConfigRepository.isNameExists(OrganizationSolverConfigDTO.getName(),OrganizationSolverConfigDTO.getId());
 
         if (solverConfigOptional.isPresent() && !nameExists) {
             OrganizationSolverConfig OrganizationSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(OrganizationSolverConfigDTO, OrganizationSolverConfig.class);

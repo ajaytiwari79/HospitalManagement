@@ -37,8 +37,8 @@ public class CountrySolverConfigController {
 
     @GetMapping(value = "/{solverConfigId}")
     @ApiOperation("Get CountrySolverConfig")
-    public ResponseEntity<Map<String, Object>> getCountrySolverConfig(@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getCountrySolverConfig(solverConfigId));
+    public ResponseEntity<Map<String, Object>> getCountrySolverConfigById(@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getCountrySolverConfigById(solverConfigId));
     }
 
     @GetMapping
@@ -59,9 +59,9 @@ public class CountrySolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping
+    @DeleteMapping(value = "/{solverConfigId}")
     @ApiOperation("Delete CountrySolverConfigration")
-    public ResponseEntity<Map<String, Object>> deleteCountrySolverConfig(@RequestParam BigInteger solverConfigId) {
+    public ResponseEntity<Map<String, Object>> deleteCountrySolverConfig(@PathVariable BigInteger solverConfigId) {
         countrySolverConfigService.deleteCountrySolverConfig(solverConfigId);
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }

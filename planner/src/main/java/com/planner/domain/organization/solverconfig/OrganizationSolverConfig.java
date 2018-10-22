@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
-@Document
+
 public class OrganizationSolverConfig extends SolverConfig{
 
     private BigInteger parentOrganizationSolverConfigId;//copiedFrom

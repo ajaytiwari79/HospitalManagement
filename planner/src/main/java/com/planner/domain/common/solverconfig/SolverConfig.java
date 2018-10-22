@@ -10,7 +10,6 @@ import java.util.List;
 public class SolverConfig extends MongoBaseEntity {
 
     protected String name;//Unique(but not when copying)
-    protected String parentId;//copiedFromId;
     protected String description;
     protected Long phaseId;
     protected Long planningPeriodId;
@@ -34,13 +33,6 @@ public class SolverConfig extends MongoBaseEntity {
         this.name = name;
     }
 
-    public String getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
 
     public String getDescription() {
         return description;
@@ -112,10 +104,7 @@ public class SolverConfig extends MongoBaseEntity {
         return this;
     }
 
-    public SolverConfig setParentIdBuilder(String parentId) {
-        this.parentId = parentId;
-        return this;
-    }
+
 
     public SolverConfig setDescriptionBuilder(String description) {
         this.description = description;

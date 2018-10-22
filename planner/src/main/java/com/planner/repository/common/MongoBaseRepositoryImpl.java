@@ -20,6 +20,7 @@ import java.util.Optional;
  * This class will be loaded by {@link org.springframework.data.mongodb.repository.config.EnableMongoRepositories}
  * which is configured in planner Main class
  * as an instance of Proxy class into every {@Repository} annotated interface
+ *
  * @param <T>
  * @param <ID>
  */
@@ -47,13 +48,18 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
 
     @Override
     public boolean safeDeleteById(BigInteger id) {
-        mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)), Update.update("deleted", true),  entityInformation.getJavaType());
+        mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)), Update.update("deleted", true), entityInformation.getJavaType());
         return true;
     }
 
     @Override
-    public boolean isNameExists(String name) {
-        return mongoOperations.exists(new Query(Criteria.where("name").is(name)),  entityInformation.getJavaType());
+    public boolean isNameExists(String name, BigInteger solverConfigIdNotApplicableForCheck) {
+        boolean result;
+        if (solverConfigIdNotApplicableForCheck != null)
+            result = mongoOperations.exists(new Query(Criteria.where("name").is(name).andOperator(Criteria.where("_id").ne(solverConfigIdNotApplicableForCheck))), entityInformation.getJavaType());
+        else
+            result = mongoOperations.exists(new Query(Criteria.where("name").is(name)), entityInformation.getJavaType());
+        return result;
     }
 
     @Override
@@ -68,11 +74,12 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     }
 
     @Override
-    public List<T> findAllSolverConfigNotDeletedByType(String solverConfigType){
+    public List<T> findAllSolverConfigNotDeletedByType(String solverConfigType) {
         List<T> result;
-        if("country".equalsIgnoreCase(solverConfigType))
-            result= mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("countryId").exists(false))), entityInformation.getJavaType());
-        else  result= mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("unitId").exists(false))), entityInformation.getJavaType());
+        if ("country".equalsIgnoreCase(solverConfigType))
+            result = mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("countryId").exists(true))), entityInformation.getJavaType());
+        else
+            result = mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("unitId").exists(true))), entityInformation.getJavaType());
         return result;
     }
 /**********************************Custom Sequence Generator by this Application******************************************************/
@@ -114,7 +121,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         //Get class name for sequence class
         String className = entity.getClass().getSimpleName();
         //By Pass, to save both type of solverConfig in same Collection
-        if(entity instanceof SolverConfig) className=SolverConfig.class.getSimpleName();
+        if (entity instanceof SolverConfig) className = SolverConfig.class.getSimpleName();
         //Set Id if entity don't have Id
         if (entity.getId() == null) entity.setId(nextSequence(className));
         //Set createdAt if entity don't have createdAt
