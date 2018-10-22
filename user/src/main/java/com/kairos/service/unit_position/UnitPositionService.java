@@ -790,6 +790,7 @@ public class UnitPositionService {
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
         unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
         unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
+        unitPositionDetails.setTotalWeeklyHours(currentPositionLine.getTotalWeeklyHours());
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
         unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
@@ -1108,7 +1109,7 @@ public class UnitPositionService {
         List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("upIds", unitpositionIds.toString().replace("[", "").replace("]", "")));
         WTATableSettingWrapper wtaWithTableSettings = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_WTA, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTATableSettingWrapper>>() {
         });
-        Map<Long, UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().filter(u -> u.getHistory().equals(false)).collect(Collectors.toMap(UnitPositionQueryResult::getId, v -> v));
+        Map<Long, UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().filter(u ->u.getHistory()!=null && u.getHistory().equals(false)).collect(Collectors.toMap(UnitPositionQueryResult::getId, v -> v));
         wtaWithTableSettings.getAgreements().forEach(currentWTA -> {
             UnitPositionQueryResult unitPositionQueryResult = unitPositionQueryResultMap.get(currentWTA.getUnitPositionId());
             if (unitPositionQueryResult != null) {

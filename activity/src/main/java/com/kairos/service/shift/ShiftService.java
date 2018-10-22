@@ -209,6 +209,7 @@ public class ShiftService extends MongoBaseService {
     private GenericIntegrationService genericIntegrationService;
 
     @Inject private ShiftReminderService shiftReminderService;
+
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         Activity activity = activityWrapper.getActivity();
@@ -286,7 +287,7 @@ public class ShiftService extends MongoBaseService {
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            saveShiftWithActivity(phase, activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO);
+            saveShiftWithActivity(phase, activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,false);
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
             ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfoDTO.getViolatedRules(), ShiftViolatedRules.class);
@@ -312,7 +313,7 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
-    public void saveShiftWithActivity(Phase phase, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void saveShiftWithActivity(Phase phase, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean updateShift) {
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shift.getStaffId(), activityIds);
         Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId, v -> v));
         int scheduledMinutes = 0;
@@ -349,7 +350,9 @@ public class ShiftService extends MongoBaseService {
             shift.getActivities().addAll(breakActvities);
         }
         shiftMongoRepository.save(shift);
-        updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+        if(!updateShift) {
+            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+        }
     }
 
     public void saveShiftWithActivity(Phase phase, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -398,7 +401,7 @@ public class ShiftService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate());
-        saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
+        saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false);
         payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getViolatedRules(), ShiftViolatedRules.class);
         shiftViolatedRules.setShift(shift);
@@ -554,14 +557,17 @@ public class ShiftService extends MongoBaseService {
 
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
+            saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,true);
 
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
-            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
+            timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
+//            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
+            Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
+            //anil m2 notify event for updating staffing level
             boolean presenceTypeShift = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
             if (activityWrapper.getTimeType().equals(TimeTypes.WORKING_TYPE.toString())) {
-                applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shift.getStartDate(), shift,
+                applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
                         true, oldStateOfShift, presenceTypeShift, false, activityChangeStatus(activityOld, activity) == ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE
                         , activityChangeStatus(activityOld, activity) == ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE));
             }
@@ -678,8 +684,14 @@ public class ShiftService extends MongoBaseService {
 
         }
         shift.setFunctionId(functionId);
-        saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
+        shiftMongoRepository.save(shift);
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+        timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
         payOutService.deletePayOut(shift.getId());
+
+        boolean isShiftForPreence = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+        applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
+                false, null, isShiftForPreence, true, false, false));
         List<BigInteger> jobIds=shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         shiftReminderService.deleteReminderTrigger(jobIds,shift.getUnitId());
 
@@ -803,7 +815,7 @@ public class ShiftService extends MongoBaseService {
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
+            saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
 
