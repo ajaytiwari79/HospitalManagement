@@ -54,7 +54,7 @@ public class UserRestClientForScheduler {
                 return HttpMethod.PUT;
             case GET:
                 return HttpMethod.GET;
-            default:return null;
+            default: throw new UnsupportedOperationException("Invalid method specified");
 
         }
     }
