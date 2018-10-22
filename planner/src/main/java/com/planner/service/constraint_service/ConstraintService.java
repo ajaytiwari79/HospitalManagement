@@ -18,14 +18,14 @@ public class ConstraintService {
 
 
     //==========================================================================
-    public void createConstraint(ConstraintDTO constraintDTO) {
+    /*public void createConstraint(ConstraintDTO constraintDTO) {
         boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName(),null);
         if (!nameExists) {
             Constraint constraint = ObjectMapperUtils.copyPropertiesByMapper(constraintDTO, Constraint.class);
             constraintsRepository.saveObject(constraint);
         }
 
-    }
+    }*/
     //=========================================================================
     public ConstraintDTO getConstraint(BigInteger constraintId) {
         ConstraintDTO constraintDTO = null;
@@ -43,7 +43,7 @@ public class ConstraintService {
     }
     //=========================================================================
     //Only update if present
-    public ConstraintDTO updateConstraint(ConstraintDTO constraintDTO) {
+    /*public ConstraintDTO updateConstraint(ConstraintDTO constraintDTO) {
         Optional<Constraint> constraintOptional = constraintsRepository.findById(constraintDTO.getId());
         boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName(),constraintDTO.getId());
 
@@ -52,7 +52,7 @@ public class ConstraintService {
             constraintsRepository.save(constraint);
         }
         return constraintDTO;
-    }
+    }*/
     //=========================================================================
     //Soft Delete
     public boolean deleteConstraint(BigInteger constraintId) {

@@ -118,7 +118,7 @@ public class ActivityMongoRepository {
         return aggregationResults.getMappedResults();
     }
    //For Organization(Unit)
-    public List<PhaseDTO> getAllPhasesByUnitId(Long unitId) {
+    public List<PhaseDTO> getAllPhasesByOrganizationId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("organizationId").is(unitId)));
         AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
@@ -126,7 +126,7 @@ public class ActivityMongoRepository {
     }
 
     //For Organization(Unit
-    public List<PlanningPeriodDTO> getAllPlanningPeriodByUnitId(Long unitId)
+    public List<PlanningPeriodDTO> getAllPlanningPeriodByOrganizationId(Long unitId)
     {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId)));

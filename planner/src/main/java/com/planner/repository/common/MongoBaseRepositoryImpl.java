@@ -53,12 +53,13 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     }
 
     @Override
-    public boolean isNameExists(String name, BigInteger solverConfigIdNotApplicableForCheck) {
+    public boolean isNameExists(String name, BigInteger solverConfigIdNotApplicableForCheck,boolean checkForCountry) {
         boolean result;
+        String idFieldType=checkForCountry?"countryId":"unitId";
         if (solverConfigIdNotApplicableForCheck != null)
-            result = mongoOperations.exists(new Query(Criteria.where("name").is(name).andOperator(Criteria.where("_id").ne(solverConfigIdNotApplicableForCheck))), entityInformation.getJavaType());
+            result = mongoOperations.exists(new Query(Criteria.where("name").is(name).andOperator(Criteria.where("_id").ne(solverConfigIdNotApplicableForCheck).andOperator(Criteria.where(idFieldType).exists(true)))), entityInformation.getJavaType());
         else
-            result = mongoOperations.exists(new Query(Criteria.where("name").is(name)), entityInformation.getJavaType());
+            result = mongoOperations.exists(new Query(Criteria.where("name").is(name).andOperator(Criteria.where(idFieldType).exists(true))), entityInformation.getJavaType());
         return result;
     }
 

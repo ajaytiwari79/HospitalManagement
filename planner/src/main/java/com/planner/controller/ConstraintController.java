@@ -26,7 +26,7 @@ public class ConstraintController {
     @PostMapping
     @ApiOperation("Create Constraint")
     public ResponseEntity<Map<String, Object>> createConstraint(@RequestBody ConstraintDTO constraintDTO) {
-        constraintService.createConstraint(constraintDTO);
+       // constraintService.createConstraint(constraintDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
     }
 
@@ -52,7 +52,7 @@ public class ConstraintController {
     @PatchMapping
     @ApiOperation("Update Constraint")
     public ResponseEntity<Map<String, Object>> updateConstraint(@RequestBody ConstraintDTO constraintDTO) {
-        constraintService.updateConstraint(constraintDTO);
+        //constraintService.updateConstraint(constraintDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
     }
     //=============================================================================

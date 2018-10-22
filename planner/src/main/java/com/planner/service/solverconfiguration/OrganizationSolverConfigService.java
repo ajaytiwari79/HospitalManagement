@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UnitSolverConfigService {
+public class OrganizationSolverConfigService {
     @Inject
     private SolverConfigRepository solverConfigRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
 
-    public void createUnitSolverConfig(OrganizationSolverConfigDTO organizationSolverConfigDTO) {
-        boolean nameExists = solverConfigRepository.isNameExists(organizationSolverConfigDTO.getName(),null);
+    public void createOrganizationSolverConfig(OrganizationSolverConfigDTO organizationSolverConfigDTO) {
+        boolean nameExists = solverConfigRepository.isNameExists(organizationSolverConfigDTO.getName(),null,false);
         if (!nameExists) {
             OrganizationSolverConfig organizationSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(organizationSolverConfigDTO, OrganizationSolverConfig.class);
             solverConfigRepository.saveObject(organizationSolverConfig);
@@ -33,7 +33,7 @@ public class UnitSolverConfigService {
     }
 
 
-    public void copyUnitSolverConfig(OrganizationSolverConfigDTO organizationSolverConfigDTO) {
+    public void copyOrganizationSolverConfig(OrganizationSolverConfigDTO organizationSolverConfigDTO) {
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(organizationSolverConfigDTO.getId());
         if (solverConfigOptional.isPresent()) {
             OrganizationSolverConfig organizationSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(organizationSolverConfigDTO, OrganizationSolverConfig.class);
@@ -43,7 +43,7 @@ public class UnitSolverConfigService {
         }
     }
 /*************************************************************************/
-    public OrganizationSolverConfigDTO getUnitSolverConfig(BigInteger solverConfigId) {
+    public OrganizationSolverConfigDTO getOrganizationSolverConfig(BigInteger solverConfigId) {
         OrganizationSolverConfigDTO OrganizationSolverConfigDTO = null;
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(solverConfigId);
         if (solverConfigOptional.isPresent()) {
@@ -53,16 +53,15 @@ public class UnitSolverConfigService {
         return OrganizationSolverConfigDTO;
     }
     /*************************************************************************/
-    public List<OrganizationSolverConfigDTO> getAllUnitSolverConfig() {
+    public List<OrganizationSolverConfigDTO> getAllOrganizationSolverConfig() {
         List<SolverConfig> organizationSolverConfigList = solverConfigRepository.findAllSolverConfigNotDeletedByType("organization");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationSolverConfigList, OrganizationSolverConfigDTO.class);
     }
     /*************************************************************************/
     //Only update if present
-    public OrganizationSolverConfigDTO updateUnitSolverConfig(OrganizationSolverConfigDTO OrganizationSolverConfigDTO) {
+    public OrganizationSolverConfigDTO updateOrganizationSolverConfig(OrganizationSolverConfigDTO OrganizationSolverConfigDTO) {
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(OrganizationSolverConfigDTO.getId());
-        boolean nameExists = solverConfigRepository.isNameExists(OrganizationSolverConfigDTO.getName(),OrganizationSolverConfigDTO.getId());
-
+        boolean nameExists = solverConfigRepository.isNameExists(OrganizationSolverConfigDTO.getName(),OrganizationSolverConfigDTO.getId(),false);
         if (solverConfigOptional.isPresent() && !nameExists) {
             OrganizationSolverConfig OrganizationSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(OrganizationSolverConfigDTO, OrganizationSolverConfig.class);
             solverConfigRepository.saveObject(OrganizationSolverConfig);
@@ -71,7 +70,7 @@ public class UnitSolverConfigService {
     }
     /*************************************************************************/
     //Soft Delete
-    public boolean deleteUnitSolverConfig(BigInteger solverConfigId) {
+    public boolean deleteOrganizationSolverConfig(BigInteger solverConfigId) {
         boolean isPresent = solverConfigRepository.findById(solverConfigId).isPresent();
         if (isPresent) {
             solverConfigRepository.safeDeleteById(solverConfigId);
@@ -80,34 +79,34 @@ public class UnitSolverConfigService {
     }
 
     /******************************Country Default Data***********************************************/
-    public DefaultDataDTO getDefaultData(Long unitId) {
+    public DefaultDataDTO getDefaultData(Long organizationId) {
         DefaultDataDTO defaultDataDTO=new DefaultDataDTO()
                 //get All Phases
-                .setPhaseDTOSBuilder(getAllPhases(unitId))
+                .setPhaseDTOSBuilder(getAllPhases(organizationId))
                 //getAllPlanningPeriod
-                .setPlanningPeriodDTOSBuilder(getAllPlanningPeriods(unitId));
+                .setPlanningPeriodDTOSBuilder(getAllPlanningPeriods(organizationId));
 
 
         return defaultDataDTO;
     }
 
     /**
-     *@param unitId
+     *@param organizationId
      * @return
      */
-    private List<PhaseDTO> getAllPhases(Long unitId)
+    private List<PhaseDTO> getAllPhases(Long organizationId)
     {
-        List<PhaseDTO> phaseDTOS=activityMongoRepository.getAllPhasesByUnitId(unitId);;
+        List<PhaseDTO> phaseDTOS=activityMongoRepository.getAllPhasesByOrganizationId(organizationId);;
         return phaseDTOS;
     }
 
     /**
      *
-     * @param unitId
+     * @param organizationId
      * @return
      */
-    private List<PlanningPeriodDTO> getAllPlanningPeriods(Long unitId) {
-        return activityMongoRepository.getAllPlanningPeriodByUnitId(unitId);
+    private List<PlanningPeriodDTO> getAllPlanningPeriods(Long organizationId) {
+        return activityMongoRepository.getAllPlanningPeriodByOrganizationId(organizationId);
     }
 
 
