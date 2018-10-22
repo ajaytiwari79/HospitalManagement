@@ -71,6 +71,8 @@ public class GenericIntegrationService {
     GenericRestClient genericRestClient;
     @Inject
     ExceptionService exceptionService;
+    @Inject
+    private UserRestClientForScheduler userRestClientForScheduler;
 
     public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId, Long dateInMillis) {
         BasicNameValuePair basicNameValuePair = new BasicNameValuePair("dateInMillis", dateInMillis.toString());
@@ -508,6 +510,11 @@ public class GenericIntegrationService {
     //Note here 2nd argument is taken just because of unitId(might not present in UserContext) not null in url
     public List<ClientOrganizationIds> getCitizenIdsByUnitIds(List<Long> unitIds) {
         return genericRestClient.publishRequestWithoutAuth(unitIds, unitIds.get(0), RestClientUrlType.UNIT, HttpMethod.POST, GET_UNIT_IDS_BY_CLIENT_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientOrganizationIds>>>() {
+        });
+    }
+
+    public String getTimezone() {
+        return userRestClientForScheduler.publishRequest(null,2567L,RestClientUrlType.UNIT,HttpMethod.GET,"/time_zone",null,new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
         });
     }
     }
