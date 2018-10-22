@@ -789,6 +789,7 @@ public class UnitPositionService {
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
         unitPositionDetails.setFullTimeWeeklyMinutes(currentPositionLine.getFullTimeWeeklyMinutes());
         unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
+        unitPositionDetails.setTotalWeeklyHours(currentPositionLine.getTotalWeeklyHours());
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
         unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
