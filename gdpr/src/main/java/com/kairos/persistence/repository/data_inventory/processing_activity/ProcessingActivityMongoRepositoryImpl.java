@@ -151,7 +151,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     @Override
     public ProcessingActivityResponseDTO getProcessingActivityAndMetaDataById(Long unitId, BigInteger processingActivityId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
                 lookup("processingPurpose", "processingPurposes", "_id", "processingPurposes"),
                 lookup("transferMethod", "transferMethods", "_id", "transferMethods"),
                 lookup("accessorParty", "accessorParties", "_id", "accessorParties"),

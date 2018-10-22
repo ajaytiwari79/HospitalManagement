@@ -64,7 +64,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		return localeService.getMessage(message, params);
 	}
 
-	@Override
+	/*@Override
 	public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 		logger.error("exception in activity service",ex);
 		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
@@ -85,7 +85,31 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		errorMessage.setSuccess(false);
 		return new ResponseEntity<Object>(errorMessage, headers, status);
 
-	}
+	}*/
+
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.error("exception in activity service",ex);
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
+        List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
+        //  String error;
+        for (FieldError fieldError : fieldErrors) {
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
+            errors.add(error);
+        }
+        for (ObjectError objectError : globalErrors) {
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
+            errors.add(error);
+        }
+
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setErrors(errors);
+        errorMessage.setSuccess(false);
+
+        return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
+
+    }
 
 
 	@Override

@@ -43,7 +43,7 @@ public class KafkaProducer {
             throw new InvalidJobSubTypeException("Invalid jobSubType");
         }
         KairosSchedulerLogsDTO schedulerLog;
-        ListenableFuture<SendResult<Integer,KairosSchedulerExecutorDTO>> future =  kafkaTemplate.send(SCHEDULER_TO_USER_QUEUE_TOPIC, job);
+        ListenableFuture<SendResult<Integer,KairosSchedulerExecutorDTO>> future =  kafkaTemplate.send(queueLabel, job);
         future.addCallback(new ListenableFutureCallback<SendResult<Integer, KairosSchedulerExecutorDTO>>() {
 
             @Override

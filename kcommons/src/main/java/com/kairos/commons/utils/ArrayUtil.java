@@ -1,10 +1,12 @@
-package com.kairos.utils;
+package com.kairos.commons.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 2/11/17.
@@ -21,6 +23,15 @@ public class ArrayUtil {
             uniqueElement.add(secondList.get(i));
         }
         return uniqueElement;
+    }
+
+    public static <T> Set<T> getUnionOfList(List<T> first, List<T> second) {
+        Set<T> union = new HashSet<>();
+        if(first!=null)
+            union.addAll(first);
+        if(second!=null)
+            union.addAll(second);
+        return union;
     }
 
 }
