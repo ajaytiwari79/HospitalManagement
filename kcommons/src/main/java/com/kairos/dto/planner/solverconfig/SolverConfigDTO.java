@@ -14,26 +14,19 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolverConfigDTO {
     //Common
-    private BigInteger id;
-    private String name;//Unique
-    private String description;
-    private Long phaseId;
-    private Long planningPeriodId;
-    private byte threadCount;
-    private short terminationTimeInMinutes;
-    private Long planningProblemId;
-    private List<BigInteger> constraintIds;
-    //Unit properties
-    private Long unitId;
-    //Country Properties
-    private Long countryId;
-    private Long parentCountryId;
-    private Long organizationSubServiceId;
+    protected BigInteger id;
+    protected String name;//Unique
+    protected String description;
+    protected Long phaseId;
+    protected Long planningPeriodId;
+    protected byte threadCount;
+    protected short terminationTimeInMinutes;
+    protected Long planningProblemId;
+    protected List<BigInteger> constraintIds;
 
-    //Constructors
-    public SolverConfigDTO() {
 
-    }
+
+
 
     //Setters and Getters
 
@@ -59,22 +52,6 @@ public class SolverConfigDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public Long getPhaseId() {
@@ -125,21 +102,6 @@ public class SolverConfigDTO {
         this.constraintIds = constraintIds;
     }
 
-    public Long getOrganizationSubServiceId() {
-        return organizationSubServiceId;
-    }
-
-    public void setOrganizationSubServiceId(Long organizationSubServiceId) {
-        this.organizationSubServiceId = organizationSubServiceId;
-    }
-
-    public Long getParentCountryId() {
-        return parentCountryId;
-    }
-
-    public void setParentCountryId(Long parentCountryId) {
-        this.parentCountryId = parentCountryId;
-    }
 
     /*****************************SolverConfigDTO Builder****************************************/
     public SolverConfigDTO setNameBuilder(String name) {
@@ -152,15 +114,6 @@ public class SolverConfigDTO {
         return this;
     }
 
-    public SolverConfigDTO setUnitIdBuilder(Long unitId) {
-        this.unitId = unitId;
-        return this;
-    }
-
-    public SolverConfigDTO setCountryIdBuilder(Long countryId) {
-        this.countryId = countryId;
-        return this;
-    }
 
     public SolverConfigDTO setPhaseIdBuilder(Long phaseId) {
         this.phaseId = phaseId;
@@ -192,13 +145,5 @@ public class SolverConfigDTO {
         return this;
     }
 
-    public SolverConfigDTO setOrganizationSubServiceIdBuilder(Long organizationSubServiceId) {
-        this.organizationSubServiceId = organizationSubServiceId;
-        return this;
-    }
-    public SolverConfigDTO setParentCountryIdBuilder(Long parentCountryId) {
-        this.parentCountryId = parentCountryId;
-        return this;
-    }
-
+    
 }

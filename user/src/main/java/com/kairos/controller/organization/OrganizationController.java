@@ -443,14 +443,14 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Organization Hierarchy")
-    @GetMapping(PARENT_ORGANIZATION_URL+"/hierarchy")
+    @GetMapping(PARENT_ORGANIZATION_URL+"/hierarchyBalance")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationHierarchy(@PathVariable Long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.generateHierarchyMinimum(organizationId));
     }
 
     @ApiOperation(value = "Get Organization Hierarchy")
-    @GetMapping(PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy")
+    @GetMapping(PARENT_ORGANIZATION_URL+"/organization_flow/hierarchyBalance")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab(@PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

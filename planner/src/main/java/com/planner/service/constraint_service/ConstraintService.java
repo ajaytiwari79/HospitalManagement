@@ -7,6 +7,7 @@ import com.planner.repository.constraints.ConstraintsRepository;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class ConstraintService {
 
     }
     //=========================================================================
-    public ConstraintDTO getConstraint(String constraintId) {
+    public ConstraintDTO getConstraint(BigInteger constraintId) {
         ConstraintDTO constraintDTO = null;
         Optional<Constraint> constraintOptional = constraintsRepository.findById(constraintId);
         if (constraintOptional.isPresent()) {
@@ -43,7 +44,7 @@ public class ConstraintService {
     //=========================================================================
     //Only update if present
     public ConstraintDTO updateConstraint(ConstraintDTO constraintDTO) {
-        Optional<Constraint> constraintOptional = constraintsRepository.findById(constraintDTO.getId()+"");
+        Optional<Constraint> constraintOptional = constraintsRepository.findById(constraintDTO.getId());
         boolean nameExists = constraintsRepository.isNameExists(constraintDTO.getName());
 
         if (constraintOptional.isPresent() && !nameExists) {
@@ -54,7 +55,7 @@ public class ConstraintService {
     }
     //=========================================================================
     //Soft Delete
-    public boolean deleteConstraint(String constraintId) {
+    public boolean deleteConstraint(BigInteger constraintId) {
         boolean isPresent = constraintsRepository.findById(constraintId).isPresent();
         if (isPresent) {
             constraintsRepository.safeDeleteById(constraintId);

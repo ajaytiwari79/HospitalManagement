@@ -7,7 +7,7 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigWTADTO;
 import com.kairos.planner.vrp.taskplanning.model.constraint.*;
 import com.planner.commonUtil.StaticField;
-import com.planner.domain.solverconfig.SolverConfig;
+import com.planner.domain.common.solverconfig.SolverConfig;
 import com.planner.repository.solver_config.SolverConfigRepository;
 import com.planner.util.wta.FileIOUtil;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,6 +3,7 @@ package com.planner.repository.common;
 import com.kairos.commons.utils.DateUtils;
 import com.planner.domain.MongoBaseEntity;
 import com.planner.domain.common.MongoSequence;
+import com.planner.domain.common.solverconfig.SolverConfig;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.*;
@@ -45,7 +46,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     }
 
     @Override
-    public boolean safeDeleteById(String id) {
+    public boolean safeDeleteById(BigInteger id) {
         mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)), Update.update("deleted", true),  entityInformation.getJavaType());
         return true;
     }
@@ -65,6 +66,15 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     public List<T> findAllNotDeleted() {
         return mongoOperations.find(new Query(Criteria.where("deleted").exists(false)), entityInformation.getJavaType());
     }
+
+    @Override
+    public List<T> findAllSolverConfigNotDeletedByType(String solverConfigType){
+        List<T> result;
+        if("country".equalsIgnoreCase(solverConfigType))
+            result= mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("countryId").exists(false))), entityInformation.getJavaType());
+        else  result= mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("unitId").exists(false))), entityInformation.getJavaType());
+        return result;
+    }
 /**********************************Custom Sequence Generator by this Application******************************************************/
     /**
      * @param sequenceName
@@ -73,7 +83,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
      * by our own Application , not by(default Mongo ObjectId)
      * during all types of save operations
      */
-    public String nextSequence(String sequenceName) {
+    public BigInteger nextSequence(String sequenceName) {
         //adding sequence postfix into class name
         sequenceName = sequenceName + SEQUENCE_POST_FIX;
         //Find query
@@ -87,7 +97,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         findAndModifyOptions.upsert(true);
 
         MongoSequence mongoSequence = mongoOperations.findAndModify(new BasicQuery(findQuery), new BasicUpdate(updateQuery), findAndModifyOptions, MongoSequence.class);
-        return mongoSequence.getSequenceNumber() + "";
+        return new BigInteger(mongoSequence.getSequenceNumber() + "");
     }
 
     /**
@@ -103,6 +113,8 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         Assert.notNull(entity, "Entity must not be null!");
         //Get class name for sequence class
         String className = entity.getClass().getSimpleName();
+        //By Pass, to save both type of solverConfig in same Collection
+        if(entity instanceof SolverConfig) className=SolverConfig.class.getSimpleName();
         //Set Id if entity don't have Id
         if (entity.getId() == null) entity.setId(nextSequence(className));
         //Set createdAt if entity don't have createdAt

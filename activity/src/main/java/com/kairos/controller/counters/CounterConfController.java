@@ -39,12 +39,12 @@ public class CounterConfController {
     }
 
     /*
-     * TODO: constraint: this should be applicable if creator updates the counter criteria after a prior notice period this will be effective to throughout hierarchy.
+     * TODO: constraint: this should be applicable if creator updates the counter criteria after a prior notice period this will be effective to throughout hierarchyBalance.
      * description: UPDATE IN COUNTER DEFINITION BY OWNER [version is best.]
      * Initially, any update in counter will point to a new document with updated details for that level.
      * counter can be updated by owning level.
-     * child in hierarchy will be updated (or will point to that new document) after a time period.
-     * there should be a prior notification of time period with changed details whenever any counter get updated. after that time this will be effective to hierarchy
+     * child in hierarchyBalance will be updated (or will point to that new document) after a time period.
+     * there should be a prior notification of time period with changed details whenever any counter get updated. after that time this will be effective to hierarchyBalance
      * updated counter copy will be different than normal counter copies with a boolean field updatedDefinition.
      * In this scenario, there should be two states for this 'draft' and 'publish'
     */

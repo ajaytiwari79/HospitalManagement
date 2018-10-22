@@ -1,4 +1,4 @@
-package com.planner.domain.solverconfig;
+package com.planner.domain.common.solverconfig;
 
 import com.planner.domain.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -6,24 +6,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.util.List;
 
-@Document
+@Document(collection = "solverConfig")
 public class SolverConfig extends MongoBaseEntity {
-    //Properties applicable common to both Country and Unit(Organization)
-    private String name;//Unique(but not when copying)
-    private String parentId;//copiedFromId;
-    private String description;
-    private Long phaseId;
-    private Long planningPeriodId;
-    private byte threadCount;
-    private short terminationTimeInMinutes;
-    private Long planningProblemId;
-    private List<BigInteger> constraintIds;
-    //Properties applicable only at Unit(Organization) level else null
-    private Long unitId;
-    //Properties applicable only at Country level else null
-    private Long countryId;
-    private Long parentCountryId;
-    private Long organizationSubServiceId;
+
+    protected String name;//Unique(but not when copying)
+    protected String parentId;//copiedFromId;
+    protected String description;
+    protected Long phaseId;
+    protected Long planningPeriodId;
+    protected byte threadCount;
+    protected short terminationTimeInMinutes;
+    protected Long planningProblemId;
+    protected List<BigInteger> constraintIds;
+
 
     //Constructors
     public SolverConfig() {
@@ -53,22 +48,6 @@ public class SolverConfig extends MongoBaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public Long getPhaseId() {
@@ -119,24 +98,11 @@ public class SolverConfig extends MongoBaseEntity {
         this.constraintIds = constraintIds;
     }
 
-    public Long getOrganizationSubServiceId() {
-        return organizationSubServiceId;
-    }
 
-    public void setOrganizationSubServiceId(Long organizationSubServiceId) {
-        this.organizationSubServiceId = organizationSubServiceId;
-    }
 
-    public Long getParentCountryId() {
-        return parentCountryId;
-    }
-
-    public void setParentCountryId(Long parentCountryId) {
-        this.parentCountryId = parentCountryId;
-    }
 
     /*****************************SolverConfig Builder****************************************/
-    public SolverConfig setIdBuilder(String id) {
+    public SolverConfig setIdBuilder(BigInteger id) {
         this.id = id;
         return this;
     }
@@ -156,15 +122,6 @@ public class SolverConfig extends MongoBaseEntity {
         return this;
     }
 
-    public SolverConfig setUnitIdBuilder(Long unitId) {
-        this.unitId = unitId;
-        return this;
-    }
-
-    public SolverConfig setCountryIdBuilder(Long countryId) {
-        this.countryId = countryId;
-        return this;
-    }
 
     public SolverConfig setPhaseIdBuilder(Long phaseId) {
         this.phaseId = phaseId;
@@ -196,13 +153,5 @@ public class SolverConfig extends MongoBaseEntity {
         return this;
     }
 
-    public SolverConfig setOrganizationSubServiceIdBuilder(Long organizationSubServiceId) {
-        this.organizationSubServiceId = organizationSubServiceId;
-        return this;
-    }
-    public SolverConfig setParentCountryIdBuilder(Long parentCountryId) {
-        this.parentCountryId = parentCountryId;
-        return this;
-    }
 
 }

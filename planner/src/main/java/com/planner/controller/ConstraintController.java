@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_COUNTRY_CONSTRAINT_URL;
@@ -32,7 +33,7 @@ public class ConstraintController {
     //=============================================================================
     @GetMapping(value = "/{constraintId}")
     @ApiOperation("Get Constraint")
-    public ResponseEntity<Map<String, Object>> getConstraint(@PathVariable String constraintId) {
+    public ResponseEntity<Map<String, Object>> getConstraint(@PathVariable BigInteger constraintId) {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,constraintService.getConstraint(constraintId));
     }
     //=============================================================================
@@ -57,7 +58,7 @@ public class ConstraintController {
     //=============================================================================
     @DeleteMapping
     @ApiOperation("Delete Constraint")
-    public ResponseEntity<Map<String, Object>> deleteConstraint(@RequestParam String constraintId) {
+    public ResponseEntity<Map<String, Object>> deleteConstraint(@RequestParam BigInteger constraintId) {
         constraintService.deleteConstraint(constraintId);
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }

@@ -7,7 +7,7 @@ import com.kairos.dto.planner.vrp.vrpPlanning.ShiftDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-import com.planner.domain.solverconfig.SolverConfig;
+import com.planner.domain.common.solverconfig.SolverConfig;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;

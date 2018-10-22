@@ -541,7 +541,7 @@ public class ExpertiseService {
     }
 
     /**
-     * to get skills of expertise,data will be in form of tree hierarchy
+     * to get skills of expertise,data will be in form of tree hierarchyBalance
      *
      * @param expertiseId
      * @param countryId

@@ -9,18 +9,18 @@ import java.util.Date;
 public class MongoBaseEntity {
 
     @Id
-    protected String id;
+    protected BigInteger id;
     protected Boolean deleted;
     protected Date createdAt;
     protected Date updatedAt;
 
 
     //Setters and Getters
-    public String getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

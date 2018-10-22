@@ -46,9 +46,7 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "return id(os) as id,os.name as name,collect({id:id(osSub),name:osSub.name}) as organizationSubServices")
     List<OrganizationServiceQueryResult> getAllOrganizationServices(Long countryId);
 
-    @Query("Match(osSub:OrganizationService) where id(osSub)={0} " +
-            "Match(osSub)<-[:"+PROVIDE_SERVICE+"]-(unit:Organization) " +
-            "return id(unit)")
-    List<Long> getUnitIdsByOrganizationSubServiceId(Long organizationSubServiceId);
+    @Query("Match(os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService)<-[:"+PROVIDE_SERVICE+"]-(o:Organization) where id(os)={0},id(ossub)={1} return id(o)")
+    List<Long> getUnitIdsByOrganizationServiceAndSubServiceId(Long organizationServiceId,Long organizationSubServiceId);
 
 }

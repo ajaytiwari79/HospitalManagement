@@ -72,7 +72,7 @@ public final class ApiConstants {
     public static final String ABSENCE_TYPES_TITLE=" /absenceTypes/{title}";
     public static final String CONTRACT_TYPE="/contractType";
     public static final String COUNTRY_ORGANIZATION_SERVICE_URL="/country/organizaton_service/{organizationServiceId}";
-    public static final String ORGANIZATION_TYPES_HIERARCHY="/organization_types/hierarchy";
+    public static final String ORGANIZATION_TYPES_HIERARCHY="/organization_types/hierarchyBalance";
     public static final String TASK_TYPES_SKILLS="/task_type/skills";
     public static final String TIME_SLOTS="/time_slots";
     public static final String DAY_TYPES="/day_types";

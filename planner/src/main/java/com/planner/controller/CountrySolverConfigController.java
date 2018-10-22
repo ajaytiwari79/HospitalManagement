@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.country.solverconfig.CountrySolverConfigDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.solverconfiguration.CountrySolverConfigService;
 import io.swagger.annotations.ApiOperation;
@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_COUNTRY_SOLVER_CONFIG_URL;
@@ -22,21 +23,21 @@ public class CountrySolverConfigController {
 
     @PostMapping
     @ApiOperation("Create CountrySolverConfig")
-    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@RequestBody SolverConfigDTO solverConfigDTO) {
-        countrySolverConfigService.createCountrySolverConfig(solverConfigDTO);
+    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
+        countrySolverConfigService.createCountrySolverConfig(countrySolverConfigDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
     }
 
     @PostMapping (value = "/copy")
     @ApiOperation("Copy CountrySolverConfig")
-    public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@RequestBody SolverConfigDTO solverConfigDTO) {
-        countrySolverConfigService.copyCountrySolverConfig(solverConfigDTO);
+    public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
+        countrySolverConfigService.copyCountrySolverConfig(countrySolverConfigDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/{solverConfigId}")
     @ApiOperation("Get CountrySolverConfig")
-    public ResponseEntity<Map<String, Object>> getCountrySolverConfig(@PathVariable String solverConfigId) {
+    public ResponseEntity<Map<String, Object>> getCountrySolverConfig(@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getCountrySolverConfig(solverConfigId));
     }
 
@@ -48,19 +49,19 @@ public class CountrySolverConfigController {
 
     /**
      * Always modification no object creation so,Patch
-     * @param solverConfigDTO
+     * @param countrySolverConfigDTO
      * @return
      */
     @PatchMapping
     @ApiOperation("Update CountrySolverConfigration")
-    public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@RequestBody SolverConfigDTO solverConfigDTO) {
-        countrySolverConfigService.updateCountrySolverConfig(solverConfigDTO);
+    public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {
+        countrySolverConfigService.updateCountrySolverConfig(countrySolverConfigDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping
     @ApiOperation("Delete CountrySolverConfigration")
-    public ResponseEntity<Map<String, Object>> deleteCountrySolverConfig(@RequestParam String solverConfigId) {
+    public ResponseEntity<Map<String, Object>> deleteCountrySolverConfig(@RequestParam BigInteger solverConfigId) {
         countrySolverConfigService.deleteCountrySolverConfig(solverConfigId);
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }

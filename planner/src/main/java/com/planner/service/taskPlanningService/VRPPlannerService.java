@@ -64,9 +64,9 @@ public class VRPPlannerService {
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
         //vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
-        if(!solver.isTerminateEarly()){
+        /*if(!solver.isTerminateEarly()){
             plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
-        }
+        }*/
     }
 
     private void saveIndictment(BigInteger solverConfigId, Collection<ConstraintMatchTotal> constraintMatchTotals){

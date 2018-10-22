@@ -143,7 +143,7 @@ public class CountryRestClient {
             HttpEntity<Set> request = new HttpEntity<>(organizationSubTypes);
             ResponseEntity<RestTemplateResponseEnvelope<OrganizationTypeHierarchyQueryResult>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/organization_types/hierarchy",
+                            baseUrl + "/country/{countryId}/organization_types/hierarchyBalance",
                             HttpMethod.POST,
                             request, typeReference,countryId);
             RestTemplateResponseEnvelope<OrganizationTypeHierarchyQueryResult> response = restExchange.getBody();
