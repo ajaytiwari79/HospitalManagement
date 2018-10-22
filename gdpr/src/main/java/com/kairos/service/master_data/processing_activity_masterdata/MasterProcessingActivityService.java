@@ -1,8 +1,10 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
@@ -12,6 +14,7 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
@@ -347,8 +350,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
             processingActivityList.addAll(subProcessingActivityList);
         }
         if (!riskListCorrespondingToProcessingActivity.isEmpty()) {
-            Map<MasterProcessingActivity, List<BigInteger>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskListCorrespondingToProcessingActivity);
-            processingActivityList.forEach(processingActivity -> processingActivity.setRisks(riskIdListCorresponsingProcessingActivities.get(processingActivity)));
+            Map<MasterProcessingActivity, List<Risk>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskListCorrespondingToProcessingActivity);
+            processingActivityList.forEach(processingActivity -> processingActivity.setRisks(riskIdListCorresponsingProcessingActivities.get(processingActivity).stream().map(Risk::getId).collect(Collectors.toList())));
         }
         masterProcessingActivityRepository.saveAll(getNextSequence(processingActivityList));
         return processingActivityRiskDTO;
@@ -384,7 +387,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             if (!Optional.ofNullable(masterProcessingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
                 masterProcessingActivity.setProcessingActivities(new ArrayList<>());
             }
-            masterProcessingActivity.getProcessingActivities().add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true, masterProcessingActivity.getRisks()));
+            masterProcessingActivity.getProcessingActivities().add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true, masterProcessingActivity.getRisks(),masterProcessingActivity.getSuggestedDate(),masterProcessingActivity.getSuggestedDataStatus()));
             masterProcessingActivity.setMainParent(true);
             masterProcessingActivity.setRisks(new ArrayList<>());
         });

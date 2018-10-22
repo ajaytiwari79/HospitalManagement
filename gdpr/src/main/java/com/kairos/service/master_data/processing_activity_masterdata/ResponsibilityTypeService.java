@@ -1,9 +1,8 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
-
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
@@ -86,7 +85,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long countryId) {
-        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return responsibilityTypeMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

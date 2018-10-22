@@ -209,10 +209,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "municipalityName:contactAddress.municipalityName} end}) AS unitList")
     List<Map<String, Object>> getUnits(long organizationId);
 
-    @Query("Match (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) where id(o)={0} AND id(os)={1} SET r.isEnabled=false return r")
+    @Query("Match (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) where id(o)={0} AND id(os)={1} SET r.isEnabled=false")
     void removeServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("Match (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) where id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true return r")
+    @Query("Match (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) where id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
     void updateServiceFromOrganization(long unitId, long serviceId);
 
     @Query("Match (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) where id(o)={0} AND id(os)={1} return count(r) as countOfRel")
@@ -428,13 +428,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getServicesForParent(long organizationId);
 
-    @Query("Match (unit:Organization),(skill:Skill) where id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill) return skill")
+    @Query("Match (unit:Organization),(skill:Skill) where id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
     void addSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("Match (unit:Organization),(skill:Skill) where id (unit)={0} AND id(skill) IN {1} Match (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true return skill")
+    @Query("Match (unit:Organization),(skill:Skill) where id (unit)={0} AND id(skill) IN {1} Match (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
     void updateSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("Match (unit:Organization),(organizationService:OrganizationService) where id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService) return r")
+    @Query("Match (unit:Organization),(organizationService:OrganizationService) where id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
     void addOrganizationServiceInUnit(long unitId, List<Long> organizationServiceId, long creationDate, long lastModificationDate);
 
     @Query("Match (o:Organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(os:Skill) where id(o)={0} AND id(os)={1} return count(r) as countOfRel")
@@ -487,7 +487,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) with  r,skill,unit,skillCategory,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "optional match (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) where id(staff) IN {1}\n" +
             "with {staff:case when staffSkillRel is null then [] else collect(id(staff)) end} as staff,skillCategory,skill,r,otags,ctags\n" +
-            "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:case when r is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")
+            "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:case when r is null or r.customName is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null or r.customName is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByOrganization(long unitId, List<Long> staffId);
 
     @Query("Match (organization:Organization) where id(organization)={0} \n" +
@@ -620,10 +620,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
 
     @Query("Match (o:Organization)-[rel:" + ORGANIZATION_HAS_UNIONS + "]->(union:Organization) where id(o)={0}  AND  id(union)={1} \n" +
-            "SET rel.disabled=true, rel.dateOfSeparation={2} return rel")
+            "SET rel.disabled=true, rel.dateOfSeparation={2} ")
     void removeUnionFromOrganization(long unitId, long unionId, long dateOfSeparation);
 
-    @Query("Match (unit:Organization),(union:Organization) where id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union) return r")
+    @Query("Match (unit:Organization),(union:Organization) where id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union)")
     void addUnionInOrganization(long unitId, Long unionId, long dateOfJoining);
 
 
@@ -673,7 +673,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
-    @Query("Match (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) where id(orgType) IN {0} return id(orgType) as orgTypeId, collect(id(org)) as unitIds ")
+    @Query("Match (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) where id(orgType) IN {0} \n" +
+            "MATCH(org)-[:" + SUB_TYPE_OF + "]->(organizationType:OrganizationType) \n" +
+            "return id(org) as unitId, collect(id(organizationType)) as orgTypeIds")
     List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
     @Query("Match (child:Organization) \n" +

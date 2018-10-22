@@ -1,6 +1,7 @@
 package com.kairos.dto.user.country.experties;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public class AppliedFunctionDTO {
     private Long id;
     private String name;
     private String icon;
-    private List<Long> appliedDates;
+    private List<LocalDate> appliedDates;
 
     public AppliedFunctionDTO() {
 
@@ -42,11 +43,11 @@ public class AppliedFunctionDTO {
         this.icon = icon;
     }
 
-    public List<Long> getAppliedDates() {
+    public List<LocalDate> getAppliedDates() {
         return appliedDates;
     }
 
-    public void setAppliedDates(List<Long> appliedDates) {
+    public void setAppliedDates(List<LocalDate> appliedDates) {
         this.appliedDates = appliedDates;
     }
 }

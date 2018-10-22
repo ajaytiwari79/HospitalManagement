@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.master_data.asset_management;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
@@ -53,8 +53,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     public List<MasterAssetResponseDTO> getAllMasterAssetWithAssetTypeAndSubAssetType(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
@@ -70,8 +70,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     public MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
 
@@ -98,8 +98,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
@@ -136,15 +136,19 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
+    public List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
 
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
-                .and(DELETED).is(false));
-        query.addCriteria(Criteria.where("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
-        query.addCriteria(Criteria.where("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubType().getId()));
-        query.addCriteria(Criteria.where("organizationServices._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
-        query.addCriteria(Criteria.where("organizationSubServices._id").in(organizationMetaDataDTO.getOrganizationSubService().getId()));
-        return mongoTemplate.find(query, MasterAsset.class);
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                        .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
+                new CustomAggregationOperation(masterAssetProjectionOperation)
+
+        );
+        return mongoTemplate.aggregate(aggregation, MasterAsset.class, MasterAssetResponseDTO.class).getMappedResults();
 
     }
 }

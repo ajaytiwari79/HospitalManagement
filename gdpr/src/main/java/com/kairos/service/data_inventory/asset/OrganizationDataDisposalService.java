@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -84,7 +84,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long organizationId) {
-        return dataDisposalMongoRepository.findAllOrganizationDataDisposals(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return dataDisposalMongoRepository.findAllByUnitIdAndSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -96,7 +96,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      */
     public DataDisposal getDataDisposalById(Long organizationId, BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        DataDisposal exist = dataDisposalMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -128,7 +128,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     public DataDisposalDTO updateDataDisposal(Long organizationId, BigInteger id, DataDisposalDTO dataDisposalDTO) {
 
 
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndName(organizationId, dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalMongoRepository.findByUnitIdAndName(organizationId, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;

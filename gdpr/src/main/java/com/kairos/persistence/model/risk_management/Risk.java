@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Document
@@ -25,6 +26,46 @@ public class Risk extends MongoBaseEntity {
     private Staff riskOwner;
     @NotNull(message = "Risk Level can't be null")
     private RiskSeverity riskLevel;
+    private BigInteger assetType;
+    private BigInteger processingActivity;
+
+
+    public Risk() {
+    }
+
+    public Risk(Long countryId, @NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel) {
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.riskLevel = riskLevel;
+        this.countryId = countryId;
+    }
+
+    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel, LocalDate dueDates) {
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.riskLevel = riskLevel;
+        this.dueDate = dueDates;
+    }
+
+    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description, @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel) {
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.riskLevel = riskLevel;
+    }
+
+
+    public BigInteger getAssetType() { return assetType; }
+
+    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
+
+    public BigInteger getProcessingActivity() { return processingActivity; }
+
+    public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
 
     public Staff getRiskOwner() { return riskOwner; }
 
@@ -94,24 +135,5 @@ public class Risk extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public Risk(Long countryId, @NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel) {
-        this.name = name;
-        this.description = description;
-        this.riskRecommendation = riskRecommendation;
-        this.riskLevel = riskLevel;
-        this.countryId = countryId;
-    }
 
-    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel,LocalDate dueDates) {
-        this.name = name;
-        this.description = description;
-        this.riskRecommendation = riskRecommendation;
-        this.riskLevel = riskLevel;
-        this.dueDate=dueDates;
-    }
-
-    public Risk() {
-    }
 }

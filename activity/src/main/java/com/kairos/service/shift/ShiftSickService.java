@@ -1,8 +1,9 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.period.PeriodDTO;
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -19,10 +20,10 @@ import com.kairos.persistence.repository.attendence_setting.SickSettingsReposito
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
@@ -60,10 +61,12 @@ public class ShiftSickService extends MongoBaseService {
     PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
     private SickSettingsRepository sickSettingsRepository;
-    @Inject private ShiftService shiftService;
+    @Inject
+    private ShiftService shiftService;
     @Inject
     private PhaseService phaseService;
-
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -80,7 +83,7 @@ public class ShiftSickService extends MongoBaseService {
         if (!activity.getRulesActivityTab().isAllowedAutoAbsence()) {
             exceptionService.actionNotPermittedException("activity.notEligible.for.absence", activity.getName());
         }
-        StaffUnitPositionDetails staffUnitPositionDetails = staffRestClient.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
+        StaffUnitPositionDetails staffUnitPositionDetails = genericIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
         if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
@@ -113,7 +116,7 @@ public class ShiftSickService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
 
-            ShiftActivity shiftActivity = new ShiftActivity(activity.getId(),activity.getName());
+            ShiftActivity shiftActivity = new ShiftActivity(activity.getId(), activity.getName());
             shiftActivity.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDaySickShift.getStartDate())));
             shiftActivity.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDaySickShift.getEndDate())));
 
@@ -131,20 +134,28 @@ public class ShiftSickService extends MongoBaseService {
 
 
         }
-        addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
+        addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts, null);
 
     }
 
-    private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
-        shifts.addAll(staffOriginalShiftsOfDates);
+    private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts, Set<LocalDate> dates) {
+        Map<LocalDate, Long> dateLongMap = new HashMap<>();
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
+        if (staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions() != null) {
+            dateLongMap = genericIntegrationService.removeFunctionFromUnitPositionByDates(staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getUnitPosition().getId(), dates);
+        }
+        for (Shift shift : staffOriginalShiftsOfDates) {
+            shift.setFunctionId(dateLongMap.get(DateUtils.asLocalDate(shift.getStartDate())));
+            shifts.add(shift);
+        }
+        //shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate());
-            shiftService.saveShiftWithActivity(phase,shifts,staffAdditionalInfoDTO);
+            shiftService.saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
         }
     }
 
-    private void calculateShiftStartAndEndTime(Shift currentShift, Shift previousDayShift, short shiftNeedsToAddForDays,  List<PeriodDTO> periodDTOList) {
+    private void calculateShiftStartAndEndTime(Shift currentShift, Shift previousDayShift, short shiftNeedsToAddForDays, List<PeriodDTO> periodDTOList) {
         currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDayShift.getStartDate())));
         currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDayShift.getEndDate())));
         currentShift.setScheduledMinutes(previousDayShift.getScheduledMinutes());
@@ -162,21 +173,26 @@ public class ShiftSickService extends MongoBaseService {
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
-        staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
+        Set<LocalDate> dates = new HashSet<>();
+        staffOriginalShiftsOfDates.forEach(s -> {
+                    s.setDisabled(true);
+                    dates.add(DateUtils.asLocalDate(s.getStartDate()));
+                }
+        );
 
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
             shiftNeedsToAddForDays--;
-            ShiftActivity shiftActivity = calculateShiftStartAndEndTime(shiftNeedsToAddForDays,activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
+            ShiftActivity shiftActivity = calculateShiftStartAndEndTime(shiftNeedsToAddForDays, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
             shiftActivity.setActivityId(activity.getId());
             shiftActivity.setActivityName(activity.getName());
             Shift currentShift = new Shift(null, null, staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
             shifts.add(currentShift);
         }
-        addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
+        addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts, dates);
     }
 
-    private ShiftActivity calculateShiftStartAndEndTime(short shiftNeedsToAddForDays,TimeCalculationActivityTab timeCalculationActivityTab, StaffUnitPositionDetails unitPosition, Duration duration) {
+    private ShiftActivity calculateShiftStartAndEndTime(short shiftNeedsToAddForDays, TimeCalculationActivityTab timeCalculationActivityTab, StaffUnitPositionDetails unitPosition, Duration duration) {
         int scheduledMinutes = 0;
         int weeklyMinutes;
         int shiftDurationInMinute = 0;
@@ -210,18 +226,35 @@ public class ShiftSickService extends MongoBaseService {
 
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {
 
-        StaffUnitPositionDetails staffUnitPositionDetails = staffRestClient.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
+        StaffUnitPositionDetails staffUnitPositionDetails = genericIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
         if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
         List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(staffUnitPositionDetails.getId(), unitId, DateUtils.getCurrentLocalDate());
-        shifts.forEach(s -> {
-            if (s.isSickShift()) {
-                s.setDeleted(true);// delete the sick shift.
-            } else if (s.isDisabled()) {
-                s.setDisabled(false);
+        Map<Long, Set<LocalDate>> dateAndFunctionIdMap = new HashMap<>();
+        for (Shift shift : shifts) {
+            Set<LocalDate> dates;
+            if (shift.isSickShift()) {
+                shift.setDeleted(true);// delete the sick shift.
+            } else if (shift.isDisabled()) {
+                shift.setDisabled(false);
+                if (shift.getFunctionId() != null) {
+                    if (dateAndFunctionIdMap.keySet().contains(shift.getFunctionId())) {
+                        dates = dateAndFunctionIdMap.get(shift.getFunctionId()) != null ? dateAndFunctionIdMap.get(shift.getFunctionId()) : new HashSet<>();
+                        dates.add(DateUtils.asLocalDate(shift.getStartDate()));
+                        dateAndFunctionIdMap.put(shift.getFunctionId(), dates);
+                    } else {
+                        dateAndFunctionIdMap.put(shift.getFunctionId(), new HashSet<>(Arrays.asList(DateUtils.asLocalDate(shift.getStartDate()))));
+                    }
+
+
+                }
             }
-        });
+        }
+        Boolean functionRestored = genericIntegrationService.restoreFunctionFromUnitPositionByDate(unitId, staffUnitPositionDetails.getId(), dateAndFunctionIdMap);
+        if (functionRestored != null && !functionRestored) {
+            logger.error("error occurred in User service while restoring functions");
+        }
         if (!shifts.isEmpty())
             save(shifts);
     }

@@ -10,13 +10,12 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "master_processing_activity")
+@Document
 public class MasterProcessingActivity extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")

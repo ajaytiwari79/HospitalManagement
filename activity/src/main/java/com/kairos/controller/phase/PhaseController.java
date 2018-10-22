@@ -47,7 +47,7 @@ public class PhaseController {
     @ApiOperation(value = "Get All phases by unit Id")
     @GetMapping(value="")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getPhasesByUnit(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getCategorisedPhasesByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getCategorisedPhasesByUnit(unitId));
     }
 
@@ -68,6 +68,12 @@ public class PhaseController {
     @GetMapping(value = "/byDate")
     public ResponseEntity<Map<String, Object>> getUnitPhaseByDate(@PathVariable Long unitId,@RequestParam(value = "date",required = false)Date date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getUnitPhaseByDate(unitId,date));
+    }
+
+    @ApiOperation(value = "get Unit Default Phases ")
+    @GetMapping(value = "/all")
+    public ResponseEntity<Map<String, Object>> getDefaultPhasesByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getDefaultPhasesByUnit(unitId));
     }
 }
 

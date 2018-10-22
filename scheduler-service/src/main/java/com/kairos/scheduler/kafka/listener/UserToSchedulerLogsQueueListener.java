@@ -1,7 +1,7 @@
 package com.kairos.scheduler.kafka.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import static com.kairos.scheduler.constants.AppConstants.USER_TO_SCHEDULER_LOGS
 @Component
 public class UserToSchedulerLogsQueueListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerJobQueueListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerLogsQueueListener.class);
     @Inject
     private SchedulerPanelService schedulerPanelService;
 

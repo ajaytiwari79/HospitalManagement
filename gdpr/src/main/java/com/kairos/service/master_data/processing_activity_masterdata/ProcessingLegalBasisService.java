@@ -1,9 +1,9 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
@@ -88,7 +88,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      */
 
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long countryId) {
-        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return legalBasisMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

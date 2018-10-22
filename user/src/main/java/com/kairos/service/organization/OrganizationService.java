@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
@@ -7,9 +8,15 @@ import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
-import com.kairos.enums.IntegrationOperation;
+import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
@@ -60,8 +67,6 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
-import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.rest_client.PeriodRestClient;
 import com.kairos.rest_client.PhaseRestClient;
 import com.kairos.rest_client.PlannedTimeTypeRestClient;
@@ -83,17 +88,9 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
-
-import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResponse;
 import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResult;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
@@ -1372,10 +1369,10 @@ public class OrganizationService {
             //  plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
             List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips;
             unitPositionEmploymentTypeRelationShips = unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
-            if (!unitPositionEmploymentTypeRelationShips.isEmpty()) {
+          /*  if (!unitPositionEmploymentTypeRelationShips.isEmpty()) {
                 plannerSyncService.publishAllUnitPositions(unitId, unitPositionEmploymentTypeRelationShips, IntegrationOperation.CREATE);
             }
-            phaseRestClient.initialOptaplannerSync(unitId);
+            */phaseRestClient.initialOptaplannerSync(unitId);
         }
         return new PlannerSyncResponseDTO(syncStarted);
     }

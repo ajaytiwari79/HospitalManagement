@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,10 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 
 @RestController
@@ -56,15 +57,28 @@ public class AssessmentController {
 
 
     @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
-    @GetMapping("/assessment")
+    @GetMapping("/assessment/assignee")
     public ResponseEntity<Object> getAllLaunchedAssessment(@PathVariable Long unitId,@RequestParam Long loggedInUserId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfAssignee(unitId,loggedInUserId));
     }
 
+    @ApiOperation(value = "get All Assessment of unit")
+    @GetMapping("/assessment")
+    public ResponseEntity<Object> getAllAssessmentByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
+    }
+
+    @ApiOperation(value = "delete Assessment by id")
+    @DeleteMapping("/assessment/{assessmentId}")
+    public ResponseEntity<Object> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.deleteAssessmentbyId(unitId,assessmentId));
+    }
+
+
     @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody AssessmentAnswerValueObject assessmentAnswerValueObject) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObject));
+    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody()));
     }
 
 

@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Group extends UserBaseEntity {
 
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
+    @NotBlank(message = "error.name.notnull")
     private String name;
     private boolean isEnabled =true;
     //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")

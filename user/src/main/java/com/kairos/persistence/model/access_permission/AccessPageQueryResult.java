@@ -20,7 +20,7 @@ public class AccessPageQueryResult {
     private boolean write;
     private boolean active;
     private String moduleId;
-
+    private Long parentId;
 
     public String getModuleId() {
         return moduleId;
@@ -95,6 +95,14 @@ public class AccessPageQueryResult {
 
     public void setWrite(boolean write) {
         this.write = write;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     @Override

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document(collection = "data_disposal")
+@Document
 public class DataDisposal extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")
@@ -45,7 +45,7 @@ public class DataDisposal extends MongoBaseEntity {
         this.name = name;
     }
 
-    public DataDisposal( String name) {
+    public DataDisposal(@NotBlank String name) {
         this.name = name;
     }
 

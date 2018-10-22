@@ -142,6 +142,7 @@ public class CompanyCreationService {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
             organization.setAccountType(accountType);
+            accessGroupService.createDefaultAccessGroups(organization, Collections.emptyList());
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
@@ -193,12 +194,18 @@ public class CompanyCreationService {
             if (!Optional.ofNullable(accountType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
-            organization.setAccountType(accountType);
             //accountType is Changed for parent organization We need to add this account type to child organization as well
-            if (!organization.getChildren().isEmpty())
-
-                organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
-
+            if (organization.getAccountType() == null || !organization.getAccountType().getId().equals(orgDetails.getAccountTypeId())) {
+                organization.setAccountType(accountType);
+                List<Long> organizationIds = new ArrayList<>();
+                organizationIds.addAll(organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList()));
+                organizationIds.add(organization.getId());
+                accessGroupService.removeDefaultCopiedAccessGroup(organizationIds);
+                if (!organization.getChildren().isEmpty()) {
+                    organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
+                }
+                accessGroupService.createDefaultAccessGroups(organization, organization.getChildren());
+            }
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
@@ -299,6 +306,7 @@ public class CompanyCreationService {
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
+
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
@@ -312,6 +320,7 @@ public class CompanyCreationService {
                     if (userBySameEmailOrCPR != 0) {
                         exceptionService.duplicateDataException("user already exist by email or cpr");
                     }
+
                 }
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
@@ -324,6 +333,7 @@ public class CompanyCreationService {
     }
 
     //It checks null as well
+
     private void setEncryptedPasswordAndAge(UnitManagerDTO unitManagerDTO, User user) {
         if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
             user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
@@ -414,6 +424,8 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
+
+        accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
 
@@ -554,9 +566,7 @@ public class CompanyCreationService {
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
 
-        // if more than 2 default things needed make a  async service Please
-        List<AccessGroupQueryResult> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups);
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
@@ -567,7 +577,7 @@ public class CompanyCreationService {
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,accessGroups);
+                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
         CompletableFuture.allOf(createdInUnit).join();
 
         return true;

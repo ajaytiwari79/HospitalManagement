@@ -1,9 +1,11 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
@@ -84,7 +86,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
-        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return processingPurposeMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

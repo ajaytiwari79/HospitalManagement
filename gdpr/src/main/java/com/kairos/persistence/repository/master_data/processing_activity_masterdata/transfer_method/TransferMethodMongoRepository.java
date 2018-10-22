@@ -26,7 +26,10 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
     TransferMethod findByName(Long countryId, String name);
 
     @Query("{deleted:false,countryId:?0}")
-    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId, Sort sort);
+    List<TransferMethodResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<TransferMethodResponseDTO> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<TransferMethod> getTransferMethodListByIds(Long countryId, Set<BigInteger> transferMethodIds);
@@ -36,13 +39,13 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
 
 
     @Query("{organizationId:?0,deleted:false}")
-    List<TransferMethodResponseDTO> findAllOrganizationTransferMethods(Long organizationId,Sort  sort);
+    List<TransferMethodResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort  sort);
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    TransferMethod findByOrganizationIdAndId(Long organizationId, BigInteger id);
+    TransferMethod findByUnitIdAndId(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    TransferMethod findByOrganizationIdAndName(Long organizationId, String name);
+    TransferMethod findByUnitIdAndName(Long unitId, String name);
 
 }

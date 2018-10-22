@@ -3,7 +3,10 @@ package com.kairos.persistence.model.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.apache.commons.lang.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * Created by Jasgeet on 15/9/17.
@@ -12,6 +15,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelationType extends UserBaseEntity {
+    @NotBlank(message = "error.relationType.name.notEmpty")
     private String name;
     private String description;
     private boolean enabled = true;
@@ -21,7 +25,7 @@ public class RelationType extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getDescription() {
@@ -29,7 +33,7 @@ public class RelationType extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public boolean isEnabled() {

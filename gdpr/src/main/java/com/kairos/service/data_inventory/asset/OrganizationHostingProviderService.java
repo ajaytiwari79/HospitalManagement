@@ -1,8 +1,7 @@
 package com.kairos.service.data_inventory.asset;
-
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -93,7 +92,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long organizationId) {
-        return hostingProviderMongoRepository.findAllOrganizationHostingProviders(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return hostingProviderMongoRepository.findAllUnitIdAndSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -106,7 +105,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      */
     public HostingProvider getHostingProviderById(Long organizationId, BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        HostingProvider exist = hostingProviderMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -136,7 +135,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      */
     public HostingProviderDTO updateHostingProvider(Long organizationId, BigInteger id, HostingProviderDTO hostingProviderDTO) {
 
-        HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndName(organizationId, hostingProviderDTO.getName());
+        HostingProvider hostingProvider = hostingProviderMongoRepository.findByUnitIdAndName(organizationId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;

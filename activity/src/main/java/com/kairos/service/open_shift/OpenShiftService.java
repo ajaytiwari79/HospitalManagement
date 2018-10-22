@@ -207,13 +207,14 @@ public class OpenShiftService extends MongoBaseService {
         OpenShiftActivityWrapper openShiftActivityWrapper = openShiftMongoRepository.getOpenShiftAndActivity(openShiftId, unitId);
         OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         Date startDate = DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
+        Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
             Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId(), openShift.getStartDate().getTime());
-            UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+            UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId,startDate,endDate);
             data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
         }
-        Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));
+
         List<OpenShift> similarShifts = openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate, endDate);
 
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();

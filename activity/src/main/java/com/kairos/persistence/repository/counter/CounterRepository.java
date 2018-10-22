@@ -68,6 +68,11 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
+    public List<KPI> getKPIsByIds(List<BigInteger> kpiIds){
+        Query query = new Query(Criteria.where("id").in(kpiIds));
+        return mongoTemplate.find(query, KPI.class);
+    }
+
     //removal of counters
     public void removeAll(String fieldName, List values, Class claz){
         Query query = new Query(Criteria.where(fieldName).in(values));

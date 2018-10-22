@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -92,7 +92,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long organizationId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrgOrganizationalSecurityMeasures(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return organizationalSecurityMeasureMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -105,7 +105,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long organizationId, BigInteger id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -135,7 +135,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      */
     public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long organizationId, BigInteger id, OrganizationalSecurityMeasureDTO orgSecurityMeasureDTO) {
 
-        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndName(organizationId, orgSecurityMeasureDTO.getName());
+        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByUnitIdAndName(organizationId, orgSecurityMeasureDTO.getName());
         if (Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
             if (id.equals(organizationalSecurityMeasure.getId())) {
                 return orgSecurityMeasureDTO;

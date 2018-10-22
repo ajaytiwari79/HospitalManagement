@@ -52,23 +52,12 @@ public class TImeBankCalculationServiceTest {
 
     @Before
     public void getMockShifts(){
-        activity = new Activity(new BalanceSettingsActivityTab(new BigInteger("123")));
-        activity.setId(new BigInteger("125"));
-        activity.setName("Activity1");
-        activity.setParentId(new BigInteger("12"));
-        DateTime startDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("22/02/2018 00:00:00");
-        DateTime endDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("23/02/2018 00:00:00");
-        interval = new Interval(startDate,endDate);
-        ShiftWithActivityDTO shift = new ShiftWithActivityDTO(interval.getStart().minusHours(2).toDate(),interval.getStart().plusMinutes(120).toDate(),activity);
-        shifts.add(shift);
-        shift = new ShiftWithActivityDTO(interval.getStart().plusMinutes(240).toDate(),interval.getStart().plusMinutes(720).toDate(),activity);
-        shifts.add(shift);
-        shift = new ShiftWithActivityDTO(interval.getStart().plusMinutes(1020).toDate(),interval.getStart().plusMinutes(1560).toDate(),activity);
-        shifts.add(shift);
+
     }
 
     @Test
     public void calculateTimeBank(){
+
         when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = null;//timeBankService.getCostTimeAgreement(1225l);
         DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
@@ -76,6 +65,7 @@ public class TImeBankCalculationServiceTest {
         Assert.assertEquals(dailyTimeBankEntry.getTotalTimeBankMin(),1130);
         Assert.assertEquals(dailyTimeBankEntry.getScheduledMin(),1020);
         Assert.assertEquals(dailyTimeBankEntry.getContractualMin(),300);
+
     }
 
 

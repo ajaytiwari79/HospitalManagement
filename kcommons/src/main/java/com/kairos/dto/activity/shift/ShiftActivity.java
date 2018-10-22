@@ -3,7 +3,10 @@ package com.kairos.dto.activity.shift;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -20,14 +23,18 @@ public class ShiftActivity {
     private String activityName;
     private long bid;
     private long pId;
+    private Long reasonCodeId;
     private String remarks;
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
+
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
+    public ShiftActivity() {
+    }
 
 
     public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
@@ -44,6 +51,14 @@ public class ShiftActivity {
     }
 
 
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
+
     public BigInteger getPlannedTimeId() {
         return plannedTimeId;
     }
@@ -52,8 +67,6 @@ public class ShiftActivity {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public ShiftActivity() {
-    }
 
     public Set<ShiftStatus> getStatus() {
         return status;
@@ -166,4 +179,6 @@ public class ShiftActivity {
     public void setActivityName(String activityName) {
         this.activityName = activityName;
     }
+
+
 }

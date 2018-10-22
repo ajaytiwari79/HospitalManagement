@@ -46,6 +46,7 @@ public class StaffPersonalDetailDTO {
     // used for staff validation
     private Long accessGroupId;
     private String accessGroupName;
+    private Long parentAccessGroupId;
     private String email;
     private Staff staff;
     public StaffPersonalDetailDTO() {
@@ -299,5 +300,13 @@ public class StaffPersonalDetailDTO {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
+    }
+
+    public Long getParentAccessGroupId() {
+        return parentAccessGroupId;
+    }
+
+    public void setParentAccessGroupId(Long parentAccessGroupId) {
+        this.parentAccessGroupId = parentAccessGroupId;
     }
 }

@@ -1,13 +1,16 @@
 package com.kairos.service.data_inventory.processing_activity;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -91,7 +94,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long organizationId) {
-        return dataSourceMongoRepository.findAllOrganizationDataSources(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return dataSourceMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -102,7 +105,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      */
     public DataSource getDataSource(Long organizationId, BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        DataSource exist = dataSourceMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -112,9 +115,9 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
     public Boolean deleteDataSource(Long unitId, BigInteger dataSourceId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
+        List<ProcessingActivityBasicDTO>  processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource",new StringBuilder(processingActivitiesLinkedWithDataSource.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource",new StringBuilder(processingActivitiesLinkedWithDataSource.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
        dataSourceMongoRepository.safeDelete(dataSourceId);
         return true;
@@ -129,7 +132,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      */
     public DataSourceDTO updateDataSource(Long organizationId, BigInteger id, DataSourceDTO dataSourceDTO) {
 
-        DataSource dataSource = dataSourceMongoRepository.findByNameAndOrganizationId(organizationId, dataSourceDTO.getName());
+        DataSource dataSource = dataSourceMongoRepository.findByNameAndUnitId(organizationId, dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;

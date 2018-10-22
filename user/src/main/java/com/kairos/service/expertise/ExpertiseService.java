@@ -163,16 +163,14 @@ public class ExpertiseService {
                     exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.present", seniorityLevel.getId());
 
                 } else if (seniorityLevelDTO.getTo() == null && seniorityLevel.getTo() != null) {
-                    if (seniorityLevelDTO.getFrom() > seniorityLevel.getTo()) {
+                    if (seniorityLevelDTO.getFrom() < seniorityLevel.getTo()) {
                         exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.greaterThan", seniorityLevel.getTo(), seniorityLevel.getId());
 
                     }
-                    break;
                 } else if (seniorityLevelDTO.getTo() != null && seniorityLevel.getTo() == null) {
                     if (seniorityLevelDTO.getTo() > seniorityLevel.getFrom()) {
                         exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.lessThan", seniorityLevel.getFrom(), seniorityLevel.getId());
                     }
-
                 } else {
                     if (seniorityLevelDTO.getFrom() < seniorityLevel.getFrom() && !(seniorityLevelDTO.getTo() <= seniorityLevel.getFrom())) {
                         throw new ActionNotPermittedException("Already a Sr level is present 1:" + seniorityLevel.getId());

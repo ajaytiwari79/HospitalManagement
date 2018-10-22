@@ -32,16 +32,19 @@ public interface ResponsibilityTypeMongoRepository extends MongoBaseRepository<R
     ResponsibilityType findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<ResponsibilityTypeResponseDTO> findAllResponsibilityTypes(Long countryId, Sort sort);
+    List<ResponsibilityTypeResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<ResponsibilityTypeResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<ResponsibilityTypeResponseDTO> findAllOrganizationResponsibilityTypes(Long organizationId,Sort sort);
+    List<ResponsibilityTypeResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    ResponsibilityType findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    ResponsibilityType findByUnitIdAndId(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    ResponsibilityType findByOrganizationIdAndName(Long organizationId,String name);
+    ResponsibilityType findByUnitIdAndName(Long unitId, String name);
 
 
 }

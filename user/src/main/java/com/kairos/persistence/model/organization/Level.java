@@ -3,7 +3,10 @@ package com.kairos.persistence.model.organization;
 
 
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * Created by prabjot on 21/8/17.
@@ -11,6 +14,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class Level extends UserBaseEntity {
 
+    @NotBlank(message = "message.country.level.name.notEmpty")
     private String name;
     private String description;
     private boolean isEnabled = true;
@@ -22,7 +26,7 @@ public class Level extends UserBaseEntity {
     }
 
     public Level(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public boolean isEnabled() {
@@ -38,7 +42,7 @@ public class Level extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public String getDescription() {
@@ -46,7 +50,7 @@ public class Level extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public boolean isDeleted() {

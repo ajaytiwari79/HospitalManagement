@@ -34,7 +34,7 @@ public class OrganizationRestClient {
     @Autowired
     RestTemplate restTemplate;
     @Autowired
-    @Qualifier(value = "schedulerRestTemplate")
+    @Qualifier(value = "restTemplateWithoutAuth")
     RestTemplate restTemplateWithAuth;
 
 

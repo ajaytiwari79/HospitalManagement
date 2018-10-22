@@ -4,18 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.tag.Tag;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -243,7 +241,7 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
+    public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
         this.name = name;
         this.id = id;
         this.description = description;
@@ -269,7 +267,7 @@ public class Expertise extends UserBaseEntity {
         this.history = history;
     }
 
-    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
+    public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description) {
 
         this.name = name;
         this.id = id;

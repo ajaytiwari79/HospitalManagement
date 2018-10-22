@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -94,7 +94,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long organizationId) {
-        return hostingTypeMongoRepository.findAllOrganizationHostingTypes(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return hostingTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

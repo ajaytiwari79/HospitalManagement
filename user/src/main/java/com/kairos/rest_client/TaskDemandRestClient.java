@@ -30,7 +30,7 @@ public class TaskDemandRestClient {
     @Autowired
     RestTemplate restTemplate;
     @Autowired
-    @Qualifier("schedulerRestTemplate")
+    @Qualifier("restTemplateWithoutAuth")
     RestTemplate schedulerRestTemplate;
     @Inject
     private ExceptionService exceptionService;

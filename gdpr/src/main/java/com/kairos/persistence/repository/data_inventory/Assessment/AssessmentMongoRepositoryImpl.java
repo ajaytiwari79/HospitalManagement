@@ -2,7 +2,11 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
+import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
+import com.kairos.response.dto.common.AssessmentResponseDTO;
+import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -16,7 +20,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,13 +46,31 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId, Long loggedInUserId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList).and("assignee._id").is(loggedInUserId))
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList).and("assignee._id").is(loggedInUserId)),
+                sort(Sort.Direction.DESC,"createdAt")
 
         );
         AggregationResults<AssessmentBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentBasicResponseDTO.class);
         return result.getMappedResults();
     }
 
+    @Override
+    public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
+
+        String projectionOpertaion = "{ '$project':{'asset':{$arrayElemAt:['$asset',0]},'processingActivity':{'$arrayElemAt':['$processingActivity',0]}," +
+                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assignee':1,'approver':1,'createdAt':1,'assessmentStatus':1}}";
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
+                lookup("asset", "assetId", "_id", "asset"),
+                lookup("processingActivity", "processingActivityId", "_id", "processingActivity"),
+                new CustomAggregationOperation(Document.parse(projectionOpertaion)),
+                sort(Sort.Direction.DESC,"createdAt")
+
+        );
+        AggregationResults<AssessmentResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentResponseDTO.class);
+        return result.getMappedResults();
+    }
 
     @Override
     public Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId) {
@@ -62,5 +83,12 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId).and("assessmentStatus").in(assessmentStatusList));
         return mongoTemplate.findOne(query, Assessment.class);
+    }
+
+
+    @Override
+    public List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("questionnaireTemplateId").is(templateId).and("assessmentStatus").in(assessmentStatusList));
+        return mongoTemplate.find(query, Assessment.class);
     }
 }

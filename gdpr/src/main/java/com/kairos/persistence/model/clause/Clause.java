@@ -9,20 +9,18 @@ import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.javers.core.metamodel.annotation.*;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@TypeName("clause")
+@Document
 public class Clause extends MongoBaseEntity {
 
     @NotBlank
@@ -31,27 +29,16 @@ public class Clause extends MongoBaseEntity {
     private List<ClauseTag> tags = new ArrayList<>();
     @NotNull
     private String description;
-
     private List<OrganizationType> organizationTypes;
-
     private List<OrganizationSubType> organizationSubTypes;
-
     private List<ServiceCategory> organizationServices;
-
     private List<SubServiceCategory> organizationSubServices;
-
     private List<AccountTypeVO> accountTypes;
-
     private Long countryId;
-
     private Boolean isDefault = true;
-
     private List<Long> organizationList;
-
     private BigInteger parentClauseId;
-
     private List<BigInteger> templateTypes;
-
     @Transient
     private Integer orderedIndex;
 
@@ -67,9 +54,7 @@ public class Clause extends MongoBaseEntity {
         return templateTypes;
     }
 
-    public void setTemplateTypes(List<BigInteger> templateTypes) {
-        this.templateTypes = templateTypes;
-    }
+    public void setTemplateTypes(List<BigInteger> templateTypes) { this.templateTypes = templateTypes; }
 
     public Long getCountryId() {
         return countryId;

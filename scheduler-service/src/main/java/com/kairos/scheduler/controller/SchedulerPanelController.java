@@ -1,7 +1,9 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
+
+import com.kairos.scheduler.service.UserIntegrationService;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -27,6 +29,8 @@ public class SchedulerPanelController {
 
     @Inject
     private SchedulerPanelService schedulerPanelService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
     @GetMapping("/{schedulerPanelId}")
     @ApiOperation("Get Scheduler Panel ")
@@ -75,12 +79,22 @@ public class SchedulerPanelController {
     public ResponseEntity<Map<String, Object>> getAllJobDetails(@PathVariable Long unitId,@RequestParam("offset") int offset) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getAllJobDetailsByUnitId(unitId,offset));
     }
+    /*@GetMapping("/authToken")
+    @ApiOperation("Get job details ")
+    public ResponseEntity<Map<String, Object>> getAuthToken() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getAuthToken());
+    }*/
     @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelIds));
+    public ResponseEntity<Map<String, Object>> deleteJobs(@RequestBody Set<BigInteger> schedulerPanelIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJobs(schedulerPanelIds));
     }
 
+    @DeleteMapping("/{schedulerPanelId}")
+    @ApiOperation("Delete Scheduler Panel ")
+    public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
+    }
     @GetMapping("/default_data")
     @ApiOperation("Get default data")
     public ResponseEntity<Map<String, Object>> getDefaultData() {

@@ -11,6 +11,7 @@ import com.kairos.persistence.repository.master_data.asset_management.AssetTypeM
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -100,7 +101,7 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + assetId);
         }
-        List<ProcessingActivityBasicResponseDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
+        List<ProcessingActivityBasicDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
         Map<String, Object> result = new HashMap<>();
         if (!linkedProcessingActivities.isEmpty()) {
             result.put(IS_SUCCESS, false);
@@ -206,7 +207,17 @@ public class AssetService extends MongoBaseService {
                 }
             }
         }
-        ObjectMapperUtils.copyProperties(assetDTO, asset);
+        asset.setHostingProvider(assetDTO.getHostingProvider());
+        asset.setHostingType(assetDTO.getHostingType());
+        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setDataDisposal(assetDTO.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        asset.setSuggested(assetDTO.isSuggested());
         assetMongoRepository.save(asset);
         return assetDTO;
     }
@@ -268,18 +279,18 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @description get all Previous Assessment Launched for Asset
      * @param unitId
      * @param assetId
      * @return
+     * @description get all Previous Assessment Launched for Asset
      */
     public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, BigInteger assetId) {
-        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(unitId, assetId);
+        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(unitId, assetId);
     }
 
 
     /**
-     * @param unitId    -unitid
+     * @param unitId    -unit Id
      * @param countryId -country id
      * @param assetDTO
      * @return
@@ -319,9 +330,8 @@ public class AssetService extends MongoBaseService {
                         subProcessingActivity.setSelected(true);
                         defaultSelected = false;
                     } else if (defaultSelected) {
-                        ProcessingActivityBasicResponseDTO defaultSubProcessingActivity = subProcessingActivity;
-                        defaultSubProcessingActivity.setSelected(true);
-                        defaultSubProcessingActivityList.add(defaultSubProcessingActivity);
+                        subProcessingActivity.setSelected(true);
+                        defaultSubProcessingActivityList.add(subProcessingActivity);
                     }
                 }
 

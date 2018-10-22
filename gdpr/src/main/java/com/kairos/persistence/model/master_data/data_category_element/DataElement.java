@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Document(collection = "data_element")
+@Document
 public class DataElement extends MongoBaseEntity {
 
 

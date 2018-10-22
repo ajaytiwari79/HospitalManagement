@@ -22,7 +22,6 @@ import static com.kairos.constants.AppConstant.DELETED;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionnaireTemplateRepository {
@@ -33,11 +32,9 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
     final String addFieldSections = CustomAggregationQuery.questionnaireTemplateAddNonDeletedSections();
     final String addFieldQuestions = CustomAggregationQuery.questionnaireTemplateAddNonDeletedQuestions();
-    final String addFieldAssetType = CustomAggregationQuery.questionnaireTemplateAddNonDeletedAssetType();
     final String groupData = CustomAggregationQuery.questionnaireTemplateGroupOperation();
     final String projection = CustomAggregationQuery.questionnaireTemplateProjectionBeforeGroupOperationForAssetType();
 
-    Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
     Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
     Document sectionsAddFieldOperation = Document.parse(addFieldSections);
     Document projectionOperation = Document.parse(projection);
@@ -69,10 +66,10 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
-                new CustomAggregationOperation(assetTypeAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
@@ -91,10 +88,10 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
-                new CustomAggregationOperation(assetTypeAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
@@ -110,40 +107,21 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
     public QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("templateType").is(templateType));
-        query.fields().include("id").include("name");
+        query.fields().include("id").include("name").include("templateStatus").include("templateType");
         return mongoTemplate.findOne(query,QuestionnaireTemplate.class);
     }
 
 
-    @Override
-    public QuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsByUnitIdAndId(Long unitId, BigInteger templateId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                new CustomAggregationOperation(sectionsAddFieldOperation),
-                new CustomAggregationOperation(assetTypeAddFieldOperation),
-                unwind("sections", true),
-                lookup("question", "sections.questions", "_id", "questions"),
-                new CustomAggregationOperation(questionsAddFieldOperation),
-                new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation)
-        );
-
-        AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
-        return result.getUniqueMappedResult();
-    }
 
     @Override
     public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByUnitId(Long unitId, BigInteger templateId) {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
-                new CustomAggregationOperation(assetTypeAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
@@ -159,10 +137,10 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
-                new CustomAggregationOperation(assetTypeAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),

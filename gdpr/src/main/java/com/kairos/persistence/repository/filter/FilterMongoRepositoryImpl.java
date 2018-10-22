@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.filter;
-
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.enums.gdpr.FilterType;
@@ -46,9 +45,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         } else {
             aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
         }
-        filterTypes.forEach(filterType -> {
-                    buildAggregationQuery(filterType,aggregationOperations);
-                }
+        filterTypes.forEach(filterType -> buildAggregationQuery(filterType,aggregationOperations)
 
         );
 

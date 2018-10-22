@@ -1,9 +1,10 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
@@ -83,7 +84,7 @@ public class TransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long countryId) {
-        return transferMethodRepository.findAllTransferMethods(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return transferMethodRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

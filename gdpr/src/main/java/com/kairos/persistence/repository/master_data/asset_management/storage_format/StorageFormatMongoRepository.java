@@ -27,7 +27,10 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     StorageFormat findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId, Sort sort);
+    List<StorageFormatResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<StorageFormatResponseDTO> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<StorageFormat> getStorageFormatListByIds(Long countryId, Set<BigInteger> storageFormatIds);
@@ -36,13 +39,13 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<StorageFormatResponseDTO> findAllOrganizationStorageFormats(Long organizationId,Sort sort);
+    List<StorageFormatResponseDTO> findAllUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    StorageFormat findByOrganizationIdAndName(Long organizationId,String name);
+    StorageFormat findByUnitIdAndName(Long unitId, String name);
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    StorageFormat findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    StorageFormat findByUnitIdAndId(Long unitId, BigInteger id);
 
 }

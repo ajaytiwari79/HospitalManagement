@@ -18,6 +18,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.joda.time.Interval;
@@ -42,7 +43,7 @@ public class PriorityGroupRulesDataGetterService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private PriorityGroupIntegrationService priorityGroupIntegrationService;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private PriorityGroupRepository priorityGroupRepository;
     @Inject
@@ -71,7 +72,10 @@ public class PriorityGroupRulesDataGetterService {
         Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap =  new HashMap<BigInteger, List<StaffUnitPositionQueryResult>>();
         Map<BigInteger, OpenShift> openShiftMap = new HashMap<BigInteger, OpenShift>();
         for(OpenShift openShift:openShifts) {
-            openShiftStaffMap.put(openShift.getId(),new ArrayList<>(staffsUnitPositions));
+
+            List<StaffUnitPositionQueryResult> staffUnitPositionQueryResults = new ArrayList<>(staffsUnitPositions);
+            staffUnitPositionQueryResults.stream().filter(staffUnitPositionQueryResult -> staffUnitPositionQueryResult.getStartDate()<openShift.getStartDate().getTime());
+            openShiftStaffMap.put(openShift.getId(),staffUnitPositionQueryResults);
             openShiftMap.put(openShift.getId(),openShift);
         }
         calculateTimeBankAndPlannedHours(unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
@@ -96,7 +100,7 @@ public class PriorityGroupRulesDataGetterService {
         staffIncludeFilterDTO.setMaxOpenShiftDate(maxDateLong);
         staffIncludeFilterDTO.setExpertiseIds(priorityGroupDTO.getExpertiseIds());
         staffIncludeFilterDTO.setEmploymentTypeIds(priorityGroupDTO.getEmploymentTypeIds());
-        return priorityGroupIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
+        return genericIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
 
     }
     public List<Shift> getShifts(PriorityGroupDTO priorityGroupDTO, LocalDate maxDate, LocalDate minDate,List<Long> commonUnitPositionIds) {

@@ -1,13 +1,12 @@
 package com.kairos.dto.activity.counter.data;
 
-import java.math.BigInteger;
 import java.util.List;
 
 public class FilterCriteriaDTO {
     private Long currentCountryId;
     private Long currentUnitId;
     private List<FilterCriteria> filters;
-    private List<BigInteger> counterIds;
+    private List<BasicRequirementDTO> dataRequestList;
 
     public FilterCriteriaDTO() {
     }
@@ -40,11 +39,12 @@ public class FilterCriteriaDTO {
         this.filters = filters;
     }
 
-    public List<BigInteger> getCounterIds() {
-        return counterIds;
+    public List<BasicRequirementDTO> getDataRequestList() {
+        return dataRequestList;
     }
 
-    public void setCounterIds(List<BigInteger> counterIds) {
-        this.counterIds = counterIds;
+    public void setDataRequestList(List<BasicRequirementDTO> dataRequestList) {
+        this.dataRequestList = dataRequestList;
     }
+
 }

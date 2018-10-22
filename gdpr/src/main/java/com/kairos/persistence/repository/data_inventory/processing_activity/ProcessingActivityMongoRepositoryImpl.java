@@ -61,27 +61,28 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 "'active':{'$first':'$active'}," +
                 "'suggested':{'$first':'$suggested'}," +
                 "'description':{'$first':'$description'}," +
+                "'risks':{'$first':'$risks'}," +
                 "'managingDepartment':{'$first':'$managingDepartment'}," +
                 "'processOwner':{'$first':'$processOwner'}}}";
 
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("subProcess").is(false)),
-                lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
-                lookup("transfer_method", "transferMethods", "_id", "transferMethods"),
-                lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
+                lookup("processingPurpose", "processingPurposes", "_id", "processingPurposes"),
+                lookup("transferMethod", "transferMethods", "_id", "transferMethods"),
+                lookup("accessorParty", "accessorParties", "_id", "accessorParties"),
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
-                lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
+                lookup("responsibilityType", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
                 lookup("risk", "risks", "_id", "risks"),
-                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
+                lookup("processingActivity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 unwind("subProcessingActivities", true),
                 lookup("risk", "subProcessingActivities.risks", "_id", "subProcessingActivities.risks"),
-                lookup("processing_purpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
-                lookup("transfer_method", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
-                lookup("accessor_party", "subProcessingActivities.accessorParties", "_id", "subProcessingActivities.accessorParties"),
+                lookup("processingPurpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
+                lookup("transferMethod", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
+                lookup("accessorParty", "subProcessingActivities.accessorParties", "_id", "subProcessingActivities.accessorParties"),
                 lookup("dataSource", "subProcessingActivities.dataSources", "_id", "subProcessingActivities.dataSources"),
-                lookup("responsibility_type", "subProcessingActivities.responsibilityType", "_id", "subProcessingActivities.responsibilityType"),
+                lookup("responsibilityType", "subProcessingActivities.responsibilityType", "_id", "subProcessingActivities.responsibilityType"),
                 lookup("processingLegalBasis", "subProcessingActivities.processingLegalBasis", "_id", "subProcessingActivities.processingLegalBasis"),
                 new CustomAggregationOperation(Document.parse(groupOperation)),
                 sort(Sort.Direction.DESC, "createdAt")
@@ -99,7 +100,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").in(processingActivityIds)),
-                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
+                lookup("processingActivity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 new CustomAggregationOperation(addNonDeletedSubProcessingActivityOperation)
         );
         AggregationResults<ProcessingActivityBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponseDTO.class);
@@ -113,7 +114,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
-                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
+                lookup("processingActivity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 new CustomAggregationOperation(addNonDeletedSubProcessingActivityOperation),
                 sort(Sort.Direction.DESC, "createdAt")
 
@@ -130,9 +131,9 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         Document addToFieldOperationFilter = Document.parse(addNonDeletedDataElements);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("_id").in(dataSubjectIds)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
@@ -150,12 +151,12 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     @Override
     public ProcessingActivityResponseDTO getProcessingActivityAndMetaDataById(Long unitId, BigInteger processingActivityId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
-                lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
-                lookup("transfer_method", "transferMethods", "_id", "transferMethods"),
-                lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
+                lookup("processingPurpose", "processingPurposes", "_id", "processingPurposes"),
+                lookup("transferMethod", "transferMethods", "_id", "transferMethods"),
+                lookup("accessorParty", "accessorParties", "_id", "accessorParties"),
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
-                lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
+                lookup("responsibilityType", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
                 lookup("asset", "assetId", "_id", "asset")
         );
@@ -181,16 +182,16 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessWithRisks(Long unitId) {
+    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessWithRisksByUnitId(Long unitId) {
 
-        String groupSubProcessingActivity = "{'$group':{_id:'$_id','subProcessingActivities':{'$addToSet':'$subProcessingActivities'},'risks':{'$first':'$risks'},'name':{'$first':'$name'}}}";
+        String groupSubProcessingActivity = "{'$group':{_id:'$_id','processingActivities':{'$addToSet':'$processingActivities'},'risks':{'$first':'$risks'},'name':{'$first':'$name'}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("risk", "risks", "_id", "risks"),
-                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
-                unwind("subProcessingActivities", true),
-                lookup("risk", "subProcessingActivities.risks", "_id", "subProcessingActivities.risks"),
+                lookup("processingActivity", "subProcessingActivities", "_id", "processingActivities"),
+                unwind("processingActivities", true),
+                lookup("risk", "processingActivities.risks", "_id", "processingActivities.risks"),
                 new CustomAggregationOperation(Document.parse(groupSubProcessingActivity))
 
         );

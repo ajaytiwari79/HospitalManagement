@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -97,7 +97,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return technicalSecurityMeasureMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -110,7 +110,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long organizationId, BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -140,7 +140,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long organizationId, BigInteger id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByOrganizationIdAndName(organizationId, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByUnitIdAndName(organizationId, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;

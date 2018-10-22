@@ -1,9 +1,10 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
@@ -82,7 +83,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long countryId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return organizationalSecurityMeasureMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

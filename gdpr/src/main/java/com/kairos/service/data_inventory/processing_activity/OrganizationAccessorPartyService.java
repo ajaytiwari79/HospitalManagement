@@ -1,14 +1,15 @@
 package com.kairos.service.data_inventory.processing_activity;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -80,7 +81,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long organizationId) {
-        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return accessorPartyMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -103,9 +104,9 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
 
-        List<ProcessingActivityBasicResponseDTO> processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        List<ProcessingActivityBasicDTO> processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", new StringBuilder(processingActivitiesLinkedWithAccessorParty.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", new StringBuilder(processingActivitiesLinkedWithAccessorParty.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
         accessorPartyMongoRepository.safeDelete(accessorPartyId);
         return true;
@@ -121,7 +122,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     public AccessorPartyDTO updateAccessorParty(Long organizationId, BigInteger id, AccessorPartyDTO accessorPartyDTO) {
 
 
-        AccessorParty accessorParty = accessorPartyMongoRepository.findByNameAndOrganizationId(organizationId, accessorPartyDTO.getName());
+        AccessorParty accessorParty = accessorPartyMongoRepository.findByNameAndUnitId(organizationId, accessorPartyDTO.getName());
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;

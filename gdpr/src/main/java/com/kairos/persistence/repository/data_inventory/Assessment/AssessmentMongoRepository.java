@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.data_inventory.Assessment;
 
 
+import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
@@ -20,8 +21,11 @@ public interface AssessmentMongoRepository extends MongoBaseRepository<Assessmen
     @Query("{deleted:false,organizationId:?0,_id:?1}")
     Assessment findByIdAndNonDeleted(Long unitId,BigInteger assessmentId);
 
+    @Query("{deleted:false,organizationId:?0,_id:?1,assessmentStatus:?2}")
+    Assessment findByUnitIdAndIdAndAssessmentStatus(Long unitId, BigInteger assessmentId, AssessmentStatus assessmentStatus);
+
     @Query("{deleted:false,organizationId:?0,assetId:?1}")
-    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(Long unitId, BigInteger assetId);
+    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId);
 
     @Query("{deleted:false,organizationId:?0,processingActivityId:?1}")
     List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(Long unitId, BigInteger processingActivityId);
