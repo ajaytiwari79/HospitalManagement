@@ -7,11 +7,20 @@ public class StaffUnitPositionQueryResult {
     private String staffEmail;
     private Long unitPositionId;
     private Integer workingDaysPerWeek;
+    private Integer totalWeeklyHours;
     private Integer contractedMinByWeek;
     private Long startDate;
     private Long endDate;
     private Integer accumulatedTimeBank;
     private Integer deltaWeeklytimeBank;
+
+    public Integer getTotalWeeklyHours() {
+        return totalWeeklyHours;
+    }
+
+    public void setTotalWeeklyHours(Integer totalWeeklyHours) {
+        this.totalWeeklyHours = totalWeeklyHours;
+    }
 
     public String getStaffEmail() {
         return staffEmail;

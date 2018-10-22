@@ -103,9 +103,11 @@ public class StaffingLevelUtil {
         for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO:presenceStaffingLevelDto.getPresenceStaffingLevelInterval()){
             Map<BigInteger,StaffingLevelActivity> staffingLevelActivityMap=staffingLevelTimeSlotDTO.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId,Function.identity()));
             StaffingLevelActivity staffingLevelActivities[]=new StaffingLevelActivity[staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()];
-            activitiesRankMap.forEach((activityId,rank)->{
-                staffingLevelActivities[rank-1]=staffingLevelActivityMap.get(activityId);
-            });
+            if(activitiesRankMap!=null) {
+                activitiesRankMap.forEach((activityId, rank) -> {
+                    staffingLevelActivities[rank - 1] = staffingLevelActivityMap.get(activityId);
+                });
+            }
             staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
 
         }

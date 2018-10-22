@@ -34,14 +34,16 @@ public class StaffingLevelActivityRankService extends MongoBaseService {
 
     private List<StaffingLevelActivityRank> constructObjects(Map<BigInteger, Integer> activitiesRankMap, Map<BigInteger, StaffingLevelActivityRank> staffingLevelActivityRankingMap, BigInteger staffingLevelId, LocalDate staffingLevelDate) {
         List<StaffingLevelActivityRank> staffingLevelActivityRanks = new ArrayList<>();
-        activitiesRankMap.forEach((k, v) -> {
-            if (staffingLevelActivityRankingMap.get(k) != null) {
-                staffingLevelActivityRanks.add(new StaffingLevelActivityRank(staffingLevelActivityRankingMap.get(k).getId(), k, staffingLevelDate, staffingLevelId, v));
-            }
-            else{
-                staffingLevelActivityRanks.add(new StaffingLevelActivityRank(k, staffingLevelDate, staffingLevelId, v));
-            }
-        });
+        if(activitiesRankMap!=null){
+            activitiesRankMap.forEach((k, v) -> {
+                if (staffingLevelActivityRankingMap.get(k) != null) {
+                    staffingLevelActivityRanks.add(new StaffingLevelActivityRank(staffingLevelActivityRankingMap.get(k).getId(), k, staffingLevelDate, staffingLevelId, v));
+                }
+                else{
+                    staffingLevelActivityRanks.add(new StaffingLevelActivityRank(k, staffingLevelDate, staffingLevelId, v));
+                }
+            });
+        }
         return staffingLevelActivityRanks;
     }
 }
