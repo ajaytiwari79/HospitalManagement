@@ -75,6 +75,7 @@ public class AttendanceSettingService extends MongoBaseService {
         List<Shift> shifts=shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         List<OrganizationCommonDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new OrganizationCommonDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
         List<ReasonCodeDTO> reasonCodes=staffAndOrganizationIds.get(0).getReasonCodes();
+        Map<Long,List<ReasonCodeDTO>> unitAndReasonCode=staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId,StaffResultDTO::getReasonCodes));
         if(!shifts.isEmpty()) {
             List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
             for(UnitSettingDTO unitSettingDTO:unitSettingDTOS){
@@ -93,7 +94,7 @@ public class AttendanceSettingService extends MongoBaseService {
                     if (interval.contains(DateUtils.getCurrentMillistByTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
                         result = (result || reasonCodeId != null) ? true : false;
                         if (!result) {
-                            attendanceDTO = new AttendanceDTO(new ArrayList<>(),reasonCodes);
+                                attendanceDTO = new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(checkInshift.getUnitId()));
                         }
                     } else {
                         result = result ? true : false;
@@ -122,7 +123,7 @@ public class AttendanceSettingService extends MongoBaseService {
          if(shift!=null && checkIn){
                 attendanceSetting= checkInWithShift(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()));
             if(attendanceSetting==null){
-                return new AttendanceDTO(new ArrayList<>(),reasonCodes);
+                return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
             }else {
                 shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration());
                 shiftMongoRepository.save(shift);
@@ -132,7 +133,7 @@ public class AttendanceSettingService extends MongoBaseService {
         else if(!checkIn){
             attendanceSetting= checkOut(staffAndOrganizationIds,shift,reasonCodeId);
             if(attendanceSetting==null){
-                return new AttendanceDTO(new ArrayList<>(),reasonCodes);
+                return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
             }else {
                 if(shift!=null){
                     shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration());
