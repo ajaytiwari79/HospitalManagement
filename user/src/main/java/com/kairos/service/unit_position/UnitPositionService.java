@@ -674,6 +674,7 @@ public class UnitPositionService {
                 });
                 if (u.getEndDate() != null) {
                     u.setEndDate(positionLine.getEndDate());
+                    u.setEditable(positionLine.getEndDate().isBefore(DateUtils.getCurrentLocalDate())?false:true);
                 }
             });
         });
