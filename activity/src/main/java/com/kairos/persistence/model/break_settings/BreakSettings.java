@@ -7,30 +7,29 @@ import java.math.BigInteger;
 
 @Document
 public class BreakSettings extends MongoBaseEntity {
-    private Long unitId;
+    private Long countryId;
     private Long shiftDurationInMinute;
     private Long breakDurationInMinute;
-    private Long numberOfBreaks;
-    private BigInteger paidActivityId;
-    private BigInteger unpaidActivityId;
+    private Long expertiseId;
+    private BigInteger activityId;
 
     public BreakSettings() {
         //Default Constructor
     }
 
-    public BreakSettings(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
-        this.unitId = unitId;
+    public BreakSettings(Long countryId, Long shiftDurationInMinute, Long breakDurationInMinute, Long expertiseId) {
+        this.countryId = countryId;
         this.shiftDurationInMinute = shiftDurationInMinute;
         this.breakDurationInMinute = breakDurationInMinute;
-        this.numberOfBreaks = numberOfBreaks;
+        this.expertiseId = expertiseId;
     }
 
-    public Long getUnitId() {
-        return unitId;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     public Long getShiftDurationInMinute() {
@@ -49,27 +48,19 @@ public class BreakSettings extends MongoBaseEntity {
         this.breakDurationInMinute = breakDurationInMinute;
     }
 
-    public Long getNumberOfBreaks() {
-        return numberOfBreaks;
+    public Long getExpertiseId() {
+        return expertiseId;
     }
 
-    public void setNumberOfBreaks(Long numberOfBreaks) {
-        this.numberOfBreaks = numberOfBreaks;
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
     }
 
-    public BigInteger getPaidActivityId() {
-        return paidActivityId;
+    public BigInteger getActivityId() {
+        return activityId;
     }
 
-    public void setPaidActivityId(BigInteger paidActivityId) {
-        this.paidActivityId = paidActivityId;
-    }
-
-    public BigInteger getUnpaidActivityId() {
-        return unpaidActivityId;
-    }
-
-    public void setUnpaidActivityId(BigInteger unpaidActivityId) {
-        this.unpaidActivityId = unpaidActivityId;
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
     }
 }

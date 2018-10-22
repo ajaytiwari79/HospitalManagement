@@ -42,7 +42,7 @@ public class BreakSettingsService extends MongoBaseService {
             exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
         }
         breakSettings =ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
-        breakSettings.setUnitId(unitId);
+        breakSettings.setCountryId(unitId);
         save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
@@ -83,7 +83,7 @@ public class BreakSettingsService extends MongoBaseService {
 
         }
         breakSettings=ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
-        breakSettings.setUnitId(unitId);
+        breakSettings.setCountryId(unitId);
         save(breakSettings);
         return breakSettingsDTO;
     }

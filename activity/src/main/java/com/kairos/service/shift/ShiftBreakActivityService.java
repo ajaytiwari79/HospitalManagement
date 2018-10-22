@@ -1,10 +1,7 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -88,7 +83,7 @@ public class ShiftBreakActivityService {
     /*private Object[] createBreakActivity(BreakSettings breakSettings, Long shiftDurationInMinute, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Boolean paid, ZonedDateTime shiftStart, ZonedDateTime shiftEnd, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap){
         ShiftActivity shiftActivity = null;
         if (breakSettings.getShiftDurationInMinute() < shiftDurationInMinute) {
-            Activity breakActivity = breakActivitiesMap.get(paid ? breakSettings.getPaidActivityId() : breakSettings.getUnpaidActivityId()).getActivity();
+            Activity breakActivity = breakActivitiesMap.get(paid ? breakSettings.getActivityId() : breakSettings.getActivityId()).getActivity();
             ZonedDateTime breakStart = shiftStart.plusMinutes(breakSettings.getShiftDurationInMinute());
             ZonedDateTime breakEnd = breakStart.plusMinutes(breakSettings.getBreakDurationInMinute());
             if (breakEnd.isAfter(shiftEnd)) {
@@ -135,7 +130,7 @@ public class ShiftBreakActivityService {
 
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(List<BreakSettings> breakSettings) {
-        List<BigInteger> breakActivityIds = breakSettings.stream().flatMap(a -> Stream.of(a.getPaidActivityId(), a.getUnpaidActivityId())).collect(Collectors.toList());
+        List<BigInteger> breakActivityIds = breakSettings.stream().flatMap(a -> Stream.of(a.getPaidActivityId(), a.getActivityId())).collect(Collectors.toList());
         List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByActivityId(breakActivityIds);
         return breakActivities.stream().collect(Collectors.toMap(key -> key.getActivity().getId(), value -> value));
     }
@@ -178,9 +173,9 @@ public class ShiftBreakActivityService {
             breakAllowedAfterMinute = breakSettings.get(i).getShiftDurationInMinute();
 
             if (shiftDurationInMinute > breakAllowedAfterMinute) {
-                if (paid != null) {
-                    breakActivity =  breakActivitiesMap.get(paid ?breakSettings.get(i).getPaidActivityId() : breakSettings.get(i).getUnpaidActivityId()).getActivity();
-                }
+                //if (paid != null) {
+                 //   breakActivity =  breakActivitiesMap.get(paid ?breakSettings.get(i).getPaidActivityId() : breakSettings.get(i).getActivityId()).getActivity();
+               // }
                 endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis)));
                 // we have added a sub shift now adding the break for remaining period

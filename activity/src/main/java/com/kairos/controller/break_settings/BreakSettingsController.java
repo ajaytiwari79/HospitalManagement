@@ -14,12 +14,13 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 
 @RestController
-@Api(API_ORGANIZATION_UNIT_URL)
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 public class BreakSettingsController {
 
     @Inject
