@@ -412,8 +412,8 @@ public class ActivityController {
     @ApiOperation("Check rest client")
     @GetMapping(value = "/check_rest_client")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTimeZone() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,genericIntegrationService.getTimezone());
+    public ResponseEntity<Map<String, Object>> getTimeZone(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,genericIntegrationService.getStaff(countryId,14098L));
 
     }
 }

@@ -1621,14 +1621,13 @@ public class StaffService {
         return new ClientStaffInfoDTO(staff.getId());
     }
 
+    /**
+     * @Desc We are checking null in another ms
+     * @param staffId
+     * @return
+     */
     public Staff getStaffById(long staffId) {
-        Staff staff = staffGraphRepository.findOne(staffId, 0);
-        if (staff == null) {
-            logger.debug("Searching staff by id " + staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.id.incorrect", staffId);
-
-        }
-        return staff;
+        return staffGraphRepository.findOne(staffId, 0);
     }
 
     public List<Long> getCountryAdminIds(long organizationId) {
