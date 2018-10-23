@@ -24,7 +24,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
 @RestController
-public class CountryReasonCodeController {
+public class ReasonCodeController {
     @Inject
     ReasonCodeService reasonCodeService;
 

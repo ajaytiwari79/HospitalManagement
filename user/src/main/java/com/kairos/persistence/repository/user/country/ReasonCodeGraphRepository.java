@@ -38,6 +38,10 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
             "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
     List<ReasonCodeResponseDTO> findReasonCodesByUnitIdAndReasonCodeType(long unitId, ReasonCodeType reasonCodeType);
 
+    @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} return  reasonCode.name as name," +
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
+    List<ReasonCodeResponseDTO> findReasonCodeByUnitId(long unitId);
+
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
             "with count(reasonCode) as reasonCodeCount return CASE when reasonCodeCount>0 THEN  true ELSE false END as response ")
     boolean findByUnitIdAndNameExcludingCurrent(Long unitId, Long reasonCodeId, String name, ReasonCodeType reasonCodeType);
