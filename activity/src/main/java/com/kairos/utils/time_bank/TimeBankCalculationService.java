@@ -568,7 +568,6 @@ public class TimeBankCalculationService {
             interval = getIntervalByDateForAdvanceView(unitPositionWithCtaDetailsDTO, interval);
         }
         int contractualMinutes = 0;
-        int count = 0;
         if (interval != null) {
             DateTime startDate = interval.getStart();
             while (startDate.isBefore(interval.getEnd())) {
@@ -580,7 +579,7 @@ public class TimeBankCalculationService {
                 }
                 startDate = startDate.plusDays(1);
             }
-            contractualMinutes = count * (totalWeeklyMinutes / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
+            //contractualMinutes = count * (totalWeeklyMinutes / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
             /* else {
                 DateTime startDate = interval.getStart();
                 while (startDate.isBefore(interval.getEnd())) {
@@ -597,8 +596,8 @@ public class TimeBankCalculationService {
 
 
     public List<DateTimeInterval> getPlanningPeriodIntervals(Long unitId,Date startDate,Date endDate){
-        List<PlanningPeriodDTO> planningPeriods = planningPeriodMongoRepository.findPeriodsOfUnitByStartAndEndDate(unitId, DateUtils.asLocalDate(startDate), DateUtils.asLocalDate(endDate));
-        List<DateTimeInterval> dateTimeIntervals = planningPeriods.stream().map(planningPeriodDTO -> new DateTimeInterval(DateUtils.asDate(planningPeriodDTO.getStartDate()),DateUtils.asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toList());
+        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndBetweenDates(unitId, startDate, endDate);
+        List<DateTimeInterval> dateTimeIntervals = planningPeriods.stream().map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toList());
         return dateTimeIntervals;
     }
 

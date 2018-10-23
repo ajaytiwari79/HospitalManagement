@@ -262,7 +262,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 project("phase._id","phase.name")
         );
         AggregationResults<Phase> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, Phase.class);
-        return results.getMappedResults().get(0);
+        return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
     }
 
 
