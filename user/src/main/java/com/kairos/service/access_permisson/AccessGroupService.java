@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -44,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 
@@ -81,6 +79,14 @@ public class AccessGroupService {
     private DayTypeGraphRepository dayTypeGraphRepository;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+        if((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
+
+        if((!accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+        }
+
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -124,6 +130,14 @@ public class AccessGroupService {
     }
 
     public AccessGroupDTO updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
+        if((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
+
+        if((!accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+        }
+
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -603,7 +617,13 @@ public class AccessGroupService {
 
 
     public CountryAccessGroupDTO createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
+        if((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
 
+        if((!accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+        }
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -641,7 +661,13 @@ public class AccessGroupService {
     }
 
     public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
+        if((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
 
+        if((!accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+        }
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -757,7 +783,13 @@ public class AccessGroupService {
     }
 
     public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+        if((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
 
+        if((!accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+        }
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -798,7 +830,13 @@ public class AccessGroupService {
     }
 
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
+        if((countryAccessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(countryAccessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
 
+        if((!countryAccessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(countryAccessGroupDTO.getDayTypeIds()))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
         if (countryAccessGroupDTO.getEndDate() != null && countryAccessGroupDTO.getEndDate().isBefore(countryAccessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }

@@ -40,7 +40,7 @@ public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountT
 
     @Query("MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +
             "MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType) WHERE (ag.endDate IS NULL OR date(ag.endDate) >= date())" +
-            "MATCH(ag)-[:"+DAY_TYPES+"]->(dayType:DayType)" +
+            "OPTIONAL MATCH(ag)-[:"+DAY_TYPES+"]->(dayType:DayType)" +
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, collect(dayType) as dayTypes")
     List<AccessGroupQueryResult> getAccessGroupsByAccountTypeId(Long accountTypeId);
 
