@@ -264,7 +264,7 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
     public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
-        OrganizationDTO organization = organizationRestClient.getOrganizationWithCountryId(unitId);
+        OrganizationDTO organization = genericIntegrationService.getOrganizationWithCountryId(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }

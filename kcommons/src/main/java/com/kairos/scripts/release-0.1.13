@@ -50,5 +50,17 @@ set r.employmentTypeCategory="PERMANENT"
 
 db.activities.updateMany({},{$set:{"communicationActivityTab" : { "allowCommunicationReminder" : false, "notifyAfterDeleteActivity" : true, "activityReminderSettings" : [] }}});
 
+// find sequence of claue Tag and insert new Entry
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "ClauseTagSequence"},{$inc: { sequenceNumber: 1 }});
+db.kairos_sequence.find({"sequenceName" : "ClauseTagSequence"})
 
-
+ db.getCollection('clauseTag').insert({
+ "_id" : "545151",//This Id should be according to SequenceNumber of That Class in QA and Development
+ "deleted" : false,
+ "updatedAt" : ISODate("2018-10-17T06:27:50.658Z"),
+ "createdAt" : ISODate("2018-10-17T06:27:50.650Z"),
+ "countryId" : NumberLong(4),
+ "defaultTag" : true,
+ "name" : "none",
+ "_class" : "com.kairos.persistence.model.clause_tag.ClauseTag"
+    })
