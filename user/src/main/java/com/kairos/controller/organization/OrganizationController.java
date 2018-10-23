@@ -977,7 +977,7 @@ public class OrganizationController {
      * @return timeslot info map
      */
     @ApiOperation("get time slot info by unit id and timeslot name")
-    @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
+    //@RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
     @PostMapping(PARENT_ORGANIZATION_URL+UNIT_URL+"/time_slot_name")
     ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody Long timeSlotExternalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, timeSlotExternalId));

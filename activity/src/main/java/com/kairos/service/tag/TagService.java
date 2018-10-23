@@ -110,9 +110,9 @@ public class TagService extends MongoBaseService {
 
     public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO, String type) {
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
@@ -124,9 +124,9 @@ public class TagService extends MongoBaseService {
 
     public Tag  updateOrganizationTag(Long organizationId, BigInteger tagId, TagDTO tagDTO, String type) {
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
@@ -144,9 +144,9 @@ public class TagService extends MongoBaseService {
 
     public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType, String type){
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
@@ -163,8 +163,8 @@ public class TagService extends MongoBaseService {
         } else {
             tags = tagMongoRepository.findAllTagByOrganizationIdAndNameAndMasterDataTypeAndDeletedAndCountryTagFalse(organizationId, filterText, masterDataType.toString(), false);
         }
-        if(organizationRestClient.showCountryTagForOrganization(organizationId)){
-            Long countryId = organizationRestClient.getCountryIdOfOrganization(organizationId);
+        if(genericIntegrationService.showCountryTagForOrganization(organizationId)){
+            Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
             if(masterDataType == null){
                 tags.addAll( tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false));
             } else {
@@ -177,9 +177,9 @@ public class TagService extends MongoBaseService {
 
     public boolean deleteOrganizationTag(Long organizationId, BigInteger tagId, String type){
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         Tag tag = tagMongoRepository.findTagByIdAndOrganizationIdAndDeletedAndCountryTagFalse(tagId, organizationId, false);

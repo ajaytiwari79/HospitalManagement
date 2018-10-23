@@ -9,6 +9,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -37,7 +38,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     @Autowired
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
     @Autowired
-    private OrganizationRestClient organizationRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Autowired
     private ExceptionService exceptionService;
     @Inject
@@ -119,7 +120,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(proposedDate).isPresent()){
             return staffingLevelTemplateRepository.findAllByUnitIdAndDeletedFalse(unitId);
         }
-        List<DayType> dayTypes = organizationRestClient.getDayType(proposedDate);
+        List<DayType> dayTypes = genericIntegrationService.getDayType(proposedDate);
         List<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toList());
 
         Optional<DayType> holidayDayType = dayTypes.stream().filter(dayType -> dayType.isHolidayType()).findFirst();

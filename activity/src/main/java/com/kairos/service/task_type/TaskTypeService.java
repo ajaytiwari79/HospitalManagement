@@ -660,7 +660,7 @@ public class TaskTypeService extends MongoBaseService {
         for (TaskTypeEnum.TaskTypeDays taskTypeDay : taskType.getForbiddenDays()) {
             taskTypeDays.add(taskTypeDay.value);
         }*/
-        List<DayType> dayTypes=organizationRestClient.getDayTypes(unitId);
+        List<DayType> dayTypes=genericIntegrationService.getDayTypes(unitId);
         return getDayTypeMapList(dayTypes,taskType);
     }
 
@@ -673,7 +673,7 @@ public class TaskTypeService extends MongoBaseService {
         for (TaskTypeEnum.TaskTypeDays taskTypeDay : taskType.getForbiddenDays()) {
             taskTypeDays.add(taskTypeDay.value);
         }*/
-        List<DayType> dayTypes=organizationRestClient.getDayTypesByCountryId(countryId);
+        List<DayType> dayTypes=genericIntegrationService.getDayTypesByCountryId(countryId);
         return getDayTypeMapList(dayTypes,taskType);
     }
 
@@ -744,7 +744,7 @@ public class TaskTypeService extends MongoBaseService {
     public TaskTypeDTO linkTaskTypesWithOrg(String taskTypeId, long organizationId,
                                             long subServiceId) throws CloneNotSupportedException {
 
-        boolean exist=organizationRestClient.isExistOrganization(organizationId);
+        boolean exist=genericIntegrationService.isExistOrganization(organizationId);
         if (!exist) {
             return null;
         }
@@ -859,12 +859,12 @@ public class TaskTypeService extends MongoBaseService {
         }
 
 
-        List<OrganizationDTO> organizations = organizationRestClient.getOrganizationsByOrganizationType(organizationTypeId);
+        List<OrganizationDTO> organizations = genericIntegrationService.getOrganizationsByOrganizationType(organizationTypeId);
         if(isSelected){
             Set<Long> subTypes = taskType.getOrganizationSubTypes();
             subTypes.addAll(organizationSubTypeId);
             taskType.setOrganizationSubTypes(subTypes);
-            organizationRestClient.linkOrganizationTypeWithService(organizationSubTypeId,taskType.getSubServiceId());
+            genericIntegrationService.linkOrganizationTypeWithService(organizationSubTypeId,taskType.getSubServiceId());
             List<TaskType> taskTypes = new ArrayList<>();
             organizations.forEach(organization -> {
                 TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organization.getId(),new BigInteger(taskTypeId),taskType.getSubServiceId());
@@ -882,7 +882,7 @@ public class TaskTypeService extends MongoBaseService {
                 save(taskTypes);
             }
         } else {
-            organizationRestClient.deleteLinkingOfOrganizationTypeAndService(organizationSubTypeId,taskType.getSubServiceId());
+            genericIntegrationService.deleteLinkingOfOrganizationTypeAndService(organizationSubTypeId,taskType.getSubServiceId());
             taskType.getOrganizationSubTypes().removeAll(organizationSubTypeId);
             organizations.forEach(organization -> {
                 deleteTaskType(taskTypeId,organization.getId(),taskType.getSubServiceId());
@@ -1109,7 +1109,7 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskTypeResponseDTO> visibleTaskTypes = new ArrayList<>();;
         List<TaskTypeResponseDTO> selectedTaskTypes = new ArrayList<>();
         if(ORGANIZATION.equalsIgnoreCase(type)){
-            OrganizationDTO organization=organizationRestClient.getOrganization(id);
+            OrganizationDTO organization=genericIntegrationService.getOrganization();
             // OrganizationDTO organization = organizationGraphRepository.findOne(id);
             if (organization == null) {
                 return null;
@@ -1117,11 +1117,11 @@ public class TaskTypeService extends MongoBaseService {
             OrganizationDTO parent;
             if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
                 // parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
-                parent = organizationRestClient.getParentOrganizationOfCityLevel(organization.getId());
+                parent = genericIntegrationService.getParentOrganizationOfCityLevel(organization.getId());
 
             } else {
                 // parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-                parent = organizationRestClient.getParentOfOrganization(organization.getId());
+                parent = genericIntegrationService.getParentOfOrganization(organization.getId());
             }
             /*if(parent == null){
                 for(TaskType taskType : taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,0,true)){
@@ -1145,7 +1145,7 @@ public class TaskTypeService extends MongoBaseService {
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,id,true));
         } else if(TEAM.equalsIgnoreCase(type)){
             //OrganizationDTO unit = organizationGraphRepository.getOrganizationByTeamId(id);
-            OrganizationDTO unit = organizationRestClient.getOrganizationByTeamId(id);
+            OrganizationDTO unit = genericIntegrationService.getOrganizationByTeamId(id);
             if(unit == null){
                 exceptionService.internalError("error.organization.team.notfound");
             }
