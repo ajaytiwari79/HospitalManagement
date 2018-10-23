@@ -9,7 +9,6 @@ public class BreakSettingsDTO {
     private Long shiftDurationInMinute;
     @Min(value = 1, message = "error.breakSettings.breakDuration.must.greaterThanZero")
     private Long breakDurationInMinute;
-    private Long expertiseId;
     private BigInteger activityId;
 
 
@@ -20,7 +19,6 @@ public class BreakSettingsDTO {
     public BreakSettingsDTO(Long shiftDurationInMinute, Long breakDurationInMinute, Long expertiseId) {
         this.shiftDurationInMinute = shiftDurationInMinute;
         this.breakDurationInMinute = breakDurationInMinute;
-        this.expertiseId = expertiseId;
     }
 
     public BigInteger getId() {
@@ -46,14 +44,6 @@ public class BreakSettingsDTO {
 
     public void setBreakDurationInMinute(Long breakDurationInMinute) {
         this.breakDurationInMinute = breakDurationInMinute;
-    }
-
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
     }
 
     public BigInteger getActivityId() {

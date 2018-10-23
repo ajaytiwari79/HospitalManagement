@@ -113,4 +113,6 @@ public final class ApiConstants {
     public static final String GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID=CLIENT_CITIZEN_ID+STAFF_WITH_STAFF_ID+"/getStaffCitizenHouseholds";
     public static final String CLIENT_BY_IDS="/client/clientsByIds";
     public static final String GET_UNIT_IDS_BY_CLIENT_IDS="/client/client_ids_by_unitIds";
+    public  static  final  String API_EXPERTISE_URL ="/expertise/{expertiseId}";
+    public  static  final  String API_EXPERTISE_BREAK_URL =API_V1+COUNTRY_URL+"/expertise/{expertiseId}/break";
 }

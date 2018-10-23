@@ -40,7 +40,7 @@ public class ShiftBreakActivityService {
 
    /* public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffUnitPositionDetails unitPositionDetails) {
         Long shiftDurationInMinute = new DateTimeInterval(shift.getStartDate(), shift.getEndDate()).getMinutes();
-        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(shift.getUnitId(), shiftDurationInMinute);
+        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(shift.getUnitId(), shiftDurationInMinute);
         List<ShiftActivity> breakActivities = new ArrayList<>();
         if (!breakSettings.isEmpty()) {
             Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings);
@@ -129,17 +129,17 @@ public class ShiftBreakActivityService {
     }*/
 
 
-    public Map<BigInteger, ActivityWrapper> getBreakActivities(List<BreakSettings> breakSettings) {
-        List<BigInteger> breakActivityIds = breakSettings.stream().flatMap(a -> Stream.of(a.getPaidActivityId(), a.getActivityId())).collect(Collectors.toList());
-        List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByActivityId(breakActivityIds);
-        return breakActivities.stream().collect(Collectors.toMap(key -> key.getActivity().getId(), value -> value));
+    public Map<BigInteger, ActivityWrapper> getBreakActivities(List<BreakSettings> breakSettings,Long unitId) {
+        List<BigInteger> breakActivityIds = breakSettings.stream().map(BreakSettings::getActivityId).collect(Collectors.toList());
+        List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByParentIdsAndUnitId(breakActivityIds,unitId);
+        return breakActivities.stream().collect(Collectors.toMap(key -> key.getActivity().getParentId(), value -> value));
     }
 
     public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffUnitPositionDetails unitPositionDetails) {
         if (activityWrapperMap.get(mainShift.getActivities().get(0).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
             Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
-            List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(mainShift.getUnitId(), shiftDurationInMinute);
-            Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings);
+            List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(unitPositionDetails.getExpertise().getId(), shiftDurationInMinute);
+            Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings,mainShift.getUnitId());
 
             boolean paid = false;
             if (Optional.ofNullable(unitPositionDetails.getExpertise().getBreakPaymentSetting()).isPresent() &&

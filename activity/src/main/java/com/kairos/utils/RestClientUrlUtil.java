@@ -78,6 +78,25 @@ public class RestClientUrlUtil {
         return baseUrl;
     }
 
+    /**
+     * @Author vipul
+     * @param restClientUrlType
+     * @param id
+     * @return
+     */
+    public static String getUserServiceBaseUrl(RestClientUrlType restClientUrlType,Long id){
+        String baseUrl = null;
+        switch (restClientUrlType){
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                break;
+            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
+                break;
+            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl).toString();
+                break;
+        }
+        return baseUrl;
+    }
+
     //~ ======================================================================
 
     //TODO FIX

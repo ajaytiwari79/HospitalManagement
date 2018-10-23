@@ -80,7 +80,42 @@ public class GenericRestClient {
 
     }
 
+    /**
+     * @Author vipul
+     * @param t
+     * @param id
+     * @param restClientUrlType
+     * @param httpMethod
+     * @param uri
+     * @param queryParam
+     * @param typeReference
+     * @param pathParams
+     * @param <T>
+     * @param <V>
+     * @return
+     * @DESC   PLEASE USE  when you dont need parent organization in URL
+     */
+    public <T extends Object, V> V publishRequestWithoutParentOrganization(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        String url = baseUrl +getURIWithParam(queryParam);
+        try {
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    restTemplate.exchange(
+                            url,
+                            httpMethod,
+                            new HttpEntity<>(t), typeReference, pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                exceptionService.internalError(response.getMessage());
+            }
+            return response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in User micro service " + e.getMessage());
+        }
 
+    }
     /**
      * @param t
      * @param id

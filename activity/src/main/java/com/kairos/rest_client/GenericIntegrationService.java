@@ -8,59 +8,50 @@ import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.client.Client;
 import com.kairos.dto.user.client.ClientOrganizationIds;
 import com.kairos.dto.user.client.ClientTemporaryAddress;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.dto.user.organization.TimeSlot;
+import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
+import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.access_page.KPIAccessPageDTO;
-import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -513,13 +504,12 @@ public class GenericIntegrationService {
         });
     }
 
-    public String getTimezone() {
-        return userRestClientForScheduler.publishRequest(null,2567L,RestClientUrlType.UNIT,HttpMethod.GET,"/time_zone",null,new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
-        });
-    }
     public StaffDTO getStaff(Long unitId,Long staffId) {
         return userRestClientForScheduler.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<StaffDTO>>() {
         }, staffId);
+    }
+    public Expertise getExpertise(Long countryId, Long expertiseId) {
+        return genericRestClient.publishRequestWithoutParentOrganization(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
     }
 

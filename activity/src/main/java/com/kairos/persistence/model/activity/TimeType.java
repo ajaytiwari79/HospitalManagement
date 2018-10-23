@@ -2,6 +2,7 @@ package com.kairos.persistence.model.activity;
 
 
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,7 +21,7 @@ public class TimeType extends MongoBaseEntity{
     private String description;
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
-
+    private BreakPaymentSetting breakPaymentSetting;
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
         this.label = label;
@@ -100,5 +101,13 @@ public class TimeType extends MongoBaseEntity{
 
     public void setBackgroundColor(String backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }
