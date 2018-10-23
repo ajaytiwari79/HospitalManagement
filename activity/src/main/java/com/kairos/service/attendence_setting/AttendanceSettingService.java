@@ -26,6 +26,7 @@ import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -222,4 +223,9 @@ public class AttendanceSettingService extends MongoBaseService {
         return false;
     }
 
+    public void checkOutBySchedulerJob(Long unitId){
+        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(DateUtils.asDate(DateUtils.getCurrentLocalDate().minusDays(1)),DateUtils.getDate(),unitId);
+        Map<BigInteger,Shift> shiftIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+
+    }
 }
