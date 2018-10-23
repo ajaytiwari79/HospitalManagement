@@ -2,7 +2,7 @@ package com.kairos.persistence.model.solver_config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.solver_config.ContraintLevel;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -20,7 +20,7 @@ public class ConstraintValue {
     private BigInteger id;
 
     //it is used for current constraint belongs to which level like (Hard,Medium,soft).
-    private ConstraintLevel level;
+    private ContraintLevel level;
     //it is used for current constraint belongs to which level no in bendableScore like (hard[0],soft[1]).
     private Integer levelNo;
     //it is used for current constraint break how much in no. (like -10,-20) if it is static.
@@ -65,11 +65,11 @@ public class ConstraintValue {
         this.id = id;
     }
 
-    public ConstraintLevel getLevel() {
+    public ContraintLevel getLevel() {
         return level;
     }
 
-    public void setLevel(ConstraintLevel level) {
+    public void setLevel(ContraintLevel level) {
         this.level = level;
     }
 

@@ -2,7 +2,7 @@ package com.planner.domain.common.constarint;
 
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.solver_config.ContraintLevel;
 import com.planner.domain.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,7 +17,7 @@ public class Constraint extends MongoBaseEntity{
     protected String description;
     protected ConstraintType constraintType;
     protected ConstraintSubType constraintSubType;
-    protected ConstraintLevel constraintLevel;
+    protected ContraintLevel contraintLevel;
     protected int penalty;
     protected Long planningProblemId;
 
@@ -63,12 +63,12 @@ public class Constraint extends MongoBaseEntity{
         this.constraintSubType = constraintSubType;
     }
 
-    public ConstraintLevel getConstraintLevel() {
-        return constraintLevel;
+    public ContraintLevel getContraintLevel() {
+        return contraintLevel;
     }
 
-    public void setConstraintLevel(ConstraintLevel constraintLevel) {
-        this.constraintLevel = constraintLevel;
+    public void setContraintLevel(ContraintLevel contraintLevel) {
+        this.contraintLevel = contraintLevel;
     }
 
     public int getPenalty() {

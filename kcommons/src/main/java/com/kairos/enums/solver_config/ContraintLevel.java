@@ -1,19 +1,18 @@
-package com.kairos.enums.constraint;
+package com.kairos.enums.solver_config;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.kairos.enums.solver_config.PlanningType;
 
 /**
  * @author pradeep
  * @date - 20/6/18
  */
 
-public enum ConstraintLevel {
+public enum ContraintLevel {
 
     HARD("Hard"),MEDIUM("Medium"),SOFT("Soft");
 
     private String value;
-    ConstraintLevel(String value) {
+    ContraintLevel(String value) {
         this.value = value;
     }
 
