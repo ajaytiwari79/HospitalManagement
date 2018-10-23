@@ -753,7 +753,7 @@ public class StaffingLevelService extends MongoBaseService {
             ShiftPlanningStaffingLevelDTO staffingLevel = new ShiftPlanningStaffingLevelDTO(sl.getPhaseId(), asLocalDate(sl.getCurrentDate()), sl.getWeekCount(), sl.getStaffingLevelSetting());
             objects = getStaffingLevelInterval(sl.getPresenceStaffingLevelInterval());
             activityIds.addAll((Set<BigInteger>) objects[1]);
-            staffingLevel.setPresenceStaffingLevelInterval((List<StaffingLevelTimeSlotDTO>) objects[0]);
+            staffingLevel.setStaffingLevelInterval((List<StaffingLevelTimeSlotDTO>) objects[0]);
             staffingLevelDtos.add(staffingLevel);
         }
         return new Object[]{staffingLevelDtos, activityIds};

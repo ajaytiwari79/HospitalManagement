@@ -16,8 +16,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-
-
 /*
  * @author: Mohit Shakya
  * @usage: Service operations for planned time type.

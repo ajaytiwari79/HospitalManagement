@@ -98,8 +98,6 @@ import static com.kairos.constants.AppConstants.*;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
 
-
-
 /**
  * Created by pawanmandhan on 17/8/17.
  */
