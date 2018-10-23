@@ -2,8 +2,8 @@ package com.kairos.dto.activity.counter.data;
 
 import com.kairos.dto.activity.counter.chart.DataUnit;
 import com.kairos.dto.activity.counter.enums.ChartType;
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-
 import java.math.BigInteger;
 import java.util.List;
 
@@ -19,11 +19,11 @@ public class RawRepresentationData {
 
     }
 
-    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, String displayUnit, RepresentationUnit unit, List<DataUnit> dataList){
+    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<DataUnit> dataList){
         this.counterId = counterId;
         this.title = title;
         this.chartType = chartType;
-        this.displayUnit = displayUnit;
+        this.displayUnit = displayUnit.getDisplayValue();
         this.unit = unit;
         this.dataList = dataList;
     }

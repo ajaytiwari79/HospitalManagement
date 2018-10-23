@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.unit_position;
 
 
+import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
@@ -307,6 +308,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +
             " return id(positionLine) as id,  case hourlyCost when null then 0.0 else hourlyCost end as hourlyWages")
     List<UnitPositionLinesQueryResult> findFunctionalHourlyWages(List<Long> unitPositionIds);
+
 
 
 }

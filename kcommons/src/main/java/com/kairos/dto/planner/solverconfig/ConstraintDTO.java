@@ -2,7 +2,7 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.solver_config.ConstraintCategory;
+import com.kairos.enums.constraint.ConstraintCategory;
 
 import java.math.BigInteger;
 

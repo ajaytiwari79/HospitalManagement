@@ -24,7 +24,7 @@ public class ShiftPlanningStaffingLevelDTO {
     }
 
     public ShiftPlanningStaffingLevelDTO(BigInteger phaseId, LocalDate currentDate,Integer weekCount,
-                            StaffingLevelSetting staffingLevelSetting) {
+                                         StaffingLevelSetting staffingLevelSetting) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;

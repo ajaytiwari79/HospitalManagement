@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
@@ -228,8 +229,8 @@ public class OrganizationService {
     DayTypeService dayTypeService;
     @Inject
     private AccessPageService accessPageService;
-    //@Inject
-    //private WTAService wtaService;
+    @Inject
+    private CompanyCreationService companyCreationService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
@@ -369,28 +370,23 @@ public class OrganizationService {
         organization.setOrganizationSetting(organizationSetting);
 
         organizationGraphRepository.save(organization);
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+        companyCreationService.setUserInfoInOrganization(organization.getId(),organization,orgDetails.getUnitManager(),false,true,true);
 
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        long creationDate = DateUtil.getCurrentDate().getTime();
+
+        timeSlotService.createDefaultTimeSlots(organization, Collections.EMPTY_LIST);
+        long creationDate = DateUtils.getCurrentDayStartMillis();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
-        creationDate = DateUtil.getCurrentDate().getTime();
+        creationDate = DateUtils.getCurrentDayStartMillis();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         // Create Unit Manager
         orgDetails.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManager().getAccessGroupId()));
         createUnitManager(organization.getId(), orgDetails);
 
-        // DO NOT CREATE PHASE for UNION
-//        if (!orgDetails.getUnion()) {
-//            phaseRestClient.createDefaultPhases(organization.getId());
-//            periodRestClient.createDefaultPeriodSettings(organization.getId());
-//        }
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId(), orgDetails.getUnitManager()));
         organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
@@ -410,7 +406,7 @@ public class OrganizationService {
             return null;
         }
         organizationGraphRepository.save(union);
-        return organizationResponse(union, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId(), null);
+        return organizationResponse(union, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId(), orgDetails.getUnitManager());
     }
 
     private OrganizationResponseDTO organizationResponse(Organization organization, Long organizationTypeId, List<Long> organizationSubTypeId, Long companyCategoryId, UnitManagerDTO unitManagerDTO) {
@@ -454,7 +450,7 @@ public class OrganizationService {
         contactAddressDTO.setRegionName(contactAddress.getRegionName());
         contactAddressDTO.setProvince(contactAddress.getProvince());
         contactAddressDTO.setAddressProtected(contactAddress.isAddressProtected());
-        contactAddressDTO.setStreet1(contactAddress.getStreet());
+        contactAddressDTO.setStreet(contactAddress.getStreet());
         contactAddressDTO.setLatitude(contactAddress.getLatitude());
         contactAddressDTO.setLongitude(contactAddress.getLongitude());
         contactAddressDTO.setZipCodeValue(contactAddress.getZipCode().getZipCode());
@@ -551,7 +547,7 @@ public class OrganizationService {
         organization.setCompanyType(orgDetails.getCompanyType());
         organization.setVatId(orgDetails.getVatId());
         organization.setBoardingCompleted(true);
-
+        organization.setName(orgDetails.getName());
         return organization;
     }
 

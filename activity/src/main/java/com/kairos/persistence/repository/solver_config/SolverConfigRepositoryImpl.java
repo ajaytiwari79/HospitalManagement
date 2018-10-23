@@ -1,3 +1,4 @@
+/*
 package com.kairos.persistence.repository.solver_config;
 
 import com.kairos.persistence.model.solver_config.SolverConfig;
@@ -16,10 +17,12 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.look
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
+*/
 /**
  * @author pradeep
  * @date - 20/6/18
- */
+ *//*
+
 
 public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository {
     @Inject private MongoTemplate mongoTemplate;
@@ -34,7 +37,8 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
     }
 
-    /*@Override
+    */
+/*@Override
     public List<SolverConfigDTO> getAllByUnitId(Long unitId) {
         Aggregation agg = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
@@ -42,7 +46,8 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         );
         AggregationResults< SolverConfigDTO > result =mongoTemplate.aggregate(agg,SolverConfig.class,SolverConfigDTO.class);
         return result.getMappedResults();
-    }*/
+    }*//*
+
 
     public Boolean existsSolverConfigByNameAndUnitId(Long unitId, String name) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
@@ -57,3 +62,4 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
     }
 
 }
+*/
