@@ -46,7 +46,7 @@ public class UnitPosition  extends MongoBaseEntity {
         this.seniorityLevelId = seniorityLevelId;
         this.paidOutFrequencyEnum = paidOutFrequencyEnum;
         this.workingTimeAgreement = workingTimeAgreement;
-        this.kairosId=kairosId;
+        //this.kairosId=kairosId;
         this.staffId=staffId;
     }
 

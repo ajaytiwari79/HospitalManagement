@@ -6,11 +6,10 @@ import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.persistence.model.unit_settings.PhaseSettings;
+import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

@@ -3,7 +3,6 @@ package com.planner.domain.wta.templates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.templates.BreakTemplateValue;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import java.util.List;
 public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
     private List<BreakTemplateValue> breakTemplateValues;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();;
 
 
     public List<BigInteger> getTimeTypeIds() {
@@ -28,17 +27,20 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
+
+
+
+
     public BreaksInShiftWTATemplate(String name,  boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {
         this.name = name;
-        //this.templateType = WTATemplateType.;
         this.disabled = disabled;
         this.description = description;
         this.breakTemplateValues=breakTemplateValues;

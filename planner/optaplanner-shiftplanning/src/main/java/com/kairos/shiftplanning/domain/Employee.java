@@ -1,8 +1,10 @@
 package com.kairos.shiftplanning.domain;
 
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
-import com.kairos.shiftplanning.domain.wta.*;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
+import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
@@ -28,6 +30,8 @@ public class Employee {
     private DateTime prevShiftStart;
     private DateTime prevShiftEnd;
     transient private CollectiveTimeAgreement collectiveTimeAgreement;
+    private Map<java.time.LocalDate,CTAResponseDTO> localDateCTAResponseDTOMap;// added 10-9-2018
+    private Map<java.time.LocalDate,WorkingTimeAgreement> localDateWTAMap;
     private Location location;
     private String name;
     private Set<Skill> skillSet;
@@ -37,6 +41,7 @@ public class Employee {
     private int workingDaysInWeek;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private Long employmentTypeId;
+    private Long unitPositionId;
 
 
     public Employee(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
@@ -50,6 +55,23 @@ public class Employee {
         this.paidOutFrequencyEnum=paidOutFrequencyEnum;
         this.employmentTypeId = employmentTypeId;
     }
+
+    public Map<java.time.LocalDate, CTAResponseDTO> getLocalDateCTAResponseDTOMap() {
+        return localDateCTAResponseDTOMap;
+    }
+
+    public void setLocalDateCTAResponseDTOMap(Map<java.time.LocalDate, CTAResponseDTO> localDateCTAResponseDTOMap) {
+        this.localDateCTAResponseDTOMap = localDateCTAResponseDTOMap;
+    }
+
+    public Map<java.time.LocalDate, WorkingTimeAgreement> getLocalDateWTAMap() {
+        return localDateWTAMap;
+    }
+
+    public void setLocalDateWTAMap(Map<java.time.LocalDate, WorkingTimeAgreement> localDateWTAMap) {
+        this.localDateWTAMap = localDateWTAMap;
+    }
+
     public int getTotalWeeklyMinutes() {
         return totalWeeklyMinutes;
     }
@@ -200,7 +222,13 @@ public class Employee {
     public Employee() {
     }
 
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
 
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
 
     @Override
     public boolean equals(Object o) {

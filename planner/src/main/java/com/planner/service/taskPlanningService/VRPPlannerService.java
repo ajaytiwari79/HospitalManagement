@@ -18,7 +18,7 @@ import com.planner.domain.vrpPlanning.VRPIndictment;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
-import com.planner.service.Client.PlannerRestClient;
+import com.planner.service.rest_client.PlannerRestClient;
 import com.planner.service.vrpService.VRPGeneratorService;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
@@ -52,7 +52,7 @@ public class VRPPlannerService {
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO){
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
         List<File> drlFileList = getDrlFileList(vrpTaskPlanningDTO.getSolverConfig());
-        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath(),vrpTaskPlanningDTO.getSolverConfig().getTerminationTime(),vrpTaskPlanningDTO.getSolverConfig().getNumberOfThread());
+        VrpTaskPlanningSolver solver =null;// new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath(),vrpTaskPlanningDTO.getSolverConfig().getTerminationTime(),vrpTaskPlanningDTO.getSolverConfig().getNumberOfThread());
         runningSolversPerProblem.put(solution.getSolverConfigId().toString(),solver);
         Object[] solutionAndIndictment=solver.solveProblemOnRequest(solution);
         runningSolversPerProblem.remove(solution.getSolverConfigId().toString());
@@ -62,11 +62,11 @@ public class VRPPlannerService {
         Map<Object,Indictment> indictment = (Map<Object,Indictment>)solutionAndIndictment[1];
         Object[] solvedTasks = getSolvedTasks(solution.getShifts(), indictment);
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
-        vrpPlanningSolution.setId(solution.getId());
+        //vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
-        if(!solver.isTerminateEarly()){
+        /*if(!solver.isTerminateEarly()){
             plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
-        }
+        }*/
     }
 
     private void saveIndictment(BigInteger solverConfigId, Collection<ConstraintMatchTotal> constraintMatchTotals){
@@ -120,12 +120,12 @@ public class VRPPlannerService {
         try{
         Map<String, File> fileMap = Arrays.asList(new File(appConfig.getDroolFilePath()).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
         drlFiles.add(fileMap.get(AppConstants.DROOL_BASE_FILE));
-        for (ConstraintValueDTO constraintValueDTO : solverConfigDTO.getConstraints()) {
+       /* for (ConstraintValueDTO constraintValueDTO : solverConfigDTO.getConstraints()) {
             if (fileMap.containsKey(constraintValueDTO.getName())) {
                 drlFiles.add(fileMap.get(constraintValueDTO.getName()));
             }
             ;
-        }
+        }*/
         }catch(Exception e){
             e.printStackTrace();
             log.error("Continuing with no drls.");
