@@ -55,7 +55,7 @@ public class TimeBankController {
     @GetMapping(value = "overview/unit_position/{unitEmploymentId}/")
     public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam Integer year) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getOverviewTimeBank
-                (unitEmploymentId,year));
+                (unitId,unitEmploymentId,year));
     }
 
     @GetMapping(value = "visual_view/unit_position/{unitPositionId}")
