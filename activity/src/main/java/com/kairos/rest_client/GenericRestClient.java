@@ -26,8 +26,7 @@ import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
-import static org.apache.commons.codec.Charsets.UTF_16;
-import static org.apache.commons.codec.Charsets.UTF_8;
+import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrlWithoutParentOrganization;
 
 @Service
 public class GenericRestClient {
@@ -37,7 +36,7 @@ public class GenericRestClient {
     RestTemplate restTemplate;
     @Inject
     private ExceptionService exceptionService;
-    @Inject
+    @Autowired
     @Qualifier("restTemplateWithoutAuth")
     private RestTemplate schedulerRestTemplate;
 
@@ -59,7 +58,7 @@ public class GenericRestClient {
      * @date 12-10-2018
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
         String url = baseUrl +getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
@@ -96,7 +95,7 @@ public class GenericRestClient {
      * @DESC   PLEASE USE  when you dont need parent organization in URL
      */
     public <T extends Object, V> V publishRequestWithoutParentOrganization(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        final String baseUrl = getUserServiceBaseUrlWithoutParentOrganization(restClientUrlType, id) + uri;
         String url = baseUrl +getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
@@ -132,7 +131,7 @@ public class GenericRestClient {
      * @date 12-10-2018
      */
     public <T extends Object, V> V publishRequestWithoutAuth(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
         String url = baseUrl + getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =

@@ -25,7 +25,7 @@ public class VrpTaskPlanningDTO {
     }
 
     public VrpTaskPlanningDTO(SolverConfigDTO solverConfig, List<ShiftDTO> shifts, List<EmployeeDTO> employees, List<TaskDTO> tasks,List<TaskDTO> drivingTimeList,List<TaskDTO> escalatedTaskList) {
-        this.solverConfig = solverConfig;
+       this.solverConfig = solverConfig;
         this.shifts = shifts;
         this.employees = employees;
         this.tasks = tasks;

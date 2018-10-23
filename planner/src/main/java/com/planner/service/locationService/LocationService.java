@@ -82,7 +82,7 @@ public class LocationService {
         saveList(planningLocations);
     }
 
-    public boolean saveLocationDistances() {
+   /* public boolean saveLocationDistances() {
         List<PlanningLocation> planningLocations = planningLocationRepository.findAll();
         List<LocationDistance> locationDistances = getAllLocationDistances();
         List<LocationDistance> updatedLocationDistances = graphHopperService.getLocationDistances(planningLocations, locationDistances);
@@ -96,7 +96,7 @@ public class LocationService {
         List<LocationDistance> updatedLocationDistances = graphHopperService.getLocationDistancesByPlanningLocation(planningLocation, locationDistances);
         locationRepository.saveAll(updatedLocationDistances);
         return true;
-    }
+    }*/
 
 
     public List<LocationDistance> getAllLocationDistances() {
@@ -123,7 +123,7 @@ public class LocationService {
     }*/
 
     public void update(PlanningLocation planningLocation){
-        PlanningLocation planningLocation1 = findOne(planningLocation.getId());
+        PlanningLocation planningLocation1 = findOne(planningLocation.getId().toString());
         planningLocation1.setCity(planningLocation.getCity());
         planningLocation1.setCountry(planningLocation.getCountry());
         planningLocation1.setDistrict(planningLocation.getDistrict());
@@ -138,7 +138,7 @@ public class LocationService {
     public void updateList(List<PlanningLocation> planningLocations){
         List<PlanningLocation> updatedPlanningLocation = new ArrayList<>();
         for (PlanningLocation planningLocation:planningLocations) {
-            PlanningLocation planningLocation1 = findOne(planningLocation.getId());
+            PlanningLocation planningLocation1 = findOne(planningLocation.getId().toString());
             planningLocation1.setCity(planningLocation.getCity());
             planningLocation1.setCountry(planningLocation.getCountry());
             planningLocation1.setDistrict(planningLocation.getDistrict());

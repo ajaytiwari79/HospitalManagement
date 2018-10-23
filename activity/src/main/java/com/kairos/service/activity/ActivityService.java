@@ -375,7 +375,7 @@ public class ActivityService extends MongoBaseService {
         //updating activity category based on time type
         Long countryId = activity.getCountryId();
         if (countryId == null)
-            countryId = organizationRestClient.getCountryIdOfOrganization(activity.getUnitId());
+            countryId = genericIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
 
         updateActivityCategory(activity, countryId);
         save(activity);
@@ -452,7 +452,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
-        List<DayType> dayTypes = organizationRestClient.getDayTypesByCountryId(countryId);
+        List<DayType> dayTypes = genericIntegrationService.getDayTypesByCountryId(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
         List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();
@@ -696,7 +696,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
 
-        boolean isSuccess = organizationRestClient.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
+        boolean isSuccess = genericIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
         if (!isSuccess) {
             exceptionService.dataNotFoundException("message.parameters.incorrect");
         }
@@ -733,7 +733,7 @@ public class ActivityService extends MongoBaseService {
 
 
     public ActivityWithUnitIdDTO getActivityByUnitId(long unitId, String type) {
-        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = organizationRestClient.getOrganizationTypeAndSubTypeByUnitId(unitId, type);
+        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = genericIntegrationService.getOrganizationTypeAndSubTypeByUnitId(unitId, type);
 
         ActivityWithUnitIdDTO activityWithUnitIdDTO = new ActivityWithUnitIdDTO();
         if (!organizationTypeAndSubTypeDTO.isParent()) {
@@ -792,7 +792,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
-        List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(unitId);
         LocalDate date = LocalDate.now();
         int year = date.getYear();
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();

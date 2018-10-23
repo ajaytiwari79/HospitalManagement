@@ -12,6 +12,7 @@ import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -46,7 +47,7 @@ public class WTAOrganizationService extends MongoBaseService {
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
-    @Inject private OrganizationRestClient organizationRestClient;
+    @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private RuleTemplateService ruleTemplateService;
     @Inject private WTABuilderService wtaBuilderService;
     @Inject private ExceptionService exceptionService;
@@ -55,7 +56,7 @@ public class WTAOrganizationService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
-        OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
+        OrganizationDTO organization = genericIntegrationService.getOrganization();
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
         }
@@ -92,7 +93,7 @@ public class WTAOrganizationService extends MongoBaseService {
             logger.info("Expertise cant be changed at unit level :", wtaId);
             exceptionService.actionNotPermittedException("message.expertise.unitlevel.update",wtaId);
         }
-        OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
+        OrganizationDTO organization = genericIntegrationService.getOrganization();
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
         }
