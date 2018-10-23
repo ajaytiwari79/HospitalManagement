@@ -33,7 +33,6 @@ public class CommonsExceptionUtil {
         throw new ActionNotPermittedException(convertMessage(message, params));
     }
 
-
     public void invalidRequestException(String message, Object... params) {
         throw new InvalidRequestException(convertMessage(message, params));
     }
@@ -49,7 +48,6 @@ public class CommonsExceptionUtil {
         throw new IllegalArgumentException(convertMessage(message, params));
     }
 
-
     public void dataNotMatchedException(String message,Object... params) {
         throw new DataNotMatchedException(convertMessage(message, params));
     }
@@ -59,9 +57,6 @@ public class CommonsExceptionUtil {
     public void runtimeException(String message,Object... params) {
         throw new RuntimeException(convertMessage(message, params));
     }
-
-
-
 
     public void internalServerError(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
