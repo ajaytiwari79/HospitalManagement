@@ -45,7 +45,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<Map<String, Object>> getAccessPageHierarchy(long accessGroupId);
 
 
-    // Fetch access page hierarchyBalance show only selected access page
+    // Fetch access page hierarchy show only selected access page
     @Query("match (ag:AccessGroup) where id(ag)={0} WITH ag \n" +
             "MATCH path=(accessPage:AccessPage{active:true})-[:SUB_PAGE*]->(subPage:AccessPage{active:true})-[:HAS_ACCESS_OF_TABS]-(ag) \n" +
             "WITH NODES(path) AS np,ag WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs,ag UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps,ag with ps,ag\n" +

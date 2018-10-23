@@ -55,7 +55,7 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/organization_types/hierarchyBalance", method = RequestMethod.POST)
+    @RequestMapping(value = COUNTRY_URL + "/organization_types/hierarchy", method = RequestMethod.POST)
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationTypeHierarchy(@PathVariable long countryId,
                                                                             @RequestBody Set<Long> orgTypeIds) {
