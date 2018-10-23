@@ -33,6 +33,8 @@ public class ShiftActivity {
 
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
+    public ShiftActivity() {
+    }
 
 
     public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
@@ -65,8 +67,6 @@ public class ShiftActivity {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public ShiftActivity() {
-    }
 
     public Set<ShiftStatus> getStatus() {
         return status;

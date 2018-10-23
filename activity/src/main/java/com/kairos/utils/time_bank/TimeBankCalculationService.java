@@ -108,10 +108,11 @@ public class TimeBankCalculationService {
         DailyTimeBankEntry dailyTimeBank = null;
         if (CollectionUtils.isNotEmpty(shifts)) {
             StaffUnitPositionDetails ctaDto = staffAdditionalInfoDTO.getUnitPosition();
+            int totalWeeklyMinutes = ctaDto.getTotalWeeklyMinutes()+(ctaDto.getTotalWeeklyHours()*60);
             dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(ctaDto.getId()+""+DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate())));
             int totalDailyTimebank = 0;
             int dailyScheduledMin = 0;
-            int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? ctaDto.getTotalWeeklyMinutes() / ctaDto.getWorkingDaysInWeek() : 0;
+            int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? totalWeeklyMinutes / ctaDto.getWorkingDaysInWeek() : 0;
             Map<BigInteger, Integer> ctaTimeBankMinMap = new HashMap<>();
             for (ShiftWithActivityDTO shift : shifts) {
                 for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
@@ -373,7 +374,8 @@ public class TimeBankCalculationService {
         timeBankDTO.setStaffId(unitPositionWithCtaDetailsDTO.getStaffId());
         timeBankDTO.setWorkingDaysInWeek(unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
         timeBankDTO.setUnitPositionId(unitPositionWithCtaDetailsDTO.getId());
-        timeBankDTO.setTotalWeeklyMin(unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes());
+        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes()+(unitPositionWithCtaDetailsDTO.getTotalWeeklyHours()*60);
+        timeBankDTO.setTotalWeeklyMin(totalWeeklyMinutes);
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = getTimeBankIntervals(totalTimeBankBeforeStartDate, query, intervals, shiftsintervalMap, timeBanksIntervalMap, timeTypeDTOS, unitPositionWithCtaDetailsDTO, payoutTransactionIntervalMap);
         timeBankDTO.setTimeIntervals(timeBankIntervalDTOS);
         List<CTADistributionDTO> timeBankCTADistributions = timeBankIntervalDTOS.stream().flatMap(ti -> ti.getTimeBankDistribution().getChildren().stream()).collect(Collectors.toList());
@@ -551,6 +553,7 @@ public class TimeBankCalculationService {
      */
     public int calculateTimeBankForInterval(Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, boolean isByOverView, List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
         List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
+        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes()+(unitPositionWithCtaDetailsDTO.getTotalWeeklyHours()*60);
         if (!calculateContractual) {
             dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d -> DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toList());
         }
@@ -569,7 +572,7 @@ public class TimeBankCalculationService {
                     }
                     interval = interval.withStart(interval.getStart().plusDays(1));
                 }
-                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
+                contractualMinutes = count * (totalWeeklyMinutes / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
             } else {
                 DateTime startDate = interval.getStart();
                 while (startDate.isBefore(interval.getEnd())) {
@@ -578,7 +581,7 @@ public class TimeBankCalculationService {
                     }
                     startDate = startDate.plusDays(1);
                 }
-                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
+                contractualMinutes = count * (totalWeeklyMinutes / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
             }
         }
         return contractualMinutes;

@@ -6,22 +6,23 @@ import java.util.List;
 
 @QueryResult
 public class OrgTypeQueryResult {
-    private Long orgTypeId;
-    private List<Long> unitIds;
+    private List<Long> orgTypeIds;
+    private Long unitId;
 
-    public Long getOrgTypeId() {
-        return orgTypeId;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setOrgTypeId(Long orgTypeId) {
-        this.orgTypeId = orgTypeId;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
-    public List<Long> getUnitIds() {
-        return unitIds;
+    public List<Long> getOrgTypeIds() {
+
+        return orgTypeIds;
     }
 
-    public void setUnitIds(List<Long> unitIds) {
-        this.unitIds = unitIds;
+    public void setOrgTypeIds(List<Long> orgTypeIds) {
+        this.orgTypeIds = orgTypeIds;
     }
 }

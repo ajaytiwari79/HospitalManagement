@@ -47,6 +47,38 @@ public class UnitPositionLine extends UserBaseEntity {
 
     }
 
+    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    public void setFunctions(List<Function> functions) {
+        this.functions = functions;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
+
+    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+    }
+
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
+    }
+
+    public void setHourlyWages(float hourlyWages) {
+        this.hourlyWages = hourlyWages;
+    }
+
     public SeniorityLevel getSeniorityLevel() {
         return seniorityLevel;
     }

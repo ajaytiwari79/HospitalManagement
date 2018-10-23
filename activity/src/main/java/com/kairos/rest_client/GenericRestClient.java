@@ -59,7 +59,7 @@ public class GenericRestClient {
      * @date 12-10-2018
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;
         String url = baseUrl +getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
@@ -97,7 +97,7 @@ public class GenericRestClient {
      * @date 12-10-2018
      */
     public <T extends Object, V> V publishRequestWithoutAuth(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;
         String url = baseUrl + getURIWithParam(queryParam);
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =

@@ -41,9 +41,14 @@ db.agreement_template.renameCollection("policyAgreementTemplate");
 
 
 
+MATCH p=()-[r:HAS_EMPLOYMENT_TYPE]->()  where NOT exists(r.employmentTypeCategory)
+set r.employmentTypeCategory="PERMANENT"
+
+
 
 // To update existing Activity reminder setting tab
 
 db.activities.updateMany({},{$set:{"communicationActivityTab" : { "allowCommunicationReminder" : false, "notifyAfterDeleteActivity" : true, "activityReminderSettings" : [] }}});
+
 
 

@@ -68,6 +68,13 @@ public class AssessmentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
     }
 
+    @ApiOperation(value = "delete Assessment by id")
+    @DeleteMapping("/assessment/{assessmentId}")
+    public ResponseEntity<Object> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.deleteAssessmentbyId(unitId,assessmentId));
+    }
+
+
     @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
     public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {

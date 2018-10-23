@@ -71,6 +71,8 @@ public class GenericIntegrationService {
     GenericRestClient genericRestClient;
     @Inject
     ExceptionService exceptionService;
+    @Inject
+    private UserRestClientForScheduler userRestClientForScheduler;
 
     public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId, Long dateInMillis) {
         BasicNameValuePair basicNameValuePair = new BasicNameValuePair("dateInMillis", dateInMillis.toString());
@@ -612,6 +614,7 @@ public class GenericIntegrationService {
         });
     }
 
+
     public OrganizationSkillAndOrganizationTypesDTO getOrganizationSkillOrganizationSubTypeByUnitId(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SKILL_ORG_TYPES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationSkillAndOrganizationTypesDTO>>() {
         });
@@ -648,5 +651,16 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, TEAM_ORGANIZATION_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, teamId);
     }
+
+    public String getTimezone() {
+        return userRestClientForScheduler.publishRequest(null,2567L,RestClientUrlType.UNIT,HttpMethod.GET,"/time_zone",null,new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
+        });
+    }
+    public StaffDTO getStaff(Long unitId,Long staffId) {
+        return userRestClientForScheduler.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<StaffDTO>>() {
+        }, staffId);
+    }
+
+
 }
 
