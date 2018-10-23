@@ -5,7 +5,7 @@ import com.kairos.dto.planner.solverconfig.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.DefaultContraintsDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigConstraintWrapper;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.enums.solver_config.ConstraintCategory;
+import com.kairos.enums.constraint.ConstraintCategory;
 import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 import com.kairos.persistence.model.solver_config.Constraint;

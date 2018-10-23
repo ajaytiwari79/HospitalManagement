@@ -2,7 +2,7 @@ package com.planner.service.constraint_service;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.constarints.ConstraintDTO;
-import com.planner.domain.constarints.Constraint;
+import com.planner.domain.common.constarint.Constraint;
 import com.planner.repository.constraints.ConstraintsRepository;
 import org.springframework.stereotype.Service;
 

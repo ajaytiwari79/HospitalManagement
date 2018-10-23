@@ -1,6 +1,7 @@
-package com.kairos.enums.solver_config;
+package com.kairos.enums.constraint;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.kairos.enums.solver_config.PlanningType;
 
 /**
  * @author pradeep

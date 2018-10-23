@@ -2,8 +2,8 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.solver_config.ConstraintCategory;
-import com.kairos.enums.solver_config.ContraintLevel;
+import com.kairos.enums.constraint.ConstraintCategory;
+import com.kairos.enums.constraint.ConstraintLevel;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -22,7 +22,7 @@ public class ConstraintValueDTO {
     private String description;
     private ConstraintCategory category;
 
-    private ContraintLevel level;
+    private ConstraintLevel level;
     //it is used for current constraint belongs to which level no in bendableScore like (hard[0],soft[1]).
     private Integer levelNo;
     //it is used for current constraint break how much in no. (like -10,-20) if it is static.
@@ -59,11 +59,11 @@ public class ConstraintValueDTO {
         this.id = id;
     }
 
-    public ContraintLevel getLevel() {
+    public ConstraintLevel getLevel() {
         return level;
     }
 
-    public void setLevel(ContraintLevel level) {
+    public void setLevel(ConstraintLevel level) {
         this.level = level;
     }
 

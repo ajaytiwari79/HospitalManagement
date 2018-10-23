@@ -1,12 +1,16 @@
-package com.kairos.dto.planner.constarints;
+package com.planner.domain.common.constarint;
 
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ConstraintLevel;
+import com.planner.domain.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
-public class ConstraintDTO {
+@Document
+public class Constraint extends MongoBaseEntity{
+
     //~
     protected BigInteger id;
     protected String name;
