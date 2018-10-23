@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.persistence.model.activity.PlannedTimeType;
-import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

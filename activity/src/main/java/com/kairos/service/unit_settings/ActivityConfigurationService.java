@@ -1,6 +1,6 @@
 package com.kairos.service.unit_settings;
 
-import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;

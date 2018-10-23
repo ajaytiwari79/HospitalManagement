@@ -3,7 +3,7 @@ package com.kairos.service.expertise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
-import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.user.country.experties.*;
 import com.kairos.enums.IntegrationOperation;

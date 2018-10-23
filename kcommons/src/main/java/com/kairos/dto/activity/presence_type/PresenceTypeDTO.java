@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.planned_time_type;
+package com.kairos.dto.activity.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

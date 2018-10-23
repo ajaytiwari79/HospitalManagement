@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
-import com.kairos.dto.activity.planned_time_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
