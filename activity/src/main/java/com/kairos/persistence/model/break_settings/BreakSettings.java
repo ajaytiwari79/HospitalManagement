@@ -17,11 +17,12 @@ public class BreakSettings extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public BreakSettings(Long countryId, Long shiftDurationInMinute, Long breakDurationInMinute, Long expertiseId) {
+    public BreakSettings(Long countryId, Long shiftDurationInMinute, Long breakDurationInMinute, Long expertiseId,BigInteger activityId) {
         this.countryId = countryId;
         this.shiftDurationInMinute = shiftDurationInMinute;
         this.breakDurationInMinute = breakDurationInMinute;
         this.expertiseId = expertiseId;
+        this.activityId=activityId;
     }
 
     public Long getCountryId() {

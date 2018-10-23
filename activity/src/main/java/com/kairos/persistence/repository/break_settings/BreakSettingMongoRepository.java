@@ -21,6 +21,6 @@ public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSe
     List<BreakSettings> findAllByDeletedFalseAndExpertiseIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(Long expertiseId, Long shiftDurationInMinute);
 
     @Query("")
-    List<BreakSettings> findAllByUnitIdAndDeletedFalseOrderByCreatedAtAsc(Long unitId);
+    List<BreakSettings> findAllByDeletedFalseOrderByCreatedAtAsc(Long unitId);
 
 }

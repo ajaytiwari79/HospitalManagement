@@ -22,10 +22,21 @@ public class TimeType extends MongoBaseEntity{
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
     private BreakPaymentSetting breakPaymentSetting;
+    public TimeType() {}
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
         this.label = label;
         this.description = description;
+    }
+
+
+
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor) {
+        this.timeTypes = timeTypes;
+        this.label = label;
+        this.description = description;
+        this.backgroundColor=backgroundColor;
+        this.leafNode = true;
     }
 
     public Long getCountryId() {
@@ -34,16 +45,6 @@ public class TimeType extends MongoBaseEntity{
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
-    }
-
-    public TimeType() {}
-
-    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor) {
-        this.timeTypes = timeTypes;
-        this.label = label;
-        this.description = description;
-        this.backgroundColor=backgroundColor;
-        this.leafNode = true;
     }
 
 

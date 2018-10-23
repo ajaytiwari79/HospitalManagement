@@ -26,26 +26,26 @@ public class BreakSettingsController {
     private BreakSettingsService breakSettingsService;
 
     @ApiOperation("Create break settings ")
-    @PostMapping(value = "/break")
+    @PostMapping()
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long countryId, @PathVariable Long expertiseId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, breakSettingsService.createBreakSettings(countryId,expertiseId, breakSettingsDTO));
     }
 
     @ApiOperation("Get all break settings ")
-    @GetMapping(value = "/break")
+    @GetMapping()
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getBreakSettings(@PathVariable Long countryId,@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, breakSettingsService.getBreakSettings(countryId,expertiseId));
     }
 
     @ApiOperation("Get remove a particular break settings from unit")
-    @DeleteMapping(value = "/break/{breakSettingsId}")
+    @DeleteMapping(value = "/{breakSettingsId}")
     public ResponseEntity<Map<String, Object>> deleteBreakSettings(@PathVariable BigInteger breakSettingsId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,breakSettingsService.removeBreakSettings(breakSettingsId));
     }
     @ApiOperation("update a particular break settings for unit")
-    @PutMapping(value = "/break/{breakSettingsId}")
+    @PutMapping(value = "/{breakSettingsId}")
     public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,@PathVariable BigInteger breakSettingsId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true,breakSettingsService.updateBreakSettings(countryId,expertiseId,breakSettingsId,breakSettingsDTO));
     }

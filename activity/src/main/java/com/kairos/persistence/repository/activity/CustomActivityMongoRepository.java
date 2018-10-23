@@ -73,6 +73,6 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds);
     List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId);
-    List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(long countryId, BreakPaymentSetting breakPaymentSetting);
+    List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId,List<BigInteger> timeTypeIds);
 
 }

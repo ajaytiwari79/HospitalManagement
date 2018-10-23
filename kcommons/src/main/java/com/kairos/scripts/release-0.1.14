@@ -1,0 +1,5 @@
+
+ACTIVITY
+
+db.time_Type.update({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
+db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
