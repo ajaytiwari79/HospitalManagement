@@ -365,7 +365,7 @@ public class TimeBankCalculationService {
      * @param payOutTransactions
      * @return TimeBankAndPayoutDTO
      */
-    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId,long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS, List<PayOut> payOuts, List<PayOutTransaction> payOutTransactions) {
+    public TimeBankAndPayoutDTO getTimeBankAdvanceView(Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS, List<PayOut> payOuts, List<PayOutTransaction> payOutTransactions) {
         TimeBankDTO timeBankDTO = new TimeBankDTO();
         timeBankDTO.setCostTimeAgreement(unitPositionWithCtaDetailsDTO);
         timeBankDTO.setStartDate(startDate);
@@ -479,7 +479,7 @@ public class TimeBankCalculationService {
      * @param unitPositionWithCtaDetailsDTO
      * @return TimeBankDTO
      */
-    public TimeBankDTO getOverviewTimeBank(Long unitId,Long unitEmployementPositionId, DateTime startDate, DateTime lastDateTimeOfYear, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+    public TimeBankDTO getTimeBankOverview(Long unitId, Long unitEmployementPositionId, DateTime startDate, DateTime lastDateTimeOfYear, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<Interval> weeklyIntervals = getWeeklyIntervals(startDate, lastDateTimeOfYear);
         List<Interval> monthlyIntervals = getMonthlyIntervals(startDate, lastDateTimeOfYear);
         Map<Interval, List<DailyTimeBankEntry>> weeklyIntervalTimeBankMap = getTimebankIntervalsMap(weeklyIntervals, dailyTimeBankEntries);
