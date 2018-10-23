@@ -116,7 +116,6 @@ public class AttendanceSettingService extends MongoBaseService {
                 if (attendanceSetting == null) {
                     return (attendanceDTO!=null)?attendanceDTO:new AttendanceDTO(unitIdAndNames,reasonCodes);
                 }
-                checkOutBySchedulerJob(unitId);
             }
         }else{
             shift=shifts.stream().filter(shift1 -> shift1.getAttendanceDuration()!=null&&shift1.getAttendanceDuration().getFrom()!=null&&shift1.getAttendanceDuration().getTo()==null).findAny().orElse(null);
@@ -227,7 +226,7 @@ public class AttendanceSettingService extends MongoBaseService {
     public void checkOutBySchedulerJob(Long unitId){
         List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(DateUtils.asDate(DateUtils.getCurrentLocalDate().minusDays(1)),DateUtils.getDate(),unitId);
         Map<BigInteger,Shift> shiftIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
-        List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.getCurrentLocalDate());
+        List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getCurrentLocalDate()));
         return;
     }
 }
