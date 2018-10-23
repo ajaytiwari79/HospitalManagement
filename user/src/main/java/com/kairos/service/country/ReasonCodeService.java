@@ -137,15 +137,15 @@ public class ReasonCodeService {
 
    public void createDefalutDateForUnit(Organization organization,long countryId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
-       createDefaultDate(reasonCodeResponseDTO,organization);
+       createDefaultData(reasonCodeResponseDTO,organization);
    }
 
     public void createDefalutDateForSubUnit(Organization organization,long parentId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
-        createDefaultDate(reasonCodeResponseDTO,organization);
+        createDefaultData(reasonCodeResponseDTO,organization);
     }
 
-   public void createDefaultDate(List<ReasonCodeResponseDTO> reasonCodeResponseDTO,Organization organization){
+   public void createDefaultData(List<ReasonCodeResponseDTO> reasonCodeResponseDTO, Organization organization){
        if(!reasonCodeResponseDTO.isEmpty()){
        List<ReasonCode> reasonCodes=new ArrayList<>();
        reasonCodeResponseDTO.forEach(reasonCode->{
