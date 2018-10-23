@@ -72,7 +72,7 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitId(long unitId, ReasonCodeType reasonCodeType){
-        return reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId,reasonCodeType);
+        return reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId,reasonCodeType);
     }
 
     public ReasonCodeResponseDTO updateReasonCodeForCountry(long countryId, ReasonCodeDTO reasonCodeDTO){
