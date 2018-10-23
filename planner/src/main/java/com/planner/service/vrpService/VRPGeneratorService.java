@@ -1,15 +1,14 @@
 package com.planner.service.vrpService;
 
-import com.kairos.planner.vrp.taskplanning.model.*;
-import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.ShiftDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.planner.domain.solverconfig.SolverConfig;
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
+import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.tomtomResponse.Matrix;
-import com.planner.service.config.SolverConfigService;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;
 import com.planner.service.tomtomService.TomTomService;
@@ -31,7 +30,7 @@ public class VRPGeneratorService {
     @Autowired private TaskService taskService;
     @Autowired private EmployeeService employeeService;
     @Autowired private TomTomService tomTomService;
-    @Autowired private SolverConfigService solverConfigService;
+    //@Autowired private SolverConfigService solverConfigService;
 
     public VrpTaskPlanningSolution writeToJson(){
         VrpTaskPlanningSolution solution = new VrpTaskPlanningSolution();
@@ -95,8 +94,8 @@ public class VRPGeneratorService {
         List<Employee> employees = (List<Employee>)objects[1];
         problem.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
 
-        SolverConfig solverConfig = solverConfigService.getSolverConfigByDTO(vrpTaskPlanningDTO.getSolverConfig());
-        problem.setConstraint(solverConfig.getConstraint());
+        SolverConfig solverConfig = null;//solverConfigService.getSolverConfigByDTO(vrpTaskPlanningDTO.getSolverConfig());
+        //problem.setConstraint(solverConfig.getConstraint());
         problem.setTasks(tasks);
         Map<LocationPair,Boolean> onArriveSideMatrix=tomTomService.getOnArriveSideMatrix();
         LocationsRouteMatrix locationsRouteMatrix = new LocationsRouteMatrix(onArriveSideMatrix);

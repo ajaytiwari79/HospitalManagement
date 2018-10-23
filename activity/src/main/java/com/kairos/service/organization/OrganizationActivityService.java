@@ -1,7 +1,5 @@
 package com.kairos.service.organization;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
@@ -11,13 +9,11 @@ import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
@@ -25,8 +21,6 @@ import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -68,7 +62,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 

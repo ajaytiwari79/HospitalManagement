@@ -1,9 +1,10 @@
 package com.planner.domain.wta.templates;
 
-import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.dto.activity.wta.AgeRange;
-import com.planner.domain.wta.WTABaseRuleTemplate;
+import com.kairos.enums.wta.WTATemplateType;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -11,11 +12,21 @@ import java.util.List;
  */
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
-    private List<Long> activitieIds;
-    private long validationStartDateMillis;
+    private List<BigInteger> activityIds;
+    private LocalDate validationStartDate;
     private Long numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    private float recommendedValue;
 
     public boolean isCarryForwardLeave() {
         return carryForwardLeave;
@@ -38,15 +49,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         //Default Constructor
     }
 
-    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds,
-                                        long validationStartDateMillis, Long numberOfWeeks) {
-        super(name , description);
-        this.disabled=disabled;
-        this.ageRange = ageRange;
-        this.activitieIds = activitieIds;
-        this.validationStartDateMillis = validationStartDateMillis;
-        this.numberOfWeeks = numberOfWeeks;
-    }
 
     public List<AgeRange> getAgeRange() {
         return ageRange;
@@ -56,20 +58,20 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         this.ageRange = ageRange;
     }
 
-    public List<Long> getActivitieIds() {
-        return activitieIds;
+    public List<BigInteger> getActivityIds() {
+        return activityIds;
     }
 
-    public void setActivitieIds(List<Long> activitieIds) {
-        this.activitieIds = activitieIds;
+    public void setActivityIds(List<BigInteger> activityIds) {
+        this.activityIds = activityIds;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public Long getNumberOfWeeks() {

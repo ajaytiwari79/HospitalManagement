@@ -3,8 +3,7 @@ package com.planner.domain.vrpPlanning;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.vrp.taskplanning.model.Employee;
-import com.kairos.planner.vrp.taskplanning.model.Shift;
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 import com.planner.domain.staff.PlanningShift;
 import com.planner.domain.task.Task;
 

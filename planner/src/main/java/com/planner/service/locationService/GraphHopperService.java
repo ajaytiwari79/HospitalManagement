@@ -23,7 +23,7 @@ import com.planner.domain.location.LocationDistance;
 @Service
 public class GraphHopperService {
 
-    private static Logger log = LoggerFactory.getLogger(GraphHopperService.class);
+ /*   private static Logger log = LoggerFactory.getLogger(GraphHopperService.class);
 
     @Autowired
     private AppConfig appConfig;
@@ -63,9 +63,9 @@ public class GraphHopperService {
         return locationDistances;
     }
 
-    /***
+    *//***
      * this function gives distance By car
-     */
+     *//*
 
     public void getRoute() {
         RoutingApi routing = new RoutingApi();
@@ -96,9 +96,9 @@ public class GraphHopperService {
 
     public List<LocationDistance> getLocationDistances(List<PlanningLocation> planningLocations, List<LocationDistance> locationDistances) {
         List<LocationDistance> updatedLocationDistances = new ArrayList<>();
-        /*if(locationDistances.size()==0){
+        *//*if(locationDistances.size()==0){
             updatedLocationDistances = getInitialLocationDistance(planningLocations);
-		}*/
+		}*//*
         Map<String, LocationDistance> locationDistancesMap = getLocationDistanceMap(locationDistances);
         for (PlanningLocation planningLocation1 : planningLocations) {
             for (PlanningLocation planningLocation2 : planningLocations) {
@@ -148,9 +148,9 @@ public class GraphHopperService {
     }
 
 
-    /***
+    *//***
      * this function gives distance By car
-     */
+     *//*
 
     public List<LocationDistance> getLocationDistancesByPlanningLocation(PlanningLocation planningLocation, List<LocationDistance> locationDistances) {
         Map<String, LocationDistance> locationDistancesMap = getLocationDistanceMap(locationDistances);
@@ -233,5 +233,5 @@ public class GraphHopperService {
         }
         return allPoints;
     }
-
+*/
 }
