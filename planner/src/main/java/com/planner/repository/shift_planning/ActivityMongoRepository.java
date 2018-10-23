@@ -3,7 +3,8 @@ package com.planner.repository.shift_planning;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+
+import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;

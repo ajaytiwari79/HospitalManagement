@@ -3,9 +3,11 @@ package com.planner.service.shift_planning;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
+
+import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.Employee;

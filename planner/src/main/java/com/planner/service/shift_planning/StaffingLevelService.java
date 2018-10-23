@@ -1,8 +1,9 @@
 package com.planner.service.shift_planning;
 
-import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

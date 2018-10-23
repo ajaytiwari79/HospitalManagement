@@ -1,8 +1,10 @@
-package com.kairos.dto.activity.staffing_level;
+package com.kairos.dto.planner.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -17,13 +19,13 @@ public class ShiftPlanningStaffingLevelDTO {
     private LocalDate currentDate;
     private Integer weekCount;
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelTimeSlotDTO> staffingLevelInterval=new ArrayList<>();
+    private List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval=new ArrayList<>();
 
     public ShiftPlanningStaffingLevelDTO() {
         //default constructor
     }
 
-    public ShiftPlanningStaffingLevelDTO(BigInteger phaseId, LocalDate currentDate,Integer weekCount,
+    public ShiftPlanningStaffingLevelDTO(BigInteger phaseId, LocalDate currentDate, Integer weekCount,
                                          StaffingLevelSetting staffingLevelSetting) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
@@ -71,11 +73,11 @@ public class ShiftPlanningStaffingLevelDTO {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public List<StaffingLevelTimeSlotDTO> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+    public List<StaffingLevelTimeSlotDTO> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 }
