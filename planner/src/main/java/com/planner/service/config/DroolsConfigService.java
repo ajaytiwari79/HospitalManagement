@@ -103,9 +103,9 @@ public class DroolsConfigService {
         return condition;
     }
 
-    /*because of we use hard and soft constraints so thats why
-    we add use upper level of soft constraints as a medium
-    constraints because of this we use medium level for it*/
+    /*because of we use hard and soft constraint so thats why
+    we add use upper level of soft constraint as a medium
+    constraint because of this we use medium level for it*/
     private String getContraintWithLevel(ConstraintDTO constraintDTO, int mediumLevel, int totalLevel) {
         if (totalLevel == 3) {
             if(constraintDTO.getLevel().equals(StaticField.HARD)){

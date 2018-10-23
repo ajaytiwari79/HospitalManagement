@@ -2,17 +2,17 @@ package com.planner.service.solverconfiguration;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.planner.country.solverconfig.CountrySolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
-import com.planner.domain.common.solverconfig.SolverConfig;
-import com.planner.domain.country.solverconfig.CountrySolverConfig;
-import com.planner.domain.organization.solverconfig.OrganizationSolverConfig;
+import com.planner.domain.solverconfig.common.SolverConfig;
+import com.planner.domain.solverconfig.country.CountrySolverConfig;
+import com.planner.domain.solverconfig.unit.UnitSolverConfig;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
-import com.planner.service.commons.exception.ExceptionService;
+import com.planner.component.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -66,11 +66,11 @@ public class CountrySolverConfigService {
     private void copyUnitSolverConfigByOrganizationServiceAndSubService(Long organizationServiceId, Long organizationSubServiceId, CountrySolverConfig countrySolverConfig) {
         List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationServiceAndSubServiceId(organizationServiceId,organizationSubServiceId);
         if(!applicableUnitIdForSolverConfig.isEmpty()) {
-            OrganizationSolverConfig organizationSolverConfig=ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig,OrganizationSolverConfig.class);
+            UnitSolverConfig unitSolverConfig =ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig,UnitSolverConfig.class);
             for (Long unitId : applicableUnitIdForSolverConfig) {
-                organizationSolverConfig.setIdBuilder(null);//Unset Id
-                organizationSolverConfig.setUnitId(unitId);
-                solverConfigRepository.saveObject(organizationSolverConfig);
+                unitSolverConfig.setIdBuilder(null);//Unset Id
+                unitSolverConfig.setUnitId(unitId);
+                solverConfigRepository.saveObject(unitSolverConfig);
             }
         }
     }

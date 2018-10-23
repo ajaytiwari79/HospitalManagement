@@ -1,6 +1,6 @@
 package com.planner.domain.task;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.time.LocalDateTime;
 import java.util.Date;
