@@ -193,7 +193,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public Map<String, Object> getAllActivityByUnitAndDeleted(Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
@@ -206,7 +206,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
@@ -266,14 +266,14 @@ public class OrganizationActivityService extends MongoBaseService {
 
         save(activity);
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);
         return activityTabsWrapper;
     }
 
     public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
-        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -284,7 +284,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long unitId) {
-        List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(unitId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
         List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();

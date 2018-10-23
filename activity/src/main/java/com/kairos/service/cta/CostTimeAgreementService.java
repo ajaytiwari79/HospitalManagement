@@ -323,7 +323,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      * @return CTARuleTemplateCategoryWrapper
      */
     public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByUnit(Long unitId) {
-        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         return loadAllCTARuleTemplateByCountry(countryId);
     }
 
@@ -457,7 +457,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
 
         }
-        OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
+        OrganizationDTO organization = genericIntegrationService.getOrganization();
         collectiveTimeAgreementDTO.setId(null);
         CostTimeAgreement costTimeAgreement = buildCTA(collectiveTimeAgreementDTO);
         costTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));

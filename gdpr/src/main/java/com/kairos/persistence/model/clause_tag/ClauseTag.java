@@ -12,8 +12,12 @@ public class ClauseTag extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be  empty")
     private String name;
-
+    private boolean defaultTag;
     private Long countryId;
+
+    public boolean isDefaultTag() { return defaultTag; }
+
+    public void setDefaultTag(boolean defaultTag) { this.defaultTag = defaultTag; }
 
     public Long getCountryId() {
         return countryId;
