@@ -189,7 +189,7 @@ public class EmploymentService {
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+        if( accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created){
             exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
