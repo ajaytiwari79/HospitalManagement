@@ -12,6 +12,7 @@ public class UnitPositionWithCtaDetailsDTO {
 
     private Long id;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
+    private Integer totalWeeklyHours;
     private int totalWeeklyMinutes;
     private int workingDaysInWeek;
     private Long staffId;
@@ -31,14 +32,23 @@ public class UnitPositionWithCtaDetailsDTO {
     public UnitPositionWithCtaDetailsDTO() {
     }
 
-    public UnitPositionWithCtaDetailsDTO(Long id, int totalWeeklyMinutes, int workingDaysInWeek, LocalDate startDate, LocalDate endDate) {
+    public UnitPositionWithCtaDetailsDTO(Long id, int totalWeeklyMinutes, int workingDaysInWeek, LocalDate startDate, LocalDate endDate,int totalWeeklyHours) {
         this.id = id;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.workingDaysInWeek = workingDaysInWeek;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.totalWeeklyHours = totalWeeklyHours;
     }
 
+
+    public Integer getTotalWeeklyHours() {
+        return totalWeeklyHours;
+    }
+
+    public void setTotalWeeklyHours(Integer totalWeeklyHours) {
+        this.totalWeeklyHours = totalWeeklyHours;
+    }
 
     public float getHourlyCost() {
         return hourlyCost;
