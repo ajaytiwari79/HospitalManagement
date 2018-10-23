@@ -1,14 +1,12 @@
 package com.planner.service.taskPlanningService;
 
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.planner.solverconfig.ConstraintValueDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.planner.vrp.taskplanning.model.Shift;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
-import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.constants.AppConstants;
 import com.planner.domain.staff.PlanningShift;

@@ -2,7 +2,7 @@ package com.planner.controller;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.planner.commonUtil.ResponseHandler;
-import com.planner.service.constraint_service.ConstraintService;
+import com.planner.service.constraint.ConstraintService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

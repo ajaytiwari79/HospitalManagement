@@ -1,11 +1,9 @@
 package com.planner.domain.vrpPlanning;
 
-import com.planner.domain.MongoBaseEntity;
-import org.optaplanner.core.api.score.constraint.Indictment;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author pradeep
