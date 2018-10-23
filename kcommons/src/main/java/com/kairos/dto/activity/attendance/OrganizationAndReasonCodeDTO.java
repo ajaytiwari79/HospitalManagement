@@ -5,23 +5,33 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import java.util.List;
 
 public class OrganizationAndReasonCodeDTO {
-    private Long unitId;
+    private Long id;
+    private String name;
     private List<ReasonCodeDTO> reasonCode;
 
     public OrganizationAndReasonCodeDTO() {
     }
 
-    public OrganizationAndReasonCodeDTO(Long unitId, List<ReasonCodeDTO> reasonCode) {
-        this.unitId = unitId;
+    public OrganizationAndReasonCodeDTO(Long id, String name, List<ReasonCodeDTO> reasonCode) {
+        this.id = id;
+        this.name = name;
         this.reasonCode = reasonCode;
     }
 
-    public Long getUnitId() {
-        return unitId;
+    public Long getId() {
+        return id;
     }
 
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<ReasonCodeDTO> getReasonCode() {

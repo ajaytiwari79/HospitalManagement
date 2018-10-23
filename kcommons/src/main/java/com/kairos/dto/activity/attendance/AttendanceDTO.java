@@ -3,16 +3,13 @@ package com.kairos.dto.activity.attendance;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class AttendanceDTO {
 
 
     private AttendanceDurationDTO duration;
-    private List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS;
-    //private List<OrganizationCommonDTO> organizationIdAndNameResults;
+    private List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes;
     private OrganizationCommonDTO organizationCommonDTO;
     private List<ReasonCodeDTO> reasonCode;
     private SickSettingsDTO sickSettings;
@@ -26,8 +23,8 @@ public class AttendanceDTO {
     }
 
 
-    public AttendanceDTO(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS, List<ReasonCodeDTO> reasonCode) {
-        this.organizationAndReasonCodeDTOS = organizationAndReasonCodeDTOS;
+    public AttendanceDTO(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes, List<ReasonCodeDTO> reasonCode) {
+        this.organizationAndReasonCodes = organizationAndReasonCodes;
         this.reasonCode = reasonCode;
     }
 
@@ -40,12 +37,12 @@ public class AttendanceDTO {
         this.organizationCommonDTO = organizationCommonDTO;
     }
 
-    public List<OrganizationAndReasonCodeDTO> getOrganizationAndReasonCodeDTOS() {
-        return organizationAndReasonCodeDTOS;
+    public List<OrganizationAndReasonCodeDTO> getOrganizationAndReasonCodes() {
+        return organizationAndReasonCodes;
     }
 
-    public void setOrganizationAndReasonCodeDTOS(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS) {
-        this.organizationAndReasonCodeDTOS = organizationAndReasonCodeDTOS;
+    public void setOrganizationAndReasonCodes(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes) {
+        this.organizationAndReasonCodes = organizationAndReasonCodes;
     }
 
     public AttendanceDurationDTO getDuration() {
