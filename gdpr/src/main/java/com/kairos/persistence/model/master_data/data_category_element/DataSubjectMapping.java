@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,8 @@ public class DataSubjectMapping extends MongoBaseEntity {
 
     @NotNull(message = "Data category cannot null")
     @NotEmpty(message = "Data Category cannot be empty")
-    private Set<BigInteger> dataCategories;
+    // empty set to get rid of null pointer exception
+    private Set<BigInteger> dataCategories=new HashSet<>();
 
     private Long countryId;
 
