@@ -31,7 +31,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " with functionalPaymentMatrix ,collect (id(pga)) as payGroupAreaIds \n" +
             " match(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)" +
             " match(seniorityLevel:SeniorityLevel)<-[:" + FOR_SENIORITY_LEVEL + "]- (seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) " +
-            " with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, collect({functionId:id(function), amount:function_amt.amount}) as functions\n" +
+            " with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, collect({functionId:id(function),amountEditableAtUnit:function_amt.amountEditableAtUnit, amount:function_amt.amount}) as functions\n" +
             " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction")
     List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrix(Long functionalPaymentId);
 
