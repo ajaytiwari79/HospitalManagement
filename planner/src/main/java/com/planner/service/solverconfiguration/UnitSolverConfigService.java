@@ -24,7 +24,7 @@ public class UnitSolverConfigService {
     private ActivityMongoRepository activityMongoRepository;
 
     public void createUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
-        boolean nameExists = solverConfigRepository.isNameExists(unitSolverConfigDTO.getName(),null,false);
+        boolean nameExists = solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(),null,false,unitSolverConfigDTO.getUnitId());
         if (!nameExists) {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             solverConfigRepository.saveObject(unitSolverConfig);
@@ -59,14 +59,14 @@ public class UnitSolverConfigService {
     }
     /*************************************************************************/
     //Only update if present
-    public UnitSolverConfigDTO updateUnitSolverConfig(UnitSolverConfigDTO UnitSolverConfigDTO) {
-        Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(UnitSolverConfigDTO.getId());
-        boolean nameExists = solverConfigRepository.isNameExists(UnitSolverConfigDTO.getName(), UnitSolverConfigDTO.getId(),false);
+    public UnitSolverConfigDTO updateUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
+        Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(unitSolverConfigDTO.getId());
+        boolean nameExists = solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), unitSolverConfigDTO.getId(),false,unitSolverConfigDTO.getUnitId());
         if (solverConfigOptional.isPresent() && !nameExists) {
-            UnitSolverConfig UnitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(UnitSolverConfigDTO, UnitSolverConfig.class);
-            solverConfigRepository.saveObject(UnitSolverConfig);
+            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
+            solverConfigRepository.saveObject(unitSolverConfig);
         }
-        return UnitSolverConfigDTO;
+        return unitSolverConfigDTO;
     }
     /*************************************************************************/
     //Soft Delete
