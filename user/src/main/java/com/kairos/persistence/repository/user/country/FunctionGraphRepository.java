@@ -52,6 +52,6 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             " functionalPayment.startDate<=timestamp() AND (functionalPayment.endDate=null OR functionalPayment.endDate>=timestamp())"+
             "MATCH(sl)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment) \n" +
             "MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function:Function) \n" +
-            "RETURN distinct id(function) as id,function.name as name,rel.amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
+            "RETURN distinct id(function) as id,function.name as name,rel.amount as amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
     List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,Long seniorityLevelId);
 }
