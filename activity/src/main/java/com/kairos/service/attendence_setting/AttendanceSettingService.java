@@ -4,6 +4,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 
 import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
@@ -209,7 +211,7 @@ public class AttendanceSettingService extends MongoBaseService {
 
         private AttendanceSetting checkInWithShift(Shift shift, Long reasonCodeId, StaffResultDTO staffAndOrganizationId) {
                 AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())));
-            AttendanceSetting attendanceSetting = new AttendanceSetting(shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,attendanceDuration);
+            AttendanceSetting attendanceSetting = new AttendanceSetting(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,attendanceDuration);
         return attendanceSetting;
 
     }
@@ -223,10 +225,25 @@ public class AttendanceSettingService extends MongoBaseService {
         return false;
     }
 
+
     public void checkOutBySchedulerJob(Long unitId){
-        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(DateUtils.asDate(DateUtils.getCurrentLocalDate().minusDays(1)),DateUtils.getDate(),unitId);
-        Map<BigInteger,Shift> shiftIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        List<Shift> saveShifts=new ArrayList<>();
         List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getCurrentLocalDate()));
+        List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
+        Map<BigInteger,Shift> staffIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        attendanceSettings.forEach(attendanceSetting -> {
+            if(staffIdAndShifts.get(attendanceSetting.getShiftId())!=null)
+            {
+                Shift shift=staffIdAndShifts.get(attendanceSetting.getStaffId()+""+attendanceSetting.getAttendanceDuration().getFrom());
+                attendanceSetting.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                saveShifts.add(shift);
+            }else{
+                attendanceSetting.getAttendanceDuration().setTo(LocalDateTime.now().minusDays(1).toLocalDate().atTime(LocalTime.MAX));
+            }
+        });
+        if(!attendanceSettings.isEmpty()) attendanceSettingRepository.saveEntities(attendanceSettings);
+        if(!saveShifts.isEmpty()) shiftMongoRepository.saveEntities(saveShifts);
         return;
     }
 }

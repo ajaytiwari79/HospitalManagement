@@ -4,22 +4,19 @@ package com.kairos.persistence.model.attendence_setting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
 
+import java.math.BigInteger;
+
 
 public class AttendanceSetting extends MongoBaseEntity {
     private Long staffId;
     private Long unitId;
     private Long userId;
+    private BigInteger shiftId;
     private Long reasonCodeId;
     private AttendanceDuration attendanceDuration ;
     public AttendanceSetting() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId,Long userId,AttendanceDuration attendanceDuration) {
-        this.staffId = staffId;
-        this.unitId = unitId;
-        this.userId=userId;
-        this.attendanceDuration=attendanceDuration;
-    }
     public AttendanceSetting(Long unitId, Long staffId,Long userId,Long reasonCodeId,AttendanceDuration attendanceDuration) {
         this.staffId = staffId;
         this.unitId = unitId;
@@ -27,6 +24,16 @@ public class AttendanceSetting extends MongoBaseEntity {
         this.reasonCodeId=reasonCodeId;
         this.attendanceDuration=attendanceDuration;
     }
+
+    public AttendanceSetting(BigInteger shiftId,Long unitId, Long staffId, Long userId, Long reasonCodeId, AttendanceDuration attendanceDuration) {
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.userId = userId;
+        this.shiftId = shiftId;
+        this.reasonCodeId = reasonCodeId;
+        this.attendanceDuration = attendanceDuration;
+    }
+
     public Long getStaffId() {
         return staffId;
     }
@@ -65,5 +72,13 @@ public class AttendanceSetting extends MongoBaseEntity {
 
     public void setReasonCodeId(Long reasonCodeId) {
         this.reasonCodeId = reasonCodeId;
+    }
+
+    public BigInteger getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(BigInteger shiftId) {
+        this.shiftId = shiftId;
     }
 }
