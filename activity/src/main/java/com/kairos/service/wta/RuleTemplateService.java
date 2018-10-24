@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.WEEKS;
+
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -82,7 +84,7 @@ public class RuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.wtaruletemplate.alreadyexists");
         }
 
-        String week = "WEEK";
+        String week = WEEKS;
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;
         long daysCount = 10;

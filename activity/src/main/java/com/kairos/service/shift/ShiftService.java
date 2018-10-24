@@ -83,6 +83,7 @@ import com.kairos.service.wta.WTAService;
 import com.kairos.utils.ShiftValidatorService;
 import com.kairos.utils.event.ShiftNotificationEvent;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
+import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -379,6 +380,7 @@ public class ShiftService extends MongoBaseService {
                 shiftActivity.setTimeType(activityWrapper.getTimeType());
                 shiftActivity.setActivityName(activityWrapper.getActivity().getName());
             }
+            shift.setCreatedBy(UserContext.getUserDetails().getId());
             shift.setPhaseId(phase.getId());
             shift.setScheduledMinutes(scheduledMinutes);
             shift.setDurationMinutes(durationMinutes);
@@ -391,8 +393,9 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type) {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getStartDate()), shift.getStaffId(), type, shift.getUnitPositionId());
-        Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
+        Date shiftStartDate = DateUtils.onlyDate(shift.getActivities().get(0).getStartDate());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftStartDate), shift.getStaffId(), type, shift.getUnitPositionId());
+
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftStartDate);
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.cta.notFound", ctaResponseDTO.getId());
@@ -556,6 +559,8 @@ public class ShiftService extends MongoBaseService {
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+            shift.setUpdatedBy(UserContext.getUserDetails().getId());
+            shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,true);
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
