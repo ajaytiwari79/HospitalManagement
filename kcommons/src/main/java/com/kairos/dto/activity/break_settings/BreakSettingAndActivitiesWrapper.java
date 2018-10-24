@@ -11,18 +11,16 @@ import java.util.List;
 
 public class BreakSettingAndActivitiesWrapper {
     private List<BreakSettingsDTO> breakSettings;
-    private List<ActivityDTO> paidActivities;
-    private List<ActivityDTO> unpaidActivities;
+    private List<ActivityDTO> activities;
     private FlexibleTimeSettingDTO flexibleTimeSettings;
 
     public BreakSettingAndActivitiesWrapper() {
         //Default Constructor
     }
 
-    public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> paidActivities, List<ActivityDTO> unpaidActivities, FlexibleTimeSettingDTO flexibleTimeSettings) {
+    public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> activities, FlexibleTimeSettingDTO flexibleTimeSettings) {
         this.breakSettings = breakSettings;
-        this.paidActivities = paidActivities;
-        this.unpaidActivities = unpaidActivities;
+        this.activities=activities;
         this.flexibleTimeSettings = flexibleTimeSettings;
     }
 
@@ -34,20 +32,12 @@ public class BreakSettingAndActivitiesWrapper {
         this.breakSettings = breakSettings;
     }
 
-    public List<ActivityDTO> getPaidActivities() {
-        return paidActivities;
+    public List<ActivityDTO> getActivities() {
+        return activities;
     }
 
-    public void setPaidActivities(List<ActivityDTO> paidActivities) {
-        this.paidActivities = paidActivities;
-    }
-
-    public List<ActivityDTO> getUnpaidActivities() {
-        return unpaidActivities;
-    }
-
-    public void setUnpaidActivities(List<ActivityDTO> unpaidActivities) {
-        this.unpaidActivities = unpaidActivities;
+    public void setActivities(List<ActivityDTO> activities) {
+        this.activities = activities;
     }
 
     public FlexibleTimeSettingDTO getFlexibleTimeSettings() {

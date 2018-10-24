@@ -14,39 +14,39 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_EXPERTISE_BREAK_URL;
 
 
 @RestController
-@Api(API_ORGANIZATION_UNIT_URL)
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_EXPERTISE_BREAK_URL)
+@RequestMapping(API_EXPERTISE_BREAK_URL)
 public class BreakSettingsController {
 
     @Inject
     private BreakSettingsService breakSettingsService;
 
     @ApiOperation("Create break settings ")
-    @PostMapping(value = "/break")
+    @PostMapping()
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long unitId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, breakSettingsService.createBreakSettings(unitId, breakSettingsDTO));
+    public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long countryId, @PathVariable Long expertiseId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, breakSettingsService.createBreakSettings(countryId,expertiseId, breakSettingsDTO));
     }
 
     @ApiOperation("Get all break settings ")
-    @GetMapping(value = "/break")
+    @GetMapping()
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getBreakSettings(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, breakSettingsService.getBreakSettings(unitId));
+    public ResponseEntity<Map<String, Object>> getBreakSettings(@PathVariable Long countryId,@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, breakSettingsService.getBreakSettings(countryId,expertiseId));
     }
 
     @ApiOperation("Get remove a particular break settings from unit")
-    @DeleteMapping(value = "/break/{breakSettingsId}")
-    public ResponseEntity<Map<String, Object>> deleteBreakSettings(@PathVariable Long unitId, @PathVariable BigInteger breakSettingsId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,breakSettingsService.removeBreakSettings(unitId,breakSettingsId));
+    @DeleteMapping(value = "/{breakSettingsId}")
+    public ResponseEntity<Map<String, Object>> deleteBreakSettings(@PathVariable BigInteger breakSettingsId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,breakSettingsService.removeBreakSettings(breakSettingsId));
     }
     @ApiOperation("update a particular break settings for unit")
-    @PutMapping(value = "/break/{breakSettingsId}")
-    public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long unitId,@PathVariable BigInteger breakSettingsId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true,breakSettingsService.updateBreakSettings(unitId,breakSettingsId,breakSettingsDTO));
+    @PutMapping(value = "/{breakSettingsId}")
+    public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,@PathVariable BigInteger breakSettingsId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true,breakSettingsService.updateBreakSettings(countryId,expertiseId,breakSettingsId,breakSettingsDTO));
     }
 }

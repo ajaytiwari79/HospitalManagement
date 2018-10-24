@@ -1,6 +1,6 @@
 package com.planner.domain.planning_problem;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document

@@ -1,6 +1,6 @@
 package com.planner.domain.activity;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.List;

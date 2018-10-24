@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
-import static org.apache.commons.codec.Charsets.UTF_16;
-import static org.apache.commons.codec.Charsets.UTF_8;
+
 
 @Service
 public class GenericRestClient {
@@ -79,7 +77,6 @@ public class GenericRestClient {
         }
 
     }
-
 
     /**
      * @param t
@@ -145,32 +142,6 @@ public class GenericRestClient {
             e.printStackTrace();
         }
         return uri;
-    }
-
-    // ============================Unusable code TODO Remove
-    //TODO Remove
-    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String, Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit, id);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + getURI(t, uri, queryParams),
-                            getHttpMethod(integrationOperation),
-                            t == null ? null : new HttpEntity<>(t), typeReference, pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
     }
 
     //TODO Remove

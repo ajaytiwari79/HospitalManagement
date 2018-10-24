@@ -1,6 +1,6 @@
 package com.planner.domain.tomtomResponse;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.util.List;
 

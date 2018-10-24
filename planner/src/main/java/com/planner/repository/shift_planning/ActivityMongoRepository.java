@@ -118,16 +118,16 @@ public class ActivityMongoRepository {
         AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
         return aggregationResults.getMappedResults();
     }
-   //For Organization(Unit)
-    public List<PhaseDTO> getAllPhasesByOrganizationId(Long unitId) {
+   //For Unit(Unit)
+    public List<PhaseDTO> getAllPhasesByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("organizationId").is(unitId)));
         AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
         return aggregationResults.getMappedResults();
     }
 
-    //For Organization(Unit
-    public List<PlanningPeriodDTO> getAllPlanningPeriodByOrganizationId(Long unitId)
+    //For Unit(Unit
+    public List<PlanningPeriodDTO> getAllPlanningPeriodByUnitId(Long unitId)
     {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId)));

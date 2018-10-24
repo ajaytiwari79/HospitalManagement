@@ -222,7 +222,7 @@ public class PositionCodeService {
             logger.info(data.toString());
         }
 
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
         PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
         return positionCodeUnionWrapper;
     }
