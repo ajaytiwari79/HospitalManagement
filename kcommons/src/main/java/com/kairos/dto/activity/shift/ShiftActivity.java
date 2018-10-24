@@ -30,6 +30,7 @@ public class ShiftActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
+    private boolean breakShift;
 
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
@@ -180,5 +181,11 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
+    public boolean isBreakShift() {
+        return breakShift;
+    }
 
+    public void setBreakShift(boolean breakShift) {
+        this.breakShift = breakShift;
+    }
 }
