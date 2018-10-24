@@ -2,11 +2,16 @@ package com.kairos.dto.planner.constarints.country;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 
+import javax.validation.constraints.NotBlank;
+import java.math.BigInteger;
+
 public class CountryConstraintDTO extends ConstraintDTO {
     //~
+    //@NotBlank
     private Long countryId;
-    private Long parentCountryConstraintId;
+   // @NotBlank
     private Long organizationServiceId;
+    //@NotBlank
     private Long organizationSubServiceId;
 
     //======================================================
@@ -19,13 +24,6 @@ public class CountryConstraintDTO extends ConstraintDTO {
         this.countryId = countryId;
     }
 
-    public Long getParentCountryConstraintId() {
-        return parentCountryConstraintId;
-    }
-
-    public void setParentCountryConstraintId(Long parentCountryConstraintId) {
-        this.parentCountryConstraintId = parentCountryConstraintId;
-    }
 
     public Long getOrganizationServiceId() {
         return organizationServiceId;

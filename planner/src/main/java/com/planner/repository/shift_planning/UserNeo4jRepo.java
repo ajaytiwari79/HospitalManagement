@@ -49,4 +49,21 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
     @Query("Match(os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ossub:OrganizationService)<-[:"+PROVIDE_SERVICE+"]-(o:Organization) where id(os)={0} AND id(ossub)={1} return id(o)")
     List<Long> getUnitIdsByOrganizationServiceAndSubServiceId(Long organizationServiceId,Long organizationSubServiceId);
 
+    @Query("Optional Match(c:Country) where id(c)={0} " +
+            "Optional Match(os:OrganizationService) where id(os)={1} " +
+            "Optional Match(osSub:OrganizationService) where id(osSub)={2} " +
+            "Optional Match (c)-[link:"+HAS_ORGANIZATION_SERVICES+"]-(os)-[child:"+ORGANIZATION_SUB_SERVICE+"]-(osSub) " +
+            "return " +
+            "when c is null then countryNotExists " +
+            "when os is null then organizationServiceNotExists " +
+            "when osSub is null then organizationSubServiceNotExists " +
+            "when child is null or link is null  then relationShipNotValid " +
+            "else valid end as result")
+    String validateCountryConstraint(Long countryId,Long organizationServiceId,Long organizationSubServiceId);
+
+    @Query("Optional Match(unit:Organization) where id(unit)={0} " +
+            "return" +
+            "when unit is null then unitNotExists else unitExists end " +
+            "as result")
+    String validateUnitConstraint(Long unitId);
 }

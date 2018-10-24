@@ -15,7 +15,8 @@ import java.util.Map;
 import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_COUNTRY_CONSTRAINT_URL;
 
 @RestController
-@RequestMapping(API_PARENT_ORGANIZATION_COUNTRY_CONSTRAINT_URL)
+@Deprecated
+
 public class ConstraintController {
 
 

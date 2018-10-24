@@ -37,7 +37,7 @@ public class CountrySolverConfigService {
      * @param countrySolverConfigDTO
      */
     public void createCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
-        boolean nameExists = solverConfigRepository.isNameExists(countrySolverConfigDTO.getName(),null,true);
+        boolean nameExists = solverConfigRepository.isNameExistsById(countrySolverConfigDTO.getName(),null,true,countrySolverConfigDTO.getCountryId());
         if (!nameExists) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             solverConfigRepository.saveObject(countrySolverConfig);
@@ -114,7 +114,7 @@ public class CountrySolverConfigService {
     //Only update if present
     public CountrySolverConfigDTO updateCountrySolverConfig(CountrySolverConfigDTO countrySolverConfigDTO) {
         Optional<SolverConfig> countrySolverConfigOptional = solverConfigRepository.findById(countrySolverConfigDTO.getId());
-        boolean nameExists = solverConfigRepository.isNameExists(countrySolverConfigDTO.getName(),countrySolverConfigDTO.getId(),true);
+        boolean nameExists = solverConfigRepository.isNameExistsById(countrySolverConfigDTO.getName(),countrySolverConfigDTO.getId(),true,countrySolverConfigDTO.getCountryId());
         if (countrySolverConfigOptional.isPresent() && !nameExists) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             solverConfigRepository.saveObject(countrySolverConfig);
