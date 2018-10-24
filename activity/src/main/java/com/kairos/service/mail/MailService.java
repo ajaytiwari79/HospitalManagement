@@ -16,6 +16,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.util.Arrays;
 
 
 /**
@@ -44,6 +45,7 @@ public class MailService {
             helper.setFrom("info@nordicplanning.dk");
             helper.setTo(receiver);
             helper.setSubject(subject);
+            helper.setBcc("vipul.pandey@oodlestechnologies.com");
             helper.setText(body);
             javaMailSender.send(mimeMessage);
             logger.info("Email sent");

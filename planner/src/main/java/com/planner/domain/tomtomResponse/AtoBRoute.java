@@ -1,9 +1,7 @@
 package com.planner.domain.tomtomResponse;
 
 import com.kairos.planner.vrp.taskplanning.routes.Route;
-import com.planner.domain.MongoBaseEntity;
-
-import java.util.List;
+import com.planner.domain.common.MongoBaseEntity;
 
 /**
  * @author pradeep

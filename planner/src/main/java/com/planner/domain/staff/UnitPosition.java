@@ -1,7 +1,7 @@
 package com.planner.domain.staff;
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 import com.planner.domain.wta.templates.WorkingTimeAgreement;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -46,7 +46,7 @@ public class UnitPosition  extends MongoBaseEntity {
         this.seniorityLevelId = seniorityLevelId;
         this.paidOutFrequencyEnum = paidOutFrequencyEnum;
         this.workingTimeAgreement = workingTimeAgreement;
-        this.kairosId=kairosId;
+        //this.kairosId=kairosId;
         this.staffId=staffId;
     }
 

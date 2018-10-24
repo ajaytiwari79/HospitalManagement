@@ -2,6 +2,7 @@ package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import org.joda.time.DateTime;
 
@@ -90,7 +91,7 @@ public class ExpertiseUpdateDTO {
     }
 
     public void setEndDateMillis(Date endDateMillis) {
-        this.endDateMillis = endDateMillis;
+        this.endDateMillis =endDateMillis==null?null: DateUtils.getEndOfDay(endDateMillis);
     }
 
     public Long getOrganizationLevelId() {

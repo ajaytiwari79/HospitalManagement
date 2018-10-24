@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "questionnaire_template")
+@Document
 public class QuestionnaireTemplate extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")
@@ -36,6 +36,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
     public QuestionnaireTemplate(@NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
         this.name = name;
         this.description = description;
+        this.templateStatus=templateStatus;
     }
 
     public BigInteger getAssetType() { return assetType; }

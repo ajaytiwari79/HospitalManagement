@@ -1,7 +1,7 @@
 package com.planner.repository.vrpPlanning;
 
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
-import com.planner.repository.MongoBaseRepository;
+import com.planner.repository.common.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

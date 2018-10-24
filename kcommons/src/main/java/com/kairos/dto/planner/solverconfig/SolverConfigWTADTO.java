@@ -5,6 +5,7 @@ import com.kairos.enums.wta.WTATemplateType;
 import java.math.BigInteger;
 import java.util.List;
 
+@Deprecated
 public class SolverConfigWTADTO {
     private BigInteger id;
     private List<WTATemplateType> templateTypes;

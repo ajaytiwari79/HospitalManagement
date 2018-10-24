@@ -1,8 +1,10 @@
 package com.kairos.controller.counters;
 
 
+import com.kairos.dto.activity.counter.chart.BaseChart;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.response.ResponseDTO;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.chart.BaseChart;
 import com.kairos.service.counter.CounterDataService;
 import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.COUNTER_DATA_URL;
@@ -46,6 +47,12 @@ public class CounterDataController {
         kpiList.addAll(counterDataService.getCountersData(unitId, solverConfigId));
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiList);
+    }
+
+    @PostMapping
+    public ResponseEntity<ResponseDTO<Object>> getFilteredCounterData(@RequestBody FilterCriteriaDTO criteria){
+        //get filters and get counter ids.
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, new Object());
     }
 
 

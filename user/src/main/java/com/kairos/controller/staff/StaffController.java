@@ -27,7 +27,6 @@ import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +43,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 
 /**
@@ -585,6 +585,13 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
 
+    @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds,@RequestParam("unitPositionIds") List<Long> unitPositionIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds,unitPositionIds, unitId, ORGANIZATION));
+    }
+
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not and get current unit position ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -609,7 +616,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws ParseException {
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws Exception {
 
         String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
         Long reasonCodeId = employmentDTO.getReasonCodeId();

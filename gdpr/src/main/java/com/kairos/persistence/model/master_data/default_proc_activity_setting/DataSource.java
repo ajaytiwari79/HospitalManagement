@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document(collection = "dataSource")
+@Document
 public class DataSource extends  MongoBaseEntity {
 
 

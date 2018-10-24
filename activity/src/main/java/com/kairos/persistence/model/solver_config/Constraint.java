@@ -1,11 +1,8 @@
 package com.kairos.persistence.model.solver_config;
 
-import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.enums.solver_config.ConstraintCategory;
+import com.kairos.enums.constraint.ConstraintCategory;
 import com.kairos.enums.solver_config.PlanningType;
-
-import java.util.List;
 
 /**
  * @author pradeep

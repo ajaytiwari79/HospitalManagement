@@ -13,11 +13,11 @@ public class AssetTypeBasicResponseDTO {
     private String name;
     private Long organizationId;
     private SuggestedDataStatus suggestedDataStatus;
-    private boolean subAsset;
+    private Boolean subAssetType;
 
-    public boolean isSubAsset() { return subAsset; }
+    public Boolean getSubAssetType() { return subAssetType; }
 
-    public void setSubAsset(boolean subAsset) { this.subAsset = subAsset; }
+    public void setSubAssetType(Boolean subAssetType) { this.subAssetType = subAssetType; }
 
     public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 

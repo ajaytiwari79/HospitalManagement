@@ -121,15 +121,20 @@ public class ProcessingActivityService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
         processingActivity = processingActivityMongoRepository.findByUnitIdAndId(organizationId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
-        } else if (!processingActivity.isActive()) {
+        if (!processingActivity.isActive()) {
             exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
-        if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
             processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
 
         }
+        processingActivity.setResponsibilityType(processingActivityDTO.getResponsibilityType());
+        processingActivity.setTransferMethods(processingActivityDTO.getTransferMethods());
+        processingActivity.setDataSources(processingActivityDTO.getDataSources());
+        processingActivity.setProcessingPurposes(processingActivityDTO.getProcessingPurposes());
+        processingActivity.setAccessorParties(processingActivityDTO.getAccessorParties());
+        processingActivity.setProcessingPurposes(processingActivityDTO.getProcessingPurposes());
+        processingActivity.setProcessingLegalBasis(processingActivityDTO.getProcessingLegalBasis());
         processingActivity.setName(processingActivityDTO.getName());
         processingActivity.setDescription(processingActivityDTO.getDescription());
         processingActivity.setManagingDepartment(processingActivityDTO.getManagingDepartment());

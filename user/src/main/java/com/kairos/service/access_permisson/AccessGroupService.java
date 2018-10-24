@@ -636,6 +636,7 @@ public class AccessGroupService {
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
         accessGroupDTO.setId(accessGroup.getId());
+        accessGroupDTO.setEnabled(true);
         return accessGroupDTO;
     }
 
@@ -831,6 +832,7 @@ public class AccessGroupService {
     }
 
     // Method to fetch list of access group by Organization category ( Hub, Organization and Union)
+    //TODO all three db calls can be combined in one
     public Map<String, List<AccessGroupQueryResult>> getCountryAccessGroupsForOrganizationCreation(Long countryId) {
         Map<String, List<AccessGroupQueryResult>> accessGroupForParentOrganizationCreation = new HashMap<>();
         accessGroupForParentOrganizationCreation.put("hub",
@@ -857,6 +859,7 @@ public class AccessGroupService {
         return userAccessRoleDTO;
     }
 
+
     public UserAccessRoleDTO getStaffAccessRoles(Long unitId, Long staffId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(unitId,
@@ -882,14 +885,15 @@ public class AccessGroupService {
     }
 
     public Map<Long, Long> getAccessGroupUsingParentId(Long unitId, Set<Long> accessGroupIds) {
-        //intentionally return blank
-        return new HashMap<>();
-        //TODO PLEASE DON"T REMOVE AS WE NEED IT TO FETCH ACCESSGROUP
-        //return accessGroupRepository.getAccessGroupIdsUsingParentIds(unitId,accessGroupIds);
+        List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentIds(unitId,accessGroupIds);
+        return convertToMap(accessPageQueryResults);
     }
-// Substitute of above Query
     public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(organizationId);
+        return convertToMap(accessPageQueryResults);
+    }
+
+    private Map<Long, Long> convertToMap(List<AccessPageQueryResult> accessPageQueryResults){
         Map<Long, Long > response=new HashMap<>();
         accessPageQueryResults.forEach(accessPageQueryResult -> {
             response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());

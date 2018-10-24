@@ -1,6 +1,6 @@
 package com.planner.domain.task;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -44,7 +44,7 @@ public class Task extends MongoBaseEntity{
     }
 
     public Task(String id, Long installationNumber, Double latitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
-        this.id = id;
+        //this.id = id;
         this.installationNumber = installationNumber;
         this.latitude = latitude;
         this.longitude = longitude;

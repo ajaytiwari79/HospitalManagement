@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,11 +20,11 @@ import java.util.List;
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
-    private boolean checkAgainstTimeRules;
     private List<Long> dayTypeIds = new ArrayList<>();
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -73,21 +74,25 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.timeLimit = timeLimit;
     }
 
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
 
     public ShiftLengthWTATemplate() {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
-    public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+
+
+    public ShiftLengthWTATemplate(String name, String description, long timeLimit) {
         super(name, description);
         this.timeLimit = timeLimit;
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
+        this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 }

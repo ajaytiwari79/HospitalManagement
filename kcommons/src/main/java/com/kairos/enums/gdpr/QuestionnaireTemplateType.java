@@ -1,6 +1,6 @@
 package com.kairos.enums.gdpr;
 
-public enum QuestionnaireTemplateType
+public  enum QuestionnaireTemplateType
 {
 
     ASSET_TYPE("asset_type"),  VENDOR("vendor"),  PROCESSING_ACTIVITY("processing_activity"),  GENERAL("general");
@@ -9,5 +9,6 @@ public enum QuestionnaireTemplateType
     QuestionnaireTemplateType(String value) {
         this.value = value;
     }
+
 
 }

@@ -61,11 +61,13 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.kairos.constants.AppConstants.*;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 
 /**
@@ -187,7 +189,7 @@ public class EmploymentService {
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+        if( accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created){
             exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
@@ -703,7 +705,7 @@ public class EmploymentService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public Employment updateEmploymentEndDate(Organization unit, Long staffId) {
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId) throws Exception {
         Long employmentEndDate = getMaxEmploymentEndDate(staffId);
         return saveEmploymentEndDate(unit,employmentEndDate, staffId,null,null,null);
     }
@@ -753,7 +755,7 @@ public class EmploymentService {
         return true;
     }
 
-    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) {
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
         Long employmentEndDate = null;
         if(Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
@@ -765,18 +767,22 @@ public class EmploymentService {
 
     private Long getMaxEmploymentEndDate(Long staffId) {
         Long employmentEndDate = null;
-        List<LocalDate> unitPositionsEndDateMillis = unitPositionGraphRepository.getAllUnitPositionsByStaffId(staffId);
-            if(!unitPositionsEndDateMillis.isEmpty()) {
-                LocalDate maxEndDate = unitPositionsEndDateMillis.get(0);
+         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<String> unitPositionsEndDate = unitPositionGraphRepository.getAllUnitPositionsByStaffId(staffId);
+            if(!unitPositionsEndDate.isEmpty()) {
+                //java.lang.ClassCastException: java.lang.String cannot be cast to java.time.LocalDate
+                LocalDate maxEndDate = LocalDate.parse(unitPositionsEndDate.get(0));
                 boolean isEndDateBlank = false;
                 //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
-                for (LocalDate unitPositionEndDateMillis : unitPositionsEndDateMillis) {
-                    if (!Optional.ofNullable(unitPositionEndDateMillis).isPresent()) {
+                for ( String unitPositionEndDateString : unitPositionsEndDate) {
+                    LocalDate unitPositionEndDate=LocalDate.parse(unitPositionEndDateString);
+                    if (!Optional.ofNullable(unitPositionEndDate).isPresent()) {
                         isEndDateBlank = true;
                         break;
                     }
-                    if (maxEndDate.isBefore( unitPositionEndDateMillis)) {
-                        maxEndDate = unitPositionEndDateMillis;
+                    if (maxEndDate.isBefore( unitPositionEndDate)) {
+                        maxEndDate = unitPositionEndDate;
                     }
                 }
                 employmentEndDate = isEndDateBlank ? null : DateUtils.getLongFromLocalDate(maxEndDate);
@@ -785,7 +791,7 @@ public class EmploymentService {
 
     }
 
-    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId,Long reasonCodeId, Long endDateMillis,Long accessGroupId) {
+    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId,Long reasonCodeId, Long endDateMillis,Long accessGroupId) throws Exception {
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         ReasonCode reasonCode = null;

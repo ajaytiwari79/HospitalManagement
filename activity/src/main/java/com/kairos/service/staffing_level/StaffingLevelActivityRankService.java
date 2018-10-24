@@ -23,8 +23,8 @@ public class StaffingLevelActivityRankService extends MongoBaseService {
     private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
 
      boolean updateStaffingLevelActivityRank(LocalDate staffingLevelDate, BigInteger staffingLevelId, Map<BigInteger, Integer> activitiesRankMap) {
-        List<StaffingLevelActivityRank> staffingLevelActivityRank = staffingLevelActivityRankRepository.findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse();
-        Map<BigInteger, StaffingLevelActivityRank> staffingLevelActivityRankingMap = staffingLevelActivityRank.stream().collect(Collectors.toMap(StaffingLevelActivityRank::getId, Function.identity()));
+        List<StaffingLevelActivityRank> staffingLevelActivityRank = staffingLevelActivityRankRepository.findAllByStaffingLevelIdAndStaffingLevelDateAndDeletedFalse(staffingLevelId,staffingLevelDate);
+        Map<BigInteger, StaffingLevelActivityRank> staffingLevelActivityRankingMap = staffingLevelActivityRank.stream().collect(Collectors.toMap(StaffingLevelActivityRank::getActivityId, Function.identity(),(current,previous)->current));
         List<StaffingLevelActivityRank> staffingLevelActivityRanks = constructObjects(activitiesRankMap, staffingLevelActivityRankingMap,staffingLevelId,staffingLevelDate);
         if(!staffingLevelActivityRanks.isEmpty()){
             save(staffingLevelActivityRanks);
@@ -34,14 +34,16 @@ public class StaffingLevelActivityRankService extends MongoBaseService {
 
     private List<StaffingLevelActivityRank> constructObjects(Map<BigInteger, Integer> activitiesRankMap, Map<BigInteger, StaffingLevelActivityRank> staffingLevelActivityRankingMap, BigInteger staffingLevelId, LocalDate staffingLevelDate) {
         List<StaffingLevelActivityRank> staffingLevelActivityRanks = new ArrayList<>();
-        activitiesRankMap.forEach((k, v) -> {
-            if (staffingLevelActivityRankingMap.get(k) != null) {
-                staffingLevelActivityRanks.add(new StaffingLevelActivityRank(staffingLevelActivityRankingMap.get(k).getId(), k, staffingLevelDate, staffingLevelId, v));
-            }
-            else{
-                staffingLevelActivityRanks.add(new StaffingLevelActivityRank(k, staffingLevelDate, staffingLevelId, v));
-            }
-        });
+        if(activitiesRankMap!=null){
+            activitiesRankMap.forEach((k, v) -> {
+                if (staffingLevelActivityRankingMap.get(k) != null) {
+                    staffingLevelActivityRanks.add(new StaffingLevelActivityRank(staffingLevelActivityRankingMap.get(k).getId(), k, staffingLevelDate, staffingLevelId, v));
+                }
+                else{
+                    staffingLevelActivityRanks.add(new StaffingLevelActivityRank(k, staffingLevelDate, staffingLevelId, v));
+                }
+            });
+        }
         return staffingLevelActivityRanks;
     }
 }

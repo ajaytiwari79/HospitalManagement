@@ -6,6 +6,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,15 +36,26 @@ public class DateUtils {
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
         return localDateTimeToDate(endOfDay);
     }
-
+    public static LocalDateTime getLocalDateTimeFromDate(Date date ){
+       return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
+    }
+    public static long getCurrentMillistByTimeZone(String timeZone){
+        return Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime();
+    }
     public static LocalDate getCurrentLocalDate() {
         return LocalDate.now();
 
     }
+
     public static LocalTime getCurrentLocalTime() {
         return LocalTime.now();
 
     }
+    public static LocalDateTime getCurrentLocalDateTime() {
+        return LocalDateTime.now();
+
+    }
+
     public static LocalDate getLocalDateFromDate(Date date) {
 
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -326,6 +338,10 @@ public class DateUtils {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+    public static LocalDate asLocalDate(DateTime dateTime){
+        return asLocalDate(dateTime.toDate());
+    }
+
 
     public static LocalTime asLocalTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalTime();
@@ -413,8 +429,19 @@ public class DateUtils {
         return ((endDate.getTime() - startDate.getTime()) / (1000 * 60));
     }
 
-    public static int getDifferenceBetweenDatesInDays(LocalDate startDate, LocalDate endDate) {
-        return Period.between(startDate,endDate).getDays();
+    public static int getDifferenceBetweenDatesInDays(LocalDate startDate, LocalDate endDate, DurationType durationType) {
+        switch (durationType) {
+            case DAYS: {
+                return Period.between(startDate, endDate).getDays();
+            }
+            case MINUTES: {
+                return (3600 * Period.between(startDate, endDate).getDays());
+            }
+            case HOURS: {
+                return (60 * Period.between(startDate, endDate).getDays());
+            }
+        }
+        return Period.between(startDate, endDate).getDays();
 
     }
 
@@ -464,6 +491,7 @@ public class DateUtils {
     }
 
     public static String getDateStringWithFormat(Date date, String dateFormat) {
+
         org.joda.time.format.DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
         DateTime dateTime = new DateTime(date);
         return dateTime.toString(formatter);
@@ -507,13 +535,6 @@ public class DateUtils {
         return endDate.minusDays(1);
     }
 
-    public static Long getDurationBetweenTwoLocalDatesIncludingLastDate(LocalDate startDate, LocalDate endDate, DurationType durationType) {
-        Long duration = getDurationBetweenTwoLocalDates(startDate, endDate, durationType);
-        if (Optional.ofNullable(duration).isPresent()) {
-            duration += 1;
-        }
-        return duration;
-    }
 
     public static Long getDurationBetweenTwoLocalDates(LocalDate startDate, LocalDate endDate, DurationType durationType) {
         switch (durationType) {
@@ -540,6 +561,27 @@ public class DateUtils {
             case HOURS: {
                 return localDateTime.plusHours(duration * recurringNumber);
             }
+            case MINUTES: {
+                return localDateTime.plusMinutes(duration * recurringNumber);
+            }
+
+
+        }
+        return localDateTime;
+    }
+    public static LocalDateTime substractDurationInLocalDateTime(LocalDateTime localDateTime, int duration, DurationType durationType) {
+        switch (durationType) {
+            case DAYS: {
+                return localDateTime.minusDays(duration);
+            }
+            case HOURS: {
+                return localDateTime.minusHours(duration );
+            }
+            case MINUTES: {
+                return localDateTime.minusMinutes(duration );
+            }
+
+
         }
         return localDateTime;
     }
@@ -586,7 +628,7 @@ public class DateUtils {
 
 
     public static Long getLongFromLocalDate(LocalDate date) {
-        return (date==null)?  null: date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return (date == null) ? null : date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static LocalDate getDateFromEpoch(Long dateLong) {
@@ -645,7 +687,7 @@ public class DateUtils {
     }
 
     public static Long getMillisFromLocalDateTime(LocalDateTime date) {
-        return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;
+        return date == null ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static Long getOneDayBeforeMillis() {
@@ -674,8 +716,8 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
-    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes,int seconds) {
-        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes,seconds));
+    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes, int seconds) {
+        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes, seconds));
     }
 
     public static Date getStartOfTheDay(Date date){
@@ -690,9 +732,11 @@ public class DateUtils {
     public static Date getDateAfterDaysWithTime(short daysAfter, LocalTime duration) {
         return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atTime(duration).toInstant(ZoneOffset.UTC));
     }
+
     public static LocalDate getLocalDateAfterDays(short daysAfter) {
         return DateUtils.getCurrentLocalDate().plusDays(daysAfter);
     }
+
     public static LocalDate getLocalDateFromString(String receivedDate) {
         SimpleDateFormat format = new SimpleDateFormat(ISO_FORMAT, Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
@@ -706,7 +750,7 @@ public class DateUtils {
 
     }
 
-
-
-
+    public static LocalDateTime getLocalDateTimeFromMillis(Long longValue) {
+        return (longValue == null) ? null : LocalDateTime.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault());
+    }
 }

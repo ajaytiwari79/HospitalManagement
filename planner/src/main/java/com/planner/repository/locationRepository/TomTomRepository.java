@@ -1,7 +1,7 @@
 package com.planner.repository.locationRepository;
 
 import com.planner.domain.tomtomResponse.TomTomResponse;
-import com.planner.repository.MongoBaseRepository;
+import com.planner.repository.common.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 
 /**

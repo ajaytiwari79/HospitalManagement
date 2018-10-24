@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,6 +40,22 @@ public class Staff {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Staff staff = (Staff) o;
+        return Objects.equals(id, staff.id) &&
+                Objects.equals(lastName, staff.lastName) &&
+                Objects.equals(firstName, staff.firstName);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, lastName, firstName);
     }
 
     public Staff() {

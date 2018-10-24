@@ -60,7 +60,8 @@ public class Shift extends MongoBaseEntity {
     private boolean sickShift;
     private LocalDate validatedByStaffDate;
     private LocalDate validatedByPlannerDate;
-    private Long createdBy = UserContext.getUserDetails().getId();
+    private Long createdBy ;//= UserContext.getUserDetails().getId();
+    private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
     private Long functionId;
     private Long staffUserId;
@@ -139,6 +140,15 @@ public class Shift extends MongoBaseEntity {
 
     public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
         this.attendanceDuration = attendanceDuration;
+    }
+
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public Long getCreatedBy() {
@@ -285,11 +295,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public DateTimeInterval getDateTimeInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.getEndDate().getTime());
-    }
-
-
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
@@ -389,7 +394,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
+        return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
 
     public ShiftQueryResult getShiftQueryResult() {

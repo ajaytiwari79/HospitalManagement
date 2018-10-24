@@ -78,6 +78,20 @@ public class RestClientUrlUtil {
         return baseUrl;
     }
 
+    public static String getUserServiceBaseUrl(RestClientUrlType restClientUrlType,Long id,Long parentId){
+        String baseUrl = null;
+        switch (restClientUrlType){
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId.toString()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                break;
+            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId.toString()).append("/country/").append(id).toString();
+                break;
+            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId.toString()).toString();
+                break;
+        }
+        return baseUrl;
+    }
+
+
     //~ ======================================================================
 
     //TODO FIX
