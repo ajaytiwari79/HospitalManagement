@@ -576,7 +576,7 @@ public class GenericIntegrationService {
     }
 
     public boolean verifyOrganizationExpertizeAndRegions(OrganizationMappingActivityDTO organizationMappingActivityDTO) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        return genericRestClient.publishRequest(organizationMappingActivityDTO, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
