@@ -42,6 +42,9 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     @Query("{organizationId:?0,deleted:false}")
     List<HostingTypeResponseDTO> findAllByUnitIdSortByCreatedDate(Long organizationId, Sort sort);
 
+    @Query("{organizationId:?0,deleted:false}")
+    List<HostingTypeResponseDTO> findAllByUnitId(Long organizationId);
+
 }
 
 
