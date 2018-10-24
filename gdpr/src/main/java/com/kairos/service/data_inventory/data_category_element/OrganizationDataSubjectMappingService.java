@@ -1,6 +1,7 @@
 package com.kairos.service.data_inventory.data_category_element;
 
 
+import com.kairos.dto.gdpr.data_inventory.OrganizationDataCategoryDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationDataSubjectDTO;
 import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationDataSubjectBasicDTO;
@@ -14,6 +15,7 @@ import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingRespon
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,13 +48,98 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     @Inject
     private DataElementMongoRepository dataElementMongoRepository;
 
+
+    public OrganizationDataSubjectDTO createAndUpdateDataSubject(Long unitId, OrganizationDataSubjectDTO organizationDataSubjectDTO) {
+
+        DataSubjectMapping dataSubject = dataSubjectMappingRepository.findByNameAndUnitId(unitId, organizationDataSubjectDTO.getName());
+        if (Optional.ofNullable(dataSubject).isPresent() && !dataSubject.getId().equals(organizationDataSubjectDTO.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", "Data Subject", organizationDataSubjectDTO.getName());
+        }
+
+        if (Optional.ofNullable(organizationDataSubjectDTO.getId()).isPresent()) {
+            dataSubject = dataSubjectMappingRepository.findOne(organizationDataSubjectDTO.getId());
+        } else {
+            dataSubject = new DataSubjectMapping(organizationDataSubjectDTO.getName());
+            dataSubject.setOrganizationId(unitId);
+        }
+        DataCategory dataCategory = createAndUpdateDataCategory(unitId, organizationDataSubjectDTO.getDataCategory());
+        dataSubject.getDataCategories().add(dataCategory.getId());
+        dataSubjectMappingRepository.save(dataSubject);
+        organizationDataSubjectDTO.setId(dataSubject.getId());
+        return organizationDataSubjectDTO;
+    }
+
+
+    private DataCategory createAndUpdateDataCategory(Long unitId, OrganizationDataCategoryDTO dataCategoryDTO) {
+
+        DataCategory dataCategory = null;
+        if (Optional.ofNullable(dataCategoryDTO.getId()).isPresent()) {
+            dataCategory = dataCategoryMongoRepository.findByUnitIdAndId(unitId, dataCategoryDTO.getId());
+        } else {
+            dataCategory = dataCategoryMongoRepository.findByUnitIdAndName(unitId, dataCategoryDTO.getName());
+            if (Optional.ofNullable(dataCategory).isPresent()) {
+                exceptionService.duplicateDataException("message.duplicate", "Data Category", dataCategoryDTO.getName());
+            }
+            dataCategory = new DataCategory(dataCategoryDTO.getName());
+            dataCategory.setOrganizationId(unitId);
+        }
+        if (CollectionUtils.isNotEmpty(dataCategory.getDataElements())) {
+            List<DataElement> dataElements = dataElementMongoRepository.findAllDataElementByUnitIdAndIds(unitId, dataCategory.getDataElements());
+            List<String> dataElementNames = new ArrayList<>();
+            dataElements.forEach(dataElement -> {
+                dataElementNames.add(dataElement.getName().trim().toLowerCase());
+                if (dataElementNames.contains(dataCategoryDTO.getDataElementName().toLowerCase())) {
+                    exceptionService.invalidRequestException("message.dataElement.already.present.in.dataCategory", dataCategoryDTO.getDataElementName(), dataCategoryDTO.getName());
+                }
+            });
+        }
+        DataElement dataElement = new DataElement(dataCategoryDTO.getDataElementName());
+        dataElement.setOrganizationId(unitId);
+        dataElementMongoRepository.save(dataElement);
+        dataCategory.getDataElements().add(dataElement.getId());
+        dataCategoryMongoRepository.save(dataCategory);
+        return dataCategory;
+
+    }
+
+
     /**
+     * @param unitId        - organization id
+     * @param dataSubjectId - Data Subject id
+     * @return return true on success full deletion of data Subject
+     */
+    public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
+
+        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
+        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Data Subject ", dataSubjectId);
+        }
+        delete(dataSubjectMapping);
+        return true;
+    }
+
+
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId) {
+        return dataSubjectMappingRepository.getAllDataSubjectWithDataCategoryAndDataElementByUnitId(unitId);
+    }
+
+
+    public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId) {
+        return dataSubjectMappingRepository.getDataSubjectWithDataCategoryAndDataElementByUnitId(unitId, dataSubjectId);
+    }
+
+
+    /*
+     * may be required in future if multiple data subject create at same time
+     * */
+
+    /*  *//**
      * @description  -method uses buildDataSubjectWithDataCategoriesAndDataElement to build Data Subject Object and Map Data Categories With Data Subject,
      * Method check for Duplicate name of Data Subject
      * @param unitId -organization id
      * @param dataSubjectDTOS Data Subject List contain Set<String> names of data Subject and list of  Data Category corresponding to Data Subject
      * @return method return list of Data Subject
-     */
+     *//*
 
     public List<DataSubjectMapping> createDataSubjectWithDataCategoriesAndDataElements(Long unitId, List<OrganizationDataSubjectDTO> dataSubjectDTOS) {
 
@@ -70,14 +157,42 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         return buildDataSubjectWithDataCategoriesAndDataElement(unitId, dataSubjectDTOS, dataCategoryDTOList);
     }
 
+*/
 
-    /**
-     * @descirption
-     * @param unitId
-     * @param dataSubjectDTOS
-     * @param dataCategoryDTOS  list od Data Category dto which contain List of Data Element corresponding to Data Category.
-     * @return method build data Subject object and Return list of Data Subjects
+    /*
+     * may be required in future if multiple data subject create at same time
+     * */
+    /*public OrganizationDataSubjectBasicDTO updateDataSubjectMappingById(Long unitId, BigInteger dataSubjectId, OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
+
+        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByNameAndUnitId(unitId, dataSubjectMappingDTO.getName());
+        if (Optional.ofNullable(dataSubjectMapping).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.duplicate", "Data Subject ", dataSubjectMappingDTO.getName());
+        }
+        dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
+        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Subject ", dataSubjectId);
+        }
+        dataSubjectMapping.setName(dataSubjectMappingDTO.getName());
+        dataSubjectMapping.setDataCategories(dataSubjectMappingDTO.getDataCategories());
+        dataSubjectMappingRepository.save(dataSubjectMapping);
+        dataSubjectMappingDTO.setId(dataSubjectMapping.getId());
+        return dataSubjectMappingDTO;
+
+
+    }*/
+
+    /*
+
+
      */
+/**
+ * @descirption
+ * @param unitId
+ * @param dataSubjectDTOS
+ * @param dataCategoryDTOS  list od Data Category dto which contain List of Data Element corresponding to Data Category.
+ * @return method build data Subject object and Return list of Data Subjects
+ *//*
+
     private List<DataSubjectMapping> buildDataSubjectWithDataCategoriesAndDataElement(Long unitId, List<OrganizationDataSubjectDTO> dataSubjectDTOS, List<DataCategoryDTO> dataCategoryDTOS) {
 
 
@@ -113,52 +228,6 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         return dataSubjectMappingList;
     }
 
-
-    /**
-     *
-     * @param unitId - organization id
-     * @param dataSubjectId - Data Subject id
-     * @return return true on success full deletion of data Subject
-     */
-    public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
-
-        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
-        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Data Subject ", dataSubjectId);
-        }
-        delete(dataSubjectMapping);
-        return true;
-    }
-
-
-    public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId) {
-        return dataSubjectMappingRepository.getAllDataSubjectWithDataCategoryAndDataElementByUnitId(unitId);
-    }
-
-
-    public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId) {
-        return dataSubjectMappingRepository.getDataSubjectWithDataCategoryAndDataElementByUnitId(unitId, dataSubjectId);
-    }
-
-
-    public OrganizationDataSubjectBasicDTO updateDataSubjectMappingById(Long unitId, BigInteger dataSubjectId, OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
-
-        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByNameAndUnitId(unitId, dataSubjectMappingDTO.getName());
-        if (Optional.ofNullable(dataSubjectMapping).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.duplicate", "Data Subject ", dataSubjectMappingDTO.getName());
-        }
-        dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
-        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Subject ", dataSubjectId);
-        }
-        dataSubjectMapping.setName(dataSubjectMappingDTO.getName());
-        dataSubjectMapping.setDataCategories(dataSubjectMappingDTO.getDataCategories());
-        dataSubjectMappingRepository.save(dataSubjectMapping);
-        dataSubjectMappingDTO.setId(dataSubjectMapping.getId());
-        return dataSubjectMappingDTO;
-
-
-    }
-
+*/
 
 }

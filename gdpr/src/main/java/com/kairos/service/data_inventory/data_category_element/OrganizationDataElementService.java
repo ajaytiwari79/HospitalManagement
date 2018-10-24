@@ -14,6 +14,11 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
+
+/*
+* function for saving data element and deleting data element are invalid  now as work flow changes ,but may be rquired in future on multiple creation of data Category and data Subject
+*
+* */
 @Service
 public class OrganizationDataElementService extends MongoBaseService {
 

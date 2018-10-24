@@ -23,6 +23,10 @@ import java.util.*;
 
 import static com.kairos.constants.AppConstant.*;
 
+
+/*
+* * function for saving data Category and deleting data Category are invalid  now as work flow changes ,but may be rquired in future if we have to create multiple  data Category and data Subject
+ */
 @Service
 public class OrganizationDataCategoryService extends MongoBaseService {
 

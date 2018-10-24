@@ -248,9 +248,6 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", new StringBuilder(assetsLinkedWithAssetType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
         AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
-        if (!Optional.ofNullable(assetType).isPresent() && !assetType.isSubAssetType()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
-        }
         Set<BigInteger> riskIds = new HashSet<>();
         riskIds.addAll(assetType.getRisks());
         List<AssetType> assetSubTypes = assetTypeMongoRepository.findAllAssetSubTypeByUnitIdAndIds(unitId, assetType.getSubAssetTypes());
