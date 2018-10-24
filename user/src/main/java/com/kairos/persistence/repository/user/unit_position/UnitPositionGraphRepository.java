@@ -5,6 +5,7 @@ import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQuery
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
@@ -301,7 +302,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(unitPosition)-[:IN_UNIT]-(org:Organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:HAS_MUNICIPALITY]-(pga:PayGroupArea)<-[pgaRel:HAS_PAY_GROUP_AREA]-(payGrade) \n" +
             "with  unitPosition,positionLine,payGrade,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost \n" +
             " OPTIONAL MATCH (positionLine)-[:HAS_FUNCTION]-(function:Function) \n" +
-            " OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:APPLICABLE_FOR_EXPERTISE]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (positionLine.endDate IS NULL OR date(positionLine.endDate)>= date(datetime({epochmillis:functionalPayment.startDate})))\n" +
+            " OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:APPLICABLE_FOR_EXPERTISE]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate})))\n" +
             " OPTIONAL MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix) \n" +
             " OPTIONAL MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]->(seniorityLevel) \n" +
             " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +

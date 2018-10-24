@@ -1723,11 +1723,8 @@ public class StaffService {
         if (shiftDate != null) {
             functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
         }
-
         Long countryId = organization.getCountry().getId();
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
-        //Todo it should calculate dynamically
-        unitPosition.setHourlyCost(14.5f);
         unitPosition.setFunctionId(functionId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());

@@ -846,6 +846,8 @@ public class UnitPositionService {
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
 
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        List<UnitPositionLinesQueryResult> unitPositionLinesQueryResults=unitPositionGraphRepository.findFunctionalHourlyCost(Arrays.asList(unitPositionId));
+        Map<Long,Float> hourlyCostMap=unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId,UnitPositionLinesQueryResult::getHourlyCost,(previous, current) -> current));
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
         convertUnitPositionObject(unitPosition, unitPositionDetails);
         unitPositionDetails.setCountryId(countryId);
@@ -856,6 +858,8 @@ public class UnitPositionService {
             unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
         }
         unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
+        float hourlyCost=(float) (unitPosition.getPositionLines().get(0).getStartDate().isLeapYear()?hourlyCostMap.get(unitPosition.getPositionLines().get(0).getId())/366*7.4:hourlyCostMap.get(unitPosition.getPositionLines().get(0).getId())/365*7.4);
+        unitPositionDetails.setHourlyCost(hourlyCost);
         return unitPositionDetails;
     }
 
