@@ -250,36 +250,36 @@ public class UnitPositionService {
 
         LocalDate unitPositionStartDate = unitPositionDTO.getStartDate();
         LocalDate unitPositionEndDate = unitPositionDTO.getEndDate();
-        if (unitPositions.size()>1) {
-            unitPositions.forEach(unitPosition -> {
-                // if null date is set
-                if (unitPosition.getEndDate() != null) {
-                    if (unitPositionStartDate.isBefore(unitPosition.getEndDate()) && unitPositionStartDate.isAfter(unitPosition.getStartDate())) {
-                        exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
-                    }
-                    if (unitPositionEndDate != null) {
-                        Interval previousInterval = new Interval(DateUtil.getDateFromEpoch(unitPosition.getStartDate()), DateUtil.getDateFromEpoch(unitPosition.getEndDate()));
-                        Interval interval = new Interval(DateUtil.getDateFromEpoch(unitPositionStartDate), DateUtil.getDateFromEpoch(unitPositionEndDate));
-                        logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
-                        if (previousInterval.overlaps(interval))
-                            exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
-                    } else {
-                        if (unitPositionStartDate.isBefore(unitPosition.getEndDate())) {
-                            exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getEndDate());
-                        }
-                    }
-                } else {
-                    // unitEmploymentEnd date is null
-                    if (unitPositionEndDate != null) {
-                        if (unitPositionEndDate.isAfter(unitPosition.getStartDate())) {
-                            exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
-                        }
-                    } else {
+
+        unitPositions.forEach(unitPosition -> {
+            // if null date is set
+            if (unitPosition.getEndDate() != null) {
+                if (unitPositionStartDate.isBefore(unitPosition.getEndDate()) && unitPositionStartDate.isAfter(unitPosition.getStartDate())) {
+                    exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
+                }
+                if (unitPositionEndDate != null) {
+                    Interval previousInterval = new Interval(DateUtil.getDateFromEpoch(unitPosition.getStartDate()), DateUtil.getDateFromEpoch(unitPosition.getEndDate()));
+                    Interval interval = new Interval(DateUtil.getDateFromEpoch(unitPositionStartDate), DateUtil.getDateFromEpoch(unitPositionEndDate));
+                    logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
+                    if (previousInterval.overlaps(interval))
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
+                } else {
+                    if (unitPositionStartDate.isBefore(unitPosition.getEndDate())) {
+                        exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getEndDate());
                     }
                 }
-            });
-        }
+            } else {
+                // unitEmploymentEnd date is null
+                if (unitPositionEndDate != null) {
+                    if (unitPositionEndDate.isAfter(unitPosition.getStartDate())) {
+                        exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
+                    }
+                } else {
+                    exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
+                }
+            }
+        });
+
         return true;
     }
 
@@ -410,12 +410,12 @@ public class UnitPositionService {
          **/
         if (changeResultDTO.isCalculativeChanged()) {
 
-            List<UnitPosition> oldUnitPositions
-                    = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
-            validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+            // List<UnitPosition> oldUnitPositions
+            //       = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
+            //validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
             if (currentUnitPositionLine.getStartDate().isEqual(unitPositionDTO.getStartDate())) {
                 //both are of same start Date only set  data
-                updateCurrentPositionLine(currentUnitPositionLine,unitPositionDTO);
+                updateCurrentPositionLine(currentUnitPositionLine, unitPositionDTO);
                 if (changeResultDTO.isEmploymentTypeChanged()) {
                     unitPositionEmploymentTypeRelationShipGraphRepository.updateEmploymentTypeInCurrentUnitPositionLine(currentUnitPositionLine.getId(), unitPositionDTO.getEmploymentTypeId(), unitPositionDTO.getEmploymentTypeCategory());
                 }
@@ -437,7 +437,6 @@ public class UnitPositionService {
                         new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
                         }, unitPositionId);
             }
-
 
 
             if (changeResultDTO.getWtaId() != null) {
@@ -674,7 +673,9 @@ public class UnitPositionService {
                 });
                 if (u.getEndDate() != null) {
                     u.setEndDate(positionLine.getEndDate());
-                    u.setEditable(positionLine.getEndDate().isBefore(DateUtils.getCurrentLocalDate())?false:true);
+                    u.setEditable(positionLine.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) ? false : true);
+                } else {
+                    u.setEditable(true);
                 }
             });
         });
@@ -1109,7 +1110,7 @@ public class UnitPositionService {
         List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("upIds", unitpositionIds.toString().replace("[", "").replace("]", "")));
         WTATableSettingWrapper wtaWithTableSettings = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_WTA, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTATableSettingWrapper>>() {
         });
-        Map<Long, UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().filter(u ->u.getHistory()!=null && u.getHistory().equals(false)).collect(Collectors.toMap(UnitPositionQueryResult::getId, v -> v));
+        Map<Long, UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().filter(u -> u.getHistory() != null && u.getHistory().equals(false)).collect(Collectors.toMap(UnitPositionQueryResult::getId, v -> v));
         wtaWithTableSettings.getAgreements().forEach(currentWTA -> {
             UnitPositionQueryResult unitPositionQueryResult = unitPositionQueryResultMap.get(currentWTA.getUnitPositionId());
             if (unitPositionQueryResult != null) {
