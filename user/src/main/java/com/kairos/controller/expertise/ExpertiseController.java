@@ -53,6 +53,13 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseIds);
     }
 
+    @ApiOperation(value = "find an expertise by id")
+    @GetMapping(value = "country/{countryId}/expertise/{expertiseId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getExpertiseById(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
+    }
+
     @ApiOperation(value = "Get Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
