@@ -54,11 +54,11 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "Optional Match(osSub:OrganizationService) where id(osSub)={2} " +
             "Optional Match (c)-[link:"+HAS_ORGANIZATION_SERVICES+"]-(os)-[child:"+ORGANIZATION_SUB_SERVICE+"]-(osSub) " +
             "return " +
-            "when c is null then countryNotExists " +
-            "when os is null then organizationServiceNotExists " +
-            "when osSub is null then organizationSubServiceNotExists " +
-            "when child is null or link is null  then relationShipNotValid " +
-            "else valid end as result")
+            "case when c is null then \"countryNotExists\" " +
+            "when os is null then \"organizationServiceNotExists\" " +
+            "when osSub is null then \"organizationSubServiceNotExists\" " +
+            "when child is null or link is null  then \"relationShipNotValid\" " +
+            "else \"valid\" end as result")
     String validateCountryConstraint(Long countryId,Long organizationServiceId,Long organizationSubServiceId);
 
     @Query("Optional Match(unit:Organization) where id(unit)={0} " +

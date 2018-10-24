@@ -42,6 +42,7 @@ public class CountryConstraintService {
     /**
      * Copy CountryConstraint on applicable
      * units
+     *
      * @param organizationServiceId
      * @param organizationSubServiceId
      * @param countryConstraint
@@ -50,8 +51,9 @@ public class CountryConstraintService {
         List<Long> applicableUnitIdForConstraint = userNeo4jRepo.getUnitIdsByOrganizationServiceAndSubServiceId(organizationServiceId, organizationSubServiceId);
         List<UnitConstraint> unitConstraintList = new ArrayList<>();
         if (!applicableUnitIdForConstraint.isEmpty()) {
-            UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
             for (Long unitId : applicableUnitIdForConstraint) {
+                UnitConstraint unitConstraint = new UnitConstraint();
+                unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
                 unitConstraint.setId(null);//Unset Id
                 unitConstraint.setUnitId(unitId);
                 unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
@@ -59,7 +61,7 @@ public class CountryConstraintService {
             }
 
             if (unitConstraintList.size() > 0) {
-                //TODO Bulk save Operation
+                constraintsRepository.saveObjectList(unitConstraintList);
             }
         }
     }
@@ -72,7 +74,8 @@ public class CountryConstraintService {
             countryConstraint.setParentCountryConstraintId(countryConstraintDTO.getId());
             countryConstraint.setId(null);//Unset Id
             constraintsRepository.saveObject(countryConstraint);
-
+            //Now copy same Constraints on unit
+            createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
         }
     }
 
@@ -116,7 +119,6 @@ public class CountryConstraintService {
 
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countryConstraintDTO.getCountryId());
         } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), checkApplicableId ? countryConstraintDTO.getId() : null, true, countryConstraintDTO.getCountryId())) {
-
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         } else if ("organizationServiceNotExists".equals(result)) {
 
