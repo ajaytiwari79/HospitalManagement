@@ -1,5 +1,6 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.custom_exception.*;
 import com.kairos.wrapper.ResponseEnvelope;

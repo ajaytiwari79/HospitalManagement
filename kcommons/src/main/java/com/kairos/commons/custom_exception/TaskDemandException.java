@@ -1,4 +1,4 @@
-package com.kairos.custom_exception;
+package com.kairos.commons.custom_exception;
 
 /**
  * Created by oodles on 4/4/17.
