@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 public class FunctionsDTO {
     private Long functionId;
     private BigDecimal amount; // amount which is added to this function;
+    private boolean amountEditableAtUnit;
 
     public FunctionsDTO() {
         // dc
@@ -33,6 +34,13 @@ public class FunctionsDTO {
         this.amount = amount;
     }
 
+    public boolean isAmountEditableAtUnit() {
+        return amountEditableAtUnit;
+    }
+
+    public void setAmountEditableAtUnit(boolean amountEditableAtUnit) {
+        this.amountEditableAtUnit = amountEditableAtUnit;
+    }
 
     public FunctionsDTO(BigDecimal amount, Long functionId) {
         this.functionId = functionId;

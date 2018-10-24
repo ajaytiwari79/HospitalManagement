@@ -1,5 +1,10 @@
 
-ACTIVITY
+kairos ACTIVITY
 
 db.time_Type.update({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
 db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
+
+
+NEO
+MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
+set r.amountEditableAtUnit=FALSE
