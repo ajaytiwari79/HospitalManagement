@@ -38,11 +38,11 @@ public class ShiftActivity {
     }
 
 
-    public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activityName = activityname;
+        this.activityName = activityName;
     }
 
     public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift) {

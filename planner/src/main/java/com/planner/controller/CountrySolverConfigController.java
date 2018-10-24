@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.dto.planner.country.solverconfig.CountrySolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.solverconfiguration.CountrySolverConfigService;
 import io.swagger.annotations.ApiOperation;

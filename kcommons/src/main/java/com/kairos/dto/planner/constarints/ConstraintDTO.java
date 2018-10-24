@@ -2,7 +2,7 @@ package com.kairos.dto.planner.constarints;
 
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.solver_config.ContraintLevel;
+import com.kairos.enums.constraint.ConstraintLevel;
 
 import java.math.BigInteger;
 
@@ -13,7 +13,7 @@ public class ConstraintDTO {
     protected String description;
     protected ConstraintType constraintType;
     protected ConstraintSubType constraintSubType;
-    protected ContraintLevel contraintLevel;
+    protected ConstraintLevel constraintLevel;
     protected int penalty;
     protected Long planningProblemId;
 
@@ -59,12 +59,12 @@ public class ConstraintDTO {
         this.constraintSubType = constraintSubType;
     }
 
-    public ContraintLevel getContraintLevel() {
-        return contraintLevel;
+    public ConstraintLevel getConstraintLevel() {
+        return constraintLevel;
     }
 
-    public void setContraintLevel(ContraintLevel contraintLevel) {
-        this.contraintLevel = contraintLevel;
+    public void setConstraintLevel(ConstraintLevel constraintLevel) {
+        this.constraintLevel = constraintLevel;
     }
 
     public int getPenalty() {

@@ -1,9 +1,9 @@
 package com.planner.repository.common;
 
 import com.kairos.commons.utils.DateUtils;
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 import com.planner.domain.common.MongoSequence;
-import com.planner.domain.common.solverconfig.SolverConfig;
+import com.planner.domain.solverconfig.common.SolverConfig;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.*;
@@ -53,9 +53,9 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     }
 
     @Override
-    public boolean isNameExists(String name, BigInteger solverConfigIdNotApplicableForCheck,boolean checkForCountry) {
+    public boolean isNameExists(String name, BigInteger solverConfigIdNotApplicableForCheck, boolean checkForCountry) {
         boolean result;
-        String idFieldType=checkForCountry?"countryId":"unitId";
+        String idFieldType = checkForCountry ? "countryId" : "unitId";
         if (solverConfigIdNotApplicableForCheck != null)
             result = mongoOperations.exists(new Query(Criteria.where("name").is(name).andOperator(Criteria.where("_id").ne(solverConfigIdNotApplicableForCheck).andOperator(Criteria.where(idFieldType).exists(true)))), entityInformation.getJavaType());
         else
@@ -74,14 +74,16 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         return mongoOperations.find(new Query(Criteria.where("deleted").exists(false)), entityInformation.getJavaType());
     }
 
+    @Deprecated
     @Override
     public List<T> findAllSolverConfigNotDeletedByType(String solverConfigType) {
-        List<T> result;
-        if ("country".equalsIgnoreCase(solverConfigType))
-            result = mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("countryId").exists(true))), entityInformation.getJavaType());
-        else
-            result = mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where("unitId").exists(true))), entityInformation.getJavaType());
-        return result;
+        String idType = "country".equalsIgnoreCase(solverConfigType) ? "countryId" : "unitId";
+        return mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where(idType).exists(true))), entityInformation.getJavaType());
+
+    }
+    @Override
+    public List<T> findAllObjectsNotDeletedByType(String type) {
+        return mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where(type+"Id").exists(true))), entityInformation.getJavaType());
     }
 /**********************************Custom Sequence Generator by this Application******************************************************/
     /**

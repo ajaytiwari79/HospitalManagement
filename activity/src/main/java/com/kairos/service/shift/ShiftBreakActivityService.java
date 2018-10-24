@@ -104,7 +104,6 @@ public class ShiftBreakActivityService {
                 startDateMillis = endDateMillis;
                 lastItemAdded = SHIFT;
                 if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
-
                     endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                     shifts.add(getShiftObject( breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis),true));
                     shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
@@ -131,7 +130,9 @@ public class ShiftBreakActivityService {
             if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                 startDateMillis = endDateMillis;
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                shifts.add(getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis)));
+               ShiftActivity currentBreakActivity= getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis));
+               currentBreakActivity.setBreakShift(true);
+                shifts.add(currentBreakActivity);
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                 lastItemAdded = BREAK;
@@ -146,8 +147,6 @@ public class ShiftBreakActivityService {
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             totalBreakAllotedInMinute += ((endDateMillis - startDateMillis) / ONE_MINUTE);
             shifts.add(getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis),true));
-
-
         } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded)) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
