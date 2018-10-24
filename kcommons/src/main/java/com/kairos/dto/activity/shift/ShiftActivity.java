@@ -30,6 +30,7 @@ public class ShiftActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
+    private boolean breakShift;
 
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
@@ -37,14 +38,21 @@ public class ShiftActivity {
     }
 
 
-    public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
+
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activityName = activityname;
+        this.activityName = activityName;
     }
 
-
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift) {
+        this.activityId = activityId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+        this.breakShift=breakShift;
+    }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
@@ -180,5 +188,11 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
+    public boolean isBreakShift() {
+        return breakShift;
+    }
 
+    public void setBreakShift(boolean breakShift) {
+        this.breakShift = breakShift;
+    }
 }

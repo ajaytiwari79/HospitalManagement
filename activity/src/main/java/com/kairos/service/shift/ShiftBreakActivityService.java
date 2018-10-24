@@ -182,7 +182,8 @@ public class ShiftBreakActivityService {
                     breakActivity =  breakActivitiesMap.get(paid ?breakSettings.get(i).getPaidActivityId() : breakSettings.get(i).getUnpaidActivityId()).getActivity();
                 }
                 endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
-                shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis)));
+                shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis),false));
+
                 // we have added a sub shift now adding the break for remaining period
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 // if still after subtraction the shift is greater than
@@ -191,7 +192,7 @@ public class ShiftBreakActivityService {
                 lastItemAdded = SHIFT;
                 if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                     endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                    shifts.add(getShiftObject( breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis)));
+                    shifts.add(getShiftObject( breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis),true));
 
                     shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                     startDateMillis = endDateMillis;
@@ -209,13 +210,13 @@ public class ShiftBreakActivityService {
             // last end date is now start date
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
-            shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis)));
+            shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis),false));
             shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
             lastItemAdded = SHIFT;
             if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                 startDateMillis = endDateMillis;
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                shifts.add(getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis)));
+                shifts.add(getShiftObject( breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis),true));
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                 lastItemAdded = BREAK;
@@ -227,20 +228,20 @@ public class ShiftBreakActivityService {
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             totalBreakAllotedInMinute += ((endDateMillis - startDateMillis) / ONE_MINUTE);
-            shifts.add(getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis)));
+            shifts.add(getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis),true));
 
 
         } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded)) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
-            shifts.add(getShiftObject( mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis)));
+            shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis),false));
 
         }
         return shifts;
     }
 
-    private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate) {
-        ShiftActivity childShift = new ShiftActivity( name, startDate, endDate, activityId);
+    private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate,boolean breakShift) {
+        ShiftActivity childShift = new ShiftActivity( name, startDate, endDate, activityId,breakShift);
         childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
         childShift.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
         return childShift;
