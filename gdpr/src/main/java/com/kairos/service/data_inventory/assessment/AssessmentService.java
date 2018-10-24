@@ -390,6 +390,9 @@ public class AssessmentService extends MongoBaseService {
         if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
             exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
         }
+        if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
+            exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
+        }
         assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
         assessmentMongoRepository.save(assessment);
         return assessmentAnswerValueObjects;
@@ -515,6 +518,18 @@ public class AssessmentService extends MongoBaseService {
         }
     }
 
+    private List<BigInteger> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
+        List<BigInteger> entityIdList = new ArrayList<>();
+        if (objectToCast instanceof ArrayList) {
+            List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
+            entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
+        } else {
+            LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
+            entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+        }
+        return entityIdList;
+    }
+
 
     private void saveAssetValueToAssessmentAnswer(Long unitId, Assessment assessment) {
 
@@ -533,6 +548,22 @@ public class AssessmentService extends MongoBaseService {
         assessment.setAssessmentAnswers(assetAssessmentAnswerVOS);
     }
 
+
+    private void saveProcessingActivityValueToAssessmentAnswer(Long unitId, Assessment assessment) {
+        ProcessingActivityResponseDTO processingActivityDTO = processingActivityMongoRepository.getProcessingActivityAndMetaDataById(unitId, assessment.getProcessingActivityId());
+        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
+        if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
+        }
+        List<AssessmentAnswerValueObject> processingActivityAssessmentAnswerVOS = new ArrayList<>();
+        for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
+            for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                processingActivityAssessmentAnswerVOS.add(mapProcessingActivityValueAssessmentAnswerOnStatusUpdatingFromNewToInProgress(processingActivityDTO, questionBasicDTO));
+            }
+        }
+        assessment.setAssessmentAnswers(processingActivityAssessmentAnswerVOS);
+
+    }
 
     private AssessmentAnswerValueObject mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(AssetResponseDTO assetResponseDTO, QuestionBasicResponseDTO questionBasicDTO) {
 
@@ -576,24 +607,6 @@ public class AssessmentService extends MongoBaseService {
 
     }
 
-
-    private void saveProcessingActivityValueToAssessmentAnswer(Long unitId, Assessment assessment) {
-        ProcessingActivityResponseDTO processingActivityDTO = processingActivityMongoRepository.getProcessingActivityAndMetaDataById(unitId, assessment.getProcessingActivityId());
-        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
-        if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
-        }
-        List<AssessmentAnswerValueObject> processingActivityAssessmentAnswerVOS = new ArrayList<>();
-        for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
-            for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                processingActivityAssessmentAnswerVOS.add(mapProcessingActivityValueAssessmentAnswerOnStatusUpdatingFromNewToInProgress(processingActivityDTO, questionBasicDTO));
-            }
-        }
-        assessment.setAssessmentAnswers(processingActivityAssessmentAnswerVOS);
-
-    }
-
-
     private AssessmentAnswerValueObject mapProcessingActivityValueAssessmentAnswerOnStatusUpdatingFromNewToInProgress(ProcessingActivityResponseDTO processingActivityDTO, QuestionBasicResponseDTO questionBasicDTO) {
 
         ProcessingActivityAttributeName processingActivityAttributeName = ProcessingActivityAttributeName.valueOf(questionBasicDTO.getAttributeName());
@@ -634,19 +647,6 @@ public class AssessmentService extends MongoBaseService {
                 return null;
         }
 
-    }
-
-
-    private List<BigInteger> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
-        List<BigInteger> entityIdList = new ArrayList<>();
-        if (objectToCast instanceof ArrayList) {
-            List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-            entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
-        } else {
-            LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-            entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
-        }
-        return entityIdList;
     }
 
 
