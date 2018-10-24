@@ -5,24 +5,20 @@ import java.math.BigInteger;
 
 public class BreakSettingsDTO {
     private BigInteger id;
-    private Long unitId;
     @Min(value = 1, message = "error.breakSettings.shiftDuration.must.greaterThanZero")
     private Long shiftDurationInMinute;
     @Min(value = 1, message = "error.breakSettings.breakDuration.must.greaterThanZero")
     private Long breakDurationInMinute;
-    private Long numberOfBreaks;
-    private BigInteger paidActivityId;
-    private BigInteger unpaidActivityId;
+    private BigInteger activityId;
+
 
     public BreakSettingsDTO() {
         //Default Constructor
     }
 
-    public BreakSettingsDTO(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
-        this.unitId = unitId;
+    public BreakSettingsDTO(Long shiftDurationInMinute, Long breakDurationInMinute, Long expertiseId) {
         this.shiftDurationInMinute = shiftDurationInMinute;
         this.breakDurationInMinute = breakDurationInMinute;
-        this.numberOfBreaks = numberOfBreaks;
     }
 
     public BigInteger getId() {
@@ -33,13 +29,6 @@ public class BreakSettingsDTO {
         this.id = id;
     }
 
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
 
     public Long getShiftDurationInMinute() {
         return shiftDurationInMinute;
@@ -57,27 +46,13 @@ public class BreakSettingsDTO {
         this.breakDurationInMinute = breakDurationInMinute;
     }
 
-    public Long getNumberOfBreaks() {
-        return numberOfBreaks;
+    public BigInteger getActivityId() {
+        return activityId;
     }
 
-    public void setNumberOfBreaks(Long numberOfBreaks) {
-        this.numberOfBreaks = numberOfBreaks;
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
     }
 
-    public BigInteger getPaidActivityId() {
-        return paidActivityId;
-    }
 
-    public void setPaidActivityId(BigInteger paidActivityId) {
-        this.paidActivityId = paidActivityId;
-    }
-
-    public BigInteger getUnpaidActivityId() {
-        return unpaidActivityId;
-    }
-
-    public void setUnpaidActivityId(BigInteger unpaidActivityId) {
-        this.unpaidActivityId = unpaidActivityId;
-    }
 }

@@ -1,9 +1,10 @@
-package com.kairos.persistence.repository.activity;
+package com.kairos.persistence.repository.time_type;
 
 
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -13,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, BigInteger> {
+public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, BigInteger> ,CustomTimeTypeMongoRepository {
 
     @Query("{'upperLevelTimeTypeId':{'$exists':false},'deleted' : false,'countryId':?0}")
     List<TimeType> getTopLevelTimeType(Long countryId);
@@ -56,4 +57,7 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
 
     @Query("{upperLevelTimeTypeId:{ $in:?0},deleted : false}")
     List<TimeType> findAllChildTimeTypeByParentId(List<BigInteger> timeTypeIds);
+
+    @Query(value = "{ upperLevelTimeTypeId:{'$exists':false}, deleted:false, countryId:?0 , breakPaymentSetting:?1 }")
+    List<TimeType> findAllByDeletedFalseAndCountryIdAndBreakPaymentSetting(Long countryId, BreakPaymentSetting breakPaymentSetting);
 }
