@@ -1243,10 +1243,16 @@ public class ShiftService extends MongoBaseService {
             }
         }
         shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        List<BigInteger> activityIds = shiftState.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         shiftState.setShiftId(shiftDTO.getShiftId());
         shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
         shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
-        shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+        shiftState.getActivities().forEach(a -> {
+            a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+            a.setActivityName(activityWrapperMap.get(a.getActivityId()).getActivity().getName());
+        });
         save(shiftState);
         if (validatedByStaff) {
             shiftState.setValidatedByStaffDate(LocalDate.now());
