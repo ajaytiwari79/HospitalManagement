@@ -231,11 +231,13 @@ public class AttendanceSettingService extends MongoBaseService {
             if(staffIdAndShifts.get(attendanceSetting.getShiftId())!=null)
             {
                 Shift shift=staffIdAndShifts.get(attendanceSetting.getStaffId()+""+attendanceSetting.getAttendanceDuration().getFrom());
-                attendanceSetting.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
-                shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
-                saveShifts.add(shift);
+                if(!shift.getEndDate().after(DateUtils.getCurrentDate())) {
+                    attendanceSetting.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                    shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                    saveShifts.add(shift);
+                }
             }else{
-                attendanceSetting.getAttendanceDuration().setTo(LocalDateTime.now().minusDays(1).toLocalDate().atTime(LocalTime.MAX));
+                attendanceSetting.getAttendanceDuration().setTo(LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
             }
         });
         if(!attendanceSettings.isEmpty()) attendanceSettingRepository.saveEntities(attendanceSettings);
