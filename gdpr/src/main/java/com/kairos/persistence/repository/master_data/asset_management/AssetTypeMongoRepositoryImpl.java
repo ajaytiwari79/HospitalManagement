@@ -33,7 +33,9 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
     private String nonDeletedSubAsset = CustomAggregationQuery.assetTypesAddNonDeletedSubAssetTypes();
     Document nonDeletedSubAssetOperation = Document.parse(nonDeletedSubAsset);
-    private String groupOperation = "{ '$group' : { '_id' : '$_id', 'subAssetTypes': { '$addToSet' : '$subAssetTypes' },'risks' : { '$first' : '$risks' }, 'hasSubAsset' : { '$first' : '$hasSubAsset' }, 'name' : { '$first':'$name' }," +
+    private String groupOperationWithRisk = "{ '$group' : { '_id' : '$_id', 'subAssetTypes': { '$addToSet' : '$subAssetTypes' },'risks' : { '$first' : '$risks' }, 'hasSubAsset' : { '$first' : '$hasSubAsset' }, 'name' : { '$first':'$name' }," +
+            "'subAssetType' : { '$first' :'$subAssetType'}, 'createdAt':{'$first' : '$createdAt' } } }";
+    private String groupOperationWithOutRisk = "{ '$group' : { '_id' : '$_id', 'subAssetTypes': { '$addToSet' : '$subAssetTypes' },'hasSubAsset' : { '$first' : '$hasSubAsset' }, 'name' : { '$first':'$name' }," +
             "'subAssetType' : { '$first' :'$subAssetType'}, 'createdAt':{'$first' : '$createdAt' } } }";
 
 
@@ -58,7 +60,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
                 lookup("assetType", "subAssetTypes", "_id", "subAssetTypes"),
                 unwind("subAssetTypes", true),
                 lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
-                new CustomAggregationOperation(Document.parse(groupOperation)),
+                new CustomAggregationOperation(Document.parse(groupOperationWithRisk)),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
@@ -102,7 +104,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
                 lookup("assetType", "subAssetTypes", "_id", "subAssetTypes"),
                 unwind("subAssetTypes", true),
                 lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
-                new CustomAggregationOperation(Document.parse(groupOperation)),
+                new CustomAggregationOperation(Document.parse(groupOperationWithRisk)),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
@@ -123,5 +125,23 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
         );
         AggregationResults<AssetTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeResponseDTO.class);
         return result.getUniqueMappedResult();
+    }
+
+    @Override
+    public List<AssetTypeResponseDTO> getAllAssetTypeWithSubAssetTypeByUnitId(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAssetType").is(false).and(DELETED).is(false)),
+                lookup("risk", "risks", "_id", "risks"),
+                lookup("assetType", "subAssetTypes", "_id", "subAssetTypes"),
+                unwind("subAssetTypes", true),
+                new CustomAggregationOperation(Document.parse(groupOperationWithOutRisk)),
+                sort(Sort.Direction.DESC, "createdAt"),
+                new CustomAggregationOperation(nonDeletedSubAssetOperation)
+        );
+
+
+        AggregationResults<AssetTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeResponseDTO.class);
+        return result.getMappedResults();
     }
 }
