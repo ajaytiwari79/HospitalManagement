@@ -284,9 +284,6 @@ public class UnitPositionService {
     }
 
     private UnitPositionLine createPositionLine(UnitPosition oldUnitPosition, UnitPositionLine oldUnitPositionLine, UnitPositionDTO unitPositionDTO) {
-        if (unitPositionDTO.getStartDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
-        }
         if (Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent() && unitPositionDTO.getStartDate().isAfter(unitPositionDTO.getEndDate())) {
             exceptionService.actionNotPermittedException("message.startdate.notlessthan.enddate");
         }
