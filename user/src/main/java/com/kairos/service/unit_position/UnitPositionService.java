@@ -654,15 +654,15 @@ public class UnitPositionService {
         });
 
         List<UnitPositionLinesQueryResult> positionLines = unitPositionGraphRepository.findAllPositionLines(unitPositionIds);
-        //List<UnitPositionLinesQueryResult> hourlyCostPerLine=unitPositionGraphRepository.findFunctionalHourlyCost(unitPositionIds);
-        //Map<Long,Float> hourlyCostMap=hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId,UnitPositionLinesQueryResult::getHourlyCost));
+        List<UnitPositionLinesQueryResult> hourlyCostPerLine=unitPositionGraphRepository.findFunctionalHourlyCost(unitPositionIds);
+        Map<Long,Float> hourlyCostMap=hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId,UnitPositionLinesQueryResult::getHourlyCost,(previous, current) -> current));
         Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap = positionLines.stream().collect(Collectors.groupingBy(UnitPositionLinesQueryResult::getUnitPositionId));
 
         unitPositionQueryResults.forEach(u -> {
             u.setPositionLines(positionLinesMap.get(u.getId()));
             u.getPositionLines().forEach(positionLine -> {
-//                    float hourlyCost=(float) (positionLine.getStartDate().isLeapYear()?hourlyCostMap.get(positionLine.getId())/366*7.4:hourlyCostMap.get(positionLine.getId())/365*7.4);
-//                    positionLine.setHourlyCost(hourlyCost);
+                    float hourlyCost=(float) (positionLine.getStartDate().isLeapYear()?hourlyCostMap.get(positionLine.getId())/366*7.4:hourlyCostMap.get(positionLine.getId())/365*7.4);
+                    positionLine.setHourlyCost(hourlyCost);
 
                     ctawtaWrapper.getCta().forEach(cta -> {
                     if ((cta.getStartDate().isBefore(positionLine.getStartDate()) || positionLine.getStartDate().isEqual(cta.getStartDate()))
