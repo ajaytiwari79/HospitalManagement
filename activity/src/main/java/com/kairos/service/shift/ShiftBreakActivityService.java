@@ -46,7 +46,7 @@ public class ShiftBreakActivityService {
         List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByParentIdsAndUnitId(breakActivityIds,unitId);
         Map<BigInteger, ActivityWrapper> activityWrapperMap=
         breakActivities.stream().collect(Collectors.toMap(key -> key.getActivity().getParentId(), value -> value));  // THis map is used for break
-        activityWrapperMap.putAll(breakActivities.stream().collect(Collectors.toMap(key -> key.getActivity().getId(), value -> value)));
+        activityWrapperMap.putAll(breakActivities.stream().collect(Collectors.toMap(key -> key.getActivity().getId(), value -> value))); // this map is used for payOut
         return activityWrapperMap;
     }
 

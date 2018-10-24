@@ -655,7 +655,7 @@ public class GenericIntegrationService {
     }
 
     public Expertise getExpertise(Long countryId, Long expertiseId) {
-        return genericRestClient.publishRequestWithoutParentOrganization(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
 
 }

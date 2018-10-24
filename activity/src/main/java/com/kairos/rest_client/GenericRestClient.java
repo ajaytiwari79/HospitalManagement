@@ -24,9 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
-import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrlWithoutParentOrganization;
+
 
 @Service
 public class GenericRestClient {
@@ -79,42 +78,6 @@ public class GenericRestClient {
 
     }
 
-    /**
-     * @Author vipul
-     * @param t
-     * @param id
-     * @param restClientUrlType
-     * @param httpMethod
-     * @param uri
-     * @param queryParam
-     * @param typeReference
-     * @param pathParams
-     * @param <T>
-     * @param <V>
-     * @return
-     * @DESC   PLEASE USE  when you dont need parent organization in URL
-     */
-    public <T extends Object, V> V publishRequestWithoutParentOrganization(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrlWithoutParentOrganization(restClientUrlType, id) + uri;
-        String url = baseUrl +getURIWithParam(queryParam);
-        try {
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            url,
-                            httpMethod,
-                            new HttpEntity<>(t), typeReference, pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                exceptionService.internalError(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in User micro service " + e.getMessage());
-        }
-
-    }
     /**
      * @param t
      * @param id
@@ -179,32 +142,6 @@ public class GenericRestClient {
             e.printStackTrace();
         }
         return uri;
-    }
-
-    // ============================Unusable code TODO Remove
-    //TODO Remove
-    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String, Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit, id);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + getURI(t, uri, queryParams),
-                            getHttpMethod(integrationOperation),
-                            t == null ? null : new HttpEntity<>(t), typeReference, pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
     }
 
     //TODO Remove
