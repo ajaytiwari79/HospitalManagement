@@ -528,7 +528,7 @@ public class ShiftService extends MongoBaseService {
 
         List<ShiftActivity> shiftActivities = findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(), staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap, shiftActivityIdsDTO);
-        shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities);
+        shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities,phase,staffAdditionalInfoDTO.getUserAccessRoleDTO());
 
 
         // End Here
@@ -567,7 +567,7 @@ public class ShiftService extends MongoBaseService {
 
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
-//            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
+            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
             //anil m2 notify event for updating staffing level
@@ -1251,10 +1251,16 @@ public class ShiftService extends MongoBaseService {
             }
         }
         shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        List<BigInteger> activityIds = shiftState.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         shiftState.setShiftId(shiftDTO.getShiftId());
         shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
         shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
-        shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+        shiftState.getActivities().forEach(a -> {
+            a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+            a.setActivityName(activityWrapperMap.get(a.getActivityId()).getActivity().getName());
+        });
         save(shiftState);
         if (validatedByStaff) {
             shiftState.setValidatedByStaffDate(LocalDate.now());

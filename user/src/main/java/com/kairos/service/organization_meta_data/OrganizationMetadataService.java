@@ -1,7 +1,7 @@
 package com.kairos.service.organization_meta_data;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.PaymentSettings;
 import com.kairos.dto.user.organization.PaymentSettingsDTO;
