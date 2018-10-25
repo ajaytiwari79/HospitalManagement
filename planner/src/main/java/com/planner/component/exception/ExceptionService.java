@@ -2,6 +2,7 @@ package com.planner.component.exception;
 
 import com.planner.common.custum_exceptions.DataNotFoundByIdException;
 import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
+import com.planner.common.custum_exceptions.RelationShipNotValidException;
 import com.planner.component.locale.LocaleService;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -36,5 +37,9 @@ public class ExceptionService {
 
     public void fieldAlreadyExistsException(String message, Object... params) {
         throw new FieldAlreadyExistsException(convertMessage(message, params));
+    }
+
+    public void relationShipNotValidException(String message, Object... params) {
+        throw new RelationShipNotValidException(convertMessage(message, params));
     }
 }

@@ -21,5 +21,8 @@ public interface CustomAssetTypeRepository {
 
     List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByUnitId(Long unitId);
 
+    List<AssetTypeResponseDTO> getAllAssetTypeWithSubAssetTypeByUnitId(Long unitId);
+
+
 
 }

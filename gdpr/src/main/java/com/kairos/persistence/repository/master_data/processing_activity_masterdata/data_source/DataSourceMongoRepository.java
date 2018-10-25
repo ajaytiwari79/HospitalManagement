@@ -41,6 +41,9 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
     @Query("{organizationId:?0,deleted:false}")
     List<DataSourceResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
+    @Query("{organizationId:?0,deleted:false}")
+    List<DataSourceResponseDTO> findAllByUnitId(Long unitId);
+
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     DataSource findByUnitIdAndId(Long unitId, BigInteger id);
 

@@ -52,4 +52,7 @@ public interface AccessorPartyMongoRepository extends MongoBaseRepository<Access
 
     @Query("{organizationId:?0,deleted:false}")
     List<AccessorPartyResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
+
+    @Query("{organizationId:?0,deleted:false}")
+    List<AccessorPartyResponseDTO> findAllByUnitId(Long unitId);
 }

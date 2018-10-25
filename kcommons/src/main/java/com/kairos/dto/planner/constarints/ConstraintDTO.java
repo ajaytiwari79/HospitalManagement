@@ -16,6 +16,7 @@ public class ConstraintDTO {
     protected ConstraintLevel constraintLevel;
     protected int penalty;
     protected Long planningProblemId;
+    protected BigInteger parentCountryConstraintId; //always will null while coming from frontend
 
 
     // =================================================
@@ -81,5 +82,13 @@ public class ConstraintDTO {
 
     public void setPlanningProblemId(Long planningProblemId) {
         this.planningProblemId = planningProblemId;
+    }
+
+    public BigInteger getParentCountryConstraintId() {
+        return parentCountryConstraintId;
+    }
+
+    public void setParentCountryConstraintId(BigInteger parentCountryConstraintId) {
+        this.parentCountryConstraintId = parentCountryConstraintId;
     }
 }
