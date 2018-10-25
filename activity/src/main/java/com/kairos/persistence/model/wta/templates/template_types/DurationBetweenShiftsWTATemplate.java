@@ -100,7 +100,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(shifts.get(shifts.size() - 1).getActivitiesEndDate());
                 timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(infoWrapper.getShift().getActivitiesStartDate())).getMinutes();
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift/60);
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
                 if (!isValid) {
                     if (limitAndCounter[1] != null) {
                         int counterValue = limitAndCounter[1] - 1;
