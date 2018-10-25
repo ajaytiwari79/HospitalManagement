@@ -293,12 +293,11 @@ public class ShiftService extends MongoBaseService {
             ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfoDTO.getViolatedRules(), ShiftViolatedRules.class);
             shiftViolatedRules.setShift(mainShift);
             save(shiftViolatedRules);
+            activityWrapperMap.put(activityWrapper.getActivity().getId(),activityWrapper);
+            shiftReminderService.setReminderTrigger( activityWrapperMap,mainShift);
 
         }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
-        Map<BigInteger,ActivityWrapper> activityWrapperMap= new HashMap<>();
-        activityWrapperMap.put(activityWrapper.getActivity().getId(),activityWrapper);
-        shiftReminderService.setReminderTrigger( activityWrapperMap,mainShift);
         return shiftWithViolatedInfoDTO;
     }
 
