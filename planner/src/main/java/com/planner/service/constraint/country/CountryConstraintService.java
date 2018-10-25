@@ -17,6 +17,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Note:- All DTO fields null value validation if required will be validated on DTO itself
+ * by Either {@code @NotNull} or {@code @NotEmpty} annotation
+ */
 @Service
 public class CountryConstraintService {
 
@@ -31,7 +35,7 @@ public class CountryConstraintService {
 
     //======================================================
     public void createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
-        if (preValidateCountryConstraintDTO(countryConstraintDTO, false)) {
+        if (preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
             constraintsRepository.saveObject(countryConstraint);
             //Now copy same Constraints on unit
@@ -69,7 +73,7 @@ public class CountryConstraintService {
     //====================================================
     public void copyCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
-        if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, false)) {
+        if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
             countryConstraint.setParentCountryConstraintId(countryConstraintDTO.getId());
             countryConstraint.setId(null);//Unset Id
@@ -88,7 +92,7 @@ public class CountryConstraintService {
     //====================================================
     public void updateCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
-        if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
+        if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, false)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
             constraintsRepository.saveObject(countryConstraint);
         }
@@ -99,7 +103,7 @@ public class CountryConstraintService {
         boolean result = false;
         if (countryConstraintId != null)
             result = constraintsRepository.safeDeleteById(countryConstraintId);
-        if (!result) {//TODO throw exception
+        if (!result) {//TODO throw exception if required
         }
 
     }
@@ -112,13 +116,13 @@ public class CountryConstraintService {
      * @param countryConstraintDTO
      * @return
      */
-    private boolean preValidateCountryConstraintDTO(CountryConstraintDTO countryConstraintDTO, boolean checkApplicableId) {
+    private boolean preValidateCountryConstraintDTO(CountryConstraintDTO countryConstraintDTO, boolean isCurrentObjectIdNull) {
         String result = userNeo4jRepo.validateCountryConstraint(countryConstraintDTO.getCountryId(), countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId());
 
         if ("countryNotExists".equals(result)) {
 
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countryConstraintDTO.getCountryId());
-        } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), checkApplicableId ? countryConstraintDTO.getId() : null, true, countryConstraintDTO.getCountryId())) {
+        } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), isCurrentObjectIdNull? null : countryConstraintDTO.getId() , true, countryConstraintDTO.getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         } else if ("organizationServiceNotExists".equals(result)) {
 

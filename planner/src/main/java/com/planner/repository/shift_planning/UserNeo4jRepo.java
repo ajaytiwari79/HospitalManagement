@@ -62,8 +62,8 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
     String validateCountryConstraint(Long countryId,Long organizationServiceId,Long organizationSubServiceId);
 
     @Query("Optional Match(unit:Organization) where id(unit)={0} " +
-            "return" +
-            "when unit is null then unitNotExists else unitExists end " +
+            "return " +
+            "case when unit is null then \"unitNotExists\" else \"valid\" end " +
             "as result")
     String validateUnitConstraint(Long unitId);
 }

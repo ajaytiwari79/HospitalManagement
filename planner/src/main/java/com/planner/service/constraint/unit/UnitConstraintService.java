@@ -14,6 +14,10 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 
+/**
+ * Note:- All DTO fields null value validation if required will be validated on DTO itself
+ * by Either {@code @NotNull} or {@code @NotEmpty} annotation
+ */
 @Service
 public class UnitConstraintService {
 
@@ -28,7 +32,7 @@ public class UnitConstraintService {
 
     //======================================================
     public void createUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
-        if (preValidateUnitConstraintDTO(unitConstraintDTO, false)) {
+        if (preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
             constraintsRepository.saveObject(unitConstraint);
         }
@@ -38,7 +42,7 @@ public class UnitConstraintService {
     //====================================================
     public void copyUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
-        if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, false)) {
+        if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
             unitConstraint.setParentUnitConstraintId(unitConstraintDTO.getId());
             unitConstraint.setId(null);//Unset Id
@@ -49,14 +53,14 @@ public class UnitConstraintService {
 
     //====================================================
     public List<UnitConstraint> getUnitConstraintsByUnitId(Long unitId) {
-        List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, unitId);
+        List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(false, unitId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, UnitConstraint.class);
     }
 
     //====================================================
     public void updateUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
-        if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
+        if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, false)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
             constraintsRepository.saveObject(unitConstraint);
         }
@@ -67,7 +71,7 @@ public class UnitConstraintService {
         boolean result = false;
         if (unitConstraintId != null)
             result = constraintsRepository.safeDeleteById(unitConstraintId);
-        if (!result) {//TODO throw exception
+        if (!result) {//TODO throw exception if reqired
         }
 
     }
@@ -80,13 +84,13 @@ public class UnitConstraintService {
      * @param unitConstraintDTO
      * @return
      */
-    private boolean preValidateUnitConstraintDTO(UnitConstraintDTO unitConstraintDTO, boolean checkApplicableId) {
+    private boolean preValidateUnitConstraintDTO(UnitConstraintDTO unitConstraintDTO, boolean isCurrentObjectIdNull) {
         String result = userNeo4jRepo.validateUnitConstraint(unitConstraintDTO.getUnitId());
 
         if ("unitNotExists".equals(result)) {
 
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Unit", unitConstraintDTO.getUnitId());
-        } else if (constraintsRepository.isNameExistsById(unitConstraintDTO.getName(), checkApplicableId ? unitConstraintDTO.getId() : null, false, unitConstraintDTO.getUnitId())) {
+        } else if (constraintsRepository.isNameExistsById(unitConstraintDTO.getName(), isCurrentObjectIdNull? null : unitConstraintDTO.getId(),false, unitConstraintDTO.getUnitId())) {
 
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         }

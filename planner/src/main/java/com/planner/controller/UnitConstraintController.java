@@ -12,8 +12,10 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
+import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_UNIT_CONSTRAINT_URL;
+
 @RestController
-@RequestMapping
+@RequestMapping(API_PARENT_ORGANIZATION_UNIT_CONSTRAINT_URL)
 public class UnitConstraintController {
 
     @Inject
