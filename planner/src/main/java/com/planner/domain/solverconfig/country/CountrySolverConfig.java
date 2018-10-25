@@ -9,7 +9,6 @@ public class CountrySolverConfig extends SolverConfig{
 
    
     private Long countryId;
-    private BigInteger parentCountrySolverConfigId;//copiedFrom
     private Long organizationServiceId;
     private Long organizationSubServiceId;
     
@@ -21,14 +20,6 @@ public class CountrySolverConfig extends SolverConfig{
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
-    }
-
-    public BigInteger getParentCountrySolverConfigId() {
-        return parentCountrySolverConfigId;
-    }
-
-    public void setParentCountrySolverConfigId(BigInteger parentCountrySolverConfigId) {
-        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
     }
 
     public Long getOrganizationServiceId() {

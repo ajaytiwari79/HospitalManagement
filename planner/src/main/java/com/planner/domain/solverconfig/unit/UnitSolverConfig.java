@@ -7,8 +7,8 @@ import java.math.BigInteger;
 
 public class UnitSolverConfig extends SolverConfig{
 
-    private BigInteger parentUnitSolverConfigId;//copiedFrom
     private Long unitId;
+    private BigInteger parentUnitSolverConfigId;//copiedFrom
 
     //~ Getter/Setter
     public BigInteger getParentUnitSolverConfigId() {

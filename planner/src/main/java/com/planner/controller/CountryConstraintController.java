@@ -37,8 +37,8 @@ public class CountryConstraintController {
 
     @GetMapping
     @ApiOperation("Get CountryConstraint")
-    public ResponseEntity<Map<String, Object>> getCountryConstraintsByCountryId(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countryConstraintService.getCountryConstraintsByCountryId(countryId));
+    public ResponseEntity<Map<String, Object>> getAllCountryConstraintByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countryConstraintService.getAllCountryConstraintByCountryId(countryId));
     }
 
 

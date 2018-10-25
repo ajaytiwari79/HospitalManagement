@@ -31,24 +31,27 @@ public class UnitConstraintService {
     private ExceptionService exceptionService;
 
     //======================================================
-    public void createUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
+    public UnitConstraintDTO createUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         if (preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
             constraintsRepository.saveObject(unitConstraint);
+            unitConstraintDTO.setId(unitConstraint.getId());
         }
+        return unitConstraintDTO;
     }
 
 
     //====================================================
-    public void copyUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
+    public UnitConstraintDTO copyUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
         if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
             unitConstraint.setParentUnitConstraintId(unitConstraintDTO.getId());
             unitConstraint.setId(null);//Unset Id
             constraintsRepository.saveObject(unitConstraint);
-
+            unitConstraintDTO.setId(unitConstraint.getId());
         }
+        return unitConstraintDTO;
     }
 
     //====================================================
@@ -85,13 +88,10 @@ public class UnitConstraintService {
      * @return
      */
     private boolean preValidateUnitConstraintDTO(UnitConstraintDTO unitConstraintDTO, boolean isCurrentObjectIdNull) {
-        String result = userNeo4jRepo.validateUnitConstraint(unitConstraintDTO.getUnitId());
-
+        String result = userNeo4jRepo.validateUnit(unitConstraintDTO.getUnitId());
         if ("unitNotExists".equals(result)) {
-
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Unit", unitConstraintDTO.getUnitId());
-        } else if (constraintsRepository.isNameExistsById(unitConstraintDTO.getName(), isCurrentObjectIdNull? null : unitConstraintDTO.getId(),false, unitConstraintDTO.getUnitId())) {
-
+        } else if (constraintsRepository.isNameExistsById(unitConstraintDTO.getName(), isCurrentObjectIdNull ? null : unitConstraintDTO.getId(), false, unitConstraintDTO.getUnitId())) {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         }
         return true;

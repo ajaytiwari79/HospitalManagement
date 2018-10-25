@@ -34,13 +34,15 @@ public class CountryConstraintService {
     private ExceptionService exceptionService;
 
     //======================================================
-    public void createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
+    public CountryConstraintDTO createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         if (preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
             constraintsRepository.saveObject(countryConstraint);
             //Now copy same Constraints on unit
             createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
+            countryConstraintDTO.setId(countryConstraint.getId());
         }
+        return countryConstraintDTO;
     }
 
     /**
@@ -71,7 +73,7 @@ public class CountryConstraintService {
     }
 
     //====================================================
-    public void copyCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
+    public CountryConstraintDTO copyCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
         if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
@@ -80,11 +82,13 @@ public class CountryConstraintService {
             constraintsRepository.saveObject(countryConstraint);
             //Now copy same Constraints on unit
             createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
+            countryConstraintDTO.setId(countryConstraint.getId());
         }
+        return countryConstraintDTO;
     }
 
     //====================================================
-    public List<CountryConstraint> getCountryConstraintsByCountryId(Long countryId) {
+    public List<CountryConstraint> getAllCountryConstraintByCountryId(Long countryId) {
         List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, countryId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, CountryConstraint.class);
     }
@@ -117,24 +121,18 @@ public class CountryConstraintService {
      * @return
      */
     private boolean preValidateCountryConstraintDTO(CountryConstraintDTO countryConstraintDTO, boolean isCurrentObjectIdNull) {
-        String result = userNeo4jRepo.validateCountryConstraint(countryConstraintDTO.getCountryId(), countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId());
-
+        String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countryConstraintDTO.getCountryId(), countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId());
         if ("countryNotExists".equals(result)) {
-
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countryConstraintDTO.getCountryId());
-        } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), isCurrentObjectIdNull? null : countryConstraintDTO.getId() , true, countryConstraintDTO.getCountryId())) {
+        } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), isCurrentObjectIdNull ? null : countryConstraintDTO.getId(), true, countryConstraintDTO.getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         } else if ("organizationServiceNotExists".equals(result)) {
-
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "OrganizationService", countryConstraintDTO.getOrganizationServiceId());
         } else if ("organizationSubServiceNotExists".equals(result)) {
-
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "OrganizationSubService", countryConstraintDTO.getOrganizationSubServiceId());
         } else if ("relationShipNotValid".equals(result)) {
-
             exceptionService.relationShipNotValidException("message.relationship.notValid");
         }
-
         return true;
     }
 }
