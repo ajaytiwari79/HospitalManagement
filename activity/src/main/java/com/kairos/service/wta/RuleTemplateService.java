@@ -13,7 +13,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.wta.templates.BreakAvailabilitySettings;
+import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;

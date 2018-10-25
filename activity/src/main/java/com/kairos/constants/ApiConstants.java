@@ -140,7 +140,5 @@ public final class ApiConstants {
     public static final String DAY_TYPE = "/dayType";
     public static final String SHOW_COUNTRY_TAGS = "/show_country_tags";
     public static final String TEAM_ORGANIZATION_ID = "/team/organizationId";
-
-
-
+    public static final String COUNTRY_FLEXI_TIME_SETTINGS="/country/{countryId}/flexible_time";
 }

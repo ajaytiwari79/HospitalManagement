@@ -14,6 +14,8 @@ import com.kairos.dto.activity.activity.activity_tabs.communication_tab.Communic
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.FrequencySettings;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.flexible_time.ActivityFlexibleTimeDetails;
+import com.kairos.dto.activity.flexible_time.FlexibleTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
@@ -35,6 +37,7 @@ import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -51,6 +54,7 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.flexible_time.FlexibleTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.phase.PhaseService;
@@ -147,6 +151,8 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private GenericRestClient genericRestClient;
     @Inject private MongoSequenceRepository mongoSequenceRepository;
+    @Inject
+    private FlexibleTimeSettingsService flexibleTimeSettingsService;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -197,6 +203,7 @@ public class ActivityService extends MongoBaseService {
 
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
         List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
+        FlexibleTimeSettingsDTO flexibleTimeSettingsDTO=flexibleTimeSettingsService.getFlexibleTimeSettings(countryId);
 
 
         RulesActivityTab rulesActivityTab = new RulesActivityTab();
@@ -226,7 +233,17 @@ public class ActivityService extends MongoBaseService {
 
         SkillActivityTab skillActivityTab = new SkillActivityTab();
         activity.setSkillActivityTab(skillActivityTab);
-        LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+
+        Set<ActivityFlexibleTimeDetails> activityFlexibleTimeDetailsForCheckIn=new HashSet<>();
+        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForHome=new ActivityFlexibleTimeDetails(LocationEnum.HOME,(short)0,(short)0);
+        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForUnit=new ActivityFlexibleTimeDetails(LocationEnum.OFFICE,(short)0,(short)0);
+        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForDepot=new ActivityFlexibleTimeDetails(LocationEnum.DEPOT,(short)0,(short)0);
+        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForOther=new ActivityFlexibleTimeDetails(LocationEnum.OTHERS,(short)0,(short)0);
+        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForHome);
+        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForUnit);
+        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForDepot);
+        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForOther);
+        LocationActivityTab locationActivityTab = new LocationActivityTab(activityFlexibleTimeDetailsForCheckIn,activityFlexibleTimeDetailsForCheckIn);
         activity.setLocationActivityTab(locationActivityTab);
 
     }
@@ -947,6 +964,7 @@ public class ActivityService extends MongoBaseService {
         List<Activity> activitiesByExternalIds = activityMongoRepository.findByExternalIdIn(externalIdsOfAllActivities);
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
         List<Activity> activities = new ArrayList<>(timeCareActivities.size());
+        FlexibleTimeSettingsDTO flexibleTimeSettingsDTO=flexibleTimeSettingsService.getFlexibleTimeSettings(countryId);
 
         for (TimeCareActivity timeCareActivity : timeCareActivities) {
 
@@ -983,7 +1001,16 @@ public class ActivityService extends MongoBaseService {
             activity.setRulesActivityTab(rulesActivityTab);
 
             // location settings
-            LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+            Set<ActivityFlexibleTimeDetails> activityFlexibleTimeDetailsForCheckIn=new HashSet<>();
+            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForHome=new ActivityFlexibleTimeDetails(LocationEnum.HOME,(short)0,(short)0);
+            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForUnit=new ActivityFlexibleTimeDetails(LocationEnum.OFFICE,(short)0,(short)0);
+            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForDepot=new ActivityFlexibleTimeDetails(LocationEnum.DEPOT,(short)0,(short)0);
+            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForOther=new ActivityFlexibleTimeDetails(LocationEnum.OTHERS,(short)0,(short)0);
+            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForHome);
+            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForUnit);
+            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForDepot);
+            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForOther);
+            LocationActivityTab locationActivityTab = new LocationActivityTab(activityFlexibleTimeDetailsForCheckIn,activityFlexibleTimeDetailsForCheckIn);
             activity.setLocationActivityTab(locationActivityTab);
 
             //Time calculation tab
@@ -1163,7 +1190,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", locationActivityTabDTO.getActivityId());
         }
-        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getCanBeStartAt(), locationActivityTabDTO.getCanBeEndAt());
+        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getFlexibleTimeForCheckIn(),locationActivityTabDTO.getFlexibleTimeForCheckOut());
         activity.setLocationActivityTab(locationActivityTab);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(locationActivityTab);

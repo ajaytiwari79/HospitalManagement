@@ -1,36 +1,29 @@
-package com.kairos.persistence.model.wta.templates.template_types;
+package com.kairos.dto.activity.wta.templates;
 /*
  *Created By Pavan on 25/10/18
  *
  */
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 
 import java.util.Set;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class BreakWTATemplate extends WTABaseRuleTemplate {
-
+public class BreakWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private short breakGapMinutes;
     private Set<BreakAvailabilitySettings> breakAvailability;
 
-    public BreakWTATemplate(short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {
+    public BreakWTATemplateDTO(short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {
         this.breakGapMinutes = breakGapMinutes;
         this.breakAvailability = breakAvailability;
     }
 
-    public BreakWTATemplate(String name, String description, short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {
+    public BreakWTATemplateDTO(String name, String description, short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {
         super(name, description);
         this.breakGapMinutes = breakGapMinutes;
         this.breakAvailability = breakAvailability;
     }
 
-    public BreakWTATemplate() {
-
+    public BreakWTATemplateDTO() {
     }
 
     public short getBreakGapMinutes() {

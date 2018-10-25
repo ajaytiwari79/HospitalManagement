@@ -1,10 +1,13 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.flexible_time.ActivityFlexibleTimeDetails;
+import com.kairos.dto.activity.flexible_time.FlexibleTimeDetails;
 import com.kairos.enums.LocationEnum;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 13/4/18.
@@ -12,8 +15,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LocationActivityTabDTO {
     private BigInteger activityId;
-    private List<LocationEnum> canBeStartAt;
-    private List<LocationEnum> canBeEndAt;
+    private Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn;
+    private Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut;
 
     public LocationActivityTabDTO() {
     }
@@ -26,21 +29,19 @@ public class LocationActivityTabDTO {
         this.activityId = activityId;
     }
 
-    public List<LocationEnum> getCanBeStartAt() {
-        return canBeStartAt;
+    public Set<ActivityFlexibleTimeDetails> getFlexibleTimeForCheckIn() {
+        return flexibleTimeForCheckIn;
     }
 
-    public void setCanBeStartAt(List<LocationEnum> canBeStartAt) {
-        this.canBeStartAt = canBeStartAt;
+    public void setFlexibleTimeForCheckIn(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn) {
+        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
     }
 
-    public List<LocationEnum> getCanBeEndAt() {
-        return canBeEndAt;
+    public Set<ActivityFlexibleTimeDetails> getFlexibleTimeForCheckOut() {
+        return flexibleTimeForCheckOut;
     }
 
-    public void setCanBeEndAt(List<LocationEnum> canBeEndAt) {
-        this.canBeEndAt = canBeEndAt;
+    public void setFlexibleTimeForCheckOut(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut) {
+        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.wta.templates;/*
+package com.kairos.dto.activity.wta.templates;/*
  *Created By Pavan on 25/10/18
  *
  */
