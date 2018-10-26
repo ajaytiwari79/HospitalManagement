@@ -274,24 +274,23 @@ public class DefaultDataInheritService extends MongoBaseService {
                     for (MasterProcessingActivityResponseDTO subProcessingActivityDTO : masterProcessingActivityDTO.getSubProcessingActivities()) {
                         ProcessingActivity subProcessingActivity = new ProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), false);
                         subProcessingActivity.setOrganizationId(unitId);
-                        processingActivity.setSubProcess(true);
+                        subProcessingActivity.setSubProcess(true);
                         subProcessingActivities.add(subProcessingActivity);
                     }
                     processingActivities.addAll(subProcessingActivities);
-                    processingActivitySubProcessingActivityListMap.put(processingActivity, subProcessingActivities);
                 }
+                processingActivitySubProcessingActivityListMap.put(processingActivity, subProcessingActivities);
             }
 
-            processingActivities.clear();
-            if (processingActivities.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(processingActivities)) {
                 processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
             }
-            processingActivities = new ArrayList<>(processingActivitySubProcessingActivityListMap.keySet());
             processingActivitySubProcessingActivityListMap.forEach((processingActivity, subProcessingActivities) -> {
                 if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
                     processingActivity.setSubProcessingActivities(subProcessingActivities.stream().map(ProcessingActivity::getId).collect(Collectors.toList()));
                 }
             });
+            processingActivities = new ArrayList<>(processingActivitySubProcessingActivityListMap.keySet());
             processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
         }
     }

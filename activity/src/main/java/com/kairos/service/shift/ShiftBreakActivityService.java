@@ -40,6 +40,19 @@ public class ShiftBreakActivityService {
     @Inject private ExceptionService exceptionService;
 
 
+   /* public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffUnitPositionDetails unitPositionDetails) {
+        Long shiftDurationInMinute = new DateTimeInterval(shift.getStartDate(), shift.getEndDate()).getMinutes();
+        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(shift.getUnitId(), shiftDurationInMinute);
+        List<ShiftActivity> breakActivities = new ArrayList<>();
+        if (!breakSettings.isEmpty()) {
+            Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings);
+            boolean paid = Optional.ofNullable(unitPositionDetails.getExpertise().getBreakPaymentSetting()).isPresent() &&
+                    BreakPaymentSetting.PAID.equals(unitPositionDetails.getExpertise().getBreakPaymentSetting());
+            activityWrapperMap.putAll(breakActivitiesMap);
+            breakActivities = getBreaks(activityWrapperMap, shift, breakSettings, breakActivitiesMap, paid);
+        }
+        return breakActivities;
+    }*/
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(List<BreakSettings> breakSettings,Long unitId) {
         List<BigInteger> breakActivityIds = breakSettings.stream().map(BreakSettings::getActivityId).collect(Collectors.toList());// These are country activity ids

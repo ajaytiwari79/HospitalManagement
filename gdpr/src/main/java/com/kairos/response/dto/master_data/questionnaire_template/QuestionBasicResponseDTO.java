@@ -17,6 +17,7 @@ public class QuestionBasicResponseDTO {
     private String question;
     private String description;
     private Object assessmentQuestionValues;
+    private Object assessmentAnswerChoices;
     private QuestionType questionType;
     private String attributeName;
     private boolean required;
@@ -66,6 +67,10 @@ public class QuestionBasicResponseDTO {
     public Object getAssessmentQuestionValues() { return assessmentQuestionValues; }
 
     public void setAssessmentQuestionValues(Object assessmentQuestionValues) { this.assessmentQuestionValues = assessmentQuestionValues; }
+
+    public Object getAssessmentAnswerChoices() { return assessmentAnswerChoices; }
+
+    public void setAssessmentAnswerChoices(Object assessmentAnswerChoices) { this.assessmentAnswerChoices = assessmentAnswerChoices; }
 
     public QuestionBasicResponseDTO() {
     }

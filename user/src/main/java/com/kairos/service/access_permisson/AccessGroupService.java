@@ -853,8 +853,8 @@ public class AccessGroupService {
         Long userId = UserContext.getUserDetails().getId();
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,
-                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString()),
-                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString())
+                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),userId),
+                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),userId)
         );
         return userAccessRoleDTO;
     }

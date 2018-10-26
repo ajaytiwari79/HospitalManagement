@@ -41,6 +41,9 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
     @Query("{organizationId:?0,deleted:false}")
     List<TransferMethodResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort  sort);
 
+    @Query("{organizationId:?0,deleted:false}")
+    List<TransferMethodResponseDTO> findAllByUnitId(Long unitId);
+
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     TransferMethod findByUnitIdAndId(Long unitId, BigInteger id);

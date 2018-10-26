@@ -207,6 +207,8 @@ public class AssetService extends MongoBaseService {
                 }
             }
         }
+        asset.setName(assetDTO.getName());
+        asset.setDescription(assetDTO.getDescription());
         asset.setHostingProvider(assetDTO.getHostingProvider());
         asset.setHostingType(assetDTO.getHostingType());
         asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());

@@ -48,4 +48,9 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseR
     @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
     OrganizationalSecurityMeasure findByUnitIdAndName(Long unitId, String name);
 
+    @Query("{deleted:false,organizationId:?0}")
+    List<OrganizationalSecurityMeasureResponseDTO> findAllByUnitId(Long unitId);
+
+
+
 }

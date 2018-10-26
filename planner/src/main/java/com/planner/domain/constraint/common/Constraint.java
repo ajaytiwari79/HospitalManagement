@@ -20,6 +20,7 @@ public class Constraint extends MongoBaseEntity{
     protected ConstraintLevel constraintLevel;
     protected int penalty;
     protected Long planningProblemId;
+    protected BigInteger parentCountryConstraintId;//copiedFrom
 
 
     // =================================================
@@ -85,5 +86,13 @@ public class Constraint extends MongoBaseEntity{
 
     public void setPlanningProblemId(Long planningProblemId) {
         this.planningProblemId = planningProblemId;
+    }
+
+    public BigInteger getParentCountryConstraintId() {
+        return parentCountryConstraintId;
+    }
+
+    public void setParentCountryConstraintId(BigInteger parentCountryConstraintId) {
+        this.parentCountryConstraintId = parentCountryConstraintId;
     }
 }
