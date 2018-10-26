@@ -30,9 +30,9 @@ public class DataElementMongoRepositoryImpl implements CustomDataElementReposito
     }
 
     @Override
-    public List<DataElement> findByUnitIdAndNames(Long countryId, Set<String> names) {
+    public List<DataElement> findByUnitIdAndNames(Long unitId, Set<String> names) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(DELETED).is(false).and("name").in(names).and(ORGANIZATION_ID).is(countryId));
+        query.addCriteria(Criteria.where(DELETED).is(false).and("name").in(names).and(ORGANIZATION_ID).is(unitId));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, DataElement.class);

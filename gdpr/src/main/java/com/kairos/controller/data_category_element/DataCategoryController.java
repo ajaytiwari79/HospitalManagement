@@ -56,7 +56,7 @@ public class DataCategoryController {
     @ApiOperation("delete data category by id ")
     @DeleteMapping(COUNTRY_URL + "/data_category/{dataCategoryId}")
     public ResponseEntity<ResponseDTO<Boolean>> deleteDataCategory(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategory(dataCategoryId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCatgeoryById(countryId,false,dataCategoryId));
 
     }
 
@@ -98,7 +98,7 @@ public class DataCategoryController {
     @ApiOperation("organization ,delete data category by id ")
     @DeleteMapping(UNIT_URL + "/data_category/{dataCategoryId}")
     public ResponseEntity<ResponseDTO<Boolean>> deleteOrganziationDataCategory(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategory(dataCategoryId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCatgeoryById(unitId,true,dataCategoryId));
 
     }
 

@@ -3,11 +3,15 @@ package com.kairos.service.data_subject_management;
 import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
+import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
+import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +39,9 @@ public class DataCategoryService extends MongoBaseService {
     @Inject
     private DataElementMongoRepository dataElementMongoRepository;
 
+    @Inject
+    private DataSubjectMappingRepository dataSubjectMappingRepository;
+
 
     /**
      * @param referenceId
@@ -48,7 +55,7 @@ public class DataCategoryService extends MongoBaseService {
         if (Optional.ofNullable(previousDataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
-        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, false, dataCategoryDto.getDataElements());
+        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isUnitId, dataCategoryDto.getDataElements());
         DataCategory dataCategory = new DataCategory(dataCategoryDto.getName(), dataElementList.stream().map(DataElement::getId).collect(Collectors.toList()));
         if (isUnitId)
             dataCategory.setOrganizationId(referenceId);
@@ -60,10 +67,9 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-
     /**
      * @param referenceId
-     * @param dataCategoryId              id of Data Category
+     * @param dataCategoryId  id of Data Category
      * @param dataCategoryDto request body of Data Category contains List of Existing Data Elements and New Data Elements
      * @return Data category with updated data elements and new Data Elements
      * @description this method update data category , data elements and create new data elements if add to data category
@@ -78,7 +84,7 @@ public class DataCategoryService extends MongoBaseService {
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId,isUnitId, dataCategoryDto.getDataElements());
+        List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isUnitId, dataCategoryDto.getDataElements());
         dataCategory.setName(dataCategoryDto.getName());
         dataCategory.setDataElements(dataElements.stream().map(DataElement::getId).collect(Collectors.toList()));
         dataCategoryMongoRepository.save(dataCategory);
@@ -88,13 +94,14 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    /**
-     * @description soft delete Data Category on the basis of id , method used at country and unit level both
-     * @param dataCategoryId
-     * @return
-     */
-    public boolean deleteDataCategory(BigInteger dataCategoryId) {
-        dataCategoryMongoRepository.safeDelete(dataCategoryId);
+    public boolean deleteDataCatgeoryById(Long refrenceId, boolean isUnitId, BigInteger dataCatgeoryId) {
+
+        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(refrenceId, dataCatgeoryId)
+                : dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(refrenceId, dataCatgeoryId);
+        if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
+            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", dataSubjectLinkedWithDataCategory.stream().map(DataSubjectMappingBasicResponseDTO::getName).collect(Collectors.joining(",")));
+        }
+        dataCategoryMongoRepository.safeDelete(dataCatgeoryId);
         return true;
 
     }
@@ -138,7 +145,6 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-
     /**
      * @param unitId
      * @return return list of Data Category with data Elements
@@ -146,8 +152,6 @@ public class DataCategoryService extends MongoBaseService {
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
         return dataCategoryMongoRepository.getAllDataCategoryWithDataElementByUnitId(unitId);
     }
-
-
 
 
 }

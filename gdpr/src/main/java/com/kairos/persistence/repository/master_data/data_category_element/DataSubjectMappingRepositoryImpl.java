@@ -131,8 +131,6 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 sort(Sort.Direction.DESC, "createdAt"),
                 group("$id")
-                        .first("organizationTypes").as("organizationTypes")
-                        .first("organizationSubTypes").as("organizationSubTypes")
                         .first("name").as("name")
                         .first("description").as("description")
                         .first("createdAt").as("createdAt")
@@ -158,8 +156,6 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
-                        .first("organizationTypes").as("organizationTypes")
-                        .first("organizationSubTypes").as("organizationSubTypes")
                         .first("name").as("name")
                         .first("description").as("description")
                         .first(COUNTRY_ID).as(COUNTRY_ID)

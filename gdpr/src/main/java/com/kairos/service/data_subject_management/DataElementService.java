@@ -83,7 +83,7 @@ public class DataElementService extends MongoBaseService {
         List<DataElement> previousDataELementList = isUnitId ? dataElementMongoRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementMongoRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         previousDataELementList.forEach(dataElement -> {
 
-            if (!dataElementDTOMap.containsKey(dataElement.getId()) || (dataElementDTOMap.containsKey(dataElement.getId()) && !dataElement.getName().equals(dataElementDTOMap.get(dataElement.getId()).getName()))) {
+            if (!dataElementDTOMap.containsKey(dataElement.getId())) {
                 exceptionService.duplicateDataException("message.duplicate", "Data Element", dataElement.getName());
             }
         });
