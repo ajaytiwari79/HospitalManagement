@@ -1,10 +1,11 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
@@ -14,6 +15,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -80,7 +82,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
-        return hostingProviderMongoRepository.findAllHostingProviders(countryId);
+        return hostingProviderMongoRepository.findAllByCountryIdAndSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

@@ -1,10 +1,13 @@
 package com.kairos.dto.activity.counter.distribution.access_group;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.function.BiFunction;
 
 public class AccessGroupMappingDTO {
     private Long accessGroupId;
     private BigInteger kpiId;
+    private List<BigInteger> kpiIds;
 
     public AccessGroupMappingDTO() {
     }
@@ -30,5 +33,11 @@ public class AccessGroupMappingDTO {
         this.kpiId = kpiId;
     }
 
-  
+    public List<BigInteger> getKpiIds() {
+        return kpiIds;
+    }
+
+    public void setKpiIds(List<BigInteger> kpiIds) {
+        this.kpiIds = kpiIds;
+    }
 }

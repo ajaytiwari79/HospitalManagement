@@ -217,9 +217,7 @@ public abstract class RelationshipConstants {
 
     public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
-    public final static String LOCATED_IN = "LOCATED_IN";
     public final static String ORGANIZATION_HAS_UNIONS = "ORGANIZATION_HAS_UNIONS";
-    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
 
 
     public final static String IN_UNIT = "IN_UNIT";
@@ -264,6 +262,10 @@ public abstract class RelationshipConstants {
     public final static String HAS_ACCESS_Of_MODULE = "HAS_ACCESS_Of_MODULE";
     public final static String HAS_UNIT_TYPE = "HAS_UNIT_TYPE";
 
+    public final static String HAS_POSITION_LINES="HAS_POSITION_LINES";
+
+    public static final String DAY_TYPES="DAY_TYPES";
+    public static final String HAS_PARENT_ACCESS_GROUP="HAS_PARENT_ACCESS_GROUP";
 
     /**
      * Default constructor

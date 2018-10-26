@@ -1,10 +1,12 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
+import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
@@ -13,13 +15,16 @@ import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.risk_management.RiskService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,6 +51,9 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     @Inject
     private RiskMongoRepository riskMongoRepository;
 
+    @Inject
+    private AssetTypeService assetTypeService;
+
 
     /**
      * @param
@@ -64,30 +72,37 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         }
         AssetType assetType = new AssetType(assetTypeDto.getName());
         assetType.setOrganizationId(unitId);
-        Map<AssetType, List<OrganizationLevelRiskDTO>> riskRelatedToAssetTypeAndSubAssetType = new HashMap<>();
+        Map<AssetType, List<OrganizationLevelRiskDTO>> riskDTORelatedToAssetTypeAndSubAssetType = new HashMap<>();
         List<AssetType> subAssetTypeList = new ArrayList<>();
-        if (!assetTypeDto.getRisks().isEmpty()) {
-            riskRelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
+        if (CollectionUtils.isNotEmpty(assetTypeDto.getRisks())) {
+            riskDTORelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
         }
-        if (!assetTypeDto.getSubAssetTypes().isEmpty()) {
-            subAssetTypeList = buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, assetTypeDto.getSubAssetTypes(), riskRelatedToAssetTypeAndSubAssetType);
+        if (CollectionUtils.isNotEmpty(assetTypeDto.getSubAssetTypes())) {
+            subAssetTypeList = buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, assetTypeDto.getSubAssetTypes(), riskDTORelatedToAssetTypeAndSubAssetType);
             assetType.setHasSubAsset(true);
         }
-        Map<AssetType, List<BigInteger>> riskIdsCoresspondingToAssetAndSubAssetType;
-        if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
-            riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskRelatedToAssetTypeAndSubAssetType);
+        Map<AssetType, List<Risk>> riskCoresspondingToAssetAndSubAssetType = new HashMap<>();
+        if (!riskDTORelatedToAssetTypeAndSubAssetType.isEmpty()) {
+            riskCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTORelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType));
+                subAssetType.setRisks(riskCoresspondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType));
+            assetType.setRisks(riskCoresspondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
-        if (!subAssetTypeList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(subAssetTypeList)) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-            assetType.setSubAssetTypes(subAssetTypeIds);
+            assetType.setSubAssetTypes(subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }
         assetTypeMongoRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
+        if (CollectionUtils.isNotEmpty(riskCoresspondingToAssetAndSubAssetType.keySet())) {
+            List<Risk> risks = new ArrayList<>();
+            riskCoresspondingToAssetAndSubAssetType.forEach((k, v) -> {
+                v.stream().forEach(risk -> risk.setAssetType(k.getId()));
+                risks.addAll(v);
+            });
+            riskMongoRepository.saveAll(getNextSequence(risks));
+        }
         return assetTypeDto;
 
 
@@ -95,13 +110,12 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
 
     public List<AssetType> buildSubAssetTypeListAndRiskAndLinkedToAssetType(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, Map<AssetType, List<OrganizationLevelRiskDTO>> riskRelatedToSubAssetTypes) {
-
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
         for (AssetTypeOrganizationLevelDTO subAssetTypeDto : subAssetTypesDto) {
             AssetType assetSubType = new AssetType(subAssetTypeDto.getName());
             assetSubType.setOrganizationId(unitId);
-            assetSubType.setSubAsset(true);
+            assetSubType.setSubAssetType(true);
             if (!subAssetTypeDto.getRisks().isEmpty()) {
                 riskRelatedToSubAssetTypes.put(assetSubType, subAssetTypeDto.getRisks());
             }
@@ -177,46 +191,46 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         if (Optional.ofNullable(assetType).isPresent() && !assetTypeId.equals(assetType.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
-        assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
-        if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.duplicateDataException("message.dataNotFound", "Asset Type", assetTypeId);
-        }
+        assetType = assetTypeMongoRepository.findOne(assetTypeId);
         assetType.setName(assetTypeDto.getName());
         List<AssetTypeOrganizationLevelDTO> newSubAssetTypeDTOs = new ArrayList<>();
         List<AssetTypeOrganizationLevelDTO> updateExistingSubAssetTypeDTOs = new ArrayList<>();
         assetTypeDto.getSubAssetTypes().forEach(subAssetTypeDto -> {
-            if (Optional.ofNullable(subAssetTypeDto.getId()).isPresent()) {
+            if (Optional.ofNullable(subAssetTypeDto.getId()).isPresent())
                 updateExistingSubAssetTypeDTOs.add(subAssetTypeDto);
-            } else {
+            else
                 newSubAssetTypeDTOs.add(subAssetTypeDto);
-            }
-        });
-        Map<AssetType, List<OrganizationLevelRiskDTO>> riskRelatedToAssetTypeAndSubAssetType = new HashMap<>();
-        List<AssetType> subAssetTypeList = new ArrayList<>();
-        if (!assetTypeDto.getRisks().isEmpty()) {
-            riskRelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
-        }
-        if (!newSubAssetTypeDTOs.isEmpty()) {
-            subAssetTypeList.addAll(buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, newSubAssetTypeDTOs, riskRelatedToAssetTypeAndSubAssetType));
-        }
-        if (!updateExistingSubAssetTypeDTOs.isEmpty()) {
-            subAssetTypeList.addAll(updateSubAssetTypes(unitId, updateExistingSubAssetTypeDTOs, riskRelatedToAssetTypeAndSubAssetType));
-        }
-        Map<AssetType, List<BigInteger>> riskIdsRelatedToSubAssetTypeOrAssetType;
-        if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
-            riskIdsRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskRelatedToAssetTypeAndSubAssetType);
-            for (AssetType subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(subAssetType));
-            }
-            assetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(assetType));
-        }
 
-        if (!subAssetTypeList.isEmpty()) {
+        });
+        Map<AssetType, List<OrganizationLevelRiskDTO>> riskDTORelatedToAssetTypeAndSubAssetType = new HashMap<>();
+        List<AssetType> subAssetTypeList = new ArrayList<>();
+        if (!assetTypeDto.getRisks().isEmpty())
+            riskDTORelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
+        if (CollectionUtils.isNotEmpty(newSubAssetTypeDTOs))
+            subAssetTypeList.addAll(buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, newSubAssetTypeDTOs, riskDTORelatedToAssetTypeAndSubAssetType));
+        if (CollectionUtils.isNotEmpty(updateExistingSubAssetTypeDTOs))
+            subAssetTypeList.addAll(updateSubAssetTypes(unitId, updateExistingSubAssetTypeDTOs, riskDTORelatedToAssetTypeAndSubAssetType));
+        Map<AssetType, List<Risk>> riskRelatedToSubAssetTypeOrAssetType = new HashMap<>();
+        if (!riskDTORelatedToAssetTypeAndSubAssetType.isEmpty()) {
+            riskRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTORelatedToAssetTypeAndSubAssetType);
+            for (AssetType subAssetType : subAssetTypeList) {
+                subAssetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+            }
+            assetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+        }
+        if (CollectionUtils.isNotEmpty(subAssetTypeList)) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-            assetType.setSubAssetTypes(subAssetTypeIds);
+            assetType.setSubAssetTypes(subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }
         assetTypeMongoRepository.save(assetType);
+        if (CollectionUtils.isNotEmpty(riskRelatedToSubAssetTypeOrAssetType.keySet())) {
+            List<Risk> risks = new ArrayList<>();
+            riskRelatedToSubAssetTypeOrAssetType.forEach((k, v) -> {
+                v.stream().forEach(risk -> risk.setAssetType(k.getId()));
+                risks.addAll(v);
+            });
+            riskMongoRepository.saveAll(getNextSequence(risks));
+        }
         return assetTypeDto;
 
     }
@@ -230,15 +244,20 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     public boolean deleteAssetTypeById(Long unitId, BigInteger assetTypeId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithAssetType = assetMongoRepository.findAllAssetLinkedWithAssetType(unitId, assetTypeId);
-        if (!assetsLinkedWithAssetType.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithAssetType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", new StringBuilder(assetsLinkedWithAssetType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
-        if (!Optional.ofNullable(assetType).isPresent() && !assetType.isSubAsset()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
+        if (!Optional.ofNullable(assetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType.getName());
         }
+        Set<BigInteger> riskIds = assetType.getRisks();
+        List<AssetType> assetSubTypes = assetTypeMongoRepository.findAllAssetSubTypeByUnitIdAndIds(unitId, assetType.getSubAssetTypes());
+        if (CollectionUtils.isNotEmpty(assetSubTypes)) {
+            assetTypeMongoRepository.safeDelete(assetSubTypes);
+            assetSubTypes.forEach(subAssetType -> riskIds.addAll(subAssetType.getRisks()));
+        }
+        if (CollectionUtils.isNotEmpty(riskIds)) riskMongoRepository.safeDelete(riskIds);
         delete(assetType);
         return true;
 
@@ -247,24 +266,23 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
     public boolean deleteAssetSubTypeById(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithAssetSubType = assetMongoRepository.findAllAssetLinkedWithAssetSubType(unitId, subAssetTypeId);
-        if (!assetsLinkedWithAssetSubType.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithAssetSubType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
-        }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
-        } else {
-            assetType.getSubAssetTypes().remove(subAssetTypeId);
-            assetTypeMongoRepository.save(assetType);
-            AssetType subAssetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, subAssetTypeId);
-            if (!Optional.ofNullable(subAssetType).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
-            }
-            delete(subAssetType);
         }
+        List<AssetBasicResponseDTO> assetsLinkedWithAssetSubType = assetMongoRepository.findAllAssetLinkedWithAssetSubType(unitId, subAssetTypeId);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetSubType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Sub Asset Type", new StringBuffer(assetsLinkedWithAssetSubType.stream().map(AssetBasicResponseDTO::getName).collect(Collectors.joining(","))));
+        }
+        AssetType subAssetType = assetTypeMongoRepository.safeDelete(subAssetTypeId);
+        if (!Optional.ofNullable(subAssetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
+        }
+        if (CollectionUtils.isNotEmpty(subAssetType.getRisks())) {
+            riskMongoRepository.safeDelete(subAssetType.getRisks());
+        }
+        assetType.getSubAssetTypes().remove(subAssetTypeId);
+        assetTypeMongoRepository.save(assetType);
         return true;
 
     }
@@ -279,15 +297,63 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      */
     public boolean unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(Long unitId, BigInteger assetTypeId, BigInteger riskId) {
 
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetTypeId);
         }
         assetType.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSafeDelete(riskId);
+        riskMongoRepository.safeDelete(riskId);
         assetTypeMongoRepository.save(assetType);
         return true;
     }
+
+
+    /**
+     * @param countryId
+     * @param unitId
+     * @param assetTypeBasicDTO
+     * @return
+     */
+    public Map<String, AssetTypeBasicDTO> saveAndSuggestAssetTypeAndSubAssetTypeToCountryAdmin(Long unitId, Long countryId, AssetTypeBasicDTO assetTypeBasicDTO) {
+
+        Map<String, AssetTypeBasicDTO> result = createAssetTypeAndSubAssetTypeWithBasicDetail(unitId, assetTypeBasicDTO);
+        AssetTypeBasicDTO acceptedByCountryAdmin = assetTypeService.saveSuggestedAssetTypeAndSubAssetTypeFromUnit(countryId, assetTypeBasicDTO);
+        result.put("SuggestedData", acceptedByCountryAdmin);
+        return result;
+    }
+
+
+    /**
+     * @param unitId
+     * @param assetTypeBasicDTO
+     * @return
+     * @description create sub Asset tYpe and Asset type with basic detail on Save and Suggest of data from unit to country admin
+     */
+    private Map<String, AssetTypeBasicDTO> createAssetTypeAndSubAssetTypeWithBasicDetail(Long unitId, AssetTypeBasicDTO assetTypeBasicDTO) {
+
+        AssetType assetType = new AssetType(assetTypeBasicDTO.getName());
+        assetType.setOrganizationId(unitId);
+        List<AssetType> subAssetTypes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(assetTypeBasicDTO.getSubAssetTypes())) {
+            for (AssetTypeBasicDTO subAssetTypeDTO : assetTypeBasicDTO.getSubAssetTypes()) {
+                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
+                subAssetType.setOrganizationId(unitId);
+                subAssetType.setSuggestedDate(LocalDate.now());
+                assetType.setHasSubAsset(true);
+                subAssetType.setSubAssetType(true);
+                subAssetTypes.add(subAssetType);
+            }
+        }
+        if (!subAssetTypes.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
+            assetType.setSubAssetTypes(subAssetTypes.stream().map(AssetType::getId).collect(Collectors.toSet()));
+        }
+        assetTypeMongoRepository.save(assetType);
+        assetTypeBasicDTO.setId(assetType.getId());
+        return (Map<String, AssetTypeBasicDTO>) new HashMap<>().put("new", assetTypeBasicDTO);
+
+    }
+
 
     /**
      * @param assetTypeDTOs check for duplicates in name of Asset types

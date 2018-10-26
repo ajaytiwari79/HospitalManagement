@@ -1,7 +1,7 @@
 package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
 
@@ -10,12 +10,14 @@ import java.math.BigInteger;
 public class AssetTypeBasicResponseDTO {
 
     private BigInteger id;
-
     private String name;
-
     private Long organizationId;
-
     private SuggestedDataStatus suggestedDataStatus;
+    private Boolean subAssetType;
+
+    public Boolean getSubAssetType() { return subAssetType; }
+
+    public void setSubAssetType(Boolean subAssetType) { this.subAssetType = subAssetType; }
 
     public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 

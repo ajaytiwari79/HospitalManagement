@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +22,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class Region extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Region.name.notEmpty") @NotNull(message = "error.Region.name.notnull")
+    @NotBlank(message = "error.Region.name.notEmpty")
     private String name;
-    @NotEmpty(message = "error.Region.code.notEmpty") @NotNull(message = "error.Region.code.notnull")
+    @NotBlank(message = "error.Region.code.notEmpty")
     private String code;
-    @NotEmpty(message = "error.Region.geoFence.notEmpty") @NotNull(message = "error.Region.geoFence.notnull")
+    @NotBlank(message = "error.Region.geoFence.notEmpty")
     private String geoFence;
 
     private float latitude;

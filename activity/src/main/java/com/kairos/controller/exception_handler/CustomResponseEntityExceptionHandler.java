@@ -1,6 +1,9 @@
 package com.kairos.controller.exception_handler;
 
-import com.kairos.custom_exception.*;
+import com.kairos.commons.custom_exception.*;
+import com.kairos.commons.service.locale.LocaleService;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -32,6 +35,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -42,13 +46,27 @@ import java.util.Set;
 @ControllerAdvice
 @Order(1)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler  {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(CustomResponseEntityExceptionHandler.class);
 
 	public CustomResponseEntityExceptionHandler() {
 		super();
 	}
 
-	@Override
+	@Inject
+	private LocaleService localeService;
+
+	private String convertMessage(String message, Object... params) {
+		for (int i = 0; i < params.length; i++) {
+			try {
+				params[i] = localeService.getMessage(params[i].toString());
+			} catch (Exception e) {
+				// intentionally left empty
+			}
+		}
+		return localeService.getMessage(message, params);
+	}
+
+	/*@Override
 	public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 		logger.error("exception in activity service",ex);
 		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
@@ -56,11 +74,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
 		//  String error;
 		for (FieldError fieldError : fieldErrors) {
-			FieldErrorDTO error=new FieldErrorDTO(fieldError.getField(),fieldError.getDefaultMessage());
+			FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
 			errors.add(error);
 		}
 		for (ObjectError objectError : globalErrors) {
-			FieldErrorDTO error=new FieldErrorDTO(objectError.getObjectName(),objectError.getDefaultMessage());
+			FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
 			errors.add(error);
 		}
 
@@ -69,7 +87,31 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		errorMessage.setSuccess(false);
 		return new ResponseEntity<Object>(errorMessage, headers, status);
 
-	}
+	}*/
+
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.error("exception in activity service",ex);
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
+        List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
+        //  String error;
+        for (FieldError fieldError : fieldErrors) {
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
+            errors.add(error);
+        }
+        for (ObjectError objectError : globalErrors) {
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
+            errors.add(error);
+        }
+
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setErrors(errors);
+        errorMessage.setSuccess(false);
+
+        return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
+
+    }
 
 
 	@Override
@@ -351,7 +393,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({AddressNotVerifiedByTomTom.class,
 			ZipCodeNotFound.class,CitizenNotFoundException.class})
 	@ResponseBody
-	public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex,HttpServletRequest request) {
+	public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex, HttpServletRequest request) {
 		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -420,7 +462,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler({DataNotFoundException.class})
 	@ResponseBody
-	public ResponseEnvelope dataNotFound(DataNotFoundException ex,HttpServletRequest request) {
+	public ResponseEnvelope dataNotFound(DataNotFoundException ex, HttpServletRequest request) {
 		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -433,7 +475,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ResponseStatus(HttpStatus.NOT_MODIFIED)
 	@ExceptionHandler({DataNotModifiedException.class})
 	@ResponseBody
-	public ResponseEnvelope dataNotModified(DataNotModifiedException ex,HttpServletRequest request) {
+	public ResponseEnvelope dataNotModified(DataNotModifiedException ex, HttpServletRequest request) {
 		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);

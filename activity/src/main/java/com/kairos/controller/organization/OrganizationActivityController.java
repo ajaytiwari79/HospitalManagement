@@ -2,13 +2,14 @@ package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.wrapper.activity.RulesActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.RulesActivityTabDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -111,7 +112,20 @@ public class OrganizationActivityController {
     ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO));
     }
+    // Phase Settings
+    @ApiOperation("get Phase setting Tab of Activity")
+    @GetMapping(value = "/activity/{activityId}/phase_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getPhaseSettingTab(@PathVariable BigInteger activityId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getPhaseSettingTabOfActivity(activityId, unitId));
+    }
 
+    @ApiOperation("Update Phase setting Tab of Activity")
+    @PutMapping(value = "/activity/phase_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(phaseSettingsActivityTab));
+    }
 
     @ApiOperation("get getTime Calculation Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/timeCalculation")

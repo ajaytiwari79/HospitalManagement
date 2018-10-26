@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -19,10 +20,10 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
 
 
     @Query("{'countryId':?0,_id:?1,deleted:false}")
-    AssetType findByIdAndCountryId(Long countryId, BigInteger id);
+    AssetType findByIdAndCountryId(Long countryId, BigInteger assetTypeId);
 
     @Query("{_id:?0,deleted:false}")
-    AssetTypeBasicResponseDTO findAssetTypeById( BigInteger id);
+    AssetTypeBasicResponseDTO findAssetTypeById( BigInteger assetTypeId);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<AssetTypeBasicResponseDTO> findAssetTypeListByIds(List<BigInteger> ids);
@@ -36,9 +37,15 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
     List<AssetType> findAllAssetTypeByUnitIdAndIds(Long unitId, List<BigInteger> ids);
 
+    @Query("{deleted:false,organizationId:?0,_id:{$in:?1},subAssetType:true}")
+    List<AssetType> findAllAssetSubTypeByUnitIdAndIds(Long unitId, Set<BigInteger> ids);
 
-    @Query("{organizationId:?0,_id:?1,deleted:false}")
-    AssetType findByUnitIdAndId(Long organizationId, BigInteger id);
 
+    @Query("{organizationId:?0,_id:?1,deleted:false,subAssetType:false}")
+    AssetType findByIdAndUnitId(Long organizationId, BigInteger assetTypeId);
+
+
+    @Query("{organizationId:?0,_id:?1,deleted:false,subAssetType:true}")
+    AssetType findSubAssetTypeByIdAndUnitId(Long organizationId, BigInteger assetTypeId);
 
 }

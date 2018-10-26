@@ -1,12 +1,12 @@
 package com.kairos.service.activity;
 
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
-import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,14 +27,14 @@ public class PlannedTimeTypeService extends MongoBaseService {
     private Logger logger = LoggerFactory.getLogger(PlannedTimeTypeService.class);
 
     @Inject
-    private CountryRestClient countryRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
     public void verifyCountry(Long countryId) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
+        CountryDTO country = genericIntegrationService.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Country not found by Id while creating Planned Time type in country" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
@@ -50,6 +50,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist", presenceTypeDTO.getName());
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
+        plannedTimeType.setImageName(presenceTypeDTO.getImageName());
         save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId());
         logger.info(plannedTimeType.toString());
@@ -87,6 +88,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.presenceType.id.notFound");
         }
         PlannedTimeType plannedTimeType = presenceTypeOptional.get();
+        plannedTimeType.setImageName(presenceTypeDTO.getImageName());
         plannedTimeType.setName(presenceTypeDTO.getName());
         save(plannedTimeType);
         return presenceTypeDTO;

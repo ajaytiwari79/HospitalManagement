@@ -44,7 +44,7 @@ public class OrganizationBasicDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getShortCompanyName() {
@@ -52,7 +52,7 @@ public class OrganizationBasicDTO {
     }
 
     public void setShortCompanyName(String shortCompanyName) {
-        this.shortCompanyName = shortCompanyName;
+        this.shortCompanyName =shortCompanyName!=null? shortCompanyName.trim():null;
     }
 
     public String getDescription() {
@@ -60,7 +60,7 @@ public class OrganizationBasicDTO {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description!=null?description.trim():null;
     }
 
     public String getDesiredUrl() {
@@ -68,7 +68,7 @@ public class OrganizationBasicDTO {
     }
 
     public void setDesiredUrl(String desiredUrl) {
-        this.desiredUrl = desiredUrl;
+        this.desiredUrl = desiredUrl!=null?desiredUrl.trim():null;
     }
 
     public Long getCompanyCategoryId() {

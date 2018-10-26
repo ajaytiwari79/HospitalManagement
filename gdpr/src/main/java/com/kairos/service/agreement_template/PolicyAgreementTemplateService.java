@@ -1,15 +1,20 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.dto.gdpr.PolicyAgreementTemplateDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
+import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
+import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,6 +42,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     @Inject
     private TemplateTypeService templateTypeService;
+
+    @Inject
+    private AgreementSectionMongoRepository agreementSectionMongoRepository;
 
 
     /**
@@ -85,6 +93,34 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     /**
      * @param countryId
      * @param agreementTemplateId
+     * @param policyAgreementTemplateDto
+     * @return
+     */
+    public PolicyAgreementTemplateDTO updatePolicyAgreementTemplateBasicDetails(Long countryId, BigInteger agreementTemplateId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+
+        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByName(countryId, policyAgreementTemplateDto.getName());
+        if (Optional.ofNullable(template).isPresent() && !agreementTemplateId.equals(template.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
+        }
+        template = policyAgreementTemplateRepository.findOne(agreementTemplateId);
+        template.setName(policyAgreementTemplateDto.getName())
+                .setDescription(policyAgreementTemplateDto.getDescription())
+                .setAccountTypes(policyAgreementTemplateDto.getAccountTypes())
+                .setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes())
+                .setOrganizationSubTypes(policyAgreementTemplateDto.getOrganizationSubTypes())
+                .setOrganizationServices(policyAgreementTemplateDto.getOrganizationServices())
+                .setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices())
+                .setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
+        policyAgreementTemplateRepository.save(template);
+        policyAgreementTemplateDto.setId(template.getId());
+        return policyAgreementTemplateDto;
+
+    }
+
+
+    /**
+     * @param countryId
+     * @param agreementTemplateId
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
@@ -97,7 +133,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS = agreementSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
                     sortClauseOfAgreementSectionAndSubSectionInResponseDTO(clauseBasicResponseDTOS, agreementSectionResponseDTO);
                     if (!Optional.ofNullable(agreementSectionResponseDTO.getSubSections().get(0).getId()).isPresent()) {
-                        agreementSectionResponseDTO.getSubSections().clear();;
+                        agreementSectionResponseDTO.getSubSections().clear();
                     } else {
                         agreementSectionResponseDTO.getSubSections().forEach(agreementSubSectionResponseDTO -> {
                             Map<BigInteger, ClauseBasicResponseDTO> subSectionClauseBasicResponseDTOS = agreementSubSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
@@ -112,11 +148,40 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
         agreementSectionResponseDTO.getClauses().clear();
         List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
-        List<BigInteger> clauseIdOrderIndex=agreementSectionResponseDTO.getClauseIdOrderedIndex();
-        for (int i = 0; i <clauseIdOrderIndex.size(); i++) {
+        List<BigInteger> clauseIdOrderIndex = agreementSectionResponseDTO.getClauseIdOrderedIndex();
+        for (int i = 0; i < clauseIdOrderIndex.size(); i++) {
             clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i)));
         }
         agreementSectionResponseDTO.setClauses(clauses);
+    }
+
+
+    /**
+     * @param countryId
+     * @param clauseId
+     * @description methos return list of Agreement Template Conatining clause in Section and Sub Sections
+     */
+    public List<AgreementTemplateBasicResponseDTO> getAgreementTemplateListContainClause(Long countryId, BigInteger clauseId) {
+        return policyAgreementTemplateRepository.findAgreementTemplateListByCountryIdAndClauseId(countryId, clauseId);
+    }
+
+
+    /**
+     * @param countryId
+     * @param agreementTemplateClauseUpdateDTO - agreement template ids , clause previous id and new clause id
+     * @Description method update agreement template section containing previous clause with new clause
+     */
+    public boolean updateAgreementTemplateOldClauseWithNewVersionOfClause(Long countryId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+
+        List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(countryId, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+        if (CollectionUtils.isNotEmpty(agreementSectionsAndSubSectionsContainingClause)) {
+            agreementSectionsAndSubSectionsContainingClause.forEach(agreementSection -> {
+                int clauseIndex = agreementSection.getClauseIdOrderedIndex().indexOf(agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+                agreementSection.getClauseIdOrderedIndex().set(clauseIndex, agreementTemplateClauseUpdateDTO.getNewClauseId());
+            });
+            agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionsAndSubSectionsContainingClause));
+        }
+        return true;
     }
 
 

@@ -1,14 +1,15 @@
 package com.kairos.persistence.repository.clause;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -24,7 +25,6 @@ import java.util.List;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.ID;
 import static com.kairos.constants.AppConstant.DELETED;
 
@@ -40,7 +40,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public Clause findByTitle(Long countryId,  String title) {
+    public Clause findByTitle(Long countryId, String title) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").is(title));
@@ -51,7 +51,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<Clause> findClausesByTitle(Long countryId,  List<String> clauseTitles) {
+    public List<Clause> findClausesByTitle(Long countryId, List<String> clauseTitles) {
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").in(clauseTitles));
         query.collation(Collation.of("en").
@@ -64,12 +64,10 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
-
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
+                sort(Sort.Direction.DESC, "createdAt")
         );
-
-
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getMappedResults();
     }
@@ -78,7 +76,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
 
@@ -103,8 +101,9 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
+                sort(Sort.Direction.DESC, "createdAt")
 
         );
 
@@ -118,11 +117,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
         switch (filterType) {
             case ACCOUNT_TYPES:
-                List<BigInteger> ids = new ArrayList<>();
-                for (Long id : filterSelection.getValue()) {
-                    ids.add(BigInteger.valueOf(id));
-                }
-                return Criteria.where("accountTypes" + ID).in(ids);
+                return Criteria.where("accountTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_TYPES:
                 return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 

@@ -1,5 +1,6 @@
 package com.kairos.controller.expertise;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
@@ -7,21 +8,17 @@ import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.FunctionalPaymentService;
-import com.kairos.service.locale.LocaleService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +66,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "Get cta and wta by expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/cta_wta")
-    ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId) {
+    ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId) throws Exception {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId));
     }
 
@@ -89,8 +86,8 @@ public class ExpertiseController {
     @ApiOperation(value = "Get all expertise by orgSubType")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId, @PathVariable long organizationSubTypeId, @RequestParam(value = "selectedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId, selectedDate));
+    public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId, @PathVariable long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId));
     }
 
     @ApiOperation(value = "Update Age range in Expertise")

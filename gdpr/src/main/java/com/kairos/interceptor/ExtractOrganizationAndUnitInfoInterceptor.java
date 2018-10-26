@@ -1,7 +1,7 @@
 package com.kairos.interceptor;
 
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
 
-        if (orgIdString != null) {
+        if (orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)) {
             final Long orgId = Long.valueOf(orgIdString);
             UserContext.setOrgId(orgId);
         }

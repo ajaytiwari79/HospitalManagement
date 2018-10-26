@@ -16,10 +16,10 @@ import java.util.List;
 @Repository
 public interface PayOutTransactionMongoRepository extends MongoBaseRepository<PayOutTransaction,BigInteger>{
     @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutTransaction> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<PayOutTransaction> findAllByUnitPositionIdsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutTransaction> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
+    List<PayOutTransaction> findAllByUnitPositionIdAndDate(Long unitPositionId, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1},deleted:false}")
     PayOutTransaction findOneByUnitPositionAndDate(Long unitPositionId, Date payOutDate);

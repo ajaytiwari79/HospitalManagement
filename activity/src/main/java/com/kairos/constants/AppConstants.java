@@ -165,9 +165,11 @@ public class AppConstants {
     public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
     public static final String SHIFT = "SHIFT";
-    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s";
+    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s, Accumulated timebank- %s, Delta Weeklytimebank- %s," +
+            " PlannedHoursweek- %s";
+    public static final String SHIFT_EMAIL_BODY = "Hi, %s, \n shift %s  will start on %s at %s .";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
-    public static final String SHIFT_NOTIFICATION="SHIFT_NOTIFICATION";
+    public static final String SHIFT_NOTIFICATION="Shift Reminder";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";
@@ -182,4 +184,12 @@ public class AppConstants {
     public static final int STAFF_GRACE_PERIOD_DAYS=2;
     public static final int MANAGEMENT_GRACE_PERIOD_DAYS=2;
     public static final String SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC= "SchedulerToActivityQueue";
+
+    public static final String ACTIVITY_TO_SCHEDULER_JOB_QUEUE_TOPIC="activityToSchedulerJobQueue";
+    public static final String ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC="activityToSchedulerLogQueue";
+    public static final long ONE_DAY_MINUTES=1439;
+    public static final String OVERSTAFFING="OVERSTAFFING";
+    public static final String UNDERSTAFFING="UNDERSTAFFING";
+    public static final String BALANCED="BALANCED";
+
 }

@@ -1,9 +1,13 @@
 package com.kairos.dto.activity.staffing_level;
 
+import java.math.BigInteger;
+import java.util.Map;
+
 public class StaffingLevelSetting {
     private int defaultDetailLevelMinutes=15;
     private Integer detailLevelMinutes;
     private Duration duration;
+    private Map<BigInteger,Integer> activitiesRank;
 
     public StaffingLevelSetting() {
         //default constructor
@@ -36,5 +40,13 @@ public class StaffingLevelSetting {
 
     public void setDefaultDetailLevelMinutes(int defaultDetailLevelMinutes) {
         this.defaultDetailLevelMinutes = defaultDetailLevelMinutes;
+    }
+
+    public Map<BigInteger, Integer> getActivitiesRank() {
+        return activitiesRank;
+    }
+
+    public void setActivitiesRank(Map<BigInteger, Integer> activitiesRank) {
+        this.activitiesRank = activitiesRank;
     }
 }

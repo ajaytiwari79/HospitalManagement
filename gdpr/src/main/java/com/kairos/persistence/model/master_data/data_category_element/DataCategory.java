@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
 
-@Document(collection = "data_category")
+@Document
 public class DataCategory extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be empty")

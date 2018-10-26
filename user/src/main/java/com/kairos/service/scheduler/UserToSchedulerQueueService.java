@@ -1,11 +1,11 @@
 package com.kairos.service.scheduler;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.scheduler.KairosScheduleJobDTO;
-import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
+import com.kairos.scheduler.queue.producer.KafkaProducer;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -18,7 +18,7 @@ public class UserToSchedulerQueueService {
 
     @Inject
     private KafkaProducer kafkaProducer;
-    public void pushToJobQueueOnEmploymentEnd(Long employmentEndDate, Long currentEmploymentEndDate,Long organiationId,Long employmentId, ZoneId unitTimeZone) {
+    public void pushToJobQueueOnEmploymentEnd(Long employmentEndDate, Long currentEmploymentEndDate,Long organiationId,Long employmentId, ZoneId unitTimeZone) throws Exception {
 
         if ((Optional.ofNullable(employmentEndDate).isPresent() && !employmentEndDate.equals(currentEmploymentEndDate)) ||
                 (!Optional.ofNullable(employmentEndDate).isPresent() && Optional.ofNullable(currentEmploymentEndDate).isPresent())) {

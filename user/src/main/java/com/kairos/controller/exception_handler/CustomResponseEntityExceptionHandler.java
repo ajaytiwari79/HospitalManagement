@@ -1,8 +1,14 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.custom_exception.*;
+import com.kairos.commons.custom_exception.AddressNotVerifiedByTomTom;
+import com.kairos.commons.custom_exception.CitizenNotFoundException;
+import com.kairos.commons.custom_exception.FlsCredentialException;
+import com.kairos.commons.custom_exception.TaskDemandException;
+import com.kairos.commons.custom_exception.ZipCodeNotFound;
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.custom_exception.*;
 import com.kairos.wrapper.ResponseEnvelope;
-import com.kairos.service.locale.LocaleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -50,6 +56,16 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @Autowired
     private LocaleService localeService;
 
+    private String convertMessage(String message, Object... params) {
+        for (int i = 0; i < params.length; i++) {
+            try {
+                params[i] = localeService.getMessage(params[i].toString());
+            } catch (Exception e) {
+                // intentionally left empty
+            }
+        }
+        return localeService.getMessage(message, params);
+    }
     public CustomResponseEntityExceptionHandler() {
         super();
     }
@@ -62,11 +78,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
         //  String error;
         for (FieldError fieldError : fieldErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), fieldError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
             errors.add(error);
         }
         for (ObjectError objectError : globalErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), objectError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
             errors.add(error);
         }
 

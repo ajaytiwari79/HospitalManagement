@@ -2,7 +2,7 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

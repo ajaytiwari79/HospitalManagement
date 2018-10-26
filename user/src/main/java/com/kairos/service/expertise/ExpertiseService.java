@@ -2,9 +2,9 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.user.country.experties.*;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -163,16 +163,14 @@ public class ExpertiseService {
                     exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.present", seniorityLevel.getId());
 
                 } else if (seniorityLevelDTO.getTo() == null && seniorityLevel.getTo() != null) {
-                    if (seniorityLevelDTO.getFrom() > seniorityLevel.getTo()) {
+                    if (seniorityLevelDTO.getFrom() < seniorityLevel.getTo()) {
                         exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.greaterThan", seniorityLevel.getTo(), seniorityLevel.getId());
 
                     }
-                    break;
                 } else if (seniorityLevelDTO.getTo() != null && seniorityLevel.getTo() == null) {
                     if (seniorityLevelDTO.getTo() > seniorityLevel.getFrom()) {
                         exceptionService.actionNotPermittedException("message.expertise.seniorityLevel.lessThan", seniorityLevel.getFrom(), seniorityLevel.getId());
                     }
-
                 } else {
                     if (seniorityLevelDTO.getFrom() < seniorityLevel.getFrom() && !(seniorityLevelDTO.getTo() <= seniorityLevel.getFrom())) {
                         throw new ActionNotPermittedException("Already a Sr level is present 1:" + seniorityLevel.getId());
@@ -287,7 +285,7 @@ public class ExpertiseService {
     }
 
 
-    public List<ExpertiseQueryResult> getAllExpertise(long countryId, String selectedDate) {
+    public List<ExpertiseQueryResult> getAllExpertise(long countryId) {
         return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
     }
 
@@ -637,9 +635,9 @@ public class ExpertiseService {
     }
 
 
-    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId, Date selectedDate) {
+    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         //Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId, selectedDate.getTime());
+        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
     public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {

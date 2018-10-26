@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -13,14 +13,17 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -91,7 +94,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long organizationId) {
-        return hostingTypeMongoRepository.findAllOrganizationHostingTypes(organizationId);
+        return hostingTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -117,16 +120,10 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     public Boolean deleteHostingType(Long unitId, BigInteger hostingTypeId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithHostingType = assetMongoRepository.findAllAssetLinkedWithHostingType(unitId, hostingTypeId);
-        if (!assetsLinkedWithHostingType.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithHostingType.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Type", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Type", new StringBuilder(assetsLinkedWithHostingType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        HostingType hostingType = hostingTypeMongoRepository.findByOrganizationIdAndId(unitId, hostingTypeId);
-        if (!Optional.ofNullable(hostingType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", hostingTypeId);
-        }
-        delete(hostingType);
+        hostingTypeMongoRepository.safeDelete(hostingTypeId);
         return true;
     }
 

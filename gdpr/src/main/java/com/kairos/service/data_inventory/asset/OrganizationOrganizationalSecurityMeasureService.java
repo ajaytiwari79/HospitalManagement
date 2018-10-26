@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -13,13 +13,16 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -89,7 +92,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long organizationId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrgOrganizationalSecurityMeasures(organizationId);
+        return organizationalSecurityMeasureMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -102,7 +105,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long organizationId, BigInteger id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -114,16 +117,10 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
     public Boolean deleteOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithOrganizationalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
-        if (!assetsLinkedWithOrganizationalSecurityMeasure.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithOrganizationalSecurityMeasure.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithOrganizationalSecurityMeasure)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", new StringBuilder(assetsLinkedWithOrganizationalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(unitId, orgSecurityMeasureId);
-        if (!Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Security Measure", orgSecurityMeasureId);
-        }
-        delete(organizationalSecurityMeasure);
+        organizationalSecurityMeasureMongoRepository.safeDelete(orgSecurityMeasureId);
         return true;
 
     }
@@ -138,7 +135,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      */
     public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long organizationId, BigInteger id, OrganizationalSecurityMeasureDTO orgSecurityMeasureDTO) {
 
-        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndName(organizationId, orgSecurityMeasureDTO.getName());
+        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByUnitIdAndName(organizationId, orgSecurityMeasureDTO.getName());
         if (Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
             if (id.equals(organizationalSecurityMeasure.getId())) {
                 return orgSecurityMeasureDTO;

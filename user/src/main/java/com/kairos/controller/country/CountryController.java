@@ -1,6 +1,12 @@
 package com.kairos.controller.country;
 
 import com.kairos.dto.activity.shift.FunctionDTO;
+import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
+import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
@@ -25,12 +31,6 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
-import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
-import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
-import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
-import com.kairos.dto.user.country.skill.SkillDTO;
-import com.kairos.dto.user.organization.OrganizationBasicDTO;
-import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import io.swagger.annotations.Api;
@@ -49,6 +49,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**
@@ -377,6 +378,13 @@ public class CountryController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
+    }
+
+    @ApiOperation(value = "Get DayType for unit")
+    @RequestMapping(value = UNIT_URL + "/day_type", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypeForUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeForUnit(unitId));
     }
 
     @ApiOperation(value = "Add DayType by countryId")
@@ -925,8 +933,8 @@ public class CountryController {
     @ApiOperation(value = "Get Available expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId, selectedDate));
+    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId));
     }
 
     @ApiOperation(value = "Get all union with Service")

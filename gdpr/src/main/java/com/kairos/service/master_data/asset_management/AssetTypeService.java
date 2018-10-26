@@ -1,24 +1,29 @@
 package com.kairos.service.master_data.asset_management;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
+import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,7 +65,7 @@ public class AssetTypeService extends MongoBaseService {
         if (Optional.ofNullable(previousAssetType).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
-        AssetType assetType = new AssetType(assetTypeDto.getName(), countryId);
+        AssetType assetType = new AssetType(assetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
         Map<AssetType, List<BasicRiskDTO>> riskRelatedToAssetTypeAndSubAssetType = new HashMap<>();
         List<AssetType> subAssetTypeList = new ArrayList<>();
         if (!assetTypeDto.getRisks().isEmpty()) {
@@ -70,18 +75,17 @@ public class AssetTypeService extends MongoBaseService {
             subAssetTypeList = buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, assetTypeDto.getSubAssetTypes(), riskRelatedToAssetTypeAndSubAssetType);
             assetType.setHasSubAsset(true);
         }
-        Map<AssetType, List<BigInteger>> riskIdsCoresspondingToAssetAndSubAssetType;
+        Map<AssetType, List<Risk>> riskIdsCoresspondingToAssetAndSubAssetType;
         if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
-            riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId,false, riskRelatedToAssetTypeAndSubAssetType);
+            riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskRelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType));
+                subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType));
+            assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
         if (!subAssetTypeList.isEmpty()) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-            assetType.setSubAssetTypes(subAssetTypeIds);
+            assetType.setSubAssetTypes(subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }
         assetTypeMongoRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
@@ -98,8 +102,8 @@ public class AssetTypeService extends MongoBaseService {
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
         for (AssetTypeDTO subAssetTypeDto : subAssetTypesDto) {
-            AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), countryId);
-            assetSubType.setSubAsset(true);
+            AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
+            assetSubType.setSubAssetType(true);
             if (!subAssetTypeDto.getRisks().isEmpty()) {
                 riskRelatedToSubAssetTypes.put(assetSubType, subAssetTypeDto.getRisks());
             }
@@ -150,8 +154,8 @@ public class AssetTypeService extends MongoBaseService {
      * @param
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public AssetTypeResponseDTO getAssetTypeById(Long countryId, BigInteger id) {
-        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getAssetTypesWithSubAssetTypesByIdAndCountryId(countryId, id);
+    public AssetType getAssetTypeById(Long countryId, BigInteger id) {
+        AssetType assetType = assetTypeMongoRepository.findByIdAndCountryId(countryId, id);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", id);
         }
@@ -174,7 +178,7 @@ public class AssetTypeService extends MongoBaseService {
     /**
      * @param countryId
      * @param
-     * @param assetTypeId           id of Asset Type to which Sub Asset Types Link.
+     * @param assetTypeId  id of Asset Type to which Sub Asset Types Link.
      * @param assetTypeDto asset type Dto contain list of Existing sub Asset types which need to be update and New SubAsset Types  which we need to create and add to asset afterward.
      * @return Asset Type with updated Sub Asset and new Sub Asset Types
      * @throws DuplicateDataException if Asset type is already present with same name .
@@ -210,19 +214,17 @@ public class AssetTypeService extends MongoBaseService {
         if (!updateExistingSubAssetTypeDTOs.isEmpty()) {
             subAssetTypeList.addAll(updateSubAssetTypes(countryId, updateExistingSubAssetTypeDTOs, riskRelatedToAssetTypeAndSubAssetType));
         }
-        Map<AssetType, List<BigInteger>> riskIdsRelatedToSubAssetTypeOrAssetType;
+        Map<AssetType, List<Risk>> riskRelatedToSubAssetTypeOrAssetType;
         if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
-            riskIdsRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId,false, riskRelatedToAssetTypeAndSubAssetType);
+            riskRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskRelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(subAssetType));
+                subAssetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            assetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(assetType));
+            assetType.setRisks(riskRelatedToSubAssetTypeOrAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
-
         if (!subAssetTypeList.isEmpty()) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-            assetType.setSubAssetTypes(subAssetTypeIds);
+            assetType.setSubAssetTypes(subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }
         assetTypeMongoRepository.save(assetType);
         return assetTypeDto;
@@ -243,10 +245,41 @@ public class AssetTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetTypeId);
         }
         assetType.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSafeDelete( riskId);
+        riskMongoRepository.safeDelete(riskId);
         assetTypeMongoRepository.save(assetType);
         return true;
     }
+
+
+    /**
+     * @return
+     */
+    public AssetTypeBasicDTO saveSuggestedAssetTypeAndSubAssetTypeFromUnit(Long countryId, AssetTypeBasicDTO assetTypeDTO) {
+
+        AssetType previousAssetType = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDTO.getName());
+        if (Optional.ofNullable(previousAssetType).isPresent()) {
+            return null;
+        }
+        AssetType assetType = new AssetType(assetTypeDTO.getName(), countryId, SuggestedDataStatus.PENDING);
+        assetType.setSuggestedDate(LocalDate.now());
+        List<AssetType> subAssetTypes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(assetTypeDTO.getSubAssetTypes())) {
+            for (AssetTypeBasicDTO subAssetTypeDTO : assetTypeDTO.getSubAssetTypes()) {
+                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName(), countryId, SuggestedDataStatus.PENDING);
+                subAssetType.setSuggestedDate(LocalDate.now());
+                subAssetType.setSubAssetType(true);
+                subAssetTypes.add(subAssetType);
+            }
+        }
+        if (!subAssetTypes.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
+            assetType.setSubAssetTypes(subAssetTypes.stream().map(AssetType::getId).collect(Collectors.toSet()));
+        }
+        assetTypeMongoRepository.save(assetType);
+        assetTypeDTO.setId(assetType.getId());
+        return assetTypeDTO;
+    }
+
 
     /**
      * @param assetTypeDTOs check for duplicates in name of Asset types

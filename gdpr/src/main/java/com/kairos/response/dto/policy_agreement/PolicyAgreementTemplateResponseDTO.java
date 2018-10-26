@@ -6,30 +6,23 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
-import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
+import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyAgreementTemplateResponseDTO {
 
     private BigInteger id;
-
     private String name;
-
     private String description;
-
-    private List<AccountTypeResponseDTO> accountTypes;
-
+    private List<AccountTypeVO> accountTypes;
     private List<OrganizationType> organizationTypes;
-
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
-
     private List<BigInteger> sections;
 
     private TemplateTypeResponseDTO templateType;
@@ -66,13 +59,9 @@ public class PolicyAgreementTemplateResponseDTO {
         this.description = description;
     }
 
-    public List<AccountTypeResponseDTO> getAccountTypes() {
-        return accountTypes;
-    }
+    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
-    public void setAccountTypes(List<AccountTypeResponseDTO> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
+    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 
     public List<BigInteger> getSections() { return sections; }
 

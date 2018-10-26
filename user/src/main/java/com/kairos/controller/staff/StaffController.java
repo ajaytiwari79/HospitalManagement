@@ -27,6 +27,7 @@ import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -38,9 +39,11 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 
 /**
@@ -293,8 +296,8 @@ public class StaffController {
 
     @RequestMapping(value = "/filter",method = RequestMethod.POST)
     @ApiOperation("get staff")
-    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId,@RequestParam String type, @RequestParam long id, @RequestParam("unitPosition") boolean allStaffRequired) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffWithFilter(unitId, type, id, allStaffRequired, staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId,@RequestParam String type, @RequestParam long id, @RequestParam String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffWithFilter(unitId, type, id, staffFilterDTO,moduleId));
     }
 
     /**
@@ -539,6 +542,7 @@ public class StaffController {
      * @auther anil maurya
      * this endpoint is called from task micro service
      */
+
     @RequestMapping(value = "/getStaffInfo", method = RequestMethod.GET)
     @ApiOperation("Get loggedin Staff Info")
     public ResponseEntity<Map<String, Object>> getStaffInfo(OAuth2Authentication user) {
@@ -576,9 +580,16 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment/{unitPositionId}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate, @PathVariable long unitId, @PathVariable long staffId,
                                                                       @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
+    }
+
+    @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds,@RequestParam("unitPositionIds") List<Long> unitPositionIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsEmploymentData(staffIds,unitPositionIds, unitId, ORGANIZATION));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
@@ -605,7 +616,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws ParseException {
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws Exception {
 
         String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
         Long reasonCodeId = employmentDTO.getReasonCodeId();

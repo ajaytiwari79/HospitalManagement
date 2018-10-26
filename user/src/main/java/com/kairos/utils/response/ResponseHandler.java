@@ -1,5 +1,6 @@
 package com.kairos.utils.response;
 
+import com.kairos.dto.response.ResponseDTO;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
@@ -28,6 +29,11 @@ public final class ResponseHandler {
         map.put("time_stamp", dateTime);
         return new ResponseEntity<Map<String, Object>>(map, status);
 
+    }
+
+    public static <T> ResponseEntity<ResponseDTO<T>> generateResponseDTO(HttpStatus status, boolean isSuccess, T responsObj){
+        ResponseDTO<T> responseDTO = new ResponseDTO<T>(status.value(), isSuccess, responsObj);
+        return new ResponseEntity<>(responseDTO, status);
     }
 
     public static ResponseEntity<String> generateResponse(JSONObject jsonObject) {

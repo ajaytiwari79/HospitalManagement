@@ -116,8 +116,8 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
                 consDays=0;
             }
             if(consDays>=nightsWorked){
-                ZonedDateTime start= DateUtils.getZoneDateTime(shifts.get(l-1).getEndDate());
-                ZonedDateTime end=DateUtils.getZoneDateTime(shifts.get(l).getStartDate());
+                ZonedDateTime start= DateUtils.asZoneDateTime(shifts.get(l-1).getEndDate());
+                ZonedDateTime end=DateUtils.asZoneDateTime(shifts.get(l).getStartDate());
                 int diff=new DateTimeInterval(start,end).getMinutes()- minimumRest;//FIXME
                 totalRestUnder+=diff;
                 consDays=0;

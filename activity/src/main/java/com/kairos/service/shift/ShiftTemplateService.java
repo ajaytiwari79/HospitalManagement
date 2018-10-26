@@ -1,13 +1,13 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
-import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
-import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -44,11 +45,7 @@ public class ShiftTemplateService extends MongoBaseService {
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO){
 
         //Check for activity is absence type or not
-        Set<BigInteger>  activityIds=new HashSet<>();
-        shiftTemplateDTO.getShiftList().forEach(shift->{
-            activityIds.add(shift.getActivityId());
-            activityIds.addAll(shift.getSubShifts().stream().map(s->s.getActivityId()).collect(Collectors.toSet()));
-        });
+        Set<BigInteger>  activityIds=shiftTemplateDTO.getShiftList().stream().flatMap(s->s.getActivities().stream().map(a->a.getActivityId())).collect(Collectors.toSet());
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         activities.forEach(activity -> {
             if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
@@ -64,26 +61,11 @@ public class ShiftTemplateService extends MongoBaseService {
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOs =shiftTemplateDTO.getShiftList();
         List<IndividualShiftTemplate> individualShiftTemplates=new ArrayList<>();
         individualShiftTemplateDTOs.forEach(individualShiftTemplateDTO -> {
-            List<IndividualShiftTemplateDTO> subShifts=individualShiftTemplateDTO.getSubShifts();
-            List<IndividualShiftTemplate> individualShiftTemplates1=new ArrayList<>();
-            if(Optional.ofNullable(subShifts).isPresent() && subShifts.size()>0){
-                individualShiftTemplates1=ObjectMapperUtils.copyPropertiesOfListByMapper(subShifts,IndividualShiftTemplate.class);
-                save(individualShiftTemplates1);
-                individualShiftTemplateDTO.setSubShifts(ObjectMapperUtils.copyPropertiesOfListByMapper(individualShiftTemplates1,IndividualShiftTemplateDTO.class));
-            }
-            Set<BigInteger> subShiftIds=individualShiftTemplates1.stream().map(subShifts1-> subShifts1.getId()).collect(Collectors.toSet());
-            IndividualShiftTemplate individualShiftTemplate=new IndividualShiftTemplate();
-            ObjectMapperUtils.copyPropertiesExceptSpecific(individualShiftTemplateDTO,individualShiftTemplate,"shiftList");
-            individualShiftTemplate.setSubShiftIds(subShiftIds);
-            individualShiftTemplate.setMainShift(true);
+            IndividualShiftTemplate individualShiftTemplate=ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO,IndividualShiftTemplate.class);
             individualShiftTemplates.add(individualShiftTemplate);
         });
         save(individualShiftTemplates);
-        Set<BigInteger> individualShiftTemplateIds=new HashSet<>();
-        for(int i=0;i<individualShiftTemplates.size();i++){
-            shiftTemplateDTO.getShiftList().get(i).setId(individualShiftTemplates.get(i).getId());
-            individualShiftTemplateIds.add(individualShiftTemplates.get(i).getId());
-            }
+        Set<BigInteger> individualShiftTemplateIds= individualShiftTemplates.stream().map(i->i.getId()).collect(Collectors.toSet());
         ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
@@ -97,19 +79,14 @@ public class ShiftTemplateService extends MongoBaseService {
         List<ShiftTemplateDTO> shiftTemplateDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(shiftTemplates,ShiftTemplateDTO.class);
         Set<BigInteger> individualShiftTemplateIds=shiftTemplates.stream().flatMap(e->e.getIndividualShiftTemplateIds().stream()).collect(Collectors.toSet());
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS=  individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
-        Set<BigInteger>  activityIds=new HashSet<>();
-        individualShiftTemplateDTOS.forEach(shift->{
-            activityIds.add(shift.getActivityId());
-            activityIds.addAll(shift.getSubShifts().stream().map(s->s.getActivityId()).collect(Collectors.toSet()));
-        });
+        Set<BigInteger>  activityIds=individualShiftTemplateDTOS.stream().flatMap(s->s.getActivities().stream().map(a->a.getActivityId())).collect(Collectors.toSet());
         Map<BigInteger,String> timeTypeMap = activityMongoRepository.findAllTimeTypeByActivityIds(activityIds).stream().collect(Collectors.toMap(k->k.getActivityId(),v->v.getTimeType()));
         Map<BigInteger, IndividualShiftTemplateDTO> individualShiftTemplateDTOMap = individualShiftTemplateDTOS.stream().collect(Collectors.toMap(IndividualShiftTemplateDTO::getId, Function.identity()));
         shiftTemplateDTOS.forEach(shiftTemplateDTO -> {
             shiftTemplateDTO.getIndividualShiftTemplateIds().forEach(individualShiftTemplateId->{
                 IndividualShiftTemplateDTO individualShiftTemplateDTO = individualShiftTemplateDTOMap.get(individualShiftTemplateId);
-                individualShiftTemplateDTO.setTimeType(timeTypeMap.get(individualShiftTemplateDTO.getActivityId()));
-                individualShiftTemplateDTO.getSubShifts().forEach(subShift->{
-                    subShift.setTimeType(timeTypeMap.get(subShift.getActivityId()));
+                individualShiftTemplateDTO.getActivities().forEach(shiftActivity->{
+                    shiftActivity.setTimeType(timeTypeMap.get(shiftActivity.getActivityId()));
                 });
                 shiftTemplateDTO.getShiftList().add(individualShiftTemplateDTO);
             });
@@ -151,8 +128,9 @@ public class ShiftTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", individualShiftTemplateId);
         }
         individualShiftTemplateDTO.setId(shiftDayTemplate.get().getId());
-        ObjectMapperUtils.copyPropertiesExceptSpecific(individualShiftTemplateDTO,shiftDayTemplate.get(),"subShifts");
-        save(shiftDayTemplate.get());
+        IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO,IndividualShiftTemplate.class);
+        individualShiftTemplate.setId(shiftDayTemplate.get().getId());
+        save(individualShiftTemplate);
         return individualShiftTemplateDTO;
     }
 
@@ -174,15 +152,37 @@ public class ShiftTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(individualShiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", individualShiftTemplateId);
         }
-        if(!individualShiftTemplate.isMainShift()){
-            exceptionService.actionNotPermittedException("message.individualShift.not.mainShift");
-        }
         individualShiftTemplate.setDeleted(true);
         save(individualShiftTemplate);
         ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftTemplateId);
         shiftTemplate.getIndividualShiftTemplateIds().remove(individualShiftTemplate.getId());
         save(shiftTemplate);
         return true;
+    }
+
+    public ShiftWithViolatedInfoDTO createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
+        List<ShiftDTO> shifts = new ArrayList<>();
+        ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplate().getId());
+        Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
+        List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
+        individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
+            ShiftDTO newShiftDTO = new ShiftDTO();
+            ObjectMapperUtils.copyPropertiesExceptSpecific(individualShiftTemplateDTO,newShiftDTO, "activities");
+            newShiftDTO.setId(null);
+            newShiftDTO.setStaffId(shiftDTO.getStaffId());
+            newShiftDTO.setUnitPositionId(shiftDTO.getUnitPositionId());
+            List<ShiftActivity> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
+            individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
+                Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(),shiftTemplateActivity.getStartTime());
+                Date endDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getEndTime());
+                ShiftActivity shiftActivity = new ShiftActivity(shiftTemplateActivity.getActivityName(),startDate,endDate,shiftTemplateActivity.getActivityId());
+                shiftActivities.add(shiftActivity);
+            });
+            newShiftDTO.setActivities(shiftActivities);
+            newShiftDTO = shiftService.createShift(unitId, newShiftDTO, "Organization",false).getShifts().get(0);
+            shifts.add(newShiftDTO);
+        });
+        return new ShiftWithViolatedInfoDTO(shifts,new ViolatedRulesDTO());
     }
 
 

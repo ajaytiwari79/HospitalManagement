@@ -1,23 +1,27 @@
 package com.kairos.service.data_inventory.processing_activity;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -77,7 +81,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long organizationId) {
-        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId);
+        return accessorPartyMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -100,17 +104,11 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        List<ProcessingActivityBasicDTO> processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithAccessorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", processingActivityNames);
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", new StringBuilder(processingActivitiesLinkedWithAccessorParty.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        AccessorParty accessorParty = accessorPartyMongoRepository.findOrganizationIdAndIdAndNonDeleted(unitId, accessorPartyId);
-        if (!Optional.ofNullable(accessorParty).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyId);
-        }
-        delete(accessorParty);
+        accessorPartyMongoRepository.safeDelete(accessorPartyId);
         return true;
     }
 
@@ -124,7 +122,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     public AccessorPartyDTO updateAccessorParty(Long organizationId, BigInteger id, AccessorPartyDTO accessorPartyDTO) {
 
 
-        AccessorParty accessorParty = accessorPartyMongoRepository.findByNameAndOrganizationId(organizationId, accessorPartyDTO.getName());
+        AccessorParty accessorParty = accessorPartyMongoRepository.findByNameAndUnitId(organizationId, accessorPartyDTO.getName());
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;

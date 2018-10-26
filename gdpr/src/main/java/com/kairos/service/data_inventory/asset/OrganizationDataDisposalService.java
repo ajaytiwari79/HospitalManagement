@@ -1,8 +1,8 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -13,13 +13,16 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -81,7 +84,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long organizationId) {
-        return dataDisposalMongoRepository.findAllOrganizationDataDisposals(organizationId);
+        return dataDisposalMongoRepository.findAllByUnitIdAndSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -93,7 +96,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      */
     public DataDisposal getDataDisposalById(Long organizationId, BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        DataDisposal exist = dataDisposalMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -106,16 +109,10 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     public Boolean deleteDataDisposalById(Long unitId, BigInteger dataDisposalId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
-        if (!assetsLinkedWithDataDisposal.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithDataDisposal.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithDataDisposal)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", new StringBuilder(assetsLinkedWithDataDisposal.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndId(unitId, dataDisposalId);
-        if (!Optional.ofNullable(dataDisposal).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", dataDisposalId);
-        }
-        delete(dataDisposal);
+        dataDisposalMongoRepository.safeDelete(dataDisposalId);
         return true;
 
     }
@@ -131,7 +128,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     public DataDisposalDTO updateDataDisposal(Long organizationId, BigInteger id, DataDisposalDTO dataDisposalDTO) {
 
 
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndName(organizationId, dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalMongoRepository.findByUnitIdAndName(organizationId, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;

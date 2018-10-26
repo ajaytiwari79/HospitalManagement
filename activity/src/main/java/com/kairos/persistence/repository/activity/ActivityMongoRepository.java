@@ -18,18 +18,16 @@ import java.util.Set;
 public interface ActivityMongoRepository extends MongoBaseRepository<Activity, BigInteger>,
         CustomActivityMongoRepository {
 
-    @CountQuery("{_id:{$in:?0}, deleted:false}")
-    Integer countActivityByIds(Set<BigInteger> activityIds);
 
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);
 
     Activity findByParentIdAndDeletedFalseAndUnitId(BigInteger parentId, Long unitId);
 
-    @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
+    @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1}")
     List<ActivityDTO> findByDeletedFalseAndCountryId(Long countryId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
+    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1}")
     List<ActivityDTO> findByDeletedFalseAndUnitId(Long unitId);
 
     @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'compositeActivities':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
@@ -42,12 +40,13 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
 
-    Activity findByNameIgnoreCaseAndUnitIdAndDeletedFalse(String unpaidBreak, Long unitId);
-
-    List<Activity> findAllByUnitIdAndNameInIgnoreCaseAndDeletedFalse( Long unitId,String... unpaidBreak);
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
+
+
+    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "'_id':1, 'phaseSettingsActivityTab':1")
+    List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
 

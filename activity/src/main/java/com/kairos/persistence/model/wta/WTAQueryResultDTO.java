@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author pradeep
@@ -20,7 +21,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTAQueryResultDTO {
 
-    private BigInteger parentWTA;
+    private BigInteger parentId;
 
     private BigInteger countryParentWTA;
 
@@ -60,7 +61,7 @@ public class WTAQueryResultDTO {
     private List<TagDTO> tags = new ArrayList<>();
 
     public List<WTABaseRuleTemplate> getRuleTemplates() {
-        return ruleTemplates;
+        return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
     public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
@@ -91,12 +92,12 @@ public class WTAQueryResultDTO {
         this.tags = tags;
     }
 
-    public BigInteger getParentWTA() {
-        return parentWTA;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setParentWTA(BigInteger parentWTA) {
-        this.parentWTA = parentWTA;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public Date getStartDate() {

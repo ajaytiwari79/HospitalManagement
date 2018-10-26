@@ -1,31 +1,33 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
+
+import com.kairos.dto.scheduler.JobDetailsDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
-import com.kairos.scheduler.persistence.model.unit_settings.UnitTimeZoneMapping;
-import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
-import com.kairos.scheduler.persistence.repository.JobDetailsRepository;
-import com.kairos.scheduler.persistence.repository.SchedulerPanelRepository;
-import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
+import com.kairos.scheduler.persistence.repository.job_details.JobDetailsRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.SchedulerPanelRepository;
 import com.kairos.scheduler.service.MongoBaseService;
 
 import com.kairos.scheduler.service.UserIntegrationService;
-import com.kairos.scheduler.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 
+import com.kairos.scheduler.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.MessageFormat;
@@ -64,7 +66,10 @@ public class SchedulerPanelService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
 
-
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public void initSchedulerPanels() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");
@@ -87,6 +92,11 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public List<SchedulerPanelDTO> createSchedulerPanel(long unitId, List<SchedulerPanelDTO> schedulerPanelDTOs) {
 
         //logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
@@ -103,10 +113,8 @@ public class SchedulerPanelService extends MongoBaseService {
                 //    IntegrationSettings integrationSettings = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
                 if(integrationConfigurationOpt.isPresent()) {
                     exceptionService.dataNotFoundByIdException("message.integrationsettings.notfound",schedulerPanelDTO.getIntegrationConfigurationId());
-
                 }
                 schedulerPanel.setIntegrationConfigurationId(schedulerPanelDTO.getIntegrationConfigurationId());
-
             }
 
             //schedulerPanel.setProcessType(integrationConfiguration.getName());
@@ -139,7 +147,7 @@ public class SchedulerPanelService extends MongoBaseService {
         save(schedulerPanels);
         String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
 
-        //schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone));
+        schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone));
         for(SchedulerPanel schedulerPanel:schedulerPanels) {
             dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
         }
@@ -147,6 +155,11 @@ public class SchedulerPanelService extends MongoBaseService {
         return  ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanelDTO.class);
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public SchedulerPanelDTO updateSchedulerPanel(SchedulerPanelDTO schedulerPanelDTO,BigInteger schedulerPanelId)  {
         logger.info("schedulerPanel.getId()-------------> "+schedulerPanelId);
         Optional<SchedulerPanel> panelOpt = schedulerPanelRepository.findById(schedulerPanelId);
@@ -176,12 +189,13 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
+            panel.setOneTimeTriggerDate(null);
 
         }
         else {
             panel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
         }
-
+        panel.setOneTimeTrigger(schedulerPanelDTO.isOneTimeTrigger());
         save(panel);
         String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
@@ -190,6 +204,11 @@ public class SchedulerPanelService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(panel,SchedulerPanelDTO.class);
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public List<LocalDateTimeIdDTO> updateSchedulerPanelsOneTimeTriggerDate(List<LocalDateTimeIdDTO> localDateTimeIdDTOS, Long unitId) {
 
         Set<BigInteger> schedulerPanelIDs = localDateTimeIdDTOS.stream().map(localDateTimeIdDTO -> localDateTimeIdDTO.getId()).collect(Collectors.toSet());
@@ -215,6 +234,10 @@ public class SchedulerPanelService extends MongoBaseService {
         return localDateTimeIdDTOS;
     }
 
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public void updateSchedulerPanelByJobSubTypeAndEntityId(SchedulerPanelDTO schedulerPanelDTO) {
 
         SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanelDTO.getJobSubType(),schedulerPanelDTO.getEntityId(),schedulerPanelDTO.getUnitId());
@@ -250,6 +273,11 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public SchedulerPanelDTO findSchedulerPanelById(BigInteger schedulerPanelId) {
 
         logger.info("schedulerPanelId ----> "+schedulerPanelId);
@@ -263,20 +291,33 @@ public class SchedulerPanelService extends MongoBaseService {
         return schedulerPanelDTO;
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
-        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitId(unitId);
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitIdAndDeletedFalse(unitId);
         List<SchedulerPanelDTO> schedulerPanelDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanelDTO.class);
         return schedulerPanelDTOS;
 
     }
 
 
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public List<SchedulerPanel> getAllControlPanels() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByActive(true);
         return schedulerPanels;
     }
 
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     private String intervalStringBuilder(List days, Integer repeat, LocalTime runOnce){
         String regex = "\\[|\\]";
 
@@ -289,6 +330,11 @@ public class SchedulerPanelService extends MongoBaseService {
         return interval;
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     private String cronExpressionSelectedHoursBuilder(List days, Integer repeat, Integer startTime, List selectedHours){
         String cronExpressionSelectedHours = "0 {0}/{1} {2} ? * {3}"; // 	0 5/60 14-18 ? * MON-FRI
         String cronExpressionSelectedHoursWithoutRepeat = "0 {0} {1} ? * {2}";
@@ -303,6 +349,11 @@ public class SchedulerPanelService extends MongoBaseService {
         return cronExpression;
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     private String cronExpressionRunOnceBuilder(List days, LocalTime runOnce){
         String cronExpressionRunOnce = "0 {0} {1} ? * {2}";
         String interval  = daysOfWeek(days);
@@ -315,6 +366,10 @@ public class SchedulerPanelService extends MongoBaseService {
         return cronExpression;
     }
 
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     private String daysOfWeek(List interval){
         String regex = "\\[|\\]|";
         String intervalString;
@@ -323,6 +378,11 @@ public class SchedulerPanelService extends MongoBaseService {
         return intervalString;
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public SchedulerPanel setScheduleLastRunTime(SchedulerPanel schedulerPanel){
         Optional<SchedulerPanel> panelOptional = schedulerPanelRepository.findById(schedulerPanel.getId());
         SchedulerPanel panel = null;
@@ -337,6 +397,11 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public void createJobScheduleDetails(KairosSchedulerLogsDTO logs) {
         JobDetails jobDetails = new JobDetails();
         ObjectMapperUtils.copyProperties(logs,jobDetails);
@@ -347,11 +412,29 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
+    public List<JobDetailsDTO> getAllJobDetailsByUnitId(Long unitId, int offset){
+        return jobDetailsRepository.findAllSchedulerPanelsByUnitIdAndOffset(unitId,offset);
+    }
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public List<JobDetails> getJobDetails(BigInteger schedulerPanelId){
         return jobDetailsRepository.findAllBySchedulerPanelIdOrderByStartedDesc(schedulerPanelId);
     }
 
-    public Boolean deleteJob(Set<BigInteger> schedulerPanelIds){
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
+    public Boolean deleteJobs(Set<BigInteger> schedulerPanelIds){
         try {
             if(schedulerPanelIds.isEmpty()) {
                 exceptionService.invalidRequestException("request.invalid");
@@ -375,6 +458,27 @@ public class SchedulerPanelService extends MongoBaseService {
             return false;
         }
     }
+
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
+    public Boolean deleteJob(BigInteger schedulerPanelId){
+
+        if(!Optional.ofNullable(schedulerPanelRepository.safeDeleteById(schedulerPanelId)).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+        }
+
+        dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelId);
+
+        return true;
+    }
+
+    /**
+     * @author yatharth
+     * @lastmodifiedby
+     */
     public void deleteJobBySubTypeAndEntityId(SchedulerPanelDTO schedulerPanel) {
 
         SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
@@ -385,6 +489,15 @@ public class SchedulerPanelService extends MongoBaseService {
         schedulerPanelDB.setDeleted(true);
         schedulerPanelDB.setActive(false);
         save(schedulerPanelDB);
+    }
+
+    /**
+     * @Author Yatharth
+     * @return
+     *
+     */
+    public SchedulerPanelDefaultDataDto getDefaultData() {
+        return new SchedulerPanelDefaultDataDto(Arrays.asList(JobSubType.values()),Arrays.asList(JobType.values()));
     }
 //Dont remove
    /* public ControlPanelDTO getControlPanelData(BigInteger schedulerPanelId){

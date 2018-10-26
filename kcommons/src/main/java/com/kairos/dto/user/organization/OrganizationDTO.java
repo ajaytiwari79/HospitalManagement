@@ -16,7 +16,7 @@ public class OrganizationDTO {
     private String name;
     private String description;
     private boolean isPreKairos;
-    private List<OrganizationTypeDTO> organizationTypes;
+    private OrganizationTypeDTO organizationType;
     private List<OrganizationTypeDTO> organizationSubTypes;
     private List<Long> businessTypeId;
     private AddressDTO contactAddress;
@@ -76,12 +76,12 @@ public class OrganizationDTO {
         isPreKairos = preKairos;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypes;
+    public OrganizationTypeDTO getOrganizationType() {
+        return organizationType;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationType(OrganizationTypeDTO organizationType) {
+        this.organizationType = organizationType;
     }
 
     public List<OrganizationTypeDTO> getOrganizationSubTypes() {

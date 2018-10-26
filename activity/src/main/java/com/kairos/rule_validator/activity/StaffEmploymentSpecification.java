@@ -1,10 +1,10 @@
 package com.kairos.rule_validator.activity;
 
 
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -16,10 +16,10 @@ import java.util.Optional;
 public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
     private Phase phase;
-    private Activity activity;
+    private ActivityDTO activity;
     private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
 
-    public StaffEmploymentSpecification(Phase phase, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public StaffEmploymentSpecification(Phase phase, ActivityDTO activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.phase = phase;
         this.activity = activity;
         this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
@@ -30,7 +30,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
         if(Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()){
             return true;
         }
-        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
+        List<PhaseTemplateValue> phaseTemplateValues = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues();
         PhaseTemplateValue phaseTemplateValue1 = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
@@ -48,7 +48,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
+        List<PhaseTemplateValue> phaseTemplateValues = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues();
         PhaseTemplateValue phaseTemplateValue1 = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {

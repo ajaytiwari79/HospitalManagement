@@ -78,7 +78,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
-        JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
+     JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
         //anilm2 use commented code if certificate not install
         converter.setSigningKey("123456");
         /*try{

@@ -1,6 +1,6 @@
 package com.kairos.service.common;
 
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
@@ -167,17 +167,6 @@ public class MongoBaseService {
         entity.setUpdatedAt(DateUtils.getDate());
         mongoTemplate.save(entity);
         return entity;
-    }
-
-
-    public <T extends MongoBaseEntity> List<T> deleteAll(List<T> entities) {
-
-        Assert.notNull(entities, "Entity must not be null!");
-        //  Get class name for sequence class
-
-        entities.forEach(entity -> entity.setDeleted(true));
-        mongoTemplate.save(entities);
-        return entities;
     }
 
 

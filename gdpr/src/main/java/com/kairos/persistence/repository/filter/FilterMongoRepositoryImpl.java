@@ -1,10 +1,9 @@
 package com.kairos.persistence.repository.filter;
-
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
@@ -28,7 +27,6 @@ import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
 import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
 
 
@@ -47,9 +45,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         } else {
             aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
         }
-        filterTypes.forEach(filterType -> {
-                    buildAggregationQuery(filterType,aggregationOperations);
-                }
+        filterTypes.forEach(filterType -> buildAggregationQuery(filterType,aggregationOperations)
 
         );
 

@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
+import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.open_shift.DurationField;
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
-import com.kairos.wrapper.activity.CutOffInterval;
-import com.kairos.wrapper.activity.CutOffIntervalUnit;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -21,14 +21,11 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForFinalSchedule;
     private boolean eligibleForDraftSchedule;
     private boolean eligibleForRequest;
-    private boolean eligibleAgainstTimeRules;
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
     private List<Long> dayTypes= new ArrayList<>();
-    private List<PhaseTemplateValue> eligibleForSchedules;
     private boolean eligibleForStaffingLevel;
-    private boolean eligibleForPresence;
-    private boolean eligibleForAbsence;
+
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
     private LocalDate cutOffStartFrom;
@@ -52,40 +49,19 @@ public class RulesActivityTab implements Serializable{
         //Default Constructor
     }
 
-    //for time care
-    public RulesActivityTab(boolean eligibleForWholeDay,boolean eligibleAgainstTimeRules) {
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-    }
 
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleAgainstTimeRules, boolean eligibleForAbsence, boolean lockLengthPresent, boolean eligibleToBeForced, List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
-        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
-        this.eligibleForRequest = eligibleForRequest;
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-        this.lockLengthPresent = lockLengthPresent;
-        this.eligibleToBeForced = eligibleToBeForced;
-        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
-        this.eligibleForPresence=eligibleForPresence;
-        this.eligibleForAbsence=eligibleForAbsence;
-        this.dayTypes=dayTypes;
-        this.eligibleForSchedules = eligibleForSchedules;
-    }
 
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
+    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean lockLengthPresent, boolean eligibleToBeForced,
+                            List<Long> dayTypes, boolean eligibleForStaffingLevel, boolean breakAllowed, boolean approvalAllowed
             , LocalTime earliestStartTime, LocalTime latestStartTime, Short shortestTime, Short longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,PQLSettings pqlSettings,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
         this.eligibleForRequest = eligibleForRequest;
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
         this.lockLengthPresent = lockLengthPresent;
         this.eligibleToBeForced = eligibleToBeForced;
         this.dayTypes = dayTypes;
-        this.eligibleForSchedules = eligibleForSchedules;
         this.eligibleForStaffingLevel=eligibleForStaffingLevel;
-        this.eligibleForPresence=eligibleForPresence;
-        this.eligibleForAbsence=eligibleForAbsence;
         this.breakAllowed = breakAllowed;
         this.approvalAllowed = approvalAllowed;
         this.earliestStartTime=earliestStartTime;
@@ -144,22 +120,6 @@ public class RulesActivityTab implements Serializable{
         this.eligibleForStaffingLevel = eligibleForStaffingLevel;
     }
 
-    public boolean isEligibleForPresence() {
-        return eligibleForPresence;
-    }
-
-    public void setEligibleForPresence(boolean eligibleForPresence) {
-        this.eligibleForPresence = eligibleForPresence;
-    }
-
-    public boolean isEligibleForAbsence() {
-        return eligibleForAbsence;
-    }
-
-    public void setEligibleForAbsence(boolean eligibleForAbsence) {
-        this.eligibleForAbsence = eligibleForAbsence;
-    }
-
     public boolean isEligibleForFinalSchedule() {
         return eligibleForFinalSchedule;
     }
@@ -184,14 +144,6 @@ public class RulesActivityTab implements Serializable{
         this.eligibleForRequest = eligibleForRequest;
     }
 
-    public boolean isEligibleAgainstTimeRules() {
-        return eligibleAgainstTimeRules;
-    }
-
-    public void setEligibleAgainstTimeRules(boolean eligibleAgainstTimeRules) {
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-    }
-
     public boolean isLockLengthPresent() {
         return lockLengthPresent;
     }
@@ -214,14 +166,6 @@ public class RulesActivityTab implements Serializable{
 
     public void setDayTypes(List<Long> dayTypes) {
         this.dayTypes = dayTypes;
-    }
-
-    public List<PhaseTemplateValue> getEligibleForSchedules() {
-        return eligibleForSchedules;
-    }
-
-    public void setEligibleForSchedules(List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForSchedules = eligibleForSchedules;
     }
 
     public boolean isBreakAllowed() {

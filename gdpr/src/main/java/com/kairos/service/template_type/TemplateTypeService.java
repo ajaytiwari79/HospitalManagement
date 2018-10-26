@@ -1,14 +1,16 @@
 package com.kairos.service.template_type;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.custom_exception.DataNotExists;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -150,6 +152,6 @@ public class TemplateTypeService extends MongoBaseService {
      * @author vikash patwal
      */
     public List<TemplateType> getAllTemplateType(Long countryId) {
-        return templateTypeRepository.getAllTemplateType(countryId);
+        return templateTypeRepository.getAllTemplateType(countryId,new Sort(Sort.Direction.DESC,"createdAt"));
     }
 }

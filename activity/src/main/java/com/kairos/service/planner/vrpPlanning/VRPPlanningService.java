@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.dto.planner.solverconfig.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
@@ -39,7 +40,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 
@@ -51,7 +51,7 @@ import static java.util.stream.Collectors.*;
 public class VRPPlanningService extends MongoBaseService{
 
     @Inject private SolverConfigRepository solverConfigRepository;
-    @Inject private StaffRestClient staffRestClient;
+    @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private TaskService taskService;
     @Inject private TaskTypeService taskTypeService;
     @Inject private TaskTypeSettingMongoRepository taskTypeSettingMongoRepository;
@@ -105,31 +105,7 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
 
-    public void createShift(){
-        List<Long> staffs = Arrays.asList(5728l, 3361l, 3374l, 3122l, 5217l);
-        List<Shift> shifts = new ArrayList<>();
-        /*staffs.forEach(s->{
-            IntStream.range(0,4).forEachOrdered(i->{
-                Date startDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusDays(i).with(LocalTime.of(07,00)).toInstant());
-                Date endDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusDays(i).with(LocalTime.of(16,00)).plusDays(0).toInstant());
-                shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
-            });
-            Date startDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).with(LocalTime.of(07,00)).toInstant());
-            Date endDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).with(LocalTime.of(12,30)).plusDays(0).toInstant());
-            shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
 
-        });*/
-        LocalDate weekStart= LocalDate.of(2018,Month.JULY,16);
-        staffs.forEach(s->{
-            IntStream.range(0,5).forEachOrdered(i->{
-                Date startDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(LocalTime.of(07,00)).toInstant(ZoneOffset.UTC));
-                Date endDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(i==4?LocalTime.of(12,30):LocalTime.of(16,00)).toInstant(ZoneOffset.UTC));
-                shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
-            });
-
-        });
-        save(shifts);
-    }
     public Boolean planningCompleted(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.COMPLETED);
@@ -268,19 +244,19 @@ public class VRPPlanningService extends MongoBaseService{
 
     private List<ShiftDTO> getShifts(List<EmployeeDTO> employeeList,List<Long> staffIds){
         ZonedDateTime zonedDateTime = ZonedDateTime.now();
-        Date startDate = DateUtils.getDateByZonedDateTime(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS));
-        Date endDate = DateUtils.getDateByZonedDateTime(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusWeeks(1).truncatedTo(ChronoUnit.DAYS));
+        Date startDate = DateUtils.asDate(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS));
+        Date endDate = DateUtils.asDate(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusWeeks(1).truncatedTo(ChronoUnit.DAYS));
         Map<Long,EmployeeDTO> employeeDTOMap = employeeList.stream().collect(Collectors.toMap(k->new Long(k.getId()),v->v));
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
         shifts.forEach(s->{
-            shiftDTOS.add(new ShiftDTO(s.getId().toString(),s.getName(),employeeDTOMap.get(s.getStaffId()),DateUtils.asLocalDate(s.getStartDate()),s.getStartDate(),s.getEndDate()));
+            shiftDTOS.add(new ShiftDTO(s.getId().toString(),s.getActivities().get(0).getActivityName(),employeeDTOMap.get(s.getStaffId()),DateUtils.asLocalDate(s.getStartDate()),s.getStartDate(),s.getEndDate()));
         });
         return shiftDTOS;
     }
 
     private Object[] getEmployees(){
-        List<StaffDTO> staffs = staffRestClient.getStaffListByUnit();
+        List<StaffDTO> staffs = genericIntegrationService.getStaffListByUnit();
         List<Long> staffIds = staffs.stream().map(st->st.getId()).collect(toList());
         List<TaskTypeSettingDTO> taskTypeSettingDTOS = taskTypeSettingMongoRepository.findByStaffIds(staffIds);
         if(taskTypeSettingDTOS.isEmpty()){

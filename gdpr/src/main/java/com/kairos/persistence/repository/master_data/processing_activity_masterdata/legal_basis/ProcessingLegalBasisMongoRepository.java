@@ -4,6 +4,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Pr
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
@@ -29,17 +30,20 @@ public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository
     List<ProcessingLegalBasis> findProcessingLegalBasisByIds(List<BigInteger> legalBasisIds);
 
     @Query("{deleted:false,countryId:?0}")
-    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId);
+    List<ProcessingLegalBasisResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<ProcessingLegalBasisResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<ProcessingLegalBasisResponseDTO> findAllOrganizationProcessingLegalBases( Long organizationId);
+    List<ProcessingLegalBasisResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    ProcessingLegalBasis findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    ProcessingLegalBasis findByUnitIdAndId(Long unitId, BigInteger id);
 
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    ProcessingLegalBasis findByNameAndOrganizationId(Long organizationId,String name);
+    ProcessingLegalBasis findByNameAndUnitId(Long unitId, String name);
 
 
 

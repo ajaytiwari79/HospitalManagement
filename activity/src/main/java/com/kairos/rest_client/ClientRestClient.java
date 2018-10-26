@@ -29,13 +29,14 @@ import java.util.Map;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
+@Deprecated
 public class ClientRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientRestClient.class);
     @Autowired
     RestTemplate restTemplate;
     @Autowired
-    @Qualifier("schedulerRestTemplate")
+    @Qualifier("restTemplateWithoutAuth")
     private RestTemplate schedulerRestTemplate;
 
 

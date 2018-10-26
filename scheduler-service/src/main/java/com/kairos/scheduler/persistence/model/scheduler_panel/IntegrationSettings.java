@@ -1,19 +1,18 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel;
 
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 public class IntegrationSettings extends MongoBaseEntity {
 
-    @NotEmpty(message = "name can not be null") @NotNull(message = "name can not be null")
+    @NotBlank(message = "name can not be null")
     private String name;
     //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
 
-    @NotEmpty(message = "unique key can not be null") @NotNull(message = "unique key can not be null")
+    @NotBlank(message = "unique key can not be null")
     private String uniqueKey;
     private boolean isEnabled = true;
 

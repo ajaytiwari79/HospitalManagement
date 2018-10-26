@@ -10,6 +10,7 @@ import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -36,14 +38,14 @@ public class AccessGroupController {
 
     @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createAccessGroup(@PathVariable long unitId, @RequestBody AccessGroup accessGroup) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createAccessGroup(unitId, accessGroup));
+    public ResponseEntity<Map<String, Object>> createAccessGroup(@PathVariable long unitId,@Valid @RequestBody AccessGroupDTO accessGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createAccessGroup(unitId, accessGroupDTO));
     }
 
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAccessGroup(@PathVariable long unitId, @PathVariable long accessGroupId, @Valid @RequestBody AccessGroupDTO accessGroupDTO) {
-        AccessGroup updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
+        AccessGroupDTO updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
         if (updatedObject == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
         }
@@ -136,8 +138,7 @@ public class AccessGroupController {
     @RequestMapping(value = COUNTRY_URL+"/access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createCountryAccessGroup(@PathVariable long countryId,@Valid @RequestBody CountryAccessGroupDTO accessGroupDTO) {
-        AccessGroup accessGroup = accessGroupService.createCountryAccessGroup(countryId, accessGroupDTO);
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroup);
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createCountryAccessGroup(countryId, accessGroupDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)
@@ -242,5 +243,18 @@ public class AccessGroupController {
     @PostMapping(value = UNIT_URL+"/access_group/staffs")
     public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId));
+    }
+
+    @ApiOperation("get staff ids by unit id and accessgroup id")
+    @PostMapping(value = UNIT_URL+"/staffs/access_groups")
+    public ResponseEntity<Map<String, Object>> getStaffIdAndAccessGroupsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffAndAccessGroupsByUnitId(unitId,accessGroupId));
+    }
+
+    @ApiOperation("Get unit Access Groups by parent Access Group")
+    @PostMapping(value = UNIT_URL + "/access_groups_by_parent" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessGroupUsingParentId(@PathVariable Long unitId,@RequestBody Set<Long> accessGroupIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupUsingParentId(unitId,accessGroupIds));
     }
 }

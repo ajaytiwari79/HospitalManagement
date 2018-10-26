@@ -2,9 +2,11 @@ package com.kairos.config.javers;
 
 
 import com.google.common.collect.ImmutableMap;
-import com.kairos.config.mongoEnv.EnvConfig;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.config.codec.BigIntegerCodecProvider;
 import com.kairos.config.codec.BigIntegerTransformer;
+import com.kairos.dto.gdpr.ManagingOrganization;
+import com.kairos.dto.gdpr.Staff;
 import com.mongodb.*;
 import org.bson.BSON;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -44,6 +46,8 @@ public class JaversMongoConfig {
         MongoRepository javersMongoRepository =
                 new MongoRepository(mongo().getDatabase(environment.getDataBaseName()));
         return JaversBuilder.javers()
+                .registerValue(ManagingOrganization.class)
+                .registerValue(Staff.class)
                 .registerJaversRepository(javersMongoRepository)
                 .build();
     }

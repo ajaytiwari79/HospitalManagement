@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.staffing_level;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 @Deprecated
 /**
@@ -11,7 +12,7 @@ public class StaffingLevelTimeSlotDTO {
     private int minNoOfStaff;
     private int maxNoOfStaff;
     private int availableNoOfStaff;
-    private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
+    private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
     private Duration staffingLevelDuration;
 

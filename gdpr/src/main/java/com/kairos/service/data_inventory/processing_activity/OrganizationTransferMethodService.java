@@ -1,14 +1,15 @@
 package com.kairos.service.data_inventory.processing_activity;
 
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -17,11 +18,13 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -91,7 +94,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long organizationId) {
-        return transferMethodRepository.findAllOrganizationTransferMethods(organizationId);
+        return transferMethodRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -102,7 +105,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      */
     public TransferMethod getTransferMethod(Long organizationId, BigInteger id) {
 
-        TransferMethod exist = transferMethodRepository.findByOrganizationIdAndId(organizationId, id);
+        TransferMethod exist = transferMethodRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -113,17 +116,11 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     public Boolean deleteTransferMethod(Long unitId, BigInteger transferMethodId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithTransferMethod = processingActivityMongoRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
+        List<ProcessingActivityBasicDTO> processingActivitiesLinkedWithTransferMethod = processingActivityMongoRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithTransferMethod.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", processingActivityNames);
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", new StringBuilder(processingActivitiesLinkedWithTransferMethod.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndId(unitId, transferMethodId);
-        if (!Optional.ofNullable(transferMethod).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", transferMethodId);
-        }
-        delete(transferMethod);
+        transferMethodRepository.safeDelete(transferMethodId);
         return true;
     }
 
@@ -136,7 +133,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      */
     public TransferMethodDTO updateTransferMethod(Long organizationId, BigInteger id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndName(organizationId, transferMethodDTO.getName());
+        TransferMethod transferMethod = transferMethodRepository.findByUnitIdAndName(organizationId, transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;

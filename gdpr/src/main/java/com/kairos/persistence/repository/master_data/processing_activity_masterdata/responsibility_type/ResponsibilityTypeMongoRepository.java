@@ -5,6 +5,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Re
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -31,16 +32,19 @@ public interface ResponsibilityTypeMongoRepository extends MongoBaseRepository<R
     ResponsibilityType findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<ResponsibilityTypeResponseDTO> findAllResponsibilityTypes(Long countryId);
+    List<ResponsibilityTypeResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<ResponsibilityTypeResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<ResponsibilityTypeResponseDTO> findAllOrganizationResponsibilityTypes(Long organizationId);
+    List<ResponsibilityTypeResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    ResponsibilityType findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    ResponsibilityType findByUnitIdAndId(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    ResponsibilityType findByOrganizationIdAndName(Long organizationId,String name);
+    ResponsibilityType findByUnitIdAndName(Long unitId, String name);
 
 
 }

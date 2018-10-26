@@ -108,8 +108,8 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        String exception = "";
-        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivity().getId())) {
+        //TODO It should work on Multiple activity
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getId())) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
             shifts = filterShifts(shifts, null, null, activityIds);

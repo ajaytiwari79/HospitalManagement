@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 @Component
+@Deprecated
 public class AbsenceTypeRestClient {
     private static final Logger logger = LoggerFactory.getLogger(AbsenceTypeRestClient.class);
 

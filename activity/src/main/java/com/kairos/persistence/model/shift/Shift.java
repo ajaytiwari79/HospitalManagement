@@ -2,15 +2,21 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import com.kairos.dto.activity.attendance.AttendanceDuration;
+import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -20,7 +26,6 @@ import java.util.*;
 @Document(collection = "shifts")
 public class Shift extends MongoBaseEntity {
 
-    private String name;
     private Date startDate;
     private Date endDate;
     private boolean disabled = false;
@@ -31,36 +36,34 @@ public class Shift extends MongoBaseEntity {
     private long probability = 0;
     private long accumulatedTimeBankInMinutes = 0;
     private String remarks;
-    @Indexed
-    private BigInteger activityId;
     private Long staffId;
-    private Phase phase;// todo REMOVE VIPUL
     private BigInteger phaseId;
     private BigInteger planningPeriodId;
     private Integer weekCount;
     @Indexed
     private Long unitId;
-
     private int scheduledMinutes;
     private int durationMinutes;
-
-    private boolean isMainShift = true;
-    private Set<BigInteger> subShifts;
+    private List<ShiftActivity> activities;
     //time care id
     private String externalId;
 
     private Long unitPositionId;
-    private Set<ShiftStatus> status;
-    private List<BigInteger> brokenRuleTemplateIds;
+
 
     private BigInteger parentOpenShiftId;
     private Long allowedBreakDurationInMinute;
 
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
-    private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
     private boolean sickShift;
+    private LocalDate validatedByStaffDate;
+    private LocalDate validatedByPlannerDate;
+    private Long createdBy ;//= UserContext.getUserDetails().getId();
+    private Long updatedBy ;//= UserContext.getUserDetails().getId();
+    private AttendanceDuration attendanceDuration;
+    private Long functionId;
 
     public Shift() {
         //Default Constructor
@@ -73,39 +76,8 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-
-    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.staffId = staffId;
-        this.activityId = activityId;
-
-    }
-    // This is used in absance shift
-    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId,String name,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.staffId = staffId;
-        this.activityId = activityId;
-        this.name=name;
-        this.unitPositionId=unitPositionId;
-        this.unitId=unitId;
-        this.sickShift=true;
-        this.phaseId=phaseId;
-        this.planningPeriodId=planningPeriodId;
-
-    }
-    public List<BigInteger> getBrokenRuleTemplateIds() {
-        return brokenRuleTemplateIds;
-    }
-
-    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
-        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
-    }
-
-    public Shift(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
-        this.name = name;
+    public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -116,19 +88,66 @@ public class Shift extends MongoBaseEntity {
         this.probability = probability;
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
         this.remarks = remarks;
-        this.activityId = activityId;
+        this.activities = activities;
         this.staffId = staffId;
         this.unitId = unitId;
         this.unitPositionId = unitPositionId;
 
     }
+    // This is used in absance shift
+    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.activities = activities;
+        this.unitPositionId=unitPositionId;
+        this.unitId=unitId;
+        this.sickShift=true;
+        this.phaseId=phaseId;
+        this.planningPeriodId=planningPeriodId;
 
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
     }
 
-    public void setScheduledMinutes(int scheduledMinutes) {
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.remarks = remarks;
+        this.activities = activities;
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.externalId = externalId;
+        this.unitPositionId = unitPositionId;
+        this.parentOpenShiftId = parentOpenShiftId;
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+        this.copiedFromShiftId = copiedFromShiftId;
         this.scheduledMinutes = scheduledMinutes;
+        this.durationMinutes = durationMinutes;
+    }
+
+
+    public AttendanceDuration getAttendanceDuration() {
+        return attendanceDuration;
+    }
+
+    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
+        this.attendanceDuration = attendanceDuration;
+    }
+
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
     }
 
     public int getDurationMinutes() {
@@ -139,12 +158,43 @@ public class Shift extends MongoBaseEntity {
         this.durationMinutes = durationMinutes;
     }
 
-    public String getName() {
-        return name;
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
+
+
+
+
+    public List<ShiftActivity> getActivities() {
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities;
+    }
+
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
+    }
+
+
+
+
+    public LocalDate getValidatedByStaffDate() {
+        return validatedByStaffDate;
+    }
+
+    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
+        this.validatedByStaffDate = validatedByStaffDate;
+    }
+
+    public LocalDate getValidatedByPlannerDate() {
+        return validatedByPlannerDate;
+    }
+
+    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
+        this.validatedByPlannerDate = validatedByPlannerDate;
     }
 
     public Date getStartDate() {
@@ -220,7 +270,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public int getMinutes() {
-        return getInterval().getMinutes();
+        return (int)getInterval().getMinutes();
     }
 
     public String getRemarks() {
@@ -231,65 +281,15 @@ public class Shift extends MongoBaseEntity {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
     public Long getStaffId() {
         return staffId;
     }
 
-    public boolean isMainShift() {
-        return isMainShift;
-    }
-
-    public DateTimeInterval getDateTimeInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.getEndDate().getTime());
-    }
-
-    public void setMainShift(boolean mainShift) {
-        isMainShift = mainShift;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Shift{" +
-                "name='" + name + '\'' +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", disabled=" + disabled +
-                ", bid=" + bid +
-                ", pId=" + pId +
-                ", bonusTimeBank=" + bonusTimeBank +
-                ", amount=" + amount +
-                ", probability=" + probability +
-                ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
-                ", remarks='" + remarks + '\'' +
-                ", activityId=" + activityId +
-                ", staffId=" + staffId +
-                ", phase=" + phase +
-                ", weekCount=" + weekCount +
-                ", unitId=" + unitId +
-                ", status=" + status +
-                '}';
-    }
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
 
-    public Phase getPhase() {
-        return phase;
-    }
-
-    public void setPhase(Phase phase) {
-        this.phase = phase;
-    }
 
     public Integer getWeekCount() {
         return weekCount;
@@ -308,35 +308,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Set<BigInteger> getSubShifts() {
-        return subShifts;
-    }
-
-    public void setSubShifts(Set<BigInteger> subShifts) {
-        this.subShifts = subShifts;
-    }
-
-
-    public ShiftQueryResult getShiftQueryResult() {
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activityId, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
-        shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
-        shiftQueryResult.setStatus(this.getStatus());
-        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
-        return shiftQueryResult;
-    }
-
     public String getExternalId() {
         return externalId;
     }
@@ -346,7 +317,6 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-
     public Long getUnitPositionId() {
         return unitPositionId;
     }
@@ -355,13 +325,7 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-    public Set<ShiftStatus> getStatus() {
-        return status=Optional.ofNullable(status).orElse(new HashSet<>());
-    }
 
-    public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
-    }
 
     public BigInteger getParentOpenShiftId() {
         return parentOpenShiftId;
@@ -387,13 +351,6 @@ public class Shift extends MongoBaseEntity {
         this.copiedFromShiftId = copiedFromShiftId;
     }
 
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
 
     public boolean isSickShift() {
         return sickShift;
@@ -419,28 +376,67 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.remarks = remarks;
-        this.activityId = activityId;
-        this.staffId = staffId;
-        this.phase = phase;
-        this.unitId = unitId;
-        this.scheduledMinutes = scheduledMinutes;
-        this.durationMinutes = durationMinutes;
-        this.isMainShift = isMainShift;
-        this.externalId = externalId;
-        this.unitPositionId = unitPositionId;
-        this.status = status;
-        this.parentOpenShiftId = parentOpenShiftId;
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-        this.copiedFromShiftId = copiedFromShiftId;
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
     }
 
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
+        return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
+    }
+
+    public ShiftQueryResult getShiftQueryResult() {
+        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
+                this.startDate,
+                this.endDate,
+                this.bid,
+                this.pId,
+                this.bonusTimeBank,
+                this.amount,
+                this.probability,
+                this.accumulatedTimeBankInMinutes,
+                this.remarks,
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
+        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
+        return shiftQueryResult;
+    }
+
+    public ShiftDTO getShiftDTO() {
+        ShiftDTO shiftDTO = new ShiftDTO(this.id,
+                this.startDate,
+                this.endDate,
+                this.bid,
+                this.pId,
+                this.bonusTimeBank,
+                this.amount,
+                this.probability,
+                this.accumulatedTimeBankInMinutes,
+                this.remarks,
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
+        shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
+        return shiftDTO;
+    }
+
+    @Override
+    public String toString() {
+        return "Shift{" +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", disabled=" + disabled +
+                ", bid=" + bid +
+                ", pId=" + pId +
+                ", bonusTimeBank=" + bonusTimeBank +
+                ", amount=" + amount +
+                ", probability=" + probability +
+                ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
+                ", remarks='" + remarks + '\'' +
+                ", staffId=" + staffId +
+                ", weekCount=" + weekCount +
+                ", unitId=" + unitId +
+                '}';
     }
 
 }
