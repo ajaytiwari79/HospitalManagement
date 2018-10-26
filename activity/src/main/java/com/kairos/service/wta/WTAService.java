@@ -508,8 +508,9 @@ public class WTAService extends MongoBaseService {
         workingTimeAgreement.setStartDate(startDate);
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
-        workingTimeAgreement.setOrganizationParentWTA(wtaQueryResultDTO.getOrganizationParentWTA());
+        workingTimeAgreement.setOrganizationParentId(wtaQueryResultDTO.getOrganizationParentId());
         workingTimeAgreement.setParentId(wtaResponseDTO.getId());
+
         save(workingTimeAgreement);
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
@@ -594,6 +595,7 @@ public class WTAService extends MongoBaseService {
         WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
         newWta.setDescription(wtadto.getDescription());
         newWta.setName(wtadto.getName());
+        newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
         newWta.setStartDate(DateUtils.asDate(wtadto.getStartDate()));
         newWta.setEndDate(wtadto.getEndDate() != null ? DateUtils.asDate(wtadto.getEndDate()) : null);
         newWta.setRuleTemplateIds(null);
@@ -614,6 +616,7 @@ public class WTAService extends MongoBaseService {
         WTAResponseDTO olWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
         wtaResponseDTO.setParentId(oldWta.getId());
+
         wtaResponseDTO.setVersions(Collections.singletonList(olWTA));
         return wtaResponseDTO;
     }

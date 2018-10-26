@@ -48,7 +48,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private BigInteger countryParentWTA;
 
-    private BigInteger organizationParentWTA;
+    private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
 
 
     private List<BigInteger> tags = new ArrayList<>();
@@ -181,12 +181,12 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.countryParentWTA = countryParentWTA;
     }
 
-    public BigInteger getOrganizationParentWTA() {
-        return organizationParentWTA;
+    public BigInteger getOrganizationParentId() {
+        return organizationParentId;
     }
 
-    public void setOrganizationParentWTA(BigInteger organizationParentWTA) {
-        this.organizationParentWTA = organizationParentWTA;
+    public void setOrganizationParentId(BigInteger organizationParentId) {
+        this.organizationParentId = organizationParentId;
     }
 
     public boolean getDisabled() {

@@ -272,6 +272,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             oldCTA.setEndDate(ctaDTO.getStartDate().minusDays(1));
             this.save(oldCTA);
             costTimeAgreement.setParentId(oldCTA.getId());
+            costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());
             costTimeAgreement.setExpertise(oldCTA.getExpertise());
             costTimeAgreement.setOrganizationType(oldCTA.getOrganizationType());
             costTimeAgreement.setOrganizationSubType(oldCTA.getOrganizationSubType());
@@ -282,6 +283,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
             responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,unitPositionId,costTimeAgreement.getDescription(),ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionCode(), PositionCodeDTO.class));
             responseCTA.setParentId(oldCTA.getId());
+            responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
             save(costTimeAgreement);
         } else {
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
@@ -524,6 +526,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         costTimeAgreement.setParentId(ctaId);
+        costTimeAgreement.setOrganizationParentId(ctaId);
         costTimeAgreement.setStartDate(startLocalDate);
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
         ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));

@@ -3,6 +3,7 @@ kairos ACTIVITY
 
 db.time_Type.updateMany({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
 db.time_Type.updateMany({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
+db.workingTimeAgreement.updateMany({},{$rename:{"organizationParentWTA":"organizationParentId"}})
 
 
 NEO
