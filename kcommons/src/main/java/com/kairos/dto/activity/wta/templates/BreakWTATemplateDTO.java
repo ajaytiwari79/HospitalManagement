@@ -5,6 +5,7 @@ package com.kairos.dto.activity.wta.templates;
  */
 
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.enums.wta.WTATemplateType;
 
 import java.util.Set;
 
@@ -24,6 +25,8 @@ public class BreakWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public BreakWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
+
     }
 
     public short getBreakGapMinutes() {
