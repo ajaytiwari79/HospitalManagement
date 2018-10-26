@@ -5,7 +5,7 @@ import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.rule_validator.Specification;

@@ -14,9 +14,7 @@ import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRe
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
-import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.rest_client.SchedulerRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
@@ -88,8 +86,7 @@ public class AggregatorService extends MongoBaseService {
     private SchedulerRestClient schedulerRestClient;
     @Inject
     private TaskDemandMongoRepository taskDemandMongoRepository;
-    @Inject
-    private ClientRestClient clientRestClient;
+
     @Inject
     private RandomDateGeneratorService randomDateGeneratorService;
 

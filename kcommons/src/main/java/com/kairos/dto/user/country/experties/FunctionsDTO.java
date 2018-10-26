@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties
 public class FunctionsDTO {
     private Long functionId;
+    private String functionName; // THIS is used for FE compactibility
     private BigDecimal amount; // amount which is added to this function;
     private boolean amountEditableAtUnit;
 
@@ -40,6 +41,14 @@ public class FunctionsDTO {
 
     public void setAmountEditableAtUnit(boolean amountEditableAtUnit) {
         this.amountEditableAtUnit = amountEditableAtUnit;
+    }
+
+    public String getFunctionName() {
+        return functionName;
+    }
+
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
     }
 
     public FunctionsDTO(BigDecimal amount, Long functionId) {

@@ -186,7 +186,7 @@ public class WTAService extends MongoBaseService {
                 List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
                 workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
             }
-            workingTimeAgreement.setCountryParentWTA(wta.getId());
+
             workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
             workingTimeAgreements.add(workingTimeAgreement);
         });

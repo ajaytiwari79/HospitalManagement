@@ -1,6 +1,5 @@
 package com.kairos.service.phase;
 
-import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
