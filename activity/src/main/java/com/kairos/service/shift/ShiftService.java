@@ -997,7 +997,6 @@ public class ShiftService extends MongoBaseService {
         LocalDate shiftCreationDate = copyShiftDTO.getStartDate();
         LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
         ShiftResponse shiftResponse;
-
         while (shiftCreationLastDate.isAfter(shiftCreationDate) || shiftCreationLastDate.equals(shiftCreationDate)) {
             DateWiseShiftResponse dateWiseShiftResponse = shifts.get(counter);
             for (Shift sourceShift : dateWiseShiftResponse.getShifts()) {

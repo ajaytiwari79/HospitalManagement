@@ -158,7 +158,7 @@ public class ShiftValidatorService {
                 .and(wtaRulesSpecification)
                 .and(staffEmploymentSpecification);
         if (byUpdate) {
-            Specification<ShiftWithActivityDTO> activityPhaseSettingSpecification = new ActivityPhaseSettingSpecification(staffAdditionalInfoDTO, phase, (List<ActivityWrapper>) activityWrapperMap.values(), oldShift);
+            Specification<ShiftWithActivityDTO> activityPhaseSettingSpecification = new ActivityPhaseSettingSpecification(staffAdditionalInfoDTO, phase, activityWrapperMap.values(), oldShift);
             activitySpecification.and(activityPhaseSettingSpecification);
         }
         if (!byTandAPhase) {
@@ -471,7 +471,7 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> filterShifts(List<ShiftWithActivityDTO> shifts, List<BigInteger> timeTypeIds, List<BigInteger> plannedTimeIds, List<BigInteger> activitieIds) {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds())) && (CollectionUtils.isNotEmpty(activitieIds) && CollectionUtils.containsAny(activitieIds, shift.getActivitIds()));
+            boolean isValidShift = (CollectionUtils.isEmpty(timeTypeIds) || CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isEmpty(plannedTimeIds) || CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds())) && (CollectionUtils.isEmpty(activitieIds) || CollectionUtils.containsAny(activitieIds, shift.getActivitIds()));
             if (isValidShift) {
                 shiftQueryResultWithActivities.add(shift);
             }
