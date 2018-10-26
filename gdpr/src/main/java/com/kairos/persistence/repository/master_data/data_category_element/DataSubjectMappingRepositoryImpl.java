@@ -64,7 +64,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryIdAndId(Long countryId, BigInteger dataSubjectId) {
 
         String addFields = CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter = Document.parse(addFields);
@@ -146,7 +146,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitIdAndId(Long unitId, BigInteger dataSubjectId) {
         String addFields = CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(

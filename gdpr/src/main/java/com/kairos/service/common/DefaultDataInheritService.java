@@ -49,7 +49,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicR
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
-import com.kairos.service.master_data.data_category_element.DataSubjectMappingService;
+import com.kairos.service.data_subject_management.DataSubjectMappingService;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -332,7 +332,7 @@ public class DefaultDataInheritService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(dataSubjectMappingResponseDTOS)) {
             List<DataSubjectMapping> dataSubjects = new ArrayList<>();
             for (DataSubjectMappingResponseDTO dataSubjectDTO : dataSubjectMappingResponseDTOS) {
-                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName());
+                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName(),dataSubjectDTO.getDescription());
                 dataSubjectMapping.setOrganizationId(unitId);
                 if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
                     Set<BigInteger> dataCategoryIds = new HashSet<>();

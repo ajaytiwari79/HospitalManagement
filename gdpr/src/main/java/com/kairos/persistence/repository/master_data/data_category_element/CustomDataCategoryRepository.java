@@ -9,7 +9,7 @@ import java.util.Set;
 
 public interface CustomDataCategoryRepository {
 
-    DataCategory findByName(Long countryId, String name);
+    DataCategory findByCountryIdName(Long countryId, String name);
 
     DataCategoryResponseDTO getDataCategoryWithDataElementById(Long countryId, BigInteger id);
 
