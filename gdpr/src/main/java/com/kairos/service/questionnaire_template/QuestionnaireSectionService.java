@@ -2,7 +2,6 @@ package com.kairos.service.questionnaire_template;
 
 
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
-import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
@@ -12,7 +11,6 @@ import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
@@ -218,7 +216,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             }
             AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(untiId, questionnaireTemplate.getAssetType());
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
-                previousTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByUnitId(untiId, questionnaireTemplate.getAssetType());
+                previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(untiId, questionnaireTemplate.getAssetType());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
                 }
@@ -226,7 +224,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(questionnaireTemplate.getAssetSubType()))) {
                     exceptionService.invalidRequestException("message.invalid.request", "Sub Asset Type is Not Selected");
                 } else {
-                    previousTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(untiId, questionnaireTemplate.getAssetType(), Collections.singletonList(questionnaireTemplate.getAssetSubType()));
+                    previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(untiId, questionnaireTemplate.getAssetType(), Collections.singletonList(questionnaireTemplate.getAssetSubType()));
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
                     }

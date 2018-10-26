@@ -144,9 +144,9 @@ public class AssessmentService extends MongoBaseService {
             case ASSET_TYPE:
                 Asset asset = (Asset) entity;
                 if (CollectionUtils.isNotEmpty(asset.getAssetSubTypes())) {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetType(), asset.getAssetSubTypes());
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetType(), asset.getAssetSubTypes());
                 } else {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetType());
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetType());
                 }
                 if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
                     questionnaireTemplateType = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);

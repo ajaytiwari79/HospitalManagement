@@ -25,6 +25,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
     private Long countryId;
     private boolean defaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
+    private QuestionnaireTemplateType riskAssociatedEntity;
     private List<BigInteger> sections=new ArrayList<>();
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
@@ -38,6 +39,10 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
         this.description = description;
         this.templateStatus=templateStatus;
     }
+
+    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
+
+    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
 
     public BigInteger getAssetType() { return assetType; }
 
@@ -60,9 +65,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
 
     public QuestionnaireTemplateType getTemplateType() { return templateType; }
 
-    public void setTemplateType(QuestionnaireTemplateType templateType) {
-        this.templateType = templateType;
-    }
+    public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
 
     public Long getCountryId() {
         return countryId;

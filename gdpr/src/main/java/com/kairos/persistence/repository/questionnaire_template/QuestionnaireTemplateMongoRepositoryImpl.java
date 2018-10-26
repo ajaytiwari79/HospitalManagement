@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.questionnaire_template;
 
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
@@ -68,7 +69,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType","assetSubType","_id","assetSubType"),
+                lookup("assetType", "assetSubType", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -90,7 +91,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType","assetSubType","_id","assetSubType"),
+                lookup("assetType", "assetSubType", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -105,12 +106,12 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     }
 
 
+    @Override
     public QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("templateType").is(templateType));
         query.fields().include("id").include("name").include("templateStatus").include("templateType");
-        return mongoTemplate.findOne(query,QuestionnaireTemplate.class);
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
-
 
 
     @Override
@@ -120,7 +121,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType","assetSubType","_id","assetSubType"),
+                lookup("assetType", "assetSubType", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -139,7 +140,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType","assetSubType","_id","assetSubType"),
+                lookup("assetType", "assetSubType", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -151,5 +152,99 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
+    }
+
+
+    @Override
+    public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeId(Long countryId, BigInteger assetTypeId) {
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
+                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and(DELETED).is(false)
+                .and("assetType").is(assetTypeId));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+
+    @Override
+    public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeIdAndSubAssetTypeId(Long countryId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
+                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and(DELETED).is(false)
+                .and("assetType").is(assetTypeId)
+                .and("assetSubType").is(subAssetTypeId));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+
+    @Override
+    public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskAndAsssociatedEntityProcessingActivityByCountryId(Long countryId) {
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
+                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)
+                .and(DELETED).is(false));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+    @Override
+    public QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId) {
+
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and("defaultAssetTemplate").is(true)
+                .and(DELETED).is(false)
+                .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+    @Override
+    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and("assetType").is(assetTypeId).and("assetSubType").in(subAssetTypeIds)
+                .and(DELETED).is(false)
+                .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+    @Override
+    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(Long unitId, BigInteger assetTypeId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and("assetType").is(assetTypeId)
+                .and("assetSubType").exists(false)
+                .and(DELETED).is(false)
+                .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+    @Override
+    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(Long unitId, QuestionnaireTemplateType templateType) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and("templateType").is(templateType)
+                .and(DELETED).is(false)
+                .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+
+    @Override
+    public QuestionnaireTemplate findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(Long unitId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)
+                .and(DELETED).is(false).and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
+    }
+
+
+    @Override
+    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId) {
+        return null;
+    }
+
+    @Override
+    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
+        return null;
     }
 }
