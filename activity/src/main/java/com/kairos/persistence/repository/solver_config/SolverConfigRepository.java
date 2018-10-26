@@ -1,3 +1,4 @@
+/*
 package com.kairos.persistence.repository.solver_config;
 
 import com.kairos.persistence.model.solver_config.SolverConfig;
@@ -9,10 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 
+*/
 /**
  * @author pradeep
  * @date - 20/6/18
- */
+ *//*
+
 @Repository
 public interface SolverConfigRepository extends MongoBaseRepository<SolverConfig,BigInteger>, CustomSolverConfigRepository{
 
@@ -22,3 +25,4 @@ public interface SolverConfigRepository extends MongoBaseRepository<SolverConfig
     List<SolverConfigDTO> getAllByUnitId(Long unitId);
 
 }
+*/

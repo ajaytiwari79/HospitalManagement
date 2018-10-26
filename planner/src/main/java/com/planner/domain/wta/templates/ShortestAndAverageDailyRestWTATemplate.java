@@ -3,10 +3,9 @@ package com.planner.domain.wta.templates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.MinMaxSetting;
-import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +19,27 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     private long intervalLength;//
     private String intervalUnit;
-    private long validationStartDateMillis;
-    private long continuousDayRestHours;
-    private long averageRest;//(hours number)
-    private String shiftAffiliation;//(List checkbox)
-    private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
+
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -37,13 +49,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -78,53 +83,21 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.intervalUnit = intervalUnit;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-    public long getContinuousDayRestHours() {
-        return continuousDayRestHours;
-    }
-
-    public void setContinuousDayRestHours(long continuousDayRestHours) {
-        this.continuousDayRestHours = continuousDayRestHours;
-    }
-
-    public long getAverageRest() {
-        return averageRest;
-    }
-
-    public void setAverageRest(long averageRest) {
-        this.averageRest = averageRest;
-    }
-
-    public String getShiftAffiliation() {
-        return shiftAffiliation;
-    }
-
-    public void setShiftAffiliation(String shiftAffiliation) {
-        this.shiftAffiliation = shiftAffiliation;
-    }
-
     public ShortestAndAverageDailyRestWTATemplate(String name,  boolean disabled,
-                                                  String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
-                                                  long continuousDayRestHours, long averageRest, String shiftAffiliation) {
+                                                  String description, long intervalLength, String intervalUnit) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
-        this.validationStartDateMillis =validationStartDateMillis;
-        this.continuousDayRestHours=continuousDayRestHours;
-        this.averageRest=averageRest;
-        this.shiftAffiliation=shiftAffiliation;
+        wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
     public ShortestAndAverageDailyRestWTATemplate() {
         wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
+
+
+
+
 
 }

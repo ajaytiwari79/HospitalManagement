@@ -32,8 +32,8 @@ public class OrganizationDataSubjectMappingController {
 
     @ApiOperation(value = "create data Subject with data category and data element")
     @PostMapping("dataSubject_mapping/add")
-    public ResponseEntity<Object> createDataSubjectWithDataCategoryAndDataElement(@PathVariable Long unitId, @RequestBody @Valid ValidateRequestBodyList<OrganizationDataSubjectDTO> dataSubjectDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataSubjectMappingService.createDataSubjectWithDataCategoriesAndDataElements(unitId, dataSubjectDTOs.getRequestBody()));
+    public ResponseEntity<Object> createDataSubjectWithDataCategoryAndDataElement(@PathVariable Long unitId, @RequestBody @Valid OrganizationDataSubjectDTO dataSubjectDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataSubjectMappingService.createAndUpdateDataSubject(unitId, dataSubjectDTO));
     }
 
 
@@ -60,12 +60,12 @@ public class OrganizationDataSubjectMappingController {
 
 
 
-    @ApiOperation(value = "create data Subject with data category and data element")
+   /* @ApiOperation(value = "create data Subject with data category and data element")
     @PutMapping("dataSubject_mapping/update/{dataSubjectId}")
     public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId, @RequestBody @Valid OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataSubjectMappingService.updateDataSubjectMappingById(unitId,dataSubjectId,dataSubjectMappingDTO));
     }
-
+*/
 
 
 

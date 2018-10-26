@@ -21,6 +21,8 @@ public interface CustomDataCategoryRepository {
 
     DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId);
 
+    DataCategory findByUnitIdAndName(Long unitId, String name);
+
 
 
 }

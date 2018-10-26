@@ -1,3 +1,4 @@
+/*
 package com.planner.service.config;
 
 import com.kairos.enums.wta.WTATemplateType;
@@ -6,8 +7,8 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigWTADTO;
 import com.kairos.planner.vrp.taskplanning.model.constraint.*;
 import com.planner.commonUtil.StaticField;
-import com.planner.domain.solverconfig.SolverConfig;
-import com.planner.repository.config.SolverConfigRepository;
+import com.planner.domain.solverconfig.common.SolverConfig;
+import com.planner.repository.solver_config.SolverConfigRepository;
 import com.planner.util.wta.FileIOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,10 +36,12 @@ public class SolverConfigService {
         solverConfigRepository.save(solverConfig);
     }
 
-    /**
+    */
+/**
      * Creates solver config xml at {@link PathProvider} solverConfigPath property based on wta templates for this solver config
      * @param solverConfigId
-     */
+     *//*
+
     public Document createShiftPlanningSolverConfig(BigInteger solverConfigId){
         SolverConfig solverConfig=solverConfigRepository.findByKairosId(solverConfigId).get();
         List<String> validDrls=new ArrayList<>();
@@ -50,10 +53,12 @@ public class SolverConfigService {
         return baseConfig;
     }
 
-    /**
+    */
+/**
      *
      * @returns a copy of base solver config file
-     */
+     *//*
+
     public Document getBaseSolverConfig(){
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
@@ -123,7 +128,8 @@ public class SolverConfigService {
         }
     }
 
-    /*public List<SolverConfigWTADTO> getAllSolverConfig(Long unitId){
+    */
+/*public List<SolverConfigWTADTO> getAllSolverConfig(Long unitId){
         List<SolverConfigWTADTO> solverConfigDTOS = null;
         if(unitId!=null){
             List<SolverConfig> solverConfigs = solverConfigRepository.getAllByUnitId(unitId,SolverConfig.class);
@@ -140,7 +146,7 @@ public class SolverConfigService {
         SolverConfig solverConfig = solverConfigRepository.findById(solverConfigId,SolverConfig.class);
         SolverConfigWTADTO solverConfigDTO = getSolverConfigDTO(solverConfig);
         List<CategoryDTO> categoryDTOS = solverConfigRepository.findAll(Category.class);
-        //solverConfigDTO.setConstraintDTOList(getContraintDTOs(constraints));
+        //solverConfigDTO.setConstraintDTOList(getContraintDTOs(constraint));
         solverConfigDTO.setCategoryDTOS(categoryDTOS);
         return solverConfigDTO;
     }
@@ -167,10 +173,10 @@ public class SolverConfigService {
     }
 
     public List<ConstraintDTO> getContraintDTOs(String solverConfigId){
-        List<Constraint> constraints = solverConfigRepository.getAllContraintsBySolverConfigId(solverConfigId);
+        List<Constraint> constraint = solverConfigRepository.getAllContraintsBySolverConfigId(solverConfigId);
         Map<String,RuleDTO> ruleDTOMap = getRulesMap();
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
-        for (Constraint constraint :constraints) {
+        for (Constraint constraint :constraint) {
             ConstraintDTO constraintDTO = new ConstraintDTO();
             constraintDTO.setLevel(constraint.getLevel());
             constraintDTO.setLevelValue(constraint.getLevelValue());
@@ -193,7 +199,7 @@ public class SolverConfigService {
         solverConfig.setParentSolverConfigId(solverConfigDTO.getOptaPlannerId());
         solverConfig.setTemplate(solverConfigDTO.isTemplate());
         solverConfig = solverConfigRepository.save(solverConfig);
-        List<Constraint> constraints = new ArrayList<>();
+        List<Constraint> constraint = new ArrayList<>();
         for (ConstraintDTO constrainDto:solverConfigDTO.getConstraintDTOList()) {
             Constraint constraint = new Constraint();
             constraint.setStaticRuleValues(constrainDto.getStaticRuleValues());
@@ -203,9 +209,9 @@ public class SolverConfigService {
             constraint.setSolverConfigId(solverConfig.getId());
             constraint.setRuleId(constrainDto.getRuleId());
             constraint.setDynamicRuleValue(constrainDto.getDynamicRuleValues());
-            constraints.add(constraint);
+            constraint.add(constraint);
         }
-        solverConfigRepository.saveList(constraints);
+        solverConfigRepository.saveList(constraint);
         return true;
     }
 
@@ -298,13 +304,17 @@ public class SolverConfigService {
             constraint.setSolverConfigId(solverConfig.getId());
             constraint.setStaticRuleValues(contraintDto.getStaticRuleValues());
             Rule rule = null;
-            *//*rule.setPattern(contraintDto.getRuleDTO().getPattern());
+            *//*
+*/
+/*rule.setPattern(contraintDto.getRuleDTO().getPattern());
             rule.setRuleCondition(contraintDto.getRuleDTO().getRuleCondition());
             rule.setNoOfruleValues(contraintDto.getRuleDTO().getNoOfruleValues());
             rule.setDisabled(contraintDto.getRuleDTO().isDisabled());
             rule.setRuleName(contraintDto.getRuleDTO().getRuleName());
             rule.setSalience(contraintDto.getRuleDTO().getSalience());
             rule.setOutputValues(contraintDto.getRuleDTO().getOutputValues());*//*
+*/
+/*
             rule = solverConfigRepository.findById(contraintDto.getRuleId(),Rule.class);
             if(rule!=null){
                 constraint.setRuleId(rule.getId());
@@ -314,7 +324,9 @@ public class SolverConfigService {
             }
         }
         return true;
-        *//*ObjectMapper mapper = new ObjectMapper();
+        *//*
+*/
+/*ObjectMapper mapper = new ObjectMapper();
         List<Rule> rules = new ArrayList<>();
         try {
             TypeFactory typeFactory = mapper.getTypeFactory();
@@ -326,11 +338,15 @@ public class SolverConfigService {
         }
         //solverConfigRepository.saveList(rules);
         return true;*//*
-    }*/
+*/
+/*
+    }*//*
 
 
 
-    public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
+
+    */
+/*public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
         SolverConfig solverConfig = new SolverConfig();
         solverConfig.setTerminationSeconds(solverConfigDTO.getTerminationTime());
         solverConfig.setUnitId(solverConfigDTO.getUnitId());
@@ -358,6 +374,8 @@ public class SolverConfigService {
             }
         }
         return solverConfig;
-    }
+    }*//*
+
 
 }
+*/

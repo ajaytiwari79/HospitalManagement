@@ -334,6 +334,10 @@ public class DateUtils {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+    public static LocalDate asLocalDate(DateTime dateTime){
+        return asLocalDate(dateTime.toDate());
+    }
+
 
     public static LocalTime asLocalTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalTime();

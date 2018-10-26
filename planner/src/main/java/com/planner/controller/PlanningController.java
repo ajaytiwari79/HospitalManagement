@@ -20,6 +20,7 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
 @RequestMapping(API_UNIT_URL + "/planner")
+@Deprecated
 public class PlanningController {
 	private static final Logger log = LoggerFactory.getLogger(PlanningController.class);
 	@Autowired private PlannerService plannerService;

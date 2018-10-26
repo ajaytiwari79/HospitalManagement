@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(StaticField.INTEGRATION)
+@Deprecated
 public class TaskPlanningController {
 
    /* private static final Logger log = LoggerFactory.getLogger(TaskPlanningController.class);

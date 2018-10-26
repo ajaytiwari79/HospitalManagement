@@ -65,14 +65,34 @@ public class RestClientUrlUtil {
      * @author mohit
      * @date 12-10-2018
      */
-    public static String getUserServiceBaseUrl(RestClientUrlType restClientUrlType,Long id,Long parentId){
+    public static String getUserServiceBaseUrl(RestClientUrlType restClientUrlType,Long id){
         String baseUrl = null;
         switch (restClientUrlType){
-            case UNIT:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId.toString()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
             case COUNTRY:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).append("/country/").append(id).toString();
                 break;
             case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
+                break;
+            case COUNTRY_WITHOUT_PARENT_ORG:
+                baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
+                break;
+            case UNIT_WITHOUT_PARENT_ORG:
+                baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                break;
+
+        }
+        return baseUrl;
+    }
+
+    public static String getUserServiceBaseUrl(RestClientUrlType restClientUrlType,Long id,Long parentId){
+        String baseUrl = null;
+        switch (restClientUrlType){
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                break;
+            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId).append("/country/").append(id).toString();
+                break;
+            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId).toString();
                 break;
         }
         return baseUrl;

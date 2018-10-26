@@ -1,7 +1,7 @@
 package com.planner.repository.staffRepository;
 
 import com.planner.domain.staff.Employee;
-import com.planner.repository.MongoBaseRepository;
+import com.planner.repository.common.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 
 /**

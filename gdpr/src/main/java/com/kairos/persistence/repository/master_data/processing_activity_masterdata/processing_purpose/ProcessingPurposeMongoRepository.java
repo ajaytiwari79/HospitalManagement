@@ -41,6 +41,9 @@ public interface ProcessingPurposeMongoRepository extends MongoBaseRepository<Pr
     @Query("{organizationId:?0,deleted:false}")
     List<ProcessingPurposeResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
+    @Query("{organizationId:?0,deleted:false}")
+    List<ProcessingPurposeResponseDTO> findAllByUnitId(Long unitId);
+
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
     ProcessingPurpose findByUnitIdAndName(Long unitId, String name);

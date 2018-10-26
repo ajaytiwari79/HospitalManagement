@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -14,7 +15,8 @@ public class DataCategory extends MongoBaseEntity {
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    List<BigInteger> dataElements;
+    // empty array to get rid of null pointer
+    private List<BigInteger> dataElements=new ArrayList<>();
 
     private Long countryId;
 

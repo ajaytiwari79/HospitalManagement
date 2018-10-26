@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,18 +20,51 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplate {
 
-    private long numberShiftsPerPeriod;
-    private long numberOfWeeks;
+
     private String fromDayOfWeek; //(day of week)
-    private long fromTime;
-    private boolean proportional;
-    private long toTime;
+    private LocalTime fromTime;
+    private LocalTime toTime;
     private String toDayOfWeek;
+    private long intervalLength;
+    private String intervalUnit;
+    private boolean restingTimeAllowed;
+    private int restingTime;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
+    private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
+    public boolean isRestingTimeAllowed() {
+        return restingTimeAllowed;
+    }
+
+    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
+        this.restingTimeAllowed = restingTimeAllowed;
+    }
+
+    public int getRestingTime() {
+        return restingTime;
+    }
+
+    public void setRestingTime(int restingTime) {
+        this.restingTime = restingTime;
+    }
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -41,9 +74,6 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.minMaxSetting = minMaxSetting;
     }
 
-    public boolean isProportional() {
-        return proportional;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -70,11 +100,11 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public long getToTime() {
+    public LocalTime getToTime() {
         return toTime;
     }
 
-    public void setToTime(long toTime) {
+    public void setToTime(LocalTime toTime) {
         this.toTime = toTime;
     }
 
@@ -86,22 +116,6 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.toDayOfWeek = toDayOfWeek;
     }
 
-    public long getNumberShiftsPerPeriod() {
-        return numberShiftsPerPeriod;
-    }
-
-    public void setNumberShiftsPerPeriod(long numberShiftsPerPeriod) {
-        this.numberShiftsPerPeriod = numberShiftsPerPeriod;
-    }
-
-    public long getNumberOfWeeks() {
-        return numberOfWeeks;
-    }
-
-    public void setNumberOfWeeks(long numberOfWeeks) {
-        this.numberOfWeeks = numberOfWeeks;
-    }
-
     public String getFromDayOfWeek() {
         return fromDayOfWeek;
     }
@@ -110,44 +124,39 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.fromDayOfWeek = fromDayOfWeek;
     }
 
-    public long getFromTime() {
+    public LocalTime getFromTime() {
         return fromTime;
     }
 
-    public void setFromTime(long fromTime) {
+    public void setFromTime(LocalTime fromTime) {
         this.fromTime = fromTime;
     }
 
-    public boolean getProportional() {
-        return proportional;
-    }
-
-    public void setProportional(boolean proportional) {
-        this.proportional = proportional;
-    }
 
     public NumberOfWeekendShiftsInPeriodWTATemplate(String name, boolean disabled,
-                                                    String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
-                                                    String toDayOfWeek, long toTime) {
+                                                    String description, String fromDayOfWeek, LocalTime fromTime,
+                                                    String toDayOfWeek, LocalTime toTime) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-
-        this.numberShiftsPerPeriod=numberShiftsPerPeriod;
-        this.numberOfWeeks=numberOfWeeks;
-        this.proportional=proportional;
-        this.fromDayOfWeek=fromDayOfWeek;
-        this.fromTime=fromTime;
-        this.toDayOfWeek=toDayOfWeek;
-        this.toTime=toTime;
-
+        this.fromDayOfWeek = fromDayOfWeek;
+        this.fromTime = fromTime;
+        this.toDayOfWeek = toDayOfWeek;
+        this.toTime = toTime;
+        wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
 
 
     }
+
     public NumberOfWeekendShiftsInPeriodWTATemplate() {
         wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
 
     }
+
+
+
+
+
 
 
 }
