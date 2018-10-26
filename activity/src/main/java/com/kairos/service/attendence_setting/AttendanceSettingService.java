@@ -274,25 +274,26 @@ public class AttendanceSettingService extends MongoBaseService {
     }
 
     public void checkOutBySchedulerJob(Long unitId){
-//        List<Shift> saveShifts=new ArrayList<>();
-//        List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getCurrentLocalDate()));
-//            List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
-//          Map<BigInteger,Shift> staffIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
-//        attendanceSettings.forEach(attendanceSetting -> {
-//            if(staffIdAndShifts.get(attendanceSetting.getShiftId())!=null)
-//            {
-//                Shift shift=staffIdAndShifts.get(attendanceSetting.getStaffId()+""+attendanceSetting.getAttendanceDuration().getFrom());
-//                if(!shift.getEndDate().after(DateUtils.getCurrentDate())) {
-//                    attendanceSetting.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
-//                    shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
-//                    saveShifts.add(shift);
-//                }
-//            }else{
-//                attendanceSetting.getAttendanceDuration().get(0).setTo(LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
-//            }
-//        });
-//        if(!attendanceSettings.isEmpty()) attendanceSettingRepository.saveEntities(attendanceSettings);
-//        if(!saveShifts.isEmpty()) shiftMongoRepository.saveEntities(saveShifts);
+        List<Shift> saveShifts=new ArrayList<>();
+        List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getCurrentLocalDate()));
+            List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
+          Map<BigInteger,Shift> staffIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        attendanceSettings.forEach(attendanceSetting -> {
+            if(staffIdAndShifts.get(attendanceSetting.getShiftId())!=null)
+            {
+                Shift shift=staffIdAndShifts.get(attendanceSetting.getShiftId());
+                if(!shift.getEndDate().after(DateUtils.getCurrentDate())) {
+                    attendanceSetting.getAttendanceDuration().sort((a1,a2)->a1.getFrom().compareTo(a2.getFrom()));
+                    attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1).setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                    shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                    saveShifts.add(shift);
+                }
+            }else{
+                attendanceSetting.getAttendanceDuration().get(0).setTo(LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
+            }
+        });
+        if(!attendanceSettings.isEmpty()) attendanceSettingRepository.saveEntities(attendanceSettings);
+        if(!saveShifts.isEmpty()) shiftMongoRepository.saveEntities(saveShifts);
         return;
     }
 }
