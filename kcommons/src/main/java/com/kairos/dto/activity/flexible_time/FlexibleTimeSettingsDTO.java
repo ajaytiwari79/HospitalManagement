@@ -3,10 +3,12 @@ package com.kairos.dto.activity.flexible_time;/*
  *
  */
 
+import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
 
 public class FlexibleTimeSettingsDTO {
     private BigInteger id;
+    private short timeLimit;
     private FlexibleTimeDetails flexibleTimeForCheckIn;
     private FlexibleTimeDetails flexibleTimeForCheckOut;
     private Long countryId;
@@ -53,4 +55,13 @@ public class FlexibleTimeSettingsDTO {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
+
+    @AssertTrue(message = "All times should be equal or greater than time limit")
+    public boolean isValid() {
+        return (flexibleTimeForCheckIn.getAfter()!=null && timeLimit>=flexibleTimeForCheckIn.getAfter() ||
+                flexibleTimeForCheckIn.getBefore()!=null && timeLimit>=flexibleTimeForCheckIn.getBefore()||
+                flexibleTimeForCheckOut.getAfter()!=null && timeLimit>=flexibleTimeForCheckOut.getAfter() ||
+                flexibleTimeForCheckOut.getBefore()!=null && timeLimit>=flexibleTimeForCheckIn.getBefore());
+    }
+
 }

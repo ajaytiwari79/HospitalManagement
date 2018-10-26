@@ -16,6 +16,11 @@ public class FlexibleTimeSettings extends MongoBaseEntity {
         //Default Constructor
     }
 
+    public FlexibleTimeSettings(FlexibleTimeDetails flexibleTimeForCheckIn, FlexibleTimeDetails flexibleTimeForCheckOut) {
+        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
+        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+    }
+
     public FlexibleTimeDetails getFlexibleTimeForCheckIn() {
         return flexibleTimeForCheckIn;
     }

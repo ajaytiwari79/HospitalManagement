@@ -9,6 +9,7 @@ import com.kairos.dto.activity.flexible_time.FlexibleTimeSettingsDTO;
 import com.kairos.persistence.model.flexible_time.FlexibleTimeSettings;
 import com.kairos.persistence.repository.flexible_time.FlexibleTimeSettingsRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -16,11 +17,18 @@ import javax.inject.Inject;
 @Service
 public class FlexibleTimeSettingsService extends MongoBaseService {
 
+
     @Inject
     private FlexibleTimeSettingsRepository flexibleTimeSettingsRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     public FlexibleTimeSettingsDTO saveFlexibleTimeSettings(Long countryId,FlexibleTimeSettingsDTO flexibleTimeSettingsDTO){
-        FlexibleTimeSettings flexibleTimeSettings=ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingsDTO,FlexibleTimeSettings.class);
+        FlexibleTimeSettings flexibleTimeSettings=flexibleTimeSettingsRepository.getFlexibleTimeSettingsByIdAndDeletedFalse(flexibleTimeSettingsDTO.getId());
+        if(flexibleTimeSettings==null){
+            exceptionService.dataNotFoundException("data.not.Found",flexibleTimeSettingsDTO.getId());
+        }
+        flexibleTimeSettings=new FlexibleTimeSettings(flexibleTimeSettingsDTO.getFlexibleTimeForCheckIn(),flexibleTimeSettingsDTO.getFlexibleTimeForCheckOut());
         flexibleTimeSettings.setCountryId(countryId);
         save(flexibleTimeSettings);
         flexibleTimeSettingsDTO.setId(flexibleTimeSettings.getId());

@@ -13,4 +13,6 @@ import java.math.BigInteger;
 public interface FlexibleTimeSettingsRepository extends MongoBaseRepository<FlexibleTimeSettings,BigInteger> {
 
     FlexibleTimeSettingsDTO getFlexibleTimeSettingsByCountryIdAndDeletedFalse(Long countryId);
+
+    FlexibleTimeSettings getFlexibleTimeSettingsByIdAndDeletedFalse(BigInteger id);
 }
