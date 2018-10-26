@@ -298,7 +298,7 @@ public class UnitPositionService {
 
     private List<FunctionWithAmountQueryResult> findAndValidateFunction(UnitPositionDTO unitPositionDTO) {
         List<FunctionWithAmountQueryResult> functions = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevelAndIds
-                (unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(),DateUtils.getLongFromLocalDate(unitPositionDTO.getStartDate()), unitPositionDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toList()));
+                (unitPositionDTO.getUnitId(),unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(),DateUtils.getLongFromLocalDate(unitPositionDTO.getStartDate()), unitPositionDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toList()));
 
         if (functions.size() != unitPositionDTO.getFunctions().size()) {
             exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
