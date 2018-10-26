@@ -56,4 +56,11 @@ public class CountryConstraintController {
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }
 
+    //=================================================================
+    @ApiOperation("Delete CountryConstraintration")
+    public ResponseEntity<Map<String, Object>> createDefaultCountryConstraints(@PathVariable Long countryId) {
+        countryConstraintService.createDefaultCountryConstraints(countryId);
+        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+    }
+
 }

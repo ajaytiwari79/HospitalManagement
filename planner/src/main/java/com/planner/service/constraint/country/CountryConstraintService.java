@@ -9,6 +9,7 @@ import com.planner.domain.constraint.unit.UnitConstraint;
 import com.planner.repository.constraint.ConstraintsRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
+import com.planner.service.constraint.country.default_.DefaultCountryConstraintService;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,7 @@ public class CountryConstraintService {
         if (preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
             constraintsRepository.saveObject(countryConstraint);
-            //Now copy same Constraints on unit
+            //Now copy same Constraints on units
             createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
             countryConstraintDTO.setId(countryConstraint.getId());
         }
@@ -135,4 +136,18 @@ public class CountryConstraintService {
         }
         return true;
     }
+
+    //============================Create Default constraints==================================
+    public List<CountryConstraint> createDefaultCountryConstraints(Long countryId) {
+        //TODO might get these param from frontend
+        Long organizationServiceId=1l;
+        Long organizationSubServiceId=2l;
+        Long planningProblemId=3l;
+        List<CountryConstraint> countryConstraintList = DefaultCountryConstraintService.createDefaultCountryConstraints(countryId,organizationServiceId,organizationSubServiceId,planningProblemId);
+        if (countryConstraintList.size() > 0) {
+            constraintsRepository.saveObjectList(countryConstraintList);
+        }
+        return countryConstraintList;
+    }
+
 }
