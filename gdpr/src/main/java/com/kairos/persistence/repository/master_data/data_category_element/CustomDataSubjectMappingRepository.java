@@ -14,7 +14,7 @@ public interface CustomDataSubjectMappingRepository {
     DataSubjectMapping findByName(Long countryId, String name);
 
 
-    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, BigInteger dataSubjectId);
+    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryIdAndId(Long countryId, BigInteger dataSubjectId);
 
     List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId);
 
@@ -24,7 +24,7 @@ public interface CustomDataSubjectMappingRepository {
 
     List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId);
 
-    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId, BigInteger dataSubjectId);
+    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitIdAndId(Long unitId, BigInteger dataSubjectId);
 
 
 }
