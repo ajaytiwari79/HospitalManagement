@@ -18,10 +18,10 @@ public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingR
     @Autowired
     private MongoTemplate mongoTemplate;
 
-   public AttendanceSetting findMaxAttendanceCheckIn(Long userId, Date date){
+   public AttendanceSetting findMaxAttendanceCheckIn(Long userId, Date date,String shiftState){
        Aggregation aggregation = Aggregation.newAggregation(
-               match(Criteria.where("userId").is(userId).and("createdAt").gte(date)),
-               sort(Sort.Direction.DESC,"createdAt"),
+               match(Criteria.where("userId").is(userId).and("updatedAt").gte(date).orOperator(Criteria.where("shiftState").exists(true),Criteria.where("shiftState").ne(shiftState))),
+               sort(Sort.Direction.DESC,"updatedAt"),
                limit(1)
        );
 

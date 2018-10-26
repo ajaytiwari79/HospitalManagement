@@ -14,6 +14,7 @@ public class AttendanceSetting extends MongoBaseEntity {
     private Long userId;
     private BigInteger shiftId;
     private Long reasonCodeId;
+    private String shiftState;
     private List<AttendanceDuration> attendanceDuration ;
     public AttendanceSetting() {
     }
@@ -26,13 +27,14 @@ public class AttendanceSetting extends MongoBaseEntity {
         this.attendanceDuration=attendanceDuration;
     }
 
-    public AttendanceSetting(BigInteger shiftId,Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceDuration> attendanceDuration) {
+    public AttendanceSetting(BigInteger shiftId,Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceDuration> attendanceDuration,String shiftState) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.userId = userId;
         this.shiftId = shiftId;
         this.reasonCodeId = reasonCodeId;
         this.attendanceDuration = attendanceDuration;
+        this.shiftState=shiftState;
     }
 
     public Long getStaffId() {
@@ -81,5 +83,13 @@ public class AttendanceSetting extends MongoBaseEntity {
 
     public void setShiftId(BigInteger shiftId) {
         this.shiftId = shiftId;
+    }
+
+    public String getShiftState() {
+        return shiftState;
+    }
+
+    public void setShiftState(String shiftState) {
+        this.shiftState = shiftState;
     }
 }

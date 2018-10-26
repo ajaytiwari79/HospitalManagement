@@ -9,6 +9,8 @@ public class ShiftState extends Shift {
 
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
+    private String actualPhaseState;
+    private BigInteger attendanceSettingId;
 
     public BigInteger getShiftId() {
         return shiftId;
@@ -26,5 +28,19 @@ public class ShiftState extends Shift {
         this.shiftStatePhaseId = shiftStatePhaseId;
     }
 
+    public String getActualPhaseState() {
+        return actualPhaseState;
+    }
 
+    public void setActualPhaseState(String actualPhaseState) {
+        this.actualPhaseState = actualPhaseState;
+    }
+
+    public BigInteger getAttendanceSettingId() {
+        return attendanceSettingId;
+    }
+
+    public void setAttendanceSettingId(BigInteger attendanceSettingId) {
+        this.attendanceSettingId = attendanceSettingId;
+    }
 }

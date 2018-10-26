@@ -2,23 +2,24 @@ package com.kairos.service.attendence_setting;
 
 import com.kairos.commons.utils.DateTimeInterval;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
-import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
@@ -55,9 +56,10 @@ public class AttendanceSettingService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private UnitSettingRepository unitSettingRepository;
+    @Inject private ShiftStateMongoRepository shiftStateMongoRepository;
 
     public AttendanceDTO getAttendanceSetting() {
-        AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+        AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)),AppConstants.TIME_AND_ATTENDANCE);
         SickSettingsDTO sickSettings = sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
         return (Optional.ofNullable(attendanceSetting).isPresent()) ? new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()), sickSettings) : new AttendanceDTO(null, sickSettings);
     }
@@ -76,6 +78,7 @@ public class AttendanceSettingService extends MongoBaseService {
         List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS=staffAndOrganizationIds.stream().map(reasonCode->new OrganizationAndReasonCodeDTO(reasonCode.getUnitId(),reasonCode.getUnitName(),reasonCode.getReasonCodes())).collect(Collectors.toList());
         Shift shift=null;
         List<Shift> shifts=shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
+        Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<Long,List<ReasonCodeDTO>> unitAndReasonCode=staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId,StaffResultDTO::getReasonCodes));
         if(!shifts.isEmpty()) {
             List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
@@ -85,7 +88,7 @@ public class AttendanceSettingService extends MongoBaseService {
         }
         if(checkIn) {
             for (Shift checkInshift : shifts) {
-                boolean result = false;
+                boolean result;
                 if (unitIdAndFlexibleTimeMap.containsKey(checkInshift.getUnitId())) {
                     if(unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId())==null){
                         exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getUnitId());
@@ -132,7 +135,9 @@ public class AttendanceSettingService extends MongoBaseService {
         }
 
         else if(!checkIn){
-            attendanceSetting= checkOut(staffAndOrganizationIds,shift,reasonCodeId);
+            AttendanceSetting oldAttendanceSetting=attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)),AppConstants.TIME_AND_ATTENDANCE);;
+            shift=shiftMap.get(oldAttendanceSetting.getShiftId());
+            attendanceSetting= checkOut(staffAndOrganizationIds,shiftMap,oldAttendanceSetting,reasonCodeId);
             if(attendanceSetting==null){
                 return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
             }else {
@@ -146,6 +151,8 @@ public class AttendanceSettingService extends MongoBaseService {
 
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
             save(attendanceSetting);
+            if(shift!=null)
+            createShiftState(shift,checkIn,attendanceSetting);
             attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()), null);
         }
         return attendanceDTO;
@@ -167,20 +174,20 @@ public class AttendanceSettingService extends MongoBaseService {
         return attendanceSetting;
     }
 
-    private AttendanceSetting checkOut(List<StaffResultDTO> staffAndOrganizationIds,Shift shift,Long reasonCodeId) {
+    private AttendanceSetting checkOut(List<StaffResultDTO> staffAndOrganizationIds,Map<BigInteger,Shift> shiftMap,AttendanceSetting oldAttendanceSetting,Long reasonCodeId) {
         AttendanceDuration duration = null;
-        AttendanceSetting attendanceSetting=null;
-        if(shift!=null){
-            boolean result= validateFlexibleTimeWhileCheckOut(shift,reasonCodeId);
+        AttendanceSetting attendanceSetting=oldAttendanceSetting;
+        if(attendanceSetting.getShiftId()!=null&&shiftMap.get(attendanceSetting.getShiftId())!=null){
+            boolean result= validateFlexibleTimeWhileCheckOut(shiftMap.get(attendanceSetting.getShiftId()),reasonCodeId);
             if(!result){
                 return null;
             }
 
         }
-        attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
         final Long unitId=attendanceSetting.getUnitId();
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
-            duration = attendanceSetting.getAttendanceDuration().get(0);
+            attendanceSetting.getAttendanceDuration().sort((s1,s2)->s1.getFrom().compareTo(s2.getFrom()));
+            duration = attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1);
             if (!Optional.ofNullable(duration.getTo()).isPresent()) {
                 StaffResultDTO staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
                 duration.setTo(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
@@ -207,8 +214,15 @@ public class AttendanceSettingService extends MongoBaseService {
     }
 
         private AttendanceSetting checkInWithShift(Shift shift, Long reasonCodeId, StaffResultDTO staffAndOrganizationId) {
+            AttendanceSetting attendanceSetting=null;
+                AttendanceSetting oldAttendanceSetting=attendanceSettingRepository.findByShiftId(shift.getId(),AppConstants.REALTIME);
                 AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())));
-            AttendanceSetting attendanceSetting = new AttendanceSetting(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,Arrays.asList(attendanceDuration));
+                if(oldAttendanceSetting!=null){
+                    oldAttendanceSetting.getAttendanceDuration().add(attendanceDuration);
+                    attendanceSetting=oldAttendanceSetting;
+                }else{
+                    attendanceSetting= new AttendanceSetting(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,Arrays.asList(attendanceDuration), AppConstants.REALTIME);
+                }
         return attendanceSetting;
 
     }
@@ -222,12 +236,48 @@ public class AttendanceSettingService extends MongoBaseService {
         return false;
     }
 
+    public void createShiftState(Shift shift,boolean checkIn,AttendanceSetting attendanceSetting){
+        ShiftState realtimeShiftState=null;
+        ShiftState timeAndAttendanceShiftState=null;
+        AttendanceSetting attendanceSettingForTimeAndAttendance=null;
+        realtimeShiftState=shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shift.getId(),AppConstants.REALTIME);
+        if(shift!=null&&checkIn) {
+            if(realtimeShiftState==null) {
+                realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
+                realtimeShiftState.setId(null);
+                realtimeShiftState.setShiftId(shift.getId());
+                realtimeShiftState.setAttendanceSettingId(attendanceSetting.getId());
+                realtimeShiftState.setActualPhaseState(AppConstants.REALTIME);
+                shiftStateMongoRepository.save(realtimeShiftState);
+            }
+        } else{
+            attendanceSettingForTimeAndAttendance=attendanceSettingRepository.findByShiftId(shift.getId(),AppConstants.TIME_AND_ATTENDANCE);
+            if(attendanceSettingForTimeAndAttendance!=null) {
+                ObjectMapperUtils.copyPropertiesExceptSpecific(attendanceSetting,attendanceSettingForTimeAndAttendance,"id");
+            }else{
+                attendanceSettingForTimeAndAttendance = attendanceSetting;
+                attendanceSettingForTimeAndAttendance.setId(null);
+            }
+            attendanceSettingForTimeAndAttendance.setShiftState(AppConstants.TIME_AND_ATTENDANCE);
+            attendanceSettingRepository.save(attendanceSettingForTimeAndAttendance);
+            timeAndAttendanceShiftState=shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shift.getId(),AppConstants.TIME_AND_ATTENDANCE);
+            if(timeAndAttendanceShiftState!=null) {
+            ObjectMapperUtils.copyPropertiesExceptSpecific(realtimeShiftState,timeAndAttendanceShiftState,"id");
+            }else {
+                timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftState, ShiftState.class);
+                timeAndAttendanceShiftState.setId(null);
+            }
+            timeAndAttendanceShiftState.setAttendanceSettingId(attendanceSettingForTimeAndAttendance.getId());
+            timeAndAttendanceShiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
+            shiftStateMongoRepository.save(timeAndAttendanceShiftState);
+        }
+    }
 
     public void checkOutBySchedulerJob(Long unitId){
 //        List<Shift> saveShifts=new ArrayList<>();
 //        List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getCurrentLocalDate()));
-//        List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
-//        Map<BigInteger,Shift> staffIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+//            List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
+//          Map<BigInteger,Shift> staffIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
 //        attendanceSettings.forEach(attendanceSetting -> {
 //            if(staffIdAndShifts.get(attendanceSetting.getShiftId())!=null)
 //            {
@@ -238,11 +288,11 @@ public class AttendanceSettingService extends MongoBaseService {
 //                    saveShifts.add(shift);
 //                }
 //            }else{
-//                attendanceSetting.getAttendanceDuration().setTo(LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
+//                attendanceSetting.getAttendanceDuration().get(0).setTo(LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
 //            }
 //        });
 //        if(!attendanceSettings.isEmpty()) attendanceSettingRepository.saveEntities(attendanceSettings);
 //        if(!saveShifts.isEmpty()) shiftMongoRepository.saveEntities(saveShifts);
-//        return;
+        return;
     }
 }
