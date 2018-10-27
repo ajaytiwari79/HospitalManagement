@@ -197,6 +197,9 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.disabled = disabled;
     }
 
+    public boolean isDisabled() {
+        return disabled;
+    }
 
     public WorkingTimeAgreement(BigInteger id, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Date startDate, Date endDate, Date expiryDate) {
         this.id = id;
