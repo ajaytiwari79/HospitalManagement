@@ -12,14 +12,13 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
-import com.kairos.dto.user.staff.unit_position.PositionLineChangeResultDTO;
+import com.kairos.persistence.model.user.unit_position.PositionLineChangeResultDTO;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -225,14 +224,18 @@ public class UnitPositionService {
 
         UnitPositionLineEmploymentTypeRelationShip relationShip = new UnitPositionLineEmploymentTypeRelationShip(unitPosition.getUnitPositionLines().get(0), employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
-        linkFunctions(functions,unitPosition.getUnitPositionLines().get(0));
+        linkFunctions(functions,unitPosition.getUnitPositionLines().get(0),false);
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaWrapper.getCta().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaWrapper.getWta().get(0));
         return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
     }
-    private void linkFunctions(List<FunctionWithAmountQueryResult> functions, UnitPositionLine positionLine){
+    private void linkFunctions(List<FunctionWithAmountQueryResult> functions, UnitPositionLine positionLine,boolean update){
+        if (update){
+            // need to delete the current applied functions
+            unitPositionGraphRepository.removeAllAppliedFunctionOnPositionLines(positionLine.getId());
+        }
         List<UnitPositionLineFunctionRelationShip> functionsUnitPositionLines= new ArrayList<>(functions.size());
         functions.forEach(currentFunction->{
             functionsUnitPositionLines.add(new UnitPositionLineFunctionRelationShip(positionLine,currentFunction.getFunction(),currentFunction.getAmount()));
@@ -386,8 +389,10 @@ public class UnitPositionService {
         // return it witout checking its objects or values
         if(newAppliedFunctions.size()!=olderAppliesFunctions.size()){
             changeResultDTO.setCalculativeChanged(true);
-            changeResultDTO.setEmploymentTypeChanged(true);
-            return changeResultDTO; // This return is necessary as we dont want to add a new if statement
+            changeResultDTO.setFunctionsChanged(true);
+            changeResultDTO.setFunctions(newAppliedFunctions);
+
+            return changeResultDTO; // This return is necessary as we don't want to add a new if statement
         }
 
 
@@ -403,6 +408,8 @@ public class UnitPositionService {
             if (currentMatched.get()==false){
                 changeResultDTO.setCalculativeChanged(true);
                 changeResultDTO.setFunctionsChanged(true);
+                changeResultDTO.setFunctions(newAppliedFunctions);
+                return; // this is used to break from outer loop.
             }
         });
 
@@ -466,13 +473,17 @@ public class UnitPositionService {
                 if (changeResultDTO.isEmploymentTypeChanged()) {
                     unitPositionEmploymentTypeRelationShipGraphRepository.updateEmploymentTypeInCurrentUnitPositionLine(currentUnitPositionLine.getId(), unitPositionDTO.getEmploymentTypeId(), unitPositionDTO.getEmploymentTypeCategory());
                 }
+                if (changeResultDTO.isFunctionsChanged()){
+                    linkFunctions(changeResultDTO.getFunctions(),currentUnitPositionLine,true);
+                }
                 unitPositionGraphRepository.save(oldUnitPosition);
                 unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, currentUnitPositionLine);
             } else {
                 UnitPositionLine unitPositionLine = createPositionLine(oldUnitPosition, currentUnitPositionLine, unitPositionDTO);
                 oldUnitPosition.getUnitPositionLines().add(unitPositionLine);
-                linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
+                linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
+                linkFunctions(changeResultDTO.getFunctions(),unitPositionLine,false);
                 unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
 
