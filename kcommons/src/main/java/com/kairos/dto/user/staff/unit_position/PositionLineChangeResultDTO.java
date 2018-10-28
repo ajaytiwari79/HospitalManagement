@@ -6,13 +6,13 @@ import java.math.BigInteger;
  * CreatedBy vipulpandey on 3/10/18
  **/
 public class PositionLineChangeResultDTO {
-    boolean calculativeChanged;
-    boolean employmentTypeChanged;
+    private boolean calculativeChanged;
+    private boolean employmentTypeChanged;
     private BigInteger ctaId;
     private BigInteger oldctaId;
     private BigInteger wtaId;
     private BigInteger oldwtaId;
-
+    private boolean functionsChanged;
     public PositionLineChangeResultDTO(boolean calculativeChanged) {
         this.calculativeChanged=calculativeChanged;
     }
@@ -63,5 +63,13 @@ public class PositionLineChangeResultDTO {
 
     public void setEmploymentTypeChanged(boolean employmentTypeChanged) {
         this.employmentTypeChanged = employmentTypeChanged;
+    }
+
+    public boolean isFunctionsChanged() {
+        return functionsChanged;
+    }
+
+    public void setFunctionsChanged(boolean functionsChanged) {
+        this.functionsChanged = functionsChanged;
     }
 }
