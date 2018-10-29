@@ -38,7 +38,6 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireS
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -157,7 +156,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
         Asset asset = assetMongoRepository.findOne(assetId);
-        Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.Risk, asset);
+        Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, asset);
         assessment.setAssetId(assetId);
         assessment.setRiskAssessment(true);
         assessmentMongoRepository.save(assessment);
@@ -172,7 +171,7 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.Risk, null);
+        Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, null);
         assessment.setProcessingActivityId(processingActivityId);
         assessment.setRiskAssessment(true);
         assessmentMongoRepository.save(assessment);
@@ -199,7 +198,7 @@ public class AssessmentService extends MongoBaseService {
             case ASSET_TYPE:
                 questionnaireTemplate = checkPreviousLaunchedAssetAssessment(unitId, (Asset) entity);
                 break;
-            case Risk:
+            case RISK:
                 questionnaireTemplate = checkPreviousLaunchedRiskAssessment(unitId, (AssessmentTypeRiskDTO) assessmentDTO, entity);
                 assessment.setRiskAssessment(true);
                 assessment.setRiskIds(((AssessmentTypeRiskDTO) assessmentDTO).getRiskIds());
@@ -247,7 +246,7 @@ public class AssessmentService extends MongoBaseService {
             if (asset.getAssetSubTypeId() != null)
                 questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetTypeId(), asset.getAssetSubTypeId());
             else
-                questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(unitId, asset.getAssetSubTypeId());
+                questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(unitId, asset.getAssetTypeId());
 
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(unitId);

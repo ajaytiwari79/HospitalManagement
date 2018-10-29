@@ -24,7 +24,7 @@ public class Risk extends MongoBaseEntity {
     private boolean isReminderActive;
     private int daysToReminderBefore;
     private Staff riskOwner;
-    @NotNull(message = "Risk Level can't be null")
+    @NotNull(message = "RISK Level can't be null")
     private RiskSeverity riskLevel;
     private BigInteger assetType;
     private BigInteger processingActivity;
@@ -34,7 +34,7 @@ public class Risk extends MongoBaseEntity {
     }
 
     public Risk(Long countryId, @NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel) {
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -43,7 +43,7 @@ public class Risk extends MongoBaseEntity {
     }
 
     public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel, LocalDate dueDates) {
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel, LocalDate dueDates) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -51,7 +51,7 @@ public class Risk extends MongoBaseEntity {
         this.dueDate = dueDates;
     }
 
-    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description, @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel) {
+    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description, @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;

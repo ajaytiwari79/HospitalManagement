@@ -9,7 +9,6 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
-import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
@@ -82,7 +81,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                 addAssetTypeAndSubAssetTypeToQuestionnaireTemplateOnTemplateTypeStatusAssetTypeSelection(referenceId, isUnitId, questionnaireTemplate, templateDto);
                 break;
-            case Risk:
+            case RISK:
                 if (!Optional.ofNullable(templateDto.getRiskAssociatedEntity()).isPresent()) {
                     exceptionService.invalidRequestException("message.risk.questionnaireTemplate.associated.entity.not.selected");
                 }
@@ -135,9 +134,8 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
             }
         }
-
-
         questionnaireTemplate.setTemplateStatus(templateDto.getTemplateStatus());
+        questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
         questionnaireTemplate.setRiskAssociatedEntity(templateDto.getRiskAssociatedEntity());
 
     }

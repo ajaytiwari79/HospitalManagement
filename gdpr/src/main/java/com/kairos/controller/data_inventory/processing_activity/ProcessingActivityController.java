@@ -152,7 +152,7 @@ public class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "Create And Link Risk to processing activity And Sub Processing Activity")
+    @ApiOperation(value = "Create And Link RISK to processing activity And Sub Processing Activity")
     @PutMapping("/processing_activity/{processingActivityId}/risk")
     public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ProcessingActivityRiskDTO processingActivityRiskDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTO));

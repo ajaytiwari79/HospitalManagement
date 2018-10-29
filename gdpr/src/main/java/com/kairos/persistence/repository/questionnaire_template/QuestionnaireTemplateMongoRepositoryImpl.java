@@ -158,7 +158,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeId(Long countryId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
-                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
                 .and("assetTypeId").is(assetTypeId));
@@ -169,7 +169,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeIdAndSubAssetTypeId(Long countryId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
-                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
                 .and("assetTypeId").is(assetTypeId)
@@ -181,7 +181,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskAndAsssociatedEntityProcessingActivityByCountryId(Long countryId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
-                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)
                 .and(DELETED).is(false));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
@@ -231,7 +231,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(Long unitId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
-                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)
                 .and(DELETED).is(false).and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
@@ -241,7 +241,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
-                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
                 .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED)
@@ -252,7 +252,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
-                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
                 .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED)

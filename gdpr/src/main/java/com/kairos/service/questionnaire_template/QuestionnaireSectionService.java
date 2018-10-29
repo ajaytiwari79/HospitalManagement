@@ -7,7 +7,6 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
@@ -191,7 +190,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             case ASSET_TYPE:
                 checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(unitId, questionnaireTemplate);
                 break;
-            case Risk:
+            case RISK:
                 checkIfRiskQuestionnaireTemplateIsInPublishedState(unitId, questionnaireTemplate);
                 break;
             default:

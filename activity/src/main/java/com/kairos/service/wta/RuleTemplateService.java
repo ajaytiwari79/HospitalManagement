@@ -229,7 +229,7 @@ public class RuleTemplateService extends MongoBaseService {
         noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(noOfSequenceShiftWTATemplate);
 
-        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate = new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased Risk", false, "Employees with increased risk", 18, 62, false);
+        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate = new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased RISK", false, "Employees with increased risk", 18, 62, false);
         employeesWithIncreasedRiskWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         employeesWithIncreasedRiskWTATemplate.setCountryId(countryDTO.getId());
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
