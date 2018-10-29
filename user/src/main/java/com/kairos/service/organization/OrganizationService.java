@@ -783,8 +783,8 @@ public class OrganizationService {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
         Map<String, Object> response = new HashMap<>(2);
-        List<Map<String, Object>> units = organizationGraphRepository.getUnits(unitId);
-        response.put("units", units.size() != 0 ? units.get(0).get("unitList") : Collections.emptyList());
+        List<OrganizationBasicResponse>  units = getOrganizationGdprAndWorkcenter(unitId,null);
+        response.put("units", units.size() != 0 ? units : Collections.emptyList());
 
         List<Map<String, Object>> groups = organizationGraphRepository.getGroups(unitId);
         response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
