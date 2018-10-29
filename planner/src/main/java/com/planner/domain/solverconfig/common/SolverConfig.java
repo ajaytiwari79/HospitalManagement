@@ -17,6 +17,7 @@ public class SolverConfig extends MongoBaseEntity {
     protected short terminationTimeInMinutes;
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
+    protected BigInteger parentCountrySolverConfigId;//copiedFrom
 
 
     //Constructors
@@ -142,5 +143,11 @@ public class SolverConfig extends MongoBaseEntity {
         return this;
     }
 
+    public BigInteger getParentCountrySolverConfigId() {
+        return parentCountrySolverConfigId;
+    }
 
+    public void setParentCountrySolverConfigId(BigInteger parentCountrySolverConfigId) {
+        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
+    }
 }
