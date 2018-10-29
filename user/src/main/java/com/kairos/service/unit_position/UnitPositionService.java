@@ -856,7 +856,8 @@ public class UnitPositionService {
             unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
         }
         unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
-        float hourlyCost=(float) (unitPosition.getPositionLines().get(0).getStartDate().isLeapYear()?hourlyCostMap.get(unitPosition.getPositionLines().get(0).getId())/(366*7.4):hourlyCostMap.get(unitPosition.getPositionLines().get(0).getId())/(365*7.4));
+        UnitPositionLinesQueryResult unitPositionLinesQueryResult=ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0),UnitPositionLinesQueryResult.class);
+        float hourlyCost=(float) (unitPositionLinesQueryResult.getStartDate().isLeapYear()?hourlyCostMap.get(unitPositionLinesQueryResult.getId())/(366*7.4):hourlyCostMap.get(unitPositionLinesQueryResult.getId())/(365*7.4));
         unitPositionDetails.setHourlyCost(hourlyCost);
         return unitPositionDetails;
     }
