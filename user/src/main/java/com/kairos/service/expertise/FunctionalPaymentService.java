@@ -141,7 +141,7 @@ public class FunctionalPaymentService{
 
             currentSRLevelFunction.getFunctions().forEach(currentFunction -> {
                 Function function = functions.stream().
-                        filter(function1 -> function1.getId().equals(currentFunction.getFunctionId())).findAny().get();
+                        filter(function1 -> function1.getId().equals(currentFunction.getId())).findAny().get();
                 SeniorityLevelFunctionsRelationship seniorityLevelFunctionsRelationship = new SeniorityLevelFunctionsRelationship(function, seniorityLevelFunction, currentFunction.getAmount(),currentFunction.isAmountEditableAtUnit());
                 seniorityLevelFunctionsRelationships.add(seniorityLevelFunctionsRelationship);
             });

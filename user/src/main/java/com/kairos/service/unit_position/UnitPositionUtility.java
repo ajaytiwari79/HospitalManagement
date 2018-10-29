@@ -22,7 +22,7 @@ public class UnitPositionUtility {
         unitPositionDetails.setTotalWeeklyHours(currentPositionLine.getTotalWeeklyHours());
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
-        unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
+        unitPositionDetails.setHourlyCost(currentPositionLine.getHourlyCost());
     }
 
     public static void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
@@ -39,7 +39,7 @@ public class UnitPositionUtility {
         unitPositionDetails.setTotalWeeklyMinutes(currentPositionLine.getTotalWeeklyMinutes());
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
-        unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
+        unitPositionDetails.setHourlyCost(currentPositionLine.getHourlyCost());
     }
 
 }

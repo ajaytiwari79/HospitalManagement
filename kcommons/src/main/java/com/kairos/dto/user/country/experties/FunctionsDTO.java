@@ -10,8 +10,8 @@ import java.math.BigDecimal;
  */
 @JsonIgnoreProperties
 public class FunctionsDTO {
-    private Long functionId;
-    private String functionName; // THIS is used for FE compactibility
+    private Long id;
+    private String name; // THIS is used for FE compactibility
     private BigDecimal amount; // amount which is added to this function;
     private boolean amountEditableAtUnit;
 
@@ -19,12 +19,20 @@ public class FunctionsDTO {
         // dc
     }
 
-    public Long getFunctionId() {
-        return functionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setFunctionId(Long functionId) {
-        this.functionId = functionId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getFunctionId() {
+        return id;
+    } // THIS IS for FE compactibility We need to remove this Impact on FUNCTION inside expertise
+
+    public void setFunctionId(Long id) {
+        this.id = id;
     }
 
     public BigDecimal getAmount() {
@@ -43,23 +51,23 @@ public class FunctionsDTO {
         this.amountEditableAtUnit = amountEditableAtUnit;
     }
 
-    public String getFunctionName() {
-        return functionName;
+    public String getName() {
+        return name;
     }
 
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public FunctionsDTO(BigDecimal amount, Long functionId) {
-        this.functionId = functionId;
+    public FunctionsDTO(BigDecimal amount, Long id) {
+        this.id = id;
         this.amount = amount;
     }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("FunctionsDTO{");
-        sb.append(", functionId=").append(functionId);
+        sb.append(", functionId=").append(id);
         sb.append(", amount=").append(amount);
         sb.append('}');
         return sb.toString();

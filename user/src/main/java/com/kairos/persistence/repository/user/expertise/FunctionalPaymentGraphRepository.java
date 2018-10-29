@@ -61,4 +61,15 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "match(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +
             "merge (child)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn)")
     void linkFunctionalPaymentInExpertise(Long expertiseId, Long newExpertiseId);
+
+    @Query("MATCH(expertise:Expertise)<-[:"+APPLICABLE_FOR_EXPERTISE+"]-(funPayment:FunctionalPayment)  where id(expertise)={0}\n" +
+            "MATCH(funPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)\n" +
+            "MATCH(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={1}\n" +
+            "MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(:SeniorityLevelFunction)-[oldRel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function)\n" +
+            "with seniorityLevel,fpm,oldRel,collect(function) as functions\n" +
+            "FOREACH (currentFunction IN (functions)| \n" +
+            " CREATE UNIQUE (seniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(newSL:SeniorityLevelFunction{deleted:false})\n" +
+            " CREATE UNIQUE (fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(newSL)\n" +
+            " CREATE UNIQUE(newSL)-[:"+HAS_FUNCTIONAL_AMOUNT+"{amount:0,amountEditableAtUnit:oldRel.amountEditableAtUnit}]->(currentFunction))")
+    void linkWithFunctionPayment(Long expertiseId,Long seniorityLevelId);
 }

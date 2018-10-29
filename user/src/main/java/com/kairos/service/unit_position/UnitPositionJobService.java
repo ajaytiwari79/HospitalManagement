@@ -60,7 +60,7 @@ public class UnitPositionJobService {
                         UnitPositionLine newUnitPositionLine = new UnitPositionLine.UnitPositionLineBuilder()
                                 .setAvgDailyWorkingHours(positionLine.get().getAvgDailyWorkingHours())
                                 .setTotalWeeklyMinutes(positionLine.get().getTotalWeeklyMinutes())
-                                .setHourlyWages(positionLine.get().getHourlyWages())
+                                .setHourlyCost(positionLine.get().getHourlyCost())
                                 .setStartDate(todaysDate.plusDays(1))
                                 .setFunctions(positionLine.get().getFunctions())
                                 .setFullTimeWeeklyMinutes(positionLine.get().getFullTimeWeeklyMinutes())

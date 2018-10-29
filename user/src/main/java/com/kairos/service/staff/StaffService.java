@@ -1764,7 +1764,7 @@ public class StaffService {
             unitPositionDetails = new StaffUnitPositionDetails(unitId);
 
             convertUnitPositionObject(unitPosition, unitPositionDetails);
-            List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyWages(Collections.singletonList(unitPosition.getId()));
+            List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
             unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
         }
         return unitPositionDetails;
