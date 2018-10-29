@@ -4,15 +4,15 @@ package com.kairos.dto.activity.flexible_time;
  *
  */
 
-public class FlexibleTimeDetails {
+public class GlideTimeDetails {
     private Short before; // storing in minutes
     private Short after;  // storing in minutes
 
-    public FlexibleTimeDetails() {
+    public GlideTimeDetails() {
         //Default Constructor
     }
 
-    public FlexibleTimeDetails(Short before, Short after) {
+    public GlideTimeDetails(Short before, Short after) {
         this.before = before;
         this.after = after;
     }

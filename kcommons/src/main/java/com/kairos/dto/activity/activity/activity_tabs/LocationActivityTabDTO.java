@@ -1,12 +1,9 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.activity.flexible_time.ActivityFlexibleTimeDetails;
-import com.kairos.dto.activity.flexible_time.FlexibleTimeDetails;
-import com.kairos.enums.LocationEnum;
+import com.kairos.dto.activity.flexible_time.ActivityGlideTimeDetails;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,8 +12,8 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LocationActivityTabDTO {
     private BigInteger activityId;
-    private Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn;
-    private Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut;
+    private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
+    private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 
     public LocationActivityTabDTO() {
     }
@@ -29,19 +26,19 @@ public class LocationActivityTabDTO {
         this.activityId = activityId;
     }
 
-    public Set<ActivityFlexibleTimeDetails> getFlexibleTimeForCheckIn() {
-        return flexibleTimeForCheckIn;
+    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckIn() {
+        return glideTimeForCheckIn;
     }
 
-    public void setFlexibleTimeForCheckIn(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn) {
-        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
+    public void setGlideTimeForCheckIn(Set<ActivityGlideTimeDetails> glideTimeForCheckIn) {
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
     }
 
-    public Set<ActivityFlexibleTimeDetails> getFlexibleTimeForCheckOut() {
-        return flexibleTimeForCheckOut;
+    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckOut() {
+        return glideTimeForCheckOut;
     }
 
-    public void setFlexibleTimeForCheckOut(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut) {
-        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+    public void setGlideTimeForCheckOut(Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
     }
 }

@@ -14,8 +14,8 @@ import com.kairos.dto.activity.activity.activity_tabs.communication_tab.Communic
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.FrequencySettings;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
-import com.kairos.dto.activity.flexible_time.ActivityFlexibleTimeDetails;
-import com.kairos.dto.activity.flexible_time.FlexibleTimeSettingsDTO;
+import com.kairos.dto.activity.flexible_time.ActivityGlideTimeDetails;
+import com.kairos.dto.activity.flexible_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
@@ -54,7 +54,7 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.flexible_time.FlexibleTimeSettingsService;
+import com.kairos.service.flexible_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.phase.PhaseService;
@@ -152,7 +152,7 @@ public class ActivityService extends MongoBaseService {
     private GenericRestClient genericRestClient;
     @Inject private MongoSequenceRepository mongoSequenceRepository;
     @Inject
-    private FlexibleTimeSettingsService flexibleTimeSettingsService;
+    private GlideTimeSettingsService glideTimeSettingsService;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -203,7 +203,7 @@ public class ActivityService extends MongoBaseService {
 
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
         List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
-        FlexibleTimeSettingsDTO flexibleTimeSettingsDTO=flexibleTimeSettingsService.getFlexibleTimeSettings(countryId);
+        GlideTimeSettingsDTO glideTimeSettingsDTO = glideTimeSettingsService.getGlideTimeSettings(countryId);
 
 
         RulesActivityTab rulesActivityTab = new RulesActivityTab();
@@ -234,16 +234,28 @@ public class ActivityService extends MongoBaseService {
         SkillActivityTab skillActivityTab = new SkillActivityTab();
         activity.setSkillActivityTab(skillActivityTab);
 
-        Set<ActivityFlexibleTimeDetails> activityFlexibleTimeDetailsForCheckIn=new HashSet<>();
-        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForHome=new ActivityFlexibleTimeDetails(LocationEnum.HOME,(short)0,(short)0);
-        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForUnit=new ActivityFlexibleTimeDetails(LocationEnum.OFFICE,(short)0,(short)0);
-        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForDepot=new ActivityFlexibleTimeDetails(LocationEnum.DEPOT,(short)0,(short)0);
-        ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForOther=new ActivityFlexibleTimeDetails(LocationEnum.OTHERS,(short)0,(short)0);
-        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForHome);
-        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForUnit);
-        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForDepot);
-        activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForOther);
-        LocationActivityTab locationActivityTab = new LocationActivityTab(activityFlexibleTimeDetailsForCheckIn,activityFlexibleTimeDetailsForCheckIn);
+        Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckIn =new HashSet<>();
+        ActivityGlideTimeDetails activityGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForHome);
+        activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForUnit);
+        activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForDepot);
+        activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForOther);
+
+
+        Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckOut =new HashSet<>();
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForHome);
+        activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForUnit);
+        activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForDepot);
+        activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForOther);
+
+        LocationActivityTab locationActivityTab = new LocationActivityTab(activityGlideTimeDetailsForCheckIn, activityGlideTimeDetailsForCheckOut);
         activity.setLocationActivityTab(locationActivityTab);
 
     }
@@ -964,7 +976,7 @@ public class ActivityService extends MongoBaseService {
         List<Activity> activitiesByExternalIds = activityMongoRepository.findByExternalIdIn(externalIdsOfAllActivities);
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
         List<Activity> activities = new ArrayList<>(timeCareActivities.size());
-        FlexibleTimeSettingsDTO flexibleTimeSettingsDTO=flexibleTimeSettingsService.getFlexibleTimeSettings(countryId);
+        GlideTimeSettingsDTO glideTimeSettingsDTO = glideTimeSettingsService.getGlideTimeSettings(countryId);
 
         for (TimeCareActivity timeCareActivity : timeCareActivities) {
 
@@ -1001,16 +1013,27 @@ public class ActivityService extends MongoBaseService {
             activity.setRulesActivityTab(rulesActivityTab);
 
             // location settings
-            Set<ActivityFlexibleTimeDetails> activityFlexibleTimeDetailsForCheckIn=new HashSet<>();
-            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForHome=new ActivityFlexibleTimeDetails(LocationEnum.HOME,(short)0,(short)0);
-            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForUnit=new ActivityFlexibleTimeDetails(LocationEnum.OFFICE,(short)0,(short)0);
-            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForDepot=new ActivityFlexibleTimeDetails(LocationEnum.DEPOT,(short)0,(short)0);
-            ActivityFlexibleTimeDetails activityFlexibleTimeDetailsForOther=new ActivityFlexibleTimeDetails(LocationEnum.OTHERS,(short)0,(short)0);
-            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForHome);
-            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForUnit);
-            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForDepot);
-            activityFlexibleTimeDetailsForCheckIn.add(activityFlexibleTimeDetailsForOther);
-            LocationActivityTab locationActivityTab = new LocationActivityTab(activityFlexibleTimeDetailsForCheckIn,activityFlexibleTimeDetailsForCheckIn);
+            Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckIn =new HashSet<>();
+            ActivityGlideTimeDetails activityGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForHome);
+            activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForUnit);
+            activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForDepot);
+            activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForOther);
+
+
+            Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckOut =new HashSet<>();
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForHome);
+            activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForUnit);
+            activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForDepot);
+            activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForOther);
+            LocationActivityTab locationActivityTab = new LocationActivityTab(activityGlideTimeDetailsForCheckIn, activityGlideTimeDetailsForCheckOut);
             activity.setLocationActivityTab(locationActivityTab);
 
             //Time calculation tab
@@ -1190,7 +1213,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", locationActivityTabDTO.getActivityId());
         }
-        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getFlexibleTimeForCheckIn(),locationActivityTabDTO.getFlexibleTimeForCheckOut());
+        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getGlideTimeForCheckIn(),locationActivityTabDTO.getGlideTimeForCheckOut());
         activity.setLocationActivityTab(locationActivityTab);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(locationActivityTab);

@@ -1,21 +1,22 @@
-package com.kairos.dto.activity.flexible_time;/*
+package com.kairos.dto.activity.flexible_time;
+/*
  *Created By Pavan on 25/10/18
  *
  */
 
 import com.kairos.enums.LocationEnum;
 
-public class ActivityFlexibleTimeDetails {
+public class ActivityGlideTimeDetails {
     private LocationEnum location;
     private Short before; // storing in minutes
     private Short after;  // storing in minutes
     private boolean eligible;
 
-    public ActivityFlexibleTimeDetails() {
+    public ActivityGlideTimeDetails() {
         //Default Constructor
     }
 
-    public ActivityFlexibleTimeDetails(LocationEnum location, Short before, Short after) {
+    public ActivityGlideTimeDetails(LocationEnum location, Short before, Short after) {
         this.location = location;
         this.before = before;
         this.after = after;

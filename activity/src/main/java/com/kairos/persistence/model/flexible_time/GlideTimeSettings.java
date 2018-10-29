@@ -4,41 +4,41 @@ package com.kairos.persistence.model.flexible_time;
  *
  */
 
-import com.kairos.dto.activity.flexible_time.FlexibleTimeDetails;
+import com.kairos.dto.activity.flexible_time.GlideTimeDetails;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-public class FlexibleTimeSettings extends MongoBaseEntity {
+public class GlideTimeSettings extends MongoBaseEntity {
     private short timeLimit;
-    private FlexibleTimeDetails flexibleTimeForCheckIn;
-    private FlexibleTimeDetails flexibleTimeForCheckOut;
+    private GlideTimeDetails flexibleTimeForCheckIn;
+    private GlideTimeDetails flexibleTimeForCheckOut;
     private Long countryId;
 
-    public FlexibleTimeSettings() {
+    public GlideTimeSettings() {
         //Default Constructor
     }
 
-    public FlexibleTimeSettings(BigInteger id,FlexibleTimeDetails flexibleTimeForCheckIn, FlexibleTimeDetails flexibleTimeForCheckOut, short timeLimit) {
+    public GlideTimeSettings(BigInteger id, GlideTimeDetails flexibleTimeForCheckIn, GlideTimeDetails flexibleTimeForCheckOut, short timeLimit) {
         this.id=id;
         this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
         this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
         this.timeLimit=timeLimit;
     }
 
-    public FlexibleTimeDetails getFlexibleTimeForCheckIn() {
+    public GlideTimeDetails getFlexibleTimeForCheckIn() {
         return flexibleTimeForCheckIn;
     }
 
-    public void setFlexibleTimeForCheckIn(FlexibleTimeDetails flexibleTimeForCheckIn) {
+    public void setFlexibleTimeForCheckIn(GlideTimeDetails flexibleTimeForCheckIn) {
         this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
     }
 
-    public FlexibleTimeDetails getFlexibleTimeForCheckOut() {
+    public GlideTimeDetails getFlexibleTimeForCheckOut() {
         return flexibleTimeForCheckOut;
     }
 
-    public void setFlexibleTimeForCheckOut(FlexibleTimeDetails flexibleTimeForCheckOut) {
+    public void setFlexibleTimeForCheckOut(GlideTimeDetails flexibleTimeForCheckOut) {
         this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
     }
 

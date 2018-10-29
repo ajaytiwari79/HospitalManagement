@@ -1,19 +1,16 @@
 package com.kairos.persistence.model.activity.tabs;
 
-import com.kairos.dto.activity.flexible_time.ActivityFlexibleTimeDetails;
-import com.kairos.dto.activity.flexible_time.FlexibleTimeDetails;
-import com.kairos.enums.LocationEnum;
+import com.kairos.dto.activity.flexible_time.ActivityGlideTimeDetails;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Created by vipul on 13/4/18.
  */
 public class LocationActivityTab implements Serializable {
-    private Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn;
-    private Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut;
+    private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
+    private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 
 
 
@@ -21,24 +18,24 @@ public class LocationActivityTab implements Serializable {
         //Default Constructor
     }
 
-    public Set<ActivityFlexibleTimeDetails> getFlexibleTimeForCheckIn() {
-        return flexibleTimeForCheckIn;
+    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckIn() {
+        return glideTimeForCheckIn;
     }
 
-    public void setFlexibleTimeForCheckIn(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn) {
-        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
+    public void setGlideTimeForCheckIn(Set<ActivityGlideTimeDetails> glideTimeForCheckIn) {
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
     }
 
-    public Set<ActivityFlexibleTimeDetails> getFlexibleTimeForCheckOut() {
-        return flexibleTimeForCheckOut;
+    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckOut() {
+        return glideTimeForCheckOut;
     }
 
-    public void setFlexibleTimeForCheckOut(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut) {
-        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+    public void setGlideTimeForCheckOut(Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
     }
 
-    public LocationActivityTab(Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckIn, Set<ActivityFlexibleTimeDetails> flexibleTimeForCheckOut) {
-        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
-        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+    public LocationActivityTab(Set<ActivityGlideTimeDetails> glideTimeForCheckIn, Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
     }
 }

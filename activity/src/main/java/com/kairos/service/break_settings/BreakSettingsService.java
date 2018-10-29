@@ -65,7 +65,7 @@ public class BreakSettingsService extends MongoBaseService {
         /*UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
         if (unitSettingDTO != null) {
-            flexibleTimeSettingDTO = unitSettingDTO.getFlexibleTimeSettings();
+            flexibleTimeSettingDTO = unitSettingDTO.getGlideTimeSettings();
         }
         */
         return new BreakSettingAndActivitiesWrapper(breakSettings, activities, null);
