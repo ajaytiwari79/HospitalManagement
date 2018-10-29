@@ -69,7 +69,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType", "assetSubType", "_id", "assetSubType"),
+                lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -91,7 +91,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType", "assetSubType", "_id", "assetSubType"),
+                lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -121,7 +121,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
                 lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType", "assetSubType", "_id", "assetSubType"),
+                lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -139,8 +139,8 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("assetType", "assetSubType", "_id", "assetSubType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
+                lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -161,7 +161,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 .and("templateType").is(QuestionnaireTemplateType.Risk)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
-                .and("assetType").is(assetTypeId));
+                .and("assetTypeId").is(assetTypeId));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
 
@@ -172,8 +172,8 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 .and("templateType").is(QuestionnaireTemplateType.Risk)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
-                .and("assetType").is(assetTypeId)
-                .and("assetSubType").is(subAssetTypeId));
+                .and("assetTypeId").is(assetTypeId)
+                .and("assetSubTypeId").is(subAssetTypeId));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
 
@@ -199,10 +199,10 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds) {
+    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
-                .and("assetType").is(assetTypeId).and("assetSubType").in(subAssetTypeIds)
+                .and("assetTypeId").is(assetTypeId).and("assetSubTypeId").in(subAssetTypeId)
                 .and(DELETED).is(false)
                 .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
@@ -211,8 +211,8 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(Long unitId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
-                .and("assetType").is(assetTypeId)
-                .and("assetSubType").exists(false)
+                .and("assetTypeId").is(assetTypeId)
+                .and("assetSubTypeId").exists(false)
                 .and(DELETED).is(false)
                 .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
@@ -245,7 +245,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
                 .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED)
-                .and("assetType").is(assetTypeId));
+                .and("assetTypeId").is(assetTypeId));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
 
@@ -256,8 +256,8 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and(DELETED).is(false)
                 .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED)
-                .and("assetType").is(assetTypeId)
-                .and("assetSubType").is(assetSubTypeId));
+                .and("assetTypeId").is(assetTypeId)
+                .and("assetSubTypeId").is(assetSubTypeId));
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
 }

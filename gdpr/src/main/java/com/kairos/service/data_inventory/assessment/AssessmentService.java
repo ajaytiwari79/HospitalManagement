@@ -4,8 +4,9 @@ package com.kairos.service.data_inventory.assessment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.dto.gdpr.assessment.AssessmentTypeRiskDTO;
 import com.kairos.enums.gdpr.*;
-import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
+import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
@@ -116,9 +117,9 @@ public class AssessmentService extends MongoBaseService {
 
         Assessment previousAssessment = assessmentMongoRepository.findPreviousLaunchedAssessmentOfAssetByUnitId(unitId, assetId);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
+            exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        Asset asset = assetMongoRepository.findOne(assetId);
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, asset);
         assessment.setAssetId(assetId);
         saveAssetValueToAssessmentAnswer(unitId, assessment);
@@ -130,54 +131,11 @@ public class AssessmentService extends MongoBaseService {
 
     /**
      * @param unitId
-     * @param assessmentDTO
-     * @return
-     *///todo remove find by name
-    private Assessment buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
-
-        Assessment previousAssessment = assessmentMongoRepository.findAssessmentByNameAndUnitId(unitId, assessmentDTO.getName());
-        if (Optional.ofNullable(previousAssessment).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
-        }
-        QuestionnaireTemplate questionnaireTemplateType = null;
-        switch (templateType) {
-            case ASSET_TYPE:
-                Asset asset = (Asset) entity;
-                if (CollectionUtils.isNotEmpty(asset.getAssetSubTypes())) {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetType(), asset.getAssetSubTypes());
-                } else {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetType());
-                }
-                if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
-                }
-                break;
-            default:
-                questionnaireTemplateType = questionnaireTemplateMongoRepository.getQuestionnaireTemplateByTemplateTypeByUnitId(unitId, templateType);
-                break;
-
-        }
-        if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
-            exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
-        } else if (questionnaireTemplateType.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
-            exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
-        }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssignee(), assessmentDTO.getApprover());
-        assessment.setOrganizationId(unitId);
-        assessment.setComment(assessmentDTO.getComment());
-        assessment.setQuestionnaireTemplateId(questionnaireTemplateType.getId());
-        return assessment;
-
-    }
-
-    /**
-     * @param unitId
      * @param processingActivityId Processing activity id for which assessment is related
      * @param assessmentDTO        Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
     public AssessmentDTO saveAssessmentForProcessingActivity(Long unitId, BigInteger processingActivityId, AssessmentDTO assessmentDTO) {
-
 
         Assessment previousAssessment = assessmentMongoRepository.findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(unitId, processingActivityId);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
@@ -189,6 +147,112 @@ public class AssessmentService extends MongoBaseService {
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
         return assessmentDTO;
+    }
+
+
+    public AssessmentTypeRiskDTO launchAssetRiskAssessment(Long unitId, BigInteger assetId, AssessmentTypeRiskDTO assessmentDTO) {
+
+        Assessment previousAssessment = assessmentMongoRepository.findPreviousLaunchedAssessmentForAssetRisksByUnitId(unitId, assetId);
+        if (Optional.ofNullable(previousAssessment).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
+        }
+        Asset asset = assetMongoRepository.findOne(assetId);
+        Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.Risk, asset);
+        assessment.setAssetId(assetId);
+        assessment.setRiskAssessment(true);
+        assessmentMongoRepository.save(assessment);
+        assessmentDTO.setId(assessment.getAssetId());
+        return assessmentDTO;
+    }
+
+
+    public AssessmentTypeRiskDTO launchProcessingActivityRiskAssessment(Long unitId, BigInteger processingActivityId, AssessmentTypeRiskDTO assessmentDTO) {
+
+        Assessment previousAssessment = assessmentMongoRepository.findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(unitId, processingActivityId);
+        if (Optional.ofNullable(previousAssessment).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
+        }
+        Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.Risk, null);
+        assessment.setProcessingActivityId(processingActivityId);
+        assessment.setRiskAssessment(true);
+        assessmentMongoRepository.save(assessment);
+        assessmentDTO.setId(assessment.getAssetId());
+        return assessmentDTO;
+    }
+
+
+    /**
+     * @param unitId
+     * @param assessmentDTO
+     * @return
+     */
+    private Assessment buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
+
+        Assessment previousAssessment = assessmentMongoRepository.findAssessmentByNameAndUnitId(unitId, assessmentDTO.getName());
+        if (Optional.ofNullable(previousAssessment).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
+        }
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssignee(), assessmentDTO.getApprover(), assessmentDTO.getComment());
+        assessment.setOrganizationId(unitId);
+        QuestionnaireTemplate questionnaireTemplate;
+        switch (templateType) {
+            case ASSET_TYPE:
+                questionnaireTemplate = checkPreviousLaunchedAssetAssessment(unitId, (Asset) entity);
+                break;
+            case Risk:
+                questionnaireTemplate = checkPreviousLaunchedRiskAssessment(unitId, (AssessmentTypeRiskDTO) assessmentDTO, entity);
+                assessment.setRiskAssessment(true);
+                assessment.setRiskIds(((AssessmentTypeRiskDTO) assessmentDTO).getRiskIds());
+                break;
+            default:
+                questionnaireTemplate = questionnaireTemplateMongoRepository.getQuestionnaireTemplateByTemplateTypeByUnitId(unitId, templateType);
+                break;
+
+        }
+        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
+            exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
+        } else if (questionnaireTemplate.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
+            exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
+        }
+        assessment.setQuestionnaireTemplateId(questionnaireTemplate.getId());
+        return assessment;
+
+    }
+
+
+    private QuestionnaireTemplate checkPreviousLaunchedAssetAssessment(Long unitId, Asset asset) {
+        QuestionnaireTemplate questionnaireTemplate;
+        if (asset.getAssetSubTypeId()!=null) {
+            questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetTypeId(), asset.getAssetSubTypeId());
+        } else {
+            questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetTypeId());
+        }
+        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
+            questionnaireTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
+        }
+        return questionnaireTemplate;
+    }
+
+
+    /**
+     * @param unitId
+     * @param assessmentDTO
+     * @param entity
+     * @return
+     *///todo discussion pending for sub asset type refrence one to one or many to  one
+    private QuestionnaireTemplate checkPreviousLaunchedRiskAssessment(Long unitId, AssessmentTypeRiskDTO assessmentDTO, Object entity) {
+        QuestionnaireTemplate questionnaireTemplate;
+        if (QuestionnaireTemplateType.ASSET_TYPE.equals(assessmentDTO.getRiskAssociatedEntity())) {
+            Asset asset = (Asset) entity;
+            if (asset.getAssetSubTypeId() != null)
+                questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetTypeId(), asset.getAssetSubTypeId());
+            else
+                questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(unitId, asset.getAssetSubTypeId());
+
+        } else {
+            questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(unitId);
+        }
+        return questionnaireTemplate;
     }
 
 
@@ -386,11 +450,9 @@ public class AssessmentService extends MongoBaseService {
         Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
-        }
-        if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
+        } else if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
             exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
-        }
-        if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
+        } else if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
         }
         assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
@@ -417,22 +479,22 @@ public class AssessmentService extends MongoBaseService {
                 asset.setHostingLocation((String) assetAttributeValue);
                 break;
             case HOSTING_TYPE:
-                asset.setHostingType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setHostingTypeId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case DATA_DISPOSAL:
-                asset.setDataDisposal(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setDataDisposalId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case HOSTING_PROVIDER:
-                asset.setHostingProvider(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setHostingProviderId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case ASSET_TYPE:
-                asset.setAssetType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setAssetTypeId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case STORAGE_FORMAT:
                 asset.setStorageFormats(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
                 break;
             case ASSET_SUB_TYPE:
-                asset.setAssetSubTypes(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
+                asset.setAssetSubTypeId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case TECHNICAL_SECURITY_MEASURES:
                 asset.setTechnicalSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
@@ -589,7 +651,7 @@ public class AssessmentService extends MongoBaseService {
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getManagingDepartment());
             case ASSET_OWNER:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetOwner());
-                 case DATA_RETENTION_PERIOD:
+            case DATA_RETENTION_PERIOD:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod());
             default:
                 return null;

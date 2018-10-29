@@ -1,11 +1,9 @@
 package com.kairos.persistence.repository.questionnaire_template;
 
 
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -34,7 +32,7 @@ public interface CustomQuestionnaireTemplateRepository {
 
     QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId);
 
-    QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds);
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId);
 
     QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(Long unitId, BigInteger assetTypeId);
 

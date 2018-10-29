@@ -52,9 +52,6 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     @Inject
     private QuestionMongoRepository questionMongoRepository;
 
-    @Inject
-    private AssessmentMongoRepository assessmentMongoRepository;
-
 
     /**
      * @param countryId

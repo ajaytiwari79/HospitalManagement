@@ -3,6 +3,7 @@ package com.kairos.persistence.model.data_inventory.assessment;
 
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Document
 public class Assessment extends MongoBaseEntity {
@@ -22,7 +24,9 @@ public class Assessment extends MongoBaseEntity {
     private LocalDate completedDate;
     private String comment;
     private BigInteger assetId;
+    private boolean riskAssessment;
     private BigInteger processingActivityId;
+    private Set<BigInteger> riskIds;
     private List<AssessmentAnswerValueObject> assessmentAnswers;
     @NotNull
     private Staff assignee;
@@ -32,12 +36,21 @@ public class Assessment extends MongoBaseEntity {
     private BigInteger questionnaireTemplateId;
 
 
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
+    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver,String comment) {
         this.name = name;
         this.endDate = endDate;
         this.assignee = assignee;
         this.approver = approver;
+        this.comment=comment;
     }
+
+    public boolean isRiskAssessment() { return riskAssessment; }
+
+    public void setRiskAssessment(boolean riskAssessment) { this.riskAssessment = riskAssessment; }
+
+    public Set<BigInteger> getRiskIds() { return riskIds; }
+
+    public void setRiskIds(Set<BigInteger> riskIds) { this.riskIds = riskIds; }
 
     public String getName() { return name; }
 
