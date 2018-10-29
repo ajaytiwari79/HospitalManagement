@@ -32,6 +32,15 @@ public class StaffAdditionalInfoDTO {
     private ZoneId unitTimeZone;
     //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
     private List<TimeSlotWrapper> timeSlotSets;
+    private Long staffUserId;
+
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public Map<Long, List<LocalDate>> getPublicHoliday() {
         return publicHoliday;

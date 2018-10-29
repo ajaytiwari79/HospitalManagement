@@ -23,6 +23,7 @@ public class SolverConfigDTO {
     protected short terminationTimeInMinutes;
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
+    protected BigInteger parentCountrySolverConfigId;
 
 
 
@@ -145,5 +146,11 @@ public class SolverConfigDTO {
         return this;
     }
 
-    
+    public BigInteger getParentCountrySolverConfigId() {
+        return parentCountrySolverConfigId;
+    }
+
+    public void setParentCountrySolverConfigId(BigInteger parentCountrySolverConfigId) {
+        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
+    }
 }

@@ -323,22 +323,8 @@ public class AssessmentService extends MongoBaseService {
             case COMPLETED:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
-                } else {
-                    if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
-                        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
-                        List<AssessmentAnswerValueObject> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
-                        assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset));
-                        assetMongoRepository.save(asset);
-
-                    } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
-                        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, assessment.getAssetId());
-                        List<AssessmentAnswerValueObject> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
-                        assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
-                                -> saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity));
-                        processingActivityMongoRepository.save(processingActivity);
-
-                    }
                 }
+                saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
                 break;
             case NEW:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
@@ -349,6 +335,25 @@ public class AssessmentService extends MongoBaseService {
         assessment.setAssessmentStatus(assessmentStatus);
         assessmentMongoRepository.save(assessment);
         return true;
+    }
+
+
+    private void saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
+
+        if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+            Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
+            List<AssessmentAnswerValueObject> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
+            assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset));
+            assetMongoRepository.save(asset);
+
+        } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
+            ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, assessment.getAssetId());
+            List<AssessmentAnswerValueObject> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
+            assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
+                    -> saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity));
+            processingActivityMongoRepository.save(processingActivity);
+
+        }
     }
 
 
@@ -400,6 +405,24 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
+    public List<AssessmentAnswerValueObject> saveAssessmentAnswerAndChangeStatusToComplete(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
+
+        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        if (!Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
+        }
+        if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
+            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
+        }
+        assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
+        assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
+        assessmentMongoRepository.save(assessment);
+        saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
+        return assessmentAnswerValueObjects;
+
+    }
+
+
     /**
      * @param assetAttributeName  asset field
      * @param assetAttributeValue asset value corresponding to field
@@ -445,12 +468,6 @@ public class AssessmentService extends MongoBaseService {
                 break;
             case ASSET_OWNER:
                 asset.setAssetOwner((Staff) assetAttributeValue);
-                break;
-            case MIN_DATA_SUBJECT_VOLUME:
-                asset.setMinDataSubjectVolume((Long) assetAttributeValue);
-                break;
-            case MAX_DATA_SUBJECT_VOLUME:
-                asset.setMaxDataSubjectVolume((Long) assetAttributeValue);
                 break;
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
@@ -595,10 +612,6 @@ public class AssessmentService extends MongoBaseService {
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getManagingDepartment());
             case ASSET_OWNER:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetOwner());
-            case MIN_DATA_SUBJECT_VOLUME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getMinDataSubjectVolume());
-            case MAX_DATA_SUBJECT_VOLUME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getMaxDataSubjectVolume());
             case DATA_RETENTION_PERIOD:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod());
             default:

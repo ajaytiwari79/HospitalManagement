@@ -40,6 +40,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.WEEKS;
+
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -80,7 +82,7 @@ public class RuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.wtaruletemplate.alreadyexists");
         }
 
-        String week = "WEEK";
+        String week = WEEKS;
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;
         long daysCount = 10;
@@ -132,7 +134,7 @@ public class RuleTemplateService extends MongoBaseService {
         daysOffInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffInPeriodWTATemplate);
 
-        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval", false, "Maximum average duration per week in an interval", 1, localDate, true, true, timeInMins, week);
+        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval", false, "Maximum average duration per week in an interval", 1,week);
         averageScheduledTimeWTATemplate.setCountryId(countryDTO.getId());
         averageScheduledTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

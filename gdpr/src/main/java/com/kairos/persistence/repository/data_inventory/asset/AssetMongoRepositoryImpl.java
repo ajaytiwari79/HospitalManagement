@@ -45,7 +45,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
-                lookup("organizationSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
+                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
                 lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 lookup("assetType", "assetType", "_id", "assetType"),
@@ -67,7 +67,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
-                lookup("organizationSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
+                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
                 lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 lookup("assetType", "assetType", "_id", "assetType"),

@@ -26,7 +26,7 @@ public class UnitPositionDTO {
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int fullTimeWeeklyMinutes;
-    private float hourlyWages;
+    private float hourlyCost;
     private Long id;
 
     private Map<String, Object> employmentType;
@@ -130,12 +130,12 @@ public class UnitPositionDTO {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
-    public float getHourlyWages() {
-        return hourlyWages;
+    public float getHourlyCost() {
+        return hourlyCost;
     }
 
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public Long getId() {

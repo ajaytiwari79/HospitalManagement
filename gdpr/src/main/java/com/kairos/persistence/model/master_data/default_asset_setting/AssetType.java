@@ -25,7 +25,7 @@ public class AssetType extends MongoBaseEntity {
     private boolean hasSubAsset;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
-    private Set<BigInteger> risks;
+    private Set<BigInteger> risks=new HashSet<>();
     private Set<BigInteger> subAssetTypes=new HashSet<>();
 
 

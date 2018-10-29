@@ -99,7 +99,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
-            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
             if (timeInterval != null) {
                 List<ShiftWithActivityDTO> shiftWithActivityDTOS = filterShifts(Arrays.asList(infoWrapper.getShift()),timeTypeIds,null,null);
                 if(!shiftWithActivityDTOS.isEmpty()){
