@@ -170,7 +170,7 @@ public class AssessmentService extends MongoBaseService {
 
         Assessment previousAssessment = assessmentMongoRepository.findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(unitId, processingActivityId);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
+            exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.Risk, null);
         assessment.setProcessingActivityId(processingActivityId);
@@ -222,7 +222,7 @@ public class AssessmentService extends MongoBaseService {
 
     private QuestionnaireTemplate checkPreviousLaunchedAssetAssessment(Long unitId, Asset asset) {
         QuestionnaireTemplate questionnaireTemplate;
-        if (asset.getAssetSubTypeId()!=null) {
+        if (asset.getAssetSubTypeId() != null) {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetTypeId(), asset.getAssetSubTypeId());
         } else {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetTypeId());
@@ -239,9 +239,9 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentDTO
      * @param entity
      * @return
-     *///todo discussion pending for sub asset type refrence one to one or many to  one
+     */
     private QuestionnaireTemplate checkPreviousLaunchedRiskAssessment(Long unitId, AssessmentTypeRiskDTO assessmentDTO, Object entity) {
-        QuestionnaireTemplate questionnaireTemplate;
+        QuestionnaireTemplate questionnaireTemplate = null;
         if (QuestionnaireTemplateType.ASSET_TYPE.equals(assessmentDTO.getRiskAssociatedEntity())) {
             Asset asset = (Asset) entity;
             if (asset.getAssetSubTypeId() != null)
@@ -249,7 +249,7 @@ public class AssessmentService extends MongoBaseService {
             else
                 questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(unitId, asset.getAssetSubTypeId());
 
-        } else {
+        } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(unitId);
         }
         return questionnaireTemplate;
