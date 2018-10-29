@@ -35,23 +35,13 @@ public class CountrySolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{solverConfigId}")
-    @ApiOperation("Get CountrySolverConfig")
-    public ResponseEntity<Map<String, Object>> getCountrySolverConfigById(@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getCountrySolverConfigById(solverConfigId));
-    }
-
     @GetMapping
-    @ApiOperation("GetAll CountrySolverConfigration")
-    public ResponseEntity<Map<String, Object>> getAllCountrySolverConfig() {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getAllCountrySolverConfig());
+    @ApiOperation("GetAll CountrySolverConfigration By Country Id")
+    public ResponseEntity<Map<String, Object>> getAllCountrySolverConfigByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getAllCountrySolverConfigByCountryId(countryId));
     }
 
-    /**
-     * Always modification no object creation so,Patch
-     * @param countrySolverConfigDTO
-     * @return
-     */
+
     @PatchMapping
     @ApiOperation("Update CountrySolverConfigration")
     public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@RequestBody CountrySolverConfigDTO countrySolverConfigDTO) {

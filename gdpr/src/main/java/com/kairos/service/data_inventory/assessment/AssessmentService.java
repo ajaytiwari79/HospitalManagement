@@ -446,12 +446,6 @@ public class AssessmentService extends MongoBaseService {
             case ASSET_OWNER:
                 asset.setAssetOwner((Staff) assetAttributeValue);
                 break;
-            case MIN_DATA_SUBJECT_VOLUME:
-                asset.setMinDataSubjectVolume((Long) assetAttributeValue);
-                break;
-            case MAX_DATA_SUBJECT_VOLUME:
-                asset.setMaxDataSubjectVolume((Long) assetAttributeValue);
-                break;
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
                 break;
@@ -595,11 +589,7 @@ public class AssessmentService extends MongoBaseService {
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getManagingDepartment());
             case ASSET_OWNER:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetOwner());
-            case MIN_DATA_SUBJECT_VOLUME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getMinDataSubjectVolume());
-            case MAX_DATA_SUBJECT_VOLUME:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getMaxDataSubjectVolume());
-            case DATA_RETENTION_PERIOD:
+                 case DATA_RETENTION_PERIOD:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod());
             default:
                 return null;

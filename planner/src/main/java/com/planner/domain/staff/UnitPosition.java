@@ -18,7 +18,6 @@ public class UnitPosition  extends MongoBaseEntity {
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
-    private float hourlyWages;
     private Double salary;
     private Long employmentTypeId;
     private Long unitId;
@@ -29,27 +28,6 @@ public class UnitPosition  extends MongoBaseEntity {
 
     public UnitPosition() {
     }
-
-    public UnitPosition(Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum, WorkingTimeAgreement workingTimeAgreement, BigInteger kairosId,String staffId) {
-        this.expertiseId = expertiseId;
-        this.positionCodeId = positionCodeId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.totalWeeklyHours = totalWeeklyHours;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
-        this.employmentTypeId = employmentTypeId;
-        this.unitId = unitId;
-        this.seniorityLevelId = seniorityLevelId;
-        this.paidOutFrequencyEnum = paidOutFrequencyEnum;
-        this.workingTimeAgreement = workingTimeAgreement;
-        //this.kairosId=kairosId;
-        this.staffId=staffId;
-    }
-
     public Long getExpertiseId() {
         return expertiseId;
     }
@@ -112,14 +90,6 @@ public class UnitPosition  extends MongoBaseEntity {
 
     public void setWorkingDaysInWeek(int workingDaysInWeek) {
         this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
     }
 
     public Double getSalary() {

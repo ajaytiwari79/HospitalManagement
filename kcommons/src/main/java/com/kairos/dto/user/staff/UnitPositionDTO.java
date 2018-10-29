@@ -17,7 +17,7 @@ public class UnitPositionDTO {
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
-    private float hourlyWages;
+    private float hourlyCost;
 
     private float salary;
     private Long timeCareExternalId;
@@ -90,12 +90,12 @@ public class UnitPositionDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public float getHourlyWages() {
-        return hourlyWages;
+    public float getHourlyCost() {
+        return hourlyCost;
     }
 
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public float getSalary() {

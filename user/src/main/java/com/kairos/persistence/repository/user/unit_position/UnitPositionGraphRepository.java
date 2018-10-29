@@ -6,6 +6,7 @@ import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQuery
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.enums.shift.PaidOutFrequencyEnum.MONTHLY;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -35,7 +37,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "with expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "optional match (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "return expertise as expertise,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyWages:positionLine.hourlyWages,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines, "+
             " case appliedFunction when NULL then [] else  Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions")
     UnitPositionQueryResult getUnitPositionById(Long unitPositionId);
@@ -49,7 +51,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "with expertise,staff,unit,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
             "return id(staff) as staffId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyWages:positionLine.hourlyWages,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
             "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
@@ -71,7 +73,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "with staff,expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "optional match (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "return expertise as expertise,id(staff) as staffId,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyWages:positionLine.hourlyWages,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines, "+
             " case appliedFunction when NULL then [] else  Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions")
     List<UnitPositionQueryResult> getUnitPositionByIds(List<Long> unitPositionIds);
@@ -267,7 +269,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "with expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "return expertise as expertise,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes%60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes, hourlyWages:positionLine.hourlyWages,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes%60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes, hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines")
     UnitPositionQueryResult getUnitPositionOfStaff(Long staffId, Long unitId);
 
@@ -288,26 +290,27 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " {employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType," +
             "positionLine.workingDaysInWeek as workingDaysInWeek,positionLine.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, \n" +
             "(positionLine.totalWeeklyMinutes % 60) as totalWeeklyMinutes,(positionLine.totalWeeklyMinutes / 60) as  totalWeeklyHours," +
-            " positionLine.startDate as startDate, positionLine.endDate as endDate, CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost,\n" +
-            "positionLine.hourlyWages as hourlyWages,positionLine.avgDailyWorkingHours as avgDailyWorkingHours ORDER BY positionLine.startDate"
+            " positionLine.startDate as startDate, positionLine.endDate as endDate, CASE when pgaRel.payGroupAreaAmount IS NULL THEN 0.0 ELSE toInteger(toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37)))) END as hourlyCost,\n" +
+            "positionLine.avgDailyWorkingHours as avgDailyWorkingHours ORDER BY positionLine.startDate"
     )
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
 
 
-    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0}\n" +
+    @Query(" MATCH (unitPosition:UnitPosition{deleted:false,published:true}) where id(unitPosition) IN  {0} \n" +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +
-            "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(payGrade:PayGrade) \n" +
-            "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{published:true}) \n" +
-            "OPTIONAL MATCH(unitPosition)-[:IN_UNIT]-(org:Organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:HAS_MUNICIPALITY]-(pga:PayGroupArea)<-[pgaRel:HAS_PAY_GROUP_AREA]-(payGrade) \n" +
-            "with  unitPosition,positionLine,payGrade,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost \n" +
-            " OPTIONAL MATCH (positionLine)-[:HAS_FUNCTION]-(function:Function) \n" +
-            " OPTIONAL MATCH(functionalPayment:FunctionalPayment)<-[:APPLICABLE_FOR_EXPERTISE]-(expertise) \n" +
-            " OPTIONAL MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix) \n" +
-            " OPTIONAL MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]->(seniorityLevel) \n" +
-            " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +
-            " return id(positionLine) as id,  case hourlyCost when null then 0.0 else hourlyCost end as hourlyWages")
-    List<UnitPositionLinesQueryResult> findFunctionalHourlyWages(List<Long> unitPositionIds);
+            "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]-(payGrade:PayGrade) \n" +
+            "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise{published:true}) \n" +
+            "OPTIONAL MATCH(unitPosition)-[:"+IN_UNIT+"]-(org:Organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:HAS_PAY_GROUP_AREA]-(payGrade) \n" +
+            "with  unitPosition,positionLine,payGrade,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost \n" +
+            " OPTIONAL MATCH (positionLine)-[:"+HAS_FUNCTION+"]-(function:Function) \n" +
+            " OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate})))\n" +
+            " OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) \n" +
+            " OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) \n" +
+            " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) \n" +
+            " with functionalPayment,positionLine,hourlyCost, sum(toInteger(rel.amount)) as totalCostOfFunctions with positionLine, hourlyCost+totalCostOfFunctions as hourlyCost,functionalPayment\n" +
+            " return DISTINCT(id(positionLine)) as id,  CASE WHEN functionalPayment.paymentUnit='MONTHLY' THEN hourlyCost*12   ELSE hourlyCost END as hourlyCost")
+    List<UnitPositionLinesQueryResult> findFunctionalHourlyCost(List<Long> unitPositionIds);
 
 
 

@@ -9,28 +9,30 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface DataElementMongoRepository extends MongoBaseRepository<DataElement, BigInteger> {
+public interface DataElementMongoRepository extends MongoBaseRepository<DataElement, BigInteger>,CustomDataElementRepository {
 
     DataElement findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,_id:?1}")
     DataElement findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,name:{$in:?1}}")
-    List<DataElement> findByCountryIdAndNames(Long countryId,List<String> names);
+    @Query("{deleted:false,_id:?0}")
+    DataElementBasicResponseDTO getByIdAndNonDeleted( BigInteger id);
+
 
     @Query("{deleted:false,countryId:?0}")
-    List<DataElement> getAllDataElement(Long countryId);
-
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<DataElement> getAllDataElementListByIds(Long countryId,List<BigInteger> ids);
+    List<DataElementBasicResponseDTO> getAllDataElementByCountryId(Long countryId);
 
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
-    List<DataElement> findAllDataElementByUnitIdAndIds( Long unitId,List<BigInteger> ids);
+    List<DataElement> findByUnitIdAndIds(Long unitId, Set<BigInteger> ids);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<DataElement> findByCountryIdAndIds(Long countryId, Set<BigInteger> ids);
 
 
     @Query("{deleted:false,organizationId:?0}")
@@ -42,6 +44,7 @@ public interface DataElementMongoRepository extends MongoBaseRepository<DataElem
 
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
-    DataElement findByUnitIdAndId( Long organizationId,BigInteger id);
+    DataElement findByUnitIdAndId( Long unitId,BigInteger id);
+
 
 }
