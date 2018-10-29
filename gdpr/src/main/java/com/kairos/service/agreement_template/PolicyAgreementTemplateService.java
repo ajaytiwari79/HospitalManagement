@@ -3,15 +3,21 @@ package com.kairos.service.agreement_template;
 
 import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
+import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
+import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,6 +48,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     @Inject
     private ClauseMongoRepository clauseMongoRepository;
+
+    @Inject
+    private AgreementSectionMongoRepository agreementSectionMongoRepository;
+
 
 
     /**
@@ -161,6 +171,35 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i)));
         }
         agreementSectionResponseDTO.setClauses(clauses);
+    }
+
+
+    /**
+     * @param countryId
+     * @param clauseId
+     * @description methos return list of Agreement Template Conatining clause in Section and Sub Sections
+     */
+    public List<AgreementTemplateBasicResponseDTO> getAgreementTemplateListContainClause(Long countryId, BigInteger clauseId) {
+        return policyAgreementTemplateRepository.findAgreementTemplateListByCountryIdAndClauseId(countryId, clauseId);
+    }
+
+
+    /**
+     * @param countryId
+     * @param agreementTemplateClauseUpdateDTO - agreement template ids , clause previous id and new clause id
+     * @Description method update agreement template section containing previous clause with new clause
+     */
+    public boolean updateAgreementTemplateOldClauseWithNewVersionOfClause(Long countryId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+
+        List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(countryId, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+        if (CollectionUtils.isNotEmpty(agreementSectionsAndSubSectionsContainingClause)) {
+            agreementSectionsAndSubSectionsContainingClause.forEach(agreementSection -> {
+                int clauseIndex = agreementSection.getClauseIdOrderedIndex().indexOf(agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+                agreementSection.getClauseIdOrderedIndex().set(clauseIndex, agreementTemplateClauseUpdateDTO.getNewClauseId());
+            });
+            agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionsAndSubSectionsContainingClause));
+        }
+        return true;
     }
 
 

@@ -44,14 +44,14 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
     public AssetResponseDTO findAssetWithMetaDataById( Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("storage_format", "storageFormats", "_id", "storageFormats"),
-                lookup("organization_security_measure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
-                lookup("technical_security_measure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
-                lookup("hosting_type", "hostingType", "_id", "hostingType"),
-                lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
+                lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
+                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
+                lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("hostingProvider", "hostingProvider", "_id", "hostingProvider"),
+                lookup("hostingType", "hostingType", "_id", "hostingType"),
+                lookup("dataDisposal", "dataDisposal", "_id", "dataDisposal"),
                 new CustomAggregationOperation(projectionOperation)
         );
 
@@ -66,14 +66,14 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
-                lookup("storage_format", "storageFormats", "_id", "storageFormats"),
-                lookup("organization_security_measure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
-                lookup("technical_security_measure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
-                lookup("hosting_type", "hostingType", "_id", "hostingType"),
-                lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
+                lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
+                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
+                lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("hostingProvider", "hostingProvider", "_id", "hostingProvider"),
+                lookup("hostingType", "hostingType", "_id", "hostingType"),
+                lookup("dataDisposal", "dataDisposal", "_id", "dataDisposal"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation)
 

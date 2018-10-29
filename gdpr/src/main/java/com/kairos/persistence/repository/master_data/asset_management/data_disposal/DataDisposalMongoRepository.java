@@ -47,6 +47,9 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     @Query("{organizationId:?0,name:?1,deleted:false}")
     DataDisposal findByUnitIdAndName(Long unitId, String name);
 
+    @Query("{deleted:false,organizationId:?0}")
+    List<DataDisposalResponseDTO> findAllByUnitId(Long unitId);
+
 
 
 }

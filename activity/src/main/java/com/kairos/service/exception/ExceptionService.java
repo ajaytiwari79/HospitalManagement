@@ -1,13 +1,12 @@
 package com.kairos.service.exception;
 
+import com.kairos.commons.custom_exception.*;
+import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.custom_exception.*;
 import com.kairos.service.fls_visitour.exceptions.scheduler.FlsCallException;
 import com.kairos.service.fls_visitour.exceptions.scheduler.SchedulerException;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Inject;
 
 /**
  * Created by vipul on 11/5/18.
@@ -16,7 +15,36 @@ import javax.inject.Inject;
 public class ExceptionService extends CommonsExceptionUtil {
 
 
+    public void dataNotFoundByIdException(String message, Object... params) {
+        throw new com.kairos.commons.custom_exception.DataNotFoundByIdException(convertMessage(message, params));
+    }
 
+    public void actionNotPermittedException(String message, Object... params) {
+        throw new com.kairos.commons.custom_exception.ActionNotPermittedException(convertMessage(message, params));
+    }
+
+    public void invalidRequestException(String message, Object... params) {
+        throw new com.kairos.commons.custom_exception.InvalidRequestException(convertMessage(message, params));
+    }
+
+    public void duplicateDataException(String message, Object... params) {
+        throw new DuplicateDataException(convertMessage(message, params));
+    }
+    public void internalError(String message, Object... params) {
+        throw new InternalError(convertMessage(message, params));
+    }
+
+    public void illegalArgumentException(String message, Object... params) {
+        throw new IllegalArgumentException(convertMessage(message, params));
+    }
+
+    public void dataNotMatchedException(String message,Object... params) {
+        throw new DataNotMatchedException(convertMessage(message, params));
+    }
+
+    public void internalServerError(String message, Object... params) {
+        throw new InternalError(convertMessage(message, params));
+    }
 
 
     public void timeTypeLinkedException(String message, Object... params) {

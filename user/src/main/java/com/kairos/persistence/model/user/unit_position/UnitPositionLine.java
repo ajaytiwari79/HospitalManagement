@@ -29,7 +29,7 @@ public class UnitPositionLine extends UserBaseEntity {
     private int fullTimeWeeklyMinutes;  // Its coming from expertise
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;       // same from expertise
-    private float hourlyWages;          // payGroupArea
+    private float hourlyCost;          // payGroupArea
 
     public UnitPositionLine() {
         // DC
@@ -43,8 +43,44 @@ public class UnitPositionLine extends UserBaseEntity {
         this.fullTimeWeeklyMinutes = unitPositionLineBuilder.fullTimeWeeklyMinutes;
         this.avgDailyWorkingHours = unitPositionLineBuilder.avgDailyWorkingHours;
         this.workingDaysInWeek = unitPositionLineBuilder.workingDaysInWeek;
-        this.hourlyWages = unitPositionLineBuilder.hourlyWages;
+        this.hourlyCost = unitPositionLineBuilder.hourlyCost;
 
+    }
+
+    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    public void setFunctions(List<Function> functions) {
+        this.functions = functions;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
+
+    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+    }
+
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
+    }
+
+    public float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public SeniorityLevel getSeniorityLevel() {
@@ -79,9 +115,7 @@ public class UnitPositionLine extends UserBaseEntity {
         return workingDaysInWeek;
     }
 
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
+
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
@@ -96,7 +130,7 @@ public class UnitPositionLine extends UserBaseEntity {
          private int fullTimeWeeklyMinutes;
          private float avgDailyWorkingHours;
          private int workingDaysInWeek;
-         private float hourlyWages;
+         private float hourlyCost;
 
          public UnitPositionLineBuilder setSeniorityLevel(SeniorityLevel seniorityLevel) {
              this.seniorityLevel = seniorityLevel;
@@ -138,8 +172,8 @@ public class UnitPositionLine extends UserBaseEntity {
              return this;
          }
 
-         public UnitPositionLineBuilder setHourlyWages(float hourlyWages) {
-             this.hourlyWages = hourlyWages;
+         public UnitPositionLineBuilder setHourlyCost(float hourlyCost) {
+             this.hourlyCost = hourlyCost;
              return this;
          }
 

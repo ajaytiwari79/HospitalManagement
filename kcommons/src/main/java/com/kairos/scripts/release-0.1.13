@@ -1,8 +1,66 @@
 //To set phase setting data from rules tab to phase wise setting tab all previous activities
 
 db.activities.find().forEach(function (elem) {
+       elem.rulesActivityTab.eligibleForSchedules.forEach(function(phase){
+        phase.allowedSettings={};
+        phase.allowedSettings.canEdit=[];
+        });
     db.activities.update({_id: elem._id}, {
          $set:{"phaseSettingsActivityTab.phaseTemplateValues": elem.rulesActivityTab.eligibleForSchedules},
         $unset:{"rulesActivityTab.eligibleForSchedules":null}
         });
     });
+
+ // to set new property template status at organization Level
+ db.getCollection('questionnaireTemplate').updateMany({'organizationId':{$exists:true}},{$set:{'templateStatus':"PUBLISHED"}});
+
+ // rename collection gdpr
+ db.clause_tag.renameCollection("clauseTag");
+db.template_type.renameCollection("templateType");
+db.asset_type.renameCollection("assetType");
+db.data_disposal.renameCollection("dataDisposal");
+db.technical_security_measure.renameCollection("technicalSecurityMeasure");
+db.storage_format.renameCollection("storageFormat");
+db.hosting_provider.renameCollection("hostingProvider");
+db.hosting_type.renameCollection("hostingType");
+db.organization_security_measure.renameCollection("organizationalSecurityMeasure");
+db.master_asset.renameCollection("masterAsset");
+db.master_processing_activity.renameCollection("masterProcessingActivity");
+db.responsibility_type.renameCollection("responsibilityType");
+db.transfer_method.renameCollection("transferMethod");
+db.processing_purpose.renameCollection("processingPurpose");
+db.accessor_party.renameCollection("accessorParty");
+db.questionnaire_template.renameCollection("questionnaireTemplate");
+db.questionnaire_section.renameCollection("questionnaireSection");
+db.data_category.renameCollection("dataCategory");
+db.data_element.renameCollection("dataElement");
+db.data_subject_mapping.renameCollection("dataSubjectMapping");
+db.processing_activity.renameCollection("processingActivity");
+db.agreement_section.renameCollection("agreementSection");
+db.agreement_template.renameCollection("policyAgreementTemplate");
+
+
+
+MATCH p=()-[r:HAS_EMPLOYMENT_TYPE]->()  where NOT exists(r.employmentTypeCategory)
+set r.employmentTypeCategory="PERMANENT"
+
+
+
+// To update existing Activity reminder setting tab
+
+db.activities.updateMany({},{$set:{"communicationActivityTab" : { "allowCommunicationReminder" : false, "notifyAfterDeleteActivity" : true, "activityReminderSettings" : [] }}});
+
+// find sequence of claue Tag and insert new Entry
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "ClauseTagSequence"},{$inc: { sequenceNumber: 1 }});
+db.kairos_sequence.find({"sequenceName" : "ClauseTagSequence"})
+
+ db.getCollection('clauseTag').insert({
+ "_id" : "545151",//This Id should be according to SequenceNumber of That Class in QA and Development
+ "deleted" : false,
+ "updatedAt" : ISODate("2018-10-17T06:27:50.658Z"),
+ "createdAt" : ISODate("2018-10-17T06:27:50.650Z"),
+ "countryId" : NumberLong(4),
+ "defaultTag" : true,
+ "name" : "none",
+ "_class" : "com.kairos.persistence.model.clause_tag.ClauseTag"
+    })

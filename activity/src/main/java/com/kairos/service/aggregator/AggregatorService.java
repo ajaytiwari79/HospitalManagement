@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.rest_client.SchedulerRestClient;
 import com.kairos.service.MongoBaseService;
@@ -70,7 +71,7 @@ public class AggregatorService extends MongoBaseService {
     @Inject
     private Scheduler scheduler;
     @Inject
-    private IntegrationRestClient integrationServiceRestClient;
+    private GenericIntegrationService genericIntegrationService;
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
     @Inject
@@ -107,7 +108,7 @@ public class AggregatorService extends MongoBaseService {
         logger.info("Aggregator Job Starts on time---> " + DateUtils.getDate());
         try {
             List<Long> organizations = schedulerRestClient.getAllOrganizationIds();
-            logger.info("Aggregator Job Starts on time---> " + clientRestClient.getCitizenIdsByUnitIds(organizations));
+            logger.info("Aggregator Job Starts on time---> " + genericIntegrationService.getCitizenIdsByUnitIds(organizations));
             for (Long organizationId : organizations) {
                 aggregatorOneWeek(organizationId);
                 aggregatorTwoWeek(organizationId);
@@ -136,7 +137,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -211,7 +212,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -267,7 +268,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -314,7 +315,7 @@ public class AggregatorService extends MongoBaseService {
             Long  citizenId = Long.valueOf(map.get("_id").toString());
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  integrationServiceRestClient.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  genericIntegrationService.getFLS_Credentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get("flsDefaultUrl").equals("")) {
                  clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -611,11 +612,12 @@ public class AggregatorService extends MongoBaseService {
         }
     }
 
-    @Scheduled(initialDelay = 100000, fixedDelay = 1000000)
+    //Todo Yatharth please move this to scheduler microservice
+    //@Scheduled(initialDelay = 100000, fixedDelay = 1000000)
     public void countCitizenTaskDemandsHoursAndTasks(){
 
         List<Long> organizations = schedulerRestClient.getAllOrganizationIds();
-        List<ClientOrganizationIds> clientOrganizationIdsList = clientRestClient.getCitizenIdsByUnitIds(organizations);
+        List<ClientOrganizationIds> clientOrganizationIdsList = genericIntegrationService.getCitizenIdsByUnitIds(organizations);
         for(ClientOrganizationIds clientOrganizationIds : clientOrganizationIdsList ){
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(clientOrganizationIds.getOrganizationId(), clientOrganizationIds.getCitizenId());
             if(!Optional.ofNullable(clientAggregator).isPresent()) clientAggregator = new ClientAggregator();
@@ -762,7 +764,7 @@ public class AggregatorService extends MongoBaseService {
             clientAggregators.addAll(clientAggregatorMongoRepository.getAggregateDataByUnit(unitId,skip,MONOGDB_QUERY_RECORD_LIMIT));
         }
         List<Long> citizenIds = clientAggregators.stream().map(clientAggregator -> clientAggregator.getCitizenId()).collect(Collectors.toList());
-        List<Client> clients = clientRestClient.getCitizensByIdsInList(citizenIds);
+        List<Client> clients = genericIntegrationService.getCitizensByIdsInList(citizenIds);
         List<ClientExceptionCountWrapper> clientExceptionCountWrappers = new ArrayList<>();
 
         int clientAggregatorPos = 0;

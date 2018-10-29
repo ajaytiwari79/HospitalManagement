@@ -17,11 +17,12 @@ public class AppConstants {
     public final static String USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC = "UserToSchedulerLogsQueue";
     public final static String SCHEDULER_TO_USER_QUEUE_TOPIC = "SchedulerToUserQueue";
     public final static String SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC = "SchedulerToActivityQueue";
-
+    public static final String ACTIVITY_TO_SCHEDULER_JOB_QUEUE_TOPIC="activityToSchedulerJobQueue";
+    public static final String ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC="activityToSchedulerLogQueue";
 
     public static final String JOB_TO_CHECK_SICK_USER = "JOB_TO_CHECK_SICK_USER";
     public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION, EMPLOYMENT_END, QUESTIONAIRE_NIGHTWORKER, SENIORITY_LEVEL).collect(Collectors.toSet());
-    public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER, FLIP_PHASE, UPDATE_USER_ABSENCE).collect(Collectors.toSet());
+    public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER, FLIP_PHASE, SHIFT_REMINDER, UPDATE_USER_ABSENCE).collect(Collectors.toSet());
 
 
 }

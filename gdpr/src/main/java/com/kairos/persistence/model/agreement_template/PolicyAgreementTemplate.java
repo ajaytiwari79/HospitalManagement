@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "agreement_template")
+@Document
 public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be empty")

@@ -67,18 +67,15 @@ public class TaskTypeService extends MongoBaseService {
     private TaskTypeSlaConfigMongoRepository taskTypeSlaConfigMongoRepository;
     @Inject
     private EnvConfig envConfig;
-    @Autowired
-    private   SkillRestClient skillRestClient;
+
     @Autowired private OrganizationRestClient organizationRestClient;
 
     @Autowired private GenericIntegrationService genericIntegrationService;
 
-    @Autowired private TimeSlotRestClient timeSlotRestClient;
-
     @Autowired
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
 
-    @Inject private OrganizationServiceRestClient organizationServiceRestClient;
+
 
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -557,7 +554,7 @@ public class TaskTypeService extends MongoBaseService {
             CountryDTO countryDTO = genericIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
             skills = genericIntegrationService.getSkillsByCountryForTaskType(countryDTO.getId());
         } else {
-            skills = skillRestClient.getSkillsOfOrganization(taskType.getOrganizationId());
+            skills = genericIntegrationService.getSkillsOfOrganization(taskType.getOrganizationId());
         }
 
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
@@ -663,7 +660,7 @@ public class TaskTypeService extends MongoBaseService {
         for (TaskTypeEnum.TaskTypeDays taskTypeDay : taskType.getForbiddenDays()) {
             taskTypeDays.add(taskTypeDay.value);
         }*/
-        List<DayType> dayTypes=organizationRestClient.getDayTypes(unitId);
+        List<DayType> dayTypes=genericIntegrationService.getDayTypes(unitId);
         return getDayTypeMapList(dayTypes,taskType);
     }
 
@@ -676,7 +673,7 @@ public class TaskTypeService extends MongoBaseService {
         for (TaskTypeEnum.TaskTypeDays taskTypeDay : taskType.getForbiddenDays()) {
             taskTypeDays.add(taskTypeDay.value);
         }*/
-        List<DayType> dayTypes=organizationRestClient.getDayTypesByCountryId(countryId);
+        List<DayType> dayTypes=genericIntegrationService.getDayTypesByCountryId(countryId);
         return getDayTypeMapList(dayTypes,taskType);
     }
 
@@ -747,7 +744,7 @@ public class TaskTypeService extends MongoBaseService {
     public TaskTypeDTO linkTaskTypesWithOrg(String taskTypeId, long organizationId,
                                             long subServiceId) throws CloneNotSupportedException {
 
-        boolean exist=organizationRestClient.isExistOrganization(organizationId);
+        boolean exist=genericIntegrationService.isExistOrganization(organizationId);
         if (!exist) {
             return null;
         }
@@ -862,12 +859,12 @@ public class TaskTypeService extends MongoBaseService {
         }
 
 
-        List<OrganizationDTO> organizations = organizationRestClient.getOrganizationsByOrganizationType(organizationTypeId);
+        List<OrganizationDTO> organizations = genericIntegrationService.getOrganizationsByOrganizationType(organizationTypeId);
         if(isSelected){
             Set<Long> subTypes = taskType.getOrganizationSubTypes();
             subTypes.addAll(organizationSubTypeId);
             taskType.setOrganizationSubTypes(subTypes);
-            organizationRestClient.linkOrganizationTypeWithService(organizationSubTypeId,taskType.getSubServiceId());
+            genericIntegrationService.linkOrganizationTypeWithService(organizationSubTypeId,taskType.getSubServiceId());
             List<TaskType> taskTypes = new ArrayList<>();
             organizations.forEach(organization -> {
                 TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organization.getId(),new BigInteger(taskTypeId),taskType.getSubServiceId());
@@ -885,7 +882,7 @@ public class TaskTypeService extends MongoBaseService {
                 save(taskTypes);
             }
         } else {
-            organizationRestClient.deleteLinkingOfOrganizationTypeAndService(organizationSubTypeId,taskType.getSubServiceId());
+            genericIntegrationService.deleteLinkingOfOrganizationTypeAndService(organizationSubTypeId,taskType.getSubServiceId());
             taskType.getOrganizationSubTypes().removeAll(organizationSubTypeId);
             organizations.forEach(organization -> {
                 deleteTaskType(taskTypeId,organization.getId(),taskType.getSubServiceId());
@@ -930,7 +927,7 @@ public class TaskTypeService extends MongoBaseService {
         TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(unitId,new BigInteger(taskTypeId),
                 taskTypeSlaConfigDTO.getTimeSlotId());
         if(taskTypeSlaConfig == null){
-            Map<String, Object> timeSlotMap = timeSlotRestClient.getTimeSlotByUnitIdAndTimeSlotId(unitId,taskTypeSlaConfigDTO.getTimeSlotId());
+            Map<String, Object> timeSlotMap = genericIntegrationService.getTimeSlotByUnitIdAndTimeSlotId(taskTypeSlaConfigDTO.getTimeSlotId());
             taskTypeSlaConfig = new TaskTypeSlaConfig(new BigInteger(taskTypeId),unitId, taskTypeSlaConfigDTO.getTimeSlotId(), timeSlotMap.get("name").toString());
         }
 
@@ -991,7 +988,7 @@ public class TaskTypeService extends MongoBaseService {
         //anil maurya call this code via rest template
         //List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
 
-        List<TimeSlotWrapper> currentTimeSlots=timeSlotRestClient.getCurrentTimeSlot(unitId);
+        List<TimeSlotWrapper> currentTimeSlots=genericIntegrationService.getCurrentTimeSlot();
         List<TimeSlotWrapper> timeSlots = new ArrayList<>(currentTimeSlots.size());
         List<Long> timeSlotIds = new ArrayList<>(currentTimeSlots.size());
         for(TimeSlotWrapper standredTimeSlot : currentTimeSlots){
@@ -1112,7 +1109,7 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskTypeResponseDTO> visibleTaskTypes = new ArrayList<>();;
         List<TaskTypeResponseDTO> selectedTaskTypes = new ArrayList<>();
         if(ORGANIZATION.equalsIgnoreCase(type)){
-            OrganizationDTO organization=organizationRestClient.getOrganization(id);
+            OrganizationDTO organization=genericIntegrationService.getOrganization();
             // OrganizationDTO organization = organizationGraphRepository.findOne(id);
             if (organization == null) {
                 return null;
@@ -1120,11 +1117,11 @@ public class TaskTypeService extends MongoBaseService {
             OrganizationDTO parent;
             if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
                 // parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
-                parent = organizationRestClient.getParentOrganizationOfCityLevel(organization.getId());
+                parent = genericIntegrationService.getParentOrganizationOfCityLevel(organization.getId());
 
             } else {
                 // parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-                parent = organizationRestClient.getParentOfOrganization(organization.getId());
+                parent = genericIntegrationService.getParentOfOrganization(organization.getId());
             }
             /*if(parent == null){
                 for(TaskType taskType : taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,0,true)){
@@ -1148,7 +1145,7 @@ public class TaskTypeService extends MongoBaseService {
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,id,true));
         } else if(TEAM.equalsIgnoreCase(type)){
             //OrganizationDTO unit = organizationGraphRepository.getOrganizationByTeamId(id);
-            OrganizationDTO unit = organizationRestClient.getOrganizationByTeamId(id);
+            OrganizationDTO unit = genericIntegrationService.getOrganizationByTeamId(id);
             if(unit == null){
                 exceptionService.internalError("error.organization.team.notfound");
             }
@@ -1341,7 +1338,7 @@ public class TaskTypeService extends MongoBaseService {
 
     public List<Long> getServiceIds(Long organisationId){
         List<Long> serviceIds = new ArrayList<>();
-        Map<String, Object> services = organizationServiceRestClient.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
+        Map<String, Object> services = genericIntegrationService.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
         List<Map> service = (List<Map>)services.get("selectedServices");
         service.get(0).get("children");
         service.forEach(t->{

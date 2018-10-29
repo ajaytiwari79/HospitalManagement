@@ -38,8 +38,8 @@ public class CounterFilterService {
 //    }
 
     public List<AggregationOperation> getShiftFilterCriteria(Map<FilterType, List> filtersMap){
-        return ShiftFilterCriteria
-                .getInstance()
+        return null;//ShiftFilterCriteria
+        //        .getInstance()
 //                .setTimeTypeList(filtersMap.get(FilterType.TIME_TYPE))
 //                .setEmploymentTypes(filtersMap.get(FilterType.EMPLOYMENT_TYPE))
 //                .setOrganizationTypes(filtersMap.get(FilterType.ORGANIZATION_TYPE))
@@ -50,6 +50,6 @@ public class CounterFilterService {
 //                .setActivityIds(filtersMap.get(FilterType.ACTIVITY_IDS))
 //                .setStaffIds(filtersMap.get(FilterType.STAFF_IDS))
 //                .setTimeInterval(filtersMap.get(FilterType.TIME_INTERVAL))
-                .getMatchOperations();
+//                .getMatchOperations();
     }
 }

@@ -66,7 +66,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 sort(Sort.Direction.DESC, "createdAt")
         );
@@ -78,7 +78,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
 
@@ -103,7 +103,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("template_type", "templateTypes", "_id", "templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 sort(Sort.Direction.DESC, "createdAt")
 

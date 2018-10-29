@@ -1,11 +1,8 @@
 package com.kairos.service.resources;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.user.resources.ResourceWrapper;
 import com.kairos.persistence.model.user.resources.VehicleLocation;
 import com.kairos.persistence.repository.user.resources.VehicleLocationRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.expertise.ExpertiseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

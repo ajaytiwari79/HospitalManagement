@@ -2,6 +2,7 @@ package com.kairos.dto.user.country.skill;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -11,21 +12,16 @@ import java.util.List;
 public class SkillDTO {
 
     private Long id;
-
-    @NotEmpty(message = "error.SkillCategory.name.notEmpty") @NotNull(message = "error.SkillCategory.name.notnull")
+    @NotBlank(message = "error.SkillCategory.name.notEmpty")
     private String name;
-
-    //@NotEmpty(message = "error.SkillCategory.description.notEmpty") @NotNull(message = "error.SkillCategory.description.notnull")
     private String description;
-
     private String shortName;
-
     private List<Long> tags;
 
     public SkillDTO() {
     }
 
-    public SkillDTO(Long id, @NotEmpty(message = "error.SkillCategory.name.notEmpty") @NotNull(message = "error.SkillCategory.name.notnull") String name, String description) {
+    public SkillDTO(Long id, @NotBlank(message = "error.SkillCategory.name.notEmpty") String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -49,7 +49,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicR
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
-import com.kairos.service.master_data.data_category_element.DataSubjectMappingService;
+import com.kairos.service.data_subject_management.DataSubjectMappingService;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -274,24 +274,23 @@ public class DefaultDataInheritService extends MongoBaseService {
                     for (MasterProcessingActivityResponseDTO subProcessingActivityDTO : masterProcessingActivityDTO.getSubProcessingActivities()) {
                         ProcessingActivity subProcessingActivity = new ProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), false);
                         subProcessingActivity.setOrganizationId(unitId);
-                        processingActivity.setSubProcess(true);
+                        subProcessingActivity.setSubProcess(true);
                         subProcessingActivities.add(subProcessingActivity);
                     }
                     processingActivities.addAll(subProcessingActivities);
-                    processingActivitySubProcessingActivityListMap.put(processingActivity, subProcessingActivities);
                 }
+                processingActivitySubProcessingActivityListMap.put(processingActivity, subProcessingActivities);
             }
 
-            processingActivities.clear();
-            if (processingActivities.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(processingActivities)) {
                 processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
             }
-            processingActivities = new ArrayList<>(processingActivitySubProcessingActivityListMap.keySet());
             processingActivitySubProcessingActivityListMap.forEach((processingActivity, subProcessingActivities) -> {
                 if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
                     processingActivity.setSubProcessingActivities(subProcessingActivities.stream().map(ProcessingActivity::getId).collect(Collectors.toList()));
                 }
             });
+            processingActivities = new ArrayList<>(processingActivitySubProcessingActivityListMap.keySet());
             processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
         }
     }
@@ -333,7 +332,7 @@ public class DefaultDataInheritService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(dataSubjectMappingResponseDTOS)) {
             List<DataSubjectMapping> dataSubjects = new ArrayList<>();
             for (DataSubjectMappingResponseDTO dataSubjectDTO : dataSubjectMappingResponseDTOS) {
-                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName());
+                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName(),dataSubjectDTO.getDescription());
                 dataSubjectMapping.setOrganizationId(unitId);
                 if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
                     Set<BigInteger> dataCategoryIds = new HashSet<>();

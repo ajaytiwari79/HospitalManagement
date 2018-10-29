@@ -11,12 +11,8 @@ public class SkillDTO {
 
     private Long id;
    private String name;
-
-    //@NotEmpty(message = "error.SkillCategory.description.notEmpty") @NotNull(message = "error.SkillCategory.description.notnull")
     private String description;
-
     private String shortName;
-
     private List<Long> tags;
 
     public SkillDTO() {

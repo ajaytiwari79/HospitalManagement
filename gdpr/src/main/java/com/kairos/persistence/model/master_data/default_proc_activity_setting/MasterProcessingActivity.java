@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "master_processing_activity")
+@Document
 public class MasterProcessingActivity extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")

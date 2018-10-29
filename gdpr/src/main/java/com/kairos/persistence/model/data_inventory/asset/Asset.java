@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
-@Document(collection = "asset")
+@Document
 public class Asset extends MongoBaseEntity {
 
     @NotBlank(message = "Name can 't be empty")
@@ -36,9 +36,6 @@ public class Asset extends MongoBaseEntity {
     private Set<BigInteger> processingActivities;
     private Set<BigInteger> subProcessingActivities;
     private Integer dataRetentionPeriod;
-    private Long minDataSubjectVolume;
-    private Long maxDataSubjectVolume;
-    private RiskSeverity riskLevel;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
     private boolean suggested;
@@ -131,18 +128,6 @@ public class Asset extends MongoBaseEntity {
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
-
-    public Long getMinDataSubjectVolume() { return minDataSubjectVolume; }
-
-    public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
-
-    public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
-
-    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) { this.maxDataSubjectVolume = maxDataSubjectVolume; }
-
-    public RiskSeverity getRiskLevel() { return riskLevel; }
-
-    public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
 
     public String getHostingLocation() { return hostingLocation; }
 

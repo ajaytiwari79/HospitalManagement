@@ -33,15 +33,16 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds);
 
-    CTAResponseDTO getCTAByUnitPositionId(Long unitPositionId, Date date);
+    CTAResponseDTO getCTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
 
     List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
+
+    List<CTAResponseDTO> getCTAByUnitPositionIdsAndDate(List<Long> unitPositionIds, Date startDate,Date endDate);
 
     CostTimeAgreement getCTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
-    List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId,Date startDate,Date endDate) ;
 
+    List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId, Date startDate, Date endDate);
 
 }
-

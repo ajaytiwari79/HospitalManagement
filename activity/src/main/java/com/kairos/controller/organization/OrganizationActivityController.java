@@ -2,6 +2,7 @@ package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.service.activity.ActivityService;

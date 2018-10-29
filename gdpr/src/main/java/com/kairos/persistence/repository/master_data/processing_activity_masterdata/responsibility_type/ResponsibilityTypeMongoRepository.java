@@ -46,5 +46,8 @@ public interface ResponsibilityTypeMongoRepository extends MongoBaseRepository<R
     @Query("{organizationId:?0,name:?1,deleted:false}")
     ResponsibilityType findByUnitIdAndName(Long unitId, String name);
 
+    @Query("{organizationId:?0,deleted:false}")
+    List<ResponsibilityTypeResponseDTO> findAllByUnitId(Long unitId);
+
 
 }

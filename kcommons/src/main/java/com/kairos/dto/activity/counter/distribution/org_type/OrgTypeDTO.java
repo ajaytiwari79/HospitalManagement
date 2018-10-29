@@ -3,22 +3,22 @@ package com.kairos.dto.activity.counter.distribution.org_type;
 import java.util.List;
 
 public class OrgTypeDTO {
-    private Long orgTypeId;
-    private List<Long> unitIds;
+    private List<Long> orgTypeIds;
+    private Long unitId;
 
-    public Long getOrgTypeId() {
-        return orgTypeId;
+    public List<Long> getOrgTypeIds() {
+        return orgTypeIds;
     }
 
-    public void setOrgTypeId(Long orgTypeId) {
-        this.orgTypeId = orgTypeId;
+    public void setOrgTypeIds(List<Long> orgTypeIds) {
+        this.orgTypeIds = orgTypeIds;
     }
 
-    public List<Long> getUnitIds() {
-        return unitIds;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setUnitIds(List<Long> unitIds) {
-        this.unitIds = unitIds;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

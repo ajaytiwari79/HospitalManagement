@@ -3,7 +3,10 @@ package com.kairos.dto.activity.shift;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -27,18 +30,29 @@ public class ShiftActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
+    private boolean breakShift;
+
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
-
-
-    public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
-        this.activityId = activityId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.activityName = activityname;
+    public ShiftActivity() {
     }
 
 
+
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId) {
+        this.activityId = activityId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+    }
+
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift) {
+        this.activityId = activityId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+        this.breakShift=breakShift;
+    }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
@@ -61,8 +75,6 @@ public class ShiftActivity {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public ShiftActivity() {
-    }
 
     public Set<ShiftStatus> getStatus() {
         return status;
@@ -174,5 +186,13 @@ public class ShiftActivity {
 
     public void setActivityName(String activityName) {
         this.activityName = activityName;
+    }
+
+    public boolean isBreakShift() {
+        return breakShift;
+    }
+
+    public void setBreakShift(boolean breakShift) {
+        this.breakShift = breakShift;
     }
 }

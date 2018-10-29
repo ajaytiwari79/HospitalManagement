@@ -66,9 +66,9 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type","assetSubType","_id","assetSubType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -88,9 +88,9 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type","assetSubType","_id","assetSubType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -107,7 +107,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
     public QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("templateType").is(templateType));
-        query.fields().include("id").include("name");
+        query.fields().include("id").include("name").include("templateStatus").include("templateType");
         return mongoTemplate.findOne(query,QuestionnaireTemplate.class);
     }
 
@@ -118,9 +118,9 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type","assetSubType","_id","assetSubType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
@@ -137,9 +137,9 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
-                lookup("questionnaire_section", "sections", "_id", "sections"),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type","assetSubType","_id","assetSubType"),
+                lookup("questionnaireSection", "sections", "_id", "sections"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType","assetSubType","_id","assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),

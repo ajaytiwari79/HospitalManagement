@@ -21,9 +21,11 @@ public abstract class UserBaseEntity implements Serializable {
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore
+
     @CreatedDate
     private Long creationDate;
     @JsonIgnore
+
     @LastModifiedDate
     private Long lastModificationDate;
     public void setId(Long id) {

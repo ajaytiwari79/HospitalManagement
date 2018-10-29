@@ -35,6 +35,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
@@ -111,7 +112,8 @@ public class CompanyCreationService {
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
-
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -142,6 +144,7 @@ public class CompanyCreationService {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
             organization.setAccountType(accountType);
+            accessGroupService.createDefaultAccessGroups(organization, Collections.emptyList());
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
@@ -193,12 +196,18 @@ public class CompanyCreationService {
             if (!Optional.ofNullable(accountType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");
             }
-            organization.setAccountType(accountType);
             //accountType is Changed for parent organization We need to add this account type to child organization as well
-            if (!organization.getChildren().isEmpty())
-
-                organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
-
+            if (organization.getAccountType() == null || !organization.getAccountType().getId().equals(orgDetails.getAccountTypeId())) {
+                organization.setAccountType(accountType);
+                List<Long> organizationIds = new ArrayList<>();
+                organizationIds.addAll(organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList()));
+                organizationIds.add(organization.getId());
+                accessGroupService.removeDefaultCopiedAccessGroup(organizationIds);
+                if (!organization.getChildren().isEmpty()) {
+                    organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
+                }
+                accessGroupService.createDefaultAccessGroups(organization, organization.getChildren());
+            }
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
@@ -258,7 +267,7 @@ public class CompanyCreationService {
         return orgBasicData;
     }
 
-    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted, boolean parentOrganization) {
+    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted, boolean parentOrganization,boolean union) {
         if (organization == null) {
             organization = organizationGraphRepository.findOne(unitId);
             boardingCompleted = organization.isBoardingCompleted();
@@ -303,7 +312,7 @@ public class CompanyCreationService {
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
-                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
+                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(),union);
                 }
             } else {
                 // No user is found its first time so we need to validate email and CPR number
@@ -318,7 +327,7 @@ public class CompanyCreationService {
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
-                staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
+                staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization,union);
 
             }
         }
@@ -407,7 +416,7 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
+            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false,false);
         }
         //Assign Parent Organization's level to unit
 
@@ -417,6 +426,8 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
+        reasonCodeService.createDefalutDateForSubUnit(unit,parentOrganization.getId());
+        accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
 
@@ -450,7 +461,7 @@ public class CompanyCreationService {
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO, null);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
+            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false,false);
         }
         organizationGraphRepository.save(unit);
         return organizationBasicDTO;
@@ -557,20 +568,18 @@ public class CompanyCreationService {
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
 
-        // if more than 2 default things needed make a  async service Please
-        List<AccessGroupQueryResult> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups,true);
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, organization.getCountry().getId());
 
         CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO);
+                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO,countryId);
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,accessGroups);
+                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
         CompletableFuture.allOf(createdInUnit).join();
 
         return true;
