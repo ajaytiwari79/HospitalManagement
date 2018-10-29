@@ -12,7 +12,6 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
-import com.kairos.persistence.model.user.unit_position.PositionLineChangeResultDTO;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -263,38 +262,40 @@ public class UnitPositionService {
 
         LocalDate unitPositionStartDate = unitPositionDTO.getStartDate();
         LocalDate unitPositionEndDate = unitPositionDTO.getEndDate();
-        if (unitPositions.size() > 1) {
-            unitPositions.forEach(unitPosition -> {
-                // if null date is set
-                if (unitPosition.getEndDate() != null) {
-                    if (unitPositionStartDate.isBefore(unitPosition.getEndDate()) && unitPositionStartDate.isAfter(unitPosition.getStartDate())) {
-                        exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
-                    }
-                    if (unitPositionEndDate != null) {
-                        Interval previousInterval = new Interval(DateUtil.getDateFromEpoch(unitPosition.getStartDate()), DateUtil.getDateFromEpoch(unitPosition.getEndDate()));
-                        Interval interval = new Interval(DateUtil.getDateFromEpoch(unitPositionStartDate), DateUtil.getDateFromEpoch(unitPositionEndDate));
-                        logger.info(" Interval of current unit position " + previousInterval + " Interval of going to create  " + interval);
-                        if (previousInterval.overlaps(interval))
-                            exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
-                    } else {
-                        if (unitPositionStartDate.isBefore(unitPosition.getEndDate())) {
-                            exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getEndDate());
-                        }
-                    }
-                } else {
-                    // unitEmploymentEnd date is null
-                    if (unitPositionEndDate != null) {
-                        if (unitPositionEndDate.isAfter(unitPosition.getStartDate())) {
-                            exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
-                        }
-                    } else {
+
+        unitPositions.forEach(unitPosition -> {
+            // if null date is set
+            if (unitPosition.getEndDate() != null) {
+                if (unitPositionStartDate.isBefore(unitPosition.getEndDate()) && unitPositionStartDate.isAfter(unitPosition.getStartDate())) {
+                    exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
+                }
+                if (unitPositionEndDate != null) {
+                    Interval previousInterval = new Interval(DateUtil.getDateFromEpoch(unitPosition.getStartDate()), DateUtil.getDateFromEpoch(unitPosition.getEndDate()));
+                    Interval interval = new Interval(DateUtil.getDateFromEpoch(unitPositionStartDate), DateUtil.getDateFromEpoch(unitPositionEndDate));
+                    logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
+                    if (previousInterval.overlaps(interval))
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
+                } else {
+                    if (unitPositionStartDate.isBefore(unitPosition.getEndDate())) {
+                        exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getEndDate());
                     }
                 }
-            });
-        }
+            } else {
+                // unitEmploymentEnd date is null
+                if (unitPositionEndDate != null) {
+                    if (unitPositionEndDate.isAfter(unitPosition.getStartDate())) {
+                        exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", unitPositionEndDate, unitPosition.getStartDate());
+
+                    }
+                } else {
+                    exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
+                }
+            }
+        });
+
         return true;
     }
+
 
     private List<FunctionWithAmountQueryResult> findAndValidateFunction(UnitPositionDTO unitPositionDTO) {
         List<FunctionWithAmountQueryResult> functions = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevelAndIds
@@ -327,7 +328,7 @@ public class UnitPositionService {
         UnitPositionLine unitPositionLine = new UnitPositionLine.UnitPositionLineBuilder()
                 .setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours())
                 .setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60) + unitPositionDTO.getTotalWeeklyMinutes())
-                .setHourlyWages(unitPositionDTO.getHourlyWages())
+                .setHourlyCost(unitPositionDTO.getHourlyCost())
                 .setStartDate(unitPositionDTO.getStartDate())
                 .setFullTimeWeeklyMinutes(oldUnitPositionLine.getFullTimeWeeklyMinutes())
                 .setWorkingDaysInWeek(oldUnitPositionLine.getWorkingDaysInWeek())
@@ -464,9 +465,9 @@ public class UnitPositionService {
          **/
         if (changeResultDTO.isCalculativeChanged()) {
 
-            List<UnitPosition> oldUnitPositions
-                    = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
-            validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+            // List<UnitPosition> oldUnitPositions
+            //       = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
+            //validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
             if (currentUnitPositionLine.getStartDate().isEqual(unitPositionDTO.getStartDate())) {
                 //both are of same start Date only set  data
                 updateCurrentPositionLine(currentUnitPositionLine, unitPositionDTO);
@@ -536,7 +537,7 @@ public class UnitPositionService {
     private void updateCurrentPositionLine(UnitPositionLine positionLine, UnitPositionDTO unitPositionDTO) {
         positionLine.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         positionLine.setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60) + unitPositionDTO.getTotalWeeklyMinutes());
-        positionLine.setHourlyWages(unitPositionDTO.getHourlyWages());
+        positionLine.setHourlyCost(unitPositionDTO.getHourlyCost());
         positionLine.setStartDate(unitPositionDTO.getStartDate());
         //positionLine.setFunctions(functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctions()));
         positionLine.setEndDate(unitPositionDTO.getEndDate());
@@ -641,7 +642,7 @@ public class UnitPositionService {
                 .setFullTimeWeeklyMinutes(unitPosition.getExpertise().getFullTimeWeeklyMinutes())
                 .setWorkingDaysInWeek(unitPosition.getExpertise().getNumberOfWorkingDaysInWeek())
                 .setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours())
-                .setHourlyWages(unitPositionDTO.getHourlyWages())
+                .setHourlyCost(unitPositionDTO.getHourlyCost())
                 .build();
         unitPosition.setUnitPositionLines(Collections.singletonList(unitPositionLine));
         return unitPosition;
@@ -706,12 +707,17 @@ public class UnitPositionService {
         });
 
         List<UnitPositionLinesQueryResult> positionLines = unitPositionGraphRepository.findAllPositionLines(unitPositionIds);
+        List<UnitPositionLinesQueryResult> hourlyCostPerLine=unitPositionGraphRepository.findFunctionalHourlyCost(unitPositionIds);
+        Map<Long,Float> hourlyCostMap=hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId,UnitPositionLinesQueryResult::getHourlyCost,(previous, current) -> current));
         Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap = positionLines.stream().collect(Collectors.groupingBy(UnitPositionLinesQueryResult::getUnitPositionId));
+
         unitPositionQueryResults.forEach(u -> {
             u.setPositionLines(positionLinesMap.get(u.getId()));
             u.getPositionLines().forEach(positionLine -> {
+                    float hourlyCost=(float) (positionLine.getStartDate().isLeapYear()?hourlyCostMap.get(positionLine.getId())/(366*7.4):hourlyCostMap.get(positionLine.getId())/(365*7.4));
+                    positionLine.setHourlyCost(hourlyCost);
 
-                ctawtaWrapper.getCta().forEach(cta -> {
+                    ctawtaWrapper.getCta().forEach(cta -> {
                     if ((cta.getStartDate().isBefore(positionLine.getStartDate()) || positionLine.getStartDate().isEqual(cta.getStartDate()))
                             && (cta.getEndDate() == null || positionLine.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getEndDate()) || cta.getEndDate().isEqual(positionLine.getEndDate()))) {
                         positionLine.setCostTimeAgreement(cta);
@@ -727,6 +733,8 @@ public class UnitPositionService {
                 if (u.getEndDate() != null) {
                     u.setEndDate(positionLine.getEndDate());
                     u.setEditable(positionLine.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) ? false : true);
+                } else {
+                    u.setEditable(true);
                 }
             });
         });
@@ -806,7 +814,7 @@ public class UnitPositionService {
 
         UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
                 , unitPositionLine.getWorkingDaysInWeek(), unitPositionLine.getTotalWeeklyMinutes() / 60, unitPositionLine.getAvgDailyWorkingHours(), unitPositionLine.getFullTimeWeeklyMinutes(), 0D,
-                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyWages(), employmentTypes, seniorityLevel);
+                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel);
 
         unitPositionLinesQueryResult.setUnitPositionId(unitPosition.getId());
         // TODO Setting for compatibility
@@ -831,10 +839,7 @@ public class UnitPositionService {
         return result;
     }
 
-
-
-
-    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionIds, Organization organization, Long countryId) {
+        public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionIds, Organization organization, Long countryId) {
         List<UnitPositionQueryResult> unitPositions = unitPositionGraphRepository.getUnitPositionByIds(unitPositionIds);
         List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetailsList = new ArrayList<>();
         unitPositions.forEach(unitPosition -> {
@@ -861,6 +866,8 @@ public class UnitPositionService {
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
 
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        List<UnitPositionLinesQueryResult> unitPositionLinesQueryResults=unitPositionGraphRepository.findFunctionalHourlyCost(Arrays.asList(unitPositionId));
+        Map<Long,Float> hourlyCostMap=unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId,UnitPositionLinesQueryResult::getHourlyCost,(previous, current) -> current));
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
         convertUnitPositionObject(unitPosition, unitPositionDetails);
         unitPositionDetails.setCountryId(countryId);
@@ -871,6 +878,8 @@ public class UnitPositionService {
             unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
         }
         unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
+        float hourlyCost=(float) (unitPosition.getPositionLines().get(0).getStartDate().isLeapYear()?hourlyCostMap.get(unitPosition.getPositionLines().get(0).getId())/(366*7.4):hourlyCostMap.get(unitPosition.getPositionLines().get(0).getId())/(365*7.4));
+        unitPositionDetails.setHourlyCost(hourlyCost);
         return unitPositionDetails;
     }
 
@@ -1159,9 +1168,6 @@ public class UnitPositionService {
         });
         return ctaTableSettingWrapper;
     }
-
-
-
     public Boolean restoreFunctions(Long unitPositionId, Map<Long, Set<LocalDate>> payload) {
         List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults = unitPositionFunctionRelationshipRepository.findAllByFunctionIdAndUnitPositionId(unitPositionId, payload.keySet());
         List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships = new ArrayList<>();

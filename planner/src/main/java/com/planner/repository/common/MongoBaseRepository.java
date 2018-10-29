@@ -20,16 +20,20 @@ public interface MongoBaseRepository<T, ID> extends MongoRepository<T, ID> {
 
     /**
      *
-     * @param type can be either country  or unit
+     * @param checkForCountry can be either country  or unit
      * @return
      */
-    List<T> findAllObjectsNotDeletedByType(String type);
+    List<T> findAllObjectsNotDeletedById(boolean checkForCountry,Long countryOrUnitId);
+
+    T findByIdNotDeleted(BigInteger objectId);
 
     <T extends MongoBaseEntity> T saveObject(T entity);
 
+    <T extends MongoBaseEntity> List<T> saveObjectList(List<T> entity);
+
     boolean safeDeleteById(BigInteger id);
 
-    boolean isNameExists(String name,BigInteger idNotApplicableForCheck,boolean checkForCountry);
+    boolean isNameExistsById(String name,BigInteger idNotApplicableForCheck,boolean checkForCountry,Long countryOrUnitId);
 
     <T extends MongoBaseEntity> boolean safeDeleteByObject(T o);
 }

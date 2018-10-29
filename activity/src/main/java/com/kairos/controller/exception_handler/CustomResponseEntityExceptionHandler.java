@@ -1,7 +1,9 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.custom_exception.*;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -391,7 +393,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({AddressNotVerifiedByTomTom.class,
 			ZipCodeNotFound.class,CitizenNotFoundException.class})
 	@ResponseBody
-	public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex,HttpServletRequest request) {
+	public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex, HttpServletRequest request) {
 		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -460,7 +462,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler({DataNotFoundException.class})
 	@ResponseBody
-	public ResponseEnvelope dataNotFound(DataNotFoundException ex,HttpServletRequest request) {
+	public ResponseEnvelope dataNotFound(DataNotFoundException ex, HttpServletRequest request) {
 		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -473,7 +475,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ResponseStatus(HttpStatus.NOT_MODIFIED)
 	@ExceptionHandler({DataNotModifiedException.class})
 	@ResponseBody
-	public ResponseEnvelope dataNotModified(DataNotModifiedException ex,HttpServletRequest request) {
+	public ResponseEnvelope dataNotModified(DataNotModifiedException ex, HttpServletRequest request) {
 		logger.error("exception in activity service",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);

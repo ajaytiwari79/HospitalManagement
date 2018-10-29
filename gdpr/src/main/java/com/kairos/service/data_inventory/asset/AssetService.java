@@ -86,8 +86,6 @@ public class AssetService extends MongoBaseService {
         asset.setStorageFormats(assetDTO.getStorageFormats());
         asset.setDataDisposal(assetDTO.getDataDisposal());
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
-        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         asset.setSuggested(assetDTO.isSuggested());
         assetMongoRepository.save(asset);
@@ -207,6 +205,8 @@ public class AssetService extends MongoBaseService {
                 }
             }
         }
+        asset.setName(assetDTO.getName());
+        asset.setDescription(assetDTO.getDescription());
         asset.setHostingProvider(assetDTO.getHostingProvider());
         asset.setHostingType(assetDTO.getHostingType());
         asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
@@ -214,10 +214,14 @@ public class AssetService extends MongoBaseService {
         asset.setStorageFormats(assetDTO.getStorageFormats());
         asset.setDataDisposal(assetDTO.getDataDisposal());
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
-        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         asset.setSuggested(assetDTO.isSuggested());
+        asset.setManagingDepartment(assetDTO.getManagingDepartment());
+        asset.setAssetOwner(assetDTO.getAssetOwner());
+        asset.setHostingLocation(assetDTO.getHostingLocation());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setAssetType(assetDTO.getAssetType());
+        asset.setAssetSubTypes(assetDTO.getAssetSubTypes());
         assetMongoRepository.save(asset);
         return assetDTO;
     }

@@ -162,7 +162,7 @@ public class UnitPosition extends UserBaseEntity {
         this.unitPositionLines = unitPositionLines;
     }
 
-    public UnitPosition(LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
+    public UnitPosition(LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
     }

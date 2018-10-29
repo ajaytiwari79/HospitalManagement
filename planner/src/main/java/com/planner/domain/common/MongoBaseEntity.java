@@ -10,7 +10,7 @@ public class MongoBaseEntity {
 
     @Id
     protected BigInteger id;
-    protected Boolean deleted;
+    protected boolean deleted;
     protected Date createdAt;
     protected Date updatedAt;
 
@@ -24,11 +24,11 @@ public class MongoBaseEntity {
         this.id = id;
     }
 
-    public Boolean getDeleted() {
+    public boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 
