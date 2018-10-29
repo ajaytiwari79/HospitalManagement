@@ -46,3 +46,9 @@ db.wtaBaseRuleTemplate.insert({
     "updatedAt" : ISODate("2018-07-03T12:20:07.417Z"),
      "deleted" : false,
      "_class" : "com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate" });
+
+
+     // To Update previous Activity Location Tab data
+
+    db.activities.updateMany({},{$set:{"locationActivityTab.glideTimeForCheckIn": [{"location" : "OFFICE","before" : 60,"after" : 60,"eligible" : false},{"location" : "DEPOT","before" : 60,"after" : 60,"eligible" : false},{"location" : "OTHERS","before" : 60,"after" : 60,"eligible" : false},{"location" : "HOME","before" : 60,"after" : 60,"eligible" : false}],
+    "locationActivityTab.glideTimeForCheckOut" : [{"location" : "OTHERS","before" : 60,"after" : 60,"eligible" : false},{"location":"OFFICE","before" : 60,"after" : 60,"eligible" : false},{"location" : "DEPOT","before" : 60,"after" : 60,"eligible" : false},{"location" : "HOME","before" : 60,"after" : 60,"eligible" : false}]}});
