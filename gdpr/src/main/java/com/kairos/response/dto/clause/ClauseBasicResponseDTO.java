@@ -2,9 +2,13 @@ package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * clause basic response dto is for Agreement section
@@ -22,6 +26,9 @@ public class ClauseBasicResponseDTO {
 
     @NotBlank
     private String description;
+
+    private List<ClauseTagDTO> tags = new ArrayList<>();
+
 
     public BigInteger getId() {
         return id;
@@ -45,5 +52,13 @@ public class ClauseBasicResponseDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<ClauseTagDTO> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<ClauseTagDTO> tags) {
+        this.tags = tags;
     }
 }

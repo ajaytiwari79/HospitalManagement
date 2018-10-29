@@ -13,21 +13,25 @@ import java.util.List;
 public class OrganizationMetaDataDTO {
 
 
-    private Long typeId;
-
-    private List<Long> subTypeIds;
-
+    private List<Long> organizationTypeId;
+    private List<Long> organizationSubTypeIds;
     private List<Long> serviceCategoryIds;
-
     private List<Long> subServiceCategoryIds;
 
-    public Long getTypeId() { return typeId; }
+    public OrganizationMetaDataDTO(List<Long> organizationTypeId, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds) {
+        this.organizationTypeId = organizationTypeId;
+        this.organizationSubTypeIds = organizationSubTypeIds;
+        this.serviceCategoryIds = serviceCategoryIds;
+        this.subServiceCategoryIds = subServiceCategoryIds;
+    }
 
-    public void setTypeId(Long typeId) { this.typeId = typeId; }
+    public List<Long> getOrganizationTypeId() { return organizationTypeId; }
 
-    public List<Long> getSubTypeIds() { return subTypeIds; }
+    public void setOrganizationTypeId(List<Long> organizationTypeId) { this.organizationTypeId = organizationTypeId; }
 
-    public void setSubTypeIds(List<Long> subTypeIds) { this.subTypeIds = subTypeIds; }
+    public List<Long> getOrganizationSubTypeIds() { return organizationSubTypeIds; }
+
+    public void setOrganizationSubTypeIds(List<Long> organizationSubTypeIds) { this.organizationSubTypeIds = organizationSubTypeIds; }
 
     public List<Long> getServiceCategoryIds() { return serviceCategoryIds; }
 
