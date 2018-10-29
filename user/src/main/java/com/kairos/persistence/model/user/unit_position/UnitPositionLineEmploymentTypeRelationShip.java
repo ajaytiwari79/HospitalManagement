@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_E
  * Created by vipul on 6/4/18.
  */
 @RelationshipEntity(type = HAS_EMPLOYMENT_TYPE)
-public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
+public class UnitPositionLineEmploymentTypeRelationShip extends UserBaseEntity {
 
 
     @StartNode
@@ -49,11 +49,11 @@ public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
         this.employmentTypeCategory = employmentTypeCategory;
     }
 
-    public UnitPositionEmploymentTypeRelationShip() {
+    public UnitPositionLineEmploymentTypeRelationShip() {
 
     }
 
-    public UnitPositionEmploymentTypeRelationShip(UnitPositionLine unitPositionLine, EmploymentType employmentType, EmploymentCategory employmentTypeCategory) {
+    public UnitPositionLineEmploymentTypeRelationShip(UnitPositionLine unitPositionLine, EmploymentType employmentType, EmploymentCategory employmentTypeCategory) {
         this.unitPositionLine = unitPositionLine;
         this.employmentType = employmentType;
         this.employmentTypeCategory = employmentTypeCategory;

@@ -1,12 +1,11 @@
 package com.kairos.persistence.repository.user.unit_position;
 
 
-import com.kairos.persistence.model.pay_table.PayGrade;
+import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
-import com.kairos.persistence.model.user.unit_position.UnitPositionLine;
+import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.enums.shift.PaidOutFrequencyEnum.MONTHLY;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -111,7 +109,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
             "UNION " +
-            "MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0} \n" +
+            "MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0} \n" +
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
@@ -128,7 +126,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 // Please make sure driver supports at least protocol version 2.
 // Driver upgrade is most likely required.; nested exception is org.neo4j.ogm.exception.TransactionException:
 // Date is not supported as a return type in Bolt protocol version 1. Please make sure driver supports at least protocol version 2. Driver upgrade is most likely required
-    @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return up.startDate as startDate")
+    @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return up.endDate as endDate")
     List<String> getAllUnitPositionsByStaffId(Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(subOrg:Organization) where id(unitPosition)={0} " +
@@ -139,7 +137,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     UnitPositionQueryResult getUnitIdAndParentUnitIdByUnitPositionId(Long unitPositionId);
 
     @Query("match(positionLine:UnitPositionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(positionLine)={0} return positionLine,employmentRel,employmentType")
-    UnitPositionEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
+    UnitPositionLineEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
 
     // TODO its INCORRECT
     @Query("match(unitPosition:UnitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
@@ -147,7 +145,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)" +
             "where id(o)={0}" +
             "return unitPosition,employmentRel,employmentType")
-    List<UnitPositionEmploymentTypeRelationShip> findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(Long parentOrganizationId);
+    List<UnitPositionLineEmploymentTypeRelationShip> findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(Long parentOrganizationId);
 
     @Query("match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) where id(unitPosition)={0}  detach delete rel")
     void removeOlderFunctionsFromUnitPosition(Long unitPositionId);
@@ -280,9 +278,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) " +
             "MATCH(positionLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(payGrade:PayGrade) " +
             "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) " +
-            "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function) "+
+            "OPTIONAL MATCH (positionLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
             "OPTIONAL MATCH(unitPosition)-[:" + IN_UNIT + "]-(org:Organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) " +
-            " with  unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel,pgaRel, case function when  null  then [] else collect({id:id(function),name:function.name}) end as functionData "+
+            " with  unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel,pgaRel,functionalRel, case function when  null  then [] else collect({id:id(function),name:function.name,icon:function.icon, amount:functionalRel.amount}) end as functionData "+
             "return id(positionLine) as id,id(unitPosition) as unitPositionId," +
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             " freeChoiceToPension:seniorityLevel.freeChoiceToPension,to:seniorityLevel.to,functions:collect(functionData[0])," +
@@ -295,6 +293,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     )
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
+    @Query(" MATCH (positionLine:UnitPositionLine) where id(positionLine) IN {0} " +
+            "OPTIONAL MATCH (positionLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
+            "RETURN distinct function as function,functionalRel.amount as amount")
+    List<FunctionWithAmountQueryResult> findAllAppliedFunctionOnPositionLines(Long unitPositionLineId);
+
+    @Query(" MATCH (positionLine:UnitPositionLine) where id(positionLine) IN {0} " +
+            "MATCH (positionLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
+            "detach delete functionalRel")
+    void removeAllAppliedFunctionOnPositionLines(Long unitPositionLineId);
 
 
     @Query(" MATCH (unitPosition:UnitPosition{deleted:false,published:true}) where id(unitPosition) IN  {0} \n" +

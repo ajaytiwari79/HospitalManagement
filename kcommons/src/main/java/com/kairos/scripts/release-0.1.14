@@ -1,5 +1,11 @@
 
-ACTIVITY
+kairos ACTIVITY
 
-db.time_Type.update({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
-db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
+db.time_Type.updateMany({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
+db.time_Type.updateMany({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
+db.workingTimeAgreement.updateMany({},{$rename:{"organizationParentWTA":"organizationParentId"}})
+
+
+NEO
+MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
+set r.amountEditableAtUnit=FALSE

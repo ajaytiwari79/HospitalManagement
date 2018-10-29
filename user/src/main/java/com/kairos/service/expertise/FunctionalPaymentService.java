@@ -5,7 +5,7 @@ import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.rule_validator.Specification;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class FunctionalPaymentService{
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(FunctionalPaymentService.class);
     private ExpertiseGraphRepository expertiseGraphRepository;
     private ExceptionService exceptionService;
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
@@ -141,8 +141,8 @@ public class FunctionalPaymentService{
 
             currentSRLevelFunction.getFunctions().forEach(currentFunction -> {
                 Function function = functions.stream().
-                        filter(function1 -> function1.getId().equals(currentFunction.getFunctionId())).findAny().get();
-                SeniorityLevelFunctionsRelationship seniorityLevelFunctionsRelationship = new SeniorityLevelFunctionsRelationship(function, seniorityLevelFunction, currentFunction.getAmount());
+                        filter(function1 -> function1.getId().equals(currentFunction.getId())).findAny().get();
+                SeniorityLevelFunctionsRelationship seniorityLevelFunctionsRelationship = new SeniorityLevelFunctionsRelationship(function, seniorityLevelFunction, currentFunction.getAmount(),currentFunction.isAmountEditableAtUnit());
                 seniorityLevelFunctionsRelationships.add(seniorityLevelFunctionsRelationship);
             });
             seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);

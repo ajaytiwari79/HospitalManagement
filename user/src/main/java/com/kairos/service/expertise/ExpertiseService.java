@@ -147,6 +147,7 @@ public class ExpertiseService {
                     expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
             addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
             expertiseGraphRepository.save(expertise);
+            functionalPaymentGraphRepository.linkWithFunctionPayment(expertise.getId(),seniorityLevel.getId());
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
