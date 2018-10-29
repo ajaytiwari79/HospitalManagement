@@ -1,10 +1,9 @@
-package com.kairos.dto.activity.flexible_time;
+package com.kairos.dto.activity.glide_time;
 /*
  *Created By Pavan on 20/10/18
  *
  */
 
-import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
 
 public class GlideTimeSettingsDTO {

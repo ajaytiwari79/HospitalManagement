@@ -76,13 +76,13 @@ public class UnitSettingController {
     //Flexible Time Settings
 
     @ApiOperation("Get Flexible time settings")
-    @GetMapping("/flexible_time")
+    @GetMapping("/glide_time")
     public ResponseEntity<Map<String,Object>> getFlexibleTime(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.getFlexibleTime(unitId));
     }
 
     @ApiOperation("Update Flexible time setting")
-    @PutMapping("/flexible_time")
+    @PutMapping("/glide_time")
     public ResponseEntity<Map<String,Object>> updateFlexibleTime(@PathVariable Long unitId, @RequestBody FlexibleTimeSettingDTO flexibleTimeSettingDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.updateFlexibleTime(unitId,flexibleTimeSettingDTO));
     }

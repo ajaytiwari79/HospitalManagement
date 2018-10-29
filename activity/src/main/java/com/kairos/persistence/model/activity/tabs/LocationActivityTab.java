@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
-import com.kairos.dto.activity.flexible_time.ActivityGlideTimeDetails;
+import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 
 import java.io.Serializable;
 import java.util.Set;

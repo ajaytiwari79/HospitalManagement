@@ -1,12 +1,12 @@
-package com.kairos.service.flexible_time;
+package com.kairos.service.glide_time;
 /*
  *Created By Pavan on 20/10/18
  *
  */
 
-import com.kairos.dto.activity.flexible_time.GlideTimeSettingsDTO;
+import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.persistence.model.flexible_time.GlideTimeSettings;
-import com.kairos.persistence.repository.flexible_time.GlideTimeSettingsRepository;
+import com.kairos.persistence.repository.glide_time.GlideTimeSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;

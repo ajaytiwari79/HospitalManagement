@@ -1,11 +1,11 @@
-package com.kairos.controller.flexible_time;
+package com.kairos.controller.glide_time;
 /*
  *Created By Pavan on 20/10/18
  *
  */
 
-import com.kairos.dto.activity.flexible_time.GlideTimeSettingsDTO;
-import com.kairos.service.flexible_time.GlideTimeSettingsService;
+import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
+import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

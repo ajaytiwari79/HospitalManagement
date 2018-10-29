@@ -4,7 +4,7 @@ package com.kairos.persistence.model.flexible_time;
  *
  */
 
-import com.kairos.dto.activity.flexible_time.GlideTimeDetails;
+import com.kairos.dto.activity.glide_time.GlideTimeDetails;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
