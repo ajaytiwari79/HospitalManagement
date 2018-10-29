@@ -32,7 +32,6 @@ public class StaffUnitPositionDetails {
     private Integer totalWeeklyHours;
     private Integer fullTimeWeeklyMinutes;
     private Float avgDailyWorkingHours;
-    private Float hourlyWages;
     private Long id;
     private Long staffId;
     private Float salary;
@@ -159,15 +158,6 @@ public class StaffUnitPositionDetails {
     public void setAvgDailyWorkingHours(Float avgDailyWorkingHours) {
         this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
-
-    public Float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(Float hourlyWages) {
-        this.hourlyWages = hourlyWages;
-    }
-
     public Long getId() {
         return id;
     }
