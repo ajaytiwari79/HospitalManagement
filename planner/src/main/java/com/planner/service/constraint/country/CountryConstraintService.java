@@ -6,7 +6,9 @@ import com.planner.component.exception.ExceptionService;
 import com.planner.domain.constraint.common.Constraint;
 import com.planner.domain.constraint.country.CountryConstraint;
 import com.planner.domain.constraint.unit.UnitConstraint;
+import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.repository.constraint.ConstraintsRepository;
+import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.service.constraint.country.default_.DefaultCountryConstraintService;
@@ -33,6 +35,8 @@ public class CountryConstraintService {
     private UserNeo4jRepo userNeo4jRepo;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private PlanningProblemRepository planningProblemRepository;
 
     //======================================================
     public CountryConstraintDTO createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
@@ -139,11 +143,12 @@ public class CountryConstraintService {
 
     //============================Create Default constraints==================================
     public List<CountryConstraint> createDefaultCountryConstraints(Long countryId) {
-        //TODO might get these param from frontend
-        Long organizationServiceId=1l;
-        Long organizationSubServiceId=2l;
-        Long planningProblemId=3l;
-        List<CountryConstraint> countryConstraintList = DefaultCountryConstraintService.createDefaultCountryConstraints(countryId,organizationServiceId,organizationSubServiceId,planningProblemId);
+        PlanningProblem existingPlanningProblem=planningProblemRepository.findPlanningProblemByType("shiftPlanning");
+        BigInteger planningProblemId=null;
+        if(existingPlanningProblem!=null) planningProblemId=existingPlanningProblem.getId();
+        //TODO exception message needs to modify
+        else exceptionService.dataNotFoundByIdException("message.dataNotFound","PlanningProblem","shiftPlanning");
+        List<CountryConstraint> countryConstraintList = DefaultCountryConstraintService.createDefaultCountryConstraints(countryId,planningProblemId);
         if (countryConstraintList.size() > 0) {
             constraintsRepository.saveObjectList(countryConstraintList);
         }

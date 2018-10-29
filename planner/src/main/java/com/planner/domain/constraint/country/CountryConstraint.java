@@ -17,7 +17,7 @@ public class CountryConstraint extends Constraint {
     //~ Constructors
     public CountryConstraint(){}
 
-    public CountryConstraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, Long planningProblemId, BigInteger parentCountryConstraintId, Long countryId, Long organizationServiceId, Long organizationSubServiceId) {
+    public CountryConstraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentCountryConstraintId, Long countryId, Long organizationServiceId, Long organizationSubServiceId) {
         super(id, name, description, constraintType, constraintSubType, constraintLevel, penalty, planningProblemId, parentCountryConstraintId);
         this.countryId = countryId;
         this.organizationServiceId = organizationServiceId;
