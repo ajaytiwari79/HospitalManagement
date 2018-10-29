@@ -19,27 +19,46 @@ import java.util.Set;
 public class DataSubjectMapping extends MongoBaseEntity {
 
 
-    @NotBlank(message = "Name can't be null or empty")
-    @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "Description Cannot be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    @NotEmpty(message = "ManagingOrganization Type cannot be empty")
-    @NotNull(message = "ManagingOrganization Type cannot null")
     private List<OrganizationType> organizationTypes;
 
-    @NotEmpty(message = "ManagingOrganization Type cannot be empty")
-    @NotNull(message = "ManagingOrganization Sub Type cannot be empty")
     private List<OrganizationSubType> organizationSubTypes;
 
-    @NotNull(message = "Data category cannot null")
-    @NotEmpty(message = "Data Category cannot be empty")
-    // empty set to get rid of null pointer exception
-    private Set<BigInteger> dataCategories=new HashSet<>();
+    private Set<BigInteger> dataCategories = new HashSet<>();
 
     private Long countryId;
+
+
+    public DataSubjectMapping() {
+    }
+
+    public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
+                              Set<BigInteger> dataCategories) {
+        this.name = name;
+        this.description = description;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.dataCategories = dataCategories;
+    }
+
+
+    public DataSubjectMapping( @NotBlank(message = "error.message.name.notNull.orEmpty")
+                               @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty Set<BigInteger> dataCategories) {
+        this.name = name;
+        this.description = description;
+        this.dataCategories = dataCategories;
+    }
+
+    public DataSubjectMapping(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name,@NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
+        this.name = name;
+        this.description=description;
+    }
 
     public Long getCountryId() {
         return countryId;
@@ -89,20 +108,5 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
-                              Set<BigInteger> dataCategories) {
-        this.name = name;
-        this.description = description;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
-        this.dataCategories = dataCategories;
-    }
 
-    public DataSubjectMapping() {
-    }
-
-
-    public DataSubjectMapping(String name) {
-        this.name = name;
-    }
 }

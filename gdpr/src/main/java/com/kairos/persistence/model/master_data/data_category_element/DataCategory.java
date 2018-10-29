@@ -44,10 +44,11 @@ public class DataCategory extends MongoBaseEntity {
         this.name = name;
     }
 
-    public DataCategory(String name, List<BigInteger> dataElements, Long countryId) {
+    public DataCategory( @NotBlank(message = "Name cannot be empty")
+                         @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
+                                 String name, List<BigInteger> dataElements) {
         this.name = name;
         this.dataElements = dataElements;
-        this.countryId = countryId;
     }
 
 
