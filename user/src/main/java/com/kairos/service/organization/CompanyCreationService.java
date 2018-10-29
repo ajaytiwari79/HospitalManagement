@@ -1,10 +1,9 @@
 package com.kairos.service.organization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
-import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
@@ -42,8 +41,6 @@ import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
-
-import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
