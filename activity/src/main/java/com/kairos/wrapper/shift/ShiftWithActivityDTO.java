@@ -131,11 +131,11 @@ public class ShiftWithActivityDTO {
     }
 
     public List<ShiftActivityDTO> getActivities() {
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities;
     }
 
     public void setActivities(List<ShiftActivityDTO> activities) {
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
 
