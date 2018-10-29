@@ -20,4 +20,3 @@ db.wtaBaseRuleTemplate.insert({
     "updatedAt" : ISODate("2018-07-03T12:20:07.417Z"),
     "deleted" : false,
     "_class" : "com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays"
-});

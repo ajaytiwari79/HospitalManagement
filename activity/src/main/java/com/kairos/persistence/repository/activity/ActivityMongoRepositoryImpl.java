@@ -31,6 +31,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.kairos.enums.TimeTypes.PAID;
+import static com.kairos.enums.TimeTypes.UNPAID;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
