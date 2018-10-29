@@ -10,12 +10,14 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import io.jsonwebtoken.lang.Collections;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -98,10 +100,8 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
 
     public AverageScheduledTimeWTATemplate(String name, boolean disabled,
-                                           String description, long intervalLength, LocalDate validationStartDate
-            , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
+                                           String description, long intervalLength,String intervalUnit) {
         this.intervalLength = intervalLength;
-        //this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
         this.disabled = disabled;
         this.description = description;
@@ -126,9 +126,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-
-        //TODO It should work on Multiple activity
-        if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && timeTypeIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeTypeId())){
+       if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && Collections.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);

@@ -32,7 +32,15 @@ public class StaffAdditionalInfoQueryResult {
     private List<TimeSlotWrapper> timeSlotSets;
     private UserAccessRoleDTO user;
     private UserAccessRoleDTO userAccessRoleDTO;
+    private Long staffUserId;
 
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public UserAccessRoleDTO getUser() {
         return user;

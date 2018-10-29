@@ -31,6 +31,7 @@ import com.kairos.persistence.repository.user.country.CountryAccessGroupRelation
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
@@ -79,6 +80,8 @@ public class AccessGroupService {
     private StaffService staffService;
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
@@ -852,10 +855,11 @@ public class AccessGroupService {
     public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,
-                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),userId),
-                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),userId)
-        );
+        Long staff=staffGraphRepository.findStaffIdByUserId(userId,unitId);
+        //changes by pavan
+        boolean isStaff = staff==null ? accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),userId): false;
+        boolean isManagementStaff = staff==null ? accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),userId) : true;
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,isStaff,isManagementStaff);
         return userAccessRoleDTO;
     }
 
