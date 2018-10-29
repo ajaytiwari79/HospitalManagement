@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlanningProblemRepository extends MongoBaseRepository<PlanningProblem,String>{
+
+    PlanningProblem findPlanningProblemByType(String type);
 }
