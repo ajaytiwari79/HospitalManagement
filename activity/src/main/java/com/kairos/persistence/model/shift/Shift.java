@@ -179,11 +179,11 @@ public class Shift extends MongoBaseEntity {
 
 
     public List<ShiftActivity> getActivities() {
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities;
     }
 
     public void setActivities(List<ShiftActivity> activities) {
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
 
