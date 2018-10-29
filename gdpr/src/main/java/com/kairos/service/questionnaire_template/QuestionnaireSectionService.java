@@ -191,6 +191,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
             case ASSET_TYPE:
                 checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(unitId, questionnaireTemplate);
                 break;
+            case Risk:
+                checkIfRiskQuestionnaireTemplateIsInPublishedState(unitId, questionnaireTemplate);
+                break;
             default:
                 QuestionnaireTemplate previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(unitId, questionnaireTemplate.getTemplateType());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
@@ -202,37 +205,54 @@ public class QuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long untiId, QuestionnaireTemplate questionnaireTemplate) {
+    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
 
         QuestionnaireTemplate previousTemplate = null;
         if (questionnaireTemplate.isDefaultAssetTemplate()) {
-            previousTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(untiId);
+            previousTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.duplicateDataException("duplicate.questionnaire.template.assetType.defaultTemplate");
             }
         } else {
-            if (!Optional.ofNullable(questionnaireTemplate.getAssetType()).isPresent()) {
-                exceptionService.invalidRequestException("message.invalid.request", "asset type is not selected");
-            }
-            AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(untiId, questionnaireTemplate.getAssetType());
-            if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
-                previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(untiId, questionnaireTemplate.getAssetType());
+            if (questionnaireTemplate.getAssetSubTypeId() != null) {
+                previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, questionnaireTemplate.getAssetTypeId(), questionnaireTemplate.getAssetSubTypeId());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
-                    exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
+                    exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
                 }
             } else {
-                if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(questionnaireTemplate.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(questionnaireTemplate.getAssetSubType()))) {
-                    exceptionService.invalidRequestException("message.invalid.request", "Sub Asset Type is Not Selected");
-                } else {
-                    previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(untiId, questionnaireTemplate.getAssetType(), Collections.singletonList(questionnaireTemplate.getAssetSubType()));
-                    if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
-                        exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
-                    }
+                previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, questionnaireTemplate.getAssetTypeId());
+                if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                    exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName());
                 }
             }
         }
     }
 
+    private void checkIfRiskQuestionnaireTemplateIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
+        QuestionnaireTemplate previousTemplate = null;
+        switch (questionnaireTemplate.getRiskAssociatedEntity()) {
+            case ASSET_TYPE:
+                if (questionnaireTemplate.getAssetSubTypeId() != null) {
+                    previousTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, questionnaireTemplate.getAssetTypeId(), questionnaireTemplate.getAssetSubTypeId());
+                    if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                        exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
+                    }
+                } else {
+                    previousTemplate = questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(unitId, questionnaireTemplate.getAssetTypeId());
+                    if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                        exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName());
+                    }
+                }
+                break;
+            case PROCESSING_ACTIVITY:
+                previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(unitId);
+                if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                    exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType());
+                }
+                break;
+
+        }
+    }
 
     public boolean deleteQuestionnaireSectionByUnitId(Long unitId, BigInteger templateId, BigInteger questionnaireSectionId) {
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByUnitIdAndId(unitId, templateId);
