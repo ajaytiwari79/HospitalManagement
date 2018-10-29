@@ -146,8 +146,7 @@ public class CountryConstraintService {
         PlanningProblem existingPlanningProblem=planningProblemRepository.findPlanningProblemByType("shiftPlanning");
         BigInteger planningProblemId=null;
         if(existingPlanningProblem!=null) planningProblemId=existingPlanningProblem.getId();
-        //TODO exception message needs to modify
-        else exceptionService.dataNotFoundByIdException("message.dataNotFound","PlanningProblem","shiftPlanning");
+        else exceptionService.dataNotFoundByTypeException("message.type.dataNotFound","PlanningProblem","shiftPlanning");
         List<CountryConstraint> countryConstraintList = DefaultCountryConstraintService.createDefaultCountryConstraints(countryId,planningProblemId);
         if (countryConstraintList.size() > 0) {
             constraintsRepository.saveObjectList(countryConstraintList);
