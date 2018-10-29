@@ -538,14 +538,4 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     }
 
-    @Override
-    public List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds) {
-
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("isParentActivity").is(true).and("deleted").is(false).and("organizationTypes").is(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds).and("state").nin("DRAFT")))
-                ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                match(Criteria.where("timeType.TimeTypes").orOperator(Criteria.where("timeType.TimeTypes").is(PAID).and("timeType.TimeTypes").is(UNPAID))));
-        AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
-        return result.getMappedResults();
-    }
-
 }

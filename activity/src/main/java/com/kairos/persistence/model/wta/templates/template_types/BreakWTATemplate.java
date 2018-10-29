@@ -30,7 +30,7 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
     }
 
     public BreakWTATemplate() {
-
+        //Default Constructor
     }
 
     public short getBreakGapMinutes() {

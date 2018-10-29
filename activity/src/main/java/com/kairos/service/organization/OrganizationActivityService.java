@@ -372,7 +372,7 @@ public class OrganizationActivityService extends MongoBaseService {
         FlexibleTimeSettingsDTO flexibleTimeSettings=flexibleTimeSettingsService.getFlexibleTimeSettings(orgTypeAndSubTypeDTO.getCountryId());
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
-            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
         } else {
             existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
         }
