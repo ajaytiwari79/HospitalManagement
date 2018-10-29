@@ -45,7 +45,7 @@ public class UnitSolverConfigService {
         SolverConfig constraint = solverConfigRepository.findByIdNotDeleted(unitSolverConfigDTO.getId());
         if (constraint != null && preValidateUnitSolverConfigDTO(unitSolverConfigDTO, true)) {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
-            unitSolverConfig.setParentUnitSolverConfigId(unitSolverConfigDTO.getId());
+            unitSolverConfig.setParentSolverConfigId(unitSolverConfigDTO.getId());
             unitSolverConfig.setId(null);//Unset Id
             solverConfigRepository.saveObject(unitSolverConfig);
             unitSolverConfigDTO.setId(unitSolverConfig.getId());

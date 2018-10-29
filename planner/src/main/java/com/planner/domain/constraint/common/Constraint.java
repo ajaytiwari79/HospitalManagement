@@ -20,12 +20,12 @@ public class Constraint extends MongoBaseEntity{
     protected ConstraintLevel constraintLevel;
     protected int penalty;
     protected BigInteger planningProblemId;
-    protected BigInteger parentCountryConstraintId;//copiedFrom
+    protected BigInteger parentConstraintId;//copiedFrom
 
     //=================================================
     public Constraint(){}
 
-    public Constraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentCountryConstraintId) {
+    public Constraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentConstraintId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -34,7 +34,7 @@ public class Constraint extends MongoBaseEntity{
         this.constraintLevel = constraintLevel;
         this.penalty = penalty;
         this.planningProblemId = planningProblemId;
-        this.parentCountryConstraintId = parentCountryConstraintId;
+        this.parentConstraintId = parentConstraintId;
     }
 
     // =================================================
@@ -102,11 +102,11 @@ public class Constraint extends MongoBaseEntity{
         this.planningProblemId = planningProblemId;
     }
 
-    public BigInteger getParentCountryConstraintId() {
-        return parentCountryConstraintId;
+    public BigInteger getParentConstraintId() {
+        return parentConstraintId;
     }
 
-    public void setParentCountryConstraintId(BigInteger parentCountryConstraintId) {
-        this.parentCountryConstraintId = parentCountryConstraintId;
+    public void setParentConstraintId(BigInteger parentConstraintId) {
+        this.parentConstraintId = parentConstraintId;
     }
 }

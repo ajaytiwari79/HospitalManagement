@@ -33,14 +33,6 @@ public class CountryConstraint extends Constraint {
         this.countryId = countryId;
     }
 
-    public BigInteger getParentCountryConstraintId() {
-        return parentCountryConstraintId;
-    }
-
-    public void setParentCountryConstraintId(BigInteger parentCountryConstraintId) {
-        this.parentCountryConstraintId = parentCountryConstraintId;
-    }
-
     public Long getOrganizationServiceId() {
         return organizationServiceId;
     }
