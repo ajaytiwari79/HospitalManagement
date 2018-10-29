@@ -1,5 +1,6 @@
 
-ACTIVITY
+kairos ACTIVITY
+
 
 db.time_Type.update({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
 db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
@@ -52,3 +53,13 @@ db.wtaBaseRuleTemplate.insert({
 
     db.activities.updateMany({},{$set:{"locationActivityTab.glideTimeForCheckIn": [{"location" : "OFFICE","before" : 60,"after" : 60,"eligible" : false},{"location" : "DEPOT","before" : 60,"after" : 60,"eligible" : false},{"location" : "OTHERS","before" : 60,"after" : 60,"eligible" : false},{"location" : "HOME","before" : 60,"after" : 60,"eligible" : false}],
     "locationActivityTab.glideTimeForCheckOut" : [{"location" : "OTHERS","before" : 60,"after" : 60,"eligible" : false},{"location":"OFFICE","before" : 60,"after" : 60,"eligible" : false},{"location" : "DEPOT","before" : 60,"after" : 60,"eligible" : false},{"location" : "HOME","before" : 60,"after" : 60,"eligible" : false}]}});
+
+db.time_Type.updateMany({"label" : "Unpaid break"},{$set:{"timeType":"UNPAID"}})
+db.time_Type.updateMany({"label" : "Paid Break"},{$set:{"timeType":"PAID"}})
+db.workingTimeAgreement.updateMany({},{$rename:{"organizationParentWTA":"organizationParentId"}})
+
+
+NEO
+MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
+set r.amountEditableAtUnit=FALSE
+

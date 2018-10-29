@@ -197,7 +197,8 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByUpIds(upIds));
     }
 
-    @ApiOperation(value = "assing wta and cta to unitPosition")
+
+    @ApiOperation(value = "assign wta and cta to unitPosition while a position is created")
     @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable Long unitPositionId,@PathVariable BigInteger wtaId,@PathVariable BigInteger ctaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,ctaId));
@@ -255,7 +256,7 @@ public class WTAController {
                                                                           @RequestParam(value = "oldwtaId",required = false)  BigInteger oldwtaId,
                                                                           @RequestParam(value = "ctaId",required = false)   BigInteger ctaId,
                                                                           @RequestParam(value = "oldctaId",required = false)   BigInteger oldctaId,
-                                                                            @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
+                                                                          @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
     }
 

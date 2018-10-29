@@ -25,9 +25,7 @@ public class WTAQueryResultDTO {
 
     private BigInteger countryParentWTA;
 
-    private BigInteger organizationParentWTA;
-
-
+    private BigInteger organizationParentId; // wta id of parent organization and this must not be changable
     private Date startDate;
     private Date endDate;
     private Long expiryDate;
@@ -76,12 +74,12 @@ public class WTAQueryResultDTO {
         this.countryParentWTA = countryParentWTA;
     }
 
-    public BigInteger getOrganizationParentWTA() {
-        return organizationParentWTA;
+    public BigInteger getOrganizationParentId() {
+        return organizationParentId;
     }
 
-    public void setOrganizationParentWTA(BigInteger organizationParentWTA) {
-        this.organizationParentWTA = organizationParentWTA;
+    public void setOrganizationParentId(BigInteger organizationParentId) {
+        this.organizationParentId = organizationParentId;
     }
 
     public List<TagDTO> getTags() {
@@ -171,5 +169,6 @@ public class WTAQueryResultDTO {
     public void setOrganizationSubType(OrganizationTypeDTO organizationSubType) {
         this.organizationSubType = organizationSubType;
     }
+
 
 }

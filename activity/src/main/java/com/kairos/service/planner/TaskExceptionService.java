@@ -5,9 +5,7 @@ import com.kairos.dto.activity.task.BulkUpdateTaskDTO;
 import com.kairos.dto.activity.task.TaskActiveUpdationDTO;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.activity.task.TaskRestrictionDto;
-import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
@@ -93,8 +91,7 @@ public class TaskExceptionService extends MongoBaseService {
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-    @Inject
-    private ClientRestClient clientRestClient;
+
     @Inject
     private RestrictionFrequencyService restrictionFrequencyService;
     @Inject

@@ -1,8 +1,6 @@
 package com.kairos.service.planner;
 
-import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
@@ -60,7 +58,7 @@ public class TasksMergingService extends MongoBaseService {
     TaskConverterService taskConverterService;
     @Autowired
     GenericIntegrationService genericIntegrationService;
-    @Autowired private ClientRestClient clientRestClient;
+
 
     private static final Logger logger = LoggerFactory.getLogger(TasksMergingService.class);
 

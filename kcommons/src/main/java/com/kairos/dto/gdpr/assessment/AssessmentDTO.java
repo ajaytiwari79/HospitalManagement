@@ -1,7 +1,8 @@
-package com.kairos.dto.gdpr.data_inventory;
+package com.kairos.dto.gdpr.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,21 +13,21 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentDTO {
 
-    private BigInteger id;
+    protected BigInteger id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
-    private String name;
+    protected String name;
 
-    @NotNull(message = "Mention end Date of Assessment")
-    private LocalDate endDate;
+    @NotNull(message = "error.message.due.date.not.Selected")
+    protected LocalDate endDate;
 
-    private String comment;
+    protected String comment;
 
-    @NotNull(message = "Assignee information is not fill")
-    private Staff assignee;
+    @NotNull(message = "error.message.assignee.not.selected")
+    protected Staff assignee;
 
-    private Staff approver;
+    protected Staff approver;
 
     public BigInteger getId() { return id; }
 
@@ -51,4 +52,5 @@ public class AssessmentDTO {
     public Staff getApprover() { return approver; }
 
     public void setApprover(Staff approver) { this.approver = approver; }
+
 }

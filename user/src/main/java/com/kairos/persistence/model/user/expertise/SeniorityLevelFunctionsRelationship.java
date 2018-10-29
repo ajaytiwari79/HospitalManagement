@@ -20,6 +20,7 @@ public class SeniorityLevelFunctionsRelationship extends UserBaseEntity {
     @EndNode
     private Function function;
     private BigDecimal amount;
+    private boolean amountEditableAtUnit;
 
     public SeniorityLevelFunctionsRelationship() {
     }
@@ -48,9 +49,18 @@ public class SeniorityLevelFunctionsRelationship extends UserBaseEntity {
         this.amount = amount;
     }
 
-    public SeniorityLevelFunctionsRelationship(Function function, SeniorityLevelFunction seniorityLevelFunction, BigDecimal amount) {
+    public boolean isAmountEditableAtUnit() {
+        return amountEditableAtUnit;
+    }
+
+    public void setAmountEditableAtUnit(boolean amountEditableAtUnit) {
+        this.amountEditableAtUnit = amountEditableAtUnit;
+    }
+
+    public SeniorityLevelFunctionsRelationship(Function function, SeniorityLevelFunction seniorityLevelFunction, BigDecimal amount,boolean amountEditableAtUnit) {
         this.seniorityLevelFunction = seniorityLevelFunction;
         this.function = function;
         this.amount = amount;
+        this.amountEditableAtUnit=amountEditableAtUnit;
     }
 }

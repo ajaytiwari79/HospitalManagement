@@ -2,22 +2,20 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import io.jsonwebtoken.lang.Collections;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -126,7 +124,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-       if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && Collections.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
+       if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);

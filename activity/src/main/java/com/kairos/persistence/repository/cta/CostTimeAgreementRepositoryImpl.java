@@ -74,7 +74,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
-        query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate").include("parentId");
+        query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate").include("parentId").include("organizationParentId");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
@@ -154,7 +154,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "parentCountryCTAId", "startDate", "endDate", "ruleTemplates","unitPositionId")
+                project("name", "description", "disabled", "expertise","organizationParentId", "organization", "parentId",  "startDate", "endDate", "ruleTemplates","unitPositionId")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults();
@@ -166,7 +166,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "parentCountryCTAId", "startDate", "endDate", "ruleTemplates","unitPositionId")
+                project("name", "description", "disabled", "expertise","organizationParentId", "organization", "parentId", "startDate", "endDate", "ruleTemplates","unitPositionId")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults();

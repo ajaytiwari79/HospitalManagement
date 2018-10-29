@@ -90,7 +90,7 @@ public class CountrySolverConfigService {
         if (solverConfig != null && preValidateCountrySolverConfigDTO(countrySolverConfigDTO, true)) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             countrySolverConfig.setId(null);//UnSet
-            countrySolverConfig.setParentCountrySolverConfigId(countrySolverConfigDTO.getId());
+            countrySolverConfig.setParentSolverConfigId(countrySolverConfigDTO.getId());
             solverConfigRepository.saveObject(countrySolverConfig);
             //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
             copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfigDTO.getOrganizationServiceId(), countrySolverConfigDTO.getOrganizationSubServiceId(), countrySolverConfig);
