@@ -4,7 +4,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.unit_settings.FlexibleTimeSettingsUNIT;
+import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
@@ -121,9 +121,9 @@ public class UnitSettingService extends MongoBaseService {
         if (unitSetting == null) {
             exceptionService.dataNotFoundException("message.unit.setting.notFound");
         }
-        FlexibleTimeSettingsUNIT flexibleTimeSettingsUNIT = ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingDTO, FlexibleTimeSettingsUNIT.class);
+        FlexibleTimeSettings flexibleTimeSettings = ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingDTO, FlexibleTimeSettings.class);
         unitSetting.setUnitId(unitId);
-        unitSetting.setFlexibleTimeSettingsUNIT(flexibleTimeSettingsUNIT);
+        unitSetting.setFlexibleTimeSettings(flexibleTimeSettings);
         save(unitSetting);
         return flexibleTimeSettingDTO;
     }

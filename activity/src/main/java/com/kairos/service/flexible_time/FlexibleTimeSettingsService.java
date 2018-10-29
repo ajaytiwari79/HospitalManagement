@@ -25,10 +25,10 @@ public class FlexibleTimeSettingsService extends MongoBaseService {
 
     public FlexibleTimeSettingsDTO saveFlexibleTimeSettings(Long countryId,FlexibleTimeSettingsDTO flexibleTimeSettingsDTO){
         FlexibleTimeSettings flexibleTimeSettings=flexibleTimeSettingsRepository.getFlexibleTimeSettingsByIdAndDeletedFalse(flexibleTimeSettingsDTO.getId());
-        if(flexibleTimeSettings==null){
-            exceptionService.dataNotFoundException("data.not.Found",flexibleTimeSettingsDTO.getId());
-        }
-        flexibleTimeSettings=new FlexibleTimeSettings(flexibleTimeSettingsDTO.getFlexibleTimeForCheckIn(),flexibleTimeSettingsDTO.getFlexibleTimeForCheckOut());
+//        if(flexibleTimeSettings==null){
+//            exceptionService.dataNotFoundException("message.dataNotFound","Flexi Time Settings",flexibleTimeSettingsDTO.getId());
+//        }
+        flexibleTimeSettings=new FlexibleTimeSettings(flexibleTimeSettingsDTO.getId(),flexibleTimeSettingsDTO.getFlexibleTimeForCheckIn(),flexibleTimeSettingsDTO.getFlexibleTimeForCheckOut(),flexibleTimeSettingsDTO.getTimeLimit());
         flexibleTimeSettings.setCountryId(countryId);
         save(flexibleTimeSettings);
         flexibleTimeSettingsDTO.setId(flexibleTimeSettings.getId());

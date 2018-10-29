@@ -3,3 +3,6 @@ ACTIVITY
 
 db.time_Type.update({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
 db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
+
+// To create Constraints on country level
+db.flexibleTimeSettings.createIndex( { "countryId": 1 }, { unique: true } )

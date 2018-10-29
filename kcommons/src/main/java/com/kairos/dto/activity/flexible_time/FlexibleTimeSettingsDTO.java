@@ -23,7 +23,6 @@ public class FlexibleTimeSettingsDTO {
         this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
         this.countryId = countryId;
     }
-
     public BigInteger getId() {
         return id;
     }
@@ -56,7 +55,15 @@ public class FlexibleTimeSettingsDTO {
         this.countryId = countryId;
     }
 
-    @AssertTrue(message = "All times should be equal or greater than time limit")
+    public short getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(short timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    @AssertTrue(message = "error.flexi_time.exceeds.limit")
     public boolean isValid() {
         return (flexibleTimeForCheckIn.getAfter()!=null && timeLimit>=flexibleTimeForCheckIn.getAfter() ||
                 flexibleTimeForCheckIn.getBefore()!=null && timeLimit>=flexibleTimeForCheckIn.getBefore()||

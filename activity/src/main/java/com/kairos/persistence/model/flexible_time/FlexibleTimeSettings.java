@@ -7,7 +7,10 @@ package com.kairos.persistence.model.flexible_time;
 import com.kairos.dto.activity.flexible_time.FlexibleTimeDetails;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
+import java.math.BigInteger;
+
 public class FlexibleTimeSettings extends MongoBaseEntity {
+    private short timeLimit;
     private FlexibleTimeDetails flexibleTimeForCheckIn;
     private FlexibleTimeDetails flexibleTimeForCheckOut;
     private Long countryId;
@@ -16,9 +19,11 @@ public class FlexibleTimeSettings extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public FlexibleTimeSettings(FlexibleTimeDetails flexibleTimeForCheckIn, FlexibleTimeDetails flexibleTimeForCheckOut) {
+    public FlexibleTimeSettings(BigInteger id,FlexibleTimeDetails flexibleTimeForCheckIn, FlexibleTimeDetails flexibleTimeForCheckOut, short timeLimit) {
+        this.id=id;
         this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
         this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+        this.timeLimit=timeLimit;
     }
 
     public FlexibleTimeDetails getFlexibleTimeForCheckIn() {
@@ -45,4 +50,11 @@ public class FlexibleTimeSettings extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+    public short getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(short timeLimit) {
+        this.timeLimit = timeLimit;
+    }
 }
