@@ -6,3 +6,43 @@ db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"
 
 // To create Constraints on country level
 db.glideTimeSettings.createIndex( { "countryId": 1 }, { unique: true } )
+
+
+// To add WTA Template
+
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequence"},{$inc: { sequenceNumber: 1 }});
+
+db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
+
+db.wtaBaseRuleTemplate.insert({
+    "_id" : "723", // this must be replaced by updated sequence
+    "name" : "WTA for breaks in shif",
+    "description" : "WTA for breaks in shif",
+    "disabled" : false,
+    "ruleTemplateCategoryId" : "4",
+    "countryId" : NumberLong(18712),
+    "lastUpdatedBy" : "Ulrik",
+    "breakGapMinutes":30,
+    "breakAvailability": [
+     {
+            timeSlot: 'DAY',
+            startAfterMinutes: 60,
+            endBeforeMinutes:  120
+     },
+     {
+            timeSlot: 'NIGHT',
+            startAfterMinutes: 90,
+            endBeforeMinutes:  60
+     },
+     {
+            timeSlot: 'EVENING',
+            startAfterMinutes: 90,
+            endBeforeMinutes:  60
+     }
+    ],
+    "wtaTemplateType" : "WTA_FOR_BREAKS_IN_SHIFT",
+    "phaseTemplateValues" : [],
+    "createdAt" : ISODate("2018-07-03T12:20:07.417Z"),
+    "updatedAt" : ISODate("2018-07-03T12:20:07.417Z"),
+     "deleted" : false,
+     "_class" : "com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate" });
