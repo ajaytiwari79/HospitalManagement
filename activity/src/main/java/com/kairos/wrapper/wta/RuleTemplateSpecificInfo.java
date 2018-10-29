@@ -5,8 +5,10 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +30,10 @@ public class RuleTemplateSpecificInfo {
     private UserAccessRoleDTO user;
     private int totalTimeBank;
     private ViolatedRulesDTO violatedRules;
+    private Map<BigInteger,ActivityWrapper> activityWrapperMap;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -41,8 +44,17 @@ public class RuleTemplateSpecificInfo {
         this.user = user;
         this.totalTimeBank = totalTimeBank;
         this.violatedRules = new ViolatedRulesDTO();
+        this.activityWrapperMap = activityWrapperMap;
     }
 
+
+    public Map<BigInteger, ActivityWrapper> getActivityWrapperMap() {
+        return activityWrapperMap;
+    }
+
+    public void setActivityWrapperMap(Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        this.activityWrapperMap = activityWrapperMap;
+    }
 
     public ViolatedRulesDTO getViolatedRules() {
         return violatedRules;
