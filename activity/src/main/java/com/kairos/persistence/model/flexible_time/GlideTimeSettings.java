@@ -11,35 +11,35 @@ import java.math.BigInteger;
 
 public class GlideTimeSettings extends MongoBaseEntity {
     private short timeLimit;
-    private GlideTimeDetails flexibleTimeForCheckIn;
-    private GlideTimeDetails flexibleTimeForCheckOut;
+    private GlideTimeDetails glideTimeForCheckIn;
+    private GlideTimeDetails glideTimeForCheckOut;
     private Long countryId;
 
     public GlideTimeSettings() {
         //Default Constructor
     }
 
-    public GlideTimeSettings(BigInteger id, GlideTimeDetails flexibleTimeForCheckIn, GlideTimeDetails flexibleTimeForCheckOut, short timeLimit) {
+    public GlideTimeSettings(BigInteger id, GlideTimeDetails glideTimeForCheckIn, GlideTimeDetails glideTimeForCheckOut, short timeLimit) {
         this.id=id;
-        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
-        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
         this.timeLimit=timeLimit;
     }
 
-    public GlideTimeDetails getFlexibleTimeForCheckIn() {
-        return flexibleTimeForCheckIn;
+    public GlideTimeDetails getGlideTimeForCheckIn() {
+        return glideTimeForCheckIn;
     }
 
-    public void setFlexibleTimeForCheckIn(GlideTimeDetails flexibleTimeForCheckIn) {
-        this.flexibleTimeForCheckIn = flexibleTimeForCheckIn;
+    public void setGlideTimeForCheckIn(GlideTimeDetails glideTimeForCheckIn) {
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
     }
 
-    public GlideTimeDetails getFlexibleTimeForCheckOut() {
-        return flexibleTimeForCheckOut;
+    public GlideTimeDetails getGlideTimeForCheckOut() {
+        return glideTimeForCheckOut;
     }
 
-    public void setFlexibleTimeForCheckOut(GlideTimeDetails flexibleTimeForCheckOut) {
-        this.flexibleTimeForCheckOut = flexibleTimeForCheckOut;
+    public void setGlideTimeForCheckOut(GlideTimeDetails glideTimeForCheckOut) {
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
     }
 
     public Long getCountryId() {

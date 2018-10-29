@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 public class GlideTimeSettingsDTO {
     private BigInteger id;
-    private short timeLimit;
+    private Short timeLimit;
     private GlideTimeDetails glideTimeForCheckIn;
     private GlideTimeDetails glideTimeForCheckOut;
     private Long countryId;
@@ -56,20 +56,12 @@ public class GlideTimeSettingsDTO {
         this.countryId = countryId;
     }
 
-    public short getTimeLimit() {
+    public Short getTimeLimit() {
         return timeLimit;
     }
 
-    public void setTimeLimit(short timeLimit) {
+    public void setTimeLimit(Short timeLimit) {
         this.timeLimit = timeLimit;
-    }
-
-    @AssertTrue(message = "error.flexi_time.exceeds.limit")
-    public boolean isValid() {
-        return (glideTimeForCheckIn.getAfter()!=null && timeLimit>= glideTimeForCheckIn.getAfter() ||
-                glideTimeForCheckIn.getBefore()!=null && timeLimit>= glideTimeForCheckIn.getBefore()||
-                glideTimeForCheckOut.getAfter()!=null && timeLimit>= glideTimeForCheckOut.getAfter() ||
-                glideTimeForCheckOut.getBefore()!=null && timeLimit>= glideTimeForCheckIn.getBefore());
     }
 
 }

@@ -13,6 +13,4 @@ import java.math.BigInteger;
 public interface GlideTimeSettingsRepository extends MongoBaseRepository<GlideTimeSettings,BigInteger> {
 
     GlideTimeSettingsDTO getGlideTimeSettingsByCountryIdAndDeletedFalse(Long countryId);
-
-    GlideTimeSettings getGlideTimeSettingsByIdAndDeletedFalse(BigInteger id);
 }

@@ -22,19 +22,33 @@ public class GlideTimeSettingsService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public GlideTimeSettingsDTO saveGlideTimeSettings(Long countryId, GlideTimeSettingsDTO glideTimeSettingsDTO){
-        GlideTimeSettings glideTimeSettings = glideTimeSettingsRepository.getGlideTimeSettingsByIdAndDeletedFalse(glideTimeSettingsDTO.getId());
-        if(glideTimeSettings ==null){
-            exceptionService.dataNotFoundException("message.dataNotFound","Flexi Time Settings", glideTimeSettingsDTO.getId());
-        }
-        glideTimeSettings =new GlideTimeSettings(glideTimeSettingsDTO.getId(), glideTimeSettingsDTO.getGlideTimeForCheckIn(), glideTimeSettingsDTO.getGlideTimeForCheckOut(), glideTimeSettingsDTO.getTimeLimit());
+    public GlideTimeSettingsDTO saveGlideTimeSettings(Long countryId, GlideTimeSettingsDTO glideTimeSettingsDTO) {
+        validateGlideTime(glideTimeSettingsDTO);
+        GlideTimeSettings glideTimeSettings = new GlideTimeSettings(glideTimeSettingsDTO.getId(), glideTimeSettingsDTO.getGlideTimeForCheckIn(), glideTimeSettingsDTO.getGlideTimeForCheckOut(), glideTimeSettingsDTO.getTimeLimit());
         glideTimeSettings.setCountryId(countryId);
         save(glideTimeSettings);
         glideTimeSettingsDTO.setId(glideTimeSettings.getId());
         return glideTimeSettingsDTO;
     }
 
-    public GlideTimeSettingsDTO getGlideTimeSettings(Long countryId){
+    public GlideTimeSettingsDTO getGlideTimeSettings(Long countryId) {
         return glideTimeSettingsRepository.getGlideTimeSettingsByCountryIdAndDeletedFalse(countryId);
     }
+
+    private void validateGlideTime(GlideTimeSettingsDTO glideTimeSettingsDTO) {
+
+        if (glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter()) {
+            exceptionService.actionNotPermittedException("error.glide_time.checkin.after.exceeds.limit");
+        }
+        if (glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore()) {
+            exceptionService.actionNotPermittedException("error.glide_time.checkin.before.exceeds.limit");
+        }
+        if (glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter()) {
+            exceptionService.actionNotPermittedException("error.glide_time.checkout.after.exceeds.limit");
+        }
+        if (glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore()) {
+            exceptionService.actionNotPermittedException("error.glide_time.checkout.before.exceeds.limit");
+        }
+    }
 }
+

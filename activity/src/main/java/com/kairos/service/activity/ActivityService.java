@@ -246,10 +246,10 @@ public class ActivityService extends MongoBaseService {
 
 
         Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckOut =new HashSet<>();
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForHome);
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForUnit);
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForDepot);
@@ -1025,10 +1025,10 @@ public class ActivityService extends MongoBaseService {
 
 
             Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckOut =new HashSet<>();
-            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+            ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
             activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForHome);
             activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForUnit);
             activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForDepot);
