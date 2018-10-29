@@ -24,7 +24,7 @@ public class Risk extends MongoBaseEntity {
     private boolean isReminderActive;
     private int daysToReminderBefore;
     private Staff riskOwner;
-    @NotNull(message = "RISK Level can't be null")
+    @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
     private BigInteger assetType;
     private BigInteger processingActivity;
