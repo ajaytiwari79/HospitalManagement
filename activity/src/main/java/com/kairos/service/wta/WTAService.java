@@ -480,7 +480,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public WTAResponseDTO getWTAOfUnitPosition(Long unitPositionId) {
-        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByUnitPosition(unitPositionId, new Date());
+        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByUnitPositionIdAndDate(unitPositionId, new Date());
         return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
     }
 

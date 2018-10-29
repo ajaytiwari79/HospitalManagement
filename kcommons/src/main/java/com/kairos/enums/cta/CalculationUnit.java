@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.cta;
+package com.kairos.enums.cta;
 
 public enum CalculationUnit {
     HOURS, MONEY, UNITS

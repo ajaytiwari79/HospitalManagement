@@ -19,6 +19,7 @@ import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_UNIT_SO
 public class UnitSolverConfigController {
     @Inject
     private UnitSolverConfigService unitSolverConfigService;
+
     @PostMapping
     @ApiOperation("Create UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
@@ -26,7 +27,7 @@ public class UnitSolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
     }
 
-    @PostMapping (value = "/copy")
+    @PostMapping(value = "/copy")
     @ApiOperation("Copy UnitSolverConfig")
     public ResponseEntity<Map<String, Object>> copyUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
         unitSolverConfigService.copyUnitSolverConfig(unitSolverConfigDTO);
@@ -35,17 +36,14 @@ public class UnitSolverConfigController {
 
     @GetMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Get UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> getUnitSolverConfigById(@PathVariable BigInteger unitSolverConfigId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND, unitSolverConfigService.getUnitSolverConfig(unitSolverConfigId));
+    public ResponseEntity<Map<String, Object>> getAllUnitSolverConfigByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND, unitSolverConfigService.getAllUnitSolverConfigByUnitId(unitId));
     }
 
-    @GetMapping
-    @ApiOperation("GetAll UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> getAllUnitSolverConfig() {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND, unitSolverConfigService.getAllUnitSolverConfig());
-    }
+
     /**
      * Always modification no object creation so,Patch
+     *
      * @param unitSolverConfigDTO
      * @return
      */

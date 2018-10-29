@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.cta;
+package com.kairos.enums.cta;
 
 public enum CTARuleTemplateType {
     RULE_TEMPLATE_1("Rule Template 1"),RULE_TEMPLATE_2("Rule Template 2"),RULE_TEMPLATE_3("Rule Template 3"),

@@ -7,7 +7,6 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,24 +20,24 @@ public class RuleTemplateSpecificInfo {
 
     private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
     private ShiftWithActivityDTO shift;
-    private List<TimeSlotWrapper> timeSlotWrappers;
+    private Map<String,TimeSlotWrapper> timeSlotWrapperMap;
     private String phase;
     private DateTimeInterval planningPeriod;
-    private Map<BigInteger,Integer> counterMap;
-    private List<DayTypeDTO> dayTypes;
+    private Map<String,Integer> counterMap;
+    private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
     private int totalTimeBank;
     private ViolatedRulesDTO violatedRules;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user,int totalTimeBank) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank) {
         this.shifts = shifts;
         this.shift = shift;
-        this.timeSlotWrappers = timeSlotWrappers;
+        this.timeSlotWrapperMap = timeSlotWrapperMap;
         this.phase = phase;
         this.planningPeriod = planningPeriod;
         this.counterMap = counterMap;
-        this.dayTypes = dayTypes;
+        this.dayTypeMap = dayTypeMap;
         this.user = user;
         this.totalTimeBank = totalTimeBank;
         this.violatedRules = new ViolatedRulesDTO();
@@ -69,19 +68,19 @@ public class RuleTemplateSpecificInfo {
         this.user = user;
     }
 
-    public List<DayTypeDTO> getDayTypes() {
-        return dayTypes;
+    public Map<Long, DayTypeDTO> getDayTypeMap() {
+        return dayTypeMap;
     }
 
-    public void setDayTypes(List<DayTypeDTO> dayTypes) {
-        this.dayTypes = dayTypes;
+    public void setDayTypeMap(Map<Long, DayTypeDTO> dayTypeMap) {
+        this.dayTypeMap = dayTypeMap;
     }
 
-    public Map<BigInteger, Integer> getCounterMap() {
+    public Map<String, Integer> getCounterMap() {
         return counterMap;
     }
 
-    public void setCounterMap(Map<BigInteger, Integer> counterMap) {
+    public void setCounterMap(Map<String, Integer> counterMap) {
         this.counterMap = counterMap;
     }
 
@@ -101,12 +100,12 @@ public class RuleTemplateSpecificInfo {
         this.shift = shift;
     }
 
-    public List<TimeSlotWrapper> getTimeSlotWrappers() {
-        return timeSlotWrappers;
+    public Map<String, TimeSlotWrapper> getTimeSlotWrapperMap() {
+        return timeSlotWrapperMap;
     }
 
-    public void setTimeSlotWrappers(List<TimeSlotWrapper> timeSlotWrappers) {
-        this.timeSlotWrappers = timeSlotWrappers;
+    public void setTimeSlotWrapperMap(Map<String, TimeSlotWrapper> timeSlotWrapperMap) {
+        this.timeSlotWrapperMap = timeSlotWrapperMap;
     }
 
     public String getPhase() {
