@@ -126,7 +126,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 // Please make sure driver supports at least protocol version 2.
 // Driver upgrade is most likely required.; nested exception is org.neo4j.ogm.exception.TransactionException:
 // Date is not supported as a return type in Bolt protocol version 1. Please make sure driver supports at least protocol version 2. Driver upgrade is most likely required
-    @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return up.startDate as startDate")
+    @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return up.endDate as endDate")
     List<String> getAllUnitPositionsByStaffId(Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(subOrg:Organization) where id(unitPosition)={0} " +
