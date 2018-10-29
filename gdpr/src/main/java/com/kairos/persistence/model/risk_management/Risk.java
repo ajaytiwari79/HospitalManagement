@@ -13,12 +13,12 @@ import java.time.LocalDate;
 @Document
 public class Risk extends MongoBaseEntity {
 
-    @NotBlank(message = "Name can't be Empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;
-    @NotBlank(message = "Description can't be Empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
     private Long countryId;
-    @NotBlank(message = "Mention Recommendation")
+    @NotBlank(message = "error.message.risk.recommendation")
     private String riskRecommendation;
     private LocalDate dueDate;
     private boolean isReminderActive;

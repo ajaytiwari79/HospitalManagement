@@ -107,7 +107,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType) {
+    public QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeAndUnitId(Long unitId, QuestionnaireTemplateType templateType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("templateType").is(templateType));
         query.fields().include("id").include("name").include("templateStatus").include("templateType");
         return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
@@ -156,7 +156,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeId(Long countryId, BigInteger assetTypeId) {
+    public QuestionnaireTemplate findRiskTemplateByCountryIdAndAssetTypeId(Long countryId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
@@ -167,7 +167,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeIdAndSubAssetTypeId(Long countryId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
+    public QuestionnaireTemplate findRiskTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeId(Long countryId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
@@ -179,7 +179,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findQuestionnaireTemplateOfTemplateTypeRiskAndAsssociatedEntityProcessingActivityByCountryId(Long countryId) {
+    public QuestionnaireTemplate findRiskTemplateByAsssociatedProcessingActivityAndCountryId(Long countryId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)
@@ -199,7 +199,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
+    public QuestionnaireTemplate findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE)
                 .and("assetTypeId").is(assetTypeId).and("assetSubTypeId").in(subAssetTypeId)
@@ -229,7 +229,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(Long unitId) {
+    public QuestionnaireTemplate findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(Long unitId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)
@@ -239,7 +239,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId) {
+    public QuestionnaireTemplate findPublishedRiskTemplateByUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
@@ -250,7 +250,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
+    public QuestionnaireTemplate findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)

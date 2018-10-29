@@ -79,13 +79,13 @@ public class QuestionnaireTemplateService extends MongoBaseService {
         switch (templateDto.getTemplateType()) {
             case ASSET_TYPE:
                 questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
-                addAssetTypeAndSubAssetTypeToQuestionnaireTemplateOnTemplateTypeStatusAssetTypeSelection(referenceId, isUnitId, questionnaireTemplate, templateDto);
+                addAssetTypeAndSubAssetType(referenceId, isUnitId, questionnaireTemplate, templateDto);
                 break;
             case RISK:
                 if (!Optional.ofNullable(templateDto.getRiskAssociatedEntity()).isPresent()) {
                     exceptionService.invalidRequestException("message.risk.questionnaireTemplate.associated.entity.not.selected");
                 }
-                addRiskAssociatedEntityTypeOnTemplateTypeStatusRiskSelection(referenceId, isUnitId, questionnaireTemplate, templateDto);
+                addRiskAssociatedEntity(referenceId, isUnitId, questionnaireTemplate, templateDto);
                 break;
             default:
                 QuestionnaireTemplate previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(referenceId, templateDto.getTemplateType()) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(referenceId, templateDto.getTemplateType());
@@ -98,7 +98,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     }
 
 
-    private void addRiskAssociatedEntityTypeOnTemplateTypeStatusRiskSelection(Long referenceId, boolean isUnitId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateDTO templateDto) {
+    private void addRiskAssociatedEntity(Long referenceId, boolean isUnitId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateDTO templateDto) {
         QuestionnaireTemplate previousTemplate = null;
         if (QuestionnaireTemplateType.ASSET_TYPE.equals(templateDto.getRiskAssociatedEntity())) {
             if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
@@ -106,8 +106,8 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             }
             AssetType assetType = isUnitId ? assetTypeMongoRepository.findByIdAndUnitId(referenceId, templateDto.getAssetType()) : assetTypeMongoRepository.findByIdAndCountryId(referenceId, templateDto.getAssetType());
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
-                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(referenceId, templateDto.getAssetType())
-                        : questionnaireTemplateMongoRepository.findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeId(referenceId, templateDto.getAssetType());
+                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeId(referenceId, templateDto.getAssetType())
+                        : questionnaireTemplateMongoRepository.findRiskTemplateByCountryIdAndAssetTypeId(referenceId, templateDto.getAssetType());
 
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("message.duplicate.risk.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
@@ -118,8 +118,8 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
                     exceptionService.invalidRequestException("message.assetSubType.not.selected");
                 }
-                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType())
-                        : questionnaireTemplateMongoRepository.findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType());
+                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType())
+                        : questionnaireTemplateMongoRepository.findRiskTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
                 }
@@ -128,8 +128,8 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             }
 
         } else {
-            previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(referenceId)
-                    : questionnaireTemplateMongoRepository.findQuestionnaireTemplateOfTemplateTypeRiskAndAsssociatedEntityProcessingActivityByCountryId(referenceId);
+            previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(referenceId)
+                    : questionnaireTemplateMongoRepository.findRiskTemplateByAsssociatedProcessingActivityAndCountryId(referenceId);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
             }
@@ -141,7 +141,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     }
 
 
-    private void addAssetTypeAndSubAssetTypeToQuestionnaireTemplateOnTemplateTypeStatusAssetTypeSelection(Long referenceId, boolean isUnitId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateDTO templateDto) {
+    private void addAssetTypeAndSubAssetType(Long referenceId, boolean isUnitId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateDTO templateDto) {
 
         QuestionnaireTemplate previousTemplate = null;
         if (templateDto.isDefaultAssetTemplate()) {
@@ -165,7 +165,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
                     exceptionService.invalidRequestException("message.assetSubType.not.selected");
                 } else {
-                    previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType()) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByCountryId(referenceId, templateDto.getAssetType(), Collections.singletonList(templateDto.getAssetSubType()));
+                    previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType()) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByCountryId(referenceId, templateDto.getAssetType(), Collections.singletonList(templateDto.getAssetSubType()));
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
                     }
