@@ -111,10 +111,10 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             }
             AssetType assetType = isUnitId ? assetTypeMongoRepository.findByIdAndUnitId(referenceId, templateDto.getAssetType()) : assetTypeMongoRepository.findByIdAndCountryId(referenceId, templateDto.getAssetType());
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
-                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeId(referenceId, templateDto.getAssetType())
+                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(referenceId, templateDto.getAssetType())
                         : questionnaireTemplateMongoRepository.findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeId(referenceId, templateDto.getAssetType());
 
-                if (Optional.ofNullable(previousTemplate).isPresent()) {
+                if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("message.duplicate.risk.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
                 }
                 questionnaireTemplate.setAssetType(templateDto.getAssetType());
@@ -123,7 +123,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
                     exceptionService.invalidRequestException("message.assetSubType.not.selected");
                 }
-                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType())
+                previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType())
                         : questionnaireTemplateMongoRepository.findQuestionnaireTemplateOfTemplateTypeRiskByCountryIdAndAssetTypeIdAndSubAssetTypeId(referenceId, templateDto.getAssetType(), templateDto.getAssetSubType());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());

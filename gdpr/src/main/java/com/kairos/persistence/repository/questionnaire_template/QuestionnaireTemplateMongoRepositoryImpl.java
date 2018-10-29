@@ -239,12 +239,25 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId) {
-        return null;
+    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and(DELETED).is(false)
+                .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED)
+                .and("assetType").is(assetTypeId));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
 
     @Override
-    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
-        return null;
+    public QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and("templateType").is(QuestionnaireTemplateType.Risk)
+                .and("riskAssociatedEntity").is(QuestionnaireTemplateType.ASSET_TYPE)
+                .and(DELETED).is(false)
+                .and("templateStatus").is(QuestionnaireTemplateStatus.PUBLISHED)
+                .and("assetType").is(assetTypeId)
+                .and("assetSubType").is(assetSubTypeId));
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class);
     }
 }

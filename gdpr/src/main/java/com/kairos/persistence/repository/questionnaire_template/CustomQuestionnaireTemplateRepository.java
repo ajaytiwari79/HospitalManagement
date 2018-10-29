@@ -42,9 +42,9 @@ public interface CustomQuestionnaireTemplateRepository {
 
     QuestionnaireTemplate findPublishedQuestionnaireTemplateOfTemplateTypeRiskAndAssociatedEntityProcessingActivityByUnitId(Long unitId);
 
-    QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeId(Long unitId,BigInteger assetTypeId);
+    QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId);
 
-    QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByAndUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId,BigInteger assetTypeId,BigInteger assetSubTypeId);
+    QuestionnaireTemplate findPublishedTemplateOfTemplateTypeRiskByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId);
 
 
 }
