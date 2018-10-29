@@ -44,7 +44,12 @@ public class TimeInterval {
     }
 
     public boolean contains(int minutes){
-        return startFrom<minutes?minutes<endTo:false;
+        boolean contains = startFrom<minutes?minutes<endTo:false;
+        if(endTo<startFrom){
+            minutes = minutes+1440;
+            contains = startFrom<minutes?minutes<(endTo+1440):false;
+        }
+        return contains;
     }
 
     public TimeInterval overlap(TimeInterval timeInterval){

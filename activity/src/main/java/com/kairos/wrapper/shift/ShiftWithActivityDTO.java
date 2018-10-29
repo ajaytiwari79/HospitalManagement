@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /*
@@ -36,6 +37,7 @@ public class ShiftWithActivityDTO {
     private long accumulatedTimeBankInMinutes;
     private String remarks;
     private Long unitPositionId;
+    private BigInteger planningPeriodId;
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
@@ -46,6 +48,9 @@ public class ShiftWithActivityDTO {
     private List<ShiftActivityDTO> activities = new ArrayList<>();
     private List<ShiftStatus> status;
     private String timeType;
+    private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
+    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
     private BigInteger phaseId;
 
     //~ ===================================Constructors=======================================================
@@ -74,6 +79,36 @@ public class ShiftWithActivityDTO {
         this.activities = activities;
     }
 
+
+    public List<BigInteger> getActivitiesTimeTypeIds(){
+        if(activitiesTimeTypeIds.isEmpty()) {
+            activitiesTimeTypeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
+        }
+        return activitiesTimeTypeIds;
+    }
+
+    public List<BigInteger> getActivitiesPlannedTimeIds(){
+        if(activitiesPlannedTimeIds.isEmpty()) {
+            activitiesPlannedTimeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getPlannedTimeId()).collect(Collectors.toList());
+        }
+        return activitiesPlannedTimeIds;
+    }
+
+
+    public List<BigInteger> getActivitIds(){
+        if(activityIds.isEmpty()) {
+            activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList());
+        }
+        return activityIds;
+    }
+
+    public BigInteger getPlanningPeriodId() {
+        return planningPeriodId;
+    }
+
+    public void setPlanningPeriodId(BigInteger planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
+    }
     public BigInteger getPhaseId() {
         return phaseId;
     }
@@ -108,7 +143,7 @@ public class ShiftWithActivityDTO {
     }
 
     public int getMinutes() {
-        return ((int) (this.activities.get(0).getStartDate().getTime() - this.activities.get(activities.size() - 1).getEndDate().getTime()) / 60000);
+        return ((int) (this.activities.get(0).getEndDate().getTime() - this.activities.get(activities.size() - 1).getStartDate().getTime()) / 60000);
     }
 
     public int getScheduledMinutes() {
@@ -163,7 +198,7 @@ public class ShiftWithActivityDTO {
 
     public Date getActivitiesStartDate() {
         activities.sort((a1, a2) -> a1.getStartDate().compareTo(a2.getStartDate()));
-        return activities.get(activities.size() - 1).getEndDate();
+        return activities.get(0).getStartDate();
     }
 
     public void setEndDate(Date endDate) {

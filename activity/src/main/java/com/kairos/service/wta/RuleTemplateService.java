@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.WEEKS;
+
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -82,11 +84,8 @@ public class RuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.wtaruletemplate.alreadyexists");
         }
 
-        String week = "WEEK";
+        String weeks = WEEKS;
         String TUESDAY = "TUESDAY";
-        long timeInMins = 10;
-        long daysCount = 10;
-        LocalDate localDate = LocalDate.now();
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
         AgeRange range = new AgeRange(0, 0, 0);
 
@@ -109,7 +108,7 @@ public class RuleTemplateService extends MongoBaseService {
         ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",  "Maximum number of consecutive days");
         consecutiveWorking.setCountryId(countryDTO.getId());
         consecutiveWorking.setIntervalLength(12);
-        consecutiveWorking.setIntervalUnit(week);
+        consecutiveWorking.setIntervalUnit(weeks);
         consecutiveWorking.setPhaseTemplateValues(phaseTemplateValues);
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
@@ -122,19 +121,19 @@ public class RuleTemplateService extends MongoBaseService {
 
         NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval", false, "Maximum number of shifts per interval");
         numberOfPartOfDayShiftsWTATemplate.setIntervalLength(1);
-        numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(week);
+        numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(weeks);
         numberOfPartOfDayShiftsWTATemplate.setCountryId(countryDTO.getId());
         numberOfPartOfDayShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         numberOfPartOfDayShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(numberOfPartOfDayShiftsWTATemplate);
 
-        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period", false, "Minimum number of days off per period", 12, week);
+        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period", false, "Minimum number of days off per period", 12, weeks);
         daysOffInPeriodWTATemplate.setCountryId(countryDTO.getId());
         daysOffInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         daysOffInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffInPeriodWTATemplate);
 
-        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval", false, "Maximum average duration per week in an interval", 1, localDate, true, true, timeInMins, week);
+        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval", false, "Maximum average duration per week in an interval", 1,weeks);
         averageScheduledTimeWTATemplate.setCountryId(countryDTO.getId());
         averageScheduledTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -180,7 +179,7 @@ public class RuleTemplateService extends MongoBaseService {
         wtaBaseRuleTemplates1.add(restPeriodInAnIntervalWTATemplate);
 
 
-        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest", false, "Shortest and Average daily Rest", 1, week);
+        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest", false, "Shortest and Average daily Rest", 1, weeks);
         shortestAndAverageDailyRestWTATemplate.setCountryId(countryDTO.getId());
         shortestAndAverageDailyRestWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -215,7 +214,7 @@ public class RuleTemplateService extends MongoBaseService {
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
 
-        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence", false, "Minimum days off after a series of night shifts in sequence", 1, week, 1);
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence", false, "Minimum days off after a series of night shifts in sequence", 1, weeks, 1);
         daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         daysOffAfterASeriesWTATemplate.setCountryId(countryDTO.getId());
         daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

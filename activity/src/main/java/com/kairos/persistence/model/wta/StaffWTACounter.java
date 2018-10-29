@@ -17,16 +17,18 @@ public class StaffWTACounter extends MongoBaseEntity{
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger ruleTemplateId;
+    private String ruleTemplateName;
     private Long unitPositionId;
     private Long unitId;
     private int count;
     private boolean userHasStaffRole;
 
 
-    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId, Long unitPositionId, Long unitId, int count) {
+    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId,String ruleTemplateName, Long unitPositionId, Long unitId, int count) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.ruleTemplateId = ruleTemplateId;
+        this.ruleTemplateName = ruleTemplateName;
         this.unitPositionId = unitPositionId;
         this.unitId = unitId;
         this.count = count;
@@ -35,6 +37,14 @@ public class StaffWTACounter extends MongoBaseEntity{
     public StaffWTACounter() {
     }
 
+
+    public String getRuleTemplateName() {
+        return ruleTemplateName;
+    }
+
+    public void setRuleTemplateName(String ruleTemplateName) {
+        this.ruleTemplateName = ruleTemplateName;
+    }
 
     public boolean isUserHasStaffRole() {
         return userHasStaffRole;
