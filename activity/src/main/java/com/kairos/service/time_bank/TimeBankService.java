@@ -348,7 +348,7 @@ public class TimeBankService extends MongoBaseService {
      */
     public boolean updateTimeBank(Long unitPositionId,Date startDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId( staffAdditionalInfoDTO.getUnitPosition().getId(),startDate);
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate( staffAdditionalInfoDTO.getUnitPosition().getId(),startDate);
         if(ctaResponseDTO==null){
             exceptionService.dataNotFoundException("message.cta.notFound");
         }

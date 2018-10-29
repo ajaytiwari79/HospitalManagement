@@ -92,11 +92,19 @@ public class AssessmentController {
     }
 
 
-    @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")
+    @ApiOperation(value = "save answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
     public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody()));
     }
+
+
+    @ApiOperation(value = "save answer of assessment and change satatus to complete")
+    @PutMapping("/assessment/{assessmentId}/complete_save")
+    public ResponseEntity<Object> saveAssessmentAnswerAndChangeAssessmentStatusToComplete(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentAnswerAndChangeStatusToComplete(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody()));
+    }
+
 
 
     @ApiOperation(value = "Change Assessment status")

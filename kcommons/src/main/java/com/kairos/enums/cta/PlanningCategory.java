@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.cta;
+package com.kairos.enums.cta;
 
 public enum  PlanningCategory {
     DEVIATION_FROM_PLANNED("Deviation from Planned"),PLANNABLE("Plannable"),TASK_SPECIFIC("Task Specific");
