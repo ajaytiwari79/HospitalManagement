@@ -414,10 +414,10 @@ public class AssessmentService extends MongoBaseService {
         if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
             exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
         }
-        saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
         assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
         assessmentMongoRepository.save(assessment);
+        saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         return assessmentAnswerValueObjects;
 
     }
