@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.cta;
+package com.kairos.enums.cta;
 
 public enum ApprovalWorkFlow {
     NO_APPROVAL_NEEDED("No Approval Needed"),SELF_APPROVAL_ONE_DAY_AFTER("Self Approval 1 day after")

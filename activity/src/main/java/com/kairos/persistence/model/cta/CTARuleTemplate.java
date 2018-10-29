@@ -2,6 +2,7 @@ package com.kairos.persistence.model.cta;
 
 
 import com.kairos.dto.activity.cta.*;
+import com.kairos.enums.cta.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;

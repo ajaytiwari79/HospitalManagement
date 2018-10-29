@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.cta;
+package com.kairos.enums.cta;
 
 /**
  * Created by prerna on 20/2/18.

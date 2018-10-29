@@ -612,7 +612,8 @@ public class AggregatorService extends MongoBaseService {
         }
     }
 
-    @Scheduled(initialDelay = 100000, fixedDelay = 1000000)
+    //Todo Yatharth please move this to scheduler microservice
+    //@Scheduled(initialDelay = 100000, fixedDelay = 1000000)
     public void countCitizenTaskDemandsHoursAndTasks(){
 
         List<Long> organizations = schedulerRestClient.getAllOrganizationIds();

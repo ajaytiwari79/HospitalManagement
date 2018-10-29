@@ -8,7 +8,7 @@ import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.enums.FixedValueType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.enums.rest_client.RestClientUrlType;
+import com.kairos.enums.cta.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -31,7 +31,6 @@ import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.dto.activity.cta.CalculateValueType.FIXED_VALUE;
+import static com.kairos.enums.cta.CalculateValueType.FIXED_VALUE;
 import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 
