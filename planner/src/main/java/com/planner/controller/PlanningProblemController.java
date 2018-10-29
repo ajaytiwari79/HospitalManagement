@@ -34,7 +34,7 @@ public class PlanningProblemController {
     }
 
     @GetMapping
-    @ApiOperation("GetAll PlanningProblemration")
+    @ApiOperation("GetAll PlanningProblem")
     public ResponseEntity<Map<String, Object>> getAllPlanningProblem() {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,planningProblemService.getAllPlanningProblem());
     }
@@ -45,19 +45,24 @@ public class PlanningProblemController {
      * @return
      */
     @PatchMapping
-    
-    @ApiOperation("Update PlanningProblemration")
+    @ApiOperation("Update PlanningProblem")
     public ResponseEntity<Map<String, Object>> updatePlanningProblem(@RequestBody PlanningProblemDTO planningProblemDTO) {
         planningProblemService.updatePlanningProblem(planningProblemDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{planningProblemDTOId}")
-    @ApiOperation("Delete PlanningProblemration")
+    @ApiOperation("Delete PlanningProblem")
     public ResponseEntity<Map<String, Object>> deletePlanningProblem(@PathVariable String planningProblemDTOId) {
         planningProblemService.deletePlanningProblem(planningProblemDTOId);
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }
 
-    
+    //=====================================================================
+
+    @PostMapping("/create_default_planningProblem")
+    @ApiOperation("Create Default PlanningProblem")
+    public ResponseEntity<Map<String, Object>> createDefaultPlanningProblem() {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.CREATED,planningProblemService.createDefaultPlanningProblem());
+    }
 }

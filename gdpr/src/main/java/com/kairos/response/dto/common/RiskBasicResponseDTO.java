@@ -20,12 +20,12 @@ public class RiskBasicResponseDTO {
     private String name;
     @NotBlank(message = "Description can't be Empty")
     private String description;
-    @NotBlank(message = "Mention Risk Recommendation")
+    @NotBlank(message = "Mention RISK Recommendation")
     private String riskRecommendation;
     private LocalDate dueDate;
     private boolean isReminderActive;
     private int daysToReminderBefore;
-    @NotNull(message = "Risk Level can't be empty")
+    @NotNull(message = "RISK Level can't be empty")
     private RiskSeverity riskLevel;
     private Staff riskOwner;
 

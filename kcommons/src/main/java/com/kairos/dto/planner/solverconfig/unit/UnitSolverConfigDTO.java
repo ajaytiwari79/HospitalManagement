@@ -4,7 +4,7 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 
 public class UnitSolverConfigDTO extends SolverConfigDTO {
     private Long unitId;
-    private Long parentUnitSolverConfigId;
+    private Long parentCountrySolverConfigId;
 
     //~ Getter/Setter
     public Long getUnitId() {
@@ -15,11 +15,11 @@ public class UnitSolverConfigDTO extends SolverConfigDTO {
         this.unitId = unitId;
     }
 
-    public Long getParentUnitSolverConfigId() {
-        return parentUnitSolverConfigId;
+    public Long getParentCountrySolverConfigId() {
+        return parentCountrySolverConfigId;
     }
 
-    public void setParentUnitSolverConfigId(Long parentUnitSolverConfigId) {
-        this.parentUnitSolverConfigId = parentUnitSolverConfigId;
+    public void setParentCountrySolverConfigId(Long parentCountrySolverConfigId) {
+        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
     }
 }

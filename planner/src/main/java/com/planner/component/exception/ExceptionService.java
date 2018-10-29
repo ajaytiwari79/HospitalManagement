@@ -1,6 +1,7 @@
 package com.planner.component.exception;
 
 import com.planner.common.custum_exceptions.DataNotFoundByIdException;
+import com.planner.common.custum_exceptions.DataNotFoundByTypeException;
 import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
 import com.planner.common.custum_exceptions.RelationShipNotValidException;
 import com.planner.component.locale.LocaleService;
@@ -41,5 +42,9 @@ public class ExceptionService {
 
     public void relationShipNotValidException(String message, Object... params) {
         throw new RelationShipNotValidException(convertMessage(message, params));
+    }
+
+    public void dataNotFoundByTypeException(String message, Object... params) {
+        throw new DataNotFoundByTypeException(convertMessage(message, params));
     }
 }

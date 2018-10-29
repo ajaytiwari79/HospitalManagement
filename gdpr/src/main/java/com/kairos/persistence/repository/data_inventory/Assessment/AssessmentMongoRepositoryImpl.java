@@ -75,20 +75,52 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     @Override
     public Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId) {
 
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assetId").is(assetId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("assetId").is(assetId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(false));
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
     @Override
     public Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("processingActivityId").is(processingActivityId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(false));
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
 
     @Override
     public List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("questionnaireTemplateId").is(templateId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("questionnaireTemplateId").is(templateId)
+                .and("assessmentStatus").in(assessmentStatusList));
         return mongoTemplate.find(query, Assessment.class);
+    }
+
+
+    @Override
+    public Assessment findPreviousLaunchedAssessmentForAssetRisksByUnitId(Long unitId, BigInteger assetId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("assetId").is(assetId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(true));
+        return mongoTemplate.findOne(query, Assessment.class);
+    }
+
+    @Override
+    public Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("processingActivityId").is(processingActivityId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(true));
+        return mongoTemplate.findOne(query, Assessment.class);
     }
 }
