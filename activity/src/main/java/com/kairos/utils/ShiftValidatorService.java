@@ -4,6 +4,7 @@ package com.kairos.utils;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
@@ -380,9 +381,12 @@ public class ShiftValidatorService {
         return updatedShifts;
     }
 
-    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, List<Activity> activitieIds) {
+    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity,Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
+        LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
+        CutOffInterval cutOffInterval = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> interval.)
         shifts.forEach(s -> {
+            CollectionUtils.containsAny()
             for (ShiftActivityDTO shiftActivity : s.getActivities()) {
                 if ((dateTimeInterval.contains(s.getActivitiesStartDate()) || dateTimeInterval.contains(s.getActivitiesEndDate())) && activitieIds.contains(shiftActivity.getActivityId())) {
                     updatedShifts.add(s);

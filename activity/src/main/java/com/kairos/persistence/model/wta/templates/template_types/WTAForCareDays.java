@@ -45,8 +45,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
             for (ActivityCareDayCount careDayCount : careDayCounts) {
                 Activity activity = infoWrapper.getActivityWrapperMap().get(careDayCount.getActivityId()).getActivity();
-                DateTimeInterval dateTimeInterval = getIntervalByNumberOfWeeks(infoWrapper.getShift(),activity.getRulesActivityTab().getCutOffIntervalUnit(),activity.getRulesActivityTab().getCutOffStartFrom());
-                List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(Arrays.asList(infoWrapper.getShift(),infoWrapper.getShift()),null,null,Arrays.asList(careDayCount.getActivityId()));
+                List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity,Arrays.asList(infoWrapper.getShift(),infoWrapper.getShift()),Arrays.asList(careDayCount.getActivityId()));
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
                 if(limitAndCounter[0] < shifts.size()){
                     WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
