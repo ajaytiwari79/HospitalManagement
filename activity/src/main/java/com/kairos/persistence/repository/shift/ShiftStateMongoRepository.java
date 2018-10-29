@@ -29,6 +29,9 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
     @Query("{deleted:false,shiftId:?0,actualPhaseState:?1}")
     ShiftState findShiftStateByShiftIdAndActualPhase(BigInteger shiftId, String actualPhaseState);
 
+    @Query("{deleted:false,shiftId:{$in:?0},actualPhaseState:?1}")
+    List<ShiftState> findAllShiftStateByShiftIdAndActualPhase(List<BigInteger> shiftIds, String actualPhaseState);
+
     @Query(value = "{shiftId:?0}",delete = true)
     void deleteShiftStateByShiftId(BigInteger shiftId);
 

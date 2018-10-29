@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.shift;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -9,6 +10,7 @@ public class ShiftState extends Shift {
 
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
+    private AccessGroupRole accessGroupRole;
     private String actualPhaseState;
     private BigInteger attendanceSettingId;
 
@@ -42,5 +44,13 @@ public class ShiftState extends Shift {
 
     public void setAttendanceSettingId(BigInteger attendanceSettingId) {
         this.attendanceSettingId = attendanceSettingId;
+    }
+
+    public AccessGroupRole getAccessGroupRole() {
+        return accessGroupRole;
+    }
+
+    public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
+        this.accessGroupRole = accessGroupRole;
     }
 }

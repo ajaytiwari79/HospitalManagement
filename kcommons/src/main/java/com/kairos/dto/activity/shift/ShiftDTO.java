@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -58,6 +59,7 @@ public class ShiftDTO {
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
     private BigInteger shiftId;
+    private AccessGroupRole accessGroupRole;
     private boolean editable;
 
 
@@ -198,7 +200,13 @@ public class ShiftDTO {
         this.shiftDate = shiftDate;
     }
 
+    public AccessGroupRole getAccessGroupRole() {
+        return accessGroupRole;
+    }
 
+    public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
+        this.accessGroupRole = accessGroupRole;
+    }
 
     public List<ShiftActivity> sortShifts() {
         if (Optional.ofNullable(activities).isPresent()) {

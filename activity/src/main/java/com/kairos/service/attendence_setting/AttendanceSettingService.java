@@ -7,6 +7,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
@@ -142,7 +143,7 @@ public class AttendanceSettingService extends MongoBaseService {
                 return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
             }else {
                 if(shift!=null){
-                    shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration().get(0));
+                    shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1));
                     shiftMongoRepository.save(shift);
                 }
             }
@@ -243,34 +244,52 @@ public class AttendanceSettingService extends MongoBaseService {
         realtimeShiftState=shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shift.getId(),AppConstants.REALTIME);
         if(shift!=null&&checkIn) {
             if(realtimeShiftState==null) {
-                realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
-                realtimeShiftState.setId(null);
-                realtimeShiftState.setShiftId(shift.getId());
-                realtimeShiftState.setAttendanceSettingId(attendanceSetting.getId());
-                realtimeShiftState.setActualPhaseState(AppConstants.REALTIME);
-                shiftStateMongoRepository.save(realtimeShiftState);
-            }
-        } else{
-            attendanceSettingForTimeAndAttendance=attendanceSettingRepository.findByShiftId(shift.getId(),AppConstants.TIME_AND_ATTENDANCE);
-            if(attendanceSettingForTimeAndAttendance!=null) {
-                ObjectMapperUtils.copyPropertiesExceptSpecific(attendanceSetting,attendanceSettingForTimeAndAttendance,"id");
+                createRealTimeShiftState(realtimeShiftState,shift,attendanceSetting);
             }else{
-                attendanceSettingForTimeAndAttendance = attendanceSetting;
-                attendanceSettingForTimeAndAttendance.setId(null);
+                realtimeShiftState.setAttendanceDuration(shift.getAttendanceDuration());
             }
-            attendanceSettingForTimeAndAttendance.setShiftState(AppConstants.TIME_AND_ATTENDANCE);
+            shiftStateMongoRepository.save(realtimeShiftState);
+        } else{
+            attendanceSettingForTimeAndAttendance=attendanceSettingForTimeAndAttendance(attendanceSettingForTimeAndAttendance,attendanceSetting,shift);
             attendanceSettingRepository.save(attendanceSettingForTimeAndAttendance);
-            timeAndAttendanceShiftState=shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shift.getId(),AppConstants.TIME_AND_ATTENDANCE);
-            if(timeAndAttendanceShiftState!=null) {
-            ObjectMapperUtils.copyPropertiesExceptSpecific(realtimeShiftState,timeAndAttendanceShiftState,"id");
-            }else {
-                timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftState, ShiftState.class);
-                timeAndAttendanceShiftState.setId(null);
-            }
-            timeAndAttendanceShiftState.setAttendanceSettingId(attendanceSettingForTimeAndAttendance.getId());
-            timeAndAttendanceShiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
+            timeAndAttendanceShiftState=createTimeAndAttendanceShiftState(timeAndAttendanceShiftState,realtimeShiftState,shift,attendanceSettingForTimeAndAttendance);
             shiftStateMongoRepository.save(timeAndAttendanceShiftState);
         }
+    }
+
+    public ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,AttendanceSetting attendanceSetting){
+        realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
+        realtimeShiftState.setId(null);
+        realtimeShiftState.setShiftId(shift.getId());
+        realtimeShiftState.setAttendanceSettingId(attendanceSetting.getId());
+        realtimeShiftState.setActualPhaseState(AppConstants.REALTIME);
+        return realtimeShiftState;
+    }
+
+    public ShiftState createTimeAndAttendanceShiftState(ShiftState timeAndAttendanceShiftState,ShiftState realtimeShiftState,Shift shift,AttendanceSetting attendanceSettingForTimeAndAttendance){
+        timeAndAttendanceShiftState=shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shift.getId(),AppConstants.TIME_AND_ATTENDANCE);
+        if(timeAndAttendanceShiftState!=null) {
+            ObjectMapperUtils.copyPropertiesExceptSpecific(realtimeShiftState,timeAndAttendanceShiftState,"id");
+        }else {
+            timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftState, ShiftState.class);
+            timeAndAttendanceShiftState.setId(null);
+        }
+        timeAndAttendanceShiftState.setAttendanceSettingId(attendanceSettingForTimeAndAttendance.getId());
+        timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
+        timeAndAttendanceShiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
+        return timeAndAttendanceShiftState;
+    }
+
+    public AttendanceSetting attendanceSettingForTimeAndAttendance(AttendanceSetting attendanceSettingForTimeAndAttendance,AttendanceSetting attendanceSetting,Shift shift){
+        attendanceSettingForTimeAndAttendance=attendanceSettingRepository.findByShiftId(shift.getId(),AppConstants.TIME_AND_ATTENDANCE);
+        if(attendanceSettingForTimeAndAttendance!=null) {
+            ObjectMapperUtils.copyPropertiesExceptSpecific(attendanceSetting,attendanceSettingForTimeAndAttendance,"id");
+        }else{
+            attendanceSettingForTimeAndAttendance = attendanceSetting;
+            attendanceSettingForTimeAndAttendance.setId(null);
+        }
+        attendanceSettingForTimeAndAttendance.setShiftState(AppConstants.TIME_AND_ATTENDANCE);
+        return attendanceSettingForTimeAndAttendance;
     }
 
     public void checkOutBySchedulerJob(Long unitId){
