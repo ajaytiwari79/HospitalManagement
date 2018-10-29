@@ -15,6 +15,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -95,5 +96,14 @@ public class PlanningAppConfig {
         mappingJackson2HttpMessageConverter.setObjectMapper(serializingObjectMapper());
         mappingJackson2HttpMessageConverter.setPrettyPrint(true);
         return mappingJackson2HttpMessageConverter;
+    }
+    @Bean(name = "messageSource")
+    public ReloadableResourceBundleMessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageBundle = new ReloadableResourceBundleMessageSource();
+        messageBundle.setBasename("classpath:messages/messages");
+        messageBundle.setDefaultEncoding("UTF-8");
+        return messageBundle;
+
+
     }
 }
