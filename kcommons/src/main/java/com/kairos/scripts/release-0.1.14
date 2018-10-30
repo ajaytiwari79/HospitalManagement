@@ -2,8 +2,8 @@
 kairos ACTIVITY
 
 
-db.time_Type.update({"label" : "Unpaid break"},{$set:{"breakPaymentSetting":"UNPAID"}})
-db.time_Type.update({"label" : "Paid Break"},{$set:{"breakPaymentSetting":"PAID"}})
+db.time_Type.updateMany({"label" : "Unpaid break"},{$set:{"timeType":"UNPAID"}})
+db.time_Type.updateMany({"label" : "Paid Break"},{$set:{"timeType":"PAID"}})
 
 // To create Constraints on country level
 db.glideTimeSettings.createIndex( { "countryId": 1 }, { unique: true } )

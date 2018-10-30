@@ -791,7 +791,14 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
+        if (unitPosition.getEndDate()!=null && updateDTO.getEndDate()!=null && updateDTO.getEndDate().isBefore(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("end_date.from.end_date");
+        }
+        if (unitPosition.getEndDate()!=null && updateDTO.getStartDate().isAfter(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("start_date.from.end_date");
+        }
         updateDTO.setId(wtaId);
+        updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
         return unitPositionQueryResult;

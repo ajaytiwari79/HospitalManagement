@@ -253,6 +253,12 @@ public class CostTimeAgreementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
+        if (unitPosition.getEndDate()!=null && ctaDTO.getEndDate()!=null && ctaDTO.getEndDate().isBefore(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("end_date.from.end_date");
+        }
+        if (unitPosition.getEndDate()!=null && ctaDTO.getStartDate().isAfter(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("start_date.from.end_date");
+        }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
         if (unitPosition.isPublished()) {
@@ -297,7 +303,6 @@ public class CostTimeAgreementService extends MongoBaseService {
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
             responseCTA = new CTAResponseDTO(oldCTA.getId(), oldCTA.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, oldCTA.getStartDate(), oldCTA.getEndDate(), false,unitPositionId,oldCTA.getDescription(),ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionCode(), PositionCodeDTO.class));
-
         }
         unitPosition.setCostTimeAgreement(responseCTA);
         return unitPosition;
