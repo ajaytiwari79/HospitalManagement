@@ -47,6 +47,7 @@ public class UnitService{
         response.put("orgType",parentOrg.getOrganizationType());
         response.put("orgSubType",parentOrg.getOrganizationSubTypes());
         response.put("accountType",parentOrg.getAccountType());
+        response.put("accessGroups",accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
         response.put("businessTypes",parentOrg.getBusinessTypes());
         response.put("companyCategory",parentOrg.getCompanyCategory());
         response.put("level", parentOrg.getLevel());

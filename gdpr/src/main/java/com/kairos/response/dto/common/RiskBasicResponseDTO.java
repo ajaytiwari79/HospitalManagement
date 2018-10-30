@@ -16,16 +16,12 @@ import java.time.LocalDate;
 public class RiskBasicResponseDTO {
 
     private BigInteger id;
-    @NotBlank(message = "Name can't be Empty")
     private String name;
-    @NotBlank(message = "Description can't be Empty")
     private String description;
-    @NotBlank(message = "Mention RISK Recommendation")
     private String riskRecommendation;
     private LocalDate dueDate;
     private boolean isReminderActive;
     private int daysToReminderBefore;
-    @NotNull(message = "RISK Level can't be empty")
     private RiskSeverity riskLevel;
     private Staff riskOwner;
 

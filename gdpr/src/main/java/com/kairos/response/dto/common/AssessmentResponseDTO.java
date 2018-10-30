@@ -10,6 +10,7 @@ import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,6 +27,7 @@ public class AssessmentResponseDTO {
     private AssessmentStatus assessmentStatus;
     private AssetBasicResponseDTO asset;
     private ProcessingActivityBasicDTO processingActivity;
+    private List<RiskBasicResponseDTO> risks;
 
     public BigInteger getId() { return id; }
 
@@ -47,6 +49,10 @@ public class AssessmentResponseDTO {
 
 
     public void setComment(String comment) { this.comment = comment; }
+
+    public List<RiskBasicResponseDTO> getRisks() { return risks; }
+
+    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 
     public Staff getAssignee() { return assignee; }
 
