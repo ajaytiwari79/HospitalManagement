@@ -2,6 +2,7 @@ package com.kairos.dto.activity.time_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.TimeTypeEnum;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class TimeTypeDTO {
     private boolean selected;
     private List<TimeTypeDTO> children = new ArrayList<>();
     private String backgroundColor;
+    private TimeTypeEnum type;
 
     public TimeTypeDTO(String timeTypes) {
         this.timeTypes = timeTypes;
@@ -33,6 +35,14 @@ public class TimeTypeDTO {
     }
 
     public TimeTypeDTO() {
+    }
+
+    public TimeTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(TimeTypeEnum type) {
+        this.type = type;
     }
 
     public boolean isSelected() {

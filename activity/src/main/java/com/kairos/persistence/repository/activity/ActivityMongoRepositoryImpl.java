@@ -31,8 +31,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.kairos.enums.TimeTypes.PAID;
-import static com.kairos.enums.TimeTypes.UNPAID;
+
+import static com.kairos.enums.TimeTypeEnum.BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -536,6 +536,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
 
+    }
+
+    @Override
+    public List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds) {
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("isParentActivity").is(true).and("deleted").is(false))
+                ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                match(Criteria.where("state").nin("DRAFT").orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds),Criteria.where("timeType.type").is(BREAK))));
+        AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
+        return result.getMappedResults();
     }
 
 }
