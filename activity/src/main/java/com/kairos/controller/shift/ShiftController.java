@@ -90,8 +90,7 @@ public class ShiftController {
     @DeleteMapping(value = "/shift/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteShift(@PathVariable BigInteger shiftId) {
-        shiftService.deleteShift(shiftId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.deleteShift(shiftId));
     }
 
     @ApiOperation(value = "Get All Activities by unitId")

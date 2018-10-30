@@ -664,7 +664,8 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public void deleteShift(BigInteger shiftId) {
+    public ShiftDTO deleteShift(BigInteger shiftId) {
+        ShiftDTO shiftDTO=new ShiftDTO();
         Shift shift = shiftMongoRepository.findOne(shiftId);
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftId);
@@ -688,13 +689,14 @@ public class ShiftService extends MongoBaseService {
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         Long functionId = null;
-        if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions()) && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
+        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationBystaffId(shift.getStaffId(), DateUtils.getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(shift.getEndDate()));
+        if (shifts.size()==1 && CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions()) && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
                 && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
             functionId = genericIntegrationService.removeFunctionFromUnitPositionByDate(shift.getUnitId(), shift.getUnitPositionId(), shift.getStartDate());
+            shiftDTO.setFunctionDeleted(true);
+            shift.setFunctionId(functionId);
 
         }
-        shift.setFunctionId(functionId);
-
         shiftMongoRepository.save(shift);
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
@@ -705,6 +707,7 @@ public class ShiftService extends MongoBaseService {
                 false, null, isShiftForPreence, true, false, false));
         List<BigInteger> jobIds=shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         shiftReminderService.deleteReminderTrigger(jobIds,shift.getUnitId());
+        return shiftDTO;
 
     }
 
