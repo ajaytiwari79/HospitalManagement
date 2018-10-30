@@ -1,6 +1,7 @@
 package com.kairos;
 
 import com.kairos.service.fls_visitour.dynamic_change.FLSVisitourChangeService;
+import com.kairos.service.payroll_system.PayRollSystemService;
 import com.kairos.service.phase.PhaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     FLSVisitourChangeService flsVisitourChangeService;
     @Autowired
     private PhaseService phaseService;
+    @Inject
+    private PayRollSystemService payRollSystemService;
 
     /**
      * Executes on application ready event
@@ -37,6 +40,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
         flsVisitourChangeService.registerReceiver("visitourChange");
+        payRollSystemService.createDefaultPayRollSystemList();
 
     }
 }
