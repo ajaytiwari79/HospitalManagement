@@ -212,6 +212,10 @@ public class CompanyCreationService {
                 accessGroupService.createDefaultAccessGroups(organization, organization.getChildren());
             }
         }
+        setCompanyData(organization, orgDetails);
+    }
+
+    private void setCompanyData(Organization organization, OrganizationBasicDTO orgDetails) {
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
@@ -419,10 +423,6 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false, false);
-        }
-        //Assign Parent Organization's level to unit
 
         organizationGraphRepository.save(unit);
         organizationBasicDTO.setId(unit.getId());
@@ -433,6 +433,12 @@ public class CompanyCreationService {
         reasonCodeService.createDefalutDateForSubUnit(unit, parentOrganization.getId());
         accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
+        setCompanyData(unit, organizationBasicDTO);
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
+            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false, false);
+        }
+        //Assign Parent Organization's level to unit
+
         return organizationBasicDTO;
 
     }
@@ -453,6 +459,7 @@ public class CompanyCreationService {
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
         unit.setOrganizationSubTypes(organizationSubTypes);
         unit.setLevel(parentOrganization.getLevel());
+
 
     }
 
@@ -537,14 +544,12 @@ public class CompanyCreationService {
         return unitType;
     }
 
-    public QueryResult onBoardOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
+    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentId) throws InterruptedException, ExecutionException {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
         }
-        if (countryId == null) {
-            countryId = organization.getCountry().getId();
-        }
+
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
         //or parent has any missing required details
@@ -579,16 +584,23 @@ public class CompanyCreationService {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, organization.getCountry().getId());
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
+                countryId);
+        if (parentId == null) {
+            CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
+                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
+            CompletableFuture.allOf(hasUpdated).join();
 
-        CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
-        CompletableFuture.allOf(hasUpdated).join();
+            CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
+                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
+            CompletableFuture.allOf(createdInUnit).join();
 
-        CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
-        CompletableFuture.allOf(createdInUnit).join();
 
+        } else {
+            CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
+                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots);
+            CompletableFuture.allOf(createdInUnit).join();
+        }
         List<QueryResult> queryResults = new ArrayList<>();
 
         for (Organization childUnits : organization.getChildren()) {

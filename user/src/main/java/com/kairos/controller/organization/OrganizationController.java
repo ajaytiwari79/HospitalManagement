@@ -1456,11 +1456,11 @@ public class OrganizationController {
      *
      */
     @ApiOperation(value = "on board a unit ")
-    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/on_board")
+    @PostMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/on_boarding_done")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId) throws InterruptedException ,ExecutionException{
+    public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId,@RequestBody OrganizationBasicDTO organizationBasicDTO) throws InterruptedException ,ExecutionException{
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                unitService.onBoardOrganization(unitId));
+                unitService.onBoardOrganization(organizationBasicDTO,unitId));
     }
 
 

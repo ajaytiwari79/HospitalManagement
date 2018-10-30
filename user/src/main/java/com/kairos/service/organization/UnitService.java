@@ -2,7 +2,9 @@ package com.kairos.service.organization;
 
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.persistence.model.common.QueryResult;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
@@ -27,29 +29,41 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @Transactional
-public class UnitService{
-    @Inject private OrganizationGraphRepository organizationGraphRepository;
-    @Inject private OrganizationService organizationService;
-    @Inject private ExceptionService exceptionService;
-    @Inject private CountryGraphRepository countryGraphRepository;
-    @Inject private BusinessTypeGraphRepository businessTypeGraphRepository;
-    @Inject private ZipCodeGraphRepository zipCodeGraphRepository;
-    @Inject private OrganizationTypeGraphRepository organizationTypeGraphRepository;
-    @Inject private CompanyCategoryGraphRepository companyCategoryGraphRepository;
-    @Inject private AccessGroupService accessGroupService;
-    @Inject private AccountTypeGraphRepository accountTypeGraphRepository;
-    @Inject private UnitTypeGraphRepository unitTypeGraphRepository;
-    @Inject private  CompanyCreationService companyCreationService;
+public class UnitService {
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private BusinessTypeGraphRepository businessTypeGraphRepository;
+    @Inject
+    private ZipCodeGraphRepository zipCodeGraphRepository;
+    @Inject
+    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Inject
+    private CompanyCategoryGraphRepository companyCategoryGraphRepository;
+    @Inject
+    private AccessGroupService accessGroupService;
+    @Inject
+    private AccountTypeGraphRepository accountTypeGraphRepository;
+    @Inject
+    private UnitTypeGraphRepository unitTypeGraphRepository;
+    @Inject
+    private CompanyCreationService companyCreationService;
 
 
-    private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg){
+    private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {
         Map<String, Object> response = new HashMap<>(5);
-        response.put("orgType",parentOrg.getOrganizationType());
-        response.put("orgSubType",parentOrg.getOrganizationSubTypes());
-        response.put("accountType",parentOrg.getAccountType());
-        response.put("accessGroups",accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
-        response.put("businessTypes",parentOrg.getBusinessTypes());
-        response.put("companyCategory",parentOrg.getCompanyCategory());
+        response.put("orgType", parentOrg.getOrganizationType());
+        response.put("orgSubType", parentOrg.getOrganizationSubTypes());
+        response.put("accountType", parentOrg.getAccountType());
+        response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
+        response.put("businessTypes", parentOrg.getBusinessTypes());
+        response.put("companyCategory", parentOrg.getCompanyCategory());
         response.put("level", parentOrg.getLevel());
         return response;
     }
@@ -65,8 +79,8 @@ public class UnitService{
         Long countryId = organization.getCountry().getId();
 
         Map<String, Object> response = new HashMap<>(2);
-        response.put("parentInfo",parentOrgDefaultDetails(organization));
-        List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(unitId,null);
+        response.put("parentInfo", parentOrgDefaultDetails(organization));
+        List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(unitId, null);
         response.put("units", units.size() != 0 ? units : Collections.emptyList());
 
         List<Map<String, Object>> groups = organizationGraphRepository.getGroups(unitId);
@@ -88,9 +102,17 @@ public class UnitService{
         response.put("accessGroups", accessGroupService.getOrganizationAccessGroupsForUnitCreation(unitId));
         return response;
     }
-    public QueryResult onBoardOrganization(Long unitId)throws InterruptedException ,ExecutionException {
-        QueryResult organizationQueryResult=companyCreationService.onBoardOrganization(null,unitId);
-        return organizationQueryResult;
+
+    public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long unitId) throws InterruptedException, ExecutionException {
+        if (organizationBasicDTO.getId() == null) {
+            companyCreationService.addNewUnit(organizationBasicDTO, unitId);
+
+        }else {
+            companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
+        }
+        Country country = organizationGraphRepository.getCountry(unitId);
+        companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(),unitId);
+        return organizationBasicDTO;
 
     }
 

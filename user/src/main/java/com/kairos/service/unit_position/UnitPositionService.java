@@ -542,16 +542,19 @@ public class UnitPositionService {
             unitPosition.setEndDate(null);
         }else if(unitPositionDTO.getEndDate() != null && unitPosition.getEndDate() == null){
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
+            setEndDateToCTAWTA(unitPosition.getUnit().getId(),unitPosition.getId(),unitPositionDTO.getEndDate());
         }
         else if (unitPositionDTO.getEndDate() != null && unitPosition.getEndDate() != null && unitPosition.getEndDate().isBefore(unitPositionDTO.getEndDate())) {
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
+            setEndDateToCTAWTA(unitPosition.getUnit().getId(),unitPosition.getId(),unitPositionDTO.getEndDate());
         }
+
 
     }
     private void setEndDateToCTAWTA(Long unitId,Long unitPositionId,LocalDate endDate){
 
-
-        genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.UPDATE, APPLY_CTA_WTA_END_DATE, Collections.singletonList(new BasicNameValuePair("startDate", endDate + "")), null);
+        genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.UPDATE, APPLY_CTA_WTA_END_DATE,
+                Collections.singletonList(new BasicNameValuePair("endDate", endDate + "")), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
     }
 
     private void updateCurrentPositionLine(UnitPositionLine positionLine, UnitPositionDTO unitPositionDTO) {
