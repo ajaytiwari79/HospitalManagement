@@ -63,6 +63,7 @@ import java.math.BigInteger;
 import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,13 +108,12 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateGracePeriod(ShiftDTO shiftDTO,Boolean validatedByStaff, Long unitId,ShiftDTO staffShiftDTO) {
-        DateTimeInterval graceInterval=null;
+    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
+        DateTimeInterval graceInterval = null;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
-       }
-       else {
+        } else {
             if (staffShiftDTO.getValidated() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
@@ -125,13 +125,12 @@ public class ShiftValidatorService {
     }
 
     public DateTimeInterval getGracePeriodInterval(TimeAttendanceGracePeriod timeAttendanceGracePeriod, Date date, boolean forStaff) {
-
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = DateUtils.asZoneDateTime(date).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        ZonedDateTime endDate = null;
         if (forStaff) {
-            startDate = startDate.minusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
+            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
         } else {
-            startDate = startDate.minusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
+            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
         }
         return new DateTimeInterval(startDate, endDate);
     }
@@ -419,7 +418,7 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
         Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> (interval.getStartDate().isBefore(shiftStartLocalDate) && interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate))).findAny();
-        if(cutOffIntervalOptional.isPresent()){
+        if (cutOffIntervalOptional.isPresent()) {
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
                 LocalDate shiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
