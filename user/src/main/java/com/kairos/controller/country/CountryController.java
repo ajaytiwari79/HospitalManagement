@@ -1192,9 +1192,9 @@ public class CountryController {
     }
 
     @ApiOperation(value = "Map Selected Payroll Types to country ")
-    @PutMapping(value = COUNTRY_URL + "/mapPayRollsToCountry")
-    public ResponseEntity<Map<String, Object>> mapPayRollListToCountry(@PathVariable long countryId, @RequestBody Set<BigInteger> payRollTypeIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.mapPayRollListToCountry(countryId,payRollTypeIds));
+    @PutMapping(value = COUNTRY_URL + "/map_pay_rolls_country")
+    public ResponseEntity<Map<String, Object>> mappingPayRollListToCountry(@PathVariable long countryId, @RequestBody Set<BigInteger> payRollTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.mappingPayRollListToCountry(countryId,payRollTypeIds));
 
     }
 

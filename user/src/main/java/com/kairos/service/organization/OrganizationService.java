@@ -1493,9 +1493,9 @@ public class OrganizationService {
 
     }
 
-    public boolean mapPayRollListToUnit(long unitId, BigInteger payRollTypeId) {
+    public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
         Organization organization=organizationGraphRepository.findOne(unitId);
-        organization.setPayRollTypeId(payRollTypeId.longValue());
+        organization.setPayRollTypeId(payRollTypeId);
         organizationGraphRepository.save(organization);
         return true;
     }

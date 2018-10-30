@@ -38,6 +38,7 @@ import org.neo4j.ogm.annotation.typeconversion.DateString;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -220,7 +221,7 @@ public class Organization extends UserBaseEntity {
     private boolean boardingCompleted;
     private boolean workCenterUnit;
     private boolean gdprUnit;
-    private Long payRollTypeId;
+    private BigInteger payRollTypeId;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private AccountType accountType;
 
@@ -956,11 +957,11 @@ public class Organization extends UserBaseEntity {
         this.unitType = unitType;
     }
 
-    public Long getPayRollTypeId() {
+    public BigInteger getPayRollTypeId() {
         return payRollTypeId;
     }
 
-    public void setPayRollTypeId(Long payRollTypeId) {
+    public void setPayRollTypeId(BigInteger payRollTypeId) {
         this.payRollTypeId = payRollTypeId;
     }
 }

@@ -33,7 +33,7 @@ public class PayRollSystemService {
      */
     public void createDefaultPayRollSystemList() {
         List<PayRollSystem> payRollSystemList = payRollSystemRepository.findAll();
-        if (payRollSystemList.size() <= 0) {
+        if (payRollSystemList.isEmpty()) {
             payRollSystemList = new ArrayList<>();
             payRollSystemList.add(new PayRollSystem(100, PayRollType.INTERNAL_PAYROLL, "This payroll is an INTERNAL_PAYROLL"));
             payRollSystemList.add(new PayRollSystem(200, PayRollType.REMOTE_PAYROLL, "This payroll is an REMOTE_PAYROLL"));
@@ -47,7 +47,7 @@ public class PayRollSystemService {
     //============================================================
     public List<PayRollSystemDTO> getDefaultAvailablePayRolls() {
         List<PayRollSystem> payRollSystemList = payRollSystemRepository.findAll();
-        if (payRollSystemList.size() <= 0) {
+        if (payRollSystemList.isEmpty()) {
             exceptionService.dataNotFoundException("message.data.notFound","Defeault Payroll");
         }
         List<PayRollSystemDTO> payRollSystemDTOList=null;

@@ -18,6 +18,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -86,7 +87,7 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type= HAS_SYSTEM_LANGUAGE)
     private SystemLanguage systemLanguage;
-    private Set<Long> payRollTypeIds;
+    private Set<BigInteger> payRollTypeIds;
 
     public Country() {
     }
@@ -250,11 +251,11 @@ public class Country extends UserBaseEntity {
         this.systemLanguage = systemLanguage;
     }
 
-    public Set<Long> getPayRollTypeIds() {
+    public Set<BigInteger> getPayRollTypeIds() {
         return payRollTypeIds;
     }
 
-    public void setPayRollTypeIds(Set<Long> payRollTypeIds) {
+    public void setPayRollTypeIds(Set<BigInteger> payRollTypeIds) {
         this.payRollTypeIds = payRollTypeIds;
     }
 }

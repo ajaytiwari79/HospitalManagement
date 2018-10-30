@@ -561,13 +561,9 @@ public class CountryService {
     }
 
 
-    public boolean mapPayRollListToCountry(long countryId, Set<BigInteger> payRollTypeIds) {
+    public boolean mappingPayRollListToCountry(long countryId, Set<BigInteger> payRollTypeIds) {
         Country country=countryGraphRepository.findOne(countryId);
-        Set<Long> payRollTypeIdsSet=new HashSet<>();
-        for(BigInteger payRollTypeId:payRollTypeIds){
-            payRollTypeIdsSet.add(payRollTypeId.longValue());
-        }
-        country.setPayRollTypeIds(payRollTypeIdsSet);
+        country.setPayRollTypeIds(payRollTypeIds);
         countryGraphRepository.save(country);
         return true;
     }

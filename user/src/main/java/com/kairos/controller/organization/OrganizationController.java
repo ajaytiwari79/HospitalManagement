@@ -1453,9 +1453,9 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Map Selected Payroll Type to Unit ")
-    @PutMapping(value =PARENT_ORGANIZATION_URL+UNIT_URL + "/mapPayRollToUnit")
-    public ResponseEntity<Map<String, Object>> mapPayRollToUnit(@PathVariable long unitId, @RequestBody BigInteger payRollTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.mapPayRollListToUnit(unitId,payRollTypeId));
+    @PutMapping(value =PARENT_ORGANIZATION_URL+UNIT_URL + "/map_pay_roll_unit")
+    public ResponseEntity<Map<String, Object>> mappingPayRollToUnit(@PathVariable long unitId, @RequestBody BigInteger payRollTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.mappingPayRollToUnit(unitId,payRollTypeId));
 
     }
 
