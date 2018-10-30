@@ -23,6 +23,6 @@ public interface AttendanceSettingRepository extends MongoBaseRepository<Attenda
     @Query(value = "{deleted:false,shiftId:?0,shiftState:?1}")
     AttendanceSetting findByShiftId(BigInteger shiftId,String shiftState);
 
-    @Query(value = "{deleted:false,shiftId:?0,shiftState:?1}")
+    @Query(value = "{deleted:false,shiftId:{$in:?0},shiftState:?1}")
     List<AttendanceSetting> findAllByShiftIds(List<BigInteger> shiftIds,String shiftState);
 }
