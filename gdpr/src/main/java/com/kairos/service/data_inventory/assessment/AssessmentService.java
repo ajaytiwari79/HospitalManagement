@@ -2,9 +2,11 @@ package com.kairos.service.data_inventory.assessment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.assessment.AssessmentTypeRiskDTO;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
@@ -36,8 +38,10 @@ import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
+import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -104,6 +108,9 @@ public class AssessmentService extends MongoBaseService {
 
     @Inject
     private ObjectMapper objectMapper;
+
+    @Inject
+    private GenericRestClient genericRestClient;
 
 
     /**
@@ -191,7 +198,7 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssignee(), assessmentDTO.getApprover(), assessmentDTO.getComment());
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssigneeList(), assessmentDTO.getApprover(), assessmentDTO.getComment());
         assessment.setOrganizationId(unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
@@ -423,9 +430,12 @@ public class AssessmentService extends MongoBaseService {
     /**
      * @param unitId
      * @return
-     *///todo add argument for assignee as well
-    public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentOfAssignee(Long unitId, Long loggedInUserId) {
-        return assessmentMongoRepository.getAllLaunchedAssessmentAssignToRespondent(unitId, loggedInUserId);
+     *///todo add message here
+    public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentOfCurrentLoginUser(Long unitId) {
+
+        Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        });
+        return assessmentMongoRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId);
     }
 
 
@@ -449,7 +459,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentId
      * @return
      */
-    public List<AssessmentAnswerValueObject> addAssessmentAnswerForAssetOrProcessingActivityToAssessment(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects, AssessmentStatus status) {
+    public List<AssessmentAnswerValueObject> addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects, AssessmentStatus status) {
 
         Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {

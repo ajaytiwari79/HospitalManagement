@@ -137,7 +137,7 @@ public class MasterAssetService extends MongoBaseService {
      * @param assetDTO  -contain basic detail about asset ,name and description
      * @return
      */
-    public AssetDTO saveSuggestedAssetDataFromUnit(Long countryId, Long unitId, AssetDTO assetDTO) {
+    public AssetDTO saveSuggestedAssetFromUnit(Long countryId, Long unitId, AssetDTO assetDTO) {
         MasterAsset previousAsset = masterAssetMongoRepository.findByName(countryId, assetDTO.getName());
         if (Optional.ofNullable(previousAsset).isPresent()) {
             return null;

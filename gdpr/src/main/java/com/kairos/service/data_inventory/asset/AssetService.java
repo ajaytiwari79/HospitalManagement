@@ -16,7 +16,6 @@ import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.master_data.asset_management.MasterAssetService;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -296,7 +295,7 @@ public class AssetService extends MongoBaseService {
 
         Map<String, AssetDTO> result = new HashMap<>();
         assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
-        AssetDTO masterAsset = masterAssetService.saveSuggestedAssetDataFromUnit(countryId, unitId, assetDTO);
+        AssetDTO masterAsset = masterAssetService.saveSuggestedAssetFromUnit(countryId, unitId, assetDTO);
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
         return result;
