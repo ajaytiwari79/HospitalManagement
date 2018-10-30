@@ -262,7 +262,7 @@ public class AssessmentService extends MongoBaseService {
      */
     public List<QuestionnaireSectionResponseDTO> getAssessmentById(Long unitId, BigInteger assessmentId) {
 
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
@@ -373,7 +373,7 @@ public class AssessmentService extends MongoBaseService {
      * @return
      */
     public boolean updateAssessmentStatus(Long unitId, BigInteger assessmentId, AssessmentStatus assessmentStatus) {
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         switch (assessmentStatus) {
             case IN_PROGRESS:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
@@ -449,9 +449,9 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentId
      * @return
      */
-    public List<AssessmentAnswerValueObject> addAssessmentAnswerForAssetOrProcessingActivityToAssessment(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
+    public List<AssessmentAnswerValueObject> addAssessmentAnswerForAssetOrProcessingActivityToAssessment(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects, AssessmentStatus status) {
 
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         } else if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
@@ -460,25 +460,11 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
         }
         assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
-        assessmentMongoRepository.save(assessment);
-        return assessmentAnswerValueObjects;
-
-    }
-
-
-    public List<AssessmentAnswerValueObject> saveAssessmentAnswerAndChangeStatusToComplete(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
-
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
-        if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
+        if (Optional.ofNullable(status).isPresent() && AssessmentStatus.COMPLETED.equals(status)) {
+            assessment.setAssessmentStatus(status);
+            saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         }
-        if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
-            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
-        }
-        assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
-        assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
         assessmentMongoRepository.save(assessment);
-        saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         return assessmentAnswerValueObjects;
 
     }
