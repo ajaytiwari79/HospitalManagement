@@ -63,3 +63,6 @@ NEO
 MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
 set r.amountEditableAtUnit=FALSE
 
+MATCH(slf:SeniorityLevelFunction)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function:Function)
+set rel.amountEditableAtUnit=false;
+

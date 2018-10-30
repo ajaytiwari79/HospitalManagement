@@ -548,6 +548,11 @@ public class UnitPositionService {
         }
 
     }
+    private void setEndDateToCTAWTA(Long unitId,Long unitPositionId,LocalDate endDate){
+
+
+        genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.UPDATE, APPLY_CTA_WTA_END_DATE, Collections.singletonList(new BasicNameValuePair("startDate", endDate + "")), null);
+    }
 
     private void updateCurrentPositionLine(UnitPositionLine positionLine, UnitPositionDTO unitPositionDTO) {
         positionLine.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());

@@ -238,8 +238,9 @@ public class CompanyCreationService {
 
     // tab 1 in FE
     public OrganizationBasicResponse getOrganizationDetailsById(Long unitId) {
-        return organizationGraphRepository.getOrganizationDetailsById(unitId);
-
+        OrganizationBasicResponse organization = organizationGraphRepository.getOrganizationDetailsById(unitId);
+        organization.setUnitManager(getUnitManagerOfOrganization(unitId));
+        return organization;
     }
 
     public AddressDTO setAddressInCompany(Long unitId, AddressDTO addressDTO) {
@@ -270,7 +271,7 @@ public class CompanyCreationService {
         return orgBasicData;
     }
 
-    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted, boolean parentOrganization,boolean union) {
+    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted, boolean parentOrganization, boolean union) {
         if (organization == null) {
             organization = organizationGraphRepository.findOne(unitId);
             boardingCompleted = organization.isBoardingCompleted();
@@ -315,7 +316,7 @@ public class CompanyCreationService {
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
-                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(),union);
+                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                 }
             } else {
                 // No user is found its first time so we need to validate email and CPR number
@@ -330,7 +331,7 @@ public class CompanyCreationService {
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
-                staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization,union);
+                staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
 
             }
         }
@@ -347,7 +348,7 @@ public class CompanyCreationService {
         user.setGender(CPRUtil.getGenderFromCPRNumber(unitManagerDTO.getCprNumber()));
     }
 
-
+    // 3Rd tab in FE
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
     }
@@ -419,7 +420,7 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false,false);
+            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false, false);
         }
         //Assign Parent Organization's level to unit
 
@@ -429,7 +430,7 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createDefalutDateForSubUnit(unit,parentOrganization.getId());
+        reasonCodeService.createDefalutDateForSubUnit(unit, parentOrganization.getId());
         accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
@@ -464,7 +465,7 @@ public class CompanyCreationService {
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO, null);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false,false);
+            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false, false);
         }
         organizationGraphRepository.save(unit);
         return organizationBasicDTO;
@@ -541,8 +542,8 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
         }
-        if (countryId==null){
-            countryId=organization.getCountry().getId();
+        if (countryId == null) {
+            countryId = organization.getCountry().getId();
         }
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
@@ -581,7 +582,7 @@ public class CompanyCreationService {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, organization.getCountry().getId());
 
         CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO,countryId);
+                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
@@ -590,12 +591,12 @@ public class CompanyCreationService {
 
         List<QueryResult> queryResults = new ArrayList<>();
 
-        for(Organization childUnits : organization.getChildren()) {
-            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits,QueryResult.class);
+        for (Organization childUnits : organization.getChildren()) {
+            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
             queryResults.add(childUnit);
         }
 
-        QueryResult organizationQueryResult= ObjectMapperUtils.copyPropertiesByMapper(organization,QueryResult.class);
+        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         queryResults.add(organizationQueryResult);
 
         return treeStructureService.getTreeStructure(queryResults);
