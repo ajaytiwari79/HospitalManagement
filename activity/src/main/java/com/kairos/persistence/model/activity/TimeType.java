@@ -24,6 +24,7 @@ public class TimeType extends MongoBaseEntity{
     private String backgroundColor;
     private BreakPaymentSetting breakPaymentSetting;
     private TimeTypeEnum type;
+
     public TimeType() {}
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
@@ -106,10 +107,6 @@ public class TimeType extends MongoBaseEntity{
 
     public void setBackgroundColor(String backgroundColor) {
         this.backgroundColor = backgroundColor;
-    }
-
-    public BreakPaymentSetting getBreakPaymentSetting() {
-        return breakPaymentSetting;
     }
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {

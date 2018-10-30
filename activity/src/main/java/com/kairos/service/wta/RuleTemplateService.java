@@ -13,6 +13,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
@@ -37,10 +38,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.WEEKS;
 
@@ -230,6 +228,18 @@ public class RuleTemplateService extends MongoBaseService {
         employeesWithIncreasedRiskWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         employeesWithIncreasedRiskWTATemplate.setCountryId(countryDTO.getId());
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+
+
+        Set<BreakAvailabilitySettings> breakAvailabilitySettings=new HashSet<>();
+        BreakAvailabilitySettings breakAvailabilitySettingsForDay=new BreakAvailabilitySettings(PartOfDay.DAY,(short)60,(short)120);
+        BreakAvailabilitySettings breakAvailabilitySettingsForEvening=new BreakAvailabilitySettings(PartOfDay.EVENING,(short)90,(short)60);
+        BreakAvailabilitySettings breakAvailabilitySettingsForNight=new BreakAvailabilitySettings(PartOfDay.NIGHT,(short)90,(short)60);
+        breakAvailabilitySettings.add(breakAvailabilitySettingsForDay);
+        breakAvailabilitySettings.add(breakAvailabilitySettingsForEvening);
+        breakAvailabilitySettings.add(breakAvailabilitySettingsForNight);
+
+        BreakWTATemplate breakWTATemplate=new BreakWTATemplate("WTA for breaks in shift","WTA for breaks in shift",(short)30,breakAvailabilitySettings);
+        wtaBaseRuleTemplates1.add(breakWTATemplate);
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
         WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");
