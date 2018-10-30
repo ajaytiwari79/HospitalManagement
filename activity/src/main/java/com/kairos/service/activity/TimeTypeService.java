@@ -318,8 +318,6 @@ public class TimeTypeService extends MongoBaseService {
         workingTimeTypes.add(absenceTimeType);
         workingTimeTypes.add(breakTimeType);
 
-
-
         List<TimeType> nonWorkingTimeTypes=new ArrayList<>();
         TimeType volunteerTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "volunteer time", "", "",null,countryId);
         TimeType timeBankOffTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "timebank off time", "", "",null,countryId);
@@ -332,10 +330,6 @@ public class TimeTypeService extends MongoBaseService {
         TimeType vetoTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", "",null,countryId);
         TimeType stopBrickTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", "",null,countryId);
         TimeType availableTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "available time", "", "",null,countryId);
-
-
-
-
 
         nonWorkingTimeTypes.add(volunteerTimeType);
         nonWorkingTimeTypes.add(timeBankOffTimeType);
@@ -353,9 +347,6 @@ public class TimeTypeService extends MongoBaseService {
         allTimeTypes.addAll(nonWorkingTimeTypes);
 
         save(allTimeTypes);
-
-
-
 
         return true;
     }
