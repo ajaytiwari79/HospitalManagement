@@ -1495,8 +1495,13 @@ public class OrganizationService {
 
     public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
         Organization organization=organizationGraphRepository.findOne(unitId);
-        organization.setPayRollTypeId(payRollTypeId);
-        organizationGraphRepository.save(organization);
+        if(organization!=null && !organization.isDeleted()){
+            organization.setPayRollTypeId(payRollTypeId);
+            organizationGraphRepository.save(organization);
+        }
+        else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","Organization",unitId);
+        }
         return true;
     }
 }

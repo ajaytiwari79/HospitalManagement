@@ -563,8 +563,13 @@ public class CountryService {
 
     public boolean mappingPayRollListToCountry(long countryId, Set<BigInteger> payRollTypeIds) {
         Country country=countryGraphRepository.findOne(countryId);
-        country.setPayRollTypeIds(payRollTypeIds);
-        countryGraphRepository.save(country);
+        if(country!=null && !country.isDeleted()) {
+            country.setPayRollTypeIds(payRollTypeIds);
+            countryGraphRepository.save(country);
+        }
+        else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","Country",countryId);
+        }
         return true;
     }
 }
