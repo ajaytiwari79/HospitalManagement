@@ -135,6 +135,7 @@ public class ShiftWithActivityDTO {
     }
 
     public void setActivities(List<ShiftActivityDTO> activities) {
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
 

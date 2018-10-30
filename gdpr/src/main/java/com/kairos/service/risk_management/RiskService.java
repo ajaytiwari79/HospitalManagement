@@ -32,11 +32,11 @@ public class RiskService extends MongoBaseService {
 
 
     /**
-     * @param <E>                  E here represent List of Risk DTO which extends Basic Risk DTO   {basic risk DTO is used at countryLevel and Organization Risk DTO used at organization level}
+     * @param <E>                  E here represent List of RISK DTO which extends Basic RISK DTO   {basic risk DTO is used at countryLevel and Organization RISK DTO used at organization level}
      * @param countryIdOrUnitId
-     * @param risksRelatedToObject Map contain  Object of { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and Risk Corresponding Risk dto list to them
+     * @param risksRelatedToObject Map contain  Object of { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and RISK Corresponding RISK dto list to them
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
-     * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of Risk Ids generated after save operation
+     * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of RISK Ids generated after save operation
      */
     public <T extends MongoBaseEntity, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long countryIdOrUnitId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
 
@@ -97,7 +97,7 @@ public class RiskService extends MongoBaseService {
 
     /**
      * @param countryId countryId
-     * @param riskDTOS  list of Risk Dto
+     * @param riskDTOS  list of RISK Dto
      * @return
      */
     private <E extends BasicRiskDTO> List<Risk> buildRiskAtCountryLevel(Long countryId, List<E> riskDTOS) {
@@ -116,7 +116,7 @@ public class RiskService extends MongoBaseService {
 
     /**
      * @param unitId   - organizationId
-     * @param riskDTOS list of Risk Dto
+     * @param riskDTOS list of RISK Dto
      * @return
      */
     private <E extends BasicRiskDTO> List<Risk> buildRiskAtOrganizationLevel(Long unitId, List<E> riskDTOS) {
@@ -141,7 +141,7 @@ public class RiskService extends MongoBaseService {
         List<String> riskNames = new ArrayList<>();
         for (E riskDTO : riskDTOS) {
             if (riskNames.contains(riskDTO.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "Risk", riskDTO.getName());
+                exceptionService.duplicateDataException("message.duplicate", "RISK", riskDTO.getName());
             }
             riskNames.add(riskDTO.getName().toLowerCase());
         }

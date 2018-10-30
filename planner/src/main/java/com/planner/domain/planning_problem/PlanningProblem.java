@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class PlanningProblem extends MongoBaseEntity{
     private String name;
     private String description;
+    private String type;
 
     public String getName() {
         return name;
@@ -22,5 +23,13 @@ public class PlanningProblem extends MongoBaseEntity{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

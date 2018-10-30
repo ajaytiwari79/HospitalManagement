@@ -21,7 +21,7 @@ public class TimeType extends MongoBaseEntity{
     private String description;
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
-    private BreakPaymentSetting breakPaymentSetting;
+
     public TimeType() {}
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
@@ -104,11 +104,5 @@ public class TimeType extends MongoBaseEntity{
         this.backgroundColor = backgroundColor;
     }
 
-    public BreakPaymentSetting getBreakPaymentSetting() {
-        return breakPaymentSetting;
-    }
 
-    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-        this.breakPaymentSetting = breakPaymentSetting;
-    }
 }

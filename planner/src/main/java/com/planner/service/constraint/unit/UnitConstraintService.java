@@ -46,7 +46,7 @@ public class UnitConstraintService {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
         if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
-            unitConstraint.setParentUnitConstraintId(unitConstraintDTO.getId());
+            unitConstraint.setParentConstraintId(unitConstraintDTO.getId());
             unitConstraint.setId(null);//Unset Id
             constraintsRepository.saveObject(unitConstraint);
             unitConstraintDTO.setId(unitConstraint.getId());

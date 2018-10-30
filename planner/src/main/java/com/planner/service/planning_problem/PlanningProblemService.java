@@ -15,17 +15,18 @@ public class PlanningProblemService {
     @Inject
     private PlanningProblemRepository planningProblemRepository;
 
+    //=====================================================================
+
     /**
-     *
      * @param planningProblemDTO
      */
     public void createPlanningProblem(PlanningProblemDTO planningProblemDTO) {
         PlanningProblem planningProblem = ObjectMapperUtils.copyPropertiesByMapper(planningProblemDTO, PlanningProblem.class);
         planningProblemRepository.saveObject(planningProblem);
     }
+    //=====================================================================
 
     /**
-     *
      * @param planningProblemDTOId
      * @return
      */
@@ -37,18 +38,18 @@ public class PlanningProblemService {
         }
         return planningProblemDTO;
     }
+    //====================================================================
 
     /**
-     *
      * @return
      */
     public List<PlanningProblemDTO> getAllPlanningProblem() {
         List<PlanningProblem> planningProblems = planningProblemRepository.findAll();
         return ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblems, PlanningProblemDTO.class);
     }
+    //===================================================================
 
     /**
-     *
      * @param planningProblemDTO
      */
     public void updatePlanningProblem(PlanningProblemDTO planningProblemDTO) {
@@ -60,9 +61,9 @@ public class PlanningProblemService {
         }
 
     }
+    //=================================================================================
 
     /**
-     *
      * @param planningProblemDTOId
      */
     public void deletePlanningProblem(String planningProblemDTOId) {
@@ -73,5 +74,17 @@ public class PlanningProblemService {
             planningProblem.setDeleted(true);
             planningProblemRepository.saveObject(planningProblem);
         }
+    }
+
+
+    //=================================================================================
+    public PlanningProblemDTO createDefaultPlanningProblem() {
+        PlanningProblem defaultPlanningProblem = new PlanningProblem();
+        defaultPlanningProblem.setName("ShiftPlanning");
+        defaultPlanningProblem.setDescription("This is for ShiftPlanning");
+        defaultPlanningProblem.setType("shiftPlanning");
+        planningProblemRepository.saveObject(defaultPlanningProblem);
+        PlanningProblemDTO planningProblemDTO = ObjectMapperUtils.copyPropertiesByMapper(defaultPlanningProblem, PlanningProblemDTO.class);
+        return planningProblemDTO;
     }
 }

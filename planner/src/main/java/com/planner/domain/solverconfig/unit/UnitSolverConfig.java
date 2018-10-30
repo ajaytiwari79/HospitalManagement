@@ -8,16 +8,9 @@ import java.math.BigInteger;
 public class UnitSolverConfig extends SolverConfig{
 
     private Long unitId;
-    private BigInteger parentUnitSolverConfigId;//copiedFrom
+    private BigInteger parentCountrySolverConfigId;//copiedFrom
 
     //~ Getter/Setter
-    public BigInteger getParentUnitSolverConfigId() {
-        return parentUnitSolverConfigId;
-    }
-
-    public void setParentUnitSolverConfigId(BigInteger parentUnitSolverConfigId) {
-        this.parentUnitSolverConfigId = parentUnitSolverConfigId;
-    }
 
     public Long getUnitId() {
         return unitId;
@@ -25,5 +18,13 @@ public class UnitSolverConfig extends SolverConfig{
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public BigInteger getParentCountrySolverConfigId() {
+        return parentCountrySolverConfigId;
+    }
+
+    public void setParentCountrySolverConfigId(BigInteger parentCountrySolverConfigId) {
+        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
     }
 }
