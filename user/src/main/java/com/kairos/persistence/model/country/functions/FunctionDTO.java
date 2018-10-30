@@ -6,6 +6,8 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +25,8 @@ public class FunctionDTO {
     private Date startDate;
     @DateLong
     private Date endDate;
+    private boolean amountEditableAtUnit;
+    private BigDecimal amount;
     private List<Organization> unions;
     private List<Level> organizationLevels;
     private String icon;
@@ -106,5 +110,21 @@ public class FunctionDTO {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public boolean isAmountEditableAtUnit() {
+        return amountEditableAtUnit;
+    }
+
+    public void setAmountEditableAtUnit(boolean amountEditableAtUnit) {
+        this.amountEditableAtUnit = amountEditableAtUnit;
     }
 }

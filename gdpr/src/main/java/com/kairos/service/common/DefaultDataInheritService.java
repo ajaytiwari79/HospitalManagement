@@ -247,7 +247,7 @@ public class DefaultDataInheritService extends MongoBaseService {
                 Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
                 asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
-                asset.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
+                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
                 if (CollectionUtils.isNotEmpty(masterAssetDTO.assetSubTypes)) {
                     List<BigInteger> subAssetTypeIds = new ArrayList<>();
                     masterAssetDTO.assetSubTypes.forEach(subAssetType -> subAssetTypeIds.add(globalAssetTypeAndSubAssetTypeMap.get(subAssetType.getName().toLowerCase().trim())));
@@ -414,9 +414,9 @@ public class DefaultDataInheritService extends MongoBaseService {
                 if (questionnaireTemplateDTO.isDefaultAssetTemplate()) {
                     questionnaireTemplate.setDefaultAssetTemplate(true);
                 } else {
-                    questionnaireTemplate.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetType().getName().trim().toLowerCase()));
+                    questionnaireTemplate.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetType().getName().trim().toLowerCase()));
                     if (Optional.ofNullable(questionnaireTemplateDTO.getAssetSubType()).isPresent()) {
-                        questionnaireTemplate.setAssetSubType(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetSubType().getName().toLowerCase().trim()));
+                        questionnaireTemplate.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetSubType().getName().toLowerCase().trim()));
                     }
                 }
                 break;

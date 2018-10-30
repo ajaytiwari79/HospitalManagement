@@ -31,7 +31,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " with functionalPaymentMatrix ,collect (id(pga)) as payGroupAreaIds \n" +
             " match(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)" +
             " match(seniorityLevel:SeniorityLevel)<-[:" + FOR_SENIORITY_LEVEL + "]- (seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) " +
-            " with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, collect({functionId:id(function), amount:function_amt.amount}) as functions\n" +
+            " with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, collect({functionId:id(function),amountEditableAtUnit:function_amt.amountEditableAtUnit, amount:function_amt.amount}) as functions\n" +
             " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction")
     List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrix(Long functionalPaymentId);
 
@@ -61,4 +61,15 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "match(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +
             "merge (child)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn)")
     void linkFunctionalPaymentInExpertise(Long expertiseId, Long newExpertiseId);
+
+    @Query("MATCH(expertise:Expertise)<-[:"+APPLICABLE_FOR_EXPERTISE+"]-(funPayment:FunctionalPayment)  where id(expertise)={0}\n" +
+            "MATCH(funPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)\n" +
+            "MATCH(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={1}\n" +
+            "MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(:SeniorityLevelFunction)-[oldRel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function)\n" +
+            "with seniorityLevel,fpm,oldRel,collect(function) as functions\n" +
+            "FOREACH (currentFunction IN (functions)| \n" +
+            " CREATE UNIQUE (seniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(newSL:SeniorityLevelFunction{deleted:false})\n" +
+            " CREATE UNIQUE (fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(newSL)\n" +
+            " CREATE UNIQUE(newSL)-[:"+HAS_FUNCTIONAL_AMOUNT+"{amount:0,amountEditableAtUnit:oldRel.amountEditableAtUnit}]->(currentFunction))")
+    void linkWithFunctionPayment(Long expertiseId,Long seniorityLevelId);
 }

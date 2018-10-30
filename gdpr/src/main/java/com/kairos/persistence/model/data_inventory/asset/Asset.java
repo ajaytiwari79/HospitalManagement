@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.data_inventory.asset;
 
 
-import com.kairos.enums.RiskSeverity;
 import com.kairos.enums.gdpr.AssetAssessor;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
@@ -28,11 +27,11 @@ public class Asset extends MongoBaseEntity {
     private List<BigInteger> storageFormats;
     private List<BigInteger> orgSecurityMeasures;
     private List<BigInteger> technicalSecurityMeasures;
-    private BigInteger hostingProvider;
-    private BigInteger hostingType;
-    private BigInteger dataDisposal;
-    private BigInteger assetType;
-    private List<BigInteger> assetSubTypes;
+    private BigInteger hostingProviderId;
+    private BigInteger hostingTypeId;
+    private BigInteger dataDisposalId;
+    private BigInteger assetTypeId;
+    private BigInteger assetSubTypeId;
     private Set<BigInteger> processingActivities;
     private Set<BigInteger> subProcessingActivities;
     private Integer dataRetentionPeriod;
@@ -45,12 +44,12 @@ public class Asset extends MongoBaseEntity {
     public Asset() {
     }
 
-    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner) {
+    public Asset(String name, String description, String hostingLocation, BigInteger assetTypeId, BigInteger assetSubTypeId, ManagingOrganization managingDepartment, Staff assetOwner) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
-        this.assetType = assetType;
-        this.assetSubTypes=assetSubTypes;
+        this.assetTypeId = assetTypeId;
+        this.assetSubTypeId=assetSubTypeId;
         this.assetOwner=assetOwner;
         this.managingDepartment=managingDepartment;
     }
@@ -113,17 +112,6 @@ public class Asset extends MongoBaseEntity {
 
     public void setTechnicalSecurityMeasures(List<BigInteger> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
 
-    public BigInteger getHostingProvider() { return hostingProvider; }
-
-    public void setHostingProvider(BigInteger hostingProvider) { this.hostingProvider = hostingProvider; }
-
-    public BigInteger getHostingType() { return hostingType; }
-
-    public void setHostingType(BigInteger hostingType) { this.hostingType = hostingType; }
-
-    public BigInteger getAssetType() { return assetType; }
-
-    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
@@ -140,15 +128,25 @@ public class Asset extends MongoBaseEntity {
 
     public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
 
-    public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
+    public BigInteger getHostingProviderId() { return hostingProviderId; }
 
-    public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
+    public void setHostingProviderId(BigInteger hostingProviderId) { this.hostingProviderId = hostingProviderId; }
 
-    public BigInteger getDataDisposal() { return dataDisposal; }
+    public BigInteger getHostingTypeId() { return hostingTypeId; }
 
-    public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
+    public void setHostingTypeId(BigInteger hostingTypeId) { this.hostingTypeId = hostingTypeId; }
 
+    public BigInteger getDataDisposalId() { return dataDisposalId; }
 
+    public void setDataDisposalId(BigInteger dataDisposalId) { this.dataDisposalId = dataDisposalId; }
+
+    public BigInteger getAssetTypeId() { return assetTypeId; }
+
+    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
+
+    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
+
+    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
 }
 
 

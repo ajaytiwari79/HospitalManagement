@@ -298,7 +298,8 @@ public class AttendanceSettingService extends MongoBaseService {
     public void checkOutBySchedulerJob(Long unitId){
         List<Shift> saveShifts=new ArrayList<>();
         List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getCurrentLocalDate()));
-            List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
+
+        List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(attendanceSettings.stream().map(attendanceSetting -> attendanceSetting.getShiftId()).collect(Collectors.toList()));
           Map<BigInteger,Shift> staffIdAndShifts=shifts.stream().collect(Collectors.toMap(k->k.getId(), v->v));
         attendanceSettings.forEach(attendanceSetting -> {
             if(staffIdAndShifts.get(attendanceSetting.getShiftId())!=null)

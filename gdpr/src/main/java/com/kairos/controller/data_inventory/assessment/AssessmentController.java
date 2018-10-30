@@ -1,9 +1,13 @@
 package com.kairos.controller.data_inventory.assessment;
 
 
+import com.kairos.dto.gdpr.assessment.AssessmentTypeRiskDTO;
+import com.kairos.dto.response.ResponseDTO;
 import com.kairos.enums.gdpr.AssessmentStatus;
-import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
+import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
+import com.kairos.response.dto.common.AssessmentResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -33,26 +37,39 @@ public class AssessmentController {
     private AssessmentService assessmentService;
 
 
-    @ApiOperation(value = "Add assessment to Asset")
+    @ApiOperation(value = "launch assessment for Asset")
     @PostMapping( "/assessment/asset/{assetId}")
-    public ResponseEntity<Object> addAssessmentToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForAsset(unitId,  assetId, assessmentDTO));
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.saveAssessmentForAsset(unitId,  assetId, assessmentDTO));
 
     }
 
 
-    @ApiOperation(value = "Add assessment to Processing Activity")
+    @ApiOperation(value = "launch assessment for processing activity")
     @PostMapping( "/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<Object> addAssessmentToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO));
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO));
 
     }
 
+    @ApiOperation(value = "launch risk  assessment for asset")
+    @PostMapping( "/assessment/asset/{assetId}/risk")
+    public ResponseEntity<ResponseDTO<AssessmentTypeRiskDTO>> launchRiskAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentTypeRiskDTO assessmentDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssetRiskAssessment(unitId,  assetId, assessmentDTO));
+
+    }
+
+    @ApiOperation(value = "launch risk assessment for processing activity")
+    @PostMapping( "/assessment/processing_activity/{processingActivityId}/risk")
+    public ResponseEntity<ResponseDTO<AssessmentTypeRiskDTO>> launchRiskAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentTypeRiskDTO assessmentDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchProcessingActivityRiskAssessment(unitId,  processingActivityId, assessmentDTO));
+
+    }
 
     @ApiOperation(value = "get Assessment  By Id")
     @GetMapping( "/assessment/{assessmentId}")
-    public ResponseEntity<Object> getAssetAssessmentById( @PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentById( unitId, assessmentId));
+    public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentById( unitId, assessmentId));
     }
 
 
@@ -64,22 +81,30 @@ public class AssessmentController {
 
     @ApiOperation(value = "get All Assessment of unit")
     @GetMapping("/assessment")
-    public ResponseEntity<Object> getAllAssessmentByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
+    public ResponseEntity<ResponseDTO<List<AssessmentResponseDTO>>> getAllAssessmentByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAllAssessmentByUnitId(unitId));
     }
 
     @ApiOperation(value = "delete Assessment by id")
     @DeleteMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.deleteAssessmentbyId(unitId,assessmentId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentbyId(unitId,assessmentId));
     }
 
 
-    @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")
+    @ApiOperation(value = "save answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
     public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody()));
     }
+
+
+    @ApiOperation(value = "save answer of assessment and change satatus to complete")
+    @PutMapping("/assessment/{assessmentId}/complete_save")
+    public ResponseEntity<Object> saveAssessmentAnswerAndChangeAssessmentStatusToComplete(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentAnswerAndChangeStatusToComplete(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody()));
+    }
+
 
 
     @ApiOperation(value = "Change Assessment status")

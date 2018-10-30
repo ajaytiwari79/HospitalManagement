@@ -13,6 +13,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
@@ -37,10 +38,9 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.constants.AppConstants.WEEKS;
 
 
 /**
@@ -82,11 +82,8 @@ public class RuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.wtaruletemplate.alreadyexists");
         }
 
-        String week = "WEEK";
+        String weeks = WEEKS;
         String TUESDAY = "TUESDAY";
-        long timeInMins = 10;
-        long daysCount = 10;
-        LocalDate localDate = LocalDate.now();
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
         AgeRange range = new AgeRange(0, 0, 0);
 
@@ -109,7 +106,7 @@ public class RuleTemplateService extends MongoBaseService {
         ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",  "Maximum number of consecutive days");
         consecutiveWorking.setCountryId(countryDTO.getId());
         consecutiveWorking.setIntervalLength(12);
-        consecutiveWorking.setIntervalUnit(week);
+        consecutiveWorking.setIntervalUnit(weeks);
         consecutiveWorking.setPhaseTemplateValues(phaseTemplateValues);
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
@@ -122,19 +119,19 @@ public class RuleTemplateService extends MongoBaseService {
 
         NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval", false, "Maximum number of shifts per interval");
         numberOfPartOfDayShiftsWTATemplate.setIntervalLength(1);
-        numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(week);
+        numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(weeks);
         numberOfPartOfDayShiftsWTATemplate.setCountryId(countryDTO.getId());
         numberOfPartOfDayShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         numberOfPartOfDayShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(numberOfPartOfDayShiftsWTATemplate);
 
-        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period", false, "Minimum number of days off per period", 12, week);
+        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period", false, "Minimum number of days off per period", 12, weeks);
         daysOffInPeriodWTATemplate.setCountryId(countryDTO.getId());
         daysOffInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         daysOffInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffInPeriodWTATemplate);
 
-        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval", false, "Maximum average duration per week in an interval", 1, localDate, true, true, timeInMins, week);
+        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval", false, "Maximum average duration per week in an interval", 1,weeks);
         averageScheduledTimeWTATemplate.setCountryId(countryDTO.getId());
         averageScheduledTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -180,7 +177,7 @@ public class RuleTemplateService extends MongoBaseService {
         wtaBaseRuleTemplates1.add(restPeriodInAnIntervalWTATemplate);
 
 
-        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest", false, "Shortest and Average daily Rest", 1, week);
+        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest", false, "Shortest and Average daily Rest", 1, weeks);
         shortestAndAverageDailyRestWTATemplate.setCountryId(countryDTO.getId());
         shortestAndAverageDailyRestWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -215,7 +212,7 @@ public class RuleTemplateService extends MongoBaseService {
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
 
-        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence", false, "Minimum days off after a series of night shifts in sequence", 1, week, 1);
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence", false, "Minimum days off after a series of night shifts in sequence", 1, weeks, 1);
         daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         daysOffAfterASeriesWTATemplate.setCountryId(countryDTO.getId());
         daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -227,10 +224,22 @@ public class RuleTemplateService extends MongoBaseService {
         noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(noOfSequenceShiftWTATemplate);
 
-        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate = new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased Risk", false, "Employees with increased risk", 18, 62, false);
+        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate = new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased RISK", false, "Employees with increased risk", 18, 62, false);
         employeesWithIncreasedRiskWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         employeesWithIncreasedRiskWTATemplate.setCountryId(countryDTO.getId());
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+
+
+        Set<BreakAvailabilitySettings> breakAvailabilitySettings=new HashSet<>();
+        BreakAvailabilitySettings breakAvailabilitySettingsForDay=new BreakAvailabilitySettings(PartOfDay.DAY,(short)60,(short)120);
+        BreakAvailabilitySettings breakAvailabilitySettingsForEvening=new BreakAvailabilitySettings(PartOfDay.EVENING,(short)90,(short)60);
+        BreakAvailabilitySettings breakAvailabilitySettingsForNight=new BreakAvailabilitySettings(PartOfDay.NIGHT,(short)90,(short)60);
+        breakAvailabilitySettings.add(breakAvailabilitySettingsForDay);
+        breakAvailabilitySettings.add(breakAvailabilitySettingsForEvening);
+        breakAvailabilitySettings.add(breakAvailabilitySettingsForNight);
+
+        BreakWTATemplate breakWTATemplate=new BreakWTATemplate("WTA for breaks in shift","WTA for breaks in shift",(short)30,breakAvailabilitySettings);
+        wtaBaseRuleTemplates1.add(breakWTATemplate);
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
         WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");

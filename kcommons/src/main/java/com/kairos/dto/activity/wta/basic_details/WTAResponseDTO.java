@@ -24,6 +24,7 @@ public class WTAResponseDTO {
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
 
     private BigInteger parentId;
+    private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -213,6 +214,14 @@ public class WTAResponseDTO {
 
     public void setParentId(BigInteger parentId) {
         this.parentId = parentId;
+    }
+
+    public BigInteger getOrganizationParentId() {
+        return organizationParentId;
+    }
+
+    public void setOrganizationParentId(BigInteger organizationParentId) {
+        this.organizationParentId = organizationParentId;
     }
 
     public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, String name, String description, ExpertiseResponseDTO expertise, OrganizationTypeDTO organizationType, OrganizationTypeDTO organizationSubType, List<TagDTO> tags) {
