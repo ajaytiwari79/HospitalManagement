@@ -41,6 +41,9 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireT
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.user_context.CurrentUserDetails;
+import com.kairos.utils.user_context.UserContext;
+import com.kairos.utils.user_context.UserContextHolder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
@@ -393,6 +396,8 @@ public class AssessmentService extends MongoBaseService {
             case COMPLETED:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                } else if (!UserContext.getUserDetails().getEmail().equalsIgnoreCase(assessment.getUserEmailIdAssessmentLastAssistBy())) {
+                    exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
                 }
                 saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
                 break;
@@ -402,6 +407,7 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
         }
+        assessment.setUserEmailIdAssessmentLastAssistBy(UserContext.getUserDetails().getEmail());
         assessment.setAssessmentStatus(assessmentStatus);
         assessmentMongoRepository.save(assessment);
         return true;
@@ -471,6 +477,9 @@ public class AssessmentService extends MongoBaseService {
         }
         assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
         if (Optional.ofNullable(status).isPresent() && AssessmentStatus.COMPLETED.equals(status)) {
+            if (!UserContext.getUserDetails().getEmail().equalsIgnoreCase(assessment.getUserEmailIdAssessmentLastAssistBy())) {
+                exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+            }
             assessment.setAssessmentStatus(status);
             saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         }

@@ -36,6 +36,7 @@ public class Assessment extends MongoBaseEntity {
     private Staff approver;
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
+    private String userEmailIdAssessmentLastAssistBy;
 
 
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment) {
@@ -44,6 +45,14 @@ public class Assessment extends MongoBaseEntity {
         this.assigneeList = assigneeList;
         this.approver = approver;
         this.comment=comment;
+    }
+
+    public String getUserEmailIdAssessmentLastAssistBy() {
+        return userEmailIdAssessmentLastAssistBy;
+    }
+
+    public void setUserEmailIdAssessmentLastAssistBy(String userEmailIdAssessmentLastAssistBy) {
+        this.userEmailIdAssessmentLastAssistBy = userEmailIdAssessmentLastAssistBy;
     }
 
     public boolean isRiskAssessment() { return riskAssessment; }
