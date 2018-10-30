@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.kairos.enums.TimeTypeEnum.BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static com.kairos.enums.shift.BreakPaymentSetting.PAID;
 import static com.kairos.enums.shift.BreakPaymentSetting.UNPAID;
@@ -540,10 +541,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds) {
-
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("isParentActivity").is(true).and("deleted").is(false).and("organizationTypes").is(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds).and("state").nin("DRAFT")))
-                ,graphLookup("time_Type").startWith("upperLevelTimeTypeId").connectFrom("upperLevelTimeTypeId").connectTo("_id").as("timeType"),
-                match(Criteria.where("timeType.TimeTypes").and("timeType.label").is("")));
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("isParentActivity").is(true).and("deleted").is(false))
+                ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                match(Criteria.where("state").nin("DRAFT").orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds),Criteria.where("timeType.type").is(BREAK))));
         AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
         return result.getMappedResults();
     }

@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.activity;
 
 
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -22,6 +23,7 @@ public class TimeType extends MongoBaseEntity{
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
     private BreakPaymentSetting breakPaymentSetting;
+    private TimeTypeEnum type;
     public TimeType() {}
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
@@ -31,12 +33,14 @@ public class TimeType extends MongoBaseEntity{
 
 
 
-    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum type,Long countryId) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
         this.backgroundColor=backgroundColor;
         this.leafNode = true;
+        this.type=type;
+        this.countryId=countryId;
     }
 
     public Long getCountryId() {
@@ -110,5 +114,13 @@ public class TimeType extends MongoBaseEntity{
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+    public TimeTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(TimeTypeEnum type) {
+        this.type = type;
     }
 }
