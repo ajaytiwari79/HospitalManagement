@@ -4,7 +4,7 @@ import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection ="payRollSystem")
+@Document
 public class PayRollSystem extends MongoBaseEntity {
 
     protected int code;

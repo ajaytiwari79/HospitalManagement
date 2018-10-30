@@ -10,8 +10,4 @@ import java.math.BigInteger;
 @Repository
 public interface PayRollSystemRepository extends MongoBaseRepository<PayRollSystem, BigInteger> {
 
-    @Query(value = "{code:{$ne:?0},deleted:false}",exists = true)
-    boolean isPayRollCodeAlreadyExists(Integer code);
-
-
 }
