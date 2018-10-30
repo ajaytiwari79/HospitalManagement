@@ -58,8 +58,7 @@ public class Shift extends MongoBaseEntity {
     private BigInteger copiedFromShiftId;
 
     private boolean sickShift;
-    private LocalDate validatedByStaffDate;
-    private LocalDate validatedByPlannerDate;
+    private LocalDate validated;
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
@@ -179,22 +178,12 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
-
-    public LocalDate getValidatedByStaffDate() {
-        return validatedByStaffDate;
+    public LocalDate getValidated() {
+        return validated;
     }
 
-    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
-        this.validatedByStaffDate = validatedByStaffDate;
-    }
-
-    public LocalDate getValidatedByPlannerDate() {
-        return validatedByPlannerDate;
-    }
-
-    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
-        this.validatedByPlannerDate = validatedByPlannerDate;
+    public void setValidated(LocalDate validated) {
+        this.validated = validated;
     }
 
     public Date getStartDate() {

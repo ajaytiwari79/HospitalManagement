@@ -106,16 +106,17 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
-        DateTimeInterval graceInterval;
+    public void validateGracePeriod(ShiftDTO shiftDTO,Boolean validatedByStaff, Long unitId,ShiftDTO staffShiftDTO) {
+        DateTimeInterval graceInterval=null;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
-        } else {
-            if (shiftDTO.getValidatedByStaffDate() == null) {
+       }
+       else {
+            if (staffShiftDTO.getValidated() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(staffShiftDTO.getValidated()), validatedByStaff);
         }
         if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");

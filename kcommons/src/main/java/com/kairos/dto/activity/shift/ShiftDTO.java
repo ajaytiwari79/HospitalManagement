@@ -53,8 +53,7 @@ public class ShiftDTO {
     private int durationMinutes;
     private BigInteger plannedTimeId;
     private Long expertiseId;
-    private LocalDate validatedByStaffDate;
-    private LocalDate validatedByPlannerDate;
+    private LocalDate validated;
     private AttendanceDuration attendanceDuration;
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
@@ -146,25 +145,18 @@ public class ShiftDTO {
         this.attendanceDuration = attendanceDuration;
     }
 
-    public LocalDate getValidatedByStaffDate() {
-        return validatedByStaffDate;
-    }
-
-    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
-        this.validatedByStaffDate = validatedByStaffDate;
-    }
 
     @JsonIgnore
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
 
-    public LocalDate getValidatedByPlannerDate() {
-        return validatedByPlannerDate;
+    public LocalDate getValidated() {
+        return validated;
     }
 
-    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
-        this.validatedByPlannerDate = validatedByPlannerDate;
+    public void setValidated(LocalDate validated) {
+        this.validated = validated;
     }
 
     public Long getExpertiseId() {

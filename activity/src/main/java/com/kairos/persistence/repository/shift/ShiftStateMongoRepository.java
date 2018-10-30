@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.shift;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,6 +29,10 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
 
     @Query("{deleted:false,shiftId:?0,actualPhaseState:?1}")
     ShiftState findShiftStateByShiftIdAndActualPhase(BigInteger shiftId, String actualPhaseState);
+
+
+    @Query("{deleted:false,shiftId:?0,actualPhaseState:?1,accessGroupRole:?2}")
+    ShiftState findShiftStateByShiftIdAndActualPhaseAndRole(BigInteger shiftId, String actualPhaseState, AccessGroupRole role);
 
     @Query("{deleted:false,shiftId:{$in:?0},actualPhaseState:?1}")
     List<ShiftState> findAllShiftStateByShiftIdAndActualPhase(List<BigInteger> shiftIds, String actualPhaseState);
