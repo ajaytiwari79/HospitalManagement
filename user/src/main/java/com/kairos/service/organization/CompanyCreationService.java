@@ -541,6 +541,9 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
         }
+        if (countryId==null){
+            countryId=organization.getCountry().getId();
+        }
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
         //or parent has any missing required details

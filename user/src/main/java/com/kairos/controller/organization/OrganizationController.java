@@ -115,6 +115,7 @@ public class OrganizationController {
     @Inject
     private UnitPositionService unitPositionService;
     @Inject private VRPClientService vrpClientService;
+    @Inject private UnitService unitService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -206,7 +207,7 @@ public class OrganizationController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getManageHierarchyData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getManageHierarchyData(unitId));
+                unitService.getManageHierarchyData(unitId));
     }
 
     /**
@@ -1451,6 +1452,16 @@ public class OrganizationController {
     }
 
 
+    /**
+     *
+     */
+    @ApiOperation(value = "on board a unit ")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/on_board")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId) throws InterruptedException ,ExecutionException{
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                unitService.onBoardOrganization(unitId));
+    }
 
 
 
