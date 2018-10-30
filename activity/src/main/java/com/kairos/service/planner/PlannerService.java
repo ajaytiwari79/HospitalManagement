@@ -162,8 +162,6 @@ public class PlannerService extends MongoBaseService {
     TimeSlotRestClient timeSlotRestClient;
 
     @Autowired
-    ClientRestClient clientRestClient;
-    @Autowired
     GenericIntegrationService genericIntegrationService;
 
 

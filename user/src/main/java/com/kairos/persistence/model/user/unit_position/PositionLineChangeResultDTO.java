@@ -1,18 +1,22 @@
-package com.kairos.dto.user.staff.unit_position;
+package com.kairos.persistence.model.user.unit_position;
+
+import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * CreatedBy vipulpandey on 3/10/18
  **/
 public class PositionLineChangeResultDTO {
-    boolean calculativeChanged;
-    boolean employmentTypeChanged;
+    private boolean calculativeChanged;
+    private boolean employmentTypeChanged;
     private BigInteger ctaId;
     private BigInteger oldctaId;
     private BigInteger wtaId;
     private BigInteger oldwtaId;
-
+    private boolean functionsChanged;
+    private List<FunctionWithAmountQueryResult> functions;
     public PositionLineChangeResultDTO(boolean calculativeChanged) {
         this.calculativeChanged=calculativeChanged;
     }
@@ -63,5 +67,21 @@ public class PositionLineChangeResultDTO {
 
     public void setEmploymentTypeChanged(boolean employmentTypeChanged) {
         this.employmentTypeChanged = employmentTypeChanged;
+    }
+
+    public boolean isFunctionsChanged() {
+        return functionsChanged;
+    }
+
+    public void setFunctionsChanged(boolean functionsChanged) {
+        this.functionsChanged = functionsChanged;
+    }
+
+    public List<FunctionWithAmountQueryResult> getFunctions() {
+        return functions;
+    }
+
+    public void setFunctions(List<FunctionWithAmountQueryResult> functions) {
+        this.functions = functions;
     }
 }
