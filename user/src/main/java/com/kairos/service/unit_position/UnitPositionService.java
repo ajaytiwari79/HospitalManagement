@@ -615,9 +615,7 @@ public class UnitPositionService {
         CompletableFuture<Boolean> done = setDefaultData(unitPositionDTO, unitPosition);
         CompletableFuture.allOf(done).join();
         // UEP can be created for past dates from time care
-        if (!createFromTimeCare && unitPositionDTO.getStartDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
-        }
+
         unitPosition.setStartDate(unitPositionDTO.getStartDate());
         if (Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) {
             if (unitPositionDTO.getStartDate().isAfter(unitPositionDTO.getEndDate())) {

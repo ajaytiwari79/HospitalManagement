@@ -115,7 +115,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
-            "optional match (expertise)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
+            "optional match (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "return expertise as expertise,unionData as union, positionCode as positionCode,id(unitPosition) as id,\n" +
             " unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
