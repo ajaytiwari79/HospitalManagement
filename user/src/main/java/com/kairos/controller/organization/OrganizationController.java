@@ -6,6 +6,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -49,6 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -1450,7 +1452,12 @@ public class OrganizationController {
                 organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
     }
 
+    @ApiOperation(value = "Map Selected Payroll Type to Unit ")
+    @PutMapping(value =PARENT_ORGANIZATION_URL+UNIT_URL + "/mapPayRollToUnit")
+    public ResponseEntity<Map<String, Object>> mapPayRollToUnit(@PathVariable long unitId, @RequestBody BigInteger payRollTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.mapPayRollListToUnit(unitId,payRollTypeId));
 
+    }
 
 
 

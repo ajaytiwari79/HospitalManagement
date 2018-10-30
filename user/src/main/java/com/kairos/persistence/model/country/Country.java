@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.equipment.Equipment;
@@ -85,6 +86,7 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type= HAS_SYSTEM_LANGUAGE)
     private SystemLanguage systemLanguage;
+    private Set<Long> payRollTypeIds;
 
     public Country() {
     }
@@ -246,5 +248,13 @@ public class Country extends UserBaseEntity {
 
     public void setSystemLanguage(SystemLanguage systemLanguage) {
         this.systemLanguage = systemLanguage;
+    }
+
+    public Set<Long> getPayRollTypeIds() {
+        return payRollTypeIds;
+    }
+
+    public void setPayRollTypeIds(Set<Long> payRollTypeIds) {
+        this.payRollTypeIds = payRollTypeIds;
     }
 }

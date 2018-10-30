@@ -21,6 +21,7 @@ import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
@@ -108,6 +109,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -1489,5 +1491,12 @@ public class OrganizationService {
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneforAllorganizations(),UnitTimeZoneMappingDTO.class);
 
+    }
+
+    public boolean mapPayRollListToUnit(long unitId, BigInteger payRollTypeId) {
+        Organization organization=organizationGraphRepository.findOne(unitId);
+        organization.setPayRollTypeId(payRollTypeId.longValue());
+        organizationGraphRepository.save(organization);
+        return true;
     }
 }

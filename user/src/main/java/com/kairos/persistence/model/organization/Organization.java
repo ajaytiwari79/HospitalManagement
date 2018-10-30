@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -219,6 +220,7 @@ public class Organization extends UserBaseEntity {
     private boolean boardingCompleted;
     private boolean workCenterUnit;
     private boolean gdprUnit;
+    private Long payRollTypeId;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private AccountType accountType;
 
@@ -952,5 +954,13 @@ public class Organization extends UserBaseEntity {
 
     public void setUnitType(UnitType unitType) {
         this.unitType = unitType;
+    }
+
+    public Long getPayRollTypeId() {
+        return payRollTypeId;
+    }
+
+    public void setPayRollTypeId(Long payRollTypeId) {
+        this.payRollTypeId = payRollTypeId;
     }
 }

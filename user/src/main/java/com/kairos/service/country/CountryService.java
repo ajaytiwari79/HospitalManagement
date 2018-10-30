@@ -11,6 +11,7 @@ import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.Currency;
@@ -560,5 +561,14 @@ public class CountryService {
     }
 
 
-
+    public boolean mapPayRollListToCountry(long countryId, Set<BigInteger> payRollTypeIds) {
+        Country country=countryGraphRepository.findOne(countryId);
+        Set<Long> payRollTypeIdsSet=new HashSet<>();
+        for(BigInteger payRollTypeId:payRollTypeIds){
+            payRollTypeIdsSet.add(payRollTypeId.longValue());
+        }
+        country.setPayRollTypeIds(payRollTypeIdsSet);
+        countryGraphRepository.save(country);
+        return true;
+    }
 }

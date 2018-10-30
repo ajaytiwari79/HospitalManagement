@@ -7,6 +7,7 @@ import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
@@ -42,10 +43,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
@@ -1185,6 +1188,13 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = "expertise") Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByExpertiseId(expertiseId));
+
+    }
+
+    @ApiOperation(value = "Map Selected Payroll Types to country ")
+    @PutMapping(value = COUNTRY_URL + "/mapPayRollsToCountry")
+    public ResponseEntity<Map<String, Object>> mapPayRollListToCountry(@PathVariable long countryId, @RequestBody Set<BigInteger> payRollTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.mapPayRollListToCountry(countryId,payRollTypeIds));
 
     }
 
