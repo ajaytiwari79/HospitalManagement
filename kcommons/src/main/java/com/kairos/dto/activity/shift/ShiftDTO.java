@@ -60,6 +60,7 @@ public class ShiftDTO {
     private BigInteger shiftId;
     private AccessGroupRole accessGroupRole;
     private boolean editable;
+    private boolean functionDeleted;
 
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -400,4 +401,11 @@ public class ShiftDTO {
         this.template = template;
     }
 
+    public boolean isFunctionDeleted() {
+        return functionDeleted;
+    }
+
+    public void setFunctionDeleted(boolean functionDeleted) {
+        this.functionDeleted = functionDeleted;
+    }
 }

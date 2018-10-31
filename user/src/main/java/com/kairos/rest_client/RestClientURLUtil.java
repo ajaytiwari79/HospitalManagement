@@ -49,7 +49,7 @@ public class RestClientURLUtil {
                         .append(Optional.ofNullable(UserContext.getOrgId()).isPresent()?UserContext.getOrgId():"24").append("/unit/").append((Optional.ofNullable(id).isPresent()?id:UserContext.getUnitId())).toString();
                 return baseUrl;
             }else{
-                String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/country/").append(id).toString();
+                String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(Optional.ofNullable(UserContext.getOrgId()).isPresent()?UserContext.getOrgId():"24").append("/country/").append(id).toString();
                 return baseUrl;
             }
         }
