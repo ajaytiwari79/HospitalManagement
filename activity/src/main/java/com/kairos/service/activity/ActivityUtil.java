@@ -233,4 +233,14 @@ public class ActivityUtil {
 
 
     }
+
+    public static List<String> verifyCompositeActivities(boolean breakAllowed, List<Activity> activities){
+        List<String> invalidActivities=new ArrayList<>();
+        activities.forEach(activity -> {
+            if(activity.getRulesActivityTab().isBreakAllowed()!=breakAllowed){
+                invalidActivities.add(activity.getName());
+        }
+        });
+        return invalidActivities;
+    }
 }

@@ -33,6 +33,7 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -436,6 +437,22 @@ public class OrganizationActivityService extends MongoBaseService {
             }
         }
         save(activities);
+    }
+
+
+    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<Activity> activities){
+        List<String> invalidActivities= ActivityUtil.verifyCompositeActivities(breakAllowed,activities);
+        if(invalidActivities.size()!=0){
+            List<String> errorMessages=new ArrayList<>();
+            errorMessages.addAll(invalidActivities);
+            if(breakAllowed){
+                exceptionService.actionNotPermittedException("activities.not.support.break",errorMessages);
+            }
+            if(!breakAllowed){
+                exceptionService.actionNotPermittedException("activities.support.break",errorMessages);
+            }
+
+        }
     }
 
 
