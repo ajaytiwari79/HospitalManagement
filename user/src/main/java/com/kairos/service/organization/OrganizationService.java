@@ -21,6 +21,7 @@ import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
@@ -108,6 +109,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -772,39 +774,6 @@ public class OrganizationService {
         return organizationGraphRepository.findOne(childOrganizationId) == null;
     }
 
-    public Map<String, Object> getManageHierarchyData(long unitId) {
-
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
-
-        }
-
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-
-        Map<String, Object> response = new HashMap<>(2);
-        List<Map<String, Object>> units = organizationGraphRepository.getUnits(unitId);
-        response.put("units", units.size() != 0 ? units.get(0).get("unitList") : Collections.emptyList());
-
-        List<Map<String, Object>> groups = organizationGraphRepository.getGroups(unitId);
-        response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
-
-        if (Optional.ofNullable(countryId).isPresent()) {
-            response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
-        }
-
-        OrganizationTypeAndSubType organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
-
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
-        response.put("organizationTypes", organizationTypes);
-        response.put("businessTypes", businessTypes);
-        response.put("level", organization.getLevel());
-        response.put("companyTypes", CompanyType.getListOfCompanyType());
-        response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
-        response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId));
-        response.put("accessGroups", accessGroupService.getOrganizationAccessGroupsForUnitCreation(unitId));
-        return response;
-    }
 
     public Organization updateExternalId(long organizationId, long externalId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -1179,22 +1148,6 @@ public class OrganizationService {
     }
 
 
-    public List<OrganizationType> getOrganizationTypeByCountryId(Long countryId) {
-        return organizationTypeGraphRepository.findOrganizationTypeByCountry(countryId);
-    }
-
-    public OrganizationType getOrganizationTypeByCountryAndId(Long countryId, Long orgTypeId) {
-        return organizationTypeGraphRepository.getOrganizationTypeById(countryId, orgTypeId);
-    }
-
-    public OrganizationType getOneDefaultOrganizationTypeByCountryId(Long countryId) {
-        return organizationTypeGraphRepository.getOneDefaultOrganizationTypeById(countryId);
-    }
-
-    public List<OrganizationType> getOrganizationSubTypeById(Long orgTypeId) {
-        return organizationTypeGraphRepository.getOrganizationSubTypesByTypeId(orgTypeId);
-    }
-
     public Map<String, Object> getAvailableZoneIds(Long unitId) {
         Set<String> allZones = ZoneId.getAvailableZoneIds();
         List<String> zoneList = new ArrayList<>(allZones);
@@ -1489,5 +1442,17 @@ public class OrganizationService {
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneforAllorganizations(),UnitTimeZoneMappingDTO.class);
 
+    }
+
+    public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
+        Organization organization=organizationGraphRepository.findOne(unitId);
+        if(organization!=null && !organization.isDeleted()){
+            organization.setPayRollTypeId(payRollTypeId);
+            organizationGraphRepository.save(organization);
+        }
+        else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","Organization",unitId);
+        }
+        return true;
     }
 }

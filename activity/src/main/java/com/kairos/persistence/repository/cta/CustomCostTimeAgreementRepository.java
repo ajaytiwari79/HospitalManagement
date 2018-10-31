@@ -42,6 +42,7 @@ public interface CustomCostTimeAgreementRepository {
     CostTimeAgreement getCTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
+    void setEndDateToCTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
 
     List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId, Date startDate, Date endDate);
 

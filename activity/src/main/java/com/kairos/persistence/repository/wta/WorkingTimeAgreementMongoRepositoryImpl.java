@@ -1,18 +1,14 @@
 package com.kairos.persistence.repository.wta;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.wrapper.wta.CTAWTADTO;
-import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.util.Assert;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -256,4 +252,9 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         mongoTemplate.findAndModify(new Query(Criteria.where("id").is(oldctaId)), update, WorkingTimeAgreement.class);
         }
 
+        @Override
+    public void setEndDateToWTAOfUnitPosition(Long unitPositionId, LocalDate endDate){
+        Update update = Update.update("endDate", DateUtils.asDate(endDate));
+        mongoTemplate.findAndModify(new Query(Criteria.where("unitPositionId").is(unitPositionId).and("endDate").exists(false)),update,WorkingTimeAgreement.class);
+    }
 }
