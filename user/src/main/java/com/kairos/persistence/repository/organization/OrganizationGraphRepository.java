@@ -204,7 +204,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "contactAddress,unit " +
             "MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) WITH zipCode,contactAddress,unit " +
             "RETURN COLLECT({id:id(unit),name:unit.name,shortName:unit.shortName,contactAddress:case when contactAddress is null then [] else {id:id(contactAddress),city:contactAddress.city,longitude:contactAddress.longitude,latitude:contactAddress.latitude, " +
-            "street1:contactAddress.street1,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber, " +
+            "street:contactAddress.street,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber, " +
             "houseNumber:contactAddress.houseNumber,province:contactAddress.province,country:contactAddress.country,regionName:contactAddress.regionName, " +
             "municipalityName:contactAddress.municipalityName} end}) AS unitList")
     List<Map<String, Object>> getUnits(long organizationId);
