@@ -60,10 +60,7 @@ import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import com.kairos.utils.external_plateform_shift.Transstatus;
-import com.kairos.wrapper.activity.ActivityTabsWrapper;
-import com.kairos.wrapper.activity.ActivityTagDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
-import com.kairos.wrapper.activity.SkillActivityDTO;
+import com.kairos.wrapper.activity.*;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.lang3.SerializationUtils;
@@ -253,7 +250,7 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
+    public ActivityDTOsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
@@ -287,24 +284,30 @@ public class ActivityService extends MongoBaseService {
         save(activity);
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
-        //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
-
-        return activityTabsWrapper;
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab, generalActivityTabWithTagDTO,"tags");
+        if(!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        }
+        ActivityDTOsWrapper activityDTOsWrapper=new ActivityDTOsWrapper(generalDTO.getActivityId(),generalActivityTabWithTagDTO,activityCategories);
+        return activityDTOsWrapper;
     }
 
 
-    public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger countryId, BigInteger activityId) {
+    public ActivityDTOsWrapper getGeneralTabOfActivity(BigInteger countryId, BigInteger activityId) {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-//        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
-
-        return activityTabsWrapper;
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab, generalActivityTabWithTagDTO,"tags");
+        if(!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        }
+        ActivityDTOsWrapper activityDTOsWrapper=new ActivityDTOsWrapper(activityId,generalActivityTabWithTagDTO,activityCategories);
+        return activityDTOsWrapper;
     }
 
 
