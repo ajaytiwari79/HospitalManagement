@@ -287,7 +287,7 @@ public class ShiftService extends MongoBaseService {
         if(byTandAPhase){
             shiftState=shiftStateMongoRepository.findOne(shiftDTO.getId());
             if(shiftState!=null){
-                ObjectMapperUtils.copyPropertiesExceptSpecific(shiftDTO,shiftState,"id","accessGroupRole","actualPhaseState","validated");
+                ObjectMapperUtils.copyProperties(shiftDTO,shiftState,"id","accessGroupRole","actualPhaseState","validated");
             }else{
                 shiftState= ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
             }
@@ -1184,7 +1184,7 @@ public class ShiftService extends MongoBaseService {
             }
         }
         if(shiftState!=null){
-            ObjectMapperUtils.copyPropertiesExceptSpecific(shiftState,shiftDTO,"id","accessGroupRole","actualPhaseState");
+            ObjectMapperUtils.copyProperties(shiftState,shiftDTO,"id","accessGroupRole","actualPhaseState");
         }else {
             shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
         }
