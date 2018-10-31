@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -42,7 +43,16 @@ public class PolicyAgreementTemplateController {
     public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createBasicPolicyAgreementTemplate(countryId, agreementTemplateDto));
+    }
 
+
+    @ApiOperation("upload cover image Agreement Template")
+    @PostMapping(value = "/agreement_template/{agreementTemplateId}/upload")
+    public ResponseEntity<Object> uploadCoverPageLogo(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @RequestParam("coverPageLogo") MultipartFile coverPageLogo) {
+        if (coverPageLogo.getSize() <= 0) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, true, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.uploadCoverPageLogo(countryId, agreementTemplateId, coverPageLogo));
     }
 
     @ApiOperation("get All agreement sections and Subjection of Agreement template ")
@@ -78,15 +88,15 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("get All  agreement Template linked with Clauses ")
     @GetMapping("/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getPolicatAgreementTemplateByClauseId(@PathVariable Long countryId,@PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAgreementTemplateListContainClause(countryId,clauseId));
+    public ResponseEntity<Object> getPolicatAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAgreementTemplateListContainClause(countryId, clauseId));
 
     }
 
     @ApiOperation("Replace Old Clause With New Version of Clause")
     @PutMapping("/agreement_template/clause/version")
-    public ResponseEntity<Object> upadateAgreementTemplateOldClauaseWithNewVersionOfClause(@PathVariable Long countryId,@Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateOldClauseWithNewVersionOfClause(countryId,agreementTemplateClauseUpdateDTO));
+    public ResponseEntity<Object> upadateAgreementTemplateOldClauaseWithNewVersionOfClause(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateOldClauseWithNewVersionOfClause(countryId, agreementTemplateClauseUpdateDTO));
 
     }
 

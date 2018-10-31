@@ -15,7 +15,6 @@ public class AgreementTemplateSectionDTO {
 
     private String coverPageContent;
     private String coverPageTitle;
-    private MultipartFile coverPageLogo;
     @Valid
     private List<AgreementSectionDTO> sections=new ArrayList<>();
 
@@ -30,7 +29,4 @@ public class AgreementTemplateSectionDTO {
 
     public void setSections(List<AgreementSectionDTO> sections) { this.sections = sections; }
 
-    public MultipartFile getCoverPageLogo() { return coverPageLogo; }
-
-    public void setCoverPageLogo(MultipartFile coverPageLogo) { this.coverPageLogo = coverPageLogo; }
 }

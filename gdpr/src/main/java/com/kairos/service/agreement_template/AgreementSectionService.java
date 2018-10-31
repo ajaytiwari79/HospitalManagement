@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.agreement_template.PolicyAgreementTempl
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -57,7 +58,7 @@ public class AgreementSectionService extends MongoBaseService {
     private AWSBucketService awsBucketService;
 
 
-    public Map<String, Object> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
+    public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
@@ -70,7 +71,6 @@ public class AgreementSectionService extends MongoBaseService {
         }
         policyAgreementTemplate.setCoverPageTitle(agreementTemplateSectionDTO.getCoverPageTitle());
         policyAgreementTemplate.setCoverPageContent(agreementTemplateSectionDTO.getCoverPageContent());
-        policyAgreementTemplate.setCoverPageLogoUrl(awsBucketService.uploadImage(agreementTemplateSectionDTO.getCoverPageLogo()));
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
     }

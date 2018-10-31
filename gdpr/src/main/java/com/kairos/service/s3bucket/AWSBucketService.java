@@ -36,27 +36,22 @@ public class AWSBucketService {
 
     public String uploadImage(MultipartFile multipartFile) {
 
-        String imageUrl=null;
-        if (multipartFile.getSize()<=0) {
-            return imageUrl;
-        } else {
-            try {
-                ObjectMetadata metaData = new ObjectMetadata();
-                metaData.setContentType(multipartFile.getContentType());
-                String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
-                String key = bucketFolderName + File.separator + fileName;
-                InputStream inputStream = multipartFile.getInputStream();
-                PutObjectRequest request = new PutObjectRequest(bucketName, key, inputStream, metaData).withCannedAcl(CannedAccessControlList.PublicRead);
-                amazonS3Client.putObject(request);
-                imageUrl = amazonS3Client.getResourceUrl(bucketName, key);
-                inputStream.close();
-            } catch (IOException e) {
-                LOGGER.warn("{ IO Exception Exception cause" + e.getCause() + "}");
-            } catch (SdkClientException e) {
-                LOGGER.warn("{ Sdk Client Exception cause" + e.getCause() + "}");
-            }
+        String imageUrl = null;
+        try {
+            ObjectMetadata metaData = new ObjectMetadata();
+            metaData.setContentType(multipartFile.getContentType());
+            String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
+            String key = bucketFolderName + File.separator + fileName;
+            InputStream inputStream = multipartFile.getInputStream();
+            PutObjectRequest request = new PutObjectRequest(bucketName, key, inputStream, metaData).withCannedAcl(CannedAccessControlList.PublicRead);
+            amazonS3Client.putObject(request);
+            imageUrl = amazonS3Client.getResourceUrl(bucketName, key);
+            inputStream.close();
+        } catch (IOException e) {
+            LOGGER.warn("{ IO Exception Exception cause" + e.getCause() + "}");
+        } catch (SdkClientException e) {
+            LOGGER.warn("{ Sdk Client Exception cause" + e.getCause() + "}");
         }
-
         return imageUrl;
 
     }

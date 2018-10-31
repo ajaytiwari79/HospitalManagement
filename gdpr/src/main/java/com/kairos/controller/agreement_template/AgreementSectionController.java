@@ -3,6 +3,8 @@ package com.kairos.controller.agreement_template;
 
 import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateSectionDTO;
+import com.kairos.dto.response.ResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -40,10 +42,9 @@ public class AgreementSectionController {
 
     @ApiOperation("add section to Agreement template ")
     @PostMapping(value = "/agreement_template/{templateId}/section")
-    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, templateId, agreementTemplateSectionDTO));
+    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> createAgreementSection(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, templateId, agreementTemplateSectionDTO));
     }
-
 
     @ApiOperation("deleted agreement section by id")
     @DeleteMapping(value = "/agreement_template/{templateId}/section/delete/{id}")

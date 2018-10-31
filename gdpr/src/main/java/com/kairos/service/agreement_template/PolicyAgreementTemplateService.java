@@ -17,11 +17,13 @@ import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponse
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -52,6 +54,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     @Inject
     private AgreementSectionMongoRepository agreementSectionMongoRepository;
+
+    @Inject
+    private AWSBucketService awsBucketService;
 
 
     /**
@@ -85,6 +90,17 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
+    public String uploadCoverPageLogo(Long countryId, BigInteger agreementTemplateId, MultipartFile coverPageLogo) {
+
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, agreementTemplateId);
+        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+        }
+        String coverPageLogoUrl=awsBucketService.uploadImage(coverPageLogo);
+        policyAgreementTemplate.setCoverPageLogoUrl(coverPageLogoUrl);
+        policyAgreementTemplateRepository.save(policyAgreementTemplate);
+        return coverPageLogoUrl;
+    }
     /**
      * @param countryId
      * @return
