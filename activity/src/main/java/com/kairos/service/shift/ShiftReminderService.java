@@ -56,7 +56,7 @@ public class ShiftReminderService extends MongoBaseService {
     private final static Logger logger = LoggerFactory.getLogger(ShiftReminderService.class);
 
     public void updateReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
-        // TODO Find better approach/compositeShifts
+        // TODO Find better approach
         List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         deleteReminderTrigger(jobIds, shift.getUnitId());
         setReminderTrigger(activityWrapperMap, shift);
