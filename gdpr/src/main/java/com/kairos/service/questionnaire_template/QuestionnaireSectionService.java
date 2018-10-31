@@ -150,7 +150,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
         questionnaireTemplate.getSections().remove(questionnaireSectionId);
-        questionnaireSectionRepository.safeDelete(questionnaireSectionId);
+        questionnaireSectionRepository.safeDeleteById(questionnaireSectionId);
         return true;
     }
 
@@ -259,7 +259,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
         questionnaireTemplate.getSections().remove(questionnaireSectionId);
-        questionnaireSectionRepository.safeDelete(questionnaireSectionId);
+        questionnaireSectionRepository.safeDeleteById(questionnaireSectionId);
         return true;
     }
 

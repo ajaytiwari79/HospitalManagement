@@ -4,10 +4,14 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BulkWriteOperation;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -72,7 +76,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
     @Override
-    public T safeDelete(ID id) {
+    public T safeDeleteById(ID id) {
         Assert.notNull(id, "The given id must not be null!");
         Query query = new Query(Criteria.where("_id").is(id).and("deleted").is(false));
         Update update = new Update().set("deleted", true);
@@ -86,7 +90,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
     @Override
-    public boolean safeDelete(Set<ID> ids) {
+    public boolean safeDeleteByIds(Set<ID> ids) {
         Assert.notEmpty(ids, "Id List cant be Empty !");
         Update update = new Update().set("deleted", true);
         update.set("updatedAt", DateUtils.getDate());
@@ -96,16 +100,44 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
     @Override
-    public <T extends MongoBaseEntity> List<T> safeDelete(List<T> entities) {
-
+    public <T extends MongoBaseEntity> List<T> safeDeleteAll(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
-        //  Get class name for sequence class
+        Assert.notEmpty(entities, "Entity must not be Empty !");
+        String collectionName = mongoOperations.getCollectionName(entities.get(0).getClass());
 
-        entities.forEach(entity -> {
+        BulkWriteOperation bulkWriteOperation = ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
+
+        MongoConverter converter = mongoOperations.getConverter();
+
+
+        BasicDBObject dbObject;
+
+        //  Get class name for sequence class
+        for (T entity : entities) {
+
+
             entity.setDeleted(true);
             entity.setUpdatedAt(DateUtils.getDate());
-        });
-        mongoOperations.save(entities);
+            dbObject = new BasicDBObject();
+            /*
+             *  Converting entity object to BasicDBObject
+             * */
+            converter.write(entity, dbObject);
+            /**
+             *  Creating BasicDbObject for find query
+             * */
+            BasicDBObject query = new BasicDBObject();
+            /**
+             *  Adding query (find by ID)
+             * */
+            query.put("_id", dbObject.get("_id"));
+            /**
+             *  Replacing whole Object
+             * */
+            bulkWriteOperation.find(query).replaceOne(dbObject);
+        }
+
+        bulkWriteOperation.execute();
         return entities;
     }
 

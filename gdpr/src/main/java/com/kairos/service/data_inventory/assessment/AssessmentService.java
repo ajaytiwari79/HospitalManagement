@@ -456,7 +456,7 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(assessment).isPresent()) {
             exceptionService.invalidRequestException("message.assessment.inprogress.cannot.delete", assessment.getName());
         }
-        assetMongoRepository.safeDelete(assessmentId);
+        assetMongoRepository.safeDeleteById(assessmentId);
         return true;
     }
 

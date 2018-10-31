@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.data_inventory.processing_activity.Proc
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
@@ -120,7 +119,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", new StringBuilder(processingActivitiesLinkedWithTransferMethod.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        transferMethodRepository.safeDelete(transferMethodId);
+        transferMethodRepository.safeDeleteById(transferMethodId);
         return true;
     }
 
