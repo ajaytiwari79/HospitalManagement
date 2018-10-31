@@ -443,8 +443,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<Activity> activities){
         List<String> invalidActivities= ActivityUtil.verifyCompositeActivities(breakAllowed,activities);
         if(invalidActivities.size()!=0){
-            List<String> errorMessages=new ArrayList<>();
-            errorMessages.addAll(invalidActivities);
+            List<String> errorMessages = new ArrayList<>(invalidActivities);
             if(breakAllowed){
                 exceptionService.actionNotPermittedException("activities.not.support.break",errorMessages);
             }

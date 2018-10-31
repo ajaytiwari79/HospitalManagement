@@ -25,11 +25,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.ENTERED_TIMES;
 
 public class ActivityUtil {
 
-    public static LocationActivityTab initializeLocationActivityTab(GlideTimeSettingsDTO glideTimeSettingsDTO ){
+    private static LocationActivityTab initializeLocationActivityTab(GlideTimeSettingsDTO glideTimeSettingsDTO){
         Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckIn =new HashSet<>();
         ActivityGlideTimeDetails activityGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
         ActivityGlideTimeDetails activityGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
@@ -109,8 +108,7 @@ public class ActivityUtil {
 
     public static Activity buildActivity(ActivityDTO activityDTO) {
         List<BigInteger> tags = new ArrayList<>(activityDTO.getTags());
-        Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
-        return activity;
+        return new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
     }
 
     public static List<PhaseTemplateValue> getPhaseForRulesActivity(List<PhaseDTO> phases) {
@@ -131,7 +129,7 @@ public class ActivityUtil {
     public static Activity initializeTimeCareActivities(TimeCareActivity timeCareActivity,Long orgType,List<Long> orgSubTypes,Long countryId,GlideTimeSettingsDTO glideTimeSettingsDTO,List<PhaseDTO> phases,List<Activity> activitiesByExternalIds
     ,ActivityCategory activityCategory,List<Skill> skills, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId){
         Optional<Activity> result = activitiesByExternalIds.stream().filter(activityByExternalId -> timeCareActivity.getId().equals(activityByExternalId.getExternalId())).findFirst();
-        Activity activity = (result.isPresent()) ? result.get() : new Activity();
+        Activity activity = result.orElseGet(Activity::new);
         activity.setCountryId(countryId);
         activity.setParentActivity(true);
         activity.setState(ActivityStateEnum.LIVE);
