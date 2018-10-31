@@ -21,22 +21,10 @@ public class AppConstant {
 
     public static final String EXISTING_DATA_LIST= "existing";
     public static final String NEW_DATA_LIST = "new";
-    public static final String AGREEMENT_SECTION = "agreement_section";
-    public static final String AGREEMENT_SECTION_WRAPPER= "agreement_section_wrapper";
-    public static final String DATA_ELEMENT_LIST = "data-elements";
-    public static final String DATA_CATEGORY_LIST = "data_categories";
-    public static final String DATA_SUBJECT_LIST = "data_subjects";
-
-
-
-    public static final String AGREEMENT_SUB_SECTION_MAP_CONTAINING_CLAUSE = "agreement_sub_section_map_with_clauses";
-
-
+    public static final String FORWARD_SLASH = "/";
 
 
     //rollback
-    public static final String QUESTION_LIST = "question_list";
-    public static final String QUESTIONNAIRE_SECTIONS = "questionnaire_sectionList";
     public static final String PROCESSING_ACTIVITIES = "processing_activities";
     public static final String IDS_LIST = "ids";
     public static final String DATA_ELEMENTS_LIST = "data_elements";
@@ -61,10 +49,6 @@ public class AppConstant {
     public static final String SUB_PROCESSING_ACTIVITY_KEY = "subProcessingActivities";
 
 
-//RISK constant for asset type and Sub types
-
-    public static final String ASSET_TYPE_Risk_LIST= "assetType";
-    public static final String SUB_ASSET_TYPE_Risk_LIST= "subsAssetType";
 
 
 
