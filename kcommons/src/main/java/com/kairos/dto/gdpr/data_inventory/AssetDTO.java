@@ -40,7 +40,7 @@ public class AssetDTO {
     private BigInteger hostingType;
     private BigInteger dataDisposal;
     @NotNull(message = "error.message.assetType.notNull")
-    private BigInteger assetType;
+    private BigInteger assetTypeId;
     private BigInteger assetSubTypeId;
     private Integer dataRetentionPeriod;
     private Long minDataSubjectVolume;
@@ -83,7 +83,6 @@ public class AssetDTO {
     public BigInteger getHostingType() { return hostingType; }
 
     public BigInteger getDataDisposal() { return dataDisposal; }
-    public BigInteger getAssetType() { return assetType; }
 
     public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
 
@@ -122,9 +121,6 @@ public class AssetDTO {
     public void setHostingType(BigInteger hostingType) { this.hostingType = hostingType; }
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
-
-
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
 
     public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
@@ -135,4 +131,8 @@ public class AssetDTO {
 
     public AssetDTO() {
     }
+
+    public BigInteger getAssetTypeId() { return assetTypeId; }
+
+    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
 }
