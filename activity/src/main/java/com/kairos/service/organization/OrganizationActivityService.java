@@ -51,7 +51,6 @@ import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.wrapper.activity.ActivityDTOsWrapper;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
@@ -198,7 +197,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return response;
     }
 
-    public ActivityDTOsWrapper getGeneralTabOfActivity(BigInteger activityId, Long unitId) {
+    public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId, Long unitId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
@@ -207,14 +206,13 @@ public class OrganizationActivityService extends MongoBaseService {
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
+        //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab, generalActivityTabWithTagDTO,"tags");
-        if(!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
-        }
-        ActivityDTOsWrapper activityDTOsWrapper=new ActivityDTOsWrapper(activityId,generalActivityTabWithTagDTO,activityCategories);
-        return activityDTOsWrapper;
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!activity.getTags().isEmpty()) generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
+        return activityTabsWrapper;
     }
 
     //TODO Need to make sure that its fine to not copy expertise/skills/employmentTypes
@@ -234,7 +232,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityCopied;
     }
 
-    public ActivityDTOsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
+    public ActivityTabsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
@@ -266,16 +264,14 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setTags(generalDTO.getTags());
 
         save(activity);
-
+        // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab, generalActivityTabWithTagDTO,"tags");
-        if(!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        }
-        ActivityDTOsWrapper activityDTOsWrapper=new ActivityDTOsWrapper(generalDTO.getActivityId(),generalActivityTabWithTagDTO,activityCategories);
-        return activityDTOsWrapper;
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!generalDTO.getTags().isEmpty()) generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
+        return activityTabsWrapper;
     }
 
     public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
