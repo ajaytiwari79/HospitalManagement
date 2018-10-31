@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class QuestionBasicResponseDTO {
 
     private BigInteger id;
