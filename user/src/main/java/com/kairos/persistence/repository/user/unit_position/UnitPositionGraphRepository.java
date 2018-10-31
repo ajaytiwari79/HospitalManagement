@@ -305,7 +305,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     void removeAllAppliedFunctionOnPositionLines(Long unitPositionLineId);
 
 
-    @Query(" MATCH (unitPosition:UnitPosition{deleted:false,published:true}) where id(unitPosition) IN  {0} \n" +
+    @Query(" MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition) IN  {0} \n" +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +
             "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]-(payGrade:PayGrade) \n" +
             "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise{published:true}) \n" +
