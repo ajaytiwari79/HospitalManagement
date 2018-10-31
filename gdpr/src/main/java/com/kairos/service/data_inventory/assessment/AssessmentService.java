@@ -130,8 +130,8 @@ public class AssessmentService extends MongoBaseService {
         }
         Asset asset = assetMongoRepository.findOne(assetId);
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, asset);
-        assessment.setAssetId(assetId);
         saveAssetValueToAssessmentAnswer(unitId, assessment);
+        assessment.setAssetId(assetId);
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
         return assessmentDTO;
@@ -223,6 +223,13 @@ public class AssessmentService extends MongoBaseService {
         } else if (questionnaireTemplate.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
             exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
         }
+        if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
+            if (!Optional.ofNullable(assessmentDTO.getAssessmentScheduledDate()).isPresent()) {
+                exceptionService.invalidRequestException("message.assessment.scheduling.date.not.Selected");
+            }
+            assessment.setAssessmentScheduledDate(assessmentDTO.getAssessmentScheduledDate());
+        }
+        assessment.setAssessmentSchedulingFrequency(assessmentDTO.getAssessmentSchedulingFrequency());
         assessment.setQuestionnaireTemplateId(questionnaireTemplate.getId());
         return assessment;
 

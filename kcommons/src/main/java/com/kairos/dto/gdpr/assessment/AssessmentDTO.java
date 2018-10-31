@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
 import javax.validation.Valid;
@@ -32,6 +33,11 @@ public class AssessmentDTO {
 
     protected Staff approver;
 
+    protected LocalDate assessmentScheduledDate;
+
+    @NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
+    protected AssessmentSchedulingFrequency assessmentSchedulingFrequency;
+
     public BigInteger getId() { return id; }
 
     public void setId(BigInteger id) { this.id = id; }
@@ -56,4 +62,11 @@ public class AssessmentDTO {
 
     public void setApprover(Staff approver) { this.approver = approver; }
 
+    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+
+    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+
+    public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
+
+    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
 }
