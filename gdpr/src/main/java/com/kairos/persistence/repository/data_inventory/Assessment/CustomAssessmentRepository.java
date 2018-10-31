@@ -11,7 +11,7 @@ public interface CustomAssessmentRepository {
 
     Assessment findAssessmentByNameAndUnitId(Long unitId, String name);
 
-    List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId, Long loggedInUserId);
+    List<AssessmentBasicResponseDTO> getAllAssessmentByUnitIdAndStaffId(Long unitId, Long staffId);
 
     List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId);
 

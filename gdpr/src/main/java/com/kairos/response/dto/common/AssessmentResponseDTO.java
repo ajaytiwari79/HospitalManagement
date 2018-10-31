@@ -22,7 +22,7 @@ public class AssessmentResponseDTO {
     private LocalDate endDate;
     private LocalDate completedDate;
     private String comment;
-    private Staff assignee;
+    private List<Staff> assigneeList;
     private Staff approver;
     private AssessmentStatus assessmentStatus;
     private AssetBasicResponseDTO asset;
@@ -54,9 +54,9 @@ public class AssessmentResponseDTO {
 
     public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 
-    public Staff getAssignee() { return assignee; }
+    public List<Staff> getAssigneeList() { return assigneeList; }
 
-    public void setAssignee(Staff assignee) { this.assignee = assignee; }
+    public void setAssigneeList(List<Staff> assigneeList) { this.assigneeList = assigneeList; }
 
     public Staff getApprover() { return approver; }
 

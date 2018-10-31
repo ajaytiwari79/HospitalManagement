@@ -73,6 +73,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
@@ -543,6 +544,8 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.validateStatusOfShiftOnUpdate(shift, shiftDTO);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()), shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        List<Activity> activityList=activities.stream().map(ActivityWrapper::getActivity).collect(Collectors.toList());
+        organizationActivityService.verifyBreakAllowedOfActivities(activities.get(0).getActivity().getRulesActivityTab().isBreakAllowed(),activityList);
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(shift.getActivities(), shiftDTO.getActivities());
         // Validating Shift to eligibility
@@ -1081,7 +1084,6 @@ public class ShiftService extends MongoBaseService {
         Long unitPositionId = restClient.getUnitPositionId(unitId, staffId, expertiseId, startDateInISO.getTime());
 
         List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, unitId);
-        shifts.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
         return shifts;
     }
 
@@ -1092,8 +1094,8 @@ public class ShiftService extends MongoBaseService {
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO->
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(),ActivityDTO.class))
         );
-        shiftWithActivityDTO.setStartDate(shiftDTO.sortShifts().get(0).getStartDate());
-        shiftWithActivityDTO.setEndDate(shiftDTO.sortShifts().get(0).getEndDate());
+        shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
+        shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(0).getEndDate());
         shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
         return shiftWithActivityDTO;
     }

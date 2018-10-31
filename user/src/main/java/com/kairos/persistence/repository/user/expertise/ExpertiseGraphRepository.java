@@ -1,16 +1,14 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -195,5 +193,11 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) " +
             "return id(expertise) as id , expertise.name as name")
     List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
+
+    @Query("match (exp:Expertise) where id(exp)={0} \n" +
+            "optional match (exp)-[:"+HAS_SENIOR_DAYS+"]->(seniorDays:CareDays)\n" +
+            "optional match (exp)-[:"+HAS_CHILD_CARE_DAYS+"]->(childCareDays:CareDays)\n" +
+            "return  COLLECT({id:id(childCareDays), from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) as childCareDays ,COLLECT({id:id(seniorDays), from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) as seniorDays")
+    SeniorAndChildCareDaysQueryResult getSeniorDaysOfExpertise(Long expertiseId);
 
 }

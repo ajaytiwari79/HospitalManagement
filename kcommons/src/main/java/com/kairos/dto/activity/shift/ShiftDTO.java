@@ -174,6 +174,9 @@ public class ShiftDTO {
     }
 
     public void setActivities(List<ShiftActivity> activities) {
+        if (Optional.ofNullable(activities).isPresent()) {
+            activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+        }
         this.activities = activities;
     }
 
@@ -199,13 +202,6 @@ public class ShiftDTO {
 
     public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
         this.accessGroupRole = accessGroupRole;
-    }
-
-    public List<ShiftActivity> sortShifts() {
-        if (Optional.ofNullable(activities).isPresent()) {
-            activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
-        }
-        return activities;
     }
 
     public BigInteger getId() {
@@ -295,17 +291,6 @@ public class ShiftDTO {
         return startDate;
     }
 
-    @JsonIgnore
-    public Date getActivitiesEndDate(){
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
-        return activities.get(activities.size()-1).getEndDate();
-    }
-
-    @JsonIgnore
-    public Date getActivitiesStartDate(){
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
-        return activities.get(activities.size()-1).getEndDate();
-    }
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;

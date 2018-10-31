@@ -2,6 +2,7 @@ package com.kairos.utils;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.Gender;
+import org.apache.commons.lang.StringUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -13,7 +14,7 @@ import java.util.Date;
 public class CPRUtil {
 
     public static Integer getAgeFromCPRNumber(String cprNumber) {
-        return cprNumber != null ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : null;
+        return StringUtils.isNotBlank(cprNumber) ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : null;
     }
 
     public static Date fetchDateOfBirthFromCPR(String cprNumber) {
