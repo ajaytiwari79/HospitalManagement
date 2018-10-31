@@ -16,12 +16,12 @@ db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequen
 db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
 
 db.wtaBaseRuleTemplate.insert({
-    "_id" : "723", // this must be replaced by updated sequence
+    "_id" : "21889", // this must be replaced by updated sequence
     "name" : "WTA for breaks in shift",
     "description" : "WTA for breaks in shift",
     "disabled" : false,
     "ruleTemplateCategoryId" : "4",
-    "countryId" : NumberLong(18712),
+    "countryId" : NumberLong(4),
     "lastUpdatedBy" : "Ulrik",
     "breakGapMinutes":30,
     "breakAvailability": [
