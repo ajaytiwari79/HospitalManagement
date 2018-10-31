@@ -32,6 +32,7 @@ public class OrganizationBasicResponse {
     private StaffPersonalDetailDTO unitManager;
     private Long unitTypeId;
 
+
     public OrganizationBasicResponse() {
     }
 

@@ -27,7 +27,7 @@ public class WTADTO {
     private Long organizationType;
     private Long organizationSubType;
     private List<BigInteger> tags;
-
+    private LocalDate unitPositionEndDate;
     public WTADTO() {
         //default cons
     }
@@ -134,6 +134,14 @@ public class WTADTO {
 
     public void setTags(List<BigInteger> tags) {
         this.tags = tags;
+    }
+
+    public LocalDate getUnitPositionEndDate() {
+        return unitPositionEndDate;
+    }
+
+    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
+        this.unitPositionEndDate = unitPositionEndDate;
     }
 
     public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {

@@ -710,4 +710,11 @@ public class WTAService extends MongoBaseService {
         return ctawtaWrapper;
 
     }
+
+    public boolean setEndCTAWTAOfUnitPosition(Long unitPositionId, LocalDate endDate) {
+            wtaRepository.setEndDateToWTAOfUnitPosition(unitPositionId, endDate);
+            costTimeAgreementRepository.setEndDateToCTAOfUnitPosition(unitPositionId, endDate);
+    return  true;
+
+    }
 }

@@ -2,8 +2,10 @@
 kairos ACTIVITY
 
 
+
 db.time_Type.update({"label" : "Unpaid break"},{$set:{"timeTypes":"UNPAID"}})
 db.time_Type.update({"label" : "Paid Break"},{$set:{"timeTypes":"PAID"}})
+
 
 // To create Constraints on country level
 db.glideTimeSettings.createIndex( { "countryId": 1 }, { unique: true } )
@@ -63,6 +65,9 @@ NEO
 MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
 set r.amountEditableAtUnit=FALSE
 
+
+MATCH(slf:SeniorityLevelFunction)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function:Function)
+set rel.amountEditableAtUnit=false;
 
 
 

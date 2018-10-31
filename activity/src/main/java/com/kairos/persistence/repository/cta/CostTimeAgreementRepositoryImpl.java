@@ -180,11 +180,16 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         return result;
     }
 
-
+@Override
     public void disableOldCta(BigInteger oldctaId, LocalDate endDate){
         Update update=Update.update("endDate",DateUtils.asDate(endDate)).set("disabled",true);
         mongoTemplate.findAndModify(new Query(Criteria.where("id").is(oldctaId)),update,CostTimeAgreement.class);
 
 
+    }
+    @Override
+    public void setEndDateToCTAOfUnitPosition(Long unitPositionId, LocalDate endDate){
+        Update update=Update.update("endDate",DateUtils.asDate(endDate));
+        mongoTemplate.findAndModify(new Query(Criteria.where("unitPositionId").is(unitPositionId).and("endDate").exists(false)),update,CostTimeAgreement.class);
     }
 }

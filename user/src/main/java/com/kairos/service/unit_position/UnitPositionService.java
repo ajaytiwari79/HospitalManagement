@@ -542,11 +542,19 @@ public class UnitPositionService {
             unitPosition.setEndDate(null);
         }else if(unitPositionDTO.getEndDate() != null && unitPosition.getEndDate() == null){
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
+            setEndDateToCTAWTA(unitPosition.getUnit().getId(),unitPosition.getId(),unitPositionDTO.getEndDate());
         }
         else if (unitPositionDTO.getEndDate() != null && unitPosition.getEndDate() != null && unitPosition.getEndDate().isBefore(unitPositionDTO.getEndDate())) {
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
+            setEndDateToCTAWTA(unitPosition.getUnit().getId(),unitPosition.getId(),unitPositionDTO.getEndDate());
         }
 
+
+    }
+    private void setEndDateToCTAWTA(Long unitId,Long unitPositionId,LocalDate endDate){
+
+        genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.UPDATE, APPLY_CTA_WTA_END_DATE,
+                Collections.singletonList(new BasicNameValuePair("endDate", endDate + "")), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
     }
 
     private void updateCurrentPositionLine(UnitPositionLine positionLine, UnitPositionDTO unitPositionDTO) {
@@ -789,7 +797,14 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
+        if (unitPosition.getEndDate()!=null && updateDTO.getEndDate()!=null && updateDTO.getEndDate().isBefore(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("end_date.from.end_date");
+        }
+        if (unitPosition.getEndDate()!=null && updateDTO.getStartDate().isAfter(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("start_date.from.end_date");
+        }
         updateDTO.setId(wtaId);
+        updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
         return unitPositionQueryResult;
