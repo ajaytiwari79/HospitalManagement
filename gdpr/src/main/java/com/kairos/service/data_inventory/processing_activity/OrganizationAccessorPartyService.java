@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.data_inventory.processing_activity.Proc
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
@@ -108,7 +107,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", new StringBuilder(processingActivitiesLinkedWithAccessorParty.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        accessorPartyMongoRepository.safeDelete(accessorPartyId);
+        accessorPartyMongoRepository.safeDeleteById(accessorPartyId);
         return true;
     }
 

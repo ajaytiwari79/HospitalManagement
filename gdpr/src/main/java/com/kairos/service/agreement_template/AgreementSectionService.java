@@ -100,7 +100,7 @@ public class AgreementSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
         }
         agreementSection.getSubSections().remove(subSectionId);
-        agreementSectionMongoRepository.safeDelete(subSectionId);
+        agreementSectionMongoRepository.safeDeleteById(subSectionId);
         agreementSectionMongoRepository.save(agreementSection);
         return true;
     }

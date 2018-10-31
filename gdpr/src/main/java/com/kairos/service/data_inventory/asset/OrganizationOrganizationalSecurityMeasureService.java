@@ -120,7 +120,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
         if (CollectionUtils.isNotEmpty(assetsLinkedWithOrganizationalSecurityMeasure)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", new StringBuilder(assetsLinkedWithOrganizationalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        organizationalSecurityMeasureMongoRepository.safeDelete(orgSecurityMeasureId);
+        organizationalSecurityMeasureMongoRepository.safeDeleteById(orgSecurityMeasureId);
         return true;
 
     }
