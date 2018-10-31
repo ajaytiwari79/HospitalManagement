@@ -17,8 +17,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private boolean borrowLeave;
     private boolean carryForwardLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
@@ -61,21 +59,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.carryForwardLeave = carryForwardLeave;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
-
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public CutOffIntervalUnit getCutOffIntervalUnit() {
         return cutOffIntervalUnit;

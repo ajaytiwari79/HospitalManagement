@@ -245,7 +245,7 @@ public class UnitPositionService {
     }
 
     private CTAWTAWrapper assignCTAAndWTAToUnitPosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) {
-        CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.assignWTAToUnitPosition(unitPosition.getId(), unitPositionDTO.getWtaId(), unitPositionDTO.getCtaId());
+        CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.assignWTAToUnitPosition(unitPosition.getId(), unitPositionDTO.getWtaId(), unitPositionDTO.getCtaId(),unitPositionDTO.getStartDate());
         if (ctawtaWrapper.getWta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.wta.id");
         }
@@ -487,7 +487,9 @@ public class UnitPositionService {
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
                 linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
-                linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false);
+                if (changeResultDTO.isFunctionsChanged()) {
+                    linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false);
+                }
                 unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
 
@@ -542,11 +544,19 @@ public class UnitPositionService {
             unitPosition.setEndDate(null);
         }else if(unitPositionDTO.getEndDate() != null && unitPosition.getEndDate() == null){
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
+            setEndDateToCTAWTA(unitPosition.getUnit().getId(),unitPosition.getId(),unitPositionDTO.getEndDate());
         }
         else if (unitPositionDTO.getEndDate() != null && unitPosition.getEndDate() != null && unitPosition.getEndDate().isBefore(unitPositionDTO.getEndDate())) {
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
+            setEndDateToCTAWTA(unitPosition.getUnit().getId(),unitPosition.getId(),unitPositionDTO.getEndDate());
         }
 
+
+    }
+    private void setEndDateToCTAWTA(Long unitId,Long unitPositionId,LocalDate endDate){
+
+        genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.UPDATE, APPLY_CTA_WTA_END_DATE,
+                Collections.singletonList(new BasicNameValuePair("endDate", endDate + "")), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
     }
 
     private void updateCurrentPositionLine(UnitPositionLine positionLine, UnitPositionDTO unitPositionDTO) {
@@ -615,9 +625,7 @@ public class UnitPositionService {
         CompletableFuture<Boolean> done = setDefaultData(unitPositionDTO, unitPosition);
         CompletableFuture.allOf(done).join();
         // UEP can be created for past dates from time care
-        if (!createFromTimeCare && unitPositionDTO.getStartDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
-        }
+
         unitPosition.setStartDate(unitPositionDTO.getStartDate());
         if (Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) {
             if (unitPositionDTO.getStartDate().isAfter(unitPositionDTO.getEndDate())) {
@@ -791,7 +799,14 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
+        if (unitPosition.getEndDate()!=null && updateDTO.getEndDate()!=null && updateDTO.getEndDate().isBefore(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("end_date.from.end_date");
+        }
+        if (unitPosition.getEndDate()!=null && updateDTO.getStartDate().isAfter(unitPosition.getEndDate())){
+            exceptionService.actionNotPermittedException("start_date.from.end_date");
+        }
         updateDTO.setId(wtaId);
+        updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
         return unitPositionQueryResult;

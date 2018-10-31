@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentBasicResponseDTO {
@@ -15,7 +16,7 @@ public class AssessmentBasicResponseDTO {
     private LocalDate endDate;
     private LocalDate completedDate;
     private String comment;
-    private Staff assignee;
+    private List<Staff> assigneeList;
     private Staff approver;
     private AssessmentStatus assessmentStatus;
 
@@ -39,9 +40,9 @@ public class AssessmentBasicResponseDTO {
 
     public void setComment(String comment) { this.comment = comment; }
 
-    public Staff getAssignee() { return assignee; }
+    public List<Staff> getAssigneeList() { return assigneeList; }
 
-    public void setAssignee(Staff assignee) { this.assignee = assignee; }
+    public void setAssigneeList(List<Staff> assigneeList) { this.assigneeList = assigneeList; }
 
     public Staff getApprover() { return approver; }
 

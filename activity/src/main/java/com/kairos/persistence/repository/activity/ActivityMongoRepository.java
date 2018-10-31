@@ -50,4 +50,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
 
+    @Query(value = "{deleted:false,'compositeActivities.activityId':?0}",exists = true)
+    boolean existsByActivityIdInCompositeActivitiesAndDeletedFalse(BigInteger id);
+
 }

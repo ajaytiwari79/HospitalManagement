@@ -3,7 +3,6 @@ package com.kairos.service.clause;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
@@ -138,7 +137,7 @@ public class ClauseService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        clauseMongoRepository.safeDelete(clauseId);
+        clauseMongoRepository.safeDeleteById(clauseId);
         return true;
     }
 

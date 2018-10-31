@@ -201,7 +201,7 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
 
-        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year", true, false, "Senior Days per Year", Arrays.asList(range));
+        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = new SeniorDaysPerYearWTATemplate("Senior Days per Year",  false, "Senior Days per Year", Arrays.asList(range));
         seniorDaysPerYearWTATemplate.setCountryId(countryDTO.getId());
         seniorDaysPerYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         seniorDaysPerYearWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

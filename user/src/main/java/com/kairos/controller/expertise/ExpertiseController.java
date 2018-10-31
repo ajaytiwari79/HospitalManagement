@@ -181,4 +181,16 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO));
     }
 
+    @ApiOperation(value = "Get senior Days and child Care days at country")
+    @GetMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/senior_and_child_care_days")
+    public ResponseEntity<Map<String, Object>> getSeniorAndChildCareDaysAtCountry(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId));
+    }
+
+    @ApiOperation(value = "Get senior Days and child Care days at unit")
+    @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/senior_and_child_care_days")
+    public ResponseEntity<Map<String, Object>> getSeniorAndChildCareDaysAtUnit(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId));
+    }
+
 }
