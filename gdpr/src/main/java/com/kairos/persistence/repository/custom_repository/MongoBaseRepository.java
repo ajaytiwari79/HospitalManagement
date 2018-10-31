@@ -14,11 +14,11 @@ public interface MongoBaseRepository<T extends MongoBaseEntity, ID extends Seria
 
      T findOne(ID id);
 
-     T safeDelete(ID id);
+     T safeDeleteById(ID id);
 
-     boolean safeDelete(Set<ID> ids);
+     boolean safeDeleteByIds(Set<ID> ids);
 
-      <T extends MongoBaseEntity> List<T> safeDelete(List<T> entities);
+      <T extends MongoBaseEntity> List<T> safeDeleteAll(List<T> entities);
 
 
 }

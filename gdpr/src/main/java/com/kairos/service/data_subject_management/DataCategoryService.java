@@ -3,7 +3,6 @@ package com.kairos.service.data_subject_management;
 import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
@@ -101,7 +100,7 @@ public class DataCategoryService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
             exceptionService.invalidRequestException("message.cannot.delete.dataCategory", dataSubjectLinkedWithDataCategory.stream().map(DataSubjectMappingBasicResponseDTO::getName).collect(Collectors.joining(",")));
         }
-        dataCategoryMongoRepository.safeDelete(dataCatgeoryId);
+        dataCategoryMongoRepository.safeDeleteById(dataCatgeoryId);
         return true;
 
     }

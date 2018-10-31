@@ -116,7 +116,7 @@ public class DataSubjectMappingService extends MongoBaseService {
     }
 
     public boolean deleteDataSubjectById(BigInteger dataSubjectId) {
-        dataSubjectMappingRepository.safeDelete(dataSubjectId);
+        dataSubjectMappingRepository.safeDeleteById(dataSubjectId);
         return true;
     }
 

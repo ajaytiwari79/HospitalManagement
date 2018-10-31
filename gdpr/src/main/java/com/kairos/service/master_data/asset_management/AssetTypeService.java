@@ -238,7 +238,7 @@ public class AssetTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetTypeId);
         }
         assetType.getRisks().remove(riskId);
-        riskMongoRepository.safeDelete(riskId);
+        riskMongoRepository.safeDeleteById(riskId);
         assetTypeMongoRepository.save(assetType);
         return true;
     }
