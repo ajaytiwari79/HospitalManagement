@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentDTO {
@@ -25,7 +27,8 @@ public class AssessmentDTO {
     protected String comment;
 
     @NotNull(message = "error.message.assignee.not.selected")
-    protected Staff assignee;
+    @Valid
+    protected  List<Staff> assigneeList;
 
     protected Staff approver;
 
@@ -45,9 +48,9 @@ public class AssessmentDTO {
 
     public void setComment(String comment) { this.comment = comment; }
 
-    public Staff getAssignee() { return assignee; }
+    public List<Staff> getAssigneeList() { return assigneeList; }
 
-    public void setAssignee(Staff assignee) { this.assignee = assignee; }
+    public void setAssigneeList(List<Staff> assigneeList) { this.assigneeList = assigneeList; }
 
     public Staff getApprover() { return approver; }
 

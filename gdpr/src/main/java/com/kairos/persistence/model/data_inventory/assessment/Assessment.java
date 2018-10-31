@@ -7,6 +7,7 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -29,19 +30,29 @@ public class Assessment extends MongoBaseEntity {
     private Set<BigInteger> riskIds;
     private List<AssessmentAnswerValueObject> assessmentAnswers;
     @NotNull
-    private Staff assignee;
+    @Valid
+    private List<Staff> assigneeList;
     @NotNull
     private Staff approver;
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
+    private String userEmailIdAssessmentLastAssistBy;
 
 
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver,String comment) {
+    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment) {
         this.name = name;
         this.endDate = endDate;
-        this.assignee = assignee;
+        this.assigneeList = assigneeList;
         this.approver = approver;
         this.comment=comment;
+    }
+
+    public String getUserEmailIdAssessmentLastAssistBy() {
+        return userEmailIdAssessmentLastAssistBy;
+    }
+
+    public void setUserEmailIdAssessmentLastAssistBy(String userEmailIdAssessmentLastAssistBy) {
+        this.userEmailIdAssessmentLastAssistBy = userEmailIdAssessmentLastAssistBy;
     }
 
     public boolean isRiskAssessment() { return riskAssessment; }
@@ -68,9 +79,9 @@ public class Assessment extends MongoBaseEntity {
 
     public void setComment(String comment) { this.comment = comment; }
 
-    public Staff getAssignee() { return assignee; }
+    public List<Staff> getAssigneeList() { return assigneeList; }
 
-    public void setAssignee(Staff assignee) { this.assignee = assignee; }
+    public void setAssigneeList(List<Staff> assigneeList) { this.assigneeList = assigneeList; }
 
     public Staff getApprover() { return approver; }
 

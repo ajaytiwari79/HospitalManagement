@@ -30,9 +30,28 @@ public class StaffAdditionalInfoDTO {
     private UserAccessRoleDTO user;
     //This is unit TimeZone
     private ZoneId unitTimeZone;
+    private int staffAge;
     //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
     private List<TimeSlotWrapper> timeSlotSets;
     private Long staffUserId;
+    private String cprNumber;
+
+
+    public int getStaffAge() {
+        return staffAge;
+    }
+
+    public void setStaffAge(int staffAge) {
+        this.staffAge = staffAge;
+    }
+
+    public String getCprNumber() {
+        return cprNumber;
+    }
+
+    public void setCprNumber(String cprNumber) {
+        this.cprNumber = cprNumber;
+    }
 
     public Long getStaffUserId() {
         return staffUserId;

@@ -123,25 +123,11 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
             if(timeInterval!=null) {
                 DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
+                List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
-                if (!isValid) {
-                    if(limitAndCounter[1]!=null) {
-                        int counterValue =  limitAndCounter[1] - 1;
-                        if(counterValue<0){
-                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                        }else {
-                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
-                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                        }
-                    }else {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                    }
-                }
+                brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
             }
         }
     }

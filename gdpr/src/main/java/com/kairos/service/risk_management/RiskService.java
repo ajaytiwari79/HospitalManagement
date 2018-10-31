@@ -87,7 +87,7 @@ public class RiskService extends MongoBaseService {
             List<Risk> risksRelatesToObject = new ArrayList<>();
             riskDTOS.forEach(riskDTO -> {
                 Risk risk = riskMap.get(riskDTO.getId());
-                ObjectMapperUtils.copyPropertiesExceptSpecific(riskDTO, risk);
+                ObjectMapperUtils.copyProperties(riskDTO, risk);
                 risksRelatesToObject.add(risk);
             });
             riskListRelatedToObjectMap.get(objectToWhichRiskRelate).addAll(risksRelatesToObject);
