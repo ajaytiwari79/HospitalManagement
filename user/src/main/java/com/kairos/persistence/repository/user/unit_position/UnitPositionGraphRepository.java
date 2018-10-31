@@ -295,7 +295,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
     @Query(" MATCH (positionLine:UnitPositionLine) where id(positionLine) IN {0} " +
-            "OPTIONAL MATCH (positionLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
+            " MATCH (positionLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
             "RETURN distinct function as function,functionalRel.amount as amount")
     List<FunctionWithAmountQueryResult> findAllAppliedFunctionOnPositionLines(Long unitPositionLineId);
 
