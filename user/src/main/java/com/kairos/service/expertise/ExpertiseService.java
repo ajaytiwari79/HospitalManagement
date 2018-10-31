@@ -817,4 +817,9 @@ public class ExpertiseService {
                 "/expertise/" + targetExpertise.getId() + "/night_worker_setting", null);
 
     }
+
+    public SeniorAndChildCareDaysQueryResult getSeniorAndChildCareDays(Long expertiseId){
+        return ObjectMapperUtils.copyPropertiesByMapper(expertiseGraphRepository.getSeniorDaysOfExpertise(expertiseId),SeniorAndChildCareDaysQueryResult.class);
+    }
+
 }

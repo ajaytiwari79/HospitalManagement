@@ -9,6 +9,7 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -108,11 +109,10 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        //TODO It should work on Multiple activity
-        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getId())) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && CollectionUtils.containsAny(activityIds,infoWrapper.getShift().getActivitIds())) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
-            shifts = filterShifts(shifts, null, null, activityIds);
+            shifts = filterShiftsByActivityIds(shifts, activityIds);
             shifts.add(infoWrapper.getShift());
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());

@@ -23,7 +23,6 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-        //TODO It should work on Multiple activity
         employmentTypeIds.addAll(shift.getActivities().stream().filter(a->a.getActivity()!=null).flatMap(a -> a.getActivity().getEmploymentTypes().stream()).collect(Collectors.toList()));
         if (!employmentTypeIds.contains(employmentType.getId())) {
             return Arrays.asList("message.activity.employement-type-match");
