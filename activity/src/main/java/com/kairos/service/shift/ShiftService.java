@@ -44,6 +44,7 @@ import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
@@ -295,7 +296,7 @@ public class ShiftService extends MongoBaseService {
             mainShift.setPlanningPeriodId(shiftWithActivityDTO.getPlanningPeriodId());
             mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            saveShiftWithActivity(wtaQueryResultDTO, activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,false);
+            saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,false);
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
             ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfoDTO.getViolatedRules(), ShiftViolatedRules.class);
@@ -321,7 +322,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public void saveShiftWithActivity(WTAQueryResultDTO wtaQueryResultDTO, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean updateShift) {
+    public void saveShiftWithActivity(WTABaseRuleTemplate wtaQueryResultDTO, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift) {
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shift.getStaffId(), activityIds);
         Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId, v -> v));
         int scheduledMinutes = 0;
@@ -408,8 +409,8 @@ public class ShiftService extends MongoBaseService {
         List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate()));
-        saveShiftWithActivity(wtaQueryResultDTO, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false);
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shiftWithViolatedInfo.getShifts().get(0).getActivities().get(0).getStartDate()));
+        saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false);
         payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getViolatedRules(), ShiftViolatedRules.class);
         shiftViolatedRules.setShift(shift);
@@ -570,7 +571,7 @@ public class ShiftService extends MongoBaseService {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shift.setUpdatedBy(UserContext.getUserDetails().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
-            saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,true);
+            saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,true);
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
             shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);

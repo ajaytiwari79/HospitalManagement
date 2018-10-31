@@ -392,7 +392,7 @@ public class UnitPositionService {
         List<FunctionWithAmountQueryResult> newAppliedFunctions = findAndValidateFunction(unitPositionDTO);
         List<FunctionWithAmountQueryResult> olderAppliesFunctions = unitPositionGraphRepository.findAllAppliedFunctionOnPositionLines(unitPositionDTO.getPositionLineId());
         // if earlier there were 3 applied function and new its 2 or 4 then simply we need to set calculative value change and
-        // return it witout checking its objects or values
+        // return it without checking its objects or values
         if (newAppliedFunctions.size() != olderAppliesFunctions.size()) {
             changeResultDTO.setCalculativeChanged(true);
             changeResultDTO.setFunctionsChanged(true);

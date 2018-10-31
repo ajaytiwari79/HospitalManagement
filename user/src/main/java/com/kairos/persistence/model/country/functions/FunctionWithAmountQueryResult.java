@@ -19,7 +19,7 @@ public class FunctionWithAmountQueryResult {
     }
 
     public Function getFunction() {
-        return function;
+        return Opfunction;
     }
 
     public void setFunction(Function function) {
