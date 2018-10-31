@@ -487,7 +487,9 @@ public class UnitPositionService {
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
                 linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
-                linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false);
+                if (changeResultDTO.isFunctionsChanged()) {
+                    linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false);
+                }
                 unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
 
