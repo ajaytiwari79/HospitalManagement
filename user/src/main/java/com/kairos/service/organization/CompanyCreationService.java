@@ -240,7 +240,6 @@ public class CompanyCreationService {
         return kairosId;
     }
 
-    // tab 1 in FE
     public OrganizationBasicResponse getOrganizationDetailsById(Long unitId) {
         OrganizationBasicResponse organization = organizationGraphRepository.getOrganizationDetailsById(unitId);
         organization.setUnitManager(getUnitManagerOfOrganization(unitId));
@@ -352,7 +351,7 @@ public class CompanyCreationService {
         user.setGender(CPRUtil.getGenderFromCPRNumber(unitManagerDTO.getCprNumber()));
     }
 
-    // 3Rd tab in FE
+    
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
     }
