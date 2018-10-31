@@ -4,6 +4,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 @Document(collection = "shiftState")
 public class ShiftState extends Shift {
@@ -13,6 +14,7 @@ public class ShiftState extends Shift {
     private AccessGroupRole accessGroupRole;
     private String actualPhaseState;
     private BigInteger attendanceSettingId;
+    private LocalDate validated;
 
     public BigInteger getShiftId() {
         return shiftId;
@@ -52,5 +54,13 @@ public class ShiftState extends Shift {
 
     public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
         this.accessGroupRole = accessGroupRole;
+    }
+
+    public LocalDate getValidated() {
+        return validated;
+    }
+
+    public void setValidated(LocalDate validated) {
+        this.validated = validated;
     }
 }

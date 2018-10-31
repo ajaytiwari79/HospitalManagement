@@ -59,7 +59,6 @@ public class Shift extends MongoBaseEntity {
 
     private boolean sickShift;
 
-    private LocalDate validated;
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
@@ -187,14 +186,6 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
     }
 
-
-    public LocalDate getValidated() {
-        return validated;
-    }
-
-    public void setValidated(LocalDate validated) {
-        this.validated = validated;
-    }
 
     public Date getStartDate() {
         return startDate;

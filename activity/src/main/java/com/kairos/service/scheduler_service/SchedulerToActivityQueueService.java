@@ -43,11 +43,12 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case ATTENDANCE_SETTING:
                 logger.info("Job to update clock out time");
-
-            default:
-                logger.error("No exceution route found for jobsubtype");
                 attendanceSettingService.checkOutBySchedulerJob(job.getUnitId());
                 break;
+            default:
+                logger.error("No exceution route found for jobsubtype");
+                break;
+
         }
 
     }

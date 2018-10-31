@@ -318,6 +318,7 @@ public class AttendanceSettingService extends MongoBaseService {
         return timeAndAttendanceSetting;
     }
 
+    // check out after job run
     public void checkOutBySchedulerJob(Long unitId){
         List<Shift> saveShifts=new ArrayList<>();
         List<AttendanceSetting> attendanceSettings=attendanceSettingRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getEndOfDayFromLocalDateTime()));
@@ -326,7 +327,7 @@ public class AttendanceSettingService extends MongoBaseService {
              attendanceSettings.forEach(attendanceSetting -> {
                  if (staffIdAndShifts.get(attendanceSetting.getShiftId()) != null) {
                      Shift shift = staffIdAndShifts.get(attendanceSetting.getShiftId());
-                     if (!shift.getEndDate().after(DateUtils.getCurrentDate())) {
+                     if (!DateUtils.asLocalDate(shift.getEndDate()).isAfter(DateUtils.getCurrentLocalDate())) {
                          attendanceSetting.getAttendanceDuration().sort((a1, a2) -> a1.getFrom().compareTo(a2.getFrom()));
                          attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size() - 1).setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
                          shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
