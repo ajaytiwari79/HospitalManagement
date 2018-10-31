@@ -5,8 +5,7 @@ import com.kairos.dto.activity.task.BulkUpdateTaskDTO;
 import com.kairos.dto.activity.task.TaskActiveUpdationDTO;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.activity.task.TaskRestrictionDto;
-import com.kairos.rest_client.ClientRestClient;
-import com.kairos.rest_client.IntegrationRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
@@ -91,9 +90,8 @@ public class TaskExceptionService extends MongoBaseService {
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
     @Inject
-    private IntegrationRestClient integrationServiceRestClient;
-    @Inject
-    private ClientRestClient clientRestClient;
+    private GenericIntegrationService genericIntegrationService;
+
     @Inject
     private RestrictionFrequencyService restrictionFrequencyService;
     @Inject
@@ -166,7 +164,7 @@ public class TaskExceptionService extends MongoBaseService {
         List<Long> citizenIds = taskRestrictionDtos.stream().map(taskRestrictionDto -> taskRestrictionDto.getCitizenId()).collect(Collectors.toList());
 
         List<Task> tasks = taskMongoRepository.getPrePlanningTaskBetweenExceptionDates(unitId, citizenIds, dateFromAsDate, dateToAsDate);
-        Map<String,String> flsCredentails = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String,String> flsCredentails = genericIntegrationService.getFLS_Credentials(unitId);
         taskRestrictionDtos.forEach(taskRestrictionDto -> {
             List<Task> filtertedTasks = tasks.stream().filter(task -> task.getCitizenId() == taskRestrictionDto.getCitizenId()).collect(Collectors.toList());
             removeRestrictionFromTask(filtertedTasks,taskRestrictionDto,flsCredentails);
@@ -189,7 +187,7 @@ public class TaskExceptionService extends MongoBaseService {
             logger.info("Incorrect id of restriction frequency id " + restrictionFrequencyId);
             exceptionService.dataNotFoundByIdException("message.restrictionfrequency.id",restrictionFrequencyId);
         }
-        List<Long> citizenIds=clientRestClient.getCitizenIds();
+        List<Long> citizenIds=genericIntegrationService.getCitizenIds();
         //DayOfWeek dayOfWeek = LocalDate.now().getHeaderName();
         LocalDateTime dateFrom = LocalDateTime.now().withHour(DAY_START_HOUR).withMinute(DAY_START_MINUTE).withSecond(DAY_START_SECOND);
         LocalDateTime dateTo = LocalDateTime.now().withHour(DAY_END_HOUR).withMinute(DAY_END_MINUTE).withSecond(DAY_END_SECOND);
@@ -209,7 +207,7 @@ public class TaskExceptionService extends MongoBaseService {
             }
             removeRestrictionFromTask(task);
         });
-        Map<String,String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String,String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasks,flsCredentials);
         return true;
     }
@@ -230,7 +228,7 @@ public class TaskExceptionService extends MongoBaseService {
             }
             updateUnhandledTaskInfo(task, taskDTO);
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
 
         if(!tasks.isEmpty()){
@@ -271,7 +269,7 @@ public class TaskExceptionService extends MongoBaseService {
             }
             updateTaskInfo(task, bulkUpdateTaskDTO);
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         return taskService.customizeTaskData(tasks);
     }
@@ -372,7 +370,7 @@ public class TaskExceptionService extends MongoBaseService {
 
         Task task =  taskService.findOne(String.valueOf(taskId));
 
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
 
         Map<String,Object> confirmMetaData = new HashMap<>();
         confirmMetaData.put("functionCode",2);
@@ -418,7 +416,7 @@ public class TaskExceptionService extends MongoBaseService {
             return Collections.emptyList();
         }
         List<Task> tasksToReturn = new ArrayList<>(tasksToUpdate.size());
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         tasksToUpdate.forEach(task -> {
             if (!task.isSingleTask() && task.getActualPlanningTask() == null) {
                 taskService.savePreplanningStateOfTask(task);
@@ -498,7 +496,7 @@ public class TaskExceptionService extends MongoBaseService {
         }
 
         taskService.save(tasksToReturn);
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(task.getUnitId());
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(task.getUnitId());
         taskConverterService.createFlsCallFromTasks(tasksToReturn, flsCredentials);
         return taskService.customizeTaskData(tasksToReturn);
     }
@@ -545,7 +543,7 @@ public class TaskExceptionService extends MongoBaseService {
                 revertTaskState.add(actualTask);
             }
         });
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(revertTaskState, flsCredentials);
         if(!revertTaskState.isEmpty()){
             ClientAggregator clientAggregator = updateTaskCountInAggregator(revertTaskState,unitId,revertTaskState.get(0).getCitizenId(),false);
@@ -571,7 +569,7 @@ public class TaskExceptionService extends MongoBaseService {
             logger.info("taskList >>>>>>>  " + taskList);
         }
         String action = synchronizeTaskPayload.get("action").toString();
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         if (action.equals("sync")) {
             if (taskList.size() > 0) {
                 taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);

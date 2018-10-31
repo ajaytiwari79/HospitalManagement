@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document(collection = "responsibility_type")
+@Document
 public class ResponsibilityType extends MongoBaseEntity {
 
 

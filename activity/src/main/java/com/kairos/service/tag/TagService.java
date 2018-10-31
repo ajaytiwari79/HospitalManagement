@@ -1,14 +1,14 @@
 package com.kairos.service.tag;
 
 import com.kairos.controller.staffing_level.StaffingLevelController;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.tag.TagDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class TagService extends MongoBaseService {
     private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
 
     @Autowired
-    CountryRestClient countryRestClient;
+    GenericIntegrationService genericIntegrationService;
 
     @Autowired
     OrganizationRestClient organizationRestClient;
@@ -40,7 +40,7 @@ public class TagService extends MongoBaseService {
     ExceptionService exceptionService;
 
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
-        if ( !countryRestClient.isCountryExists(countryId)) {
+        if ( !genericIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
@@ -51,7 +51,7 @@ public class TagService extends MongoBaseService {
     }
 
     public Tag  updateCountryTag(Long countryId, BigInteger tagId, TagDTO tagDTO) {
-        if ( !countryRestClient.isCountryExists(countryId)) {
+        if ( !genericIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
@@ -68,7 +68,7 @@ public class TagService extends MongoBaseService {
     }
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
-        if ( !countryRestClient.isCountryExists(countryId)) {
+        if ( !genericIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
@@ -89,7 +89,7 @@ public class TagService extends MongoBaseService {
     }
 
     public boolean deleteCountryTag(Long countryId, BigInteger tagId){
-        if ( !countryRestClient.isCountryExists(countryId)) {
+        if ( !genericIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         Tag tag = tagMongoRepository.findTagByIdAndCountryIdAndDeletedAndCountryTagTrue(tagId, countryId, false);
@@ -110,9 +110,9 @@ public class TagService extends MongoBaseService {
 
     public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO, String type) {
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
@@ -124,9 +124,9 @@ public class TagService extends MongoBaseService {
 
     public Tag  updateOrganizationTag(Long organizationId, BigInteger tagId, TagDTO tagDTO, String type) {
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
@@ -144,9 +144,9 @@ public class TagService extends MongoBaseService {
 
     public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType, String type){
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
@@ -163,8 +163,8 @@ public class TagService extends MongoBaseService {
         } else {
             tags = tagMongoRepository.findAllTagByOrganizationIdAndNameAndMasterDataTypeAndDeletedAndCountryTagFalse(organizationId, filterText, masterDataType.toString(), false);
         }
-        if(organizationRestClient.showCountryTagForOrganization(organizationId)){
-            Long countryId = organizationRestClient.getCountryIdOfOrganization(organizationId);
+        if(genericIntegrationService.showCountryTagForOrganization(organizationId)){
+            Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
             if(masterDataType == null){
                 tags.addAll( tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false));
             } else {
@@ -177,9 +177,9 @@ public class TagService extends MongoBaseService {
 
     public boolean deleteOrganizationTag(Long organizationId, BigInteger tagId, String type){
         if(type.equalsIgnoreCase("team")){
-            organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
+            organizationId = genericIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !organizationRestClient.isExistOrganization(organizationId)) {
+        if ( !genericIntegrationService.isExistOrganization(organizationId)) {
             exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         Tag tag = tagMongoRepository.findTagByIdAndOrganizationIdAndDeletedAndCountryTagFalse(tagId, organizationId, false);

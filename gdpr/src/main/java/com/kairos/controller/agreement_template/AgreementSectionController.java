@@ -2,6 +2,7 @@ package com.kairos.controller.agreement_template;
 
 
 import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementTemplateSectionDTO;
 import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -39,11 +40,8 @@ public class AgreementSectionController {
 
     @ApiOperation("add section to Agreement template ")
     @PostMapping(value = "/agreement_template/{templateId}/section")
-    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateRequestBodyList<AgreementSectionDTO> agreementSections) {
-        if (CollectionUtils.isEmpty(agreementSections.getRequestBody())) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Empty Section list");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, templateId, agreementSections.getRequestBody()));
+    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Valid @RequestBody AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, templateId, agreementTemplateSectionDTO));
     }
 
 

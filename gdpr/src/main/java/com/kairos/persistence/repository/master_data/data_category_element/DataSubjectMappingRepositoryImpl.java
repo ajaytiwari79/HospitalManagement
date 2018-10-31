@@ -64,16 +64,16 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryIdAndId(Long countryId, BigInteger dataSubjectId) {
 
         String addFields = CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(dataSubjectId).and(DELETED).is(false)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
@@ -97,9 +97,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
@@ -124,15 +124,13 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 sort(Sort.Direction.DESC, "createdAt"),
                 group("$id")
-                        .first("organizationTypes").as("organizationTypes")
-                        .first("organizationSubTypes").as("organizationSubTypes")
                         .first("name").as("name")
                         .first("description").as("description")
                         .first("createdAt").as("createdAt")
@@ -146,20 +144,18 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitIdAndId(Long unitId, BigInteger dataSubjectId) {
         String addFields = CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter = Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where("_id").is(dataSubjectId).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
-                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                lookup("dataCategory", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
-                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                lookup("dataElement", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
                 new CustomAggregationOperation(addToFieldOperationFilter),
                 match(Criteria.where("dataCategories.deleted").is(false)),
                 group("$id")
-                        .first("organizationTypes").as("organizationTypes")
-                        .first("organizationSubTypes").as("organizationSubTypes")
                         .first("name").as("name")
                         .first("description").as("description")
                         .first(COUNTRY_ID).as(COUNTRY_ID)

@@ -1,11 +1,10 @@
 package com.planner.domain.staff;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 import com.planner.enums.ShiftType;
 import org.joda.time.DateTime;
 //import org.springframework.data.cassandra.core.mapping.Table;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 //@Table

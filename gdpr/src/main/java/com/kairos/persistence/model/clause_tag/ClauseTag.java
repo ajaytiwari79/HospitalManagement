@@ -7,14 +7,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 
 
-@Document(collection = "clause_tag")
-@TypeName("clause_tag")
+@Document
 public class ClauseTag extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be  empty")
     private String name;
-
+    private boolean defaultTag;
     private Long countryId;
+
+    public boolean isDefaultTag() { return defaultTag; }
+
+    public void setDefaultTag(boolean defaultTag) { this.defaultTag = defaultTag; }
 
     public Long getCountryId() {
         return countryId;

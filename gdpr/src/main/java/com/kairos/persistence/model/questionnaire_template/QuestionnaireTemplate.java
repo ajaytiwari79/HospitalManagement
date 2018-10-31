@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "questionnaire_template")
+@Document
 public class QuestionnaireTemplate extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")
@@ -20,11 +20,12 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
     private String description;
     @NotBlank(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
-    private BigInteger assetType;
-    private BigInteger assetSubType;
+    private BigInteger assetTypeId;
+    private BigInteger assetSubTypeId;
     private Long countryId;
     private boolean defaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
+    private QuestionnaireTemplateType riskAssociatedEntity;
     private List<BigInteger> sections=new ArrayList<>();
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
@@ -36,11 +37,12 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
     public QuestionnaireTemplate(@NotBlank(message = "Name can't be empty") String name, @NotBlank(message = "Description cannot be empty") String description, QuestionnaireTemplateStatus templateStatus) {
         this.name = name;
         this.description = description;
+        this.templateStatus=templateStatus;
     }
 
-    public BigInteger getAssetType() { return assetType; }
+    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 
-    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
+    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
 
     public String getDescription() { return description; }
 
@@ -59,9 +61,7 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
 
     public QuestionnaireTemplateType getTemplateType() { return templateType; }
 
-    public void setTemplateType(QuestionnaireTemplateType templateType) {
-        this.templateType = templateType;
-    }
+    public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
 
     public Long getCountryId() {
         return countryId;
@@ -75,11 +75,13 @@ public class QuestionnaireTemplate extends MongoBaseEntity {
 
     public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
 
-    public BigInteger getAssetSubType() { return assetSubType; }
+    public BigInteger getAssetTypeId() { return assetTypeId; }
 
-    public void setAssetSubType(BigInteger assetSubType) { this.assetSubType = assetSubType;    }
+    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
 
+    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
 
+    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
 
     public QuestionnaireTemplate() {
     }

@@ -31,6 +31,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
+
+import static com.kairos.enums.TimeTypeEnum.BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -498,4 +500,51 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
+    @Override
+    public List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("parentId").in(activityIds).and("deleted").is(false).and("unitId").is(unitId)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                project().and("id").as("activity._id").and("name").as("activity.name")
+                        .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")
+                        .and("parentId").as("activity.parentId")
+                        .and("employmentTypes").as("activity.employmentTypes")
+                        .and("state").as("activity.state").and("unitId").as("activity.unitId")
+                        .and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
+                        .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
+                        .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
+                        .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab")
+                        .and("compositeActivities").as("activity.compositeActivities")
+                        .and("notesActivityTab").as("activity.notesActivityTab")
+                        .and("communicationActivityTab").as("activity.communicationActivityTab")
+                        .and("bonusActivityTab").as("activity.bonusActivityTab")
+                        .and("skillActivityTab").as("activity.skillActivityTab")
+                        .and("optaPlannerSettingActivityTab").as("activity.optaPlannerSettingActivityTab")
+                        .and("ctaAndWtaSettingsActivityTab").as("activity.ctaAndWtaSettingsActivityTab")
+                        .and("locationActivityTab").as("activity.locationActivityTab")
+                        .and("permissionsActivityTab").as("activity.permissionsActivityTab")
+                        .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
+                        .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
+        );
+        AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
+        return result.getMappedResults();
+    }
+    @Override
+    public List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId,List<BigInteger> timeTypeIds) {
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("balanceSettingsActivityTab.timeTypeId").in(timeTypeIds).and("deleted").is(false).and("countryId").is(countryId))
+        ,project().and("id").as("id").and("name").as("name"));
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+
+    }
+
+    @Override
+    public List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds) {
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("isParentActivity").is(true).and("deleted").is(false))
+                ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                match(Criteria.where("state").nin("DRAFT").orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds),Criteria.where("timeType.type").is(BREAK))));
+        AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
+        return result.getMappedResults();
+    }
+
 }

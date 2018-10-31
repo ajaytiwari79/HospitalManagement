@@ -53,8 +53,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     public List<MasterAssetResponseDTO> getAllMasterAssetWithAssetTypeAndSubAssetType(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
@@ -70,8 +70,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     public MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
 
@@ -98,8 +98,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
@@ -140,11 +140,11 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getTypeId())
-                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
-                lookup("asset_type", "assetType", "_id", "assetType"),
-                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
 
         );

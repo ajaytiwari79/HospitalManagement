@@ -18,11 +18,31 @@ public interface CustomQuestionnaireTemplateRepository {
 
     QuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsByCountryId(Long countryId, BigInteger templateId);
 
-    QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType);
+    QuestionnaireTemplate findRiskTemplateByAsssociatedProcessingActivityAndCountryId(Long countryId);
+
+    QuestionnaireTemplate findRiskTemplateByCountryIdAndAssetTypeId(Long countryId, BigInteger assetTypeId);
+
+    QuestionnaireTemplate findRiskTemplateByCountryIdAndAssetTypeIdAndSubAssetTypeId(Long countryId, BigInteger assetTypeId, BigInteger subAssetTypeId);
+
+    QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeAndUnitId(Long unitId, QuestionnaireTemplateType templateType);
 
     QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByUnitId(Long unitId, BigInteger templateId);
 
     List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionsAndQuestionsByUnitId(Long unitId);
+
+    QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId);
+
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId);
+
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(Long unitId, BigInteger assetTypeId);
+
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(Long unitId, QuestionnaireTemplateType templateType);
+
+    QuestionnaireTemplate findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(Long unitId);
+
+    QuestionnaireTemplate findPublishedRiskTemplateByUnitIdAndAssetTypeId(Long unitId, BigInteger assetTypeId);
+
+    QuestionnaireTemplate findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(Long unitId, BigInteger assetTypeId, BigInteger assetSubTypeId);
 
 
 }

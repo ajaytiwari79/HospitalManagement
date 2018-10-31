@@ -25,7 +25,9 @@ public enum WTATemplateType {
     DAYS_OFF_AFTER_A_SERIES("days off after a series"),
     NO_OF_SEQUENCE_SHIFT("no of sequence shift"),
     EMPLOYEES_WITH_INCREASE_RISK("employees with increase risk"),
-    WTA_FOR_CARE_DAYS("WTA for Care days");
+    WTA_FOR_CARE_DAYS("WTA for Care days"),
+    WTA_FOR_BREAKS_IN_SHIFT("WTA for breaks in shift");
+
 
 
     private String value;

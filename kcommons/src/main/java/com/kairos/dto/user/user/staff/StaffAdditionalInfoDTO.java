@@ -32,6 +32,15 @@ public class StaffAdditionalInfoDTO {
     private ZoneId unitTimeZone;
     //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
     private List<TimeSlotWrapper> timeSlotSets;
+    private Long staffUserId;
+
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public Map<Long, List<LocalDate>> getPublicHoliday() {
         return publicHoliday;
@@ -160,13 +169,15 @@ public class StaffAdditionalInfoDTO {
     }
 
     public Set<AccessGroupRole> getRoles() {
-        Set<AccessGroupRole> roles = new HashSet<>();
-        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getManagement()) {
-            roles.add(AccessGroupRole.MANAGEMENT);
-            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
-                roles.add(AccessGroupRole.STAFF);
+            Set<AccessGroupRole> roles = new HashSet<>();
+            if(userAccessRoleDTO!=null) {
+                if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+                    roles.add(AccessGroupRole.MANAGEMENT);
+                }
+                if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+                    roles.add(AccessGroupRole.STAFF);
+                }
             }
-        }
         return roles;
     }
 }

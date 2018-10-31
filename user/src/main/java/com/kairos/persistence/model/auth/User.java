@@ -34,8 +34,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class User extends UserBaseEntity {
     protected String cprNumber;
 
-    //    @NotNull(message = "error.User.userName.notnull")
-//    @Size(min = 5, max = 20, message = "error.User.userName.size")
     private String userName;
     protected String nickName;
     protected String firstName;
@@ -73,7 +71,7 @@ public class User extends UserBaseEntity {
     private boolean isPasswordUpdated;
 
     private Long kmdExternalId;
-    private UserType userType;
+    private UserType userType = UserType.USER_ACCOUNT;
 
     @Transient
     private Boolean hubMember;

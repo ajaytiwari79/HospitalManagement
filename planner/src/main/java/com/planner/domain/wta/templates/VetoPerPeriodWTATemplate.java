@@ -3,11 +3,10 @@ package com.planner.domain.wta.templates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.MinMaxSetting;
-import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +20,28 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
-    private double maximumVetoPercentage;
-    private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
+    private int numberOfWeeks;
+    private LocalDate validationStartDate;
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    private Long vetoPerPeriod;
 
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    public int getNumberOfWeeks() {
+        return numberOfWeeks;
+    }
 
+    public void setNumberOfWeeks(int numberOfWeeks) {
+        this.numberOfWeeks = numberOfWeeks;
+    }
+
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
+    }
+
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -37,14 +49,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
         this.minMaxSetting = minMaxSetting;
-    }
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
     }
 
     public float getRecommendedValue() {
@@ -55,13 +59,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.recommendedValue = recommendedValue;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
 
     public List<BigInteger> getActivityIds() {
         return activityIds;
@@ -72,13 +69,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.activityIds = activityIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -88,25 +78,27 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public double getMaximumVetoPercentage() {
-        return maximumVetoPercentage;
+    public Long getVetoPerPeriod() {
+        return vetoPerPeriod;
     }
 
-    public void setMaximumVetoPercentage(double maximumVetoPercentage) {
-        this.maximumVetoPercentage = maximumVetoPercentage;
+    public void setVetoPerPeriod(Long vetoPerPeriod) {
+        this.vetoPerPeriod = vetoPerPeriod;
     }
 
     public VetoPerPeriodWTATemplate(String name, boolean disabled,
-                                    String description, double maximumVetoPercentage) {
+                                    String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.maximumVetoPercentage = maximumVetoPercentage;
+        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
 
     }
 
     public VetoPerPeriodWTATemplate() {
         wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
     }
+
+
 
 }

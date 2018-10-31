@@ -4,20 +4,26 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
-import com.kairos.config.env.EnvConfig;
-import com.kairos.constants.AppConstants;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.patient.PatientResourceList;
 import com.kairos.dto.user.staff.*;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskStatus;
@@ -26,18 +32,25 @@ import com.kairos.persistence.model.task_type.AddressCode;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepositoryImpl;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.repository_impl.TaskMongoRepositoryImpl;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.TimeCareRestClient;
+import com.kairos.rule_validator.TaskSpecification;
+import com.kairos.rule_validator.task.MergeTaskSpecification;
+import com.kairos.rule_validator.task.TaskDaySpecification;
+import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
 import com.kairos.serializers.MongoDateMapper;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -49,21 +62,12 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.planner.TasksMergingService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.rule_validator.task.MergeTaskSpecification;
-import com.kairos.rule_validator.task.TaskDaySpecification;
-import com.kairos.rule_validator.TaskSpecification;
-import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
-import com.kairos.dto.user.client.Client;
-import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.patient.PatientResourceList;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.utils.*;
+import com.kairos.utils.JsonUtils;
+import com.kairos.utils.TaskUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.utils.user_context.UserContext;
-import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.wrapper.EscalatedTasksWrapper;
 import com.kairos.wrapper.TaskWrapper;
 import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
@@ -150,16 +154,13 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
     @Inject
-    private CountryRestClient countryRestClient;
-    @Inject
-    private IntegrationRestClient integrationServiceRestClient;
+    private GenericIntegrationService genericIntegrationService;
+
     @Inject
     private EnvConfig envConfig;
     @Inject
     private TasksMergingService tasksMergingService;
 
-    @Inject
-    private ControlPanelRestClient controlPanelRestClient;
     @Inject
     private OrganizationRestClient organizationRestClient;
     @Inject
@@ -665,7 +666,7 @@ public class TaskService extends MongoBaseService {
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
             exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
         }
-        OrganizationStaffWrapper organizationStaffWrapper = organizationRestClient.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
+        OrganizationStaffWrapper organizationStaffWrapper = genericIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
@@ -713,8 +714,8 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));
@@ -734,7 +735,7 @@ public class TaskService extends MongoBaseService {
         if (!shiftsToCreate.isEmpty()) {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftsToCreate.get(0).getUnitId(), shiftsToCreate.get(0).getActivities().get(0).getStartDate());
             shiftService.saveShiftWithActivity(phase,shiftsToCreate,staffAdditionalInfoDTO);
-            timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
+            timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }
     }
@@ -1100,7 +1101,7 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
-        Map<String, String> flsCredential = integrationServiceRestClient.getFLS_Credentials(organizationId);
+        Map<String, String> flsCredential = genericIntegrationService.getFLS_Credentials(organizationId);
        /* Visitour visitour = visitourGraphRepository.findByOrganizationId(organizationId);
         Map<String, String> credentials = new HashMap<>();
         String url = (visitour != null) ? visitour.getServerName() : "";
@@ -1562,7 +1563,7 @@ public class TaskService extends MongoBaseService {
     public Task assignGivenTaskToUser(BigInteger taskId) {
         Task pickTask = taskMongoRepository.findOne(taskId);
         Long userId = UserContext.getUserDetails().getId();
-        StaffDTO staffDTO = staffRestClient.getStaffByUser(userId);
+        StaffDTO staffDTO = genericIntegrationService.getStaffByUser(userId);
         List<Long> assignedStaffIds = pickTask.getAssignedStaffIds();
         if (!assignedStaffIds.contains(staffDTO.getId())) assignedStaffIds.add(staffDTO.getId());
         pickTask.setAssignedStaffIds(assignedStaffIds);
@@ -1577,7 +1578,7 @@ public class TaskService extends MongoBaseService {
         boolean preferredEmployees = taskType.getEmployees().contains(PREFERRED_EMPLOYEES);
         TaskSpecification<Task> taskStaffSpecification = new TaskStaffTypeSpecification(excludeEmployees, preferredEmployees);
 
-        List<DayType> dayTypes = countryRestClient.getDayTypes(taskType.getForbiddenDayTypeIds());
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
 
         Set<Day> days = new HashSet<>();
         for (DayType dayType : dayTypes) {

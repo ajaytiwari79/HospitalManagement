@@ -162,11 +162,7 @@ public class PlannerService extends MongoBaseService {
     TimeSlotRestClient timeSlotRestClient;
 
     @Autowired
-    ClientRestClient clientRestClient;
-    @Autowired
-    IntegrationRestClient integrationServiceRestClient;
-    @Autowired
-    CountryRestClient countryRestClient;
+    GenericIntegrationService genericIntegrationService;
 
 
     private int getWeekFrequencyAsInt(String frequency) {
@@ -221,7 +217,7 @@ public class PlannerService extends MongoBaseService {
 
         Map<String, Object> citizenPlanningMap = new HashMap<>();
         //anil m2
-        Map<String, Object> clientAddressInfo=clientRestClient.getClientAddressInfo(citizenId);
+        Map<String, Object> clientAddressInfo=genericIntegrationService.getClientAddressInfo(citizenId);
         LocalDate upcomingMonday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         LocalDate fourWeekLater = upcomingMonday.plusDays(28);
         Date fromDate = Date.from(upcomingMonday.atStartOfDay(systemDefault()).toInstant());
@@ -377,7 +373,7 @@ public class PlannerService extends MongoBaseService {
 
         logger.info("Citizen is --->" + citizenId);
         //anil m2 implements rest client
-        TaskDemandVisitWrapper taskDemandInfo=clientRestClient.
+        TaskDemandVisitWrapper taskDemandInfo=genericIntegrationService.
                 getClientDetailsForTaskDemandVisit(new TaskDemandRequestWrapper(citizenId,taskDemand.getUnitId(),
                         taskDemandVisit.getTimeSlotId(),taskDemand.getStartDate(),taskDemandEndDate));
         Client citizen=taskDemandInfo.getCitizen();
@@ -721,7 +717,7 @@ public class PlannerService extends MongoBaseService {
         Date taskStartTime = dateISOFormat.parse(requestPayload.get("startTime").toString());
         List<Task> taskList = getTasksFromDemandVisits(droppedTaskDemandVisit, taskDemand, (boolean) requestPayload.get("isWeekend"), citizenId, taskType, taskStartTime);
 
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
         //Set Demand Status to Generated, once demand drag&drop in Gantt View.
         if (taskDemand.getStatus() == TaskDemand.Status.VISITATED) {
@@ -741,7 +737,7 @@ public class PlannerService extends MongoBaseService {
 
         //logger.info("taskData " + taskData);
 
-        TaskDemandVisitWrapper taskDemandInfo=clientRestClient.
+        TaskDemandVisitWrapper taskDemandInfo=genericIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId,unitId);
         Map<String, String> flsCredentials=taskDemandInfo.getFlsCredentials();
         TaskAddress taskAddress = taskDemandInfo.getTaskAddress();
@@ -843,7 +839,7 @@ public class PlannerService extends MongoBaseService {
     }
 
     private boolean validateDaySpecification(TaskType taskType,Task task){
-        List<DayType> dayTypes = countryRestClient.getDayTypes(taskType.getForbiddenDayTypeIds());
+        List<DayType> dayTypes = genericIntegrationService.getDayTypes(taskType.getForbiddenDayTypeIds());
 
         Set<Day> days = new HashSet<>();
         for(DayType dayType : dayTypes){
@@ -854,7 +850,7 @@ public class PlannerService extends MongoBaseService {
     }
 
     public List<TaskGanttDTO> actualPlanningTaskUpdate(long unitId, List<TaskUpdateDTO> customTaskList) throws CloneNotSupportedException, JsonProcessingException, ParseException {
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         List<BigInteger> taskIds = new ArrayList<>();
         customTaskList.forEach(customTask -> taskIds.add(new BigInteger(customTask.getId())));
 
@@ -903,7 +899,7 @@ public class PlannerService extends MongoBaseService {
         LocalDate upcomingMonday = DateUtils.calcNextMonday(LocalDate.now());
         LocalDate fourWeekLater = upcomingMonday.plusDays(28);
 
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         List<Task> taskList = new ArrayList<>();
         List<Task> taskRepetitionsList=new ArrayList<>();
         List<Task> tasksToReturn = new ArrayList<>();
@@ -1249,7 +1245,7 @@ public class PlannerService extends MongoBaseService {
         }
         String action = synchronizeTaskPayload.get("action").toString();
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         if (action.equals("sync")) {
             if (taskList.size() > 0) {
                 taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
@@ -1405,7 +1401,7 @@ public class PlannerService extends MongoBaseService {
     public List<Task> mergeRepetitions(List<String> jointEventsIds, Date dateFrom,Long citizenId, long unitId, String mainTaskName, boolean isActualPlanningScreen) throws CloneNotSupportedException {
 
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        TaskDemandVisitWrapper taskDemandVisitWrapper=clientRestClient.
+        TaskDemandVisitWrapper taskDemandVisitWrapper=genericIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId,unitId);
 
         Map<String, String> flsCredentials = taskDemandVisitWrapper.getFlsCredentials();
@@ -1863,7 +1859,7 @@ public class PlannerService extends MongoBaseService {
         }
 
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials=integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials=genericIntegrationService.getFLS_Credentials(unitId);
         if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {
@@ -1900,7 +1896,7 @@ public class PlannerService extends MongoBaseService {
             }
         });
         // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials=integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials=genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(revertTaskState, flsCredentials);
         return customizeTaskData(revertTaskState);
     }
@@ -1939,7 +1935,7 @@ public class PlannerService extends MongoBaseService {
         List<Object> clientList = new ArrayList<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        OrganizationClientWrapper organizationClientWrapper= clientRestClient.getOrganizationClients(organizationId);
+        OrganizationClientWrapper organizationClientWrapper= genericIntegrationService.getOrganizationClients(organizationId);
         //List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + FORWARD_SLASH);
         List<Map<String, Object>> mapList=organizationClientWrapper.getClientList();
         logger.debug("CitizenList Size: " + mapList.size());
@@ -1967,8 +1963,8 @@ public class PlannerService extends MongoBaseService {
     private  Map<String, Object> getClintsWithPlanningByClintIds(List<Long> citizenIds, Long unitId) {
         Map<String, Object> response = new HashMap<>();
         List<Object> clientList = new ArrayList<>();
-        OrganizationClientWrapper organizationClientWrapper=clientRestClient.
-                getClientsByIds(unitId,citizenIds);
+        OrganizationClientWrapper organizationClientWrapper=genericIntegrationService.
+                getClientsByIds(citizenIds);
         logger.info("Finding citizen with Id: " + citizenIds);
         //List<Map<String, Object>> mapList = organizationGraphRepository.getClientsByClintIdList(citizenId);
         List<Map<String, Object>> mapList=organizationClientWrapper.getClientList();
@@ -2061,7 +2057,7 @@ public class PlannerService extends MongoBaseService {
         logger.info("total time of PlannerService:autoGenerateTasks()" + (System.currentTimeMillis() - startTime) + " ms");
         //organization.setAutoGeneratedPerformed(true);
         //organizationGraphRepository.save(organization);
-        organizationRestClient.updateAutoGenerateTaskSettings(unitId);
+        genericIntegrationService.updateAutoGenerateTaskSettings(unitId);
         return customizeTaskData(tasksToReturn);
     }
 
@@ -2130,7 +2126,7 @@ public class PlannerService extends MongoBaseService {
      */
     public boolean oneTimeSync(long unitId) {
         long startTime = System.currentTimeMillis();
-        OrganizationDTO unit =organizationRestClient.getOrganization(unitId);
+        OrganizationDTO unit =genericIntegrationService.getOrganization();
         if (unit == null) {
             exceptionService.dataNotFoundByIdException("message.unit.id");
         }
@@ -2149,13 +2145,13 @@ public class PlannerService extends MongoBaseService {
 
         List<Task> tasks = taskMongoRepository.getTaskBetweenDatesForUnit(unitId, dateFrom, dateTo);
         logger.info("No of tasks to sync " + tasks.size());
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         if (tasks.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         } else {
             logger.debug("NO Tasks Available");
         }
-        organizationRestClient.setOneTimeSyncPerformed(unitId);
+        genericIntegrationService.setOneTimeSyncPerformed(unitId);
         logger.debug("Total time taken by one time sync::" + (System.currentTimeMillis() - startTime) + "   ms");
         return true;
     }
@@ -2171,7 +2167,7 @@ public class PlannerService extends MongoBaseService {
         });
 
         // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         return customizeTaskData(tasks);
     }
@@ -2252,7 +2248,7 @@ public class PlannerService extends MongoBaseService {
         }
         updateTaskInfo(cloneTask, taskData, daysDifference);*/
             taskService.save(tasksToReturn);
-            Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(task.getUnitId());
+            Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(task.getUnitId());
             taskConverterService.createFlsCallFromTasks(tasksToReturn, flsCredentials);
             return customizeTaskData(tasksToReturn);
         }
@@ -2297,7 +2293,7 @@ public class PlannerService extends MongoBaseService {
             updateTaskInfo(task, bulkUpdateTaskDTO);
         });
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         return customizeTaskData(tasks);
     }
@@ -2376,7 +2372,7 @@ public class PlannerService extends MongoBaseService {
         List<Task> tasksToReturn = new ArrayList<>(tasksToUpdate.size());
 
         // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = genericIntegrationService.getFLS_Credentials(unitId);
         tasksToUpdate.forEach(task -> {
             if (!task.isSingleTask() && task.getActualPlanningTask() == null) {
                 taskService.savePreplanningStateOfTask(task);
@@ -2422,7 +2418,7 @@ public class PlannerService extends MongoBaseService {
         List<Task> tasks = taskMongoRepository.getPrePlanningTaskBetweenExceptionDates(unitId, citizenIds, dateFromAsDate, dateToAsDate);
 
         // Map<String,String> flsCredentails = integrationService.getFLS_Credentials(unitId);
-        Map<String,String> flsCredentails = integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String,String> flsCredentails = genericIntegrationService.getFLS_Credentials(unitId);
         taskRestrictionDtos.forEach(taskRestrictionDto -> {
             List<Task> filtertedTasks = tasks.stream().filter(task -> task.getCitizenId() == taskRestrictionDto.getCitizenId()).collect(Collectors.toList());
             removeRestrictionFromTask(filtertedTasks,taskRestrictionDto,flsCredentails);
@@ -2486,7 +2482,7 @@ public class PlannerService extends MongoBaseService {
         Map<String, Object> returnData = new HashMap<>();
 
         // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials=integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials=genericIntegrationService.getFLS_Credentials(unitId);
 
         Map <String,Object> callMetaData = new HashMap<>();
         callMetaData.put("functionCode",1);
@@ -2520,7 +2516,7 @@ public class PlannerService extends MongoBaseService {
         Task task =  taskService.findOne(String.valueOf(taskId));
 
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials=integrationServiceRestClient.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials=genericIntegrationService.getFLS_Credentials(unitId);
 
         Map<String,Object> confirmMetaData = new HashMap<>();
         confirmMetaData.put("functionCode",2);

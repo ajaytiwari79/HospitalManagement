@@ -1,9 +1,5 @@
 package com.kairos.dto.scheduler.queue;
 
-/*
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
-*/
 
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
@@ -55,7 +51,19 @@ public class KairosScheduleJobDTO {
         this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
         this.oneTimeTrigger = oneTimeTrigger;
     }
+    public KairosScheduleJobDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,IntegrationOperation operation,
+                                Long oneTimeTriggerDateMillis, boolean oneTimeTrigger,String filterId) {
 
+        this.unitId = unitId;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.entityId = entityId;
+        this.integrationOperation = operation;
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+        this.oneTimeTrigger = oneTimeTrigger;
+        this.filterId=filterId;
+
+    }
     public Long getOneTimeTriggerDateMillis() {
         return oneTimeTriggerDateMillis;
     }
@@ -264,5 +272,6 @@ public class KairosScheduleJobDTO {
     public void setRunOnce(LocalTime runOnce) {
         this.runOnce = runOnce;
     }
+
 
 }

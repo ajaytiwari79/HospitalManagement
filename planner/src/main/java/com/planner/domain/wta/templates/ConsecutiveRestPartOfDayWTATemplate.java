@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -23,9 +23,10 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
     private long minimumRest;//hh:mm
     private long daysWorked;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private Long consecutiveDays;
+    private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
@@ -39,11 +40,11 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -96,6 +97,13 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.daysWorked = daysWorked;
     }
 
+    public Long getConsecutiveDays() {
+        return consecutiveDays;
+    }
+
+    public void setConsecutiveDays(Long consecutiveDays) {
+        this.consecutiveDays = consecutiveDays;
+    }
 
     public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
         this.name=name;
@@ -103,10 +111,12 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.description=description;
         this.minimumRest = minimumRest;
         this.daysWorked = daysWorked;
+        wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
 
     }
     public ConsecutiveRestPartOfDayWTATemplate() {
         wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
     }
+
 
 }

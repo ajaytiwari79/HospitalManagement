@@ -15,7 +15,7 @@ public class UnitPositionWtaDTO {
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
-    private float hourlyWages;
+    private float hourlyCost;
     private Double salary;
     private Long employmentTypeId;
     private Long unitId;
@@ -99,12 +99,12 @@ public class UnitPositionWtaDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public float getHourlyWages() {
-        return hourlyWages;
+    public float getHourlyCost() {
+        return hourlyCost;
     }
 
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public Double getSalary() {
@@ -153,26 +153,6 @@ public class UnitPositionWtaDTO {
 
     public void setWtaResponseDTO(WTAResponseDTO wtaResponseDTO) {
         this.wtaResponseDTO = wtaResponseDTO;
-    }
-
-    public UnitPositionWtaDTO(Long id, Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum, WTAResponseDTO wtaResponseDTO, Long staffId) {
-        this.id = id;
-        this.expertiseId = expertiseId;
-        this.positionCodeId = positionCodeId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.totalWeeklyHours = totalWeeklyHours;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
-        this.employmentTypeId = employmentTypeId;
-        this.unitId = unitId;
-        this.seniorityLevelId = seniorityLevelId;
-        this.paidOutFrequencyEnum = paidOutFrequencyEnum;
-        this.wtaResponseDTO=wtaResponseDTO;
-        this.staffId = staffId;
     }
 
     public Long getStaffId() {

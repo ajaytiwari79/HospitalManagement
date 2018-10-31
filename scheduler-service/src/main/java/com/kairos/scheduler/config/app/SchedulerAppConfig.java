@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 //import com.planner.appConfig.UserContextInterceptor;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.kairos.scheduler.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.scheduler.utils.user_context.SchedulerUserContextInterceptor;
 import com.kairos.scheduler.utils.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
@@ -42,7 +43,9 @@ import java.time.format.DateTimeFormatter;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableMongoRepositories(basePackages ={"com.kairos.scheduler.persistence.repository"})
+@EnableMongoRepositories(basePackages ={"com.kairos.scheduler.persistence.repository"},
+repositoryBaseClass = MongoBaseRepositoryImpl.class)
+
 public class SchedulerAppConfig implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerAppConfig.class);

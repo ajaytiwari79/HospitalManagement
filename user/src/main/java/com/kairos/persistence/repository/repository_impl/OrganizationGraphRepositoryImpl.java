@@ -52,10 +52,12 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " MATCH (unitPos)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
+            matchRelationshipQueryForStaff += "MATCH(unitPos)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+                    "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  ";
         } else {
-            matchRelationshipQueryForStaff += " OPTIONAL MATCH (unitPos)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  ";
+            matchRelationshipQueryForStaff += " optional MATCH(unitPos)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+                    "OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  ";
         }
 
         matchRelationshipQueryForStaff += " with staff, user, " +

@@ -4,6 +4,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -71,4 +72,10 @@ public interface CustomActivityMongoRepository {
      List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) ;
 
     List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds);
+    List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId);
+    List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId,List<BigInteger> timeTypeIds);
+
+
+    List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
+
 }

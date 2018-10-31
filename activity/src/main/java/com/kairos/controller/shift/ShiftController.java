@@ -90,8 +90,7 @@ public class ShiftController {
     @DeleteMapping(value = "/shift/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteShift(@PathVariable BigInteger shiftId) {
-        shiftService.deleteShift(shiftId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.deleteShift(shiftId));
     }
 
     @ApiOperation(value = "Get All Activities by unitId")
@@ -109,20 +108,20 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
     }
 
-    // sub shifts workflow
+    /*// sub shifts workflow
     @ApiOperation("add a sub shift for a staff")
     @PutMapping(value = "/sub-shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addSubShift(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift(unitId, shiftDTO, type));
-    }
+    }*/
 
-    @ApiOperation("update a sub shifts for a staff")
+    /*@ApiOperation("update a sub shifts for a staff")
     @PutMapping(value = "/sub-shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addSubShifts(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody List<ShiftDTO> shiftDTOS) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts(unitId, shiftDTOS, type));
-    }
+    }*/
 
     @ApiOperation("update status of shifts")
     @PutMapping(value = "/shift/update_status")
@@ -200,8 +199,8 @@ public class ShiftController {
 
     @ApiOperation("validate shift by detail view")
     @PostMapping("/shift/validate_shift_by_details_view")
-    public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestParam BigInteger shiftId,@RequestParam Boolean validatedByStaff){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftId,validatedByStaff,unitId,type));
+    public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam Boolean validatedByStaff){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftDTO,validatedByStaff,unitId,type));
     }
 
     @ApiOperation("shifts details by date")
@@ -209,11 +208,4 @@ public class ShiftController {
     public ResponseEntity<Map<String,Object>> getShiftsDetailsForComapactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
-
-    @ApiOperation("Update time bank after applying function")
-    @PutMapping("/shift/update_time_bank")
-    public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
-    }
-
 }

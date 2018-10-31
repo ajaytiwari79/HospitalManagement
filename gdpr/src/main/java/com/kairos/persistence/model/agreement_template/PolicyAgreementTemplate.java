@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "agreement_template")
+@Document
 public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be empty")
@@ -29,9 +29,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
     private BigInteger templateType;
-    private String coverPageHeader;
-    private String coverPageFooter;
-    private String coverPageImageUrl;
+    private String coverPageContent;
+    private String coverPageTitle;
+    private String coverPageLogoUrl;
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -104,15 +104,27 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
 
-    public String getCoverPageHeader() { return coverPageHeader; }
+    public String getCoverPageContent() {
+        return coverPageContent;
+    }
 
-    public void setCoverPageHeader(String coverPageHeader) { this.coverPageHeader = coverPageHeader; }
+    public void setCoverPageContent(String coverPageContent) {
+        this.coverPageContent = coverPageContent;
+    }
 
-    public String getCoverPageFooter() { return coverPageFooter; }
+    public String getCoverPageTitle() {
+        return coverPageTitle;
+    }
 
-    public void setCoverPageFooter(String coverPageFooter) { this.coverPageFooter = coverPageFooter; }
+    public void setCoverPageTitle(String coverPageTitle) {
+        this.coverPageTitle = coverPageTitle;
+    }
 
-    public String getCoverPageImageUrl() { return coverPageImageUrl; }
+    public String getCoverPageLogoUrl() {
+        return coverPageLogoUrl;
+    }
 
-    public void setCoverPageImageUrl(String coverPageImageUrl) { this.coverPageImageUrl = coverPageImageUrl; }
+    public void setCoverPageLogoUrl(String coverPageLogoUrl) {
+        this.coverPageLogoUrl = coverPageLogoUrl;
+    }
 }

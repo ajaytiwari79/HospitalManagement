@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.MongoBaseService;
@@ -78,7 +79,7 @@ public class TaskDemandService extends MongoBaseService {
      TaskTypeService taskTypeService;
 
     @Autowired
-    OrganizationRestClient organizationRestClient;
+    GenericIntegrationService genericIntegrationService;
 
     @Autowired
     CustomTaskTypeRepositoryImpl customTaskTypeRepository;
@@ -498,7 +499,7 @@ public class TaskDemandService extends MongoBaseService {
     List<TaskDemandVisit> getTaskDemandVisits(RepetitionType shiftRepetition, Long organizationId, Integer weekDayCount, String visitDuration) {
         List<TaskDemandVisit> visits = new ArrayList<>();
         for (Shifts shifts : shiftRepetition.getShifts()) {
-            Map<String, Object> timeSlot=organizationRestClient.getTimeSlotByUnitIdAndTimeSlotName(organizationId,Long.valueOf(shifts.getId()));
+            Map<String, Object> timeSlot=genericIntegrationService.getTimeSlotByUnitIdAndTimeSlotName(organizationId,Long.valueOf(shifts.getId()));
             //Map<String, Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotName(organizationId, shifts.getTitle());
             TaskDemandVisit weekDayVisit = new TaskDemandVisit();
             weekDayVisit.setTimeSlotId(Long.valueOf(timeSlot.get("id").toString()));

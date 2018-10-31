@@ -1,14 +1,17 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
+
 import com.kairos.commons.utils.BeanFactoryUtil;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -20,7 +23,11 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 
 import static com.kairos.scheduler.constants.AppConstants.activitySubTypes;
@@ -134,9 +141,15 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
 
-
     }
 
+    /**
+     * This method is useed to execute a job.
+     * @param schedulerPanel
+     * @param trigger
+     * @param timeZone
+     * @return
+     */
     private Runnable getTask(SchedulerPanel schedulerPanel,  CronTrigger trigger, TimeZone timeZone){
         Runnable runnable = new Runnable() {
             @Override
@@ -160,12 +173,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(),schedulerPanel.getUnitId(),schedulerPanel.getJobType(), schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
                         integrationSettingsDTO,DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
 
-                if(userSubTypes.contains(jobToExecute.getJobSubType())) {
-                    kafkaProducer.pushToUserQueue(jobToExecute);
-                }
-                else if(activitySubTypes.contains(jobToExecute.getJobSubType())) {
-                    kafkaProducer.pushToActivityQueue(jobToExecute);
-                }
+                kafkaProducer.pushToQueue(jobToExecute);
             }
         };
 

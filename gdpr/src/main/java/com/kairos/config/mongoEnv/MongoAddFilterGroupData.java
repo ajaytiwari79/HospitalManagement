@@ -6,7 +6,6 @@ import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
 import com.kairos.persistence.repository.filter.FilterMongoRepository;
 import com.kairos.service.common.MongoBaseService;
-import com.kairos.service.s3bucket.S3BucketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

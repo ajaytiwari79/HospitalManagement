@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,30 +25,20 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Skill extends UserBaseEntity {
-    @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
+    @NotBlank(message = "error.Skill.name.notEmpty")
     private String name;
-
-    //@NotEmpty(message = "error.Skill.description.notEmpty") @NotNull(message = "error.Skill.description.notnull")
     private String description;
-
     private boolean isEnabled = true;
-
     private String shortName;
-
     private SkillStatus skillStatus;
-
     @Relationship(type = HAS_CATEGORY)
     private SkillCategory skillCategory;
-
     @Relationship(type = REQUESTED_BY)
     User requestedBy;
-
     @Relationship(type = APPROVED_BY)
     User approvedBy;
-
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
-
     //time care id
     private String externalId;
 

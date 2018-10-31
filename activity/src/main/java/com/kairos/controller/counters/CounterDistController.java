@@ -15,17 +15,21 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.DynamicTabService;
+import com.kairos.service.counter.RestingHoursCalculationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +52,7 @@ public class CounterDistController {
     @Inject
     private DynamicTabService dynamicTabService;
 
+    @Inject private RestingHoursCalculationService restingHoursCalculationService;
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
     @GetMapping(COUNTRY_URL+"/modules")
@@ -250,4 +255,11 @@ public class CounterDistController {
         counterManagementService.createDefaultStaffKPISetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
+
+    //for filter criteria
+    @GetMapping(UNIT_URL+"/calculate_resting_hours")
+    public ResponseEntity<Map<String, Object>> calculateRestingHoues(@PathVariable Long unitId,@RequestParam List<Long> staffIds,@RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, restingHoursCalculationService.calculateRestingHours(staffIds, Date.valueOf(startDate),Date.valueOf(endDate)));
+    }
+
 }

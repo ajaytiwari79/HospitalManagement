@@ -6,10 +6,12 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +20,17 @@ public class MasterProcessingActivityResponseDTO {
 
     @NotNull
     private BigInteger id;
-
     @NotBlank
     private String name;
-
     @NotBlank
     private String description;
-
     private List<OrganizationType> organizationTypes;
-
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
-
     private List<MasterProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
-
+    private LocalDate suggestedDate;
+    private SuggestedDataStatus suggestedDataStatus;
     private Boolean hasSubProcessingActivity;
 
     public Boolean getHasSubProcessingActivity() { return hasSubProcessingActivity; }
@@ -71,6 +69,17 @@ public class MasterProcessingActivityResponseDTO {
     public List<SubServiceCategory> getOrganizationSubServices() { return organizationSubServices; }
 
     public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+
+    public LocalDate getSuggestedDate() { return suggestedDate; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
+
+    public SuggestedDataStatus getSuggestedDataStatus() {
+        return suggestedDataStatus;
+    }
+
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus;
+    }
 
     public MasterProcessingActivityResponseDTO() {
     }

@@ -4,7 +4,7 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.dto.gdpr.QuestionDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
 import com.kairos.persistence.model.questionnaire_template.Question;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
@@ -38,38 +38,40 @@ public class QuestionService extends MongoBaseService {
 
     /**
      * @param referenceId
-     * @param isReferenceIdUnitId
+     * @param isUnitId
      * @param sectionAndQuestionDTOListMap
      * @param templateType
      * @return
      */
-    public List<QuestionnaireSection> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isReferenceIdUnitId, Map<QuestionnaireSection, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
+    public List<QuestionnaireSection> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnitId, Map<QuestionnaireSection, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
 
-        List<BigInteger> questionIdList = new ArrayList<>();
         List<Question> globalQuestionList = new ArrayList<>();
         Map<QuestionnaireSection, List<Question>> sectionQuestionListMap = new HashMap<>();
         Map<BigInteger, QuestionDTO> questionDTOAndIdMap = new HashMap<>();
         List<QuestionnaireSection> questionnaireSections = new ArrayList<>();
+        Set<String> titles = new HashSet<>();
         sectionAndQuestionDTOListMap.forEach((questionnaireSection, questionDTOS) -> {
 
             List<QuestionDTO> questionListCoresspondingToSection = new ArrayList<>();
             questionDTOS.forEach(questionDTO -> {
-                if (Optional.ofNullable(questionDTO.getId()).isPresent()) {
-                    questionIdList.add(questionDTO.getId());
-                    questionDTOAndIdMap.put(questionDTO.getId(), questionDTO);
-                } else {
-                    questionListCoresspondingToSection.add(questionDTO);
+                if (titles.contains(questionDTO.getQuestion().toLowerCase().trim())) {
+                    exceptionService.duplicateDataException("message.duplicate", " question ", questionDTO.getQuestion());
                 }
+                titles.add(questionDTO.getQuestion().toLowerCase().trim());
+                if (Optional.ofNullable(questionDTO.getId()).isPresent())
+                    questionDTOAndIdMap.put(questionDTO.getId(), questionDTO);
+                else
+                    questionListCoresspondingToSection.add(questionDTO);
             });
             if (CollectionUtils.isNotEmpty(questionListCoresspondingToSection)) {
-                List<Question> questions = isReferenceIdUnitId ? buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, questionListCoresspondingToSection, templateType) : buildQuestionForMasterQuestionnaireSection(referenceId, questionListCoresspondingToSection, templateType);
+                List<Question> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCoresspondingToSection, templateType);
                 sectionQuestionListMap.put(questionnaireSection, questions);
                 globalQuestionList.addAll(questions);
             }
             questionnaireSections.add(questionnaireSection);
         });
-        if (CollectionUtils.isNotEmpty(questionIdList)) {
-            List<Question> existingQuestionList = isReferenceIdUnitId ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionIdList) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionIdList);
+        if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
+            List<Question> existingQuestionList = isUnitId ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionDTOAndIdMap.keySet()) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionDTOAndIdMap.keySet());
             existingQuestionList.forEach(question -> {
                 QuestionDTO questionDTO = questionDTOAndIdMap.get(question.getId());
                 question.setQuestion(questionDTO.getQuestion()).setDescription(questionDTO.getDescription()).
@@ -87,38 +89,18 @@ public class QuestionService extends MongoBaseService {
     }
 
 
-    private List<Question> buildQuestionForMasterQuestionnaireSection(Long countryId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
-        List<Question> questions = new ArrayList<>();
-        for (QuestionDTO questionDTO : questionDTOs) {
-            Question question = new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), countryId);
-            addAttributeNameToQuestion(question, questionDTO, templateType);
-            questions.add(question);
-        }
-        return questions;
-    }
-
-
-    private List<Question> buildQuestionForQuestionnaireSectionAtUnitLevel(Long unitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
+    private List<Question> buildQuestionForQuestionnaireSectionAtUnitLevel(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
         List<Question> questions = new ArrayList<>();
         for (QuestionDTO questionDTO : questionDTOs) {
             Question question = new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed());
-            question.setOrganizationId(unitId);
+            if (isUnitId)
+                question.setOrganizationId(referenceId);
+            else
+                question.setCountryId(referenceId);
             addAttributeNameToQuestion(question, questionDTO, templateType);
             questions.add(question);
         }
         return questions;
-    }
-
-    public void checkForDuplicacyInQuestion(List<QuestionDTO> masterQuestionDTOs) {
-
-        List<String> titles = new ArrayList<>();
-        for (QuestionDTO masterQuestionDto : masterQuestionDTOs) {
-            if (titles.contains(masterQuestionDto.getQuestion().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", " question ", masterQuestionDto.getQuestion());
-            }
-            titles.add(masterQuestionDto.getQuestion().toLowerCase());
-        }
-
     }
 
 
@@ -159,7 +141,7 @@ public class QuestionService extends MongoBaseService {
         }
         questionnaireSection.getQuestions().remove(questionId);
         questionnaireSectionRepository.save(questionnaireSection);
-        questionMongoRepository.safeDelete(questionId);
+        questionMongoRepository.safeDeleteById(questionId);
         return true;
     }
 
@@ -171,7 +153,7 @@ public class QuestionService extends MongoBaseService {
         }
         questionnaireSection.getQuestions().remove(questionId);
         questionnaireSectionRepository.save(questionnaireSection);
-        questionMongoRepository.safeDelete(questionId);
+        questionMongoRepository.safeDeleteById(questionId);
         return true;
     }
 

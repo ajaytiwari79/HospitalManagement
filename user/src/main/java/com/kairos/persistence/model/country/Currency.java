@@ -1,9 +1,11 @@
 package com.kairos.persistence.model.country;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.RELATED_TO;
@@ -15,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.RELAT
 @NodeEntity
 public class Currency extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Currency.name.notEmpty") @NotNull(message = "error.Currency.name.notnull")
+    @NotBlank(message = "error.Currency.name.notEmpty")
     private String name;
 
     private String description;
@@ -23,7 +25,7 @@ public class Currency extends UserBaseEntity {
     @Relationship(type=RELATED_TO)
     private Country country;
 
-    @NotEmpty(message = "error.Currency.currencyCode.notEmpty") @NotNull(message = "error.Currency.currencyCode.notnull")
+    @NotBlank(message = "error.Currency.currencyCode.notEmpty")
     private String currencyCode;
 
     public String getDescription() {
@@ -31,7 +33,7 @@ public class Currency extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtils.trim(description);
     }
 
     public String getName() {
@@ -39,7 +41,7 @@ public class Currency extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
 
     public Country getCountry() {
@@ -57,7 +59,7 @@ public class Currency extends UserBaseEntity {
     }
 
     public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
+        this.currencyCode = StringUtils.trim(currencyCode);
     }
 
 }

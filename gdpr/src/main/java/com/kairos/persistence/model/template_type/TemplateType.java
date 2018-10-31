@@ -12,9 +12,7 @@ import javax.validation.constraints.Pattern;
  * @Auther vikash patwal
  */
 
-@Document(collection = "template_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@Document
 public class TemplateType extends MongoBaseEntity {
 
 

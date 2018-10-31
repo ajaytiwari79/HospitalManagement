@@ -1,0 +1,77 @@
+
+kairos ACTIVITY
+
+
+
+db.time_Type.update({"label" : "Unpaid break"},{$set:{"timeTypes":"UNPAID"}})
+db.time_Type.update({"label" : "Paid Break"},{$set:{"timeTypes":"PAID"}})
+
+
+// To create Constraints on country level
+db.glideTimeSettings.createIndex( { "countryId": 1 }, { unique: true } )
+
+
+// To add WTA Template
+
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequence"},{$inc: { sequenceNumber: 1 }});
+
+db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
+
+db.wtaBaseRuleTemplate.insert({
+    "_id" : "723", // this must be replaced by updated sequence
+    "name" : "WTA for breaks in shift",
+    "description" : "WTA for breaks in shift",
+    "disabled" : false,
+    "ruleTemplateCategoryId" : "4",
+    "countryId" : NumberLong(18712),
+    "lastUpdatedBy" : "Ulrik",
+    "breakGapMinutes":30,
+    "breakAvailability": [
+     {
+            timeSlot: 'DAY',
+            startAfterMinutes: 60,
+            endBeforeMinutes:  120
+     },
+     {
+            timeSlot: 'NIGHT',
+            startAfterMinutes: 90,
+            endBeforeMinutes:  60
+     },
+     {
+            timeSlot: 'EVENING',
+            startAfterMinutes: 90,
+            endBeforeMinutes:  60
+     }
+    ],
+    "wtaTemplateType" : "WTA_FOR_BREAKS_IN_SHIFT",
+    "phaseTemplateValues" : [],
+    "createdAt" : ISODate("2018-07-03T12:20:07.417Z"),
+    "updatedAt" : ISODate("2018-07-03T12:20:07.417Z"),
+     "deleted" : false,
+     "_class" : "com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate" });
+
+
+     // To Update previous Activity Location Tab data
+
+    db.activities.updateMany({},{$set:{"locationActivityTab.glideTimeForCheckIn": [{"location" : "OFFICE","before" : 60,"after" : 60,"eligible" : false},{"location" : "DEPOT","before" : 60,"after" : 60,"eligible" : false},{"location" : "OTHERS","before" : 60,"after" : 60,"eligible" : false},{"location" : "HOME","before" : 60,"after" : 60,"eligible" : false}],
+    "locationActivityTab.glideTimeForCheckOut" : [{"location" : "OTHERS","before" : 60,"after" : 60,"eligible" : false},{"location":"OFFICE","before" : 60,"after" : 60,"eligible" : false},{"location" : "DEPOT","before" : 60,"after" : 60,"eligible" : false},{"location" : "HOME","before" : 60,"after" : 60,"eligible" : false}]}});
+
+db.time_Type.updateMany({"label" : "Unpaid break"},{$set:{"timeType":"UNPAID"}})
+db.time_Type.updateMany({"label" : "Paid Break"},{$set:{"timeType":"PAID"}})
+db.workingTimeAgreement.updateMany({},{$rename:{"organizationParentWTA":"organizationParentId"}})
+
+
+NEO
+MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
+set r.amountEditableAtUnit=FALSE
+
+
+MATCH(slf:SeniorityLevelFunction)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function:Function)
+set rel.amountEditableAtUnit=false;
+
+
+
+// Kairos Activity
+// To Add Enum in all time types
+db.time_Type.find().forEach(function(e){var timeType = e;var t;if(e.timeTypes=="WORKING_TYPE" || e.label =="Unpaid Break"){var ts;if(timeType && timeType.upperLevelTimeTypeId){ts = db.time_Type.findOne({"_id":timeType.upperLevelTimeTypeId});if(ts!=null && ts.upperLevelTimeTypeId){ts = db.time_Type.findOne({"_id":ts.upperLevelTimeTypeId});}}if(ts){timeType = ts;}}if(timeType.label=="Absence"){t="ABSENCE"}else if(timeType.label=="Presence"){t="PRESENCE"}else {if(e.timeTypes=="WORKING_TYPE" || e.label =="Unpaid Break"){t="BREAK"}else{t=null;}}e.type = t;db.time_Type.save(e)});
+

@@ -32,13 +32,22 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
 
     @Override
-    public DataCategory findByName(Long countryId, String name) {
+    public DataCategory findByCountryIdName(Long countryId, String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, DataCategory.class);
 
+    }
+
+    @Override
+    public DataCategory findByUnitIdAndName(Long unitId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("name").is(name));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, DataCategory.class);
     }
 
     @Override
@@ -49,7 +58,7 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false)),
-                lookup("data_element", "dataElements", "_id", "dataElements"),
+                lookup("dataElement", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation)
         );
 
@@ -66,7 +75,7 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("data_element", "dataElements", "_id", "dataElements"),
+                lookup("dataElement", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation),
                 sort(Sort.Direction.DESC,"createdAt")
 
@@ -95,7 +104,7 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
-                lookup("data_element", "dataElements", "_id", "dataElements"),
+                lookup("dataElement", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation),
                 sort(Sort.Direction.DESC,"createdAt")
 
@@ -113,7 +122,7 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where("_id").is(dataCategoryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
-                lookup("data_element", "dataElements", "_id", "dataElements"),
+                lookup("dataElement", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation)
         );
 

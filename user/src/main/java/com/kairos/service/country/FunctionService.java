@@ -7,7 +7,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +43,7 @@ public class FunctionService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
-        Function isAlreadyExists=functionGraphRepository.findByNameIgnoreCase(countryId,functionDTO.getName().trim());
+        Function isAlreadyExists=functionGraphRepository.findByNameIgnoreCase(countryId,functionDTO.getName());
         if(Optional.ofNullable(isAlreadyExists).isPresent()){
             exceptionService.duplicateDataException("message.function.name.alreadyExist",functionDTO.getName());
 

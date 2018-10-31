@@ -6,6 +6,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -49,6 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,6 +117,7 @@ public class OrganizationController {
     @Inject
     private UnitPositionService unitPositionService;
     @Inject private VRPClientService vrpClientService;
+    @Inject private UnitService unitService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -206,7 +209,7 @@ public class OrganizationController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getManageHierarchyData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getManageHierarchyData(unitId));
+                unitService.getManageHierarchyData(unitId));
     }
 
     /**
@@ -977,7 +980,7 @@ public class OrganizationController {
      * @return timeslot info map
      */
     @ApiOperation("get time slot info by unit id and timeslot name")
-    @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
+    //@RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
     @PostMapping(PARENT_ORGANIZATION_URL+UNIT_URL+"/time_slot_name")
     ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody Long timeSlotExternalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, timeSlotExternalId));
@@ -1450,9 +1453,20 @@ public class OrganizationController {
                 organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
     }
 
+    @ApiOperation(value = "Map Selected Payroll Type to Unit ")
+    @PutMapping(value =PARENT_ORGANIZATION_URL+UNIT_URL + "/map_pay_roll_unit")
+    public ResponseEntity<Map<String, Object>> mappingPayRollToUnit(@PathVariable long unitId, @RequestBody BigInteger payRollTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.mappingPayRollToUnit(unitId, payRollTypeId));
 
-
-
-
-
+    }
+    /**
+     *
+     */
+    @ApiOperation(value = "on board a unit ")
+    @PostMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/on_boarding_done")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId,@RequestBody OrganizationBasicDTO organizationBasicDTO) throws InterruptedException ,ExecutionException{
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                unitService.onBoardOrganization(organizationBasicDTO,unitId));
+    }
 }

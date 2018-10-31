@@ -45,6 +45,10 @@ public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository
     @Query("{organizationId:?0,name:?1,deleted:false}")
     ProcessingLegalBasis findByNameAndUnitId(Long unitId, String name);
 
+    @Query("{organizationId:?0,deleted:false}")
+    List<ProcessingLegalBasisResponseDTO> findAllByUnitId(Long unitId);
+
+
 
 
 

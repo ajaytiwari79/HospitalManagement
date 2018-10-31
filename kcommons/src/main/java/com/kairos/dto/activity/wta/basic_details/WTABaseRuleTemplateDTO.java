@@ -39,7 +39,8 @@ import java.util.List;
         @JsonSubTypes.Type(value = DaysOffAfterASeriesWTATemplateDTO.class, name = "DAYS_OFF_AFTER_A_SERIES"),
         @JsonSubTypes.Type(value = NoOfSequenceShiftWTATemplateDTO.class, name = "NO_OF_SEQUENCE_SHIFT"),
         @JsonSubTypes.Type(value = EmployeesWithIncreasedRiskWTATemplateDTO.class,name="EMPLOYEES_WITH_INCREASE_RISK"),
-        @JsonSubTypes.Type(value = WTAForCareDaysDTO.class,name="WTA_FOR_CARE_DAYS")
+        @JsonSubTypes.Type(value = WTAForCareDaysDTO.class,name="WTA_FOR_CARE_DAYS"),
+        @JsonSubTypes.Type(value = BreakWTATemplateDTO.class,name="WTA_FOR_BREAKS_IN_SHIFT")
 })
 public class WTABaseRuleTemplateDTO{
 

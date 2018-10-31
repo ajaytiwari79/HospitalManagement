@@ -1,11 +1,12 @@
 package com.planner.domain.activity;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.List;
 
 public class Activity extends MongoBaseEntity {
+    private BigInteger kairosId;
     private String name;
     private List<Long> expertises;
     private String description;
@@ -104,5 +105,13 @@ public class Activity extends MongoBaseEntity {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public BigInteger getKairosId() {
+        return kairosId;
+    }
+
+    public void setKairosId(BigInteger kairosId) {
+        this.kairosId = kairosId;
     }
 }

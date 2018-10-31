@@ -53,7 +53,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> publishOrganization(@PathVariable Long countryId,@PathVariable long organizationId) throws InterruptedException, ExecutionException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.onBoardOrganization(countryId,organizationId));
+                companyCreationService.onBoardOrganization(countryId,organizationId,null));
     }
 
     @ApiOperation(value = "get basic details  of parent organization")
@@ -77,7 +77,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setUserInfoInOrganization(@Validated @RequestBody UnitManagerDTO unitManagerDTO, @PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,false,true));
+                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,false,true,false));
     }
 
     @ApiOperation(value = "get address of parent organization")

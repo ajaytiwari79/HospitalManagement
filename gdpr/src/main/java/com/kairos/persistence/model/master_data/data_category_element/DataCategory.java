@@ -5,16 +5,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "data_category")
+@Document
 public class DataCategory extends MongoBaseEntity {
 
     @NotBlank(message = "Name cannot be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    List<BigInteger> dataElements;
+    // empty array to get rid of null pointer
+    private List<BigInteger> dataElements=new ArrayList<>();
 
     private Long countryId;
 
@@ -42,10 +44,11 @@ public class DataCategory extends MongoBaseEntity {
         this.name = name;
     }
 
-    public DataCategory(String name, List<BigInteger> dataElements, Long countryId) {
+    public DataCategory( @NotBlank(message = "Name cannot be empty")
+                         @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
+                                 String name, List<BigInteger> dataElements) {
         this.name = name;
         this.dataElements = dataElements;
-        this.countryId = countryId;
     }
 
 

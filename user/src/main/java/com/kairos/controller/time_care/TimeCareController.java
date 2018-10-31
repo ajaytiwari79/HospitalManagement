@@ -47,7 +47,7 @@ public class TimeCareController {
 
     @RequestMapping(value = "/organization/{organizationId}/unit/{unitId}/staff/employments",method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> importEmploymentsFromTimeCare(@RequestBody List<TimeCareEmploymentDTO> timeCareEmploymentDTOS,
-                                                                            @RequestParam(value = "expertiseId",required = false) Long expertiseId) throws InterruptedException ,ExecutionException {
+                                                                            @RequestParam(value = "expertiseId",required = false) Long expertiseId) throws Exception {
 
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true, unitPositionService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS, expertiseId));
     }
