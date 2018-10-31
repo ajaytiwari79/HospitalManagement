@@ -289,8 +289,10 @@ public class ActivityService extends MongoBaseService {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
         //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab,generalActivityTabWithTagDTO,"tags");
-        if(!generalDTO.getTags().isEmpty()) generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        ObjectMapperUtils.copyProperties(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!generalDTO.getTags().isEmpty()){
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
 
         return activityTabsWrapper;
@@ -306,8 +308,10 @@ public class ActivityService extends MongoBaseService {
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
 //        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyPropertiesExceptSpecific(generalTab,generalActivityTabWithTagDTO,"tags");
-        if(!activity.getTags().isEmpty()) generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        ObjectMapperUtils.copyProperties(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
 
         return activityTabsWrapper;
@@ -977,7 +981,7 @@ public class ActivityService extends MongoBaseService {
 
 
         Activity activityCopied = new Activity();
-        ObjectMapperUtils.copyPropertiesExceptSpecific(activityFromDatabase.get(), activityCopied, "id");
+        ObjectMapperUtils.copyProperties(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
