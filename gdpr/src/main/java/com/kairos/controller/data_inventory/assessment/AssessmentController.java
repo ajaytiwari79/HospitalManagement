@@ -73,10 +73,10 @@ public class AssessmentController {
     }
 
 
-    @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
-    @GetMapping("/assessment/assignee")
-    public ResponseEntity<Object> getAllLaunchedAssessment(@PathVariable Long unitId,@RequestParam Long loggedInUserId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfAssignee(unitId,loggedInUserId));
+    @ApiOperation(value = "get All launched Assessment Assign Staff Member")
+    @GetMapping("/assessment/staff")
+    public ResponseEntity<Object> getAllLaunchedAssessmentAssignToStaff(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfCurrentLoginUser(unitId));
     }
 
     @ApiOperation(value = "get All Assessment of unit")
@@ -95,7 +95,7 @@ public class AssessmentController {
     @ApiOperation(value = "save answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
     public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects ,@RequestParam AssessmentStatus status) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivity(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
     }
 
 
