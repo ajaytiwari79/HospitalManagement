@@ -3,7 +3,9 @@ package com.kairos.persistence.model.user.unit_position;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * CreatedBy vipulpandey on 3/10/18
@@ -78,7 +80,7 @@ public class PositionLineChangeResultDTO {
     }
 
     public List<FunctionWithAmountQueryResult> getFunctions() {
-        return functions;
+        return Optional.ofNullable(functions).orElse(new ArrayList<>());
     }
 
     public void setFunctions(List<FunctionWithAmountQueryResult> functions) {
