@@ -53,7 +53,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                     ActivityCareDayCount careDayCount = careDayCountMap.get(activity.getId());
                     List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());
                     shifts.add(infoWrapper.getShift());
-                    shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getActivities().get(0).getStartDate(), shifts, Arrays.asList(careDayCount.getActivityId()));
+                    shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), shifts, Arrays.asList(careDayCount.getActivityId()));
                     if (careDayCount.getCount() < shifts.size()) {
                         WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
                         infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);

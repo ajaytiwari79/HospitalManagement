@@ -1068,7 +1068,6 @@ public class ShiftService extends MongoBaseService {
         Long unitPositionId = restClient.getUnitPositionId(unitId, staffId, expertiseId, startDateInISO.getTime());
 
         List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, unitId);
-        shifts.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
         return shifts;
     }
 
@@ -1079,8 +1078,8 @@ public class ShiftService extends MongoBaseService {
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO->
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(),ActivityDTO.class))
         );
-        shiftWithActivityDTO.setStartDate(shiftDTO.sortShifts().get(0).getStartDate());
-        shiftWithActivityDTO.setEndDate(shiftDTO.sortShifts().get(0).getEndDate());
+        shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
+        shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(0).getEndDate());
         shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
         return shiftWithActivityDTO;
     }
