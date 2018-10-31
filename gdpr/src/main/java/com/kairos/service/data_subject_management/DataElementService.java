@@ -130,7 +130,7 @@ public class DataElementService extends MongoBaseService {
 
 
     public Boolean deleteDataElementById(BigInteger dataElementId) {
-        dataElementMongoRepository.safeDelete(dataElementId);
+        dataElementMongoRepository.safeDeleteById(dataElementId);
         return true;
 
     }

@@ -241,11 +241,11 @@ public class ProcessingActivityService extends MongoBaseService {
         riskIds.addAll(processingActivity.getRisks());
         List<ProcessingActivity> subProcessingActivities = processingActivityMongoRepository.findSubProcessingActivitiesByIds(unitId, new HashSet<>(processingActivity.getSubProcessingActivities()));
         if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
-            processingActivityMongoRepository.safeDelete(subProcessingActivities);
+            processingActivityMongoRepository.safeDeleteAll(subProcessingActivities);
             subProcessingActivities.forEach(subProcessingActivity -> riskIds.addAll(subProcessingActivity.getRisks()));
         }
-        if (CollectionUtils.isNotEmpty(riskIds)) riskMongoRepository.safeDelete(riskIds);
-        processingActivityMongoRepository.safeDelete(processingActivityId);
+        if (CollectionUtils.isNotEmpty(riskIds)) riskMongoRepository.safeDeleteByIds(riskIds);
+        processingActivityMongoRepository.safeDeleteById(processingActivityId);
         return true;
 
     }
@@ -257,12 +257,12 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.safeDelete(subProcessingActivityId);
+        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.safeDeleteById(subProcessingActivityId);
         if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
         }
         if (CollectionUtils.isNotEmpty(subProcessingActivity.getRisks()))
-            riskMongoRepository.safeDelete(subProcessingActivity.getRisks());
+            riskMongoRepository.safeDeleteByIds(subProcessingActivity.getRisks());
         processingActivity.getSubProcessingActivities().remove(subProcessingActivityId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
@@ -553,7 +553,7 @@ public class ProcessingActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.safeDelete(riskId);
+        riskMongoRepository.safeDeleteById(riskId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
     }

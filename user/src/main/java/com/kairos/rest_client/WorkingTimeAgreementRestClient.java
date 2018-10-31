@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
@@ -112,14 +113,15 @@ public class WorkingTimeAgreementRestClient {
 
     }
 
-    public CTAWTAWrapper assignWTAToUnitPosition(Long unitPositionId,BigInteger wtaId,BigInteger ctaId) {
+    public CTAWTAWrapper assignWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
         String baseUrl = getBaseUrl(true);
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<CTAWTAWrapper>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}",
+                            baseUrl + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}/?startDate="+startDate,
                             HttpMethod.POST, null, typeReference, unitPositionId,wtaId,ctaId);
 
             RestTemplateResponseEnvelope<CTAWTAWrapper> response = restExchange.getBody();

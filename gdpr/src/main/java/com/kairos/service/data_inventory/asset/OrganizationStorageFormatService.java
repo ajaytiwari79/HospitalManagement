@@ -123,7 +123,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(assetsLinkedWithStorageFormat)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", new StringBuilder(assetsLinkedWithStorageFormat.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        storageFormatMongoRepository.safeDelete(storageFormatId);
+        storageFormatMongoRepository.safeDeleteById(storageFormatId);
         return true;
     }
 

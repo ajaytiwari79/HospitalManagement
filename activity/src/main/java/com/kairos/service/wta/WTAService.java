@@ -465,14 +465,14 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public CTAWTAWrapper assignCTAWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId) {
+    public CTAWTAWrapper assignCTAWTAToUnitPosition(Long unitPositionId, BigInteger wtaId, BigInteger ctaId,LocalDate startDate) {
         CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
         if (wtaId != null) {
-            WTAResponseDTO wtaResponseDTO = assignWTATOUnitPosition(unitPositionId, wtaId, DateUtils.getCurrentLocalDate());
+            WTAResponseDTO wtaResponseDTO = assignWTATOUnitPosition(unitPositionId, wtaId, startDate);
             ctawtaWrapper.setWta(Arrays.asList(wtaResponseDTO));
         }
         if (ctaId != null) {
-            CTAResponseDTO ctaResponseDTO = costTimeAgreementService.assignCTATOUnitPosition(unitPositionId, ctaId, DateUtils.getCurrentLocalDate());
+            CTAResponseDTO ctaResponseDTO = costTimeAgreementService.assignCTATOUnitPosition(unitPositionId, ctaId, startDate);
             ctawtaWrapper.setCta(Arrays.asList(ctaResponseDTO));
         }
         return ctawtaWrapper;
@@ -708,6 +708,13 @@ public class WTAService extends MongoBaseService {
             costTimeAgreementRepository.disableOldCta(oldctaId, startDate.minusDays(1));
         }
         return ctawtaWrapper;
+
+    }
+
+    public boolean setEndCTAWTAOfUnitPosition(Long unitPositionId, LocalDate endDate) {
+            wtaRepository.setEndDateToWTAOfUnitPosition(unitPositionId, endDate);
+            costTimeAgreementRepository.setEndDateToCTAOfUnitPosition(unitPositionId, endDate);
+    return  true;
 
     }
 }
