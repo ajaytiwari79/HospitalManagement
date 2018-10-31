@@ -281,7 +281,7 @@ public class AttendanceSettingService extends MongoBaseService {
         Map<BigInteger,AttendanceSetting> tAndAttendanceMap=attendanceSettingForTimeAndAttendance.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         for (Shift shift:shifts) {
             if (timeAndAttendanceShiftStateMap.get(shift.getId()) != null) {
-                ObjectMapperUtils.copyPropertiesExceptSpecific(realtimeShiftStateMap.get(shift.getId()), timeAndAttendanceShiftStateMap.get(shift.getId()), "id", "actualPhaseState", "accessGroupRole","attendanceSettingId");
+                ObjectMapperUtils.copyProperties(realtimeShiftStateMap.get(shift.getId()), timeAndAttendanceShiftStateMap.get(shift.getId()), "id", "actualPhaseState", "accessGroupRole","attendanceSettingId");
                 timeAndAttendanceShiftStates.add(timeAndAttendanceShiftStateMap.get(shift.getId()));
             } else {
                 if (realtimeShiftStateMap.get(shift.getId()) != null) {
@@ -304,7 +304,7 @@ public class AttendanceSettingService extends MongoBaseService {
         Map<BigInteger,AttendanceSetting> attendanceSettingMap=attendanceSettings.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         for (Shift shift:shifts){
             if(attendanceSettingForTAndAMap.get(shift.getId())!=null) {
-                ObjectMapperUtils.copyPropertiesExceptSpecific(attendanceSettingMap.get(shift.getId()),attendanceSettingForTAndAMap.get(shift.getId()),"id","shiftState");
+                ObjectMapperUtils.copyProperties(attendanceSettingMap.get(shift.getId()),attendanceSettingForTAndAMap.get(shift.getId()),"id","shiftState");
                 timeAndAttendanceSetting.add(attendanceSettingForTAndAMap.get(shift.getId()));
             }else{
                 if(attendanceSettingMap.get(shift.getId())!=null) {
