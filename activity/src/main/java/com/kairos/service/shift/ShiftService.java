@@ -1240,6 +1240,7 @@ public class ShiftService extends MongoBaseService {
                 }
             }
         List<ShiftDTO> plannerValidatedShifts =ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole().equals(AccessGroupRole.MANAGEMENT)&&s.getValidated()!=null).collect(Collectors.toList()),ShiftDTO.class);
+        //change id becouse id was same and issue on FE side and this is only for show FE side
         for(ShiftDTO shiftDTO:plannerValidatedShifts){
             shiftDTO.setId(new BigInteger("" + shiftDTO.getStartDate().getTime()));
             shiftDTO.getActivities().forEach(shiftActivity -> shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
