@@ -5,7 +5,6 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -252,11 +251,11 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         Set<BigInteger> riskIds = assetType.getRisks();
         List<AssetType> assetSubTypes = assetTypeMongoRepository.findAllAssetSubTypeByUnitIdAndIds(unitId, assetType.getSubAssetTypes());
         if (CollectionUtils.isNotEmpty(assetSubTypes)) {
-            assetTypeMongoRepository.safeDelete(assetSubTypes);
             assetSubTypes.forEach(subAssetType -> riskIds.addAll(subAssetType.getRisks()));
         }
-        if (CollectionUtils.isNotEmpty(riskIds)) riskMongoRepository.safeDelete(riskIds);
-        delete(assetType);
+        if (CollectionUtils.isNotEmpty(riskIds)) riskMongoRepository.safeDeleteByIds(riskIds);
+        assetSubTypes.add(assetType);
+        assetTypeMongoRepository.safeDeleteAll(assetSubTypes);
         return true;
 
     }
@@ -272,12 +271,9 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetSubType)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Sub Asset Type", new StringBuffer(assetsLinkedWithAssetSubType.stream().map(AssetBasicResponseDTO::getName).collect(Collectors.joining(","))));
         }
-        AssetType subAssetType = assetTypeMongoRepository.safeDelete(subAssetTypeId);
-        if (!Optional.ofNullable(subAssetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
-        }
+        AssetType subAssetType = assetTypeMongoRepository.safeDeleteById(subAssetTypeId);
         if (CollectionUtils.isNotEmpty(subAssetType.getRisks())) {
-            riskMongoRepository.safeDelete(subAssetType.getRisks());
+            riskMongoRepository.safeDeleteByIds(subAssetType.getRisks());
         }
         assetType.getSubAssetTypes().remove(subAssetTypeId);
         assetTypeMongoRepository.save(assetType);
@@ -300,7 +296,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetTypeId);
         }
         assetType.getRisks().remove(riskId);
-        riskMongoRepository.safeDelete(riskId);
+        riskMongoRepository.safeDeleteById(riskId);
         assetTypeMongoRepository.save(assetType);
         return true;
     }

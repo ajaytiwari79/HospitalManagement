@@ -11,7 +11,6 @@ import com.kairos.persistence.repository.data_inventory.processing_activity.Proc
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
@@ -118,7 +117,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
         if (!processingActivities.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        legalBasisMongoRepository.safeDelete(legalBasisId);
+        legalBasisMongoRepository.safeDeleteById(legalBasisId);
         return true;
     }
 
