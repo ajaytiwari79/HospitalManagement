@@ -27,9 +27,14 @@ public class QuestionnaireTemplateDTO {
     private BigInteger assetSubType;
     private boolean defaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
+    private QuestionnaireTemplateType riskAssociatedEntity;
     private List sections=new ArrayList<>();
 
     public BigInteger getAssetSubType() { return assetSubType; }
+
+    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
+
+    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
 
     public void setAssetSubType(BigInteger assetSubType) { this.assetSubType = assetSubType; }
 

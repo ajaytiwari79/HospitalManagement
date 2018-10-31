@@ -60,10 +60,19 @@ public class Shift extends MongoBaseEntity {
     private boolean sickShift;
     private LocalDate validatedByStaffDate;
     private LocalDate validatedByPlannerDate;
-    private Long createdBy ;//= UserContext.getUserDetails().getId();
-    private Long updatedBy ;//= UserContext.getUserDetails().getId();
+    private Long createdBy;
+    private Long updatedBy;
     private AttendanceDuration attendanceDuration;
     private Long functionId;
+    private Long staffUserId;
+
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public Shift() {
         //Default Constructor
@@ -170,11 +179,11 @@ public class Shift extends MongoBaseEntity {
 
 
     public List<ShiftActivity> getActivities() {
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities;
     }
 
     public void setActivities(List<ShiftActivity> activities) {
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
 
@@ -286,11 +295,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public DateTimeInterval getDateTimeInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.getEndDate().getTime());
-    }
-
-
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
@@ -390,7 +394,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
+        return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
 
     public ShiftQueryResult getShiftQueryResult() {

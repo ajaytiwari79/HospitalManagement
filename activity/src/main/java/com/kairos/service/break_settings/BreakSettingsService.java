@@ -3,28 +3,24 @@ package com.kairos.service.break_settings;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.break_settings.BreakSettingAndActivitiesWrapper;
-import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
-import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
-import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.activity.shift.Expertise;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
-import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 
 @Service
 public class BreakSettingsService extends MongoBaseService {
@@ -33,61 +29,71 @@ public class BreakSettingsService extends MongoBaseService {
     private BreakSettingMongoRepository breakSettingMongoRepository;
     @Inject
     private ExceptionService exceptionService;
-    @Inject private ActivityMongoRepository activityMongoRepository;
-    @Inject private UnitSettingRepository unitSettingRepository;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private UnitSettingRepository unitSettingRepository;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
+    @Inject
+    private TimeTypeMongoRepository timeTypeMongoRepository;
 
-    public BreakSettingsDTO createBreakSettings(Long unitId, BreakSettingsDTO breakSettingsDTO) {
-        BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(unitId, breakSettingsDTO.getShiftDurationInMinute());
+    public BreakSettingsDTO createBreakSettings(Long countryId, Long expertiseId, BreakSettingsDTO breakSettingsDTO) {
+        BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(countryId, expertiseId, breakSettingsDTO.getShiftDurationInMinute());
         if (Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
         }
-        breakSettings =ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
-        breakSettings.setUnitId(unitId);
+        breakSettings = new BreakSettings(countryId,breakSettingsDTO.getShiftDurationInMinute(),breakSettingsDTO.getBreakDurationInMinute(),expertiseId,breakSettingsDTO.getActivityId());
         save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
     }
 
-    public BreakSettingAndActivitiesWrapper getBreakSettings(Long unitId) {
-        List<BreakActivitiesDTO> breakActivityDTOS =activityMongoRepository.getAllActivitiesGroupedByTimeType(unitId);
-        Map<String,List<ActivityDTO>> timeTypeActivityMap= breakActivityDTOS.stream().collect(Collectors.toMap(k->k.getTimeType(), v->v.getActivities()));
-        List<BreakSettingsDTO> breakSettings= breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
-        UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
+    public BreakSettingAndActivitiesWrapper getBreakSettings(Long countryId, Long expertiseId) {
+        Expertise expertise = genericIntegrationService.getExpertise(countryId, expertiseId);
+        if (!Optional.ofNullable(expertise).isPresent()) {
+            exceptionService.duplicateDataException("error.expertise.notfound");
+        }
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId, expertise.getBreakPaymentSetting().toString());
+        List<BigInteger> parentIds=timeTypes.stream().map(TimeType::getId).collect(Collectors.toList());
+        List<TimeType> childTimeType = timeTypeMongoRepository.findAllChildTimeTypeByParentId(parentIds);
+        parentIds.addAll(childTimeType.stream().map(TimeType::getId).collect(Collectors.toList()));
+        List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);
+
+        List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
+        // TODO VIPUL FIX
+        /*UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
         if (unitSettingDTO != null) {
-            flexibleTimeSettingDTO = unitSettingDTO.getFlexibleTimeSettings();
+            flexibleTimeSettingDTO = unitSettingDTO.getGlideTimeSettings();
         }
-        return new BreakSettingAndActivitiesWrapper(breakSettings,timeTypeActivityMap.get(WORKING_TYPE.name()),timeTypeActivityMap.get(NON_WORKING_TYPE.name()),flexibleTimeSettingDTO);
+        */
+        return new BreakSettingAndActivitiesWrapper(breakSettings, activities, null);
     }
 
-    public Boolean removeBreakSettings(Long unitId, BigInteger breakSettingsId) {
-        BreakSettings breakSettings = breakSettingMongoRepository.findByIdAndDeletedFalseAndUnitId(breakSettingsId, unitId);
-        if (!Optional.ofNullable(breakSettings).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.breakSettings.notFound", breakSettingsId);
-        }
-        breakSettings.setDeleted(true);
-        save(breakSettings);
+    public Boolean removeBreakSettings(BigInteger breakSettingsId) {
+        breakSettingMongoRepository.safeDeleteById(breakSettingsId);
         return true;
     }
 
-    public BreakSettingsDTO updateBreakSettings(Long unitId, BigInteger breakSettingsId, BreakSettingsDTO breakSettingsDTO) {
-        BreakSettings breakSettings = breakSettingMongoRepository.findByIdAndDeletedFalseAndUnitId(breakSettingsId, unitId);
+    public BreakSettingsDTO updateBreakSettings(Long countryId, Long expertiseId, BigInteger breakSettingsId, BreakSettingsDTO breakSettingsDTO) {
+        BreakSettings breakSettings = breakSettingMongoRepository.findByIdAndDeletedFalse(breakSettingsId);
         if (!Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.breakSettings.notFound", breakSettingsId);
         }
         if (!breakSettingsDTO.getShiftDurationInMinute().equals(breakSettings.getShiftDurationInMinute())) {
-            BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(unitId, breakSettingsDTO.getShiftDurationInMinute());
+            BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(countryId, expertiseId, breakSettingsDTO.getShiftDurationInMinute());
             if (Optional.ofNullable(breakSettingsFromDB).isPresent()) {
                 exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
             }
 
         }
-        breakSettings=ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
-        breakSettings.setUnitId(unitId);
+        breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
+        breakSettings.setActivityId(breakSettingsDTO.getActivityId());
+        breakSettings.setShiftDurationInMinute(breakSettingsDTO.getShiftDurationInMinute());
         save(breakSettings);
         return breakSettingsDTO;
     }
-
 
 
 }

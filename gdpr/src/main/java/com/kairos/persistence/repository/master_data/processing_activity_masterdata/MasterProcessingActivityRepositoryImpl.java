@@ -18,9 +18,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-
 import javax.inject.Inject;
-
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 import static com.kairos.constants.AppConstant.ID;
@@ -57,7 +55,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("subProcess").is(false)),
-                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
+                lookup("masterProcessingActivity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation)
         );
         AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
@@ -69,7 +67,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)),
-                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
+                lookup("masterProcessingActivity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation)
         );
@@ -97,7 +95,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(criteria),
-                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
+                lookup("masterProcessingActivity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation)
 
@@ -136,11 +134,13 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getTypeId())
-                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
-                        .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds()))
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                        .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
+                lookup("masterProcessingActivity", "subProcessingActivityIds", "_id", "subProcessingActivities")
 
-        );
+
+                );
 
         return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class).getMappedResults();
     }
@@ -154,7 +154,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("risk", "risks", "_id", "risks"),
-                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
+                lookup("masterProcessingActivity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
                 unwind("subProcessingActivities", true),
                 lookup("risk", "subProcessingActivities.risks", "_id", "subProcessingActivities.risks"),
                 new CustomAggregationOperation(Document.parse(groupSubProcessingActivities)),

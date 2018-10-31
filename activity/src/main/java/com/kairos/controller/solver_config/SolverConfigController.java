@@ -1,3 +1,4 @@
+/*
 package com.kairos.controller.solver_config;
 
 import com.kairos.constants.ApiConstants;
@@ -16,10 +17,12 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
+*/
 /**
  * @author pradeep
  * @date - 20/6/18
- */
+ *//*
+
 
 @RestController
 @RequestMapping(ApiConstants.API_ORGANIZATION_UNIT_URL + "/solverConfig")
@@ -55,7 +58,8 @@ public class SolverConfigController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,null);
     }
 
-   /* @PostMapping(value = "/{solverConfigId}/stop")
+   */
+/* @PostMapping(value = "/{solverConfigId}/stop")
     @ApiOperation("create default solver config")
     public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.stopToPlannerBySolverConfig(unitId,solverConfigId));
@@ -67,9 +71,11 @@ public class SolverConfigController {
     @ApiOperation("create default solver config")
     public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
-    }*/
+    }*//*
+
 
 }
 
 
 
+*/

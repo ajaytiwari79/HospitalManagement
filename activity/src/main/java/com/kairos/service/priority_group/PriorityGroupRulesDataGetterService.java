@@ -1,5 +1,6 @@
 package com.kairos.service.priority_group;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
@@ -78,7 +79,7 @@ public class PriorityGroupRulesDataGetterService {
             openShiftStaffMap.put(openShift.getId(),staffUnitPositionQueryResults);
             openShiftMap.put(openShift.getId(),openShift);
         }
-        calculateTimeBankAndPlannedHours(unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
+        calculateTimeBankAndPlannedHours(priorityGroupDTO.getUnitId(),unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
         List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByUnitPositionId(unitPositionIds, new Date() );
         Map<Long,Integer> assignedOpenShiftMap = shiftCountDTOS.stream().collect(Collectors.toMap(ShiftCountDTO::getUnitPositionId,ShiftCountDTO::getCount));
         List<Shift> shifts = getShifts(priorityGroupDTO,maxDate,minDate,unitPositionIds);
@@ -128,7 +129,7 @@ public class PriorityGroupRulesDataGetterService {
         return shifts;
     }
 //flagged to be changed after accumulatedtimebank has been
-    public void calculateTimeBankAndPlannedHours(Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap,Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {
+    public void calculateTimeBankAndPlannedHours(Long unitId,Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap,Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {
 
         //Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = staffsUnitPositions.iterator();
 
@@ -145,10 +146,11 @@ public class PriorityGroupRulesDataGetterService {
                 Long endDate = DateUtils.getLongFromLocalDate(openShiftDate);
                 Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftDate).getTime();
                 Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftDate);
+                //Todo Yatharth please check it and change for totalWeekly hour
                 UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
                         Optional.ofNullable(staffUnitPositionQueryResult.getContractedMinByWeek()).isPresent()?staffUnitPositionQueryResult.getContractedMinByWeek():0,
                         Optional.ofNullable(staffUnitPositionQueryResult.getWorkingDaysPerWeek()).isPresent()?staffUnitPositionQueryResult.getWorkingDaysPerWeek():0,
-                        DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));
+                        DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()),staffUnitPositionQueryResult.getTotalWeeklyHours());
                 LocalDate startDatePlanned = DateUtils.getDateFromEpoch(DateUtils.getISOStartOfWeek(openShiftDate));
                 LocalDate endDatePlanned = DateUtils.asLocalDate(DateUtils.getISOEndOfWeekDate(openShiftDate));
                 List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId());
@@ -158,10 +160,11 @@ public class PriorityGroupRulesDataGetterService {
                 plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMin() + d.getTimeBankMinWithCta()).sum();
-                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate())).getTime(),endDate),
+                List<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate())),DateUtils.getDate(endDate));
+                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate())).getTime(),endDate),
                         unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
-
-                deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(new Interval(startDateDeltaWeek,endDateDeltaWeek),
+                planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,DateUtils.getDate(startDateDeltaWeek),DateUtils.getDate(endDateDeltaWeek));
+                deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals,new Interval(startDateDeltaWeek,endDateDeltaWeek),
                         unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries, false);
 
                 staffUnitPositionQueryResult.setAccumulatedTimeBank(timeBank);

@@ -61,7 +61,7 @@ public class AppConstant {
     public static final String SUB_PROCESSING_ACTIVITY_KEY = "subProcessingActivities";
 
 
-//Risk constant for asset type and Sub types
+//RISK constant for asset type and Sub types
 
     public static final String ASSET_TYPE_Risk_LIST= "assetType";
     public static final String SUB_ASSET_TYPE_Risk_LIST= "subsAssetType";

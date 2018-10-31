@@ -272,10 +272,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     void createAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
-            "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WITH employment\n" +
+            "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) Where id(user)={3} WITH employment\n" +
             "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) WHERE id(unit)={1} \n" +
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) WHERE ag.role={2} return count(ag) > 0")
-    Boolean checkIfUserHasAccessByRoleInUnit(Long parentOrgId, Long unitId, String role);
+    Boolean checkIfUserHasAccessByRoleInUnit(Long parentOrgId, Long unitId, String role,Long userId);
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(staff)={3} WITH employment\n" +
@@ -283,7 +283,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) WHERE ag.role={2} return count(ag) > 0")
     Boolean getStaffAccessRoles(Long parentOrgId, Long unitId, String role,Long staffId);
 
-    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false, enabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND ag.role={2}\n" +
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false, enabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND ag.role={2} AND (ag.endDate IS NULL OR date(ag.endDate) >= date()) \n" +
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategoryAndRole(Long countryId, String orgCategory, String role);
 

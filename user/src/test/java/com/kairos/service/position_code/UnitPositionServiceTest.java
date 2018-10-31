@@ -1,6 +1,5 @@
 package com.kairos.service.position_code;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
@@ -29,8 +28,8 @@ public class UnitPositionServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        UnitPosition uep = new UnitPosition(LocalDate.now(),LocalDate.now().plusDays(10), 733, 14, 15, 16, 18000d);
-        UnitPosition uep2 = new UnitPosition(LocalDate.now().plusDays(11), null, 733, 14, 15, 16, 18000d);
+        UnitPosition uep = new UnitPosition(LocalDate.now(),LocalDate.now().plusDays(10) );
+        UnitPosition uep2 = new UnitPosition(LocalDate.now().plusDays(11), null );
         unitPositions.add(uep);
         unitPositions.add(uep2);
     }
@@ -52,7 +51,7 @@ public class UnitPositionServiceTest {
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithEndDate() throws Exception {
         unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
-        UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5), 733, 14, 15, 16, 18000d);
+        UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5));
         unitPositions.add(uep5);
         unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
     }
@@ -60,7 +59,7 @@ public class UnitPositionServiceTest {
     @Test
     public void validateUnitEmploymentPositionWithExpertiseOverLapCase() throws Exception {
         unitPositions.clear();
-        UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5), 733, 14, 15, 16, 18000d);
+        UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5));
         unitPositions.add(uep5);
         unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
     }
@@ -69,7 +68,7 @@ public class UnitPositionServiceTest {
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithoutOverLap() throws Exception {
         unitPositions.clear();
-        UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5), 733, 14, 15, 16, 18000d);
+        UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5));
         unitPositions.add(uep5);
         unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
     }

@@ -49,7 +49,7 @@ public class RequestComponentService extends MongoBaseService {
 
                     break;
                 case ORGANIZATION:
-                    organization = organizationRestClient.getParentOfOrganization(requestComponent.getRequestSentId());
+                    organization = genericIntegrationService.getParentOfOrganization(requestComponent.getRequestSentId());
 
                     source=MODULE_3;
                     break;

@@ -58,12 +58,13 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
 
         String projectionOpertaion = "{ '$project':{'asset':{$arrayElemAt:['$asset',0]},'processingActivity':{'$arrayElemAt':['$processingActivity',0]}," +
-                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assignee':1,'approver':1,'createdAt':1,'assessmentStatus':1}}";
+                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assignee':1,'approver':1,'createdAt':1,'assessmentStatus':1 , 'risks':{'_id':1,'name':1}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("asset", "assetId", "_id", "asset"),
                 lookup("processingActivity", "processingActivityId", "_id", "processingActivity"),
+                lookup("risk","riskIds","_id","risks"),
                 new CustomAggregationOperation(Document.parse(projectionOpertaion)),
                 sort(Sort.Direction.DESC,"createdAt")
 
@@ -75,20 +76,52 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     @Override
     public Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId) {
 
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assetId").is(assetId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("assetId").is(assetId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(false));
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
     @Override
     public Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("processingActivityId").is(processingActivityId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(false));
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
 
     @Override
     public List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("questionnaireTemplateId").is(templateId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("questionnaireTemplateId").is(templateId)
+                .and("assessmentStatus").in(assessmentStatusList));
         return mongoTemplate.find(query, Assessment.class);
+    }
+
+
+    @Override
+    public Assessment findPreviousLaunchedAssessmentForAssetRisksByUnitId(Long unitId, BigInteger assetId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("assetId").is(assetId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(true));
+        return mongoTemplate.findOne(query, Assessment.class);
+    }
+
+    @Override
+    public Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("processingActivityId").is(processingActivityId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(true));
+        return mongoTemplate.findOne(query, Assessment.class);
     }
 }

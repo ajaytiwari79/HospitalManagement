@@ -36,9 +36,10 @@ public class UnitPositionQueryResult {
     private Map<String, Object> unitInfo;
     private List<UnitPositionLinesQueryResult> positionLines;
     private Boolean history;
-    private Boolean editable;
+    private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
+
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
     }

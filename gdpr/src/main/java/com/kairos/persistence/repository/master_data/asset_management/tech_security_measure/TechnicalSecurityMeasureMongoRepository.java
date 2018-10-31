@@ -39,7 +39,7 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseReposi
 
 
     @Query("{deleted:false,organizationId:?0}")
-    List<TechnicalSecurityMeasureResponseDTO> findAllByUnitIdSortByCreatedDate(Long organizationId, Sort sort);
+    List<TechnicalSecurityMeasureResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     TechnicalSecurityMeasure findByUnitIdAndId(Long unitId, BigInteger id);
@@ -47,6 +47,12 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseReposi
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
     TechnicalSecurityMeasure findByUnitIdAndName(Long unitId, String name);
+
+
+    @Query("{deleted:false,organizationId:?0}")
+    List<TechnicalSecurityMeasureResponseDTO> findAllByUnitId(Long unitId);
+
+
 
 
 

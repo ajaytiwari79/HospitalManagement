@@ -30,6 +30,7 @@ import com.kairos.persistence.repository.user.country.CountryAccessGroupRelation
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
@@ -77,6 +78,8 @@ public class AccessGroupService {
     private StaffService staffService;
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         if((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))){
@@ -870,6 +873,7 @@ public class AccessGroupService {
     }
 
     // Method to fetch list of access group by Organization category ( Hub, Organization and Union)
+    //TODO all three db calls can be combined in one
     public Map<String, List<AccessGroupQueryResult>> getCountryAccessGroupsForOrganizationCreation(Long countryId) {
         Map<String, List<AccessGroupQueryResult>> accessGroupForParentOrganizationCreation = new HashMap<>();
         accessGroupForParentOrganizationCreation.put("hub",
@@ -889,10 +893,11 @@ public class AccessGroupService {
     public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,
-                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString()),
-                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString())
-        );
+        Long staff=staffGraphRepository.findStaffIdByUserId(userId,unitId);
+        //changes by pavan
+        boolean isStaff = staff==null ? accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),userId): false;
+        boolean isManagementStaff = staff==null ? accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),userId) : true;
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,isStaff,isManagementStaff);
         return userAccessRoleDTO;
     }
 

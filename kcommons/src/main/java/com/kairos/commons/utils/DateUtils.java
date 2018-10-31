@@ -94,6 +94,10 @@ public class DateUtils {
     }
 
 
+    public static LocalDateTime getLocalDateTime(){
+        return LocalDateTime.now();
+    }
+
     public static Date getSingleCompleteDate(Date date, Date time) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String dateString = dateFormat.format(date);
@@ -332,6 +336,10 @@ public class DateUtils {
 
     public static LocalDate asLocalDate(String receivedDate) {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    public static LocalDate asLocalDate(DateTime dateTime){
+        return asLocalDate(dateTime.toDate());
     }
 
 
@@ -710,6 +718,10 @@ public class DateUtils {
 
     public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes, int seconds) {
         return LocalDateTime.of(localDate, LocalTime.of(hours, minutes, seconds));
+    }
+
+    public static Date getStartOfTheDay(Date date){
+        return asDate(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static int getWeekNumberByLocalDate(LocalDate localDate) {

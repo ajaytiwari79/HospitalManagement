@@ -666,7 +666,7 @@ public class TaskService extends MongoBaseService {
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
             exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
         }
-        OrganizationStaffWrapper organizationStaffWrapper = organizationRestClient.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
+        OrganizationStaffWrapper organizationStaffWrapper = genericIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
@@ -715,7 +715,7 @@ public class TaskService extends MongoBaseService {
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));

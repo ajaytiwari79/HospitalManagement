@@ -1,7 +1,7 @@
 package com.planner.repository.taskRepository;
 
 import com.planner.domain.task.Task;
-import com.planner.repository.MongoBaseRepository;
+import com.planner.repository.common.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 
 /**

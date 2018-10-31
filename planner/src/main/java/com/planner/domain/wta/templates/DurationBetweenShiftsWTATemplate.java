@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,10 +19,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
-    private long durationBetweenShifts;
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
@@ -37,12 +36,20 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
     public List<PartOfDay> getPartOfDays() {
@@ -71,23 +78,16 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public long getDurationBetweenShifts() {
-        return durationBetweenShifts;
-    }
-
-    public void setDurationBetweenShifts(long durationBetweenShifts) {
-        this.durationBetweenShifts = durationBetweenShifts;
-    }
 
     public DurationBetweenShiftsWTATemplate(String name, boolean disabled,
-                                            String description, long durationBetweenShifts) {
+                                            String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.durationBetweenShifts = durationBetweenShifts;
 
     }
     public DurationBetweenShiftsWTATemplate() {
-        wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
     }
-    }
+
+
+}

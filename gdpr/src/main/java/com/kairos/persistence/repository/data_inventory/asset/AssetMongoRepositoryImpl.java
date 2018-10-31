@@ -45,13 +45,13 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
-                lookup("organizationSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
+                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
-                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
-                lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("hostingProvider", "hostingProvider", "_id", "hostingProvider"),
-                lookup("hostingType", "hostingType", "_id", "hostingType"),
-                lookup("dataDisposal", "dataDisposal", "_id", "dataDisposal"),
+                lookup("assetType", "assetSubTypeId", "_id", "assetSubTypes"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
+                lookup("hostingProvider", "hostingProviderId", "_id", "hostingProvider"),
+                lookup("hostingType", "hostingTypeId", "_id", "hostingType"),
+                lookup("dataDisposal", "dataDisposalId", "_id", "dataDisposal"),
                 new CustomAggregationOperation(projectionOperation)
         );
 
@@ -67,13 +67,13 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
-                lookup("organizationSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
+                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
-                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
-                lookup("assetType", "assetType", "_id", "assetType"),
-                lookup("hostingProvider", "hostingProvider", "_id", "hostingProvider"),
-                lookup("hostingType", "hostingType", "_id", "hostingType"),
-                lookup("dataDisposal", "dataDisposal", "_id", "dataDisposal"),
+                lookup("assetType", "assetSubTypeId", "_id", "assetSubTypes"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
+                lookup("hostingProvider", "hostingProviderId", "_id", "hostingProvider"),
+                lookup("hostingType", "hostingTypeId", "_id", "hostingType"),
+                lookup("dataDisposal", "dataDisposalId", "_id", "dataDisposal"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation)
 

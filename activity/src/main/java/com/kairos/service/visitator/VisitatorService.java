@@ -86,8 +86,6 @@ public class VisitatorService{
     OrganizationRestClient organizationRestClient;
     @Autowired
     GenericIntegrationService genericIntegrationService;
-    @Autowired
-    ClientRestClient clientRestClient;
 
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
@@ -191,7 +189,7 @@ public class VisitatorService{
 
         Map<String, Object> organizationResult = new HashMap();
 
-        Map<String, Object> response=organizationRestClient.getUnitVisitationInfo(organizationId,unitId);
+        Map<String, Object> response=genericIntegrationService.getUnitVisitationInfo();
         Map<String, Object> unitData =(Map<String, Object>)response.get("unitData");
         List<TaskPackage> taskPackageList = taskPackageMongoRepository.findAllByUnitIdAndIsDeleted(unitId,false);
         unitData.put("taskPackageList", CollectionUtils.isNotEmpty(taskPackageList) ? taskPackageList : Collections.EMPTY_LIST);
@@ -498,7 +496,7 @@ public class VisitatorService{
 
         if(taskDemand.getRecurrencePattern()== TaskDemand.RecurrencePattern.WEEKLY){
             if (taskDemand.getWeekdaySupplierId() > 0 && taskDemand.getWeekdayFrequency() != null && taskDemand.getWeekdayVisits() != null) {
-                Map<String,Object> organizaionInfo=organizationRestClient.getTaskDemandSupplierInfo(taskDemand.getWeekdaySupplierId());
+                Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
                 //anilm2 comments code
                 //Organization weekdaySupplier = organizationGraphRepository.findById(taskDemand.getWeekdaySupplierId());
                 //taskDemandMap.put("weekdaySupplier", weekdaySupplier.getName());
@@ -520,7 +518,7 @@ public class VisitatorService{
                /* Organization weekendSupplier = organizationGraphRepository.findById(taskDemand.getWeekendSupplierId());
                 taskDemandMap.put("weekendSupplierId", weekendSupplier.getId());
                 taskDemandMap.put("weekendSupplier", weekendSupplier.getName());*/
-                Map<String,Object> organizaionInfo=organizationRestClient.getTaskDemandSupplierInfo(taskDemand.getWeekendSupplierId());
+                Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
 
 
                 taskDemandMap.putAll(organizaionInfo);
@@ -538,7 +536,7 @@ public class VisitatorService{
            /* Organization weekdaySupplier = organizationGraphRepository.findById(taskDemand.getWeekdaySupplierId());
             taskDemandMap.put("weekdaySupplier", weekdaySupplier.getName());
             taskDemandMap.put("weekdaySupplierId", weekdaySupplier.getId());*/
-            Map<String,Object> organizaionInfo=organizationRestClient.getTaskDemandSupplierInfo(taskDemand.getWeekdaySupplierId());
+            Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
             taskDemandMap.putAll(organizaionInfo);
             List<TaskDemandVisit> taskDemandVisits = taskDemand.getWeekdayVisits();
             taskDemandVisits.forEach(taskDemandVisit -> taskDemandVisit.setVisitCount(toIntExact(taskDemand.getDailyFrequency())));
@@ -558,7 +556,7 @@ public class VisitatorService{
            /* Organization weekdaySupplier = organizationGraphRepository.findById(taskDemand.getWeekdaySupplierId());
             taskDemandMap.put("weekdaySupplier", weekdaySupplier.getName());
             taskDemandMap.put("weekdaySupplierId", weekdaySupplier.getId());*/
-            Map<String,Object> organizaionInfo=organizationRestClient.getTaskDemandSupplierInfo(taskDemand.getWeekdaySupplierId());
+            Map<String,Object> organizaionInfo=genericIntegrationService.getTaskDemandSupplierInfo();
 
             taskDemandMap.putAll(organizaionInfo);
 

@@ -72,11 +72,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "return id(staffs) as id,staffs.firstName+\" \" +staffs.lastName as name,staffs.profilePic as profilePic,teams,skills order by name")
     List<StaffAdditionalInfoQueryResult> getStaffAndCitizenDetailsOfUnit(long unitId);
 
-    @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization\n" +
-            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) where id(staff)={1} with staff,organization\n" +
-            "OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization\n" +
-            "OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization\n" +
-            "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
+    @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) where id(staff)={1} with staff,organization Match (staff)-[:BELONGS_TO]->(user:User) with staff,organization,user OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization,user OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization,user return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId,id(user) as staffUserId order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission,organization\n" +
@@ -398,8 +394,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
             "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
-            "match (org)-[:" + BELONGS_TO + "]-(country:Country)<-[: " + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCodes")
+            "match (org)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCodes")
     List<StaffTimezoneQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id,ReasonCodeType reasonCodeType);
+
     @Query("Match(staff:Staff)-[rel:"+STAFF_HAS_EXPERTISE+"]-(exp:Expertise) where id(staff)={0} and id(exp)={1} set rel.expertiseStartDate = {2}  return staff,exp")
     void updateStaffExpertiseRelation(Long staffId,Long expertiseId,Long millis);
 
@@ -408,6 +405,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName")
     List<StaffTimezoneQueryResult> getAllStaffsAndUnitDetailsByUserId(Long userId);
 
+/*
+ @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
+            "match (org)-[:" + BELONGS_TO + "]-(country:Country)<-[: " + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCodes")
+ */
 
 }
 

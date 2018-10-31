@@ -2,9 +2,9 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.user.country.experties.*;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -147,6 +147,7 @@ public class ExpertiseService {
                     expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
             addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
             expertiseGraphRepository.save(expertise);
+            functionalPaymentGraphRepository.linkWithFunctionPayment(expertise.getId(),seniorityLevel.getId());
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());

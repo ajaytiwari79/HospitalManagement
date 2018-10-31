@@ -1,19 +1,17 @@
 package com.kairos.service.country;
 
 
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.Currency;
@@ -45,8 +43,6 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -67,6 +63,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
+
+
 
 /**
  * Created by oodles on 16/9/16.
@@ -563,5 +561,15 @@ public class CountryService {
     }
 
 
-
+    public boolean mappingPayRollListToCountry(long countryId, Set<BigInteger> payRollTypeIds) {
+        Country country=countryGraphRepository.findOne(countryId);
+        if(country!=null && !country.isDeleted()) {
+            country.setPayRollTypeIds(payRollTypeIds);
+            countryGraphRepository.save(country);
+        }
+        else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","Country",countryId);
+        }
+        return true;
+    }
 }

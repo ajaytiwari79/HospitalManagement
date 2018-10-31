@@ -32,13 +32,22 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
 
     @Override
-    public DataCategory findByName(Long countryId, String name) {
+    public DataCategory findByCountryIdName(Long countryId, String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, DataCategory.class);
 
+    }
+
+    @Override
+    public DataCategory findByUnitIdAndName(Long unitId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("name").is(name));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, DataCategory.class);
     }
 
     @Override

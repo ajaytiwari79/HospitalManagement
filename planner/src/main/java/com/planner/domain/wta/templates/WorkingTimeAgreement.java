@@ -1,8 +1,6 @@
 package com.planner.domain.wta.templates;
 
-import com.planner.domain.MongoBaseEntity;
-import com.planner.domain.wta.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.planner.domain.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -25,7 +23,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.templates = templates;
-        this.kairosId=kairosId;
+        //this.kairosId=kairosId;
     }
 
     public String getName() {

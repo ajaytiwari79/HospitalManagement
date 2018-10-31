@@ -10,7 +10,7 @@ import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
@@ -222,7 +222,7 @@ public class PositionCodeService {
             logger.info(data.toString());
         }
 
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
         PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
         return positionCodeUnionWrapper;
     }
