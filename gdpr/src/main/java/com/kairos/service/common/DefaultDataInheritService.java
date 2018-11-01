@@ -420,7 +420,6 @@ public class DefaultDataInheritService extends MongoBaseService {
                     }
                 }
                 break;
-
             default:
                 questionnaireTemplate.setTemplateType(questionnaireTemplateDTO.getTemplateType());
                 break;

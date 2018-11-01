@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentAnswerValueObject {
 
@@ -21,7 +20,7 @@ public class AssessmentAnswerValueObject {
     @NotBlank(message ="Attribute name can't be empty" )
     private String attributeName;
     private Object value;
-    private QuestionType questionType;
+   // private QuestionType questionType;
 
 
 
@@ -32,16 +31,16 @@ public class AssessmentAnswerValueObject {
         this.questionId = questionId;
         this.attributeName = attributeName;
         this.value = value;
-        this.questionType= questionType;
+     //   this.questionType= questionType;
     }
 
-    public QuestionType getQuestionType() {
+  /*  public QuestionType getQuestionType() {
         return questionType;
     }
 
     public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
-    }
+    }*/
 
     public BigInteger getQuestionId() { return questionId; }
 

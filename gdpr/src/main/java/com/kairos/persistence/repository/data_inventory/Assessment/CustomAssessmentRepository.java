@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
