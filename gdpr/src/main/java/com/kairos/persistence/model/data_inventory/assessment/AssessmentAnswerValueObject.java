@@ -4,6 +4,7 @@ package com.kairos.persistence.model.data_inventory.assessment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.gdpr.AssetAttributeName;
+import com.kairos.enums.gdpr.QuestionType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -20,15 +21,26 @@ public class AssessmentAnswerValueObject {
     @NotBlank(message ="Attribute name can't be empty" )
     private String attributeName;
     private Object value;
+    private QuestionType questionType;
+
 
 
     public AssessmentAnswerValueObject() {
     }
 
-    public AssessmentAnswerValueObject(BigInteger questionId, String attributeName, Object value) {
+    public AssessmentAnswerValueObject(BigInteger questionId, String attributeName, Object value,QuestionType questionType) {
         this.questionId = questionId;
         this.attributeName = attributeName;
         this.value = value;
+        this.questionType= questionType;
+    }
+
+    public QuestionType getQuestionType() {
+        return questionType;
+    }
+
+    public void setQuestionType(QuestionType questionType) {
+        this.questionType = questionType;
     }
 
     public BigInteger getQuestionId() { return questionId; }
