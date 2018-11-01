@@ -88,11 +88,13 @@ public class AttendanceSettingService extends MongoBaseService {
         List<Shift> shifts=shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<Long,List<ReasonCodeDTO>> unitAndReasonCode=staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId,StaffResultDTO::getReasonCodes));
-        Map<BigInteger,LocationActivityTabDTO> activityIdAndLocationActivityTabMap = new HashMap<>();
+        Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap = new HashMap<>();
         if(!shifts.isEmpty()) {
             Set<BigInteger> activityIds = shifts.stream().flatMap(shift1 -> shift1.getActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
-            List<LocationActivityTabWithActivityIdDTO> locationActivityTabWithActivityIds = activityMongoRepository.findAllActivitieIdsAndLocationActivityTabByIds(activityIds);
-            activityIdAndLocationActivityTabMap = locationActivityTabWithActivityIds.stream().collect(Collectors.toMap(k->k.getId(),v->v.getLocationActivityTab()));
+            List<Activity> activities = activityMongoRepository.findAllActivitieIdsAndLocationActivityTabByIds(activityIds);
+            //Todo Pradeep please get specific data
+            List<LocationActivityTabWithActivityIdDTO> locationActivityTabWithActivityIds = new ArrayList<>();
+             activityIdAndLocationActivityTabMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getLocationActivityTab()));
             /*List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
             for(UnitSettingDTO unitSettingDTO:unitSettingDTOS){
                     unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
@@ -250,7 +252,7 @@ public class AttendanceSettingService extends MongoBaseService {
 
     private boolean validateGlideTimeWhileCheckOut(Shift shift, Long reasonCodeId, String timeZone){
         //Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-        LocationActivityTab locationActivityTab = activityMongoRepository.findActivityGlideTimeByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId());
+        LocationActivityTab locationActivityTab = activityMongoRepository.findActivityByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId()).getLocationActivityTab();
         ActivityGlideTimeDetails glideTimeDetails = locationActivityTab.getCheckOutGlideTime(LocationEnum.OFFICE);
         ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(glideTimeDetails.getBefore());
         ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(glideTimeDetails.getAfter());
