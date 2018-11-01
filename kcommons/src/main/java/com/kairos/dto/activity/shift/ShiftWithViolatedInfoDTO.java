@@ -1,7 +1,10 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author pradeep
@@ -12,7 +15,6 @@ public class ShiftWithViolatedInfoDTO {
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules;
     private List<String> errorMessages = new ArrayList<>();
-
 
     public ShiftWithViolatedInfoDTO() {
     }
@@ -25,7 +27,9 @@ public class ShiftWithViolatedInfoDTO {
 
     public ShiftWithViolatedInfoDTO(ViolatedRulesDTO violatedRules) {
         this.violatedRules = violatedRules;
+
     }
+
 
     public List<String> getErrorMessages() {
         return errorMessages;
@@ -50,4 +54,5 @@ public class ShiftWithViolatedInfoDTO {
     public void setViolatedRules(ViolatedRulesDTO violatedRules) {
         this.violatedRules = violatedRules;
     }
+
 }
