@@ -162,10 +162,10 @@ public class CustomAggregationQuery {
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
                 "'hostingType':{$arrayElemAt:['$hostingType',0]}," +
+                "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
                 "'dataDisposal':{$arrayElemAt:['$dataDisposal',0]}," +
                 "'hostingProvider':{$arrayElemAt:['$hostingProvider',0]}," +
                 "  'name':1," +
-                "'assetSubTypes':1," +
                 "  'description':1," +
                 "  'hostingLocation':1," +
                 "  'managingDepartment':1," +

@@ -82,6 +82,11 @@ MERGE (o)-[:HAS_ACCOUNT_TYPE]->(ANY ABOVE ACCOUNT TYPE)
 // To Add Enum in all time types
 db.time_Type.find().forEach(function(e){var timeType = e;var t;if(e.timeTypes=="WORKING_TYPE" || e.label =="Unpaid Break"){var ts;if(timeType && timeType.upperLevelTimeTypeId){ts = db.time_Type.findOne({"_id":timeType.upperLevelTimeTypeId});if(ts!=null && ts.upperLevelTimeTypeId){ts = db.time_Type.findOne({"_id":ts.upperLevelTimeTypeId});}}if(ts){timeType = ts;}}if(timeType.label=="Absence"){t="ABSENCE"}else if(timeType.label=="Presence"){t="PRESENCE"}else {if(e.timeTypes=="WORKING_TYPE" || e.label =="Unpaid Break"){t="BREAK"}else{t=null;}}e.type = t;db.time_Type.save(e)});
 
+// TO set allowedDayTypes Property in Existing AccessGroups
+MATCH(ag:AccessGroup) set ag.allowedDayTypes=true;
+
+
 
 //To set all breakAllowed to true for existing Activities
 db.activities.updateMany({},{$set:{"rulesActivityTab.breakAllowed":true}});
+
