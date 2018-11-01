@@ -18,6 +18,7 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -85,6 +86,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -94,6 +96,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -224,7 +227,7 @@ public class UnitPositionService {
 
         UnitPositionLineEmploymentTypeRelationShip relationShip = new UnitPositionLineEmploymentTypeRelationShip(unitPosition.getUnitPositionLines().get(0), employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
-        linkFunctions(functions, unitPosition.getUnitPositionLines().get(0), false);
+        linkFunctions(functions, unitPosition.getUnitPositionLines().get(0), false,unitPositionDTO.getFunctions());
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaWrapper.getCta().get(0));
@@ -232,14 +235,15 @@ public class UnitPositionService {
         return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
     }
 
-    private void linkFunctions(List<FunctionWithAmountQueryResult> functions, UnitPositionLine positionLine, boolean update) {
+    private void linkFunctions(List<FunctionWithAmountQueryResult> functions, UnitPositionLine positionLine, boolean update,Set<FunctionsDTO> functionDTOS) {
         if (update) {
             // need to delete the current applied functions
             unitPositionGraphRepository.removeAllAppliedFunctionOnPositionLines(positionLine.getId());
         }
+        Map<Long,BigDecimal> functionAmountMap=functionDTOS.stream().collect(Collectors.toMap(FunctionsDTO::getId,FunctionsDTO::getAmount));
         List<UnitPositionLineFunctionRelationShip> functionsUnitPositionLines = new ArrayList<>(functions.size());
         functions.forEach(currentFunction -> {
-            functionsUnitPositionLines.add(new UnitPositionLineFunctionRelationShip(positionLine, currentFunction.getFunction(), currentFunction.getAmount()));
+            functionsUnitPositionLines.add(new UnitPositionLineFunctionRelationShip(positionLine, currentFunction.getFunction(), functionAmountMap.get(currentFunction.getFunction().getId())));
         });
         positionLineFunctionRelationRepository.saveAll(functionsUnitPositionLines);
     }
@@ -391,23 +395,24 @@ public class UnitPositionService {
 
         List<FunctionWithAmountQueryResult> newAppliedFunctions = findAndValidateFunction(unitPositionDTO);
         List<FunctionWithAmountQueryResult> olderAppliesFunctions = unitPositionGraphRepository.findAllAppliedFunctionOnPositionLines(unitPositionDTO.getPositionLineId());
+        Map<Long,BigDecimal> functionAmountMap=unitPositionDTO.getFunctions().stream().collect(Collectors.toMap(FunctionsDTO::getId,FunctionsDTO::getAmount));
         // if earlier there were 3 applied function and new its 2 or 4 then simply we need to set calculative value change and
-        // return it witout checking its objects or values
+        // return it without checking its objects or values
         if (newAppliedFunctions.size() != olderAppliesFunctions.size()) {
             changeResultDTO.setCalculativeChanged(true);
             changeResultDTO.setFunctionsChanged(true);
             changeResultDTO.setFunctions(newAppliedFunctions);
-        } else {
+        } else {  // earlier appilied function 4 amount 5 new applied 4 but amount 6
             olderAppliesFunctions.forEach(currentOldFunction -> {
                 AtomicBoolean currentMatched = new AtomicBoolean(false);
                 newAppliedFunctions.forEach(newCurrentFunction -> {
-                    if (currentOldFunction.getFunction().getId().equals(newCurrentFunction.getFunction().getId()) && currentOldFunction.getAmount().equals(newCurrentFunction.getAmount())) {
+                    if (currentOldFunction.getFunction().getId().equals(newCurrentFunction.getFunction().getId()) && functionAmountMap.get(currentOldFunction.getFunction().getId()).equals(newCurrentFunction.getAmount())) {
                         currentMatched.getAndSet(true);
                         return; // break inner loop
                     }
                 });
                 // flag based matching
-                if (currentMatched.get() == false) {
+                if (!currentMatched.get()) {
                     changeResultDTO.setCalculativeChanged(true);
                     changeResultDTO.setFunctionsChanged(true);
                     changeResultDTO.setFunctions(newAppliedFunctions);
@@ -476,7 +481,7 @@ public class UnitPositionService {
                     unitPositionEmploymentTypeRelationShipGraphRepository.updateEmploymentTypeInCurrentUnitPositionLine(currentUnitPositionLine.getId(), unitPositionDTO.getEmploymentTypeId(), unitPositionDTO.getEmploymentTypeCategory());
                 }
                 if (changeResultDTO.isFunctionsChanged()) {
-                    linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true);
+                    linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true,unitPositionDTO.getFunctions());
                 }
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
@@ -488,7 +493,7 @@ public class UnitPositionService {
                 unitPositionGraphRepository.save(oldUnitPosition);
                 linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
                 if (changeResultDTO.isFunctionsChanged()) {
-                    linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false);
+                    linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false,unitPositionDTO.getFunctions());
                 }
                 unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
@@ -832,9 +837,9 @@ public class UnitPositionService {
         result.setReasonCode(reasonCode);
 
         Map<String, Object> employmentTypes = new HashMap();
-        employmentTypes.put("name", relationShip.getEmploymentType().getName());
-        employmentTypes.put("id", relationShip.getEmploymentType().getId());
-        employmentTypes.put("employmentTypeCategory", relationShip.getEmploymentTypeCategory());
+        employmentTypes.put("name",relationShip.getEmploymentType().getName()) ;
+        employmentTypes.put("id", unitPositionDTO.getEmploymentTypeId());
+        employmentTypes.put("employmentTypeCategory", unitPositionDTO.getEmploymentTypeCategory());
 
         Map<String, Object> seniorityLevel = new HashMap<>();
 
