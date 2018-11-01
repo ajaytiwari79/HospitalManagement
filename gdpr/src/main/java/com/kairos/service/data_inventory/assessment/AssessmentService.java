@@ -137,8 +137,10 @@ public class AssessmentService extends MongoBaseService {
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
         Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, assetResponseDTO) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, assetResponseDTO);
         assessment.setAssetId(assetId);
-        if (assessmentDTO.isRiskAssessment()) {
+        if (!assessmentDTO.isRiskAssessment()) {
             saveAssetValueToAssessment(unitId, assessment, assetResponseDTO);
+        } else {
+            saveRiskTemplateAnswerToAssessment(unitId, assessment);
         }
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
@@ -167,6 +169,9 @@ public class AssessmentService extends MongoBaseService {
         assessment.setProcessingActivityId(processingActivityId);
         if (!assessmentDTO.isRiskAssessment()) {
             saveProcessingActivityValueToAssessment(unitId, assessment, processingActivityDTO);
+        }
+        else {
+            saveRiskTemplateAnswerToAssessment(unitId, assessment);
         }
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
@@ -656,6 +661,26 @@ public class AssessmentService extends MongoBaseService {
         assessment.setAssessmentAnswers(processingActivityAssessmentAnswerVOS);
 
     }
+
+    private void saveRiskTemplateAnswerToAssessment(Long unitId, Assessment assessment) {
+
+        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
+        if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
+        }
+        List<AssessmentAnswerValueObject> riskAssessmentAnswer = new ArrayList<>();
+        for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
+            for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                riskAssessmentAnswer.add(new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), null, questionBasicDTO.getQuestionType()));
+            }
+        }
+        assessment.setAssessmentAnswers(riskAssessmentAnswer);
+
+
+    }
+
+
+    //  private void mapRisk
 
     private AssessmentAnswerValueObject mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(AssetResponseDTO assetResponseDTO, QuestionBasicResponseDTO questionBasicDTO) {
 
