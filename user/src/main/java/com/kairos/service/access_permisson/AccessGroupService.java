@@ -109,10 +109,10 @@ public class AccessGroupService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-//        if (CollectionUtils.isEmpty(dayTypes)) {
-//            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
-//        }
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
+        }
         AccessGroup accessGroup = ObjectMapperUtils.copyPropertiesByMapper(accessGroupDTO, AccessGroup.class);
         accessGroup.setDayTypes(dayTypes);
 
@@ -153,10 +153,10 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-//        if (CollectionUtils.isEmpty(dayTypes)) {
-//            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
-//        }
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
+        }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
@@ -638,10 +638,11 @@ public class AccessGroupService {
         if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
             exceptionService.dataNotMatchedException("message.accountType.notFound");
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-//        if (CollectionUtils.isEmpty(dayTypes)) {
-//            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
-//        }
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
+        }
+
         Country country = countryGraphRepository.findOne(countryId);
 
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
@@ -684,10 +685,10 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-//        if (CollectionUtils.isEmpty(dayTypes)) {
-//            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
-//        }
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
+        }
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
