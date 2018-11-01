@@ -4,7 +4,6 @@ package com.kairos.persistence.model.data_inventory.assessment;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -37,7 +36,7 @@ public class Assessment extends MongoBaseEntity {
     private Staff approver;
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
-    private String userEmailIdAssessmentLastAssistBy;
+    private UserVO assessmentLastAsitsBy;
     private LocalDate assessmentScheduledDate;
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
@@ -54,9 +53,9 @@ public class Assessment extends MongoBaseEntity {
 
     public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
 
-    public String getUserEmailIdAssessmentLastAssistBy() { return userEmailIdAssessmentLastAssistBy; }
+    public UserVO getAssessmentLastAsitsBy() { return assessmentLastAsitsBy; }
 
-    public void setUserEmailIdAssessmentLastAssistBy(String userEmailIdAssessmentLastAssistBy) { this.userEmailIdAssessmentLastAssistBy = userEmailIdAssessmentLastAssistBy; }
+    public void setAssessmentLastAsitsBy(UserVO assessmentLastAsitsBy) { this.assessmentLastAsitsBy = assessmentLastAsitsBy; }
 
     public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
 
