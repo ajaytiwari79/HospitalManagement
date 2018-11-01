@@ -882,7 +882,7 @@ public class AccessGroupService {
 
 
     public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsBy(unitId, accessGroupId), StaffAccessGroupDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
@@ -912,8 +912,7 @@ public class AccessGroupService {
         if((allowedDayTypes && CollectionUtils.isEmpty(dayTypeIds))){
             exceptionService.actionNotPermittedException("error.day_type.absent");
         }
-
-        if((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))){
+        else if((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))){
             exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
         }
     }

@@ -428,11 +428,9 @@ public class UserService {
             }
             if(checkDayType){
                 unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds);
-            }
-            else {
+            } else {
                 unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId);
             }
-
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
             List<Long> unitIds = unitWisePermissions.stream()

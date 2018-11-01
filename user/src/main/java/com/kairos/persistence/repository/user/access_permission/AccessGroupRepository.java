@@ -305,7 +305,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (emp)-[:"+BELONGS_TO+"]-(s:Staff)\n" +
             "MATCH (s)-[:"+BELONGS_TO+"]-(em:Employment)  MATCH (em)-[:"+HAS_UNIT_PERMISSIONS+"]-(unitP:UnitPermission)\n" +
             "MATCH (unitP)-[:"+HAS_ACCESS_GROUP+"]-(agp:AccessGroup) RETURN id(s) as staffId, Collect(DISTINCT id(agp)) as accessGroupIds")
-    List<StaffAccessGroupQueryResult> getStaffIdsAndAccessGroupsBy(Long unitId, List<Long> accessGroupId);
+    List<StaffAccessGroupQueryResult> getStaffIdsAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId);
 
     //for test cases
     @Query("MATCH(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")

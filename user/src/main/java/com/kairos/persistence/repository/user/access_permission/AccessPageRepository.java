@@ -339,9 +339,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     // fetch Permission of Hub Users
 
-    @Query("MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with emp \n" +
-            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org:Organization{isEnable:true}) WHERE id(org)={1}  with unitPermission,org \n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) with accessGroup,org,unitPermission \n" +
+    @Query("MATCH (emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with emp \n" +
+            "MATCH (emp)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org:Organization{isEnable:true}) WHERE id(org)={1}  with unitPermission,org \n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) with accessGroup,org,unitPermission \n" +
             "Match (module:AccessPage)<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,modulePermission,unitPermission,accessGroup\n" +
             "optional match (unitPermission)-[moduleCustomRel:HAS_CUSTOMIZED_PERMISSION]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
             "with module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
@@ -360,7 +360,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( distinct {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule}) as permissions\n" +
-            "return id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
+            "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermissionsWithDayTypes(Long userId, Set<Long> dayTypeIds);
 
 
@@ -368,22 +368,22 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
             "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with employment,org+[unit] as coll\n" +
-            "unwind coll as units with  distinct units,employment \n" +
+            "unwind coll as units WITH  distinct units,employment \n" +
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
             "WITH o,employment, [o]+units as units  unwind units as org  WITH distinct org,o,employment\n" +
-            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
+            "MATCH (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( distinct {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule}) as permissions\n" +
-            "return id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
+            "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermissions(Long userId);
 
 
 
     @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
             "MATCH (country:Country)-[:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} with accessPage\n" +
-            "optional MATCH (accessPage) -[: " +SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN accessPage.name as name,accessPage.moduleId as moduleId, collect(distinct subPages) as child ORDER BY accessPage.moduleId")
+            "OPTIONAL MATCH (accessPage) -[: " +SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN accessPage.name as name,accessPage.moduleId as moduleId, collect(distinct subPages) as child ORDER BY accessPage.moduleId")
     List<KPIAccessPageQueryResult> getKPITabsListForCountry(Long countryId);
 
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
@@ -410,12 +410,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
-            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with employment,org+[unit] as coll\n" +
+            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) WITH employment,org+[unit] as coll\n" +
             "unwind coll as units with  distinct units,employment \n" +
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
             "WITH o,employment, [o]+units as units  unwind units as org  WITH distinct org,o,employment\n" +
-            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true})  return accessGroup"
+            "MATCH (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true})  return accessGroup"
             )
     List<AccessGroup> fetchAccessGroupsOfStaffPermission(Long userId);
 
