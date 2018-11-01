@@ -38,8 +38,8 @@ public class Phase extends MongoBaseEntity {
     private String color;
     private PhaseDefaultName phaseEnum;
     private LocalTime flippingDefaultTime;
-    private int gracePeriodByStaff;
-    private int gracePeriodByManagement;
+    private int gracePeriodByStaff;// in days
+    private int gracePeriodByManagement;// in days
     private DayOfWeek untilNextDay;
     private int realtimeDuration;
     private String shortName;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.UnionState;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -19,6 +20,8 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.organization.union.Location;
+import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.staff.employment.Employment;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
@@ -217,6 +220,7 @@ public class Organization extends UserBaseEntity {
     private CompanyUnitType companyUnitType;
 
     private boolean boardingCompleted;
+    private UnionState state;
     private boolean workCenterUnit;
     private boolean gdprUnit;
     @Relationship(type = HAS_ACCOUNT_TYPE)
@@ -225,12 +229,26 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_UNIT_TYPE)
     private UnitType unitType;
 
+    @Relationship(type= HAS_LOCATION)
+    private List<Location> locations = new ArrayList<>();
+
+    @Relationship(type=HAS_SECTOR)
+    private List<Sector> sectors = new ArrayList();
+
 
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
 
     public Organization() {
     }
 
+    public Organization(String name, List<Sector> sectors, ContactAddress contactAddress,UnionState state,Country country,boolean union) {
+        this.name = name;
+        this.sectors = sectors;
+        this.contactAddress = contactAddress;
+        this.union = union;
+        this.state= state;
+        this.country = country;
+    }
 
     public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
@@ -952,5 +970,29 @@ public class Organization extends UserBaseEntity {
 
     public void setUnitType(UnitType unitType) {
         this.unitType = unitType;
+    }
+
+    public List<Location> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<Location> locations) {
+        this.locations = locations;
+    }
+
+    public UnionState getState() {
+        return state;
+    }
+
+    public void setState(UnionState state) {
+        this.state = state;
+    }
+
+    public List<Sector> getSectors() {
+        return sectors;
+    }
+
+    public void setSectors(List<Sector> sectors) {
+        this.sectors = sectors;
     }
 }

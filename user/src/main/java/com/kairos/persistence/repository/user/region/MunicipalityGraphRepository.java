@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.region;
 
+import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.MUNICIPALITY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -51,4 +52,17 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
     @Query("match(municipality:Municipality{isEnable:true})-[:PROVINCE]->(p:Province)-[:REGION]->(r:Region)-[:BELONGS_TO]->(country:Country) where id(country)={0} \n" +
             "return municipality")
     List<Municipality> getMunicipalityByCountryId(Long countryId);
+
+    @Query("match(municipality:Municipality)-[:"+PROVINCE+"]-(province:Province)-[:"+REGION+"]-(region:Region) where id(municipality) in {0}  " +
+            "return municipality,region,province")
+    List<MunicipalityQueryResult> findMunicipalityRegionAndProvince(Set<Long> municipalityIds);
+
+    @Query("match(municipality:Municipality{deleted:false}) where id(municipality)={0} return municipality")
+    Municipality findByIdDeletedFalse(Long municipalityId);
+
+    @Query("match(zipCode:ZipCode)-[:"+MUNICIPALITY+"]match(municipality:Municipality{deleted:false}) where id(municipality)={0} and id(zipCode)={1} return municipality")
+    Municipality findByZipCodeIdandIdDeletedFalse(Long municipalityId,Long zipCodeId);
+
+    @Query("match(address:ContactAddress)-[municipalityRel:"+MUNICIPALITY+"]-(municipality:Municipality) where id(address)={0} and id(municipality)={1} delete municipalityRel")
+    void deleteAddressMunicipalityRelation(Long addressId, Long municipalityId);
 }

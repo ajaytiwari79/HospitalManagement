@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface ContactAddressGraphRepository extends Neo4jBaseRepository<ContactAddress,Long>{
 
 
+
 }

@@ -1,6 +1,5 @@
 package com.kairos.config;
 
-import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
@@ -25,7 +24,6 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
@@ -65,7 +63,6 @@ import com.kairos.service.auth.UserRoleServiceUser;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
-import com.kairos.service.control_panel.ControlPanelService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OpenningHourService;
 import com.kairos.service.organization.OrganizationTypeService;
@@ -109,8 +106,6 @@ public class BootDataService {
     UserRoleServiceUser userRoleService;
     @Inject
     TeamService teamService;
-    @Inject
-    ControlPanelService controlPanelService;
     @Inject
     StaffGraphRepository staffGraphRepository;
     @Inject
@@ -167,9 +162,7 @@ public class BootDataService {
     CurrencyGraphRepository currencyGraphRepository;
     @Inject
     TimeSlotGraphRepository timeSlotGraphRepository;
-    @Inject
-    DynamicCronScheduler dynamicCronScheduler;
-    @Inject
+      @Inject
     private OpenningHourService openningHourService;
     @Inject
     private AccessPageService accessPageService;

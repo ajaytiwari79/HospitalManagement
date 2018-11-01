@@ -8,6 +8,8 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.organization.union.UnionCompleteQueryResult;
+import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -723,4 +725,30 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as unitId, org.timeZone as timezone ORDER BY unitId")
     List<UnitTimeZoneQueryResult> findTimezoneforAllorganizations();
+
+    @Query("Match(union:Organization{deleted:false,union:true}) where id(union)={0} or union.name={1} with union match(union)-[:BELONGS_TO]-(country:Country) with union,country optional " +
+            "match(union)-[:"+HAS_SECTOR+"]-(sector:Sector) with union,collect(sector) as sectors,country optional match(union)-[:"+CONTACT_ADDRESS+"]-" +
+            "(address:ContactAddress)-[:"+ZIP_CODE+"]-(zipCode:ZipCode) with union,sectors,address,zipCode,country optional match(address)-[:"+MUNICIPALITY+"]-" +
+            "(municipality:Municipality) return union,country,address,zipCode,sectors,municipality ")
+    List<UnionCompleteQueryResult> getUnionCompleteById(Long unionId, String name);
+
+    @Query("Match(union:Organization{delete:false,union:true}) where id(union)={1} match(union)-[unionSectorRelDel:"+HAS_SECTOR+"]-(sector:Sector) where id(sector) in {0} with union, " +
+            "unionSectorRelDel delete unionSectorRelDel")
+    void deleteUnionSectorRelationShip(List<Long> deleteSectorIds,Long unionId);
+
+    @Query("Match(union:Organization) where id(union)={1} match(sector:Sector) where id(sector)in {0} create unique (union)-[:"+HAS_SECTOR+"]-(sector)")
+    void createUnionSectorRelationShip(List<Long> createSectorIds,Long unionId);
+
+    @Query("Match(union:Organization{deleted:false,union:true}) where union.name={0} return count(union)>0")
+    boolean existsByName(String name);
+
+    @Query("Match(union:Organization{union:true,deleted:false})-[:BELONGS_TO]-(country:Country) where id(country)={0}\n" +
+            "with union optional match(union)-[:HAS_SECTOR]-(sector:Sector) with union,collect(sector) as sectors optional match(union)-[:CONTACT_ADDRESS]-" +
+            "(address:ContactAddress) with union,sectors,address optional match(address)-[:ZIP_CODE]-(zipCode:ZipCode) with union,sectors,address,zipCode\n" +
+            "optional match(address)-[:MUNICIPALITY]-(municipality:Municipality) with union,sectors,address,zipCode,municipality optional match(zipCode)-\n" +
+            "[:MUNICIPALITY]-(linkedMunicipality:Municipality) with union,sectors,address,zipCode,municipality,collect(linkedMunicipality)as municipalities\n" +
+            "optional match(union)-[:HAS_LOCATION]-(location:Location) return union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
+    List<UnionDataQueryResult> getUnionData(Long countryId);
+
+
 }

@@ -54,7 +54,8 @@ public class ShiftTemplateService extends MongoBaseService {
         });
 
         //Check for validating duplicate by name
-        boolean alreadyExistsByName=shiftTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(),unitId);
+        boolean alreadyExistsByName=shiftTemplateRepository.
+                existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(),unitId);
         if(alreadyExistsByName){
             exceptionService.duplicateDataException("message.shiftTemplate.exists",shiftTemplateDTO.getName());
         }
