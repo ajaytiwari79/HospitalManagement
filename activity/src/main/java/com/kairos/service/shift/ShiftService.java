@@ -1219,9 +1219,9 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftDetailViewDTO getShiftDetailsOfStaff(TimeAttendanceGracePeriod timeAttendanceGracePeriod, List<Shift> shifts, List<ShiftState> shiftStates) {
         List<ShiftDTO> plannedShifts = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
-        List<ShiftState> shiftStatesList=shiftStateMongoRepository.findAllShiftStateByShiftIdAndActualPhase(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()), AppConstants.TIME_AND_ATTENDANCE);
+        List<ShiftState> shiftStatesList=shiftStateMongoRepository.findAllShiftStateByShiftIdAndActualPhase(shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList()), AppConstants.TIME_AND_ATTENDANCE);
         if(shiftStatesList.isEmpty()){
-            shiftStatesList=shiftStateMongoRepository.findAllShiftStateByShiftIdAndActualPhase(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()), AppConstants.REALTIME);
+            shiftStatesList=shiftStateMongoRepository.findAllShiftStateByShiftIdAndActualPhase(shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList()), AppConstants.REALTIME);
         }
         List<ShiftDTO> realTimeShift = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList.stream().filter(s -> s.getAccessGroupRole().equals(AccessGroupRole.STAFF)).collect(Collectors.toList()),ShiftDTO.class);
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList, ShiftDTO.class);
