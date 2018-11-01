@@ -776,7 +776,7 @@ public class EmploymentService {
                 boolean isEndDateBlank = false;
                 //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
                 for ( String unitPositionEndDateString : unitPositionsEndDate) {
-                    LocalDate unitPositionEndDate=LocalDate.parse(unitPositionEndDateString);
+                    LocalDate unitPositionEndDate=unitPositionEndDateString==null?null:LocalDate.parse(unitPositionEndDateString);
                     if (!Optional.ofNullable(unitPositionEndDate).isPresent()) {
                         isEndDateBlank = true;
                         break;
