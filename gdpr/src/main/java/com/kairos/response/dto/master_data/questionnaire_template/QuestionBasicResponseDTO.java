@@ -16,7 +16,7 @@ public class QuestionBasicResponseDTO {
     @NotBlank(message = "Name can't be empty")
     private String question;
     private String description;
-    private Object assessmentQuestionValues;
+    private Object value;
     private Object assessmentAnswerChoices;
     private QuestionType questionType;
     private String attributeName;
@@ -64,9 +64,9 @@ public class QuestionBasicResponseDTO {
 
     public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
 
-    public Object getAssessmentQuestionValues() { return assessmentQuestionValues; }
+    public Object getValue() { return value; }
 
-    public void setAssessmentQuestionValues(Object assessmentQuestionValues) { this.assessmentQuestionValues = assessmentQuestionValues; }
+    public void setValue(Object value) { this.value = value; }
 
     public Object getAssessmentAnswerChoices() { return assessmentAnswerChoices; }
 
