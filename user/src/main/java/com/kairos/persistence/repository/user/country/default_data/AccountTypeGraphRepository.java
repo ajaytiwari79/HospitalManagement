@@ -19,29 +19,29 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_CO
 @Repository
 public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountType, Long> {
 
-    @Query("match(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
+    @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
             "RETURN accountType")
     List<AccountType> getAllAccountTypeByCountryId(Long countryId);
 
-    @Query("match(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} AND accountType.name =~{1} AND id(accountType)<>{2} " +
-            " with count(accountType) as totalCount " +
+    @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} AND accountType.name =~{1} AND id(accountType)<>{2} " +
+            " WITH count(accountType) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean checkAccountTypeExistInCountry(Long countryId, String name, Long currentAccountTypeId);
 
 
-    @Query("match(accountType:AccountType{deleted:false}) where id(accountType) IN {0} " +
+    @Query("MATCH(accountType:AccountType{deleted:false}) where id(accountType) IN {0} " +
             "RETURN accountType")
     List<AccountType> getAllAccountTypeByIds(Set<Long> accountTypeIds);
 
-    @Query("match(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
-            "Optional MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
+    @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
+            "OPTIONAL MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
             "RETURN id(accountType) as id,accountType.name as name,count(ag) as count")
     List<AccountTypeAccessGroupCountQueryResult> getAllAccountTypeWithAccessGroupCountByCountryId(Long countryId);
 
     @Query("MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +
             "MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType) WHERE (ag.endDate IS NULL OR date(ag.endDate) >= date())" +
-            "MATCH(ag)-[:"+DAY_TYPES+"]->(dayType:DayType)" +
-            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, collect(dayType) as dayTypes")
+            "OPTIONAL MATCH(ag)-[:"+DAY_TYPES+"]->(dayType:DayType)" +
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, collect(dayType) as dayTypes,ag.allowedDayTypes as allowedDayTypes")
     List<AccessGroupQueryResult> getAccessGroupsByAccountTypeId(Long accountTypeId);
 
 }

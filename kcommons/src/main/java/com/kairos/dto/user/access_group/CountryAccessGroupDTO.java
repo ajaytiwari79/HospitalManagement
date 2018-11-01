@@ -30,8 +30,8 @@ public class CountryAccessGroupDTO {
     @NotNull(message = "error.startDate.notnull")
     private LocalDate startDate;
     private LocalDate endDate;
-    @NotNull(message = "error.dayTypeIds.notnull")
     private Set<Long> dayTypeIds;
+    private boolean allowedDayTypes;
 
     public CountryAccessGroupDTO() {
         // default constructor
@@ -122,6 +122,14 @@ public class CountryAccessGroupDTO {
 
     public void setDayTypeIds(Set<Long> dayTypeIds) {
         this.dayTypeIds = dayTypeIds;
+    }
+
+    public boolean isAllowedDayTypes() {
+        return allowedDayTypes;
+    }
+
+    public void setAllowedDayTypes(boolean allowedDayTypes) {
+        this.allowedDayTypes = allowedDayTypes;
     }
 
     @AssertTrue(message = "Access group can't be blank")

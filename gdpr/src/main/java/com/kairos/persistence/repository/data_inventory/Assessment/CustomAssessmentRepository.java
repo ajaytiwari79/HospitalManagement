@@ -25,5 +25,9 @@ public interface CustomAssessmentRepository {
 
     Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId);
 
+    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId);
+
+    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(Long unitId, BigInteger processingActivityId);
+
 
 }

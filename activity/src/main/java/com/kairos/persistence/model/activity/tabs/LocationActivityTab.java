@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
+import com.kairos.enums.LocationEnum;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -37,5 +38,25 @@ public class LocationActivityTab implements Serializable {
     public LocationActivityTab(Set<ActivityGlideTimeDetails> glideTimeForCheckIn, Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
         this.glideTimeForCheckIn = glideTimeForCheckIn;
         this.glideTimeForCheckOut = glideTimeForCheckOut;
+    }
+
+    public ActivityGlideTimeDetails getCheckInGlideTime(LocationEnum locationEnum){
+        ActivityGlideTimeDetails activityGlideTimeDetails = null;
+        for (ActivityGlideTimeDetails glideTimeDetails : glideTimeForCheckIn) {
+            if(locationEnum.equals(glideTimeDetails.getLocation())){
+                activityGlideTimeDetails = glideTimeDetails;
+            }
+        }
+        return activityGlideTimeDetails;
+    }
+
+    public ActivityGlideTimeDetails getCheckOutGlideTime(LocationEnum locationEnum){
+        ActivityGlideTimeDetails activityGlideTimeDetails = null;
+        for (ActivityGlideTimeDetails glideTimeDetails : glideTimeForCheckOut) {
+            if(locationEnum.equals(glideTimeDetails.getLocation())){
+                activityGlideTimeDetails = glideTimeDetails;
+            }
+        }
+        return activityGlideTimeDetails;
     }
 }
