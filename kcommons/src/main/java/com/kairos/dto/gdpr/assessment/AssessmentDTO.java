@@ -35,7 +35,7 @@ public class AssessmentDTO {
 
     protected LocalDate assessmentScheduledDate;
 
-    @NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
+  //@NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
     protected AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
     public BigInteger getId() { return id; }

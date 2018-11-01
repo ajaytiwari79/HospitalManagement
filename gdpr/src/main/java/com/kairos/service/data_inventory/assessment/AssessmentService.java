@@ -223,12 +223,12 @@ public class AssessmentService extends MongoBaseService {
         } else if (questionnaireTemplate.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
             exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
         }
-        if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
+        /*if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
             if (!Optional.ofNullable(assessmentDTO.getAssessmentScheduledDate()).isPresent()) {
                 exceptionService.invalidRequestException("message.assessment.scheduling.date.not.Selected");
             }
             assessment.setAssessmentScheduledDate(assessmentDTO.getAssessmentScheduledDate());
-        }
+        }*/
         assessment.setAssessmentSchedulingFrequency(assessmentDTO.getAssessmentSchedulingFrequency());
         assessment.setQuestionnaireTemplateId(questionnaireTemplate.getId());
         return assessment;
