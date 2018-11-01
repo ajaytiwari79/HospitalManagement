@@ -61,8 +61,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "id(user) as userId,id(staff) as staffId,id(organization) as unitId")
     List<UserAccessRoleQueryResult>  getUsersAccessRoleByUserIds(Long unitId,List<Long> userIds,String staffRole,String managementRoll);
 
-    @Query("Match (organization:Organization) where id(organization)={0}\n" +
-            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) " +
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
+            "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) " +
             "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]-(dayType:DayType) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') " +
             "RETURN id(accessGroup) as id, accessGroup.name as name, accessGroup.description as description, accessGroup.typeOfTaskGiver as typeOfTaskGiver, accessGroup.deleted as deleted, accessGroup.role as role, accessGroup.enabled as enabled,accessGroup.startDate as startDate, accessGroup.endDate as endDate, collect(id(dayType)) as dayTypeIds,accessGroup.allowedDayTypes as allowedDayTypes ORDER BY accessGroup.name")
     List<AccessGroupQueryResult> getAccessGroupsForUnit(long unitId);
@@ -301,14 +301,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId);
 
     @Query("MATCH (org:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) where id(org)={0} and id(ag) IN {1} \n" +
-            "with ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up,ag match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with ag,emp\n" +
-            "match (emp)-[:"+BELONGS_TO+"]-(s:Staff)\n" +
+            "WITH ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up,ag match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with ag,emp\n" +
+            "MATCH (emp)-[:"+BELONGS_TO+"]-(s:Staff)\n" +
             "MATCH (s)-[:"+BELONGS_TO+"]-(em:Employment)  MATCH (em)-[:"+HAS_UNIT_PERMISSIONS+"]-(unitP:UnitPermission)\n" +
             "MATCH (unitP)-[:"+HAS_ACCESS_GROUP+"]-(agp:AccessGroup) RETURN id(s) as staffId, Collect(DISTINCT id(agp)) as accessGroupIds")
     List<StaffAccessGroupQueryResult> getStaffIdsAndAccessGroupsBy(Long unitId, List<Long> accessGroupId);
 
     //for test cases
-    @Query("Match(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")
+    @Query("MATCH(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")
     Long findAccessGroupByEmploymentId(Long employmentId);
 
 
@@ -326,8 +326,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long staffId, Long unitId);
 
 
-    @Query("Match (organization:Organization) where id(organization)={0}\n" +
-            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) WHERE id(accessGroup)={1}" +
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
+            "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) WHERE id(accessGroup)={1}" +
             "OPTIONAL MATCH (accessGroup)-[:"+DAY_TYPES+"]-(dayType:DayType)   " +
             "RETURN id(accessGroup) as id, accessGroup.name as name, accessGroup.description as description, accessGroup.typeOfTaskGiver as typeOfTaskGiver, accessGroup.deleted as deleted, accessGroup.role as role, accessGroup.enabled as enabled,accessGroup.startDate as startDate, accessGroup.endDate as endDate, collect(dayType) as dayTypes,accessGroup.allowedDayTypes as allowedDayTypes")
    AccessGroupQueryResult findByAccessGroupId(long unitId,long accessGroupId);
@@ -341,7 +341,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     void removeDefaultCopiedAccessGroup(List<Long> organizationId);
 
    @Query("MATCH (organization:Organization) where id(organization) = {0} \n" +
-            "match(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) return id(ag) as id,id(pag) as parentId")
+            "MATCH(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) return id(ag) as id,id(pag) as parentId")
     List<AccessPageQueryResult> findAllAccessGroupWithParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization:Organization) where id(organization) = {0} \n" +
