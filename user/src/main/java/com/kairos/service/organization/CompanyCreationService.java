@@ -625,6 +625,7 @@ public class CompanyCreationService {
         }
 
         QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
+        organizationQueryResult.setParentOrganization(true);
         queryResults.add(organizationQueryResult);
 
         return treeStructureService.getTreeStructure(queryResults);

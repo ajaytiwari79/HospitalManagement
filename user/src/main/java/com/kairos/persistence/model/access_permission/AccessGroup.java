@@ -39,6 +39,7 @@ public class AccessGroup extends UserBaseEntity {
     @NotNull(message = "error.startDate.notnull")
     private LocalDate startDate;
     private LocalDate endDate;
+    private boolean allowedDayTypes;
     private List<DayType> dayTypes;
     @Relationship(type = HAS_PARENT_ACCESS_GROUP)
     private AccessGroup parentAccessGroup;
@@ -151,5 +152,13 @@ public class AccessGroup extends UserBaseEntity {
 
     public void setParentAccessGroup(AccessGroup parentAccessGroup) {
         this.parentAccessGroup = parentAccessGroup;
+    }
+
+    public boolean isAllowedDayTypes() {
+        return allowedDayTypes;
+    }
+
+    public void setAllowedDayTypes(boolean allowedDayTypes) {
+        this.allowedDayTypes = allowedDayTypes;
     }
 }

@@ -3,6 +3,7 @@ package com.kairos.response.dto.common;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -28,6 +29,8 @@ public class AssessmentResponseDTO {
     private AssetBasicResponseDTO asset;
     private ProcessingActivityBasicDTO processingActivity;
     private List<RiskBasicResponseDTO> risks;
+    private LocalDate assessmentScheduledDate;
+    private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
     public BigInteger getId() { return id; }
 
@@ -73,4 +76,20 @@ public class AssessmentResponseDTO {
     public ProcessingActivityBasicDTO getProcessingActivity() { return processingActivity; }
 
     public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
+
+    public LocalDate getAssessmentScheduledDate() {
+        return assessmentScheduledDate;
+    }
+
+    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) {
+        this.assessmentScheduledDate = assessmentScheduledDate;
+    }
+
+    public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() {
+        return assessmentSchedulingFrequency;
+    }
+
+    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) {
+        this.assessmentSchedulingFrequency = assessmentSchedulingFrequency;
+    }
 }

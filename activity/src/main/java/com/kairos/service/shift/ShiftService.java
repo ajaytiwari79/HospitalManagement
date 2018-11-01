@@ -531,6 +531,11 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftWithViolatedInfoDTO updateShift(ShiftDTO shiftDTO, String type) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()), shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
+          boolean shiftExists = shiftMongoRepository.findShiftBetweenDurationByUnitPositionNotEqualToShiftId(shiftDTO.getId(),staffAdditionalInfoDTO.getStaffUserId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
+        if (shiftExists) {
+            exceptionService.invalidRequestException("message.shift.date.startandend", shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
+        }
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
@@ -542,7 +547,6 @@ public class ShiftService extends MongoBaseService {
         Set<BigInteger> activityIdsSet=ArrayUtil.getUnionOfList(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()),shiftDTO.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         List<BigInteger> activityIds = new ArrayList<>(activityIdsSet);
         shiftValidatorService.validateStatusOfShiftOnUpdate(shift, shiftDTO);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()), shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         List<Activity> activityList=activities.stream().map(ActivityWrapper::getActivity).collect(Collectors.toList());
         organizationActivityService.verifyBreakAllowedOfActivities(activities.get(0).getActivity().getRulesActivityTab().isBreakAllowed(),activityList);

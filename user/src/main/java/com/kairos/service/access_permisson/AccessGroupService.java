@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -45,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 
@@ -84,6 +82,7 @@ public class AccessGroupService {
     private StaffGraphRepository staffGraphRepository;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+        validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -103,9 +102,9 @@ public class AccessGroupService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-        if (CollectionUtils.isEmpty(dayTypes)) {
-            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         }
         AccessGroup accessGroup = ObjectMapperUtils.copyPropertiesByMapper(accessGroupDTO, AccessGroup.class);
         accessGroup.setDayTypes(dayTypes);
@@ -127,6 +126,8 @@ public class AccessGroupService {
     }
 
     public AccessGroupDTO updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
+        validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
+
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -139,9 +140,9 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-        if (CollectionUtils.isEmpty(dayTypes)) {
-            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
@@ -150,6 +151,7 @@ public class AccessGroupService {
         accessGrpToUpdate.setStartDate(accessGroupDTO.getStartDate());
         accessGrpToUpdate.setEndDate(accessGroupDTO.getEndDate());
         accessGrpToUpdate.setDayTypes(dayTypes);
+        accessGrpToUpdate.setAllowedDayTypes(accessGroupDTO.isAllowedDayTypes());
         accessGroupRepository.save(accessGrpToUpdate);
         accessGroupDTO.setId(accessGrpToUpdate.getId());
         return accessGroupDTO;
@@ -606,7 +608,7 @@ public class AccessGroupService {
 
 
     public CountryAccessGroupDTO createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
-
+        validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -617,10 +619,11 @@ public class AccessGroupService {
         if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
             exceptionService.dataNotMatchedException("message.accountType.notFound");
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-        if (CollectionUtils.isEmpty(dayTypes)) {
-            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         }
+
         Country country = countryGraphRepository.findOne(countryId);
 
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
@@ -644,7 +647,7 @@ public class AccessGroupService {
     }
 
     public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
-
+        validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -657,9 +660,9 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
-        if (CollectionUtils.isEmpty(dayTypes)) {
-            exceptionService.actionNotPermittedException("error.dayTypes.not.found");
+        List<DayType> dayTypes=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())){
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         }
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
@@ -669,6 +672,7 @@ public class AccessGroupService {
         accessGrpToUpdate.get().setStartDate(accessGroupDTO.getStartDate());
         accessGrpToUpdate.get().setEndDate(accessGroupDTO.getEndDate());
         accessGrpToUpdate.get().setDayTypes(dayTypes);
+        accessGrpToUpdate.get().setAllowedDayTypes(accessGroupDTO.isAllowedDayTypes());
         accessGroupRepository.save(accessGrpToUpdate.get());
         return accessGrpToUpdate.get();
     }
@@ -760,7 +764,7 @@ public class AccessGroupService {
     }
 
     public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
-
+        validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -801,7 +805,7 @@ public class AccessGroupService {
     }
 
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
-
+        validateDayTypes(countryAccessGroupDTO.isAllowedDayTypes(),countryAccessGroupDTO.getDayTypeIds());
         if (countryAccessGroupDTO.getEndDate() != null && countryAccessGroupDTO.getEndDate().isBefore(countryAccessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("start_date.less.from.end_date");
         }
@@ -878,7 +882,7 @@ public class AccessGroupService {
 
 
     public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsBy(unitId, accessGroupId), StaffAccessGroupDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
@@ -902,5 +906,14 @@ public class AccessGroupService {
             response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
         });
         return response;
+    }
+
+    private void validateDayTypes(boolean allowedDayTypes,Set<Long> dayTypeIds){
+        if((allowedDayTypes && CollectionUtils.isEmpty(dayTypeIds))){
+            exceptionService.actionNotPermittedException("error.day_type.absent");
+        }
+        else if((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))){
+            exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
+        }
     }
 }

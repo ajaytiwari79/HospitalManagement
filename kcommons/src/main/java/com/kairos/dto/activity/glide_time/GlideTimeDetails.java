@@ -4,32 +4,36 @@ package com.kairos.dto.activity.glide_time;
  *
  */
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 public class GlideTimeDetails {
-    private Short before; // storing in minutes
-    private Short after;  // storing in minutes
+    private short before; // storing in minutes
+    private short after;  // storing in minutes
 
     public GlideTimeDetails() {
         //Default Constructor
     }
 
-    public GlideTimeDetails(Short before, Short after) {
+    public GlideTimeDetails(short before, short after) {
         this.before = before;
         this.after = after;
     }
 
-    public Short getBefore() {
+    public short getBefore() {
         return before;
     }
 
-    public void setBefore(Short before) {
+    public void setBefore(short before) {
         this.before = before;
     }
 
-    public Short getAfter() {
+    public short getAfter() {
         return after;
     }
 
-    public void setAfter(Short after) {
+    public void setAfter(short after) {
         this.after = after;
     }
 
