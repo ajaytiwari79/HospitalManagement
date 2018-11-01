@@ -34,6 +34,7 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
@@ -43,12 +44,14 @@ import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AssessmentService extends MongoBaseService {
@@ -239,14 +242,19 @@ public class AssessmentService extends MongoBaseService {
             AssetResponseDTO asset = (AssetResponseDTO) entity;
             riskIds.addAll(asset.getAssetSubType().getRisks());
             riskIds.addAll(asset.getAssetType().getRisks());
+            if (CollectionUtils.isEmpty(riskIds)) {
+                exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
+            }
             if (asset.getAssetSubType().getId() != null)
                 questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getAssetSubType().getId());
             else
                 questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeId(unitId, asset.getAssetType().getId());
 
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
-            ProcessingActivity processingActivity = (ProcessingActivity) entity;
-            riskIds.addAll(processingActivity.getRisks());
+            if (CollectionUtils.isEmpty(((ProcessingActivityResponseDTO) entity).getRisks())) {
+                exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
+            }
+            riskIds.addAll(((ProcessingActivityResponseDTO) entity).getRisks().stream().map(RiskBasicResponseDTO::getId).collect(Collectors.toSet()));
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(unitId);
         }
         assessment.setRiskIds(riskIds);
