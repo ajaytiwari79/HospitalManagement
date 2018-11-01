@@ -22,6 +22,7 @@ public class CTAResponseDTO {
     @NotNull
     private BigInteger id;
     private BigInteger parentId;
+    private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
     private String name;
     private String description;
     private ExpertiseResponseDTO expertise;
@@ -188,5 +189,13 @@ public class CTAResponseDTO {
 
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public BigInteger getOrganizationParentId() {
+        return organizationParentId;
+    }
+
+    public void setOrganizationParentId(BigInteger organizationParentId) {
+        this.organizationParentId = organizationParentId;
     }
 }

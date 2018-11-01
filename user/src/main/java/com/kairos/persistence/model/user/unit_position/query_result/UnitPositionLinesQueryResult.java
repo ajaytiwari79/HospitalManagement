@@ -23,7 +23,7 @@ public class UnitPositionLinesQueryResult {
     private Integer fullTimeWeeklyMinutes;
     private Double salary;
     private Integer totalWeeklyMinutes;
-    private Float hourlyWages;
+    private Float hourlyCost;
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
     private WTAResponseDTO workingTimeAgreement;
@@ -33,7 +33,7 @@ public class UnitPositionLinesQueryResult {
         //DC
     }
 
-    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyWages, Map<String, Object> employmentType, Map<String, Object> seniorityLevel) {
+    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -43,7 +43,7 @@ public class UnitPositionLinesQueryResult {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.salary = salary;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.hourlyWages = hourlyWages;
+        this.hourlyCost = hourlyCost;
         this.employmentType = employmentType;
         this.seniorityLevel = seniorityLevel;
     }
@@ -104,12 +104,12 @@ public class UnitPositionLinesQueryResult {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
-    public Float getHourlyWages() {
-        return hourlyWages;
+    public Float getHourlyCost() {
+        return hourlyCost;
     }
 
-    public void setHourlyWages(Float hourlyWages) {
-        this.hourlyWages = hourlyWages;
+    public void setHourlyCost(Float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public Map<String, Object> getEmploymentType() {

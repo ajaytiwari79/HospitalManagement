@@ -9,6 +9,7 @@ import java.util.List;
  * @author pradeep
  * @date - 20/6/18
  */
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolverConfigConstraintWrapper {

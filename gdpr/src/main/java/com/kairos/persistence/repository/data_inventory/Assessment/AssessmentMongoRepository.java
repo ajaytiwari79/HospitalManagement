@@ -19,16 +19,10 @@ public interface AssessmentMongoRepository extends MongoBaseRepository<Assessmen
 
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
-    Assessment findByIdAndNonDeleted(Long unitId,BigInteger assessmentId);
+    Assessment findByUnitIdAndId(Long unitId, BigInteger assessmentId);
 
     @Query("{deleted:false,organizationId:?0,_id:?1,assessmentStatus:?2}")
     Assessment findByUnitIdAndIdAndAssessmentStatus(Long unitId, BigInteger assessmentId, AssessmentStatus assessmentStatus);
-
-    @Query("{deleted:false,organizationId:?0,assetId:?1}")
-    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId);
-
-    @Query("{deleted:false,organizationId:?0,processingActivityId:?1}")
-    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(Long unitId, BigInteger processingActivityId);
 
 
 

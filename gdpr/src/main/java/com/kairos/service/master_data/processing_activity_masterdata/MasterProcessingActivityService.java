@@ -370,7 +370,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.safeDelete(riskId);
+        riskMongoRepository.safeDeleteById(riskId);
         masterProcessingActivityRepository.save(processingActivity);
         return true;
 

@@ -10,7 +10,6 @@ import com.kairos.persistence.model.counter.KPI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /*

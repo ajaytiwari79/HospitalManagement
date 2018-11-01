@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
+@Deprecated
 public class OrganizationRestClient {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationRestClient.class);
 
@@ -36,6 +37,7 @@ public class OrganizationRestClient {
     @Autowired
     @Qualifier(value = "restTemplateWithoutAuth")
     RestTemplate restTemplateWithAuth;
+
 
 
     /**

@@ -2,15 +2,15 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabWithTagDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
-import com.kairos.persistence.model.unit_settings.PhaseSettings;
+import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityTabsWrapper {
 
-    private GeneralActivityTab generalTab;
+    private GeneralActivityTabWithTagDTO generalTab;
     private List<ActivityCategory> activityCategories;
     private BalanceSettingsActivityTab balanceSettingsTab;
     private RulesActivityTab rulesTab;
@@ -111,16 +111,12 @@ public class ActivityTabsWrapper {
     public ActivityTabsWrapper() {
     }
 
-    public ActivityTabsWrapper(GeneralActivityTab generalTab, List<ActivityCategory> activityCategories) {
+    public ActivityTabsWrapper(GeneralActivityTabWithTagDTO generalTab, List<ActivityCategory> activityCategories) {
         this.generalTab = generalTab;
         this.activityCategories = activityCategories;
     }
 
-    public ActivityTabsWrapper(GeneralActivityTab generalTab, BigInteger activityId) {
-        this.generalTab = generalTab;
-        this.activityId = activityId;
-    }
-    public ActivityTabsWrapper(GeneralActivityTab generalTab, BigInteger activityId,List<ActivityCategory> activityCategories) {
+    public ActivityTabsWrapper(GeneralActivityTabWithTagDTO generalTab, BigInteger activityId,List<ActivityCategory> activityCategories) {
         this.generalTab = generalTab;
         this.activityId = activityId;
         this.activityCategories=activityCategories;
@@ -148,11 +144,11 @@ public class ActivityTabsWrapper {
         this.notesActivityTab = notesActivityTab;
     }
 
-    public GeneralActivityTab getGeneralTab() {
+    public GeneralActivityTabWithTagDTO getGeneralTab() {
         return generalTab;
     }
 
-    public void setGeneralTab(GeneralActivityTab generalTab) {
+    public void setGeneralTab(GeneralActivityTabWithTagDTO generalTab) {
         this.generalTab = generalTab;
     }
 

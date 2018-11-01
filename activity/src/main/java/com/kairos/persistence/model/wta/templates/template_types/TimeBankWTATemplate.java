@@ -8,9 +8,7 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 
-import static com.kairos.utils.ShiftValidatorService.getValueByPhase;
-import static com.kairos.utils.ShiftValidatorService.isValid;
-import static com.kairos.utils.ShiftValidatorService.isValidForPhase;
+import static com.kairos.utils.ShiftValidatorService.*;
 
 
 /**
@@ -58,21 +56,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
-            if (!isValid) {
-                if (limitAndCounter[1] != null) {
-                    int counterValue = limitAndCounter[1] - 1;
-                    if (counterValue < 0) {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                    }else {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                    }
-                }else {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                }
-            }
+            brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
         }
     }
 

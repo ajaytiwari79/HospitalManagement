@@ -26,6 +26,9 @@ public interface ClauseTagMongoRepository extends MongoBaseRepository<ClauseTag,
     @Query("{deleted:false,countryId:?0,name:{$in:?1}}")
     List<ClauseTag> findTagByNames(Long countryId,List<String> names);
 
+    @Query("{deleted:false,countryId:?0,defaultTag:true}")
+    ClauseTag findDefaultTag(Long countryId);
+
 
     ClauseTag findByNameAndCountryId(Long countryId,String name);
     ClauseTag findByid(BigInteger id);

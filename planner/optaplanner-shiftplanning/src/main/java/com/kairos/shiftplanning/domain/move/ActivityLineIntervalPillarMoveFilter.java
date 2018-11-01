@@ -23,7 +23,7 @@ public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<Shi
         Set<DateTime> dateTimes=new HashSet<>();
         ShiftRequestPhase shift=(ShiftRequestPhase)selection.getToPlanningValue();
         if(shift==null){
-            //If all the entities are being assigned to null then this might fix some broken constraints. So it's fine.
+            //If all the entities are being assigned to null then this might fix some broken constraint. So it's fine.
             return true;
         }
         for (ActivityLineInterval activityLineInterval:activityLineIntervalList) {

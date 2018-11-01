@@ -2,7 +2,9 @@ package com.kairos.commons.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,27 @@ public class ArrayUtil {
         if(second!=null)
             union.addAll(second);
         return union;
+    }
+    /**
+     * @param first
+     * @param second
+     * @return matchedDates
+     * @Auther Pavan
+     * @Desc This method will return the Matched or common dates from two sets
+     */
+
+    public static Set<LocalDate> getIntersectedDates(Set<LocalDate> first, Set<LocalDate> second) {
+        Set<LocalDate> matchedDates = new HashSet<>();
+        if (CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)) {
+            return matchedDates;
+        }
+        for (LocalDate currentLocalDate : second) {
+            if (first.contains(currentLocalDate)) {
+                matchedDates.add(currentLocalDate);
+            }
+
+        }
+        return matchedDates;
     }
 
 }

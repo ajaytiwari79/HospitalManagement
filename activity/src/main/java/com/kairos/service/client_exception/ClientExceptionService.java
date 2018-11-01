@@ -1,9 +1,7 @@
 package com.kairos.service.client_exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.dto.user.client.Client;
 import com.kairos.dto.user.client.ClientExceptionCountWrapper;
 import com.kairos.dto.user.client.ClientTemporaryAddress;
@@ -91,8 +89,6 @@ public class ClientExceptionService extends MongoBaseService {
 
     @Inject
     private PlannerService plannerService;
-    @Inject
-    private ClientRestClient clientRestClient;
     @Inject
     GenericIntegrationService genericIntegrationService;
     @Inject

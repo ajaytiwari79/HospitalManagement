@@ -68,7 +68,7 @@ public class Skill {
 		return new EqualsBuilder()
 				.append(id, skill.id)
 				.append(name, skill.name)
-				.append(skillType.toString(), skill.skillType.toString())
+	//			.append(skillType.toString(), skill.skillType.toString())
 				.isEquals();
 	}
 
@@ -77,7 +77,7 @@ public class Skill {
 		return new HashCodeBuilder(17, 37)
 				.append(id)
 				.append(name)
-				.append(skillType.toString())
+//				.append(skillType.toString())
 				.toHashCode();
 	}
 }

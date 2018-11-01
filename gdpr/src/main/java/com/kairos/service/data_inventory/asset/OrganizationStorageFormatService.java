@@ -95,7 +95,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return storageFormatMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -123,7 +123,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(assetsLinkedWithStorageFormat)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", new StringBuilder(assetsLinkedWithStorageFormat.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        storageFormatMongoRepository.safeDelete(storageFormatId);
+        storageFormatMongoRepository.safeDeleteById(storageFormatId);
         return true;
     }
 

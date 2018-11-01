@@ -112,7 +112,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(assetsLinkedWithDataDisposal)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", new StringBuilder(assetsLinkedWithDataDisposal.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        dataDisposalMongoRepository.safeDelete(dataDisposalId);
+        dataDisposalMongoRepository.safeDeleteById(dataDisposalId);
         return true;
 
     }

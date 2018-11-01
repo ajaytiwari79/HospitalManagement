@@ -39,7 +39,7 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<StorageFormatResponseDTO> findAllUnitIdSortByCreatedDate(Long unitId, Sort sort);
+    List<StorageFormatResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
     StorageFormat findByUnitIdAndName(Long unitId, String name);
@@ -47,5 +47,8 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     StorageFormat findByUnitIdAndId(Long unitId, BigInteger id);
+
+    @Query("{organizationId:?0,deleted:false}")
+    List<StorageFormatResponseDTO> findAllByUnitId(Long unitId);
 
 }

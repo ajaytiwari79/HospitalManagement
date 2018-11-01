@@ -72,13 +72,6 @@ public class TomTomService {
         for (List<Task> origin : subTaskList) {
             String request = getRequestMap(origin, tasks);
 
-            /*try {
-                PrintWriter out = new PrintWriter(new File(System.getProperty("user.dir") + "/location"));
-                out.write(request);
-                out.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
             TomTomResponse response = submitToTomtomForMatrix(request);
             //i++;
            // tomTomRepository.save(response);

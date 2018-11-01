@@ -127,7 +127,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
 
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", new StringBuilder(assetsLinkedWithTechnicalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        technicalSecurityMeasureMongoRepository.safeDelete(techSecurityMeasureId);
+        technicalSecurityMeasureMongoRepository.safeDeleteById(techSecurityMeasureId);
         return true;
     }
 

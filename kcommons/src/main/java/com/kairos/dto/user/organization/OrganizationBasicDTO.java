@@ -30,7 +30,7 @@ public class OrganizationBasicDTO {
     private AddressDTO contactAddress; // used in case of child organization
     private UnitManagerDTO unitManager;  // Used in case of child organization only
     private Long unitTypeId;
-
+    private boolean boardingCompleted;
     public Long getId() {
         return id;
     }
@@ -165,5 +165,13 @@ public class OrganizationBasicDTO {
 
     public void setUnitTypeId(Long unitTypeId) {
         this.unitTypeId = unitTypeId;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public void setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
     }
 }

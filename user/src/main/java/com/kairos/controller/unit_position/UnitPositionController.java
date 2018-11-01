@@ -2,6 +2,7 @@ package com.kairos.controller.unit_position;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.service.unit_position.UnitPositionJobService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.utils.response.ResponseHandler;
@@ -37,6 +38,8 @@ public class UnitPositionController {
 
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject
+    private UnitPositionJobService unitPositionJobService;
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
@@ -145,7 +148,7 @@ public class UnitPositionController {
    @ApiOperation(value = "update senioritylevel")
     @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
-        unitPositionService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"),999L);
+        unitPositionJobService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"),999L);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 

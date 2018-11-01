@@ -5,6 +5,7 @@ import com.kairos.dto.activity.counter.chart.DataUnit;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.TimeTypes;
@@ -15,9 +16,7 @@ import com.kairos.service.activity.TimeTypeService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.Future;
 
 @Service
 public class RestingHoursCalculationService implements CounterService{
@@ -37,24 +36,6 @@ public class RestingHoursCalculationService implements CounterService{
 
         });
         return staffRestingHours;
-    }
-
-    private List<BigInteger> getFilterredActivities(List<FilterCriteria> filters){
-        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
-        for(FilterCriteria criteria: filters){
-            switch(criteria.getType()){
-                case ACTIVITY_IDS: activityCriteria.setActivityIds(criteria.getValues()); break;
-                case UNIT_IDS: activityCriteria.setUnitId(criteria.getValues()); break;
-                case ACTIVITY_CATEGORY_TYPE: activityCriteria.setCategoryId(criteria.getValues()); break;
-                case EMPLOYMENT_TYPE: activityCriteria.setEmploymentTypes(criteria.getValues()); break;
-                case EXPERTISE: activityCriteria.setExpertiseCriteria(criteria.getValues()); break;
-                case TIME_TYPE: activityCriteria.setTimeTypeList(criteria.getValues()); break;
-                case PLANNED_TIME_TYPE: activityCriteria.setPlanneTimeType(criteria.getValues()); break;
-                case ORGANIZATION_TYPE: activityCriteria.setOrganizationTypes(criteria.getValues()); break;
-                default: break;
-            }
-        }
-        return null;
     }
 
     private FilterCriteria getTimeTypeCriteriaForRestingHours(Long countryId){
@@ -106,12 +87,12 @@ public class RestingHoursCalculationService implements CounterService{
     @Override
     public RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterCriteria);
-        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
+        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 
     @Override
     public RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterCriteriaDTO);
-        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), "", RepresentationUnit.DECIMAL, dataList);
+        return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 }

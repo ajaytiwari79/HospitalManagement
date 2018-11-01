@@ -2,17 +2,18 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,10 +99,8 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
 
     public AverageScheduledTimeWTATemplate(String name, boolean disabled,
-                                           String description, long intervalLength, LocalDate validationStartDate
-            , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
+                                           String description, long intervalLength,String intervalUnit) {
         this.intervalLength = intervalLength;
-        //this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
         this.disabled = disabled;
         this.description = description;
@@ -126,38 +125,26 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-
-        //TODO It should work on Multiple activity
-        if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && timeTypeIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeTypeId())){
-            DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
-            List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);
-            shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
-            shifts.add(infoWrapper.getShift());
-            List<DateTimeInterval> intervals = getIntervals(interval);
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
-            for (DateTimeInterval dateTimeInterval : intervals) {
-                int totalMin = 0;
-                for (ShiftWithActivityDTO shift : shifts) {
-                    if(dateTimeInterval.overlaps(shift.getDateTimeInterval())){
-                        totalMin += (int) dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
-                    }
-                }
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
-                if (!isValid) {
-                    if(limitAndCounter[1]!=null) {
-                        int counterValue =  limitAndCounter[1] - 1;
-                        if(counterValue<0){
-                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-
-                        }else {
-                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
-                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+        if(!isDisabled()) {
+            if (intervalLength == 0l || StringUtils.isEmpty(intervalUnit)) {
+                throwException("message.ruleTemplate.interval.notNull");
+            }
+            if (isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds())) {
+                DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
+                shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
+                shifts.add(infoWrapper.getShift());
+                List<DateTimeInterval> intervals = getIntervals(interval);
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                for (DateTimeInterval dateTimeInterval : intervals) {
+                    int totalMin = 0;
+                    for (ShiftWithActivityDTO shift : shifts) {
+                        if (dateTimeInterval.overlaps(shift.getDateTimeInterval())) {
+                            totalMin += (int) dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                         }
-                    }else {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                     }
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin / (60 * (int) dateTimeInterval.getDays()));
+                    brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
                 }
             }
         }

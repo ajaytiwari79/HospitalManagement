@@ -16,11 +16,9 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
-import com.kairos.persistence.model.access_permission.UserAccessRoleQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -131,6 +129,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
 
 /**
@@ -1719,18 +1718,15 @@ public class StaffService {
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
-        //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
+        staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeFromCPRNumber(staffAdditionalInfoDTO.getCprNumber()));
         Long functionId = null;
         if (shiftDate != null) {
             functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
         }
-
         Long countryId = organization.getCountry().getId();
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
-        //Todo it should calculate dynamically
-        unitPosition.setHourlyCost(14.5f);
         unitPosition.setFunctionId(functionId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
@@ -1767,9 +1763,10 @@ public class StaffService {
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
             unitPositionDetails = new StaffUnitPositionDetails(unitId);
-            unitPositionService.convertUnitPositionObject(unitPosition, unitPositionDetails);
-            List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyWages(Collections.singletonList(unitPosition.getId()));
-            unitPositionDetails.setHourlyWages(data.size() > 0 ? data.get(0).getHourlyWages() : 0.0f);
+
+            convertUnitPositionObject(unitPosition, unitPositionDetails);
+            List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
+            unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
         }
         return unitPositionDetails;
     }
