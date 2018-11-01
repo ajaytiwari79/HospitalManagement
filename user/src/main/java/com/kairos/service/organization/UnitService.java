@@ -106,7 +106,6 @@ public class UnitService {
     public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long unitId) throws InterruptedException, ExecutionException {
         if (organizationBasicDTO.getId() == null) {
             companyCreationService.addNewUnit(organizationBasicDTO, unitId);
-
         }else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
