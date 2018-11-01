@@ -95,8 +95,8 @@ public class AttendanceSettingService extends MongoBaseService {
                     /*if(unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId())==null){
                         exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getUnitId());
                     }*/
-                    ActivityGlideTimeDetails glideTimeDetails = activityMap.get(checkInshift.getActivities().get(0).getActivityId()).getLocationActivityTab().getCheckInGlideTime(LocationEnum.OFFICE);
-                    if(glideTimeDetails==null){
+                    ActivityGlideTimeDetails glideTimeDetails = activityMap.get(checkInshift.getActivities().get(0).getActivityName()).getLocationActivityTab().getCheckInGlideTime(LocationEnum.OFFICE);
+                    if(!Optional.ofNullable(glideTimeDetails).isPresent()){
                         exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(0).getActivityId());
                     }
                     ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())).minusMinutes(glideTimeDetails.getBefore());
