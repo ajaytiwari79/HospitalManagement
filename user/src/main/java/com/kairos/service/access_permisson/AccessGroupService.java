@@ -889,23 +889,27 @@ public class AccessGroupService {
 
     public Map<Long, Long> getAccessGroupUsingParentId(Long unitId, Set<Long> accessGroupIds) {
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentIds(unitId,accessGroupIds);
-        return convertToMap(accessPageQueryResults);
+        Map<Long,Map<Long, Long>> response=convertToMap(accessPageQueryResults);
+        return response.get(unitId);
     }
 
-    public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
+    public Map<Long,Map<Long, Long>> findAllAccessGroupWithParentOfOrganization(Long organizationId){
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(organizationId);
         return convertToMap(accessPageQueryResults);
     }
 
-    public Map<Long, Long> findAllAccessGroupWithParentOfOrganizations(List<Long> organizationIds){
+    public Map<Long,Map<Long, Long>> findAllAccessGroupWithParentOfOrganizations(List<Long> organizationIds){
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganizations(organizationIds);
         return convertToMap(accessPageQueryResults);
     }
 
-    private Map<Long, Long> convertToMap(List<AccessPageQueryResult> accessPageQueryResults){
-        Map<Long, Long > response=new HashMap<>();
+    private Map<Long,Map<Long, Long>> convertToMap(List<AccessPageQueryResult> accessPageQueryResults){
+        Map<Long,Map<Long, Long>> response=new HashMap<>();
         accessPageQueryResults.forEach(accessPageQueryResult -> {
-            response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
+            response.put(accessPageQueryResult.getUnitId(),new HashMap<Long,Long>());
+        });
+        accessPageQueryResults.forEach(accessPageQueryResult -> {
+            response.get(accessPageQueryResult.getUnitId()).put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
         });
         return response;
     }

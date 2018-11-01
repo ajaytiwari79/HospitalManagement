@@ -579,7 +579,7 @@ public class CompanyCreationService {
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
 
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
+        Map<Long,Map<Long, Long>> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
@@ -589,15 +589,15 @@ public class CompanyCreationService {
             CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
                     .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
             CompletableFuture.allOf(hasUpdated).join();
-
+            Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganizations(unitIds);
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
+                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,orgAndUnitAccessGroupIdsMap);
             CompletableFuture.allOf(createdInUnit).join();
 
 
         } else {
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots);
+                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots,countryAndOrgAccessGroupIdsMap);
             CompletableFuture.allOf(createdInUnit).join();
         }
         List<QueryResult> queryResults = new ArrayList<>();

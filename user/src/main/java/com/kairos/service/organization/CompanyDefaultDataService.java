@@ -46,31 +46,29 @@ public class CompanyDefaultDataService {
     private ReasonCodeService reasonCodeService;
 
 
-    public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) throws InterruptedException, ExecutionException {
+    public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots,Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap) throws InterruptedException, ExecutionException {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
-
         units.forEach(unit -> {
-          //  Map<Long, Long> parentAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(unit.getId());
                 asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
                 asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
-//                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
-//                    new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
-//                            unit.getCountry().getId(), null, parentAndOrgAccessGroupIdsMap), unit.getId()));
+                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
+                    new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
+                            unit.getCountry().getId(), null, orgAndUnitAccessGroupIdsMap.get(unit.getId())), unit.getId()));
         });
         return CompletableFuture.completedFuture(true);
     }
 
-    public CompletableFuture<Boolean> createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
+    public CompletableFuture<Boolean> createDefaultDataForParentOrganization(Organization organization, Map<Long,Map<Long, Long>> countryAndOrgAccessGroupIdsMap,
                                                                              List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO,Long countryId) throws InterruptedException, ExecutionException {
         asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO));
         asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(organization));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId()));
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
                 new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(),
-                        organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId()));
+                        organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap.get(organization.getId())), organization.getId()));
         asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(organization, timeSlots));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
