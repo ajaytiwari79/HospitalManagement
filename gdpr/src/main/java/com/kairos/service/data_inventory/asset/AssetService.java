@@ -68,10 +68,7 @@ public class AssetService extends MongoBaseService {
         AssetType assetType = assetTypeMongoRepository.findOne(assetDTO.getAssetTypeId());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetTypeId());
-        } else if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent() && !assetType.getSubAssetTypes().contains(assetDTO.getAssetSubTypeId())) {
-            exceptionService.invalidRequestException("message.invalid.request", " invalid Sub Asset is Selected ");
         }
-
         Asset asset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
                 assetDTO.getAssetTypeId(), assetDTO.getAssetSubTypeId(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner());
         asset.setOrganizationId(unitId);
@@ -193,8 +190,6 @@ public class AssetService extends MongoBaseService {
         AssetType assetType = assetTypeMongoRepository.findOne(assetDTO.getAssetTypeId());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetTypeId());
-        } else if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent() && !assetType.getSubAssetTypes().contains(assetDTO.getAssetSubTypeId())) {
-            exceptionService.invalidRequestException("message.invalid.request", " invalid Sub Asset is Selected ");
         }
         asset.setName(assetDTO.getName());
         asset.setDescription(assetDTO.getDescription());
