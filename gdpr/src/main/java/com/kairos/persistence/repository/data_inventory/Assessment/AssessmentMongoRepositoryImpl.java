@@ -125,7 +125,6 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
-    @org.springframework.data.mongodb.repository.Query("{deleted:false,organizationId:?0,assetId:?1}")
 
     @Override
     public List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId) {
