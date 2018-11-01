@@ -169,8 +169,7 @@ public class AssessmentService extends MongoBaseService {
         assessment.setProcessingActivityId(processingActivityId);
         if (!assessmentDTO.isRiskAssessment()) {
             saveProcessingActivityValueToAssessment(unitId, assessment, processingActivityDTO);
-        }
-        else {
+        } else {
             saveRiskTemplateAnswerToAssessment(unitId, assessment);
         }
         assessmentMongoRepository.save(assessment);
@@ -287,11 +286,29 @@ public class AssessmentService extends MongoBaseService {
         }
         QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
-        if (Optional.ofNullable(assessment.getAssetId()).isPresent())
-            getAssetAssessmentQuestionAndAnswer(unitId, assessment, assessmentQuestionnaireSections);
-        else
-            getProcessingActivityAssessmentQuestionAndAnswer(unitId, assessment, assessmentQuestionnaireSections);
+        if (assessment.isRiskAssessment()) {
+            getRiskAssessmentAnswer(assessment, assessmentQuestionnaireSections);
+        } else {
+            if (Optional.ofNullable(assessment.getAssetId()).isPresent())
+                getAssetAssessmentQuestionAndAnswer(unitId, assessment, assessmentQuestionnaireSections);
+            else
+                getProcessingActivityAssessmentQuestionAndAnswer(unitId, assessment, assessmentQuestionnaireSections);
+        }
         return assessmentQuestionnaireSections;
+    }
+
+
+    private void getRiskAssessmentAnswer(Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
+
+        List<AssessmentAnswerValueObject> assessmentAnswers = assessment.getAssessmentAnswers();
+        Map<BigInteger, Object> riskAssessmentAsnwer = new HashMap<>();
+        assessmentAnswers.forEach(assessmentAnswer -> riskAssessmentAsnwer.put(assessmentAnswer.getQuestionId(), assessmentAnswer.getValue()));
+        for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+            for (QuestionBasicResponseDTO question : questionnaireSectionResponseDTO.getQuestions()) {
+                question.setValue(riskAssessmentAsnwer.get(question.getId()));
+            }
+        }
+
     }
 
 
