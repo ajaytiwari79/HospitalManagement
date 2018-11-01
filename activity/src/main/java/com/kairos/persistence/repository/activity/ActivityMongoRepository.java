@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.LocationActivityTabWithActivityIdDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
@@ -45,13 +46,16 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
 
+    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "'_id':1,'locationActivityTab':1")
+    List<LocationActivityTabWithActivityIdDTO> findAllActivitieIdsAndLocationActivityTabByIds(Set<BigInteger> activityIds);
+
 
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "'_id':1, 'phaseSettingsActivityTab':1")
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
 
-    @Query(value = "{'deleted' : false,'_id':?0}",fields = "'locationActivityTab'")
+    @Query(value = "{'deleted' : false,'_id':?0}",fields = "'locationActivityTab':1")
     LocationActivityTab findActivityGlideTimeByIdAndEnabled(BigInteger id);
 
 }
