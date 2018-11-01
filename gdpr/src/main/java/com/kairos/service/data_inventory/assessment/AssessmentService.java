@@ -688,7 +688,7 @@ public class AssessmentService extends MongoBaseService {
         List<AssessmentAnswerValueObject> riskAssessmentAnswer = new ArrayList<>();
         for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
             for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                riskAssessmentAnswer.add(new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), null, questionBasicDTO.getQuestionType()));
+                riskAssessmentAnswer.add(new AssessmentAnswerValueObject(questionBasicDTO.getId(), null, null, questionBasicDTO.getQuestionType()));
             }
         }
         assessment.setAssessmentAnswers(riskAssessmentAnswer);
