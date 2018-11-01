@@ -15,15 +15,15 @@ public interface CustomAssessmentRepository {
 
     List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId);
 
-    Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId);
+    Assessment findPreviousLaunchedAssessmentByUnitIdAndAssetId(Long unitId, BigInteger assetId);
 
-    Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId);
+    Assessment findPreviousLaunchedAssessmentByUnitIdAndProcessingActivityId(Long unitId, BigInteger processingActivityId);
 
     List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId);
 
-    Assessment findPreviousLaunchedAssessmentForAssetRisksByUnitId(Long unitId, BigInteger assetId);
+    Assessment findPreviousLaunchedRiskAssessmentByUnitIdAndAssetId(Long unitId, BigInteger assetId);
 
-    Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId);
+    Assessment findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(Long unitId, BigInteger processingActivityId);
 
     List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId);
 
