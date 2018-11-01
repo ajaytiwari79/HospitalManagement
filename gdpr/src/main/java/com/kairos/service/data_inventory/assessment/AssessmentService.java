@@ -137,10 +137,9 @@ public class AssessmentService extends MongoBaseService {
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
         Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, assetResponseDTO) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, assetResponseDTO);
         assessment.setAssetId(assetId);
-        if (assessmentDTO.isRiskAssessment())
-            assessment.setAssessmentAnswers(new ArrayList<>());
-        else
-            saveAssetValueToAssessmentAnswer(unitId, assessment, assetResponseDTO);
+        if (assessmentDTO.isRiskAssessment()) {
+            saveAssetValueToAssessment(unitId, assessment, assetResponseDTO);
+        }
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
         return assessmentDTO;
@@ -166,15 +165,13 @@ public class AssessmentService extends MongoBaseService {
         }
         Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivityDTO) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivityDTO);
         assessment.setProcessingActivityId(processingActivityId);
-        if (assessmentDTO.isRiskAssessment())
-            assessment.setAssessmentAnswers(new ArrayList<>());
-        else
-            saveProcessingActivityValueToAssessmentAnswer(unitId, assessment, processingActivityDTO);
+        if (!assessmentDTO.isRiskAssessment()) {
+            saveProcessingActivityValueToAssessment(unitId, assessment, processingActivityDTO);
+        }
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
         return assessmentDTO;
     }
-
 
 
     /**
@@ -628,7 +625,7 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
-    private void saveAssetValueToAssessmentAnswer(Long unitId, Assessment assessment, AssetResponseDTO assetResponseDTO) {
+    private void saveAssetValueToAssessment(Long unitId, Assessment assessment, AssetResponseDTO assetResponseDTO) {
 
         QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
@@ -645,7 +642,7 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
-    private void saveProcessingActivityValueToAssessmentAnswer(Long unitId, Assessment assessment, ProcessingActivityResponseDTO processingActivityDTO) {
+    private void saveProcessingActivityValueToAssessment(Long unitId, Assessment assessment, ProcessingActivityResponseDTO processingActivityDTO) {
         QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
