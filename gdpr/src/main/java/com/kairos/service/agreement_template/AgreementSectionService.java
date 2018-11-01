@@ -1,8 +1,9 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.gdpr.agreement_template.AgreementTemplateSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
@@ -13,9 +14,11 @@ import com.kairos.persistence.repository.agreement_template.PolicyAgreementTempl
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.s3bucket.AWSBucketService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,16 +54,23 @@ public class AgreementSectionService extends MongoBaseService {
     @Inject
     private ClauseTagMongoRepository clauseTagMongoRepository;
 
+    @Inject
+    private AWSBucketService awsBucketService;
 
-    public Map<String, Object> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
+
+    public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", templateId);
         }
-        checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementSectionDTOs);
-        List<BigInteger> agreementSectionIdList = createOrupdateSectionAndSubSectionOfAgreementTemplate(countryId, agreementSectionDTOs, policyAgreementTemplate);
-        policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
+        if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getSections())) {
+            checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getSections());
+            List<BigInteger> agreementSectionIdList = createOrupdateSectionAndSubSectionOfAgreementTemplate(countryId, agreementTemplateSectionDTO.getSections(), policyAgreementTemplate);
+            policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
+        }
+        policyAgreementTemplate.setCoverPageTitle(agreementTemplateSectionDTO.getCoverPageTitle());
+        policyAgreementTemplate.setCoverPageContent(agreementTemplateSectionDTO.getCoverPageContent());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
     }
