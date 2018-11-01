@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
@@ -49,5 +50,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
+
+    @Query(value = "{'deleted' : false,'_id':?0}",fields = "'locationActivityTab'")
+    LocationActivityTab findActivityGlideTimeByIdAndEnabled(BigInteger id);
 
 }

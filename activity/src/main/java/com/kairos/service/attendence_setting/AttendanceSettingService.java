@@ -5,9 +5,9 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
-import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -20,7 +20,6 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
@@ -33,8 +32,6 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static javax.management.timer.Timer.ONE_MINUTE;
 
 
 @Service
@@ -183,7 +180,7 @@ public class AttendanceSettingService extends MongoBaseService {
         AttendanceDuration duration = null;
         AttendanceSetting attendanceSetting=null;
         if(shift!=null){
-            boolean result= validateFlexibleTimeWhileCheckOut(shift,reasonCodeId,staffAndOrganizationIds);
+            boolean result= validateGlideTimeWhileCheckOut(shift,reasonCodeId,staffAndOrganizationIds);
             if(!result){
                 return null;
             }
@@ -224,10 +221,10 @@ public class AttendanceSettingService extends MongoBaseService {
 
     }
 
-    private boolean validateFlexibleTimeWhileCheckOut(Shift shift,Long reasonCodeId,List<StaffResultDTO> staffAndOrganizationIds){
+    private boolean validateGlideTimeWhileCheckOut(Shift shift, Long reasonCodeId, List<StaffResultDTO> staffAndOrganizationIds){
         Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-        Activity activity = activityMongoRepository.findActivityByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId());
-        ActivityGlideTimeDetails glideTimeDetails = activity.getLocationActivityTab().getCheckOutGlideTime(LocationEnum.OFFICE);
+        LocationActivityTab locationActivityTab = activityMongoRepository.findActivityGlideTimeByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId());
+        ActivityGlideTimeDetails glideTimeDetails = locationActivityTab.getCheckOutGlideTime(LocationEnum.OFFICE);
         ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone())).minusMinutes(glideTimeDetails.getBefore());
         ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone())).plusMinutes(glideTimeDetails.getAfter());
         DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
