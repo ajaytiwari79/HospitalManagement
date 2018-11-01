@@ -891,8 +891,14 @@ public class AccessGroupService {
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentIds(unitId,accessGroupIds);
         return convertToMap(accessPageQueryResults);
     }
+
     public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(organizationId);
+        return convertToMap(accessPageQueryResults);
+    }
+
+    public Map<Long, Long> findAllAccessGroupWithParentOfOrganizations(List<Long> organizationIds){
+        List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganizations(organizationIds);
         return convertToMap(accessPageQueryResults);
     }
 
