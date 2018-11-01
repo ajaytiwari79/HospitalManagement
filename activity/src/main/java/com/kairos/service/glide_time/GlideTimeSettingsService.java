@@ -37,16 +37,16 @@ public class GlideTimeSettingsService extends MongoBaseService {
 
     private void validateGlideTime(GlideTimeSettingsDTO glideTimeSettingsDTO) {
 
-        if (glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter()) {
+        if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter()) {
             exceptionService.actionNotPermittedException("error.glide_time.checkin.after.exceeds.limit");
         }
-        if (glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore()) {
+        if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore()) {
             exceptionService.actionNotPermittedException("error.glide_time.checkin.before.exceeds.limit");
         }
-        if (glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter()) {
+        if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter()) {
             exceptionService.actionNotPermittedException("error.glide_time.checkout.after.exceeds.limit");
         }
-        if (glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore() != null && glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore()) {
+        if (glideTimeSettingsDTO.getTimeLimit()!=null && glideTimeSettingsDTO.getTimeLimit() < glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore()) {
             exceptionService.actionNotPermittedException("error.glide_time.checkout.before.exceeds.limit");
         }
     }
