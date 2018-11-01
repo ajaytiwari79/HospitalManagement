@@ -58,4 +58,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'deleted' : false,'_id':?0}",fields = "'locationActivityTab':1")
     LocationActivityTab findActivityGlideTimeByIdAndEnabled(BigInteger id);
 
+    @Query(value = "{deleted:false,'compositeActivities.activityId':?0}",exists = true)
+    boolean existsByActivityIdInCompositeActivitiesAndDeletedFalse(BigInteger id);
+
 }

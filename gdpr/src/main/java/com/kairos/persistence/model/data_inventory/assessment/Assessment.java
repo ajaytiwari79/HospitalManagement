@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.data_inventory.assessment;
 
 
+import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
@@ -37,6 +38,8 @@ public class Assessment extends MongoBaseEntity {
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
     private String userEmailIdAssessmentLastAssistBy;
+    private LocalDate assessmentScheduledDate;
+    private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
 
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment) {
@@ -47,13 +50,17 @@ public class Assessment extends MongoBaseEntity {
         this.comment=comment;
     }
 
-    public String getUserEmailIdAssessmentLastAssistBy() {
-        return userEmailIdAssessmentLastAssistBy;
-    }
+    public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 
-    public void setUserEmailIdAssessmentLastAssistBy(String userEmailIdAssessmentLastAssistBy) {
-        this.userEmailIdAssessmentLastAssistBy = userEmailIdAssessmentLastAssistBy;
-    }
+    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
+
+    public String getUserEmailIdAssessmentLastAssistBy() { return userEmailIdAssessmentLastAssistBy; }
+
+    public void setUserEmailIdAssessmentLastAssistBy(String userEmailIdAssessmentLastAssistBy) { this.userEmailIdAssessmentLastAssistBy = userEmailIdAssessmentLastAssistBy; }
+
+    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+
+    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
 
     public boolean isRiskAssessment() { return riskAssessment; }
 

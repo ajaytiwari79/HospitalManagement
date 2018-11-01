@@ -288,7 +288,12 @@ public class ActivityService extends MongoBaseService {
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
         //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyProperties(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!generalDTO.getTags().isEmpty()){
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        }
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
 
         return activityTabsWrapper;
     }
@@ -302,7 +307,12 @@ public class ActivityService extends MongoBaseService {
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
 //        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyProperties(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!activity.getTags().isEmpty()) {
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        }
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
 
         return activityTabsWrapper;
     }
@@ -402,6 +412,7 @@ public class ActivityService extends MongoBaseService {
         if (activityMatched.size() != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
+        organizationActivityService.verifyBreakAllowedOfActivities(activity.get().getRulesActivityTab().isBreakAllowed(),activityMatched);
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.get().setCompositeActivities(compositeActivities);
         save(activity.get());
@@ -469,6 +480,13 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
+
+        if(activity.getRulesActivityTab().isBreakAllowed()!=rulesActivityDTO.isBreakAllowed()){
+            if(activity.getCompositeActivities().size()>0 || activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(rulesActivityDTO.getActivityId())) {
+                exceptionService.actionNotPermittedException("error.activity.being.used", activity.getName());
+            }
+        }
+
         if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
             if (rulesActivityDTO.getCutOffIntervalUnit().equals(DAYS) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException("error.DayValue.zero");
@@ -971,7 +989,7 @@ public class ActivityService extends MongoBaseService {
 
 
         Activity activityCopied = new Activity();
-        ObjectMapperUtils.copyPropertiesExceptSpecific(activityFromDatabase.get(), activityCopied, "id");
+        ObjectMapperUtils.copyProperties(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
