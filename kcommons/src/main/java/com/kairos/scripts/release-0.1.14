@@ -78,3 +78,8 @@ db.time_Type.find().forEach(function(e){var timeType = e;var t;if(e.timeTypes=="
 // TO set allowedDayTypes Property in Existing AccessGroups
 MATCH(ag:AccessGroup) set ag.allowedDayTypes=true;
 
+
+
+//To set all breakAllowed to true for existing Activities
+db.activities.updateMany({},{$set:{"rulesActivityTab.breakAllowed":true}});
+

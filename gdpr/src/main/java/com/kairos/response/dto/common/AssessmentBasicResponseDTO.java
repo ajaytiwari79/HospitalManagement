@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,6 +20,11 @@ public class AssessmentBasicResponseDTO {
     private List<Staff> assigneeList;
     private Staff approver;
     private AssessmentStatus assessmentStatus;
+    private List<RiskBasicResponseDTO> risks=new ArrayList<>();
+
+    public List<RiskBasicResponseDTO> getRisks() { return risks; }
+
+    public void setRisks(List<RiskBasicResponseDTO> risks) { this.risks = risks; }
 
     public BigInteger getId() { return id; }
 
