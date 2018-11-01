@@ -30,10 +30,11 @@ public class RuleTemplateSpecificInfo {
     private UserAccessRoleDTO user;
     private int totalTimeBank;
     private ViolatedRulesDTO violatedRules;
+    private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank,Map<BigInteger, ActivityWrapper> activityWrapperMap,int staffAge) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -45,8 +46,16 @@ public class RuleTemplateSpecificInfo {
         this.totalTimeBank = totalTimeBank;
         this.violatedRules = new ViolatedRulesDTO();
         this.activityWrapperMap = activityWrapperMap;
+        this.staffAge = staffAge;
     }
 
+    public int getStaffAge() {
+        return staffAge;
+    }
+
+    public void setStaffAge(int staffAge) {
+        this.staffAge = staffAge;
+    }
 
     public Map<BigInteger, ActivityWrapper> getActivityWrapperMap() {
         return activityWrapperMap;
