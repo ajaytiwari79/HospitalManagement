@@ -207,9 +207,9 @@ public class OrganizationController {
     @ApiOperation(value = "Get organization herirchy data")
     @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/manage_hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getManageHierarchyData(@PathVariable long parentOrganizationId) {
+    public ResponseEntity<Map<String, Object>> getManageHierarchyData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                unitService.getManageHierarchyData(parentOrganizationId));
+                unitService.getManageHierarchyData(unitId));
     }
 
     /**
