@@ -61,7 +61,14 @@ public class SchedulerPanelDTO {
         this.entityId = entityId;
     }
 
-    public SchedulerPanelDTO(JobType jobType,JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
+    public SchedulerPanelDTO(List<DayOfWeek> days, LocalTime runOnce, JobType jobType, JobSubType jobSubType) {
+        this.days = days;
+        this.runOnce = runOnce;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+    }
+
+    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
        this.jobType=jobType;
         this.jobSubType = jobSubType;
         this.oneTimeTrigger = oneTimeTrigger;
