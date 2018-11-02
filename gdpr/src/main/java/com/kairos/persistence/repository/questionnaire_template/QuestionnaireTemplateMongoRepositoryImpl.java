@@ -68,7 +68,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
@@ -90,7 +90,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
@@ -120,7 +120,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),

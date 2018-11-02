@@ -16,27 +16,24 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentDTO {
 
-    protected BigInteger id;
+    private BigInteger id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
-    protected String name;
-
+    private String name;
     @NotNull(message = "error.message.due.date.not.Selected")
-    protected LocalDate endDate;
-
-    protected String comment;
-
+    private LocalDate endDate;
+    private String comment;
     @NotNull(message = "error.message.assignee.not.selected")
     @Valid
-    protected  List<Staff> assigneeList;
-
-    protected Staff approver;
-
-    protected LocalDate assessmentScheduledDate;
+    private  List<Staff> assigneeList;
+    private boolean riskAssessment;
+    private Staff approver;
+    private LocalDate assessmentScheduledDate;
+    private QuestionnaireTemplateType riskAssociatedEntity;
 
   //@NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
-    protected AssessmentSchedulingFrequency assessmentSchedulingFrequency;
+    private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
     public BigInteger getId() { return id; }
 
@@ -69,4 +66,12 @@ public class AssessmentDTO {
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 
     public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
+
+    public boolean isRiskAssessment() { return riskAssessment; }
+
+    public void setRiskAssessment(boolean riskAssessment) { this.riskAssessment = riskAssessment; }
+
+    public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
+
+    public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
 }
