@@ -13,7 +13,6 @@ public class ShiftState extends Shift {
     private BigInteger shiftStatePhaseId;
     private AccessGroupRole accessGroupRole;
     private String actualPhaseState;
-    private BigInteger attendanceSettingId;
     private LocalDate validated;
 
     public BigInteger getShiftId() {
@@ -40,13 +39,6 @@ public class ShiftState extends Shift {
         this.actualPhaseState = actualPhaseState;
     }
 
-    public BigInteger getAttendanceSettingId() {
-        return attendanceSettingId;
-    }
-
-    public void setAttendanceSettingId(BigInteger attendanceSettingId) {
-        this.attendanceSettingId = attendanceSettingId;
-    }
 
     public AccessGroupRole getAccessGroupRole() {
         return accessGroupRole;

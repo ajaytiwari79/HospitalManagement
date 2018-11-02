@@ -294,7 +294,6 @@ public class AttendanceSettingService extends MongoBaseService {
         realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
         realtimeShiftState.setId(null);
         realtimeShiftState.setShiftId(shift.getId());
-        realtimeShiftState.setAttendanceSettingId(attendanceSetting.get(0).getId());
         realtimeShiftState.setActualPhaseState(AppConstants.REALTIME);
         realtimeShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
         return realtimeShiftState;
