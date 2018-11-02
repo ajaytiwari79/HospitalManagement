@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface CustomAttendanceSettingRepository {
 
-    AttendanceSetting findMaxAttendanceCheckIn(Long userId, Date date);
+    AttendanceSetting findMaxAttendanceCheckIn(Long userId, Date date,String shiftState);
 }
