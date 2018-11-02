@@ -36,7 +36,7 @@ public class Assessment extends MongoBaseEntity {
     private Staff approver;
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
-    private UserVO assessmentLastAsitsBy;
+    private UserVO assessmentLastAssistBy;
     private LocalDate assessmentScheduledDate;
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
@@ -53,9 +53,9 @@ public class Assessment extends MongoBaseEntity {
 
     public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
 
-    public UserVO getAssessmentLastAsitsBy() { return assessmentLastAsitsBy; }
+    public UserVO getAssessmentLastAssistBy() { return assessmentLastAssistBy; }
 
-    public void setAssessmentLastAsitsBy(UserVO assessmentLastAsitsBy) { this.assessmentLastAsitsBy = assessmentLastAsitsBy; }
+    public void setAssessmentLastAssistBy(UserVO assessmentLastAssistBy) { this.assessmentLastAssistBy = assessmentLastAssistBy; }
 
     public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
 

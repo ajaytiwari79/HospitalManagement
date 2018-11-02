@@ -427,7 +427,7 @@ public class AssessmentService extends MongoBaseService {
 
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
-                } else if (!currentUser.equals(assessment.getAssessmentLastAsitsBy())) {
+                } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                     exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
                 }
                 saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
@@ -438,7 +438,7 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
         }
-        assessment.setAssessmentLastAsitsBy(currentUser);
+        assessment.setAssessmentLastAssistBy(currentUser);
         assessment.setAssessmentStatus(assessmentStatus);
         assessmentMongoRepository.save(assessment);
         return true;
@@ -510,7 +510,7 @@ public class AssessmentService extends MongoBaseService {
         }
         assessment.setAssessmentAnswers(assessmentAnswerValueObjects);
         if (Optional.ofNullable(status).isPresent() && AssessmentStatus.COMPLETED.equals(status)) {
-            if (!currentUser.equals(assessment.getAssessmentLastAsitsBy())) {
+            if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setAssessmentStatus(status);
