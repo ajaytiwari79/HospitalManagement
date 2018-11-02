@@ -194,10 +194,10 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return id(expertise) as id , expertise.name as name")
     List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
 
-    @Query("match (exp:Expertise) where id(exp)={0} \n" +
-            "optional match (exp)-[:"+HAS_SENIOR_DAYS+"]->(seniorDays:CareDays)\n" +
-            "optional match (exp)-[:"+HAS_CHILD_CARE_DAYS+"]->(childCareDays:CareDays)\n" +
-            "return  COLLECT({id:id(childCareDays), from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) as childCareDays ,COLLECT({id:id(seniorDays), from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) as seniorDays")
+    @Query("MATCH (exp:Expertise) where id(exp)={0} \n" +
+            "OPTIONAL MATCH (exp)-[:"+HAS_SENIOR_DAYS+"]->(seniorDays:CareDays)\n" +
+            "OPTIONAL MATCH (exp)-[:"+HAS_CHILD_CARE_DAYS+"]->(childCareDays:CareDays)\n" +
+            "RETURN CASE WHEN count(childCareDays)>0 THEN COLLECT({id:id(childCareDays), from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) ELSE [] END as childCareDays ,CASE WHEN count(seniorDays)>0 THEN COLLECT({id:id(seniorDays), from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) ELSE [] END as seniorDays")
     SeniorAndChildCareDaysQueryResult getSeniorDaysOfExpertise(Long expertiseId);
 
 }
