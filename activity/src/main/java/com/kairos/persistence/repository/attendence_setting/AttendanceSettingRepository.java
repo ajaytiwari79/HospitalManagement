@@ -20,9 +20,7 @@ public interface AttendanceSettingRepository extends MongoBaseRepository<Attenda
     @Query(value ="{attendanceDuration:{$elemMatch:{to:{$exists:false}}},unitId:?0,createdAt:{$lte:?1},deleted:false}" )
     List<AttendanceSetting> findAllbyUnitIdAndDate(Long unitId, Date Startdate);
 
-    @Query(value = "{deleted:false,shiftId:?0,shiftState:?1}")
-    AttendanceSetting findByShiftId(BigInteger shiftId,String shiftState);
+    @Query(value = "{deleted:false,shiftId:?0}")
+    AttendanceSetting findByShiftId(BigInteger shiftId);
 
-    @Query(value = "{deleted:false,shiftId:{$in:?0},shiftState:?1}")
-    List<AttendanceSetting> findAllByShiftIds(List<BigInteger> shiftIds,String shiftState);
 }

@@ -159,15 +159,14 @@ public class AttendanceSettingService extends MongoBaseService {
 
             AttendanceSetting oldAttendanceSetting=attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)),AppConstants.TIME_AND_ATTENDANCE);;
             shift=shiftMap.get(oldAttendanceSetting.getShiftId());
-            attendanceSetting= checkOut(unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(),staffAndOrganizationIds,shiftMap,oldAttendanceSetting,reasonCodeId);
+            attendanceSetting= checkOut(staffAndOrganizationIds,shift,oldAttendanceSetting,reasonCodeId);
             if(attendanceSetting==null){
                 return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
-            }else {
-                if(shift!=null){
+            }else if(shift!=null){
                     shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1));
                     shiftMongoRepository.save(shift);
                 }
-            }
+
         }
 
 
@@ -197,11 +196,12 @@ public class AttendanceSettingService extends MongoBaseService {
     }
 
 
-    private AttendanceSetting checkOut(String timeZone,List<StaffResultDTO> staffAndOrganizationIds,Map<BigInteger,Shift> shiftMap,AttendanceSetting oldAttendanceSetting,Long reasonCodeId) {
+    private AttendanceSetting checkOut(List<StaffResultDTO> staffAndOrganizationIds,Shift shift,AttendanceSetting oldAttendanceSetting,Long reasonCodeId) {
         AttendanceDuration duration ;
         AttendanceSetting attendanceSetting=oldAttendanceSetting;
-        if(attendanceSetting.getShiftId()!=null&&shiftMap.get(attendanceSetting.getShiftId())!=null){
-            boolean result= validateGlideTimeWhileCheckOut(shiftMap.get(attendanceSetting.getShiftId()),reasonCodeId,timeZone);
+        if(attendanceSetting.getShiftId()!=null && shift!=null){
+            Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
+            boolean result= validateGlideTimeWhileCheckOut(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone());
             if(!result){
                 return null;
             }
@@ -238,13 +238,13 @@ public class AttendanceSettingService extends MongoBaseService {
 
         private AttendanceSetting checkInWithShift(Shift shift, Long reasonCodeId, StaffResultDTO staffAndOrganizationId) {
             AttendanceSetting attendanceSetting=null;
-                AttendanceSetting oldAttendanceSetting=attendanceSettingRepository.findByShiftId(shift.getId(),AppConstants.REALTIME);
+                AttendanceSetting oldAttendanceSetting=attendanceSettingRepository.findByShiftId(shift.getId());
                 AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())));
                 if(oldAttendanceSetting!=null){
                     oldAttendanceSetting.getAttendanceDuration().add(attendanceDuration);
                     attendanceSetting=oldAttendanceSetting;
                 }else{
-                    attendanceSetting= new AttendanceSetting(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,Arrays.asList(attendanceDuration), AppConstants.REALTIME);
+                    attendanceSetting= new AttendanceSetting(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,Arrays.asList(attendanceDuration));
                 }
         return attendanceSetting;
 
@@ -269,7 +269,6 @@ public class AttendanceSettingService extends MongoBaseService {
     public void createShiftState(List<Shift> shifts,boolean checkIn,List<AttendanceSetting> attendanceSettings){
         List<ShiftState> realtimeShiftStates;
         List<ShiftState> timeAndAttendanceShiftStates=null;
-       List<AttendanceSetting> attendanceSettingForTimeAndAttendance=null;
        Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         realtimeShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndActualPhase(shifts.stream().map(s->s.getId()).collect(Collectors.toList()), AppConstants.REALTIME);
         if(shifts!=null&&checkIn) {
@@ -286,9 +285,7 @@ public class AttendanceSettingService extends MongoBaseService {
                 });
                 shiftStateMongoRepository.saveEntities(realtimeShiftStates);
             }
-            attendanceSettingForTimeAndAttendance=attendanceSettingForTimeAndAttendance(attendanceSettingForTimeAndAttendance,attendanceSettings,shifts);
-            if(!attendanceSettingForTimeAndAttendance.isEmpty()) attendanceSettingRepository.saveEntities(attendanceSettingForTimeAndAttendance);
-            timeAndAttendanceShiftStates=createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates,realtimeShiftStates,shifts,attendanceSettingForTimeAndAttendance,attendanceSettings);
+            timeAndAttendanceShiftStates=createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates,realtimeShiftStates,shifts,attendanceSettings);
             if(!timeAndAttendanceShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(timeAndAttendanceShiftStates);
      }
     }
@@ -303,11 +300,10 @@ public class AttendanceSettingService extends MongoBaseService {
         return realtimeShiftState;
     }
 
-    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<AttendanceSetting> attendanceSettingForTimeAndAttendance,List<AttendanceSetting> attendanceSetting){
+    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<AttendanceSetting> attendanceSetting){
         timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndActualPhase(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),AppConstants.TIME_AND_ATTENDANCE);
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=timeAndAttendanceShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
-        Map<BigInteger,AttendanceSetting> tAndAttendanceMap=attendanceSettingForTimeAndAttendance.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         for (Shift shift:shifts) {
             if (timeAndAttendanceShiftStateMap.get(shift.getId()) != null) {
                 ObjectMapperUtils.copyProperties(realtimeShiftStateMap.get(shift.getId()), timeAndAttendanceShiftStateMap.get(shift.getId()), "id", "actualPhaseState", "accessGroupRole","attendanceSettingId");
@@ -316,7 +312,6 @@ public class AttendanceSettingService extends MongoBaseService {
                 if (realtimeShiftStateMap.get(shift.getId()) != null) {
                     ShiftState timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftStateMap.get(shift.getId()), ShiftState.class);
                     timeAndAttendanceShiftState.setId(null);
-                    timeAndAttendanceShiftState.setAttendanceSettingId(tAndAttendanceMap.get(shift.getId()).getId());
                     timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
                     timeAndAttendanceShiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
                     timeAndAttendanceShiftStates.add(timeAndAttendanceShiftState);
@@ -324,27 +319,6 @@ public class AttendanceSettingService extends MongoBaseService {
             }
         }
         return timeAndAttendanceShiftStates;
-    }
-
-    public List<AttendanceSetting> attendanceSettingForTimeAndAttendance(List<AttendanceSetting> attendanceSettingForTimeAndAttendance,List<AttendanceSetting> attendanceSettings,List<Shift> shifts){
-        List<AttendanceSetting> timeAndAttendanceSetting=new ArrayList<>();
-        attendanceSettingForTimeAndAttendance=attendanceSettingRepository.findAllByShiftIds(shifts.stream().map(s->s.getId()).collect(Collectors.toList()), AppConstants.TIME_AND_ATTENDANCE);
-        Map<BigInteger,AttendanceSetting> attendanceSettingForTAndAMap=attendanceSettingForTimeAndAttendance.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
-        Map<BigInteger,AttendanceSetting> attendanceSettingMap=attendanceSettings.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
-        for (Shift shift:shifts){
-            if(attendanceSettingForTAndAMap.get(shift.getId())!=null) {
-                ObjectMapperUtils.copyProperties(attendanceSettingMap.get(shift.getId()),attendanceSettingForTAndAMap.get(shift.getId()),"id","shiftState");
-                timeAndAttendanceSetting.add(attendanceSettingForTAndAMap.get(shift.getId()));
-            }else{
-                if(attendanceSettingMap.get(shift.getId())!=null) {
-                    AttendanceSetting attendanceSetting = attendanceSettingMap.get(shift.getId());
-                    attendanceSetting.setId(null);
-                    attendanceSetting.setShiftState(AppConstants.TIME_AND_ATTENDANCE);
-                    timeAndAttendanceSetting.add(attendanceSetting);
-                }
-            }
-        }
-        return timeAndAttendanceSetting;
     }
 
     // check out after job run
