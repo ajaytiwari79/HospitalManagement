@@ -140,9 +140,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypeByUnitIdAndIds(unitId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
             AssetTypeOrganizationLevelDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            if (!subAssetTypeDto.getRisks().isEmpty()) {
-                riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
-            }
+            riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
             subAssetType.setName(subAssetTypeDto.getName());
         });
         return subAssetTypesList;
@@ -206,8 +204,9 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         });
         riskDTORelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
         assetType.setName(assetTypeDto.getName());
-        if (CollectionUtils.isNotEmpty(updateExistingSubAssetTypeDTOs))
+        if (CollectionUtils.isNotEmpty(updateExistingSubAssetTypeDTOs)) {
             subAssetTypeList.addAll(updateSubAssetTypes(unitId, updateExistingSubAssetTypeDTOs, riskDTORelatedToAssetTypeAndSubAssetType));
+        }
         Map<AssetType, List<Risk>> riskRelatedToSubAssetTypeOrAssetType = new HashMap<>();
         if (CollectionUtils.isNotEmpty(riskDTORelatedToAssetTypeAndSubAssetType.entrySet().stream().map(Map.Entry::getValue).flatMap(List::stream).collect(Collectors.toList()))) {
             riskRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTORelatedToAssetTypeAndSubAssetType);
