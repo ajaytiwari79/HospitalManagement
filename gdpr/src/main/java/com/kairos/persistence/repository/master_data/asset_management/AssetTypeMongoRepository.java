@@ -20,7 +20,7 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
 
 
     @Query("{'countryId':?0,_id:?1,deleted:false}")
-    AssetType findByIdAndCountryId(Long countryId, BigInteger assetTypeId);
+    AssetType findByCountryIdAndId(Long countryId, BigInteger assetTypeId);
 
     @Query("{_id:?0,deleted:false}")
     AssetTypeBasicResponseDTO findAssetTypeById( BigInteger assetTypeId);
