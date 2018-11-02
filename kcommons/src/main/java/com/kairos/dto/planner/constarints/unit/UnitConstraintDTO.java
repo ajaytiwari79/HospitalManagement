@@ -5,7 +5,7 @@ import com.kairos.dto.planner.constarints.ConstraintDTO;
 public class UnitConstraintDTO extends ConstraintDTO {
     //~
     private Long unitId;
-    private Long parentUnitConstraintId;
+    private Long parentCountryConstraintId;
    
 
     //======================================================
@@ -19,11 +19,11 @@ public class UnitConstraintDTO extends ConstraintDTO {
         this.unitId = unitId;
     }
 
-    public Long getParentUnitConstraintId() {
-        return parentUnitConstraintId;
+    public Long getParentCountryConstraintId() {
+        return parentCountryConstraintId;
     }
 
-    public void setParentUnitConstraintId(Long parentUnitConstraintId) {
-        this.parentUnitConstraintId = parentUnitConstraintId;
+    public void setParentCountryConstraintId(Long parentCountryConstraintId) {
+        this.parentCountryConstraintId = parentCountryConstraintId;
     }
 }

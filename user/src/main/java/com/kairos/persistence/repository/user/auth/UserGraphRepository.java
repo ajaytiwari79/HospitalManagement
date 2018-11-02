@@ -110,7 +110,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("Match (org:Organization) where id(org)={0}" +
             "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with emp"+
             " Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            "return user " )
+            "return user LIMIT 1 " )
     User getUserOfOrganization(Long unitId);
 
     @Query("MATCH (user:User) WHERE user.cprNumber={1} OR user.email=~{0}  RETURN count(user) ")

@@ -2,6 +2,8 @@ package com.kairos.dto.user.organization.union;
 
 import com.kairos.dto.user.organization.MunicipalityDTO;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
+import com.kairos.enums.UnionState;
+
 import java.util.List;
 public class UnionDataDTO {
 
@@ -11,6 +13,7 @@ public class UnionDataDTO {
     private ContactAddressDTO mainAddress;
     private List<LocationDTO> locations;
     private List<MunicipalityDTO> municipalities;
+    private UnionState state;
 
     public String getName() {
         return name;
@@ -59,5 +62,13 @@ public class UnionDataDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UnionState getState() {
+        return state;
+    }
+
+    public void setState(UnionState state) {
+        this.state = state;
     }
 }

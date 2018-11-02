@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
-@Document
+@Document(collection="constraint")
 public class Constraint extends MongoBaseEntity{
 
     //~
@@ -19,9 +19,23 @@ public class Constraint extends MongoBaseEntity{
     protected ConstraintSubType constraintSubType;
     protected ConstraintLevel constraintLevel;
     protected int penalty;
-    protected Long planningProblemId;
-    protected BigInteger parentCountryConstraintId;//copiedFrom
+    protected BigInteger planningProblemId;
+    protected BigInteger parentConstraintId;//copiedFrom
 
+    //=================================================
+    public Constraint(){}
+
+    public Constraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentConstraintId) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.constraintType = constraintType;
+        this.constraintSubType = constraintSubType;
+        this.constraintLevel = constraintLevel;
+        this.penalty = penalty;
+        this.planningProblemId = planningProblemId;
+        this.parentConstraintId = parentConstraintId;
+    }
 
     // =================================================
     public BigInteger getId() {
@@ -80,19 +94,19 @@ public class Constraint extends MongoBaseEntity{
         this.penalty = penalty;
     }
 
-    public Long getPlanningProblemId() {
+    public BigInteger getPlanningProblemId() {
         return planningProblemId;
     }
 
-    public void setPlanningProblemId(Long planningProblemId) {
+    public void setPlanningProblemId(BigInteger planningProblemId) {
         this.planningProblemId = planningProblemId;
     }
 
-    public BigInteger getParentCountryConstraintId() {
-        return parentCountryConstraintId;
+    public BigInteger getParentConstraintId() {
+        return parentConstraintId;
     }
 
-    public void setParentCountryConstraintId(BigInteger parentCountryConstraintId) {
-        this.parentCountryConstraintId = parentCountryConstraintId;
+    public void setParentConstraintId(BigInteger parentConstraintId) {
+        this.parentConstraintId = parentConstraintId;
     }
 }

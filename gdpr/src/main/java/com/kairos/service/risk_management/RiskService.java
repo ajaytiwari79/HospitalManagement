@@ -11,6 +11,7 @@ import com.kairos.response.dto.common.RiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -32,13 +33,13 @@ public class RiskService extends MongoBaseService {
 
 
     /**
-     * @param <E>                  E here represent List of Risk DTO which extends Basic Risk DTO   {basic risk DTO is used at countryLevel and Organization Risk DTO used at organization level}
-     * @param countryIdOrUnitId
-     * @param risksRelatedToObject Map contain  Object of { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and Risk Corresponding Risk dto list to them
+     * @param <E>                  E here represent List of RISK DTO which extends Basic RISK DTO   {basic risk DTO is used at countryLevel and Organization RISK DTO used at organization level}
+     * @param referenceId
+     * @param risksRelatedToObject Map contain  Object of { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and RISK Corresponding RISK dto list to them
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
-     * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of Risk Ids generated after save operation
+     * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of RISK Ids generated after save operation
      */
-    public <T extends MongoBaseEntity, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long countryIdOrUnitId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
+    public <T extends MongoBaseEntity, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
 
         Assert.notEmpty(risksRelatedToObject, "list can' t be empty");
         List<Risk> risks = new ArrayList<>();
@@ -63,30 +64,30 @@ public class RiskService extends MongoBaseService {
             }
             List<Risk> riskRelatedTOObject = new ArrayList<>();
             if (!newRisk.isEmpty()) {
-                riskRelatedTOObject = isUnitId ? buildRiskAtOrganizationLevel(countryIdOrUnitId, newRisk) : buildRiskAtCountryLevel(countryIdOrUnitId, newRisk);
+                riskRelatedTOObject = isUnitId ? buildRiskAtOrganizationLevel(referenceId, newRisk) : buildRiskAtCountryLevel(referenceId, newRisk);
                 risks.addAll(riskRelatedTOObject);
             }
             riskListRelatedToObjectMap.put(objectToWhichRiskRelated, riskRelatedTOObject);
         });
         if (!existingRisksRelatedToObject.isEmpty()) {
-            risks.addAll(updateExistingRisk(countryIdOrUnitId, isUnitId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
+            risks.addAll(updateExistingRisk(referenceId, isUnitId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
         }
-        riskMongoRepository.saveAll(getNextSequence(risks));
+        if (CollectionUtils.isNotEmpty(risks)) riskMongoRepository.saveAll(getNextSequence(risks));
         return riskListRelatedToObjectMap;
     }
 
 
-    private <T extends MongoBaseEntity, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long countryIdOrUnitId, boolean isUnitId,
+    private <T extends MongoBaseEntity, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long referenceId, boolean isUnitId,
                                                                                               List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
         Assert.notEmpty(existingRiskIds, "List can't be empty");
-        List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(countryIdOrUnitId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(countryIdOrUnitId, existingRiskIds);
+        List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(referenceId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(referenceId, existingRiskIds);
         Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
         existingRisksRelatedToObject.forEach((objectToWhichRiskRelate, riskDTOS) ->
         {
             List<Risk> risksRelatesToObject = new ArrayList<>();
             riskDTOS.forEach(riskDTO -> {
                 Risk risk = riskMap.get(riskDTO.getId());
-                ObjectMapperUtils.copyPropertiesExceptSpecific(riskDTO, risk);
+                ObjectMapperUtils.copyProperties(riskDTO, risk);
                 risksRelatesToObject.add(risk);
             });
             riskListRelatedToObjectMap.get(objectToWhichRiskRelate).addAll(risksRelatesToObject);
@@ -97,7 +98,7 @@ public class RiskService extends MongoBaseService {
 
     /**
      * @param countryId countryId
-     * @param riskDTOS  list of Risk Dto
+     * @param riskDTOS  list of RISK Dto
      * @return
      */
     private <E extends BasicRiskDTO> List<Risk> buildRiskAtCountryLevel(Long countryId, List<E> riskDTOS) {
@@ -116,7 +117,7 @@ public class RiskService extends MongoBaseService {
 
     /**
      * @param unitId   - organizationId
-     * @param riskDTOS list of Risk Dto
+     * @param riskDTOS list of RISK Dto
      * @return
      */
     private <E extends BasicRiskDTO> List<Risk> buildRiskAtOrganizationLevel(Long unitId, List<E> riskDTOS) {
@@ -141,7 +142,7 @@ public class RiskService extends MongoBaseService {
         List<String> riskNames = new ArrayList<>();
         for (E riskDTO : riskDTOS) {
             if (riskNames.contains(riskDTO.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "Risk", riskDTO.getName());
+                exceptionService.duplicateDataException("message.duplicate", "RISK", riskDTO.getName());
             }
             riskNames.add(riskDTO.getName().toLowerCase());
         }

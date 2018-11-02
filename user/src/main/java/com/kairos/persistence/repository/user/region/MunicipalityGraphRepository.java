@@ -22,47 +22,47 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
 
     List<Municipality> findAll();
 
-    @Query("MATCH (m:Municipality {isEnable:true})-[:PROVINCE]-(p:Province) where id(p) = {0}  return {name:m.name, code:m.code, geoFence:m.geoFence, latitude:m.latitude, longitude:m.longitude,id: id(m)} as result ")
+    @Query("MATCH (m:Municipality {isEnable:true})-[:PROVINCE]-(p:Province) WHERE id(p) = {0}  RETURN {name:m.name, code:m.code, geoFence:m.geoFence, latitude:m.latitude, longitude:m.longitude,id: id(m)} as result ")
     List<Map<String, Object>> getAllMunicipalitiesOfProvince(Long provinceId);
 
-    @Query("MATCH (m:Municipality {isEnable:true})-[:MUNICIPALITY]-(zc:ZipCode  {isEnable:true}) where id(m) = {0} return {name:zc.name, zipCode:zc.zipCode, geoFence:zc.geoFence,id: id(zc)} as result ")
+    @Query("MATCH (m:Municipality {isEnable:true})-[:MUNICIPALITY]-(zc:ZipCode  {isEnable:true}) WHERE id(m) = {0} RETURN {name:zc.name, zipCode:zc.zipCode, geoFence:zc.geoFence,id: id(zc)} as result ")
     List<Map<String, Object>> getAllZipCodes(Long municipalityId);
 
     /**
-     * if zipcode has connected to multiple municipality, this will return one municipality randomly with no
+     * if zipcode has connected to multiple municipality, this will RETURN one municipality randomly WITH no
      * promise of order maintain,results can be different  for same zip code
      *
      * @param zipCodeId
-     * @return
+     * @RETURN
      */
-    @Query("Match (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) where id(zipCode)={0} return municipality limit 1")
+    @Query("MATCH (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WHERE id(zipCode)={0} RETURN municipality limit 1")
     Municipality getMunicipalityByZipCodeId(long zipCodeId);
 
-    @Query("Match (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) where id(zipCode)={0} return municipality")
+    @Query("MATCH (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WHERE id(zipCode)={0} RETURN municipality")
     List<Municipality> getMunicipalitiesByZipCode(long zipCode);
 
     Municipality findByCode(String code);
 
-    @Query("Match (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) where zipCode.zipCode={0} return municipality limit 1")
+    @Query("MATCH (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WHERE zipCode.zipCode={0} RETURN municipality limit 1")
     Municipality getMunicipalityByZipCodeId(int zipCodeId);
 
-    @Query("Match (zipCode:ZipCode{zipCode:{0}})-[:" + MUNICIPALITY + "]->(municipality:Municipality) return municipality")
+    @Query("MATCH (zipCode:ZipCode{zipCode:{0}})-[:" + MUNICIPALITY + "]->(municipality:Municipality) RETURN municipality")
     List<Municipality> getMuncipalityByZipcode(int zipcode);
 
-    @Query("match(municipality:Municipality{isEnable:true})-[:PROVINCE]->(p:Province)-[:REGION]->(r:Region)-[:BELONGS_TO]->(country:Country) where id(country)={0} \n" +
-            "return municipality")
+    @Query("MATCH(municipality:Municipality{isEnable:true})-[:PROVINCE]->(p:Province)-[:REGION]->(r:Region)-[:BELONGS_TO]->(country:Country) WHERE id(country)={0} \n" +
+            "RETURN municipality")
     List<Municipality> getMunicipalityByCountryId(Long countryId);
 
-    @Query("match(municipality:Municipality)-[:"+PROVINCE+"]-(province:Province)-[:"+REGION+"]-(region:Region) where id(municipality) in {0}  " +
-            "return municipality,region,province")
+    @Query("MATCH(municipality:Municipality)-[:"+PROVINCE+"]-(province:Province)-[:"+REGION+"]-(region:Region) WHERE id(municipality) in {0}  " +
+            "RETURN municipality,region,province")
     List<MunicipalityQueryResult> findMunicipalityRegionAndProvince(Set<Long> municipalityIds);
 
-    @Query("match(municipality:Municipality{deleted:false}) where id(municipality)={0} return municipality")
+    @Query("MATCH(municipality:Municipality{deleted:false}) WHERE id(municipality)={0} RETURN municipality")
     Municipality findByIdDeletedFalse(Long municipalityId);
 
-    @Query("match(zipCode:ZipCode)-[:"+MUNICIPALITY+"]match(municipality:Municipality{deleted:false}) where id(municipality)={0} and id(zipCode)={1} return municipality")
+    @Query("MATCH(zipCode:ZipCode)-[:"+MUNICIPALITY+"]-(municipality:Municipality{deleted:false}) WHERE id(municipality)={0} and id(zipCode)={1} RETURN municipality")
     Municipality findByZipCodeIdandIdDeletedFalse(Long municipalityId,Long zipCodeId);
 
-    @Query("match(address:ContactAddress)-[municipalityRel:"+MUNICIPALITY+"]-(municipality:Municipality) where id(address)={0} and id(municipality)={1} delete municipalityRel")
+    @Query("MATCH(address:ContactAddress)-[municipalityRel:"+MUNICIPALITY+"]-(municipality:Municipality) WHERE id(address)={0} and id(municipality)={1} DELETE municipalityRel")
     void deleteAddressMunicipalityRelation(Long addressId, Long municipalityId);
 }

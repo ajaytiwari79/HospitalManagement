@@ -37,22 +37,30 @@ public class CountryConstraintController {
 
     @GetMapping
     @ApiOperation("Get CountryConstraint")
-    public ResponseEntity<Map<String, Object>> getCountryConstraintsByCountryId(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countryConstraintService.getCountryConstraintsByCountryId(countryId));
+    public ResponseEntity<Map<String, Object>> getAllCountryConstraintByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countryConstraintService.getAllCountryConstraintByCountryId(countryId));
     }
 
 
     @PatchMapping
-    @ApiOperation("Update CountryConstraintration")
+    @ApiOperation("Update CountryConstraint")
     public ResponseEntity<Map<String, Object>> updateCountryConstraint(@RequestBody CountryConstraintDTO countryConstraintDTO) {
         countryConstraintService.updateCountryConstraint(countryConstraintDTO);
         return ResponseHandler.generateResponse("Success", HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping(value = "/{countryConstraintId}")
-    @ApiOperation("Delete CountryConstraintration")
+    @ApiOperation("Delete CountryConstraint")
     public ResponseEntity<Map<String, Object>> deleteCountryConstraint(@PathVariable BigInteger countryConstraintId) {
         countryConstraintService.deleteCountryConstraint(countryConstraintId);
+        return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
+    }
+
+    //=================================================================
+    @PostMapping("/default_country_constraint")
+    @ApiOperation("Create Default CountryConstraint")
+    public ResponseEntity<Map<String, Object>> createDefaultCountryConstraints(@PathVariable Long countryId) {
+        countryConstraintService.createDefaultCountryConstraints(countryId);
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }
 

@@ -33,9 +33,11 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
@@ -122,6 +124,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private GlideTimeSettingsService glideTimeSettingsService;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -205,7 +209,12 @@ public class OrganizationActivityService extends MongoBaseService {
         logger.info("activity.getTags() ================ > " + activity.getTags());
         //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityId, activityCategories);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyProperties(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!activity.getTags().isEmpty()){
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        }
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
         return activityTabsWrapper;
     }
 
@@ -261,7 +270,12 @@ public class OrganizationActivityService extends MongoBaseService {
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO=new GeneralActivityTabWithTagDTO();
+        ObjectMapperUtils.copyProperties(generalTab,generalActivityTabWithTagDTO,"tags");
+        if(!generalDTO.getTags().isEmpty()){
+            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        }
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
         return activityTabsWrapper;
     }
 
@@ -367,7 +381,7 @@ public class OrganizationActivityService extends MongoBaseService {
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
-            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
         } else {
             existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
         }
@@ -433,6 +447,21 @@ public class OrganizationActivityService extends MongoBaseService {
             }
         }
         save(activities);
+    }
+
+
+    public void verifyBreakAllowedOfActivities(boolean breakAllowed, List<Activity> activities){
+        List<String> invalidActivities= ActivityUtil.verifyCompositeActivities(breakAllowed,activities);
+        if(invalidActivities.size()!=0){
+            List<String> errorMessages = new ArrayList<>(invalidActivities);
+            if(breakAllowed){
+                exceptionService.actionNotPermittedException("activities.not.support.break",errorMessages);
+            }
+            if(!breakAllowed){
+                exceptionService.actionNotPermittedException("activities.support.break",errorMessages);
+            }
+
+        }
     }
 
 

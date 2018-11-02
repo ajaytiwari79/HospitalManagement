@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.UnionState;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -40,6 +41,7 @@ import org.neo4j.ogm.annotation.typeconversion.DateString;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -223,6 +225,7 @@ public class Organization extends UserBaseEntity {
     private UnionState state;
     private boolean workCenterUnit;
     private boolean gdprUnit;
+    private BigInteger payRollTypeId;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private AccountType accountType;
 
@@ -241,12 +244,12 @@ public class Organization extends UserBaseEntity {
     public Organization() {
     }
 
-    public Organization(String name, List<Sector> sectors, ContactAddress contactAddress,UnionState state,Country country,boolean union) {
+    public Organization(String name, List<Sector> sectors, ContactAddress contactAddress,boolean boardingCompleted,Country country,boolean union) {
         this.name = name;
         this.sectors = sectors;
         this.contactAddress = contactAddress;
         this.union = union;
-        this.state= state;
+        this.boardingCompleted=boardingCompleted;
         this.country = country;
     }
 
@@ -970,6 +973,14 @@ public class Organization extends UserBaseEntity {
 
     public void setUnitType(UnitType unitType) {
         this.unitType = unitType;
+    }
+
+    public BigInteger getPayRollTypeId() {
+        return payRollTypeId;
+    }
+
+    public void setPayRollTypeId(BigInteger payRollTypeId) {
+        this.payRollTypeId = payRollTypeId;
     }
 
     public List<Location> getLocations() {

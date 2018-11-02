@@ -129,6 +129,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
 
 /**
@@ -1719,6 +1720,7 @@ public class StaffService {
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
+        staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeFromCPRNumber(staffAdditionalInfoDTO.getCprNumber()));
         Long functionId = null;
         if (shiftDate != null) {
             functionId = unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId, shiftDate.toString());
@@ -1761,7 +1763,8 @@ public class StaffService {
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
             unitPositionDetails = new StaffUnitPositionDetails(unitId);
-            unitPositionService.convertUnitPositionObject(unitPosition, unitPositionDetails);
+
+            convertUnitPositionObject(unitPosition, unitPositionDetails);
             List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
             unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
         }

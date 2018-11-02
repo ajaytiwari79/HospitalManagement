@@ -51,7 +51,7 @@ public class ActivityIntegrationService {
 
     public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
 
-        genericRestClient.publish(orgTypeAndSubTypeDTO, unitId, true, IntegrationOperation.CREATE, "/organization_default_data",null);
+        genericRestClient.publish(orgTypeAndSubTypeDTO, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", null);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId) {
@@ -77,44 +77,49 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/table_settings/" + tableSettingsId, null), TableConfiguration.class);
     }
 
-    public void createDefaultKPISetting(DefaultKPISettingDTO defaultKPISettingDTO, Long unitId){
+    public void createDefaultKPISetting(DefaultKPISettingDTO defaultKPISettingDTO, Long unitId) {
         genericRestClient.publish(defaultKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/default_kpi_setting", null);
     }
 
-    public void createDefaultKPISettingForStaff(DefaultKPISettingDTO defaultKPISettingDTO, Long unitId){
+    public void createDefaultKPISettingForStaff(DefaultKPISettingDTO defaultKPISettingDTO, Long unitId) {
         genericRestClient.publish(defaultKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff_default_kpi_setting", null);
     }
 
     public void deleteShiftsAndOpenShift(Long unitId, Long staffId, LocalDateTime employmentEndDate) {
-        Map<String,Object> queryParams = new HashMap<String,Object>();
+        Map<String, Object> queryParams = new HashMap<String, Object>();
         DateUtils.asDate(employmentEndDate);
         queryParams.put("employmentEndDate", DateUtils.asDate(employmentEndDate).getTime());
-        restClientForSchedulerMessages.publish(null,unitId,true,IntegrationOperation.UPDATE,"/staff/"+staffId+"/shifts_and_openshifts",queryParams);
+        restClientForSchedulerMessages.publish(null, unitId, true, IntegrationOperation.UPDATE, "/staff/" + staffId + "/shifts_and_openshifts", queryParams);
     }
 
     public void deleteShiftsAfterEmploymentEndDate(Long unitId, LocalDate endDate, Long staffId) {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("endDate", endDate);
-        genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/"+staffId, queryParams);
+        genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/" + staffId, queryParams);
     }
 
     public List<CTAWTAResponseDTO> copyWTACTA(List<UnitPositionIdDTO> unitPositionIdDTOS) {
 
 
-        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(unitPositionIdDTOS,null,false,IntegrationOperation.CREATE,"copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope< List<CTAWTAResponseDTO>>>() {
+        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(unitPositionIdDTOS, null, false, IntegrationOperation.CREATE, "copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTAWTAResponseDTO>>>() {
         });
 
         return ctawtaResponseDTOS;
     }
 
-    public void updateTimeBank(Long unitPositionId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        BasicNameValuePair startDate=new BasicNameValuePair("shiftStartDate",shiftStartDate.toString());
-        BasicNameValuePair unitPosition=new BasicNameValuePair("unitPositionId", unitPositionId + "");
-        List<NameValuePair> param =new ArrayList<>();
+    public void updateTimeBank(Long unitPositionId, LocalDate shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        BasicNameValuePair startDate = new BasicNameValuePair("shiftStartDate", shiftStartDate.toString());
+        BasicNameValuePair unitPosition = new BasicNameValuePair("unitPositionId", unitPositionId + "");
+        List<NameValuePair> param = new ArrayList<>();
         param.add(unitPosition);
         param.add(startDate);
-        genericRestClient.publishRequest(staffAdditionalInfoDTO,staffAdditionalInfoDTO.getUnitId(),true,IntegrationOperation.UPDATE,"/timeBank/update_time_bank",param,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
+    }
 
+    public void createTimeTypes(Long countryId){
+        restClientForSchedulerMessages.publish(null,countryId, false, IntegrationOperation.CREATE, "/timeType/default",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
     }
 
 }

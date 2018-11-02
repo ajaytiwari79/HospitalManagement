@@ -3,7 +3,6 @@ package com.kairos.service.break_settings;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.break_settings.BreakSettingAndActivitiesWrapper;
-import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -15,13 +14,11 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,12 +50,11 @@ public class BreakSettingsService extends MongoBaseService {
     }
 
     public BreakSettingAndActivitiesWrapper getBreakSettings(Long countryId, Long expertiseId) {
-
         Expertise expertise = genericIntegrationService.getExpertise(countryId, expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.duplicateDataException("error.expertise.notfound");
         }
-        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndBreakPaymentSetting(countryId, expertise.getBreakPaymentSetting());
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId, expertise.getBreakPaymentSetting().toString());
         List<BigInteger> parentIds=timeTypes.stream().map(TimeType::getId).collect(Collectors.toList());
         List<TimeType> childTimeType = timeTypeMongoRepository.findAllChildTimeTypeByParentId(parentIds);
         parentIds.addAll(childTimeType.stream().map(TimeType::getId).collect(Collectors.toList()));
@@ -69,7 +65,7 @@ public class BreakSettingsService extends MongoBaseService {
         /*UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
         if (unitSettingDTO != null) {
-            flexibleTimeSettingDTO = unitSettingDTO.getFlexibleTimeSettings();
+            flexibleTimeSettingDTO = unitSettingDTO.getGlideTimeSettings();
         }
         */
         return new BreakSettingAndActivitiesWrapper(breakSettings, activities, null);

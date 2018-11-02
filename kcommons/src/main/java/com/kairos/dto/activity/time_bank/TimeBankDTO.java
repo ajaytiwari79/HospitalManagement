@@ -38,7 +38,7 @@ public class TimeBankDTO {
     private long paidoutChange;
     private long approvePayOut;
     private long requestPayOut;
-    private long totalDeltaBalanceConrection;
+    private long totalDeltaBalanceCorrection;
     private String phaseName;
 
     //Distributed min on the basis of Interval;
@@ -69,12 +69,12 @@ public class TimeBankDTO {
         this.hourlyCost = hourlyCost;
     }
 
-    public long getTotalDeltaBalanceConrection() {
-        return totalDeltaBalanceConrection;
+    public long getTotalDeltaBalanceCorrection() {
+        return totalDeltaBalanceCorrection;
     }
 
-    public void setTotalDeltaBalanceConrection(long totalDeltaBalanceConrection) {
-        this.totalDeltaBalanceConrection = totalDeltaBalanceConrection;
+    public void setTotalDeltaBalanceCorrection(long totalDeltaBalanceCorrection) {
+        this.totalDeltaBalanceCorrection = totalDeltaBalanceCorrection;
     }
 
     public String getPhaseName() {

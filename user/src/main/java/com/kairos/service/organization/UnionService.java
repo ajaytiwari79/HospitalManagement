@@ -214,12 +214,13 @@ public class UnionService {
     public LocationDTO updateLocation(LocationDTO locationDTO, Long unionId, Long locationId) {
         List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId,locationDTO.getName());
 
-        if(!locationqueryResults.get(0).getUnionId().equals(unionId)) {
-            exceptionService.invalidRequestException("message.unionId.invalid",unionId);
-        }
         if(CollectionUtils.isEmpty(locationqueryResults)||!locationqueryResults.get(0).getLocation().getId().equals(locationId)) {
             exceptionService.dataNotFoundByIdException("message.location.not.found",locationId);
         }
+        if(!locationqueryResults.get(0).getUnionId().equals(unionId)) {
+            exceptionService.invalidRequestException("message.unionId.invalid",unionId);
+        }
+
         else if(locationqueryResults.size()>1) {
             exceptionService.dataNotFoundByIdException("message.location.name.alreadyexists",locationDTO.getName());
         }
@@ -271,6 +272,7 @@ public class UnionService {
                 }
             }
         }
+        location.setName(locationDTO.getName());
 
         locationGraphRepository.save(location);
         return locationDTO;
@@ -308,10 +310,12 @@ public class UnionService {
                 address = getAddress(unionData.getMainAddress());
             }
 
-            UnionState state = UnionState.DRAFT;
+            boolean boardingCompleted=false;
+
             if(publish) {
                 validateAddress(unionData.getMainAddress());
-                state= UnionState.PUBLISHED;
+                boardingCompleted = true;
+                unionData.setState(UnionState.PUBLISHED);
             }
             List<Sector> sectors = null;
             if(!CollectionUtils.isEmpty(unionData.getSectorIds())) {
@@ -319,7 +323,7 @@ public class UnionService {
             }
 
 
-            Organization union = new Organization(unionData.getName(),sectors,address, state,country,true);
+            Organization union = new Organization(unionData.getName(),sectors,address, boardingCompleted,country,true);
 
             organizationGraphRepository.save(union);
 
@@ -343,13 +347,13 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.union.name.alreadyexists",unionData.getName());
         }
         Organization union = unionCompleteQueryResults.get(0).getUnion();
-        if(!publish&&union.getState().equals(UnionState.PUBLISHED.toString())) {
+        if(!publish&&union.isBoardingCompleted()) {
             exceptionService.invalidRequestException("message.publish.union.unpublish");
         }
-        UnionState state;
         if(publish) {
             validateAddress(unionData.getMainAddress());
-            union.setState(UnionState.PUBLISHED);
+            union.setBoardingCompleted(true);
+            unionData.setState(UnionState.PUBLISHED);
         }
         Set<Long> sectorIdsDb = unionCompleteQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
         List<Long> sectorIDsCreated = new ArrayList<>(unionData.getSectorIds());
@@ -522,8 +526,8 @@ public class UnionService {
         UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes,sectors);
 
         Map<Long,LocationDataQueryResult> locationDataMap = locationDataObjects.stream().collect(Collectors.toMap(LocationDataQueryResult::getLocationId,
-                locationDataQueryResult -> locationDataQueryResult));
-        List<UnionDataDTO> unionDataDTOS = new ArrayList<UnionDataDTO>();
+                locationDataQueryResult -> locationDataQueryResult,(first,second)->second));
+        List<UnionDataDTO> unionDataDTOS = new ArrayList<>();
         for(UnionDataQueryResult unionDataQueryResult:unionDataObjects) {
 
             UnionDataDTO unionDataDTO = new UnionDataDTO();
@@ -548,28 +552,9 @@ public class UnionService {
                 unionDataDTO.setMainAddress(contactAddressDTOUnion);
 
             }
-
-            for(Location location:unionDataQueryResult.getLocations()) {
-                LocationDataQueryResult locationDataQueryResult = locationDataMap.get(location.getId());
-                ContactAddressDTO contactAddressDTO = null;
-                List<MunicipalityDTO> municipalitiesLocation = null;
-                if(Optional.ofNullable(locationDataQueryResult.getAddress()).isPresent()) {
-                     contactAddressDTO = ObjectMapperUtils.copyPropertiesByMapper(locationDataQueryResult.getAddress(),ContactAddressDTO.class);
-                    if(Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
-                        contactAddressDTO.setZipCodeId(locationDataQueryResult.getZipCode().getId());
-                        contactAddressDTO.setZipCodeValue(locationDataQueryResult.getZipCode().getZipCode());
-                         municipalitiesLocation = ObjectMapperUtils.copyPropertiesOfListByMapper(locationDataQueryResult.getMunicipalities(),MunicipalityDTO.class);
-                        updateMunicipalities(municipalitiesLocation,municipalityMap);
-                    }
-                    if(Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {
-                        contactAddressDTO.setMunicipalityId(locationDataQueryResult.getMunicipality().getId());
-                        contactAddressDTO.setMunicipalityName(locationDataQueryResult.getMunicipality().getName());
-                    }
-                }
-
-                locationDTOS.add(new LocationDTO(location.getId(),location.getName(),contactAddressDTO,municipalitiesLocation));
-            }
+            updateLocations(locationDataMap,unionDataQueryResult,municipalityMap,locationDTOS);
             unionDataDTO.setLocations(locationDTOS);
+            unionDataDTO.setState(unionDataQueryResult.getUnion().isBoardingCompleted()?UnionState.PUBLISHED:UnionState.DRAFT);
 
 
             unionDataDTOS.add(unionDataDTO);
@@ -587,4 +572,29 @@ public class UnionService {
         }
     }
 
+    public void updateLocations(Map<Long,LocationDataQueryResult> locationDataMap,UnionDataQueryResult unionDataQueryResult,Map<Long,MunicipalityQueryResult>
+            municipalityMap,List<LocationDTO> locationDTOS) {
+
+
+        for(Location location:unionDataQueryResult.getLocations()) {
+            LocationDataQueryResult locationDataQueryResult = locationDataMap.get(location.getId());
+            ContactAddressDTO contactAddressDTO = null;
+            List<MunicipalityDTO> municipalitiesLocation = null;
+            if(Optional.ofNullable(locationDataQueryResult.getAddress()).isPresent()) {
+                contactAddressDTO = ObjectMapperUtils.copyPropertiesByMapper(locationDataQueryResult.getAddress(),ContactAddressDTO.class);
+                if(Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
+                    contactAddressDTO.setZipCodeId(locationDataQueryResult.getZipCode().getId());
+                    contactAddressDTO.setZipCodeValue(locationDataQueryResult.getZipCode().getZipCode());
+                    municipalitiesLocation = ObjectMapperUtils.copyPropertiesOfListByMapper(locationDataQueryResult.getMunicipalities(),MunicipalityDTO.class);
+                    updateMunicipalities(municipalitiesLocation,municipalityMap);
+                }
+                if(Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {
+                    contactAddressDTO.setMunicipalityId(locationDataQueryResult.getMunicipality().getId());
+                    contactAddressDTO.setMunicipalityName(locationDataQueryResult.getMunicipality().getName());
+                }
+            }
+
+            locationDTOS.add(new LocationDTO(location.getId(),location.getName(),contactAddressDTO,municipalitiesLocation));
+        }
+    }
 }

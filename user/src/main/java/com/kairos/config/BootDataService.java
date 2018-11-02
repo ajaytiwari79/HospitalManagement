@@ -56,6 +56,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.auth.RoleServiceUser;
@@ -64,6 +65,7 @@ import com.kairos.service.auth.UserService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OpenningHourService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.organization.TeamService;
@@ -75,11 +77,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.kairos.enums.user.UserType.SYSTEM_ACCOUNT;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -175,6 +181,8 @@ public class BootDataService {
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject private StaffRelationshipGraphRespository staffRelationshipGraphRespository;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
     private List<Long> skillList;
     private OrganizationService homeCareService;
 
@@ -212,6 +220,7 @@ public class BootDataService {
     private User michal;
     private User liva;
     private User admin;
+    private User systemUser;
 
     private Staff almaAsStaff;
     private Staff michalAsStaff;
@@ -243,35 +252,37 @@ public class BootDataService {
     ZipCode allegade;
 
     public void createData() {
-       /* if (countryGraphRepository.findAll().isEmpty()) {
+        if (countryGraphRepository.findAll().isEmpty()) {
 
             userBaseRepository.createFirstDBNode();
 
             createStandardTimeSlots();
-            //createMasterSkills();
-            //createOrganizationServices();
+            createMasterSkills();
+            createOrganizationServices();
             createCountries();
-            //createOrganizationTypes();
-            //createPaymentTypes();
+            createOrganizationTypes();
+            createPaymentTypes();
             createCurrency();
             createGeoGraphicalData();
             createUser();
+            createSystemUser();
             createStaff();
             createCountryLevelOrganization();
             createRegionLevelOrganization();
-            createCTARuleTemplateCategory();
-            //createCityLevelOrganization();
-            //createCitizen();
+            createTimeTypes();
+//            createCTARuleTemplateCategory();
+//            createCityLevelOrganization();
+//            createCitizen();
         }
 
-        createCTARuleTemplateCategory();
-        startRegisteredCronJobs();
+        //createCTARuleTemplateCategory();
+        //startRegisteredCronJobs();
         createEquipmentCategories();
 
 
     }
 
-    private void startRegisteredCronJobs() {
+   /* private void startRegisteredCronJobs() {
         List<ControlPanel> controlPanels = controlPanelService.getAllControlPanels();
         if (controlPanels.size() != 0) {
             for (ControlPanel controlPanel : controlPanels) {
@@ -279,8 +290,8 @@ public class BootDataService {
                 dynamicCronScheduler.setCronScheduling(controlPanel);
             }
         }
-        */
-    }
+
+    }*/
 
     private void createStandardTimeSlots() {
         String timeSlotsNames[] = new String[]{"Day", "Evening", "Night"};
@@ -658,6 +669,17 @@ public class BootDataService {
         userGraphRepository.save(admin);
     }
 
+    private void createSystemUser() {
+        systemUser = new User();
+
+        systemUser.setUserName("systemuser@kairos.com");
+        systemUser.setEmail("systemuser@kairos.com");
+        systemUser.setPassword(new BCryptPasswordEncoder().encode("admin@kairos"));
+        systemUser.setUserType(SYSTEM_ACCOUNT);
+        userGraphRepository.save(systemUser);
+    }
+
+
     private void createStaff() {
         adminAsStaff = new Staff();
         ContactAddress contactAddress = new ContactAddress();
@@ -945,5 +967,16 @@ public class BootDataService {
 
             equipmentCategoryGraphRepository.saveAll(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
         }
+    }
+
+
+    private void createTimeTypes() {
+        try {
+            activityIntegrationService.createTimeTypes(denmark.getId());
+        }
+        catch (HttpClientErrorException e){
+            logger.debug("Some error occurred in activity micro service");
+        }
+
     }
 }

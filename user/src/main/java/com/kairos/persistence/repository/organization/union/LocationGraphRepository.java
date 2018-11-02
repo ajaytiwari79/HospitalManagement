@@ -18,24 +18,26 @@ public interface LocationGraphRepository extends Neo4jBaseRepository<Location, L
 
 
 
-    @Query("match(union:Organization{deleted:false})-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) where id(union)={0} return location")
+    @Query("MATCH(union:Organization{deleted:false})-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) WHERE id(union)={0} RETURN location")
     List<Location> findLocationsByUnion(Long unionId);
 
-    @Query("Match(location:Location{deleted:false}) where location.name={0} return count(location)>0")
+    @Query("MATCH(location:Location{deleted:false}) WHERE location.name={0} RETURN COUNT(location)>0")
     boolean existsByName(String name);
 
-    @Query("Match(union:Organization)-[:"+HAS_LOCATION+"]->(location:Location{deleted:false})-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) where id(location)={0} or " +
-            "location.name={1} Match(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality)  return location,id(address)as addressId," +
-            "id(zipCode)as zipCodeId,id(municipality) as municipalityId, id(union) as unionId,address")
+    @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]->(location:Location{deleted:false}) WHERE id(location)={0} or location.name={1} WITH union,location " +
+            "OPTIONAL MATCH(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) WITH union,location,address" +
+            " OPTIONAL MATCH(address)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) WITH union,location,address,zipCode " +
+            "OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality) OPTIONAL MATCH(zipCode)-[:"+MUNICIPALITY+"]-(linkedMunicipality:Municipality)  RETURN location,id(address)AS addressId," +
+            "id(zipCode)AS zipCodeId,id(municipality) AS municipalityId, id(union) AS unionId,address,collect(linkedMunicipality) AS municipalities ")
     List<LocationQueryResult> findByIdOrNameAndDeletedFalse(Long locationId, String locationName);
 
-    @Query("Match(location:Location{deleted:false}) where id(location)={0} return location")
+    @Query("MATCH(location:Location{deleted:false}) WHERE id(location)={0} RETURN location")
     Location findByIdAndDeletedFalse(Long locationId);
 
-    @Query("Match(location:Location{deleted:false}) where id(location) in {0} optional match(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) optional match(address)-" +
-            "[:"+ZIP_CODE+"]->(zipCode:ZipCode) optional match(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality) optional match(zipCode)-["+MUNICIPALITY+"]->(linkedMunicipality:Municipality)" +
-            " optional match(municipality)-[:"+PROVINCE+"]->(province:Province) optional match(province)-[:"+REGION+"]-(region:Region) return id(location) as locationId,address,zipCode,municipality," +
-            "collect(linkedMunicipality) as municipalities,province,region")
+    @Query("MATCH(location:Location{deleted:false}) WHERE id(location) IN {0} OPTIONAL MATCH(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) OPTIONAL MATCH(address)-" +
+            "[:"+ZIP_CODE+"]->(zipCode:ZipCode) OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality) OPTIONAL MATCH(zipCode)-["+MUNICIPALITY+"]->(linkedMunicipality:Municipality)" +
+            " OPTIONAL MATCH(municipality)-[:"+PROVINCE+"]->(province:Province) OPTIONAL MATCH(province)-[:"+REGION+"]-(region:Region) RETURN id(location) AS locationId,address,zipCode,municipality," +
+            "collect(linkedMunicipality) AS municipalities,province,region")
     List<LocationDataQueryResult> getLocationData(List<Long> locationIds);
 
 

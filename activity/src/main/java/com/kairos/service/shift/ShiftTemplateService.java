@@ -103,7 +103,7 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
-        ObjectMapperUtils.copyPropertiesExceptSpecific(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
+        ObjectMapperUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
         save(shiftTemplate);
         return shiftTemplateDTO;
     }
@@ -168,7 +168,7 @@ public class ShiftTemplateService extends MongoBaseService {
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
             ShiftDTO newShiftDTO = new ShiftDTO();
-            ObjectMapperUtils.copyPropertiesExceptSpecific(individualShiftTemplateDTO,newShiftDTO, "activities");
+            ObjectMapperUtils.copyProperties(individualShiftTemplateDTO,newShiftDTO, "activities");
             newShiftDTO.setId(null);
             newShiftDTO.setStaffId(shiftDTO.getStaffId());
             newShiftDTO.setUnitPositionId(shiftDTO.getUnitPositionId());

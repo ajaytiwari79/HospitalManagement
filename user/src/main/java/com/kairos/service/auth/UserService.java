@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UnitModuleAccess;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
@@ -413,10 +414,23 @@ public class UserService {
             permissionData.setHubPermissions(unitPermissionMap);
 
         } else {
+            List<UserPermissionQueryResult> unitWisePermissions;
             Long countryId = organizationGraphRepository.getCountryId(organizationId);
             List<DayType> dayTypes=dayTypeService.getDayTypeByDate(countryId,DateUtils.getDate());
             Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
-            List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId,dayTypeIds);
+            boolean checkDayType=true;
+            List<AccessGroup> accessGroups=accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
+            for (AccessGroup currentAccessGroup:accessGroups){
+                if(!currentAccessGroup.isAllowedDayTypes()){
+                    checkDayType=false;
+                    break;
+                }
+            }
+            if(checkDayType){
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds);
+            } else {
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId);
+            }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
             List<Long> unitIds = unitWisePermissions.stream()

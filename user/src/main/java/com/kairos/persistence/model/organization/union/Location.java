@@ -5,11 +5,13 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.LOCATION_HAS_ADDRESS;
+
 @NodeEntity
 public class Location extends UserBaseEntity {
     private String name;
 
-    @Relationship(type="LOCATION_HAS_ADDRESS")
+    @Relationship(type=LOCATION_HAS_ADDRESS)
     private ContactAddress address;
 
     public Location() {

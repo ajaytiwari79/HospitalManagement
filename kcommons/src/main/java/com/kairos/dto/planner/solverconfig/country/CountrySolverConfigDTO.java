@@ -6,7 +6,6 @@ public class CountrySolverConfigDTO extends SolverConfigDTO{
 
 
     private Long countryId;
-    private Long parentCountrySolverConfigId;
     private Long organizationServiceId;
     private Long organizationSubServiceId;
 
@@ -16,14 +15,6 @@ public class CountrySolverConfigDTO extends SolverConfigDTO{
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
-    }
-
-    public Long getParentCountrySolverConfigId() {
-        return parentCountrySolverConfigId;
-    }
-
-    public void setParentCountrySolverConfigId(Long parentCountrySolverConfigId) {
-        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
     }
 
     public Long getOrganizationServiceId() {

@@ -100,7 +100,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     @Override
     public List<T> findAllObjectsNotDeletedById(boolean checkForCountry,Long countryOrUnitId) {
         String applicableIdField = checkForCountry ? "countryId" : "unitId";
-        Criteria criteria=Criteria.where("deleted").exists(false).and(applicableIdField).is(countryOrUnitId);
+        Criteria criteria=Criteria.where("deleted").ne(true).and(applicableIdField).is(countryOrUnitId);
         return mongoOperations.find(new Query(criteria), entityInformation.getJavaType());
     }
 
@@ -156,13 +156,14 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     public <T extends MongoBaseEntity> List<T> saveObjectList(List<T> objects){
         Assert.notEmpty(objects,"List Can't be empty or null");
         //Get class name for sequence class
+        String collectionName = mongoOperations.getCollectionName(objects.get(0).getClass());
         String className = objects.get(0).getClass().getSimpleName();
         //By Pass, to save both type of classes in same Collection
         if (objects.get(0) instanceof SolverConfig) className = SolverConfig.class.getSimpleName();
         if(objects.get(0) instanceof Constraint) className = Constraint.class.getSimpleName();
 
         // Creating BulkWriteOperation object
-        BulkWriteOperation bulkWriteOperation= ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(className).initializeUnorderedBulkOperation();
+        BulkWriteOperation bulkWriteOperation= ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
         //Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
         MongoConverter converter = mongoOperations.getConverter();
         BasicDBObject dbObject;
@@ -173,7 +174,8 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
             for (int i = 0; i < objects.size(); i++) {  //Set id's
                 T entity = objects.get(i);
                 if (entity.getId() == null) {
-                    entity.setId(lastSequenece.add(new BigInteger("1")));
+                    lastSequenece=lastSequenece.add(new BigInteger("1"));
+                    entity.setId(lastSequenece);
                     dbObject = new BasicDBObject();
                     converter.write(entity, dbObject);
                     bulkWriteOperation.insert(dbObject);
@@ -193,165 +195,5 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
             return null;
         }
     }
-    /*public BigInteger nextSequence(String sequenceName,Integer bulkSize){
-     *//**
-     * adding sequence postfix into class name
-     * *//*
-        sequenceName = sequenceName + SEQUENCE_POST_FIX;
 
-        *//**
-     *  Find query
-     * *//*
-        String findQuery = "{'sequenceName':'"+sequenceName+"'}";
-        *//**
-     *  Update query
-     * *//*
-
-        if(bulkSize==null){
-            bulkSize = 1;
-        }
-        String updateQuery = "{'$inc':{'sequenceNumber':"+bulkSize.toString()+"}}";
-        FindAndModifyOptions findAndModifyOptions = new FindAndModifyOptions();
-
-        *//**
-     *  return updated value
-     * *//*
-        findAndModifyOptions.returnNew(true);
-
-        *//**
-     *  create new if not exists
-     * *//*
-        findAndModifyOptions.upsert(true);
-        MongoSequence mongoSequence = mongoOperations.findAndModify(new BasicQuery(findQuery), new BasicUpdate(updateQuery), findAndModifyOptions, MongoSequence.class);
-        return new BigInteger(mongoSequence.getSequenceNumber()+"");
-    }*/
-
-    /**
-     * This method will save entity with our own provided Id
-     * which we will generate by using Sequene Document in mongo
-     *
-     * @param entity
-     * @param <T>
-     * @return
-     */
-
-    /*public <T extends MongoBaseEntity> List<T> saveEntities(List<T> entities){
-        Assert.notNull(entities, "Entity must not be null!");
-        Assert.notEmpty(entities, "Entity must not be Empty!");
-
-        String collectionName = mongoOperations.getCollectionName(entities.get(0).getClass());
-
-*//*
-*
-         *  Creating BulkWriteOperation object
-         *
-
-*//*
-
-        BulkWriteOperation bulkWriteOperation= ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
-
-*//*
-*
-         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
-         *
-*//*
-
-        MongoConverter converter = mongoOperations.getConverter();
-
-        BasicDBObject dbObject;
-*//**
-         *  Get class name for sequence class
-         * *//*
-
-        String className = entities.get(0).getClass().getSimpleName();
-        BigInteger sequence = nextSequence(className,null);
-
-*//**
-         *  Handling bulk write exceptions
-         * *//*
-
-        try{
-
-            for (T entity: entities) {
-
-*//*
-*
-                 *  Set createdAt if entity don't have createdAt
-                 *
-*//*
-
-                if(entity.getCreatedAt() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                }
-*//**
-                 *  Set updatedAt time as current time
-                 * *//*
-
-                entity.setUpdatedAt(DateUtils.getDate());
-
-
-                if(entity.getId() == null){
-*//**
-                     *  Set Id if entity don't have Id
-                     * *//*
-
-                    if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
-                        className = entity.getClass().getSuperclass().getSimpleName();
-                    }
-                    entity.setId(sequence);
-
-                    dbObject = new BasicDBObject();
-
-                     *//**  Converting entity object to BasicDBObject
-                     * *//*
-
-                    converter.write(entity, dbObject);
-
-                     *//**  Adding entity (BasicDBObject)
-                     * *//*
-
-                    bulkWriteOperation.insert(dbObject);
-                }else {
-
-                    dbObject = new BasicDBObject();
-
-                    *//* *  Converting entity object to BasicDBObject
-                     * *//*
-
-                    converter.write(entity, dbObject);
-
-*
-                     *//**  Creating BasicDbObject for find query
-                     * *//*
-
-                    BasicDBObject query = new BasicDBObject();
-
-*
-                     *//**  Adding query (find by ID)
-                     *
-*//*
-                    query.put("_id", dbObject.get("_id"));
-
-*
-                     *//**  Replacing whole Object
-                     * *//*
-
-                    bulkWriteOperation.find(query).replaceOne(dbObject);
-                }
-                sequence.add(new BigInteger("1"));
-            }
-            nextSequence(className,entities.size()-1);
-*
-             *//** Executing the Operation
-             * *//*
-
-            bulkWriteOperation.execute();
-            return entities;
-
-        } catch(Exception ex){
-            logger.error("BulkWriteOperation Exception ::  ", ex);
-            return null;
-        }
-    }*/
 }

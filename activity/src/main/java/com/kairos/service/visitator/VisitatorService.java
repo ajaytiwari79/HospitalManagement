@@ -86,8 +86,6 @@ public class VisitatorService{
     OrganizationRestClient organizationRestClient;
     @Autowired
     GenericIntegrationService genericIntegrationService;
-    @Autowired
-    ClientRestClient clientRestClient;
 
     @Inject
     private ClientAggregatorMongoRepository clientAggregatorMongoRepository;
