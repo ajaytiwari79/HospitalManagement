@@ -129,9 +129,8 @@ public class CompanyCreationService {
     @Inject
     private ReasonCodeService reasonCodeService;
     @Inject
-
     private SchedulerServiceRestClient schedulerRestClient;
-
+    @Inject
     private TreeStructureService treeStructureService;
 
 
