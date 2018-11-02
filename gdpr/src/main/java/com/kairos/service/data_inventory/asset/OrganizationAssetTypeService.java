@@ -140,9 +140,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypeByUnitIdAndIds(unitId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
             AssetTypeOrganizationLevelDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            if (!subAssetTypeDto.getRisks().isEmpty()) {
-                riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
-            }
+            riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
             subAssetType.setName(subAssetTypeDto.getName());
         });
         return subAssetTypesList;

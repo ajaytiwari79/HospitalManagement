@@ -17,6 +17,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.asset_management.MasterAssetService;
+import org.apache.commons.collections.CollectionUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
@@ -303,31 +305,17 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
-        Set<BigInteger> processingActivitiesIdList = asset.getProcessingActivities();
+        Set<BigInteger> processingActivityIds = asset.getProcessingActivities();
         List<ProcessingActivityBasicResponseDTO> processingActivityResponseDTOList = new ArrayList<>();
-        if (!processingActivitiesIdList.isEmpty()) {
-            processingActivityResponseDTOList = processingActivityMongoRepository.getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, processingActivitiesIdList);
+        if (CollectionUtils.isNotEmpty(processingActivityIds)) {
+            processingActivityResponseDTOList = processingActivityMongoRepository.getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, processingActivityIds);
             Set<BigInteger> subProcessingActivitiesIdsList = asset.getSubProcessingActivities();
 
             for (ProcessingActivityBasicResponseDTO processingActivityBasicResponseDTO : processingActivityResponseDTOList) {
 
                 List<ProcessingActivityBasicResponseDTO> subProcessingActivities = processingActivityBasicResponseDTO.getSubProcessingActivities();
-                boolean defaultSelected = true;
-                List<ProcessingActivityBasicResponseDTO> defaultSubProcessingActivityList = new ArrayList<>();
+                processingActivityBasicResponseDTO.setSubProcessingActivities(subProcessingActivities.stream().filter(subProcessingActivitiy->subProcessingActivitiesIdsList.contains(subProcessingActivitiy.getId())).collect(Collectors.toList()));
 
-                for (ProcessingActivityBasicResponseDTO subProcessingActivity : subProcessingActivities) {
-                    if (subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())) {
-                        subProcessingActivity.setSelected(true);
-                        defaultSelected = false;
-                    } else if (defaultSelected) {
-                        subProcessingActivity.setSelected(true);
-                        defaultSubProcessingActivityList.add(subProcessingActivity);
-                    }
-                }
-
-                if (defaultSelected) {
-                    processingActivityBasicResponseDTO.setSubProcessingActivities(defaultSubProcessingActivityList);
-                }
             }
         }
         return processingActivityResponseDTOList;
