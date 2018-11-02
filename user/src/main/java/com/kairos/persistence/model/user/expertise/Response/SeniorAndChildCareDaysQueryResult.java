@@ -1,7 +1,10 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,8 +13,8 @@ import java.util.List;
  */
 @QueryResult
 public class SeniorAndChildCareDaysQueryResult {
-    private List<CareDaysQueryResult> seniorDays;
-    private List<CareDaysQueryResult> childCareDays;
+    private List<CareDaysQueryResult> seniorDays = new ArrayList<>();
+    private List<CareDaysQueryResult> childCareDays = new ArrayList<>();
 
     public List<CareDaysQueryResult> getSeniorDays() {
         return seniorDays;

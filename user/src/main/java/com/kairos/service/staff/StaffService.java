@@ -1091,7 +1091,9 @@ public class StaffService {
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-
+        if(staffGraphRepository.findStaffByEmailInOrganization(payload.getPrivateEmail(),unitId)!=null){
+            exceptionService.duplicateDataException("message.email.alreadyExist", "Staff",payload.getPrivateEmail());
+        }
         // Check if Staff exists in organization with CPR Number
         if (staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)) {
             exceptionService.invalidRequestException("error.staff.exists.same.cprNumber", payload.getCprNumber());

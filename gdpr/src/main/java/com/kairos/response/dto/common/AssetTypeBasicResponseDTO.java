@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,6 +15,11 @@ public class AssetTypeBasicResponseDTO {
     private Long organizationId;
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
+    private Set<BigInteger> risks;
+
+    public Set<BigInteger> getRisks() { return risks; }
+
+    public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
 
     public Boolean getSubAssetType() { return subAssetType; }
 

@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.assessment;
 
 
-import com.kairos.dto.gdpr.assessment.AssessmentTypeRiskDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
@@ -40,7 +39,7 @@ public class AssessmentController {
     @ApiOperation(value = "launch assessment for Asset")
     @PostMapping( "/assessment/asset/{assetId}")
     public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.saveAssessmentForAsset(unitId,  assetId, assessmentDTO));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForAsset(unitId,  assetId, assessmentDTO));
 
     }
 
@@ -48,21 +47,7 @@ public class AssessmentController {
     @ApiOperation(value = "launch assessment for processing activity")
     @PostMapping( "/assessment/processing_activity/{processingActivityId}")
     public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO));
-
-    }
-
-    @ApiOperation(value = "launch risk  assessment for asset")
-    @PostMapping( "/assessment/asset/{assetId}/risk")
-    public ResponseEntity<ResponseDTO<AssessmentTypeRiskDTO>> launchRiskAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentTypeRiskDTO assessmentDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssetRiskAssessment(unitId,  assetId, assessmentDTO));
-
-    }
-
-    @ApiOperation(value = "launch risk assessment for processing activity")
-    @PostMapping( "/assessment/processing_activity/{processingActivityId}/risk")
-    public ResponseEntity<ResponseDTO<AssessmentTypeRiskDTO>> launchRiskAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentTypeRiskDTO assessmentDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchProcessingActivityRiskAssessment(unitId,  processingActivityId, assessmentDTO));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO));
 
     }
 
