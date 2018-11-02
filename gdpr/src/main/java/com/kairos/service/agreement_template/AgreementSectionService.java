@@ -69,8 +69,8 @@ public class AgreementSectionService extends MongoBaseService {
             List<BigInteger> agreementSectionIdList = createOrupdateSectionAndSubSectionOfAgreementTemplate(countryId, agreementTemplateSectionDTO.getSections(), policyAgreementTemplate);
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
-        policyAgreementTemplate.setCoverPageTitle(agreementTemplateSectionDTO.getCoverPageTitle());
-        policyAgreementTemplate.setCoverPageContent(agreementTemplateSectionDTO.getCoverPageContent());
+        policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
+        policyAgreementTemplate.setCoverPageData(agreementTemplateSectionDTO.getCoverPageData());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
     }
