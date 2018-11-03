@@ -98,9 +98,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
         String coverPageLogoUrl = awsBucketService.uploadImage(coverPageLogo);
-        CoverPageVO coverPage = new CoverPageVO(coverPageLogoUrl);
-        policyAgreementTemplate.setCoverPageData(coverPage);
-        policyAgreementTemplate.setCoverPageAdded(true);
+        if (policyAgreementTemplate.isCoverPageAdded()) {
+            policyAgreementTemplate.getCoverPageData().setCoverPageLogoUrl(coverPageLogoUrl);
+        } else {
+            policyAgreementTemplate.setCoverPageData(new CoverPageVO(coverPageLogoUrl));
+            policyAgreementTemplate.setCoverPageAdded(true);
+        }
+
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return coverPageLogoUrl;
     }

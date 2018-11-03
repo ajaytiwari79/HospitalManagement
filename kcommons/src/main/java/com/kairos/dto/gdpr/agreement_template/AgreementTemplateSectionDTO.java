@@ -19,10 +19,6 @@ public class AgreementTemplateSectionDTO {
     private List<AgreementSectionDTO> sections=new ArrayList<>();
 
 
-    public List<AgreementSectionDTO> getSections() { return sections; }
-
-    public void setSections(List<AgreementSectionDTO> sections) { this.sections = sections; }
-
     public boolean isCoverPageAdded() { return coverPageAdded; }
 
     public void setCoverPageAdded(boolean coverPageAdded) { this.coverPageAdded = coverPageAdded; }
@@ -31,4 +27,7 @@ public class AgreementTemplateSectionDTO {
 
     public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
 
+    public List<AgreementSectionDTO> getSections() { return sections; }
+
+    public void setSections(List<AgreementSectionDTO> sections) { this.sections = sections; }
 }

@@ -62,4 +62,7 @@ public class CoverPageVO {
 
         return Objects.hash(coverPageContent, coverPageTitle, coverPageLogoUrl, logoPositionLeft, logoPositionRight, logoPositionCenter);
     }
+
+    public CoverPageVO() {
+    }
 }
