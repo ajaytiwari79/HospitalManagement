@@ -218,7 +218,7 @@ public class AgreementSectionService extends MongoBaseService {
             saveAgreementSectionAndSubSectionIfClauseNotExist(agreementSectionList, agreementSubSectionListCoresspondingToAgreementSection);
         }
 
-        if (CollectionUtils.isNotEmpty(agreementSectionList)) {
+        if (!CollectionUtils.isEmpty(agreementSectionList)) {
             agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
         }
         return agreementSectionList.stream().map(AgreementSection::getId).collect(Collectors.toList());
