@@ -46,15 +46,13 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled()) {
-            Map<BigInteger,ActivityCareDayCount> careDayCountMap = careDayCounts.stream().collect(Collectors.toMap(ActivityCareDayCount::getActivityId,v->v));
+            Map<BigInteger,ActivityCareDayCount> careDayCountMap = getCareDaysCount();
             for (ShiftActivityDTO shiftActivityDTO : infoWrapper.getShift().getActivities()) {
                 Activity activity = infoWrapper.getActivityWrapperMap().get(shiftActivityDTO.getActivityId()).getActivity();
                 if(careDayCountMap.containsKey(activity.getId())) {
                     ActivityCareDayCount careDayCount = careDayCountMap.get(activity.getId());
-                    List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());
-                    shifts.add(infoWrapper.getShift());
-                    shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), shifts, Arrays.asList(careDayCount.getActivityId()));
-                    if (careDayCount.getCount() < shifts.size()) {
+                    List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), infoWrapper.getShifts(), Arrays.asList(careDayCount.getActivityId()));
+                    if (careDayCount.getCount() < (shifts.size()+1)) {
                         WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
                         infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         break;
@@ -62,6 +60,10 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                 }
             }
         }
+    }
+
+    public Map<BigInteger,ActivityCareDayCount> getCareDaysCount(){
+        return this.careDayCounts.stream().collect(Collectors.toMap(ActivityCareDayCount::getActivityId,v->v));
     }
 
 
