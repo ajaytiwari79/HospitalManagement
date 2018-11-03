@@ -604,11 +604,10 @@ public class ShiftValidatorService {
 
     public static DateTimeInterval getIntervalByWTACareDaysRuleTemplate(ShiftWithActivityDTO shift,WTAForCareDays wtaForCareDays){
         LocalDate shiftDate = DateUtils.asLocalDate(shift.getStartDate());
-        Map<BigInteger,ActivityCareDayCount> careDayCountMap = wtaForCareDays.getCareDaysCount();
+        Map<BigInteger,ActivityCareDayCount> careDayCountMap = wtaForCareDays.getCareDaysCountMap();
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             if(careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
-                ActivityCareDayCount careDayCount = careDayCountMap.get(shiftActivityDTO.getActivityId());
                 Optional<CutOffInterval> cutOffIntervalOptional = shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> (interval.getStartDate().isBefore(shiftDate) && interval.getEndDate().isAfter(shiftDate) || interval.getStartDate().isEqual(shiftDate))).findAny();
                 if(cutOffIntervalOptional.isPresent()){
                     CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
