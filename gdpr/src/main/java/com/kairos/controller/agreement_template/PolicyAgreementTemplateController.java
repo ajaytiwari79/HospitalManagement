@@ -48,11 +48,11 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("upload cover image Agreement Template")
     @PostMapping(value = "/agreement_template/{agreementTemplateId}/upload")
-    public ResponseEntity<Object> uploadCoverPageLogo(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @RequestParam("coverPageLogo") MultipartFile coverPageLogo) {
-        if (coverPageLogo.getSize() <= 0) {
+    public ResponseEntity<Object> uploadCoverPageLogo(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @RequestParam("file") MultipartFile file) {
+        if (file.getSize() == 0) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, true, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.uploadCoverPageLogo(countryId, agreementTemplateId, coverPageLogo));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.uploadCoverPageLogo(countryId, agreementTemplateId, file));
     }
 
     @ApiOperation("get All agreement sections and Subjection of Agreement template ")

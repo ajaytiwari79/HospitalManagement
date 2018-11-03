@@ -74,11 +74,12 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
-                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation)
+                new CustomAggregationOperation(groupDataOperation),
+                sort(Sort.Direction.DESC, "createdAt")
 
-        );
+
+                );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
     }
@@ -145,11 +146,11 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
-                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation)
+                new CustomAggregationOperation(groupDataOperation),
+                sort(Sort.Direction.DESC, "createdAt")
 
-        );
+                );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
     }
