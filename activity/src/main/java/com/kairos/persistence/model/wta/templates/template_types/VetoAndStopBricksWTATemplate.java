@@ -102,7 +102,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
             for (ShiftWithActivityDTO shift : shifts) {
                 if (shift.getActivitIds().contains(vetoTypeActivity)) {
                     totalVeto++;
-                } else if (shift.getActivitIds().contains(vetoTypeActivity)) {
+                } else if (shift.getActivitIds().contains(stopBricksActivity)) {
                     totalStopBricks++;
                 }
             }
