@@ -488,7 +488,7 @@ public class UnionService {
 
         List<ZipCodeDTO> zipCodes = null;
         List<SectorDTO> sectors = null;
-        if(CollectionUtils.isEmpty(zipCodesSectors.getSectors())) {
+        if(!CollectionUtils.isEmpty(zipCodesSectors.getZipCodes())) {
              zipCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getZipCodes(),ZipCodeDTO.class);
         }
         if(!CollectionUtils.isEmpty(zipCodesSectors.getSectors())) {
