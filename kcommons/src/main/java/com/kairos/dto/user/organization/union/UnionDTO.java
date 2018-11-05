@@ -2,13 +2,11 @@ package com.kairos.dto.user.organization.union;
 
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class UnionDTO {
     @NotBlank
