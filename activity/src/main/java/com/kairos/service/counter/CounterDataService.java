@@ -5,6 +5,7 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
@@ -22,7 +23,9 @@ import com.kairos.dto.activity.counter.chart.PieChart;
 import com.kairos.dto.activity.counter.chart.DataUnit;
 import com.kairos.dto.activity.counter.chart.SingleNumberChart;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
@@ -36,6 +39,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -65,6 +69,8 @@ public class CounterDataService {
     private CounterServiceMapping counterServiceMapping;
     @Inject
     private ExecutorService executorService;
+    @Inject
+    private TimeBankRepository timeBankRepository;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
@@ -350,6 +356,12 @@ public class CounterDataService {
                 counterResults.add(responseData);
             }
         }
+    }
+
+    public Map<Long,Long> calculatePlannedHour(List<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
+        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
+        return staffPlannedHours;
     }
 
 

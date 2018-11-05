@@ -13,9 +13,11 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.service.counter.CounterDataService;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.DynamicTabService;
 import com.kairos.service.counter.RestingHoursCalculationService;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -47,10 +49,15 @@ import static com.kairos.constants.ApiConstants.*;
 public class CounterDistController {
 
     @Inject
+    private ShiftService shiftService;
+    @Inject
     private CounterDistService counterManagementService;
 
     @Inject
     private DynamicTabService dynamicTabService;
+
+    @Inject
+    private CounterDataService counterDataService;
 
     @Inject private RestingHoursCalculationService restingHoursCalculationService;
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
@@ -256,10 +263,15 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
+    @GetMapping("/calculate_planned_hours")
+    public ResponseEntity<Map<String, Object>> calculatePlannedHours(@PathVariable Long unitId, @RequestParam List<Long> staffIds, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterDataService.calculatePlannedHour(staffIds,unitId,startDate,endDate));
+    }
+
     //for filter criteria
     @GetMapping(UNIT_URL+"/calculate_resting_hours")
     public ResponseEntity<Map<String, Object>> calculateRestingHoues(@PathVariable Long unitId,@RequestParam List<Long> staffIds,@RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, restingHoursCalculationService.calculateRestingHours(staffIds, Date.valueOf(startDate),Date.valueOf(endDate)));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, restingHoursCalculationService.calculateRestingHours(staffIds, null,  Date.valueOf(startDate),Date.valueOf(endDate)));
     }
 
 }
