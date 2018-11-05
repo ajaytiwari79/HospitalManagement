@@ -200,7 +200,7 @@ public class UnionService {
 
         ContactAddress address = null;
         if(Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
-             address = getAddress(locationDTO.getAddress());
+             address = getAddress(locationDTO.getAddress(),false,false,null);
         }
         Location location = new Location(locationDTO.getName(),address);
         union.getLocations().add(location);
@@ -238,39 +238,9 @@ public class UnionService {
 
         Location location = locationqueryResults.get(0).getLocation();
         Long addressIdDb = locationqueryResults.get(0).getAddressId();
-        Long zipCodeIdDb = locationqueryResults.get(0).getZipCodeId();
-        Long municipalityIdDb= locationqueryResults.get(0).getMunicipalityId();
-        ZipCode zipCode = null;
-        Municipality municipality = null;
-
 
         if(Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
-            location.setAddress(new ContactAddress(locationDTO.getAddress().getHouseNumber(), locationDTO.getAddress().getProvince(), locationDTO.getAddress().getStreet(),
-                    locationDTO.getAddress().getCity(), locationDTO.getAddress().getRegionName()));
-            if (Optional.ofNullable(locationqueryResults.get(0).getAddressId()).isPresent()) {
-                location.getAddress().setId(locationqueryResults.get(0).getAddressId());
-            }
-
-            if (Optional.ofNullable(locationDTO.getAddress().getZipCodeId()).isPresent()) {
-                zipCode = zipCodeGraphRepository.findByIdDeletedFalse(locationDTO.getAddress().getZipCodeId());
-                if (!Optional.ofNullable(zipCode).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
-                }
-                location.getAddress().setZipCode(zipCode);
-                if (zipCodeUpdated) {
-                    zipCodeGraphRepository.deleteAddressZipcodeRelation(addressIdDb, zipCodeIdDb);
-                }
-            }
-            if (Optional.ofNullable(locationDTO.getAddress().getMunicipalityId()).isPresent()) {
-                municipality = municipalityGraphRepository.findByZipCodeIdandIdDeletedFalse(locationDTO.getAddress().getMunicipalityId(), locationDTO.getAddress().getZipCodeId());
-                if (!Optional.ofNullable(municipality).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
-                }
-                location.getAddress().setMunicipality(municipality);
-                if (municipalityUpdated) {
-                    municipalityGraphRepository.deleteAddressMunicipalityRelation(addressIdDb, municipalityIdDb);
-                }
-            }
+            location.setAddress(getAddress(locationDTO.getAddress(),zipCodeUpdated,municipalityUpdated,addressIdDb));
         }
         location.setName(locationDTO.getName());
 
@@ -307,7 +277,7 @@ public class UnionService {
                 exceptionService.invalidRequestException("message.publish.address.missing");
             }  else if(Optional.ofNullable(unionData.getMainAddress()).isPresent()){
 
-                address = getAddress(unionData.getMainAddress());
+                address = getAddress(unionData.getMainAddress(),false,false,null);
             }
 
             boolean boardingCompleted=false;
@@ -378,39 +348,15 @@ public class UnionService {
             exceptionService.invalidRequestException("message.publish.address.missing");
 
         }else if(Optional.ofNullable(unionData.getMainAddress()).isPresent()){
-            address = new ContactAddress(unionData.getMainAddress().getHouseNumber(), unionData.getMainAddress().getProvince(),unionData.getMainAddress().getStreet(),
-                    unionData.getMainAddress().getCity(),unionData.getMainAddress().getRegionName());
-            if(Optional.ofNullable(unionCompleteQueryResult.getAddress()).isPresent()) {
-                address.setId(unionCompleteQueryResult.getAddress().getId());
-            }
-            if(Optional.ofNullable(unionCompleteQueryResult.getZipCode()).isPresent()) {
-                zipCodeUpdated = !unionCompleteQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
-            }
-            if(Optional.ofNullable(unionCompleteQueryResult.getMunicipality()).isPresent()) {
-                municipalityUpdated = !unionCompleteQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
-            }
 
-            if(Optional.ofNullable(unionData.getMainAddress().getZipCodeId()).isPresent()) {
-                zipCode = zipCodeGraphRepository.findByIdDeletedFalse(unionData.getMainAddress().getZipCodeId());
-                if (!Optional.ofNullable(zipCode).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
-                }
-                address.setZipCode(zipCode);
-                if(zipCodeUpdated) {
-                    zipCodeGraphRepository.deleteAddressZipcodeRelation(unionCompleteQueryResult.getAddress().getId(),unionCompleteQueryResult.getZipCode().getId());
-                }
-            }
-            if(Optional.ofNullable(unionData.getMainAddress().getMunicipalityId()).isPresent()) {
-                municipality = municipalityGraphRepository.findByZipCodeIdandIdDeletedFalse(unionData.getMainAddress().getMunicipalityId(),
-                        unionData.getMainAddress().getZipCodeId());
-                if (!Optional.ofNullable(municipality).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
-                }
-                address.setMunicipality(municipality);
-                if(municipalityUpdated) {
-                    municipalityGraphRepository.deleteAddressMunicipalityRelation(unionCompleteQueryResult.getAddress().getId(),unionCompleteQueryResult.getMunicipality().getId());
-                }
-            }
+        if(Optional.ofNullable(unionCompleteQueryResult.getZipCode()).isPresent()) {
+            zipCodeUpdated = !unionCompleteQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
+        }
+        if(Optional.ofNullable(unionCompleteQueryResult.getMunicipality()).isPresent()) {
+            municipalityUpdated = !unionCompleteQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
+        }
+        address = getAddress(unionData.getMainAddress(),zipCodeUpdated,municipalityUpdated,Optional.ofNullable(unionCompleteQueryResult.getAddress()).isPresent()?
+                unionCompleteQueryResult.getAddress().getId():null);
         }
 
         union.setName(unionData.getName());
@@ -427,6 +373,9 @@ public class UnionService {
 //        List<>
 //
 //    }
+
+
+
     public boolean validateAddress(ContactAddressDTO addressDTO) {
         Assert.notNull(addressDTO.getHouseNumber(),"meessage.houseNumber.mull");
         Assert.notNull(addressDTO.getProvince(),"meessage.province.mull");
@@ -483,15 +432,29 @@ public class UnionService {
     }*/
 
 
-    public ContactAddress getAddress(ContactAddressDTO addressDTO) {
+    /**
+     * @Author Yatharth Govil
+     * @Last ModifiedBy Yatharth Govil
+     * @param addressDTO
+     * @param zipCodeUpdated
+     * @param municipalityUpdated
+     * @param addressId
+     * @Description This method is used for creating address object for saving in DB
+     * @return ContactAddress
+     */
+    public ContactAddress getAddress(ContactAddressDTO addressDTO,boolean zipCodeUpdated,boolean municipalityUpdated, Long addressId) {
 
         ContactAddress contactAddress = new ContactAddress(addressDTO.getHouseNumber(),
                 addressDTO.getProvince(),addressDTO.getStreet(),addressDTO.getCity(),addressDTO.getRegionName());
 
+        contactAddress.setId(addressId);
         if(Optional.ofNullable(addressDTO.getZipCodeId()).isPresent()) {
             ZipCode zipCode = zipCodeGraphRepository.findByIdDeletedFalse(addressDTO.getZipCodeId());
             if(!Optional.ofNullable(zipCode).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+            }
+            if(zipCodeUpdated) {
+                zipCodeGraphRepository.deleteAddressZipcodeRelation(addressId,addressDTO.getZipCodeId());
             }
             contactAddress.setZipCode(zipCode);
         }
@@ -501,6 +464,9 @@ public class UnionService {
                 exceptionService.dataNotFoundByIdException("message.municipality.notFound");
             }
             contactAddress.setMunicipality(municipality);
+            if(municipalityUpdated) {
+                municipalityGraphRepository.deleteAddressMunicipalityRelation(addressId,addressDTO.getMunicipalityId());
+            }
         }
 
 
