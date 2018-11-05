@@ -137,7 +137,7 @@ public class RuleTemplateService extends MongoBaseService {
         averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(averageScheduledTimeWTATemplate);
 
-        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = new VetoAndStopBricksWTATemplate("Maximum veto and stop bricks per period", "Maximum veto and stop bricks per period",1,LocalDate.now(),null,null);
+        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = new VetoAndStopBricksWTATemplate("Veto and stop bricks", "Veto and stop bricks",1,LocalDate.now(),null,null);
         vetoAndStopBricksWTATemplate.setCountryId(countryDTO.getId());
         //vetoAndStopBricksWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         vetoAndStopBricksWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -290,7 +290,7 @@ public class RuleTemplateService extends MongoBaseService {
 
     }
 
-    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList, List<WTABaseRuleTemplateDTO> templateList) {
+    private void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList, List<WTABaseRuleTemplateDTO> templateList) {
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
             for (WTABaseRuleTemplateDTO ruleTemplateResponseDTO : templateList) {
                 if (ruleTemplateCategoryTagDTO.getId() != null && ruleTemplateResponseDTO != null && ruleTemplateCategoryTagDTO.getId().equals(ruleTemplateResponseDTO.getRuleTemplateCategoryId())) {
