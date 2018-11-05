@@ -63,6 +63,7 @@ import java.math.BigInteger;
 import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,16 +108,16 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
-        DateTimeInterval graceInterval;
+    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
+        DateTimeInterval graceInterval = null;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         } else {
-            if (shiftDTO.getValidatedByStaffDate() == null) {
+            if (staffShiftDTO.getValidated() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(staffShiftDTO.getValidated()), validatedByStaff);
         }
         if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
@@ -124,13 +125,12 @@ public class ShiftValidatorService {
     }
 
     public DateTimeInterval getGracePeriodInterval(TimeAttendanceGracePeriod timeAttendanceGracePeriod, Date date, boolean forStaff) {
-
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = DateUtils.asZoneDateTime(date).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        ZonedDateTime endDate = null;
         if (forStaff) {
-            startDate = startDate.minusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
+            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
         } else {
-            startDate = startDate.minusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
+            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
         }
         return new DateTimeInterval(startDate, endDate);
     }
@@ -194,16 +194,16 @@ public class ShiftValidatorService {
             LocalTime earliestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getEarliestStartTime() : staffActivitySettingMap.get(activityId).getEarliestStartTime();
             LocalTime latestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getLatestStartTime() : staffActivitySettingMap.get(activityId).getLatestStartTime();
             if (shortestTime != null && shiftTimeDetails.getTotalTime() < shortestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time",shortestTime));
             }
             if (longestTime != null && shiftTimeDetails.getTotalTime() > longestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time",longestTime));
             }
             if (earliestStartTime != null && earliestStartTime.isAfter(shiftTimeDetails.getActivityStartTime())) {
-                errorMessages.add(exceptionService.convertMessage("error.start_time.greater_than.earliest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.start_time.greater_than.earliest_time",earliestStartTime));
             }
             if (latestStartTime != null && latestStartTime.isBefore(shiftTimeDetails.getActivityStartTime())) {
-                errorMessages.add(exceptionService.convertMessage("error.start_time.less_than.latest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.start_time.less_than.latest_time",latestStartTime));
             }
             if (!errorMessages.isEmpty()) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
@@ -437,7 +437,7 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
         Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> (interval.getStartDate().isBefore(shiftStartLocalDate) && interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate))).findAny();
-        if(cutOffIntervalOptional.isPresent()){
+        if (cutOffIntervalOptional.isPresent()) {
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
                 LocalDate shiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());

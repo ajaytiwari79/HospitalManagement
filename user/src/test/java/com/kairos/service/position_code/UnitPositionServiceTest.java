@@ -1,5 +1,6 @@
 package com.kairos.service.position_code;
 
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
