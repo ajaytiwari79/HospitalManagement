@@ -14,6 +14,7 @@ public class CoverPageVO {
     private boolean logoPositionLeft;
     private boolean logoPositionRight;
     private boolean logoPositionCenter;
+    private boolean coverPageContentAdded;
 
 
     public String getCoverPageContent() { return coverPageContent; }
@@ -40,9 +41,11 @@ public class CoverPageVO {
 
     public void setLogoPositionCenter(boolean logoPositionCenter) { this.logoPositionCenter = logoPositionCenter; }
 
-    public CoverPageVO(String coverPageLogoUrl) {
-        this.coverPageLogoUrl = coverPageLogoUrl;
-    }
+    public CoverPageVO(String coverPageLogoUrl) { this.coverPageLogoUrl = coverPageLogoUrl; }
+
+    public boolean isCoverPageContentAdded() { return coverPageContentAdded; }
+
+    public void setCoverPageContentAdded(boolean coverPageContentAdded) { this.coverPageContentAdded = coverPageContentAdded; }
 
     @Override
     public boolean equals(Object o) {
