@@ -6,7 +6,6 @@ import com.kairos.dto.user.organization.union.*;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
 import com.kairos.persistence.model.address.MunicipalityQueryResult;
-import com.kairos.persistence.model.address.ZipCodeMunicipalityQueryResult;
 import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -308,15 +307,15 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
 
-        List<UnionCompleteQueryResult> unionCompleteQueryResults = organizationGraphRepository.getUnionCompleteById(unionId,unionData.getName());
+        List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId,unionData.getName());
 
-        if(CollectionUtils.isEmpty(unionCompleteQueryResults)||(unionCompleteQueryResults.size()==1&&!unionCompleteQueryResults.get(0).getUnion().getId().equals(unionId))) {
+        if(CollectionUtils.isEmpty(unionDataQueryResults)||(unionDataQueryResults.size()==1&&!unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found",unionId);
         }
-        else if(unionCompleteQueryResults.size()>1) {
+        else if(unionDataQueryResults.size()>1) {
             exceptionService.dataNotFoundByIdException("message.union.name.alreadyexists",unionData.getName());
         }
-        Organization union = unionCompleteQueryResults.get(0).getUnion();
+        Organization union = unionDataQueryResults.get(0).getUnion();
         if(!publish&&union.isBoardingCompleted()) {
             exceptionService.invalidRequestException("message.publish.union.unpublish");
         }
@@ -325,7 +324,7 @@ public class UnionService {
             union.setBoardingCompleted(true);
             unionData.setState(UnionState.PUBLISHED);
         }
-        Set<Long> sectorIdsDb = unionCompleteQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
+        Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
         List<Long> sectorIDsCreated = new ArrayList<>(unionData.getSectorIds());
         List<Long> sectorIdsToBeDeleted = new ArrayList<Long>(sectorIdsDb);
         sectorIDsCreated.removeAll(sectorIdsDb);
@@ -342,21 +341,21 @@ public class UnionService {
         Municipality municipality;
         boolean zipCodeUpdated = false;
         boolean municipalityUpdated = false;
-        UnionCompleteQueryResult unionCompleteQueryResult = unionCompleteQueryResults.get(0);
+        UnionDataQueryResult unionDataQueryResult = unionDataQueryResults.get(0);
 
         if(!Optional.ofNullable(unionData.getMainAddress()).isPresent()&&publish){
             exceptionService.invalidRequestException("message.publish.address.missing");
 
         }else if(Optional.ofNullable(unionData.getMainAddress()).isPresent()){
 
-        if(Optional.ofNullable(unionCompleteQueryResult.getZipCode()).isPresent()) {
-            zipCodeUpdated = !unionCompleteQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
+        if(Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
+            zipCodeUpdated = !unionDataQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
         }
-        if(Optional.ofNullable(unionCompleteQueryResult.getMunicipality()).isPresent()) {
-            municipalityUpdated = !unionCompleteQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
+        if(Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
+            municipalityUpdated = !unionDataQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
         }
-        address = getAddress(unionData.getMainAddress(),zipCodeUpdated,municipalityUpdated,Optional.ofNullable(unionCompleteQueryResult.getAddress()).isPresent()?
-                unionCompleteQueryResult.getAddress().getId():null);
+        address = getAddress(unionData.getMainAddress(),zipCodeUpdated,municipalityUpdated,Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()?
+                unionDataQueryResult.getAddress().getId():null);
         }
 
         union.setName(unionData.getName());

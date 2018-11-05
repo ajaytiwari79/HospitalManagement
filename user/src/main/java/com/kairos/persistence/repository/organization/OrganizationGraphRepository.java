@@ -8,7 +8,6 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.union.UnionCompleteQueryResult;
 import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
@@ -730,7 +729,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "MATCH(union)-[:"+HAS_SECTOR+"]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:"+CONTACT_ADDRESS+"]-" +
             "(address:ContactAddress) OPTIONAL MATCH(address)-[:"+ZIP_CODE+"]-(zipCode:ZipCode) WITH union,sectors,address,zipCode,country OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]-" +
             "(municipality:Municipality) RETURN union,country,address,zipCode,sectors,municipality ")
-    List<UnionCompleteQueryResult> getUnionCompleteById(Long unionId, String name);
+    List<UnionDataQueryResult> getUnionCompleteById(Long unionId, String name);
 
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={1} MATCH(union)-[unionSectorRelDel:"+HAS_SECTOR+"]-(sector:Sector) WHERE id(sector) in {0} WITH union, " +
             "unionSectorRelDel DELETE unionSectorRelDel")

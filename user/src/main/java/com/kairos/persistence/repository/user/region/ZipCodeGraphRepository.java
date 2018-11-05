@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.region;
 
-import com.kairos.persistence.model.address.ZipCodeMunicipalityQueryResult;
 import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;

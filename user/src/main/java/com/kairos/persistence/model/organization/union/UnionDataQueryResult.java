@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.organization.union;
 
 import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class UnionDataQueryResult {
     private ZipCode zipCode;
     private Municipality municipality;
     private List<Municipality> municipalities;
+    private Country country;
+
 
 
     public Organization getUnion() {
@@ -77,4 +80,11 @@ public class UnionDataQueryResult {
         this.municipalities = municipalities;
     }
 
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
 }
