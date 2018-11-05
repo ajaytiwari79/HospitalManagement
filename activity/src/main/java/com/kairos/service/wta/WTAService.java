@@ -334,7 +334,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithOrganization(organizationSubTypeId);
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationSubType(organizationSubTypeId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
             wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
