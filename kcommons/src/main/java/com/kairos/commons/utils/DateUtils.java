@@ -52,7 +52,7 @@ public class DateUtils {
 
     }
     public static LocalDateTime getCurrentLocalDateTime() {
-        return LocalDateTime.now();
+        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
     }
 

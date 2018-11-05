@@ -4,6 +4,7 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.service.TokenAuthService;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.http.NameValuePair;
@@ -24,6 +25,9 @@ import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.kairos.enums.rest_client.MicroService.SCHEDULER;
+import static com.kairos.enums.rest_client.MicroService.USER;
+import static com.kairos.utils.RestClientUrlUtil.getSchedulerBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 
 
@@ -44,24 +48,19 @@ public class UserRestClientForScheduler {
     private EnvConfig env ;
 
 
-    public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
-        switch (integrationOperation) {
-            case CREATE:
-                return HttpMethod.POST;
-            case DELETE:
-                return HttpMethod.DELETE;
-            case UPDATE:
-                return HttpMethod.PUT;
-            case GET:
-                return HttpMethod.GET;
+
+    public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod,MicroService microService, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl;
+        switch (microService) {
+            case USER:
+                 baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;// make same as its necessary for URL We have already a task to remove the organization
+                break;
+            case SCHEDULER:
+                baseUrl=getSchedulerBaseUrl(true,id);
+                break;
             default: throw new UnsupportedOperationException("Invalid method specified");
-
         }
-    }
 
-
-    public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;// make same as its necessary for URL We have already a task to remove the organization
         // organizationId
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
