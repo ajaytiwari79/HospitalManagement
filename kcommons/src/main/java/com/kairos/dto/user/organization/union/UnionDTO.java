@@ -2,19 +2,21 @@ package com.kairos.dto.user.organization.union;
 
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.ArrayList;
 
 public class UnionDTO {
     @NotBlank
     @NotNull
     private String name;
     private ContactAddressDTO mainAddress;
-    private List<Long> sectorIds;
-    private List<Long> locationIds;
+    private List<Long> sectorIds = new ArrayList<>();
+    private List<Long> locationIds = new ArrayList<>();
     private Long id;
     private UnionState state;
 

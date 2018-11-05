@@ -5,14 +5,15 @@ import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
 
 import java.util.List;
+import java.util.ArrayList;
 public class UnionDataDTO {
 
     private Long id;
     private String name;
-    private List<SectorDTO> sectors;
+    private List<SectorDTO> sectors = new ArrayList<>();
     private ContactAddressDTO mainAddress;
-    private List<LocationDTO> locations;
-    private List<MunicipalityDTO> municipalities;
+    private List<LocationDTO> locations = new ArrayList<>();
+    private List<MunicipalityDTO> municipalities = new ArrayList<>();
     private UnionState state;
 
     public String getName() {
