@@ -131,7 +131,8 @@ public class ShiftBreakActivityService {
 
             if (breakAvailability == null) { // if availability is null then we are resetting it to zero means no restriction at all
                 breakAvailability = new BreakAvailabilitySettings((short) 0, (short) 0);
-                breakWTATemplate.setBreakGapMinutes((short) 240);
+                breakWTATemplate= new BreakWTATemplate();
+                breakWTATemplate.setBreakGapMinutes((short) 0);
             }
             if (breakAvailability.getStartAfterMinutes() == 0) { // this means no start restriction is set, so we are adding the break at start
                 workedShiftDuration = workedShiftDuration + (breakSettings.get(0).getShiftDurationInMinute() / 2);
@@ -142,7 +143,7 @@ public class ShiftBreakActivityService {
             shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis), false));
             shiftDurationInMinute -= workedShiftDuration;
             startDateMillis=endDateMillis; // reassigning next start as end of this
-            itemsAddedFromBeginning++;
+
             if (breakAvailability.getEndBeforeMinutes() >= 0 && shiftDurationInMinute >= breakAvailability.getEndBeforeMinutes()) {    // add a shift at last of array we need to shift this to last
                 workedShiftDuration += breakAvailability.getEndBeforeMinutes();
                 shiftDurationInMinute -= breakAvailability.getEndBeforeMinutes();
@@ -163,7 +164,7 @@ public class ShiftBreakActivityService {
                     if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
 
                         endDateMillis = startDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                        shifts.add(itemsAddedFromBeginning, getShiftObject("BREAK", new BigInteger("2"), new Date(startDateMillis), new Date(endDateMillis), true));
+                        shifts.add(++itemsAddedFromBeginning, getShiftObject("BREAK", new BigInteger("2"), new Date(startDateMillis), new Date(endDateMillis), true));
                         shiftDurationInMinute -=  allowedBreakDurationInMinute;
                         startDateMillis=endDateMillis;
                         lastBreakEndedOnInMillis=endDateMillis;
