@@ -486,8 +486,14 @@ public class UnionService {
         Map<Long,MunicipalityQueryResult> municipalityMap = municipalityQueryResults.stream().collect(Collectors.toMap(municipalityQueryResult->municipalityQueryResult.getMunicipality().getId(),v->v));
         ZipCodeSectorQueryResult zipCodesSectors = zipCodeGraphRepository.getZipCodesAndSectors(countryId);
 
-        List<ZipCodeDTO> zipCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getZipCodes(),ZipCodeDTO.class);
-        List<SectorDTO> sectors = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getSectors(),SectorDTO.class);
+        List<ZipCodeDTO> zipCodes = null;
+        List<SectorDTO> sectors = null;
+        if(CollectionUtils.isEmpty(zipCodesSectors.getSectors())) {
+             zipCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getZipCodes(),ZipCodeDTO.class);
+        }
+        if(!CollectionUtils.isEmpty(zipCodesSectors.getSectors())) {
+             sectors = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getSectors(),SectorDTO.class);
+        }
         UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes,sectors);
 
         Map<Long,LocationDataQueryResult> locationDataMap = locationDataObjects.stream().collect(Collectors.toMap(LocationDataQueryResult::getLocationId,
