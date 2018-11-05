@@ -50,13 +50,13 @@ public class UserRestClientForScheduler {
 
 
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod,MicroService microService, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl;
+         String baseUrl;
         switch (microService) {
             case USER:
                  baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;// make same as its necessary for URL We have already a task to remove the organization
                 break;
             case SCHEDULER:
-                baseUrl=getSchedulerBaseUrl(true,id);
+                baseUrl=getSchedulerBaseUrl(true,id)+uri;
                 break;
             default: throw new UnsupportedOperationException("Invalid method specified");
         }

@@ -663,8 +663,7 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
 
-    public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
-        return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+    public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
     }
 }
 
