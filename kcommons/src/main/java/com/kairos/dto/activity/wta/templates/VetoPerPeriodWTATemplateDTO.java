@@ -92,7 +92,7 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     }
     public VetoPerPeriodWTATemplateDTO() {
-        this.wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;;
+        this.wtaTemplateType = WTATemplateType.VETO_AND_STOP_BRICKS;;
     }
 
 }
