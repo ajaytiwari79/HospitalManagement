@@ -226,7 +226,7 @@ public class AttendanceSettingService extends MongoBaseService {
 
     private boolean validateGlideTimeWhileCheckOut(Shift shift, Long reasonCodeId, String timeZone){
         //Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-        LocationActivityTab locationActivityTab = activityMongoRepository.findActivityGlideTimeByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId());
+        LocationActivityTab locationActivityTab = activityMongoRepository.findActivityByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId()).getLocationActivityTab();
         ActivityGlideTimeDetails glideTimeDetails = locationActivityTab.getCheckOutGlideTime(LocationEnum.OFFICE);
         ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(glideTimeDetails.getBefore());
         ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(glideTimeDetails.getAfter());
