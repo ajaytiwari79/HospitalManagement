@@ -440,8 +440,8 @@ public class ShiftValidatorService {
         if(cutOffIntervalOptional.isPresent()){
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
-                LocalDate shiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-                if (CollectionUtils.containsAny(shift.getActivitIds(), activitieIds) && (cutOffInterval.getStartDate().isBefore(shiftLocalDate) && cutOffInterval.getEndDate().isAfter(shiftLocalDate) || cutOffInterval.getStartDate().isEqual(shiftLocalDate))) {
+                DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1)));
+                if (CollectionUtils.containsAny(shift.getActivitIds(), activitieIds) && interval.contains(shift.getStartDate())) {
                     updatedShifts.add(shift);
                 }
             }
