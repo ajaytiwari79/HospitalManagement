@@ -488,10 +488,10 @@ public class UnionService {
 
         List<ZipCodeDTO> zipCodes = null;
         List<SectorDTO> sectors = null;
-        if(!CollectionUtils.isEmpty(zipCodesSectors.getZipCodes())) {
+        if(CollectionUtils.isNotEmpty(zipCodesSectors.getZipCodes())) {
              zipCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getZipCodes(),ZipCodeDTO.class);
         }
-        if(!CollectionUtils.isEmpty(zipCodesSectors.getSectors())) {
+        if(CollectionUtils.isNotEmpty(zipCodesSectors.getSectors())) {
              sectors = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getSectors(),SectorDTO.class);
         }
         UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes,sectors);
