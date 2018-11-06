@@ -31,8 +31,7 @@ public class AssessmentDTO {
     private Staff approver;
     private LocalDate assessmentScheduledDate;
     private QuestionnaireTemplateType riskAssociatedEntity;
-
-  //@NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
+    @NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
     public BigInteger getId() { return id; }

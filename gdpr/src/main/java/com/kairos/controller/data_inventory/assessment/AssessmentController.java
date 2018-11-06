@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.assessment;
 
 
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
@@ -81,6 +82,12 @@ public class AssessmentController {
     @PutMapping("/assessment/{assessmentId}")
     public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody ValidateRequestBodyList<AssessmentAnswerValueObject> assessmentAnswerValueObjects ,@RequestParam AssessmentStatus status) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivity(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
+    }
+
+    @ApiOperation(value = "getassessment scheduling frequency enum")
+    @PutMapping("/assessment/{assessmentId}")
+    public ResponseEntity<ResponseDTO< AssessmentSchedulingFrequency[]>> getSchedulingFrequencyEnumList() {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getSchedulingFrequency());
     }
 
 
