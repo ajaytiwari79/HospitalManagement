@@ -85,7 +85,7 @@ public class AssessmentController {
     }
 
     @ApiOperation(value = "getassessment scheduling frequency enum")
-    @PutMapping("/assessment/{assessmentId}")
+    @GetMapping("/assessment/scheduling")
     public ResponseEntity<ResponseDTO< AssessmentSchedulingFrequency[]>> getSchedulingFrequencyEnumList() {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getSchedulingFrequency());
     }
