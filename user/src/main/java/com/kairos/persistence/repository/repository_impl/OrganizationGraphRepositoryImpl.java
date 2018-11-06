@@ -137,7 +137,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         query += " return distinct {id:id(staff), expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
                 "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
                 "age:round ((timestamp()-user.dateOfBirth) / (365*24*60*60*1000))," +
-                "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId," +
+                "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId, access_token:staff.access_token," +
                 "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, " +
                 "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType),user_id:staff.user_id } as staff ORDER BY staff.id\n";
 
