@@ -170,7 +170,7 @@ public class TimeTypeService extends MongoBaseService {
         for (TimeType timeType : topLevelTimeTypes) {
             if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
                 TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor());
-                timeTypeDTO.setType(timeType.getType());
+                timeTypeDTO.setSecondLevelType(timeType.getType());
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     timeTypeDTO.setSelected(true);
                 }
@@ -179,7 +179,7 @@ public class TimeTypeService extends MongoBaseService {
                 parentOfWorkingTimeType.add(timeTypeDTO);
             } else {
                 TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor());
-                timeTypeDTO.setType(timeType.getType());
+                timeTypeDTO.setSecondLevelType(timeType.getType());
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     timeTypeDTO.setSelected(true);
                 }
@@ -259,7 +259,7 @@ public class TimeTypeService extends MongoBaseService {
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
-                levelTwoTimeTypeDTO.setType(timeType.getType());
+                levelTwoTimeTypeDTO.setSecondLevelType(timeType.getType());
                 levelTwoTimeTypeDTO.setTimeTypes(timeType.getTimeTypes().toValue());
                 levelTwoTimeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
                 levelTwoTimeTypeDTO.setUpperLevelTimeTypeId(upperlevelTimeTypeId);
