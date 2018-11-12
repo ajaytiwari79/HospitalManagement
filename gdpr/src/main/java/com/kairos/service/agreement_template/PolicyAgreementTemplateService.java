@@ -192,7 +192,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
         List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
-        Map<BigInteger, ClauseCkEditorVO> clauseCkEditorVOMap = agreementSectionResponseDTO.getClauseCkEditorVOS().stream().collect(Collectors.toMap(ClauseCkEditorVO::getId, clauseCkEditorVO -> clauseCkEditorVO));
+        Map<BigInteger, ClauseCkEditorVO> clauseCkEditorVOMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(agreementSectionResponseDTO.getClauseCkEditorVOS())) {
+            clauseCkEditorVOMap = agreementSectionResponseDTO.getClauseCkEditorVOS().stream().collect(Collectors.toMap(ClauseCkEditorVO::getId, clauseCkEditorVO -> clauseCkEditorVO));
+        }
         List<BigInteger> clauseIdOrderIndex = agreementSectionResponseDTO.getClauseIdOrderedIndex();
         for (int i = 0; i < clauseIdOrderIndex.size(); i++) {
             ClauseBasicResponseDTO clause = clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i));

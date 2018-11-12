@@ -22,7 +22,7 @@ public class AgreementSectionResponseDTO {
     private Integer orderedIndex;
     private List<BigInteger> clauseIdOrderedIndex;
     private List<ClauseBasicResponseDTO> clauses;
-    private List<ClauseCkEditorVO> clauseCkEditorVOS=new ArrayList<>();
+    private List<ClauseCkEditorVO> clauseCkEditorVOS;
     private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
