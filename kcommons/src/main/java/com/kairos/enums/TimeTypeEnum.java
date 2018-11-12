@@ -4,5 +4,5 @@ package com.kairos.enums;/*
  */
 
 public enum TimeTypeEnum {
-    PRESENCE,ABSENCE,BREAK,VETO,STOPBRICK
+    PRESENCE,ABSENCE,BREAK,VETO,STOP_BRICK
 }
