@@ -21,7 +21,7 @@ public class AgreementSection extends MongoBaseEntity {
     private boolean subSection;
     // clause id are saved in order way
     private List<BigInteger> clauseIdOrderedIndex=new ArrayList<>();
-    private List<ClauseCkEditorVO> clauseCkEditorVOS;
+    private List<ClauseCkEditorVO> clauseCkEditorVOS=new ArrayList<>();
     private List<BigInteger> subSections=new ArrayList<>();
     private Integer orderedIndex;
     private Long countryId;

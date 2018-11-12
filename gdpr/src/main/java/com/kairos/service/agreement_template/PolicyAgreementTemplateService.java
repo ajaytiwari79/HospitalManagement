@@ -195,10 +195,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         Map<BigInteger, ClauseCkEditorVO> clauseCkEditorVOMap = agreementSectionResponseDTO.getClauseCkEditorVOS().stream().collect(Collectors.toMap(ClauseCkEditorVO::getId, clauseCkEditorVO -> clauseCkEditorVO));
         List<BigInteger> clauseIdOrderIndex = agreementSectionResponseDTO.getClauseIdOrderedIndex();
         for (int i = 0; i < clauseIdOrderIndex.size(); i++) {
-            ClauseCkEditorVO clauseCkEditorVO = clauseCkEditorVOMap.get(i);
             ClauseBasicResponseDTO clause = clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i));
-            clause.setTitleHtml(clauseCkEditorVO.getTitleHtml());
-            clause.setDescriptionHtml(clauseCkEditorVO.getDescriptionHtml());
+            if (clauseCkEditorVOMap.containsKey(clause.getId())) {
+                ClauseCkEditorVO clauseCkEditorVO = clauseCkEditorVOMap.get(clause.getId());
+                clause.setTitleHtml(clauseCkEditorVO.getTitleHtml());
+                clause.setDescriptionHtml(clauseCkEditorVO.getDescriptionHtml());
+            }
+
             clauses.add(clause);
         }
         agreementSectionResponseDTO.setClauses(clauses);

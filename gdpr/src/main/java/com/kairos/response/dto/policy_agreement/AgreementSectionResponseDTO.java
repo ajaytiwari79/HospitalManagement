@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
@@ -23,7 +22,7 @@ public class AgreementSectionResponseDTO {
     private Integer orderedIndex;
     private List<BigInteger> clauseIdOrderedIndex;
     private List<ClauseBasicResponseDTO> clauses;
-    private List<ClauseCkEditorVO> clauseCkEditorVOS;
+    private List<ClauseCkEditorVO> clauseCkEditorVOS=new ArrayList<>();
     private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
