@@ -447,7 +447,7 @@ public class CompanyCreationService {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
         reasonCodeService.createDefalutDateForSubUnit(unit, parentOrganization.getId());
-        accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
+        accessGroupService.createUnitDefaultAccessGroups(unit, parentOrganization.getId());
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
@@ -592,9 +592,9 @@ public class CompanyCreationService {
         organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
-        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
-        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days,LocalTime.of(23,59),JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
-        List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+//        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
+//        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days,LocalTime.of(23,59),JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
+//        List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
