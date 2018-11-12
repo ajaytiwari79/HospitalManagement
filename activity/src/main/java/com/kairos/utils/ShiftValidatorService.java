@@ -454,13 +454,17 @@ public class ShiftValidatorService {
         }
         DateTimeInterval dateTimeInterval;
         LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
-        while (true) {
-            dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
-            endDate = validationStartDate.plusWeeks(numberOfWeeks);
-            if (dateTimeInterval.contains(shift.getStartDate())) {
-                break;
+        if(validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(shift.getStartDate()))) {
+            while (true) {
+                dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
+                if (dateTimeInterval.contains(shift.getStartDate())) {
+                    break;
+                }
+                validationStartDate = endDate;
+                endDate = validationStartDate.plusWeeks(numberOfWeeks);
             }
-            validationStartDate = endDate;
+        }else{
+            dateTimeInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         }
         return dateTimeInterval;
     }
@@ -743,7 +747,7 @@ public class ShiftValidatorService {
     }
 
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints,int totalVeto,int totalStopBricks){
-        return totalBlockingPoints<=totalVeto*VETO_BLOCKING_POINT+totalStopBricks*STOP_BRICK_BLOCKING_POINT;
+        return totalBlockingPoints>=totalVeto*VETO_BLOCKING_POINT+totalStopBricks*STOP_BRICK_BLOCKING_POINT;
 
     }
 }
