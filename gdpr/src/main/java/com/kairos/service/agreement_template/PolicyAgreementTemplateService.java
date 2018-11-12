@@ -208,6 +208,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             clauses.add(clause);
         }
         agreementSectionResponseDTO.setClauses(clauses);
+        agreementSectionResponseDTO.getClauseCkEditorVOS().clear();
+        agreementSectionResponseDTO.getClauseIdOrderedIndex().clear();
     }
 
 

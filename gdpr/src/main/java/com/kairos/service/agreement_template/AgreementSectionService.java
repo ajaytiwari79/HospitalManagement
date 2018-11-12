@@ -265,27 +265,18 @@ public class AgreementSectionService extends MongoBaseService {
         List<Clause> clauseList = new ArrayList<>();
         Map<AgreementSection, List<Clause>> clauseListCoresspondingToAgreementSection = new HashMap<>();
         Map<AgreementSection, List<ClauseBasicDTO>> exisitingClauseListCoresspondingToAgreementSections = new HashMap<>();
-        Map<AgreementSection, Map<BigInteger, Integer>> clauseOrderCoresspondingToAgreementSectionAndSubSection = new HashMap<>();
         Set<BigInteger> alteredClauseIdList = new HashSet<>();
         globalAgreementSectionAndClauseDTOListHashMap.forEach((agreementSection, clauseBasicDTOList) -> {
             List<ClauseBasicDTO> exisitingClauseList = new ArrayList<>();
             List<ClauseBasicDTO> newClauseRelatedToAgreementSection = new ArrayList<>();
-            Map<BigInteger, Integer> clauseIdAndOrder = new HashMap<>();
-            List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>();
             clauseBasicDTOList.forEach(clauseBasicDTO -> {
-                if (clauseBasicDTO.isRequireUpdate() && Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
+                if (Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
                     alteredClauseIdList.add(clauseBasicDTO.getId());
                     exisitingClauseList.add(clauseBasicDTO);
-                } else if (Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
-                    agreementSection.getClauseIdOrderedIndex().add(clauseBasicDTO.getId());
-                    clauseIdAndOrder.put(clauseBasicDTO.getId(), clauseBasicDTO.getOrderedIndex());
-                    clauseOrderCoresspondingToAgreementSectionAndSubSection.put(agreementSection, clauseIdAndOrder);
                 } else {
                     newClauseRelatedToAgreementSection.add(clauseBasicDTO);
                 }
-                clauseCkEditorVOS.add(new ClauseCkEditorVO(clauseBasicDTO.getId(), clauseBasicDTO.getTitleHtml(), clauseBasicDTO.getDescriptionHtml()));
             });
-            agreementSection.setClauseCkEditorVOS(clauseCkEditorVOS);
             if (!exisitingClauseList.isEmpty()) {
                 exisitingClauseListCoresspondingToAgreementSections.put(agreementSection, exisitingClauseList);
             }
@@ -303,7 +294,7 @@ public class AgreementSectionService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(clauseList)) {
             clauseMongoRepository.saveAll(getNextSequence(clauseList));
         }
-        sortClauseByOrderIndexAndAddClauseIdToAgreementSectionAndSubSections(agreementSubSectionListAndCoresspondingToAgreementSectionMap, agreementSubSections, clauseListCoresspondingToAgreementSection, clauseOrderCoresspondingToAgreementSectionAndSubSection);
+        sortClauseByOrderIndexAndAddClauseIdToAgreementSectionAndSubSections(agreementSubSectionListAndCoresspondingToAgreementSectionMap, agreementSubSections, clauseListCoresspondingToAgreementSection);
         if (!agreementSubSections.isEmpty()) {
             agreementSectionMongoRepository.saveAll(getNextSequence(agreementSubSections));
         }
@@ -323,39 +314,34 @@ public class AgreementSectionService extends MongoBaseService {
      * @param agreementSubSectionListAndCoresspondingToAgreementSectionMap
      * @param subSections
      * @param clauseListCoresspondingToAgreementSection
-     * @param clauseOrderCoresspondingToAgreementSectionAndSubSection
+     * @param
      */
     private void sortClauseByOrderIndexAndAddClauseIdToAgreementSectionAndSubSections(Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap, List<AgreementSection> subSections,
-                                                                                      Map<AgreementSection, List<Clause>> clauseListCoresspondingToAgreementSection, Map<AgreementSection, Map<BigInteger, Integer>> clauseOrderCoresspondingToAgreementSectionAndSubSection) {
+                                                                                      Map<AgreementSection, List<Clause>> clauseListCoresspondingToAgreementSection) {
         agreementSubSectionListAndCoresspondingToAgreementSectionMap.forEach((agreementSection, subSectionList) ->
         {
-            addClauseIdInIndexedOrderToSectionAndSubSection(agreementSection, clauseOrderCoresspondingToAgreementSectionAndSubSection, clauseListCoresspondingToAgreementSection);
+            mapClauseCkEditorHtmlAndSortClauseArray(agreementSection, clauseListCoresspondingToAgreementSection.get(agreementSection));
             if (agreementSection.isSubSection()) {
                 subSections.add(agreementSection);
             } else {
                 if (Optional.ofNullable(subSectionList).isPresent() && CollectionUtils.isNotEmpty(subSectionList)) {
                     subSections.addAll(subSectionList);
-                    subSectionList.forEach(agreementSubSection -> addClauseIdInIndexedOrderToSectionAndSubSection(agreementSubSection, clauseOrderCoresspondingToAgreementSectionAndSubSection, clauseListCoresspondingToAgreementSection));
+                    subSectionList.forEach(agreementSubSection ->
+                            mapClauseCkEditorHtmlAndSortClauseArray(agreementSubSection, clauseListCoresspondingToAgreementSection.get(agreementSubSection)));
+
                 }
             }
-
         });
 
     }
 
-    public void addClauseIdInIndexedOrderToSectionAndSubSection(AgreementSection agreementSection, Map<AgreementSection, Map<BigInteger, Integer>> clauseOrderCoresspondingToAgreementSectionAndSubSection
-            , Map<AgreementSection, List<Clause>> clauseListCoresspondingToAgreementSection) {
 
-        Map<BigInteger, Integer> agreementSubSectionClauseIdAndOrder = new HashMap<>();
-        if (Optional.ofNullable(clauseOrderCoresspondingToAgreementSectionAndSubSection.get(agreementSection)).isPresent()) {
-            agreementSubSectionClauseIdAndOrder = clauseOrderCoresspondingToAgreementSectionAndSubSection.get(agreementSection);
-        }
-        if (Optional.ofNullable(clauseListCoresspondingToAgreementSection.get(agreementSection)).isPresent() && CollectionUtils.isNotEmpty(clauseListCoresspondingToAgreementSection.get(agreementSection))) {
-            for (Clause clause : clauseListCoresspondingToAgreementSection.get(agreementSection)) {
-                agreementSubSectionClauseIdAndOrder.put(clause.getId(), clause.getOrderedIndex());
-            }
-        }
-        agreementSection.setClauseIdOrderedIndex(agreementSubSectionClauseIdAndOrder.entrySet().stream().sorted(Map.Entry.comparingByValue()).map(Map.Entry::getKey).collect(Collectors.toList()));
+    private void mapClauseCkEditorHtmlAndSortClauseArray(AgreementSection agreementSection, List<Clause> clauseList) {
+        List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>();
+        List<Clause> clauses = clauseList.stream().sorted(Comparator.comparing(Clause::getOrderedIndex)).collect(Collectors.toList());
+        clauses.forEach(clause -> clauseCkEditorVOS.add(new ClauseCkEditorVO(clause.getId(), clause.getTitleHtml(), clause.getDescriptionHtml())));
+        agreementSection.setClauseIdOrderedIndex(clauses.stream().map(Clause::getId).collect(Collectors.toList()));
+        agreementSection.setClauseCkEditorVOS(clauseCkEditorVOS);
     }
 
     /**
@@ -401,7 +387,7 @@ public class AgreementSectionService extends MongoBaseService {
     private List<Clause> updateExisingClauseListOfAgreementSection(Long countryId, Set<BigInteger> existingClauseId, Map<AgreementSection, List<ClauseBasicDTO>> existingClauseMap, Map<AgreementSection, List<Clause>> agreementSectionClauseList, PolicyAgreementTemplate agreementTemplate) {
 
 
-        Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = (Set<BigInteger>) agreementSectionMongoRepository.getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(countryId, existingClauseId);
+        Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = agreementSectionMongoRepository.getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(countryId, existingClauseId);
 
         if (CollectionUtils.isNotEmpty(clauseIdListPresentInOtherSectionAndSubSection)) {
             existingClauseId.remove(clauseIdListPresentInOtherSectionAndSubSection);
@@ -418,9 +404,12 @@ public class AgreementSectionService extends MongoBaseService {
 
                 } else {
                     clause = clauseIdMap.get(clauseBasicDTO.getId());
+                    clause.setTitle(clauseBasicDTO.getTitle());
                     clause.setDescription(clauseBasicDTO.getDescription());
                     clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
                 }
+                clause.setTitleHtml(clauseBasicDTO.getTitleHtml());
+                clause.setDescriptionHtml(clauseBasicDTO.getDescriptionHtml());
                 clausesRelateToAgreementSection.add(clause);
             });
             agreementSectionClauseList.get(agreementSection).addAll(clausesRelateToAgreementSection);
