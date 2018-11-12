@@ -3,13 +3,10 @@ package com.kairos.dto.activity.wta.templates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -23,8 +20,8 @@ public class VetoAndStopBricksWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private int numberOfWeeks;
     private LocalDate validationStartDate;
-    private BigInteger vetoTypeActivity;
-    private BigInteger stopBricksActivity;
+    private BigInteger vetoActivityId;
+    private BigInteger stopBrickActivityId;
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
 
     public int getNumberOfWeeks() {
@@ -43,20 +40,20 @@ public class VetoAndStopBricksWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.validationStartDate = validationStartDate;
     }
 
-    public BigInteger getVetoTypeActivity() {
-        return vetoTypeActivity;
+    public BigInteger getVetoActivityId() {
+        return vetoActivityId;
     }
 
-    public void setVetoTypeActivity(BigInteger vetoTypeActivity) {
-        this.vetoTypeActivity = vetoTypeActivity;
+    public void setVetoActivityId(BigInteger vetoActivityId) {
+        this.vetoActivityId = vetoActivityId;
     }
 
-    public BigInteger getStopBricksActivity() {
-        return stopBricksActivity;
+    public BigInteger getStopBrickActivityId() {
+        return stopBrickActivityId;
     }
 
-    public void setStopBricksActivity(BigInteger stopBricksActivity) {
-        this.stopBricksActivity = stopBricksActivity;
+    public void setStopBrickActivityId(BigInteger stopBrickActivityId) {
+        this.stopBrickActivityId = stopBrickActivityId;
     }
 
     public float getTotalBlockingPoints() {
