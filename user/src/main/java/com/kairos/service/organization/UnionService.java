@@ -458,7 +458,7 @@ public class UnionService {
             contactAddress.setZipCode(zipCode);
         }
         if(Optional.ofNullable(addressDTO.getMunicipalityId()).isPresent()) {
-            Municipality municipality = municipalityGraphRepository.findByIdDeletedFalse(addressDTO.getZipCodeId());
+            Municipality municipality = municipalityGraphRepository.findByZipCodeIdandIdDeletedFalse(addressDTO.getMunicipalityId(),addressDTO.getZipCodeId());
             if(!Optional.ofNullable(municipality).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.municipality.notFound");
             }
