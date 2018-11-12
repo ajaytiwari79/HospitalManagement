@@ -31,6 +31,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<SubServiceCategory> organizationSubServices;
     private BigInteger templateType;
     private boolean coverPageAdded;
+    private boolean includeContentPage;
     private CoverPageVO coverPageData;
 
 
@@ -43,6 +44,11 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
     }
+
+    public boolean isIncludeContentPage() { return includeContentPage; }
+
+    public void setIncludeContentPage(boolean includeContentPage) { this.includeContentPage = includeContentPage; }
+
     public PolicyAgreementTemplate() {
     }
 

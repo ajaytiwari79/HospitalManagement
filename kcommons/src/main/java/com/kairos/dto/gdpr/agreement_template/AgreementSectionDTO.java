@@ -19,10 +19,8 @@ public class AgreementSectionDTO {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String title;
-
-    @NotNull(message = "Section order is Not defined")
     private Integer orderedIndex;
-
+    private String titleHtml;
     @Valid
     private List<ClauseBasicDTO> clauses=new ArrayList<>();
 
@@ -63,6 +61,10 @@ public class AgreementSectionDTO {
     public Integer getOrderedIndex() { return orderedIndex; }
 
     public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
+
+    public String getTitleHtml() { return titleHtml; }
+
+    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
     public AgreementSectionDTO() {
     }
