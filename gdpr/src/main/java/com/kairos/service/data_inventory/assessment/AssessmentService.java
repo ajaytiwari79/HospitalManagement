@@ -43,6 +43,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireT
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
@@ -50,6 +51,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -207,15 +209,17 @@ public class AssessmentService extends MongoBaseService {
         }
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
-        } else if (questionnaireTemplate.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
+        } else if (QuestionnaireTemplateStatus.DRAFT.equals(questionnaireTemplate.getTemplateStatus())) {
             exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
         }
-        /*if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
+        if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
             if (!Optional.ofNullable(assessmentDTO.getAssessmentScheduledDate()).isPresent()) {
                 exceptionService.invalidRequestException("message.assessment.scheduling.date.not.Selected");
+            } else if (LocalDate.now().equals(assessmentDTO.getAssessmentScheduledDate()) || assessmentDTO.getAssessmentScheduledDate().isBefore(LocalDate.now())) {
+                exceptionService.invalidRequestException("message.assessment.enter.valid.date");
             }
             assessment.setAssessmentScheduledDate(assessmentDTO.getAssessmentScheduledDate());
-        }*/
+        }
         assessment.setAssessmentSchedulingFrequency(assessmentDTO.getAssessmentSchedulingFrequency());
         assessment.setQuestionnaireTemplateId(questionnaireTemplate.getId());
         return assessment;
@@ -480,6 +484,10 @@ public class AssessmentService extends MongoBaseService {
         return assessmentMongoRepository.getAllAssessmentByUnitId(unitId);
     }
 
+    public AssessmentSchedulingFrequency [] getSchedulingFrequency()
+    {
+        return AssessmentSchedulingFrequency.values();
+    }
 
     public boolean deleteAssessmentbyId(Long unitId, BigInteger assessmentId) {
 
@@ -657,7 +665,6 @@ public class AssessmentService extends MongoBaseService {
         for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
             for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
                 assetAssessmentAnswerVOS.add(mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(assetResponseDTO, questionBasicDTO));
-
             }
         }
         assessment.setAssessmentAnswers(assetAssessmentAnswerVOS);

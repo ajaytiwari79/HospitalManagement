@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,7 +16,7 @@ public class QuestionnaireSectionResponseDTO {
     @NotBlank(message = "name.cannot.be.empty.or.null")
     private String title;
 
-    private List<QuestionBasicResponseDTO> questions;
+    private List<QuestionBasicResponseDTO> questions=new ArrayList<>();
 
 
     public BigInteger getId() {

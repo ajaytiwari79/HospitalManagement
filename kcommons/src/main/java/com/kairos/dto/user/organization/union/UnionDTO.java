@@ -4,8 +4,8 @@ import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UnionDTO {
@@ -13,8 +13,8 @@ public class UnionDTO {
     @NotNull
     private String name;
     private ContactAddressDTO mainAddress;
-    private List<Long> sectorIds;
-    private List<Long> locationIds;
+    private List<Long> sectorIds = new ArrayList<>();
+    private List<Long> locationIds = new ArrayList<>();
     private Long id;
     private UnionState state;
 

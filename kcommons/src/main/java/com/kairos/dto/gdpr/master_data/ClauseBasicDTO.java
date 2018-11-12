@@ -17,15 +17,13 @@ public class ClauseBasicDTO {
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
-
+    private String titleHtml;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-
+    private String descriptionHtml;
     private boolean requireUpdate;
-
     @NotNull(message = "Clause order is Not defined")
     private Integer orderedIndex;
-
     public BigInteger getId() {
         return id;
     }
@@ -57,6 +55,14 @@ public class ClauseBasicDTO {
     public Integer getOrderedIndex() { return orderedIndex; }
 
     public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
+
+    public String getTitleHtml() { return titleHtml; }
+
+    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
+
+    public String getDescriptionHtml() { return descriptionHtml; }
+
+    public void setDescriptionHtml(String descriptionHtml) { this.descriptionHtml = descriptionHtml; }
 
     public ClauseBasicDTO() {
     }
