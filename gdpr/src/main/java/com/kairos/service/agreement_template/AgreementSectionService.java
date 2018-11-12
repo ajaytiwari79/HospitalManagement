@@ -69,8 +69,8 @@ public class AgreementSectionService extends MongoBaseService {
             List<BigInteger> agreementSectionIdList = createOrupdateSectionAndSubSectionOfAgreementTemplate(countryId, agreementTemplateSectionDTO.getSections(), policyAgreementTemplate);
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
-        policyAgreementTemplate.setCoverPageTitle(agreementTemplateSectionDTO.getCoverPageTitle());
-        policyAgreementTemplate.setCoverPageContent(agreementTemplateSectionDTO.getCoverPageContent());
+        policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
+        policyAgreementTemplate.setCoverPageData(agreementTemplateSectionDTO.getCoverPageData());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
     }
@@ -217,7 +217,10 @@ public class AgreementSectionService extends MongoBaseService {
         } else {
             saveAgreementSectionAndSubSectionIfClauseNotExist(agreementSectionList, agreementSubSectionListCoresspondingToAgreementSection);
         }
-        agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
+
+        if (CollectionUtils.isNotEmpty(agreementSectionList)) {
+            agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
+        }
         return agreementSectionList.stream().map(AgreementSection::getId).collect(Collectors.toList());
     }
 

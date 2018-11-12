@@ -129,9 +129,8 @@ public class CompanyCreationService {
     @Inject
     private ReasonCodeService reasonCodeService;
     @Inject
-
     private SchedulerServiceRestClient schedulerRestClient;
-
+    @Inject
     private TreeStructureService treeStructureService;
 
 
@@ -342,13 +341,17 @@ public class CompanyCreationService {
                 // No user is found its first time so we need to validate email and CPR number
                 //validate user email or name
                 if (unitManagerDTO.getCprNumber() != null || unitManagerDTO.getEmail() != null) {
-                    byte userBySameEmailOrCPR = userGraphRepository.findByEmailIgnoreCaseOrCprNumber("(?i)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber());
-                    if (userBySameEmailOrCPR != 0) {
-                        exceptionService.duplicateDataException("user already exist by email or cpr");
+                    User userBySameEmailOrCPR = userGraphRepository.findByCprNumber(unitManagerDTO.getCprNumber());
+                    if (userBySameEmailOrCPR != null) {
+                        user=userBySameEmailOrCPR;
+                        //user.setEmail(unitManagerDTO.getEmail());
+                    }
+                    else{
+                        user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                     }
 
                 }
-                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);

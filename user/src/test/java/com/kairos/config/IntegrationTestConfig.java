@@ -26,12 +26,9 @@ public class IntegrationTestConfig {
     @Bean
     @Primary
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
-                .interceptors(new TestUserContextInterceptor())
-                .build();
-        TestRestTemplate restTemplate = new TestRestTemplate(template);
-
-        return restTemplate;
+        restTemplateBuilder = restTemplateBuilder
+                .interceptors(new TestUserContextInterceptor());
+        return new TestRestTemplate(restTemplateBuilder);
     }
 
 
