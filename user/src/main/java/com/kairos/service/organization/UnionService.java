@@ -199,7 +199,7 @@ public class UnionService {
 
         ContactAddress address = null;
         if(Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
-             address = getAddress(locationDTO.getAddress(),false,false,null);
+             address = getAddress(locationDTO.getAddress(),false,false,null,null,null);
         }
         Location location = new Location(locationDTO.getName(),address);
         union.getLocations().add(location);
@@ -239,7 +239,8 @@ public class UnionService {
         Long addressIdDb = locationqueryResults.get(0).getAddressId();
 
         if(Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
-            location.setAddress(getAddress(locationDTO.getAddress(),zipCodeUpdated,municipalityUpdated,addressIdDb));
+            location.setAddress(getAddress(locationDTO.getAddress(),zipCodeUpdated,municipalityUpdated,addressIdDb,
+                    locationqueryResults.get(0).getZipCodeId(),locationqueryResults.get(0).getMunicipalityId()));
         }
         location.setName(locationDTO.getName());
 
@@ -276,7 +277,7 @@ public class UnionService {
                 exceptionService.invalidRequestException("message.publish.address.missing");
             }  else if(Optional.ofNullable(unionData.getMainAddress()).isPresent()){
 
-                address = getAddress(unionData.getMainAddress(),false,false,null);
+                address = getAddress(unionData.getMainAddress(),false,false,null,null,null);
             }
 
             boolean boardingCompleted=false;
@@ -354,8 +355,10 @@ public class UnionService {
         if(Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
             municipalityUpdated = !unionDataQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
         }
+        Long zipCodeIdDB = Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()?unionDataQueryResult.getZipCode().getId():null;
+        Long municipalityIdDB = Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()?unionDataQueryResult.getMunicipality().getId():null;
         address = getAddress(unionData.getMainAddress(),zipCodeUpdated,municipalityUpdated,Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()?
-                unionDataQueryResult.getAddress().getId():null);
+                unionDataQueryResult.getAddress().getId():null,zipCodeIdDB,municipalityIdDB);
         }
 
         union.setName(unionData.getName());
@@ -441,7 +444,8 @@ public class UnionService {
      * @Description This method is used for creating address object for saving in DB
      * @return ContactAddress
      */
-    public ContactAddress getAddress(ContactAddressDTO addressDTO,boolean zipCodeUpdated,boolean municipalityUpdated, Long addressId) {
+    public ContactAddress getAddress(ContactAddressDTO addressDTO,boolean zipCodeUpdated,boolean municipalityUpdated, Long addressId, Long oldZipCodeId,
+                                     Long oldMunicipalityId) {
 
         ContactAddress contactAddress = new ContactAddress(addressDTO.getHouseNumber(),
                 addressDTO.getProvince(),addressDTO.getStreet(),addressDTO.getCity(),addressDTO.getRegionName());
@@ -453,7 +457,7 @@ public class UnionService {
                 exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
             }
             if(zipCodeUpdated) {
-                zipCodeGraphRepository.deleteAddressZipcodeRelation(addressId,addressDTO.getZipCodeId());
+                zipCodeGraphRepository.deleteAddressZipcodeRelation(addressId,oldZipCodeId);
             }
             contactAddress.setZipCode(zipCode);
         }
@@ -464,7 +468,7 @@ public class UnionService {
             }
             contactAddress.setMunicipality(municipality);
             if(municipalityUpdated) {
-                municipalityGraphRepository.deleteAddressMunicipalityRelation(addressId,addressDTO.getMunicipalityId());
+                municipalityGraphRepository.deleteAddressMunicipalityRelation(addressId,oldMunicipalityId);
             }
         }
 
