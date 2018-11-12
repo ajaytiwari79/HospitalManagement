@@ -8,6 +8,7 @@ import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.enums.payroll_system.PayRollType;
+import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
@@ -126,6 +127,7 @@ public class CountryController {
     @Inject
     private FunctionService functionService;
     @Inject private CompanyCreationService companyCreationService;
+
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -352,20 +354,7 @@ public class CountryController {
     }
 
 
-    @ApiOperation(value = "Create a Union")
-    @RequestMapping(value = COUNTRY_URL + "/union", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> createUnion(@PathVariable Long organizationId,
-                                                           @PathVariable long countryId,
-                                                           @RequestBody OrganizationBasicDTO unionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
-                createUnion(unionDTO, countryId, organizationId));
-    }
 
-    @ApiOperation(value = "Update Union")
-    @RequestMapping(value = COUNTRY_URL + "/union/{unionId}", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateUnion(@PathVariable long countryId, @PathVariable long unionId, @Valid @RequestBody OrganizationBasicDTO unionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateUnion(unionDTO, unionId, countryId));
-    }
 
     @ApiOperation(value = "Delete Parent Organization or unit ")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.DELETE)

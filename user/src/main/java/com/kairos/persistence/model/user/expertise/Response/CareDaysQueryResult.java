@@ -1,5 +1,8 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
@@ -7,7 +10,11 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * @date - 30/10/18
  */
 @QueryResult
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class CareDaysQueryResult {
+
     private Long id;
     private Integer from;
     private Integer to;

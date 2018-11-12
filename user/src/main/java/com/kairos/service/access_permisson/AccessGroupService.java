@@ -226,22 +226,31 @@ public class AccessGroupService {
         });
     }
 
+    public void createUnitDefaultAccessGroups(Organization unit, Long parentId) {
+        List<AccessGroupQueryResult> accessGroupList = accessGroupRepository.getPatentAccessGroupByorganizationId(parentId);
+        createDefaultAccessGroupsInOrganization(unit, accessGroupList, false);
+    }
+
     /**
      * @param organization,accountTypeId
      * @author vipul
      * this method will create accessgroup to the organization
      * @Extra Need to optimize
      */
-    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroupQueryResult> accessGroupList, boolean company) {
+    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization,
+                                                                   List<AccessGroupQueryResult> accessGroupList, boolean company) {
 
 
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
 
         List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
         for (AccessGroupQueryResult currentAccessGroup : accessGroupList) {
-            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(),
+                    currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             parent.setId(currentAccessGroup.getId());
-            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(),
+                    currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(),
+                    company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
             accessGroup.setParentAccessGroup(parent);
             accessGroup.setLastModificationDate(accessGroup.getCreationDate());

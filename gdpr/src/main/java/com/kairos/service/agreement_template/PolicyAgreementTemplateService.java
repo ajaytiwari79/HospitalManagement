@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
 import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
+import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
@@ -96,11 +97,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
-        String coverPageLogoUrl=awsBucketService.uploadImage(coverPageLogo);
-        policyAgreementTemplate.setCoverPageLogoUrl(coverPageLogoUrl);
+        String coverPageLogoUrl = awsBucketService.uploadImage(coverPageLogo);
+        if (policyAgreementTemplate.isCoverPageAdded()) {
+            policyAgreementTemplate.getCoverPageData().setCoverPageLogoUrl(coverPageLogoUrl);
+        } else {
+            policyAgreementTemplate.setCoverPageData(new CoverPageVO(coverPageLogoUrl));
+            policyAgreementTemplate.setCoverPageAdded(true);
+        }
+
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return coverPageLogoUrl;
     }
+
     /**
      * @param countryId
      * @return
@@ -176,9 +184,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         );
         agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
         agreementTemplateResponse.setSections(agreementSectionResponseDTOS);
-        agreementTemplateResponse.setCoverPageContent(template.getCoverPageContent());
-        agreementTemplateResponse.setCoverPageLogoUrl(template.getCoverPageLogoUrl());
-        agreementTemplateResponse.setCoverPageTitle(template.getCoverPageTitle());
+        agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
+        agreementTemplateResponse.setCoverPageData(template.getCoverPageData());
         return agreementTemplateResponse;
     }
 
