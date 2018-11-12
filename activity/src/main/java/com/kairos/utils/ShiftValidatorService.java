@@ -743,7 +743,6 @@ public class ShiftValidatorService {
     }
 
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints,int totalVeto,int totalStopBricks){
-        //TODO I think it should check only for less then not if equal please verify Pawan
         return totalBlockingPoints<=totalVeto*VETO_BLOCKING_POINT+totalStopBricks*STOP_BRICK_BLOCKING_POINT;
 
     }

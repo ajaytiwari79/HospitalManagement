@@ -31,7 +31,6 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     private LocalDate validationStartDate;
     private BigInteger vetoTypeActivity;
     private BigInteger stopBricksActivity;
-   // private List<BigInteger> activities = new ArrayList<>();
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
 
     public VetoAndStopBricksWTATemplate() {
@@ -86,37 +85,6 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     public void setTotalBlockingPoints(float totalBlockingPoints) {
         this.totalBlockingPoints = totalBlockingPoints;
     }
-
-    //This will throw nullPointerException
-    /*public List<BigInteger> getActivities() {
-        activities.add(this.stopBricksActivity);
-        activities.add(this.vetoTypeActivity);
-        return activities;
-    }*/
-
-   /* @Override
-    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()).plusDays(1).isAfter(validationStartDate)) {
-
-            List<ShiftWithActivityDTO> shifts = filterShiftsByIntervalAndVetoAndStopBricksActivity(getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate), infoWrapper.getShifts(), getActivities());
-            shifts.add(infoWrapper.getShift());
-            int totalVeto = 0;
-            int totalStopBricks = 0;
-            for (ShiftWithActivityDTO shift : shifts) {
-                if (shift.getActivitIds().contains(vetoTypeActivity)) {
-                    totalVeto++;
-                } else if (shift.getActivitIds().contains(stopBricksActivity)) {
-                    totalStopBricks++;
-                }
-            }
-            boolean isValid = validateVetoAndStopBrickRules(totalBlockingPoints, totalVeto, totalStopBricks);
-            if (!isValid) {
-                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
-                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-            }
-
-        }
-    }*/
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
