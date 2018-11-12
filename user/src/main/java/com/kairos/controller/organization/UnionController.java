@@ -112,7 +112,7 @@ public class UnionController {
     public ResponseEntity<Map<String, Object>> updateUnion(@PathVariable long countryId, @PathVariable long unionId, @Valid @RequestBody UnionDTO unionDTO,@RequestParam(required = false) boolean publish) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unionService.updateUnion(unionDTO,countryId,unionId,publish));
     }
-  // TODO NEED TO IMPLEMENT IN FUTUREgit p
+  // TODO NEED TO IMPLEMENT IN FUTURE
 //    @RequestMapping(value = UNIT_URL + "/unions", method = RequestMethod.GET)
 //    @ApiOperation("Get All Unions by organization ")
 //    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

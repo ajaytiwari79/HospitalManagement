@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.StaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
@@ -35,10 +36,11 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
     void unlinkExpertiseFromStaffExcludingCurrent(Long staffId, List<Long> ids);
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0}" +
-            " MATCH (expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
-            " with expertise ,rel,seniorityLevel ORDER By seniorityLevel.from with expertise ,rel,collect(seniorityLevel) as seniorityLevels " +
-            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths,seniorityLevels as seniorityLevels ")
-    List<StaffExpertiseQueryResult> getExpertiseWithExperience(Long staffId);
+            "MATCH (expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
+            "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector)" +
+            "WITH sector,expertise ,rel,seniorityLevel ORDER By seniorityLevel.from with expertise ,rel,collect(seniorityLevel) as seniorityLevels " +
+            "RETURN sector,staffExpertiseQueryResult:{id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths,seniorityLevels as seniorityLevels,sector as sector} ")
+    List<SectorAndStaffExpertiseQueryResult> getExpertiseWithExperience(Long staffId);
 
 
 
