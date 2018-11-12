@@ -591,7 +591,7 @@ public class PlanningPeriodService extends MongoBaseService {
             shifts.add(shift);
         });
         save(shifts);
-        shiftService.UpdateShiftDailyTimeBankAndPaidOut(shifts,shiftList, unitId);
+        shiftService.updateShiftDailyTimeBankAndPaidOut(shifts,shiftList, unitId);
     }
 
     public void restoreAvailabilityCount(List<StaffingLevel> staffingLevels, List<StaffingLevelState> staffingLevelStates) {
