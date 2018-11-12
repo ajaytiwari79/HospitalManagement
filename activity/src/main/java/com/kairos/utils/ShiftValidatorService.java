@@ -436,7 +436,7 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
-        Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> (interval.getStartDate().isBefore(shiftStartLocalDate) && interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate))).findAny();
+        Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate))&& (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
         if(cutOffIntervalOptional.isPresent()){
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
@@ -608,10 +608,10 @@ public class ShiftValidatorService {
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             if(careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
-                Optional<CutOffInterval> cutOffIntervalOptional = shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> (interval.getStartDate().isBefore(shiftDate) && interval.getEndDate().isAfter(shiftDate) || interval.getStartDate().isEqual(shiftDate))).findAny();
+                Optional<CutOffInterval> cutOffIntervalOptional = shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate))&& (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
                 if(cutOffIntervalOptional.isPresent()){
                     CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate())));
+                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
                 }
             }
         }
