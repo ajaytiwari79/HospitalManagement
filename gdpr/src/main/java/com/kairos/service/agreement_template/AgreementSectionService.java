@@ -127,9 +127,11 @@ public class AgreementSectionService extends MongoBaseService {
 
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
             AgreementSection agreementSection = new AgreementSection(countryId, agreementSectionDTO.getTitle(), agreementSectionDTO.getOrderedIndex(), false);
+            agreementSection.setTitleHtml(agreementSectionDTO.getTitleHtml());
             List<AgreementSection> subSectionList = new ArrayList<>();
             for (AgreementSectionDTO agreementSubSectionDTO : agreementSectionDTO.getSubSections()) {
                 AgreementSection subSection = new AgreementSection(countryId, agreementSubSectionDTO.getTitle(), agreementSubSectionDTO.getOrderedIndex(), true);
+                subSection.setTitleHtml(agreementSubSectionDTO.getTitleHtml());
                 if (!agreementSubSectionDTO.getClauses().isEmpty()) {
                     globalAgreementSectionAndClauseDTOListHashMap.put(subSection, agreementSubSectionDTO.getClauses());
                 }
@@ -194,6 +196,7 @@ public class AgreementSectionService extends MongoBaseService {
                             agreementSectionDTOMap.put(agreementSubSectionDTO.getId(), agreementSubSectionDTO);
                         } else {
                             AgreementSection subSection = new AgreementSection(countryId, agreementSubSectionDTO.getTitle(), agreementSubSectionDTO.getOrderedIndex(), true);
+                            subSection.setTitleHtml(agreementSubSectionDTO.getTitleHtml());
                             if (CollectionUtils.isNotEmpty(agreementSubSectionDTO.getClauses())) {
                                 globalAgreementSectionAndClauseDTOListHashMap.put(subSection, agreementSubSectionDTO.getClauses());
                             }
@@ -241,6 +244,7 @@ public class AgreementSectionService extends MongoBaseService {
             AgreementSectionDTO agreementSectionDTO = agreementSectionDTOMap.get(agreementSection.getId());
             agreementSection.setTitle(agreementSectionDTO.getTitle());
             agreementSection.setOrderedIndex(agreementSectionDTO.getOrderedIndex());
+            agreementSection.setTitleHtml(agreementSectionDTO.getTitleHtml());
             if (!agreementSectionDTO.getClauses().isEmpty()) {
                 globalAgreementSectionAndClauseDTOListHashMap.put(agreementSection, agreementSectionDTO.getClauses());
             }

@@ -20,6 +20,7 @@ public class AgreementSectionResponseDTO {
 
     @NotBlank
     private String title;
+    private String titleHtml;
     private Integer orderedIndex;
     private List<BigInteger> clauseIdOrderedIndex;
     private List<ClauseBasicResponseDTO> clauses;
@@ -72,8 +73,12 @@ public class AgreementSectionResponseDTO {
 
     public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
 
-    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS;
-    }
+    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
+
+    public String getTitleHtml() { return titleHtml; }
+
+    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
+
     public AgreementSectionResponseDTO() {
 
     }
