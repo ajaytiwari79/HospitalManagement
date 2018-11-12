@@ -376,11 +376,11 @@ public class UnionService {
 
 
     public boolean validateAddress(ContactAddressDTO addressDTO) {
-        Assert.notNull(addressDTO.getHouseNumber(),"meessage.houseNumber.mull");
-        Assert.notNull(addressDTO.getProvince(),"meessage.province.mull");
-        Assert.notNull(addressDTO.getStreet(),"meessage.street.mull");
-        Assert.notNull(addressDTO.getCity(),"meessage.city.mull");
-        Assert.notNull(addressDTO.getRegionName(),"meessage.region.mull");
+        Assert.notNull(addressDTO.getHouseNumber(),"meessage.houseNumber.null");
+        Assert.notNull(addressDTO.getProvince(),"meessage.province.null");
+        Assert.notNull(addressDTO.getStreet(),"meessage.street.null");
+        Assert.notNull(addressDTO.getCity(),"meessage.city.null");
+        Assert.notNull(addressDTO.getRegionName(),"meessage.region.null");
         Assert.notNull(addressDTO.getZipCodeId(),"message.zipCodeId.null");
         Assert.notNull(addressDTO.getMunicipalityId(),"message.municipality.null");
         return true;
