@@ -19,10 +19,7 @@ public class AgreementSectionDTO {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String title;
-
-    @NotNull(message = "Section order is Not defined")
     private Integer orderedIndex;
-
     @Valid
     private List<ClauseBasicDTO> clauses=new ArrayList<>();
 

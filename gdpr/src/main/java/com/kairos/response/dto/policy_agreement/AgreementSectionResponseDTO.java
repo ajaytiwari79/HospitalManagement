@@ -3,6 +3,7 @@ package com.kairos.response.dto.policy_agreement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
@@ -19,13 +20,10 @@ public class AgreementSectionResponseDTO {
 
     @NotBlank
     private String title;
-
     private Integer orderedIndex;
-
     private List<BigInteger> clauseIdOrderedIndex;
-
     private List<ClauseBasicResponseDTO> clauses;
-
+    private List<ClauseCkEditorVO> clauseCkEditorVOS;
     private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
@@ -72,6 +70,10 @@ public class AgreementSectionResponseDTO {
         this.title = title;
     }
 
+    public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+
+    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS;
+    }
     public AgreementSectionResponseDTO() {
 
     }

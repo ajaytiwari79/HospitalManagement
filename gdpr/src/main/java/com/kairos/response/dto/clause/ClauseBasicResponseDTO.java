@@ -21,12 +21,10 @@ import java.util.List;
 public class ClauseBasicResponseDTO {
 
     private BigInteger id;
-    @NotBlank
     private String title;
-
-    @NotBlank
+    private String titleHtml;
     private String description;
-
+    private String descriptionHtml;
     private List<ClauseTagDTO> tags = new ArrayList<>();
 
 
@@ -60,5 +58,16 @@ public class ClauseBasicResponseDTO {
 
     public void setTags(List<ClauseTagDTO> tags) {
         this.tags = tags;
+    }
+
+    public String getTitleHtml() { return titleHtml; }
+
+    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
+
+    public String getDescriptionHtml() { return descriptionHtml; }
+
+    public void setDescriptionHtml(String descriptionHtml) { this.descriptionHtml = descriptionHtml; }
+
+    public ClauseBasicResponseDTO() {
     }
 }

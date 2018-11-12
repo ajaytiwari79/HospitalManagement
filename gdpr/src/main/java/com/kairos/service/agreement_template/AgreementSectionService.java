@@ -8,6 +8,7 @@ import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
+import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
@@ -270,6 +271,7 @@ public class AgreementSectionService extends MongoBaseService {
             List<ClauseBasicDTO> exisitingClauseList = new ArrayList<>();
             List<ClauseBasicDTO> newClauseRelatedToAgreementSection = new ArrayList<>();
             Map<BigInteger, Integer> clauseIdAndOrder = new HashMap<>();
+            List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>();
             clauseBasicDTOList.forEach(clauseBasicDTO -> {
                 if (clauseBasicDTO.isRequireUpdate() && Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
                     alteredClauseIdList.add(clauseBasicDTO.getId());
@@ -281,7 +283,9 @@ public class AgreementSectionService extends MongoBaseService {
                 } else {
                     newClauseRelatedToAgreementSection.add(clauseBasicDTO);
                 }
+                clauseCkEditorVOS.add(new ClauseCkEditorVO(clauseBasicDTO.getId(), clauseBasicDTO.getTitleHtml(), clauseBasicDTO.getDescriptionHtml()));
             });
+            agreementSection.setClauseCkEditorVOS(clauseCkEditorVOS);
             if (!exisitingClauseList.isEmpty()) {
                 exisitingClauseListCoresspondingToAgreementSections.put(agreementSection, exisitingClauseList);
             }
