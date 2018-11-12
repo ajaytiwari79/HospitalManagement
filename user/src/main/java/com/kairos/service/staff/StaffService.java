@@ -1263,7 +1263,7 @@ public class StaffService {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
 
         unitPermission = unitPermission == null ? new UnitPermission() : unitPermission;
-        AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
+        AccessGroup accessGroup =accessGroupRepository.findOne(accessGroupId); //union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
             linkAccessOfModules(accessGroup, unitPermission);
@@ -1303,7 +1303,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);//union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);

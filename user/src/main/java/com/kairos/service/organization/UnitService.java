@@ -11,6 +11,7 @@ import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -54,6 +55,8 @@ public class UnitService {
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
     private CompanyCreationService companyCreationService;
+    @Inject
+    private AccessGroupRepository accessGroupRepository;
 
 
     private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {
@@ -61,7 +64,7 @@ public class UnitService {
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
         response.put("accountType", parentOrg.getAccountType());
-        response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
+        response.put("accessGroups", accessGroupRepository.getAccessGroups(parentOrg.getId()));
         response.put("businessTypes", parentOrg.getBusinessTypes());
         response.put("companyCategory", parentOrg.getCompanyCategory());
         response.put("level", parentOrg.getLevel());

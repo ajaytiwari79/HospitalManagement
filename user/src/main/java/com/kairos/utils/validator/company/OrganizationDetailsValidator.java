@@ -56,9 +56,9 @@ public class OrganizationDetailsValidator {
             if (!Optional.ofNullable(staffPersonalDetailDTO.getEmail()).isPresent()) {
                 exceptionService.invalidRequestException("error.email.notnull", staffPersonalDetailDTO.getOrganizationId());
             }
-//            if (!Optional.ofNullable(staffPersonalDetailDTO.getAccessGroupId()).isPresent()) {
-//                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroup.notnull", staffPersonalDetailDTO.getOrganizationId());
-//            }
+            if (!Optional.ofNullable(staffPersonalDetailDTO.getAccessGroupId()).isPresent()) {
+                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroup.notnull", staffPersonalDetailDTO.getOrganizationId());
+            }
         });
     }
 

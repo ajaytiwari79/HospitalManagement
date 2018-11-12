@@ -228,7 +228,7 @@ public class AccessGroupService {
 
     public void createUnitDefaultAccessGroups(Organization unit, Long parentId) {
         List<AccessGroupQueryResult> accessGroupList = accessGroupRepository.getPatentAccessGroupByorganizationId(parentId);
-        createDefaultAccessGroupsInOrganization(unit, accessGroupList, true);
+        createDefaultAccessGroupsInOrganization(unit, accessGroupList, false);
     }
 
     /**
