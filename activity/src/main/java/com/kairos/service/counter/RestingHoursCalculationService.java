@@ -1,12 +1,14 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.counter.chart.DataUnit;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.counter.KPI;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,30 +82,38 @@ public class RestingHoursCalculationService implements CounterService {
         }
     }
 
-    private List<DataUnit> getDataList(FilterCriteriaDTO filterCriteria) {
-        Map<FilterType, List> filterTypeListMap = new HashMap<>();
-        for (FilterCriteria criteria : filterCriteria.getFilters()) {
-            filterTypeListMap.put(criteria.getType(), criteria.getValues());
+    private List<DataUnit> getDataList(Map<FilterType, List> filterBasedCriteria, Long countryId, boolean averageDay, boolean kpi) {
+        List staffIds = null;
+        List dates = new ArrayList();
+        double multiplicationFactor = 1;
+        if(kpi && filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS)!= null){
+            staffIds = filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS);
+        }else{
+            staffIds = filterBasedCriteria.get(FilterType.STAFF_IDS);
         }
-        List staffIds = filterTypeListMap.get(FilterType.STAFF_IDS);
-        List dates = filterTypeListMap.get(FilterType.TIME_INTERVAL);
-        Map<Long, Double> staffRestingHours = calculateRestingHours(staffIds, filterCriteria.getCurrentCountryId(), (Date) dates.get(0), (Date) dates.get(1));
+        if(filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null){
+            dates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
+        }else{
+            dates.add(DateUtils.substractDurationInLocalDateTime(LocalDateTime.now(), 24, DurationType.HOURS));
+            dates.add(LocalDateTime.now());
+        }
+        Map<Long, Double> staffRestingHours = calculateRestingHours(staffIds, countryId, (Date) dates.get(0), (Date) dates.get(1));
         List<DataUnit> dataList = new ArrayList<>();
         for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {
-            dataList.add(new DataUnit(entry.getKey() + "", entry.getValue()));
+            dataList.add(new DataUnit("", entry.getKey(), entry.getValue()*multiplicationFactor));
         }
         return dataList;
     }
 
     @Override
-    public RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
-        List<DataUnit> dataList = getDataList(filterCriteria);
+    public RawRepresentationData getCalculatedCounter(Map filterBasedCriteria, Long countryId, KPI kpi) {
+        List<DataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), false);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 
     @Override
-    public RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
-        List<DataUnit> dataList = getDataList(filterCriteriaDTO);
+    public RawRepresentationData getCalculatedKPI(Map filterBasedCriteria, Long countryId, KPI kpi) {
+        List<DataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart().getType(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 }

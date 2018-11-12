@@ -3,6 +3,8 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
@@ -60,6 +62,8 @@ import static java.util.stream.Collectors.toSet;
 public class CounterDistService extends MongoBaseService {
     @Inject
     private CounterRepository counterRepository;
+    @Inject
+    private CounterDataService counterDataService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -193,14 +197,24 @@ public class CounterDistService extends MongoBaseService {
         return priority;
     }
 
-    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level) {
+    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<BigInteger> kpiIds = new ArrayList<>();
         if (!accessGroupPermissionCounterDTO.getCountryAdmin()) {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }
-        List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), 4l, unitId, level);
-        return filterTabKpiDate(tabKPIDTOS);
+        List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
+        tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
+
+        List<BasicRequirementDTO> basicRequirementDTOS = new ArrayList<>();
+        tabKPIDTOS.forEach(tabKPIDTO -> {
+            basicRequirementDTOS.add(new BasicRequirementDTO(tabKPIDTO.getKpiId(), false, true));
+        });
+
+        filters.setDataRequestList(basicRequirementDTOS);
+        counterDataService.generateCounterData(filters);
+        return tabKPIDTOS;
     }
 
     public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS) {
@@ -223,7 +237,6 @@ public class CounterDistService extends MongoBaseService {
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaffPriority(String moduleId, Long unitId, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds = new ArrayList<>();
-        ;
         if (!accessGroupPermissionCounterDTO.getCountryAdmin()) {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }

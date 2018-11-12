@@ -37,7 +37,7 @@ public interface CounterService {
     }
 
     //map -> { data: [ {} ] }
-    RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi);
+    RawRepresentationData getCalculatedCounter(Map filterBasedCriteria, Long countryId, KPI kpi);
 
-    RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi);
+    RawRepresentationData getCalculatedKPI(Map filterBasedCriteria, Long countryId, KPI kpi);
 }
