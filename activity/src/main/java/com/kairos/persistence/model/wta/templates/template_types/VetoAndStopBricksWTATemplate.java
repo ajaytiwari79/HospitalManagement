@@ -3,7 +3,6 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -29,8 +28,8 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     private int numberOfWeeks;
     private LocalDate validationStartDate;
-    private BigInteger vetoTypeActivity;
-    private BigInteger stopBricksActivity;
+    private BigInteger vetoActivityId;
+    private BigInteger stopBrickActivityId;
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
 
     public VetoAndStopBricksWTATemplate() {
@@ -38,12 +37,12 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public VetoAndStopBricksWTATemplate(String name, String description, int numberOfWeeks, LocalDate validationStartDate, BigInteger vetoTypeActivity, BigInteger stopBricksActivity) {
+    public VetoAndStopBricksWTATemplate(String name, String description, int numberOfWeeks, LocalDate validationStartDate, BigInteger vetoActivityId, BigInteger stopBrickActivityId) {
         super(name, description);
         this.numberOfWeeks = numberOfWeeks;
         this.validationStartDate = validationStartDate;
-        this.vetoTypeActivity = vetoTypeActivity;
-        this.stopBricksActivity = stopBricksActivity;
+        this.vetoActivityId = vetoActivityId;
+        this.stopBrickActivityId = stopBrickActivityId;
     }
 
     public int getNumberOfWeeks() {
@@ -62,20 +61,20 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDate = validationStartDate;
     }
 
-    public BigInteger getVetoTypeActivity() {
-        return vetoTypeActivity;
+    public BigInteger getVetoActivityId() {
+        return vetoActivityId;
     }
 
-    public void setVetoTypeActivity(BigInteger vetoTypeActivity) {
-        this.vetoTypeActivity = vetoTypeActivity;
+    public void setVetoActivityId(BigInteger vetoActivityId) {
+        this.vetoActivityId = vetoActivityId;
     }
 
-    public BigInteger getStopBricksActivity() {
-        return stopBricksActivity;
+    public BigInteger getStopBrickActivityId() {
+        return stopBrickActivityId;
     }
 
-    public void setStopBricksActivity(BigInteger stopBricksActivity) {
-        this.stopBricksActivity = stopBricksActivity;
+    public void setStopBrickActivityId(BigInteger stopBrickActivityId) {
+        this.stopBrickActivityId = stopBrickActivityId;
     }
 
     public float getTotalBlockingPoints() {
@@ -96,9 +95,9 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
             shifts.add(infoWrapper.getShift());
             for (ShiftWithActivityDTO shift : shifts) {
                 if(interval.contains(shift.getStartDate())){
-                    if (shift.getActivitIds().contains(vetoTypeActivity)) {
+                    if (shift.getActivitIds().contains(vetoActivityId)) {
                         totalVeto++;
-                    } else if (shift.getActivitIds().contains(stopBricksActivity)) {
+                    } else if (shift.getActivitIds().contains(stopBrickActivityId)) {
                         totalStopBricks++;
                     }
                 }
@@ -114,8 +113,8 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     List<BigInteger> getActivityIds(){
         List<BigInteger> activityIds = new ArrayList<>();
-        CollectionUtils.addIgnoreNull(activityIds,vetoTypeActivity);
-        CollectionUtils.addIgnoreNull(activityIds,stopBricksActivity);
+        CollectionUtils.addIgnoreNull(activityIds, vetoActivityId);
+        CollectionUtils.addIgnoreNull(activityIds, stopBrickActivityId);
         return activityIds;
     }
 
