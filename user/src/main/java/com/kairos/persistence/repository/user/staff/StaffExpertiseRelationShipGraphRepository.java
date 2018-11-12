@@ -40,7 +40,7 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector)" +
             "WITH sector,expertise ,rel,seniorityLevel ORDER By seniorityLevel.from with expertise ,rel,collect(seniorityLevel) as seniorityLevels " +
             "RETURN sector,staffExpertiseQueryResult:{id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths,seniorityLevels as seniorityLevels,sector as sector} ")
-    List<SectorAndStaffExpertiseQueryResult> getExpertiseWithExperience(Long staffId);
+    List<StaffExpertiseQueryResult> getExpertiseWithExperience(Long staffId);
 
 
 
