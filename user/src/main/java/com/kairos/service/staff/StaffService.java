@@ -435,13 +435,16 @@ public class StaffService {
         map.put("pregnant", user.isPregnant());
 
 
-        List<StaffExpertiseQueryResult> staffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
-        staffExpertiseQueryResults.forEach(expertiseQueryResult -> {
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
+        Set<Long> expertiseIds=new HashSet<>();
+        staffExpertiseQueryResults.forEach(staffExpertiseQueryResult -> {
+            staffExpertiseQueryResult.getStaffExpertiseQueryResult().forEach(expertiseQueryResult->{
             expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
             expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
-        });
+            expertiseIds.add(expertiseQueryResult.getExpertiseId());
+        });});
 
-        map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
+        map.put("expertiseIds", expertiseIds);
         map.put("expertiseWithExperience", staffExpertiseQueryResults);
 
         // Visitour Speed Profile
