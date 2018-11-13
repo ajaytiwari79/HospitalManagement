@@ -447,14 +447,8 @@ public class AgreementSectionService extends MongoBaseService {
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
         }
-        List<BigInteger> clausesList = agreementSection.getClauseIdOrderedIndex();
-        if (clausesList.contains(clauseId)) {
-            clausesList.remove(clauseId);
-            agreementSection.setClauseIdOrderedIndex(clausesList);
-            agreementSectionMongoRepository.save(agreementSection);
-        } else {
-            exceptionService.invalidRequestException("message.invalidRequest", "Clause", clauseId);
-        }
+        agreementSection.getClauseIdOrderedIndex().remove(clauseId);
+        agreementSectionMongoRepository.save(agreementSection);
         return true;
     }
 

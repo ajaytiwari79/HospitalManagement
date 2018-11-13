@@ -18,6 +18,9 @@ public class OrganizationTypeAndSubTypeIdDTO {
     private List<Long> serviceCategoryIds;
     private List<Long> subServiceCategoryIds;
 
+    public OrganizationTypeAndSubTypeIdDTO() {
+    }
+
     public OrganizationTypeAndSubTypeIdDTO(List<Long> organizationTypeId, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds) {
         this.organizationTypeId = organizationTypeId;
         this.organizationSubTypeIds = organizationSubTypeIds;

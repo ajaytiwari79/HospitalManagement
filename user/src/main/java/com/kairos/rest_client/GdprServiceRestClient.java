@@ -12,6 +12,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import static com.kairos.rest_client.RestClientURLUtil.getGdprServiceBaseUrl;
 
 
-@Service
+@Component
 public class GdprServiceRestClient {
 
     private static Logger logger = LoggerFactory.getLogger(GdprServiceRestClient.class);

@@ -31,7 +31,7 @@ public class RestClientURLUtil {
     }
 
     @Value("${gateway.gdprservice.url}")
-    public static void setGdprServiceUrl(String gdprServiceUrl) {
+    public void setGdprServiceUrl(String gdprServiceUrl) {
         RestClientURLUtil.gdprServiceUrl = gdprServiceUrl;
     }
 
