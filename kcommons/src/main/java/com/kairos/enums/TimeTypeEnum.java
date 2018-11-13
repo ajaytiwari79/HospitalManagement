@@ -4,5 +4,17 @@ package com.kairos.enums;/*
  */
 
 public enum TimeTypeEnum {
-    PRESENCE,ABSENCE,BREAK,VETO,STOP_BRICK
+    PRESENCE,
+    ABSENCE,
+    BREAK,
+    VETO,
+    STOP_BRICK,
+    VOLUNTEER,
+    TIME_BANK,
+    SPLIT_SHIFT_TIME,
+    SELF_PAID,
+    PLANNED_SICK_ON_FREE_DAYS,
+    AVAILABLE_TIME,
+    UNAVAILABLE_TIME,
+    RESTING_TIME,
 }
