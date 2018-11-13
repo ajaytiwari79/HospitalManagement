@@ -14,6 +14,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
@@ -28,6 +29,7 @@ import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelati
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
@@ -104,6 +106,8 @@ public class ExpertiseService {
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
     @Inject private com.kairos.service.organization.OrganizationService organizationService;
+    @Inject
+    private SectorGraphRepository sectorGraphRepository;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -120,8 +124,10 @@ public class ExpertiseService {
             if (isExpertiseExists) {
                 exceptionService.duplicateDataException("message.duplicate", "expertise");
             }
+            List<Sector> sectors = expertiseDTO.getSectorDTOs().stream().map(sectorDTO -> new Sector(sectorDTO.getId(),sectorDTO.getName())).collect(Collectors.toList());
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
-                    expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false);
+                    expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
+                    sectors);
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);

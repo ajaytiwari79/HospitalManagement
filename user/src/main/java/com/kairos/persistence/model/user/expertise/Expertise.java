@@ -9,6 +9,7 @@ import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.union.Sector;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
@@ -32,6 +33,9 @@ public class Expertise extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     Country country;
+
+    @Relationship(type = BELONGS_TO)
+    Sector sector;
 
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
@@ -252,7 +256,7 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
     }
 
-    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history) {
+    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,List<Sector> sectors) {
         this.name = name;
         this.description = description;
         this.country = country;
@@ -265,6 +269,7 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
         this.hasDraftCopy = hasDraftCopy;
         this.history = history;
+        this.sectors = sectors;
     }
 
     public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description) {

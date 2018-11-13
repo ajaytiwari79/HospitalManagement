@@ -2,6 +2,7 @@ package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.dto.user.country.pay_table.FutureDate;
 import org.joda.time.DateTime;
@@ -54,6 +55,8 @@ public class CountryExpertiseDTO {
 
     @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
+
+    private List<SectorDTO> sectorDTOs;
 
     public Boolean isPublished() {
         return published;
@@ -207,5 +210,14 @@ public class CountryExpertiseDTO {
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+
+    public List<SectorDTO> getSectorDTOs() {
+        return sectorDTOs;
+    }
+
+    public void setSectorDTOs(List<SectorDTO> sectorDTOs) {
+        this.sectorDTOs = sectorDTOs;
     }
 }
