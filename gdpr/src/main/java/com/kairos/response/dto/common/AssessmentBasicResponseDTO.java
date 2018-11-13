@@ -3,6 +3,7 @@ package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -21,6 +22,8 @@ public class AssessmentBasicResponseDTO {
     private Staff approver;
     private AssessmentStatus assessmentStatus;
     private List<RiskBasicResponseDTO> risks=new ArrayList<>();
+    private LocalDate assessmentScheduledDate;
+    private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
 
@@ -57,4 +60,12 @@ public class AssessmentBasicResponseDTO {
     public AssessmentStatus getAssessmentStatus() { return assessmentStatus; }
 
     public void setAssessmentStatus(AssessmentStatus assessmentStatus) { this.assessmentStatus = assessmentStatus; }
+
+    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+
+    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+
+    public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
+
+    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
 }

@@ -15,7 +15,16 @@ public class CoverPageVO {
     private boolean logoPositionRight;
     private boolean logoPositionCenter;
     private boolean coverPageContentAdded;
+    private boolean coverPageContentPartAdded;
+    private boolean coverPageContentFullAdded;
 
+    public boolean isCoverPageContentPartAdded() { return coverPageContentPartAdded; }
+
+    public void setCoverPageContentPartAdded(boolean coverPageContentPartAdded) { this.coverPageContentPartAdded = coverPageContentPartAdded; }
+
+    public boolean isCoverPageContentFullAdded() { return coverPageContentFullAdded; }
+
+    public void setCoverPageContentFullAdded(boolean coverPageContentFullAdded) { this.coverPageContentFullAdded = coverPageContentFullAdded; }
 
     public String getCoverPageContent() { return coverPageContent; }
 
