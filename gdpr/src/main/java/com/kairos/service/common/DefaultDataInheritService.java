@@ -1,6 +1,7 @@
 package com.kairos.service.common;
 
 
+import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
@@ -124,9 +125,13 @@ public class DefaultDataInheritService extends MongoBaseService {
     private Map<String, BigInteger> globalCategoryNameAndIdMap = new HashMap<>();
 
 
-    public boolean copyMasterDataFromCountry( Long unitId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) throws Exception {
+    public boolean copyMasterDataFromCountry(Long unitId, OrgTypeSubTypeServiceCategoryVO orgTypeSubTypeServiceCategoryVO) throws Exception {
 
-        Long countryId=organizationMetaDataDTO.getCountryId();
+        Long countryId = orgTypeSubTypeServiceCategoryVO.getCountryId();
+        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId()),
+                orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
+                orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
+                orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
         List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
         saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
         List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
@@ -333,7 +338,7 @@ public class DefaultDataInheritService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(dataSubjectMappingResponseDTOS)) {
             List<DataSubjectMapping> dataSubjects = new ArrayList<>();
             for (DataSubjectMappingResponseDTO dataSubjectDTO : dataSubjectMappingResponseDTOS) {
-                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName(),dataSubjectDTO.getDescription());
+                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName(), dataSubjectDTO.getDescription());
                 dataSubjectMapping.setOrganizationId(unitId);
                 if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
                     Set<BigInteger> dataCategoryIds = new HashSet<>();
