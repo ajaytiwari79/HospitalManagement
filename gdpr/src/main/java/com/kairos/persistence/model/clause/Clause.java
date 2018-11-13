@@ -39,6 +39,31 @@ public class Clause extends MongoBaseEntity {
     private List<BigInteger> templateTypes;
     @Transient
     private Integer orderedIndex;
+    @Transient
+    private String titleHtml;
+    @Transient
+    private String descriptionHtml;
+
+
+    public Clause(Long countryId, String title, String description) {
+        this.countryId = countryId;
+        this.title = title;
+        this.description = description;
+    }
+
+
+    public Clause(String title, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
+        this.title = title;
+        this.description = description;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationServices = organizationServices;
+        this.organizationSubServices = organizationSubServices;
+        this.countryId = countryId;
+    }
+
+    public Clause() {
+    }
 
     public List<Long> getOrganizationList() {
         return organizationList;
@@ -52,7 +77,9 @@ public class Clause extends MongoBaseEntity {
         return templateTypes;
     }
 
-    public void setTemplateTypes(List<BigInteger> templateTypes) { this.templateTypes = templateTypes; }
+    public void setTemplateTypes(List<BigInteger> templateTypes) {
+        this.templateTypes = templateTypes;
+    }
 
     public Long getCountryId() {
         return countryId;
@@ -98,51 +125,65 @@ public class Clause extends MongoBaseEntity {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
 
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
+    }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+        this.organizationServices = organizationServices;
+    }
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
-
-    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
-
-    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
-
-    public Integer getOrderedIndex() { return orderedIndex; }
-
-    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
-
-    public Clause(Long countryId, String title, String description) {
-        this.countryId = countryId;
-        this.title = title;
-        this.description = description;
-    }
-
-
-    public Clause(String title, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
-        this.title = title;
-        this.description = description;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
-        this.organizationServices = organizationServices;
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
-        this.countryId = countryId;
     }
 
-    public Clause() {
+    public List<AccountTypeVO> getAccountTypes() {
+        return accountTypes;
     }
+
+    public void setAccountTypes(List<AccountTypeVO> accountTypes) {
+        this.accountTypes = accountTypes;
+    }
+
+    public Integer getOrderedIndex() {
+        return orderedIndex;
+    }
+
+    public void setOrderedIndex(Integer orderedIndex) {
+        this.orderedIndex = orderedIndex;
+    }
+
+    public String getTitleHtml() {
+        return titleHtml;
+    }
+
+    public void setTitleHtml(String titleHtml) {
+        this.titleHtml = titleHtml;
+    }
+
+    public String getDescriptionHtml() {
+        return descriptionHtml;
+    }
+
+    public void setDescriptionHtml(String descriptionHtml) {
+        this.descriptionHtml = descriptionHtml;
+    }
+
+
 }
