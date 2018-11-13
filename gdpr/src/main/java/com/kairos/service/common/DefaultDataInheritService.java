@@ -1,7 +1,7 @@
 package com.kairos.service.common;
 
 
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
@@ -124,8 +124,9 @@ public class DefaultDataInheritService extends MongoBaseService {
     private Map<String, BigInteger> globalCategoryNameAndIdMap = new HashMap<>();
 
 
-    public boolean copyMasterDataFromCountry(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+    public boolean copyMasterDataFromCountry( Long unitId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) throws Exception {
 
+        Long countryId=organizationMetaDataDTO.getCountryId();
         List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
         saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
         List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
