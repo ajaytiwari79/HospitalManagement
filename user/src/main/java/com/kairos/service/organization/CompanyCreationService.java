@@ -129,9 +129,8 @@ public class CompanyCreationService {
     @Inject
     private ReasonCodeService reasonCodeService;
     @Inject
-
     private SchedulerServiceRestClient schedulerRestClient;
-
+    @Inject
     private TreeStructureService treeStructureService;
 
 
@@ -621,18 +620,15 @@ public class CompanyCreationService {
                     .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots);
             CompletableFuture.allOf(createdInUnit).join();
         }
-        List<QueryResult> queryResults = new ArrayList<>();
-
-        for (Organization childUnits : organization.getChildren()) {
-            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
-            queryResults.add(childUnit);
-        }
 
         QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
-        organizationQueryResult.setParentOrganization(true);
-        queryResults.add(organizationQueryResult);
-
-        return treeStructureService.getTreeStructure(queryResults);
+        List<QueryResult> childQueryResults = new ArrayList<>();
+        for (Organization childUnits : organization.getChildren()) {
+            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
+            childQueryResults.add(childUnit);
+        }
+        organizationQueryResult.setChildren(childQueryResults);
+        return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
 
     private void addStaffsInChatServer(List<Staff> staffList) {

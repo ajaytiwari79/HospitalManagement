@@ -63,8 +63,8 @@ public class WTABuilderService extends MongoBaseService {
             case AVERAGE_SHEDULED_TIME:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, AverageScheduledTimeWTATemplate.class);
                 break;
-            case VETO_PER_PERIOD:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoPerPeriodWTATemplate.class);
+            case VETO_AND_STOP_BRICKS:
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
                 break;
             case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, NumberOfWeekendShiftsInPeriodWTATemplate.class);
