@@ -18,11 +18,11 @@ public interface MasterAssetMongoRepository extends MongoBaseRepository<MasterAs
     @Query("{countryId:?0,_id:?1,deleted:false}")
     MasterAsset findByIdAndCountryId(Long countryId, BigInteger id);
 
-    @Query("{deleted:false,countryId:?0}")
-    List<MasterAsset> findAllMasterAssets( Long countryId);
-
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
     List<MasterAsset> findMasterAssetByCountryIdAndIds(Long countryId, Set<BigInteger> assetIds);
+
+    @Query(value = "{countryId:?0,assetType:?1,deleted:false}",fields = "{_id:0,name:1}")
+    List<MasterAsset> findAllByCountryIdAndAssetTypeId(Long countryId, BigInteger assetId);
 
     MasterAsset findByid(BigInteger id);
 

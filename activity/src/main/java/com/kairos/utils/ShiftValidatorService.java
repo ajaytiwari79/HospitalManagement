@@ -9,6 +9,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -435,12 +436,12 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
-        Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> (interval.getStartDate().isBefore(shiftStartLocalDate) && interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate))).findAny();
-        if (cutOffIntervalOptional.isPresent()) {
+        Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate))&& (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
+        if(cutOffIntervalOptional.isPresent()){
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
-                LocalDate shiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-                if (CollectionUtils.containsAny(shift.getActivitIds(), activitieIds) && (cutOffInterval.getStartDate().isBefore(shiftLocalDate) && cutOffInterval.getEndDate().isAfter(shiftLocalDate) || cutOffInterval.getStartDate().isEqual(shiftLocalDate))) {
+                DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1)));
+                if (CollectionUtils.containsAny(shift.getActivitIds(), activitieIds) && interval.contains(shift.getStartDate())) {
                     updatedShifts.add(shift);
                 }
             }
@@ -596,11 +597,30 @@ public class ShiftValidatorService {
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByActivity(activityWrapperMap,shift.getStartDate(),childCareDaysCheckWTATemplate.getActivityIds()));
                     break;
+                case WTA_FOR_CARE_DAYS:
+                    WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
+                    interval = interval.addInterval(getIntervalByWTACareDaysRuleTemplate(shift,wtaForCareDays));
+
             }
         }
         return interval;
     }
 
+    public static DateTimeInterval getIntervalByWTACareDaysRuleTemplate(ShiftWithActivityDTO shift,WTAForCareDays wtaForCareDays){
+        LocalDate shiftDate = DateUtils.asLocalDate(shift.getStartDate());
+        Map<BigInteger,ActivityCareDayCount> careDayCountMap = wtaForCareDays.getCareDaysCountMap();
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
+        for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+            if(careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
+                Optional<CutOffInterval> cutOffIntervalOptional = shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate))&& (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
+                if(cutOffIntervalOptional.isPresent()){
+                    CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
+                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
+                }
+            }
+        }
+        return dateTimeInterval;
+    }
 
     public static  DateTimeInterval getIntervalByActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap,Date shiftStartDate,List<BigInteger> activityIds){
         LocalDate shiftDate = DateUtils.asLocalDate(shiftStartDate);
@@ -732,18 +752,6 @@ public class ShiftValidatorService {
             }
 
         });
-    }
-
-    public static List<ShiftWithActivityDTO> filterShiftsByIntervalAndVetoAndStopBricksActivity(DateTimeInterval interval,List<ShiftWithActivityDTO> shifts, List<BigInteger> activityIds) {
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
-        shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(activityIds) && CollectionUtils.containsAny(shift.getActivitIds(), activityIds) && interval.overlaps(shift.getDateTimeInterval()));
-            if (isValidShift) {
-                shiftQueryResultWithActivities.add(shift);
-            }
-
-        });
-        return shiftQueryResultWithActivities;
     }
 
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints,int totalVeto,int totalStopBricks){
