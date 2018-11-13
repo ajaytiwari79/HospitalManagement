@@ -191,5 +191,8 @@ public class AppConstants {
     public static final String OVERSTAFFING="OVERSTAFFING";
     public static final String UNDERSTAFFING="UNDERSTAFFING";
     public static final String BALANCED="BALANCED";
+    public static final float VETO_BLOCKING_POINT=1;
+    public static final float STOP_BRICK_BLOCKING_POINT=0.5f;
+
 
 }

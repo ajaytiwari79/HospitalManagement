@@ -310,7 +310,7 @@ public class CompanyCreationService {
                     StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(),
                             unitManagerDTO.getCprNumber(),
                             null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
-                    staffService.createUnitManagerForNewOrganization(organization, unitManagerData);
+                    staffService.createUnitManagerForNewOrganization(organization, unitManagerData,parentOrganization);
                 }
 
             }
@@ -583,6 +583,7 @@ public class CompanyCreationService {
 
 
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+        Map<Long,Long> unitAndStaffId=staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v.getStaff().getId()));
         unitIds.add(organizationId);
         if (staffPersonalDetailDTOS.size() != unitIds.size()) {
             exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
@@ -610,34 +611,36 @@ public class CompanyCreationService {
                 countryId);
         if (parentId == null) {
             CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
+                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId,unitAndStaffId);
             CompletableFuture.allOf(hasUpdated).join();
             Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganizations(unitIds);
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,orgAndUnitAccessGroupIdsMap);
+                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,orgAndUnitAccessGroupIdsMap,unitAndStaffId);
             CompletableFuture.allOf(createdInUnit).join();
 
 
         } else {
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots,countryAndOrgAccessGroupIdsMap);
+                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots,countryAndOrgAccessGroupIdsMap,unitAndStaffId);
             CompletableFuture.allOf(createdInUnit).join();
         }
-        List<QueryResult> queryResults = new ArrayList<>();
 
+        //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
+        List<QueryResult> childQueryResults = new ArrayList<>();
         for (Organization childUnits : organization.getChildren()) {
             //QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
             QueryResult childUnit = new QueryResult();
             childUnit.setId(childUnits.getId());
             childUnit.setName(childUnits.getName());
-            queryResults.add(childUnit);
+            childQueryResults.add(childUnit);
         }
         //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
-        QueryResult organizationQueryResult = new QueryResult(organization.getName(), organization.getId(), queryResults);
+        QueryResult organizationQueryResult = new QueryResult(organization.getName(), organization.getId(), childQueryResults);
         organizationQueryResult.setParentOrganization(true);
-        queryResults.add(organizationQueryResult);
+        childQueryResults.add(organizationQueryResult);
 
-        return treeStructureService.getTreeStructure(queryResults);
+        return treeStructureService.getTreeStructure(childQueryResults);
+
     }
 
     private void addStaffsInChatServer(List<Staff> staffList) {

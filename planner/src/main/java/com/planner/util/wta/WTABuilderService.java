@@ -39,7 +39,7 @@ public class WTABuilderService {
             case AVERAGE_SHEDULED_TIME:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, AverageScheduledTimeWTATemplate.class);
                 break;
-            case VETO_PER_PERIOD:
+            case VETO_AND_STOP_BRICKS:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoPerPeriodWTATemplate.class);
                 break;
             case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:

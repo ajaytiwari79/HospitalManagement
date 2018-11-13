@@ -20,7 +20,7 @@ public class TimeTypeDTO {
     private boolean selected;
     private List<TimeTypeDTO> children = new ArrayList<>();
     private String backgroundColor;
-    private TimeTypeEnum type;
+    private TimeTypeEnum secondLevelType;
 
     public TimeTypeDTO(String timeTypes) {
         this.timeTypes = timeTypes;
@@ -37,12 +37,12 @@ public class TimeTypeDTO {
     public TimeTypeDTO() {
     }
 
-    public TimeTypeEnum getType() {
-        return type;
+    public TimeTypeEnum getSecondLevelType() {
+        return secondLevelType;
     }
 
-    public void setType(TimeTypeEnum type) {
-        this.type = type;
+    public void setSecondLevelType(TimeTypeEnum secondLevelType) {
+        this.secondLevelType = secondLevelType;
     }
 
     public boolean isSelected() {

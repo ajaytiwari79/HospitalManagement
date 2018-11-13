@@ -99,7 +99,7 @@ public class SolverConfigService {
                 return StaticField.DRL_NUMBER_OF_SHIFTS_IN_INTERVAL;
             case TIME_BANK:
                 return StaticField.DRL_TIME_BANK;
-            case VETO_PER_PERIOD:
+            case VETO_AND_STOP_BRICKS:
                 return StaticField.DRL_VETO_PER_PERIOD;
             case DAILY_RESTING_TIME:
                 return StaticField.DRL_DAILY_RESTING_TIME;

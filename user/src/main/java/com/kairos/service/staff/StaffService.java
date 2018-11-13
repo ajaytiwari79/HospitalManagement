@@ -1129,7 +1129,7 @@ public class StaffService {
         return staffDTO;
     }
 
-    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
+    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData,boolean parentOrganization) {
         User user = userGraphRepository.findByEmail(staffCreationData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
             SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
@@ -1138,7 +1138,7 @@ public class StaffService {
             setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
-        setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId());
+        setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId(),parentOrganization);
         return user;
     }
 
@@ -1313,7 +1313,7 @@ public class StaffService {
         employmentGraphRepository.save(employment);
     }
 
-    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
+    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId,boolean parentOrganization) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
@@ -1322,7 +1322,14 @@ public class StaffService {
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-        organization.getEmployments().add(employment);
+        if (!parentOrganization) {
+            Organization
+                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            mainOrganization.getEmployments().add(employment);
+            organizationGraphRepository.save(mainOrganization);
+        } else {
+            organization.getEmployments().add(employment);
+        }
         organizationGraphRepository.save(organization);
         if (accessGroupId != null) {
             UnitPermission unitPermission = new UnitPermission();
@@ -1335,7 +1342,7 @@ public class StaffService {
         }
 
         employmentGraphRepository.save(employment);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())), organization.getId());
+
 
     }
 
