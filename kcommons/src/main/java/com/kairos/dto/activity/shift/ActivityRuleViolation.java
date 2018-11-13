@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * @author pradeep
@@ -10,16 +11,27 @@ import java.math.BigInteger;
 public class ActivityRuleViolation {
 
     private BigInteger activityId;
+    private List<String> errorMessages;
     private String name;
     private int counter;
 
     public ActivityRuleViolation() {
     }
 
-    public ActivityRuleViolation(BigInteger activityId, String name, int counter) {
+    public ActivityRuleViolation(BigInteger activityId, String name, int counter,List<String> errorMessages) {
         this.activityId = activityId;
         this.name = name;
         this.counter = counter;
+        this.errorMessages = errorMessages;
+    }
+
+
+    public List<String> getErrorMessages() {
+        return errorMessages;
+    }
+
+    public void setErrorMessages(List<String> errorMessages) {
+        this.errorMessages = errorMessages;
     }
 
     public BigInteger getActivityId() {

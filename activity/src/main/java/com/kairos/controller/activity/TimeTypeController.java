@@ -60,5 +60,12 @@ public class TimeTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.deleteTimeType(timeTypeId,countryId));
     }
 
+    @ApiOperation("Create Default  TimeType")
+    @PostMapping(value = "/default")
+    public ResponseEntity<Map<String, Object>> createDefaultTimeType(@PathVariable Long countryId) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.createDefaultTimeType(countryId));
+    }
+
 
 }

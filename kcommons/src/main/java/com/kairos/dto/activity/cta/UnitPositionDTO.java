@@ -7,6 +7,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Map;
 
 /**
@@ -19,14 +20,14 @@ public class UnitPositionDTO {
     private Expertise expertise;
     @JsonIgnore
     private boolean deleted;
-    private Long startDateMillis;
+    private LocalDate startDate;
     private int workingDaysInWeek;
-    private Long endDateMillis;
+    private LocalDate endDate;
     private Long lastModificationDate;
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int fullTimeWeeklyMinutes;
-    private float hourlyWages;
+    private float hourlyCost;
     private Long id;
 
     private Map<String, Object> employmentType;
@@ -66,13 +67,6 @@ public class UnitPositionDTO {
         this.deleted = deleted;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
 
     public BigInteger getCostTimeAgreementId() {
         return costTimeAgreementId;
@@ -90,12 +84,20 @@ public class UnitPositionDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public Long getEndDateMillis() {
-        return endDateMillis;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public Long getLastModificationDate() {
@@ -130,12 +132,12 @@ public class UnitPositionDTO {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
-    public float getHourlyWages() {
-        return hourlyWages;
+    public float getHourlyCost() {
+        return hourlyCost;
     }
 
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public Long getId() {

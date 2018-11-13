@@ -11,7 +11,6 @@ import com.kairos.persistence.repository.data_inventory.processing_activity.Proc
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
@@ -119,7 +118,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource",new StringBuilder(processingActivitiesLinkedWithDataSource.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-       dataSourceMongoRepository.safeDelete(dataSourceId);
+       dataSourceMongoRepository.safeDeleteById(dataSourceId);
         return true;
     }
 

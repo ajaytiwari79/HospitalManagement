@@ -29,6 +29,7 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private OrganizationType organizationType;
     private OrganizationType organizationSubType;
     private Long countryId;
+    private BigInteger organizationParentId;
     private Organization organization;
     private BigInteger parentId;
     private BigInteger parentCountryCTAId;
@@ -180,6 +181,14 @@ public class CostTimeAgreement extends MongoBaseEntity {
 
     public void setLastModifiedBy(Long lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public BigInteger getOrganizationParentId() {
+        return organizationParentId;
+    }
+
+    public void setOrganizationParentId(BigInteger organizationParentId) {
+        this.organizationParentId = organizationParentId;
     }
 
     @Override

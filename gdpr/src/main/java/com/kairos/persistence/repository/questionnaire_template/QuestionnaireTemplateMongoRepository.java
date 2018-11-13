@@ -32,22 +32,7 @@ public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepositor
     QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndByCountryId(Long countryId, BigInteger assetTypeId);
 
     @Query("{deleted:false,organizationId:?0,templateType:?1}")
-    QuestionnaireTemplate findQuestionnaireTemplateByCountryIdAndTemplateType(Long countryId, QuestionnaireTemplateType assetTypeId);
-
-
-    @Query("{deleted:false,organizationId:?0,templateType:'ASSET_TYPE',defaultAssetTemplate:true,templateStatus:'PUBLISHED'}")
-    QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId);
-
-
-    @Query("{deleted:false,organizationId:?0,assetType:?1,assetSubType:{$in:?2},templateStatus:'PUBLISHED'}")
-    QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(Long unitId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds);
-
-    @Query("{deleted:false,organizationId:?0,assetType:?1,assetSubType:{$exists:false},templateStatus:'PUBLISHED'}")
-    QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndByUnitId(Long unitId, BigInteger assetTypeId);
-
-    @Query("{deleted:false,organizationId:?0,templateStatus:'PUBLISHED',templateType:?1}")
-    QuestionnaireTemplate findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(Long unitId, QuestionnaireTemplateType templateType);
-
+    QuestionnaireTemplate findQuestionnaireTemplateByCountryIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
 
 
 }

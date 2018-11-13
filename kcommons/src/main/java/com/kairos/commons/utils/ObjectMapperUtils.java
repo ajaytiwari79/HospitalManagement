@@ -119,7 +119,7 @@ public class ObjectMapperUtils {
         return mapper;
     }
 
-     public static void copyPropertiesExceptSpecific(Object source, Object destination, String ...ignoreProperties) {
+     public static void copyProperties(Object source, Object destination, String ...ignoreProperties) {
               BeanUtils.copyProperties(source,destination,ignoreProperties);
         }
 

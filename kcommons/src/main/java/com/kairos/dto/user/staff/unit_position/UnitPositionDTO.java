@@ -1,5 +1,6 @@
 package com.kairos.dto.user.staff.unit_position;
 
+import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
@@ -34,7 +35,7 @@ public class UnitPositionDTO {
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
-    private float hourlyWages;
+    private float hourlyCost;
     private Double salary;
     private Long employmentTypeId;
     @NotNull(message = "employmentTypeCategory can't be null")
@@ -61,27 +62,12 @@ public class UnitPositionDTO {
     @NotNull(message = "seniorityLevel  is required for position")
     @Range(min = 0, message = "seniorityLevel  is required for position")
     private Long seniorityLevelId;
-    private Set<Long> functionIds = new HashSet<>();
+    private Set<FunctionsDTO> functions = new HashSet<>();
     private Long timeCareExternalId;
     private boolean published;
     private Long accessGroupId;
 
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getAccessGroupId() {
-        return accessGroupId;
-    }
-
-    public void setAccessGroupId(Long accessGroupId) {
-        this.accessGroupId = accessGroupId;
-    }
 
 
     public UnitPositionDTO() {
@@ -98,11 +84,11 @@ public class UnitPositionDTO {
     }
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                           float avgDailyWorkingHours, float hourlyWages, Double salary, Long employmentTypeId) {
+                           float avgDailyWorkingHours, float hourlyCost, Double salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.hourlyWages = hourlyWages;
+        this.hourlyCost = hourlyCost;
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
       //  this.startDateMillis = startDateMillis;
@@ -128,7 +114,20 @@ public class UnitPositionDTO {
 
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getAccessGroupId() {
+        return accessGroupId;
+    }
+
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
+    }
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -186,12 +185,12 @@ public class UnitPositionDTO {
         this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
 
-    public float getHourlyWages() {
-        return hourlyWages;
+    public float getHourlyCost() {
+        return hourlyCost;
     }
 
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public BigInteger getWtaId() {
@@ -300,12 +299,12 @@ public class UnitPositionDTO {
     }
 
 
-    public Set<Long> getFunctionIds() {
-        return functionIds;
+    public Set<FunctionsDTO> getFunctions() {
+        return functions;
     }
 
-    public void setFunctionIds(Set<Long> functionIds) {
-        this.functionIds = functionIds;
+    public void setFunctions(Set<FunctionsDTO> functions) {
+        this.functions = functions;
     }
 
     public LocalDate getStartDate() {

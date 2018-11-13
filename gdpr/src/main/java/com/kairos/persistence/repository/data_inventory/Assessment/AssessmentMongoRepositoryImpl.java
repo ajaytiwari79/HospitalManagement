@@ -43,10 +43,10 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     }
 
     @Override
-    public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId, Long loggedInUserId) {
+    public List<AssessmentBasicResponseDTO> getAllAssessmentByUnitIdAndStaffId(Long unitId, Long staffId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList).and("assignee._id").is(loggedInUserId)),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList).and("assigneeList._id").is(staffId)),
                 sort(Sort.Direction.DESC,"createdAt")
 
         );
@@ -58,12 +58,13 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
 
         String projectionOpertaion = "{ '$project':{'asset':{$arrayElemAt:['$asset',0]},'processingActivity':{'$arrayElemAt':['$processingActivity',0]}," +
-                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assignee':1,'approver':1,'createdAt':1,'assessmentStatus':1}}";
+                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 ,assessmentScheduledDate:1,assessmentSchedulingFrequency:1, 'risks':{'_id':1,'name':1}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("asset", "assetId", "_id", "asset"),
                 lookup("processingActivity", "processingActivityId", "_id", "processingActivity"),
+                lookup("risk","riskIds","_id","risks"),
                 new CustomAggregationOperation(Document.parse(projectionOpertaion)),
                 sort(Sort.Direction.DESC,"createdAt")
 
@@ -75,20 +76,87 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     @Override
     public Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId) {
 
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assetId").is(assetId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("assetId").is(assetId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(false));
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
     @Override
     public Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("processingActivityId").is(processingActivityId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(false));
         return mongoTemplate.findOne(query, Assessment.class);
     }
 
 
     @Override
     public List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("questionnaireTemplateId").is(templateId).and("assessmentStatus").in(assessmentStatusList));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("questionnaireTemplateId").is(templateId)
+                .and("assessmentStatus").in(assessmentStatusList));
         return mongoTemplate.find(query, Assessment.class);
+    }
+
+
+    @Override
+    public Assessment findPreviousLaunchedAssessmentForAssetRisksByUnitId(Long unitId, BigInteger assetId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("assetId").is(assetId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(true));
+        return mongoTemplate.findOne(query, Assessment.class);
+    }
+
+    @Override
+    public Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
+                .and(DELETED).is(false)
+                .and("processingActivityId").is(processingActivityId)
+                .and("assessmentStatus").in(assessmentStatusList)
+                .and("riskAssessment").is(true));
+        return mongoTemplate.findOne(query, Assessment.class);
+    }
+
+
+    @Override
+    public List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId) {
+
+        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 , 'risks':{'_id':1,'name':1}}}";
+
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assetId").is(assetId)),
+                lookup("risk","riskIds","_id","risks"),
+                new CustomAggregationOperation(Document.parse(projectionOpertaion)),
+                sort(Sort.Direction.DESC,"createdAt")
+
+        );
+        AggregationResults<AssessmentBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentBasicResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(Long unitId, BigInteger processingActivityId) {
+
+        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1, 'risks':{'_id':1,'name':1}}}";
+
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId)),
+                lookup("risk","riskIds","_id","risks"),
+                new CustomAggregationOperation(Document.parse(projectionOpertaion)),
+                sort(Sort.Direction.DESC,"createdAt")
+
+        );
+        AggregationResults<AssessmentBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentBasicResponseDTO.class);
+        return result.getMappedResults();
     }
 }

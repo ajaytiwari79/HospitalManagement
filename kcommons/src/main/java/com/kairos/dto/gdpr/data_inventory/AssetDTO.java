@@ -40,8 +40,8 @@ public class AssetDTO {
     private BigInteger hostingType;
     private BigInteger dataDisposal;
     @NotNull(message = "error.message.assetType.notNull")
-    private BigInteger assetType;
-    private List<BigInteger> assetSubTypes = new ArrayList<>();
+    private BigInteger assetTypeId;
+    private BigInteger assetSubTypeId;
     private Integer dataRetentionPeriod;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
@@ -83,9 +83,10 @@ public class AssetDTO {
     public BigInteger getHostingType() { return hostingType; }
 
     public BigInteger getDataDisposal() { return dataDisposal; }
-    public BigInteger getAssetType() { return assetType; }
 
-    public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
+    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
+
+    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
@@ -120,10 +121,6 @@ public class AssetDTO {
     public void setHostingType(BigInteger hostingType) { this.hostingType = hostingType; }
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
-
-    public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
-
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
 
     public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
@@ -134,4 +131,8 @@ public class AssetDTO {
 
     public AssetDTO() {
     }
+
+    public BigInteger getAssetTypeId() { return assetTypeId; }
+
+    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
 }

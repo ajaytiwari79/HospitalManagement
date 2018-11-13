@@ -189,7 +189,7 @@ public class EmploymentService {
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+        if( accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created){
             exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
@@ -776,7 +776,7 @@ public class EmploymentService {
                 boolean isEndDateBlank = false;
                 //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
                 for ( String unitPositionEndDateString : unitPositionsEndDate) {
-                    LocalDate unitPositionEndDate=LocalDate.parse(unitPositionEndDateString);
+                    LocalDate unitPositionEndDate=unitPositionEndDateString==null?null:LocalDate.parse(unitPositionEndDateString);
                     if (!Optional.ofNullable(unitPositionEndDate).isPresent()) {
                         isEndDateBlank = true;
                         break;

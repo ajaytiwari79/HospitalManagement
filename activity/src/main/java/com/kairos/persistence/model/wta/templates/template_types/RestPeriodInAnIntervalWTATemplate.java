@@ -96,21 +96,8 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
             shifts = sortShifts(shifts);
             int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
-            if (!isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60)) {
-                if (limitAndCounter[1] != null) {
-                    int counterValue = limitAndCounter[1] - 1;
-                    if (counterValue < 0) {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                    }else {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                    }
-                }else {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                }
-            }
+            boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60);
+            brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
         }
     }
 

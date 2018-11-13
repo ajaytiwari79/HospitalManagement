@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -24,9 +25,26 @@ public class ReasonCode extends UserBaseEntity {
     private ReasonCodeType reasonCodeType;
     @Relationship(type = BELONGS_TO)
     private Country country;
+    @Relationship(type = BELONGS_TO)
+    private Organization organization;
 
     public ReasonCode() {
         //Default Constructor
+    }
+    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Country country) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.reasonCodeType = reasonCodeType;
+        this.country = country;
+    }
+
+    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Organization organization) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.reasonCodeType = reasonCodeType;
+        this.organization = organization;
     }
 
     public String getName() {
@@ -69,11 +87,13 @@ public class ReasonCode extends UserBaseEntity {
         this.country = country;
     }
 
-    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Country country) {
-        this.name = name;
-        this.code = code;
-        this.description = description;
-        this.reasonCodeType = reasonCodeType;
-        this.country = country;
+    public Organization getOrganization() {
+        return organization;
     }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
+
 }

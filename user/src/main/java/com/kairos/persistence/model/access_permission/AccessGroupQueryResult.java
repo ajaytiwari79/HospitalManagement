@@ -24,6 +24,7 @@ public class AccessGroupQueryResult {
     private LocalDate endDate;
     private List<Long> dayTypeIds;
     private List<DayType> dayTypes;
+    private boolean allowedDayTypes;
 
 
     public long getId() {
@@ -112,5 +113,13 @@ public class AccessGroupQueryResult {
 
     public void setDayTypes(List<DayType> dayTypes) {
         this.dayTypes = dayTypes;
+    }
+
+    public boolean isAllowedDayTypes() {
+        return allowedDayTypes;
+    }
+
+    public void setAllowedDayTypes(boolean allowedDayTypes) {
+        this.allowedDayTypes = allowedDayTypes;
     }
 }

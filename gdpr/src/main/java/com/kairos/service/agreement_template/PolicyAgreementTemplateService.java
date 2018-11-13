@@ -1,23 +1,29 @@
 package com.kairos.service.agreement_template;
 
 
+import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
 import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
+import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -44,7 +50,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private TemplateTypeService templateTypeService;
 
     @Inject
+    private ClauseMongoRepository clauseMongoRepository;
+
+    @Inject
     private AgreementSectionMongoRepository agreementSectionMongoRepository;
+
+    @Inject
+    private AWSBucketService awsBucketService;
 
 
     /**
@@ -78,6 +90,17 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
+    public String uploadCoverPageLogo(Long countryId, BigInteger agreementTemplateId, MultipartFile coverPageLogo) {
+
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, agreementTemplateId);
+        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+        }
+        String coverPageLogoUrl=awsBucketService.uploadImage(coverPageLogo);
+        policyAgreementTemplate.setCoverPageLogoUrl(coverPageLogoUrl);
+        policyAgreementTemplateRepository.save(policyAgreementTemplate);
+        return coverPageLogoUrl;
+    }
     /**
      * @param countryId
      * @return
@@ -124,9 +147,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
-    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, BigInteger agreementTemplateId) {
+    public AgreementTemplateSectionResponseDTO getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, BigInteger agreementTemplateId) {
 
-
+        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, agreementTemplateId);
+        if (!Optional.ofNullable(template).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Template", agreementTemplateId);
+        }
+        AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
+        OrganizationMetaDataDTO organizationMetaDataDTO = new OrganizationMetaDataDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
+                template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
+                template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
+                template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
+        List<ClauseBasicResponseDTO> clauseListForTemplate = clauseMongoRepository.getClausesByAgreementTemplateMetadata(countryId, organizationMetaDataDTO);
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
@@ -142,7 +174,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     }
                 }
         );
-        return agreementSectionResponseDTOS;
+        agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
+        agreementTemplateResponse.setSections(agreementSectionResponseDTOS);
+        agreementTemplateResponse.setCoverPageContent(template.getCoverPageContent());
+        agreementTemplateResponse.setCoverPageLogoUrl(template.getCoverPageLogoUrl());
+        agreementTemplateResponse.setCoverPageTitle(template.getCoverPageTitle());
+        return agreementTemplateResponse;
     }
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {

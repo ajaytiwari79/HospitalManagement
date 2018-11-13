@@ -10,6 +10,7 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.TimeInterval;
+import org.apache.commons.collections.CollectionUtils;
 
 
 import java.math.BigInteger;
@@ -74,6 +75,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
+
     public long getTimeLimit() {
         return timeLimit;
     }
@@ -98,31 +100,16 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
-            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues)) {
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
             if (timeInterval != null) {
-                List<ShiftWithActivityDTO> shiftWithActivityDTOS = filterShifts(Arrays.asList(infoWrapper.getShift()),timeTypeIds,null,null);
-                if(!shiftWithActivityDTOS.isEmpty()){
-                    ShiftWithActivityDTO shift = shiftWithActivityDTOS.get(0);
-                    if (isValidForDay(dayTypeIds, infoWrapper)) {
-                        Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
-                        boolean isValid = isValid(minMaxSetting, limitAndCounter[0] , shift.getMinutes());
-                        if (!isValid) {
-                            if (limitAndCounter[1] != null) {
-                                int counterValue = limitAndCounter[1] - 1;
-                                if (counterValue < 0) {
-                                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                                }else {
-                                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
-                                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                                }
-                            }else {
-                                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                            }
-                        }
-                    }
+                boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()));
+                if (isValidShift && isValidForDay(dayTypeIds, infoWrapper)) {
+                    ShiftWithActivityDTO shift = infoWrapper.getShift();
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
+                    brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
+
                 }
             }
         }

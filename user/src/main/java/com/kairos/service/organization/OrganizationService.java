@@ -21,6 +21,7 @@ import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
@@ -36,7 +37,6 @@ import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -51,7 +51,7 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
+import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -61,6 +61,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -108,6 +109,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -772,39 +774,6 @@ public class OrganizationService {
         return organizationGraphRepository.findOne(childOrganizationId) == null;
     }
 
-    public Map<String, Object> getManageHierarchyData(long unitId) {
-
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
-
-        }
-
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-
-        Map<String, Object> response = new HashMap<>(2);
-        List<Map<String, Object>> units = organizationGraphRepository.getUnits(unitId);
-        response.put("units", units.size() != 0 ? units.get(0).get("unitList") : Collections.emptyList());
-
-        List<Map<String, Object>> groups = organizationGraphRepository.getGroups(unitId);
-        response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
-
-        if (Optional.ofNullable(countryId).isPresent()) {
-            response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
-        }
-
-        OrganizationTypeAndSubType organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
-
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
-        response.put("organizationTypes", organizationTypes);
-        response.put("businessTypes", businessTypes);
-        response.put("level", organization.getLevel());
-        response.put("companyTypes", CompanyType.getListOfCompanyType());
-        response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
-        response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId));
-        response.put("accessGroups", accessGroupService.getOrganizationAccessGroupsForUnitCreation(unitId));
-        return response;
-    }
 
     public Organization updateExternalId(long organizationId, long externalId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -1179,22 +1148,6 @@ public class OrganizationService {
     }
 
 
-    public List<OrganizationType> getOrganizationTypeByCountryId(Long countryId) {
-        return organizationTypeGraphRepository.findOrganizationTypeByCountry(countryId);
-    }
-
-    public OrganizationType getOrganizationTypeByCountryAndId(Long countryId, Long orgTypeId) {
-        return organizationTypeGraphRepository.getOrganizationTypeById(countryId, orgTypeId);
-    }
-
-    public OrganizationType getOneDefaultOrganizationTypeByCountryId(Long countryId) {
-        return organizationTypeGraphRepository.getOneDefaultOrganizationTypeById(countryId);
-    }
-
-    public List<OrganizationType> getOrganizationSubTypeById(Long orgTypeId) {
-        return organizationTypeGraphRepository.getOrganizationSubTypesByTypeId(orgTypeId);
-    }
-
     public Map<String, Object> getAvailableZoneIds(Long unitId) {
         Set<String> allZones = ZoneId.getAvailableZoneIds();
         List<String> zoneList = new ArrayList<>(allZones);
@@ -1352,7 +1305,7 @@ public class OrganizationService {
         List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
         List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
-        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
+        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.ORDER);
         List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(),
                 skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
@@ -1364,7 +1317,7 @@ public class OrganizationService {
         if (!staff.isEmpty()) {
             //TODO VIPUL check
             //  plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
-            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips;
+            List<UnitPositionLineEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips;
             unitPositionEmploymentTypeRelationShips = unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
           /*  if (!unitPositionEmploymentTypeRelationShips.isEmpty()) {
                 plannerSyncService.publishAllUnitPositions(unitId, unitPositionEmploymentTypeRelationShips, IntegrationOperation.CREATE);
@@ -1489,5 +1442,17 @@ public class OrganizationService {
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneforAllorganizations(),UnitTimeZoneMappingDTO.class);
 
+    }
+
+    public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
+        Organization organization=organizationGraphRepository.findOne(unitId);
+        if(organization!=null && !organization.isDeleted()){
+            organization.setPayRollTypeId(payRollTypeId);
+            organizationGraphRepository.save(organization);
+        }
+        else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","Organization",unitId);
+        }
+        return true;
     }
 }

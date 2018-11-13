@@ -21,18 +21,15 @@ public interface DataSubjectMappingRepository extends MongoBaseRepository<DataSu
     @Query("{deleted:false,countryId:?0,_id:?1}")
     DataSubjectMapping findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-
-    @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
-    DataSubjectMapping findByCountryIdAndName(Long countryId,Long organizationId,String name);
-
-
     @Query("{deleted:false,organizationId:?0,_id:?1}")
     DataSubjectMapping findByUnitIdAndId(Long organizationId,BigInteger id);
 
 
+    @Query("{deleted:false,countryId:?0,dataCategories:?1}")
+    List<DataSubjectMappingBasicResponseDTO> findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(Long countryId, BigInteger dataCategoryId);
 
     @Query("{deleted:false,organizationId:?0,dataCategories:?1}")
-    List<DataSubjectMappingBasicResponseDTO> findByUnitDataSubjectLinkWithDataCategory(Long unitId, BigInteger dataCategoryId);
+    List<DataSubjectMappingBasicResponseDTO> findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(Long unitId, BigInteger dataCategoryId);
 
 
 

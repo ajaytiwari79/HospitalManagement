@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.clause;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
@@ -35,7 +34,6 @@ public class Clause extends MongoBaseEntity {
     private List<SubServiceCategory> organizationSubServices;
     private List<AccountTypeVO> accountTypes;
     private Long countryId;
-    private Boolean isDefault = true;
     private List<Long> organizationList;
     private BigInteger parentClauseId;
     private List<BigInteger> templateTypes;
@@ -70,14 +68,6 @@ public class Clause extends MongoBaseEntity {
 
     public void setParentClauseId(BigInteger parentClauseId) {
         this.parentClauseId = parentClauseId;
-    }
-
-    public Boolean getDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(Boolean aDefault) {
-        isDefault = aDefault;
     }
 
     public String getTitle() {

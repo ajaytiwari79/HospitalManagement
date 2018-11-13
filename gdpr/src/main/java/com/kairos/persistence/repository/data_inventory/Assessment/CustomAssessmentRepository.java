@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface CustomAssessmentRepository {
 
-    Assessment findAssessmentByNameAndUnitId(Long unitId,String name);
+    Assessment findAssessmentByNameAndUnitId(Long unitId, String name);
 
-    List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId,Long loggedInUserId);
+    List<AssessmentBasicResponseDTO> getAllAssessmentByUnitIdAndStaffId(Long unitId, Long staffId);
 
     List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId);
 
@@ -19,8 +19,15 @@ public interface CustomAssessmentRepository {
 
     Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId);
 
-    List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId,BigInteger templateId);
+    List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId);
 
+    Assessment findPreviousLaunchedAssessmentForAssetRisksByUnitId(Long unitId, BigInteger assetId);
+
+    Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId);
+
+    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId);
+
+    List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(Long unitId, BigInteger processingActivityId);
 
 
 }

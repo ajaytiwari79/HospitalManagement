@@ -1,39 +1,62 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.enums.LocationEnum;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 13/4/18.
  */
 public class LocationActivityTab implements Serializable {
-    private List<LocationEnum> canBeStartAt;
-    private List<LocationEnum> canBeEndAt;
+    private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
+    private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
+
+
 
     public LocationActivityTab() {
-        //dc
+        //Default Constructor
     }
 
-    public List<LocationEnum> getCanBeStartAt() {
-        return canBeStartAt;
+    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckIn() {
+        return glideTimeForCheckIn;
     }
 
-    public void setCanBeStartAt(List<LocationEnum> canBeStartAt) {
-        this.canBeStartAt = canBeStartAt;
+    public void setGlideTimeForCheckIn(Set<ActivityGlideTimeDetails> glideTimeForCheckIn) {
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
     }
 
-    public List<LocationEnum> getCanBeEndAt() {
-        return canBeEndAt;
+    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckOut() {
+        return glideTimeForCheckOut;
     }
 
-    public void setCanBeEndAt(List<LocationEnum> canBeEndAt) {
-        this.canBeEndAt = canBeEndAt;
+    public void setGlideTimeForCheckOut(Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
     }
 
-    public LocationActivityTab(List<LocationEnum> canBeStartAt, List<LocationEnum> canBeEndAt) {
-        this.canBeStartAt = canBeStartAt;
-        this.canBeEndAt = canBeEndAt;
+    public LocationActivityTab(Set<ActivityGlideTimeDetails> glideTimeForCheckIn, Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
+        this.glideTimeForCheckIn = glideTimeForCheckIn;
+        this.glideTimeForCheckOut = glideTimeForCheckOut;
+    }
+
+    public ActivityGlideTimeDetails getCheckInGlideTime(LocationEnum locationEnum){
+        ActivityGlideTimeDetails activityGlideTimeDetails = null;
+        for (ActivityGlideTimeDetails glideTimeDetails : glideTimeForCheckIn) {
+            if(locationEnum.equals(glideTimeDetails.getLocation())){
+                activityGlideTimeDetails = glideTimeDetails;
+            }
+        }
+        return activityGlideTimeDetails;
+    }
+
+    public ActivityGlideTimeDetails getCheckOutGlideTime(LocationEnum locationEnum){
+        ActivityGlideTimeDetails activityGlideTimeDetails = null;
+        for (ActivityGlideTimeDetails glideTimeDetails : glideTimeForCheckOut) {
+            if(locationEnum.equals(glideTimeDetails.getLocation())){
+                activityGlideTimeDetails = glideTimeDetails;
+            }
+        }
+        return activityGlideTimeDetails;
     }
 }

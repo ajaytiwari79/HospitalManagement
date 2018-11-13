@@ -11,7 +11,7 @@ global HardMediumSoftLongScoreHolder scoreHolder;
 rule "Full day shifts must have breaks"
 salience 22
     when
-        Shift(isFullWorkDay()  && $brks:numberOfBreaks, $brks!=1)
+        Shift(isFullWorkDay()  && $brks:expertiseId, $brks!=1)
     then
         scoreHolder.addHardConstraintMatch(kcontext,$brks==0?-1:-$brks);
 end

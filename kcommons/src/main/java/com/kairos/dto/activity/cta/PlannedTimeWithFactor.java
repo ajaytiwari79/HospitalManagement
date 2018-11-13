@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.cta;
 
+import com.kairos.enums.cta.AccountType;
+
 public class PlannedTimeWithFactor {
     private float scale;
     private boolean add;

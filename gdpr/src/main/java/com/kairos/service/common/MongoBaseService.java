@@ -170,20 +170,5 @@ public class MongoBaseService {
     }
 
 
-    public Boolean remove(List<BigInteger> ids, Class entity) {
 
-        Assert.notNull(entity, "Entity must not be null!");
-        Assert.notEmpty(ids, "List cannot be empty");
-
-        // Get class name for sequence class
-        String className = entity.getClass().getSimpleName();
-
-        Query query = new Query();
-        query.addCriteria(Criteria.where("_id").in(ids));
-
-
-        mongoTemplate.remove(query, className);
-        return true;
-
-    }
 }

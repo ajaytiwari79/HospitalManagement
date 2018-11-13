@@ -92,7 +92,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long organizationId) {
-        return hostingProviderMongoRepository.findAllUnitIdAndSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return hostingProviderMongoRepository.findAllByUnitIdAndSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -121,7 +121,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingProvider)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", new StringBuilder(assetsLinkedWithHostingProvider.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        hostingProviderMongoRepository.safeDelete(hostingProviderId);
+        hostingProviderMongoRepository.safeDeleteById(hostingProviderId);
         return true;
     }
 

@@ -1,6 +1,6 @@
 package com.planner.domain.location;
 
-import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.common.MongoBaseEntity;
 
 //import org.springframework.data.cassandra.core.mapping.Table;
 

@@ -1,16 +1,20 @@
 package com.kairos.persistence.model.data_inventory.assessment;
 
 
+import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Document
 public class Assessment extends MongoBaseEntity {
@@ -22,22 +26,49 @@ public class Assessment extends MongoBaseEntity {
     private LocalDate completedDate;
     private String comment;
     private BigInteger assetId;
+    private boolean riskAssessment;
     private BigInteger processingActivityId;
+    private Set<BigInteger> riskIds;
     private List<AssessmentAnswerValueObject> assessmentAnswers;
     @NotNull
-    private Staff assignee;
+    @Valid
+    private List<Staff> assigneeList;
     @NotNull
     private Staff approver;
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
+    private String userEmailIdAssessmentLastAssistBy;
+    private LocalDate assessmentScheduledDate;
+    private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
 
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
+    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment) {
         this.name = name;
         this.endDate = endDate;
-        this.assignee = assignee;
+        this.assigneeList = assigneeList;
         this.approver = approver;
+        this.comment=comment;
     }
+
+    public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
+
+    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
+
+    public String getUserEmailIdAssessmentLastAssistBy() { return userEmailIdAssessmentLastAssistBy; }
+
+    public void setUserEmailIdAssessmentLastAssistBy(String userEmailIdAssessmentLastAssistBy) { this.userEmailIdAssessmentLastAssistBy = userEmailIdAssessmentLastAssistBy; }
+
+    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+
+    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+
+    public boolean isRiskAssessment() { return riskAssessment; }
+
+    public void setRiskAssessment(boolean riskAssessment) { this.riskAssessment = riskAssessment; }
+
+    public Set<BigInteger> getRiskIds() { return riskIds; }
+
+    public void setRiskIds(Set<BigInteger> riskIds) { this.riskIds = riskIds; }
 
     public String getName() { return name; }
 
@@ -55,9 +86,9 @@ public class Assessment extends MongoBaseEntity {
 
     public void setComment(String comment) { this.comment = comment; }
 
-    public Staff getAssignee() { return assignee; }
+    public List<Staff> getAssigneeList() { return assigneeList; }
 
-    public void setAssignee(Staff assignee) { this.assignee = assignee; }
+    public void setAssigneeList(List<Staff> assigneeList) { this.assigneeList = assigneeList; }
 
     public Staff getApprover() { return approver; }
 
