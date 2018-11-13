@@ -658,6 +658,17 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
 
+    //TODO Test
+    public Map<Long,Map<Long,Set<Date>>> getUnitPositionIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
+        return genericRestClient.publishRequest(unitPositionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/appliedFunctionsByUnitPositionIds", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Map<Long,Set<Date>>>>>() {
+        });
+    }
+
+    //TODO Test
+    public void restoreFunctionsWithDatesByUnitPositionIds(Map<Long, Map<Long, Set<LocalDate>>> unitPositionIdWithFunctionIdShiftDateMap,Long unitId) {
+        Boolean AreFunctionsRestored= genericRestClient.publishRequest(unitPositionIdWithFunctionIdShiftDateMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/updateFunctionOnPhaseRestoration", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
+    }
 }
 
 

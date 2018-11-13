@@ -1,21 +1,24 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by pavan on 13/3/18.
@@ -35,67 +38,70 @@ public class FunctionService {
 
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
 
 
-    public com.kairos.persistence.model.country.functions.FunctionDTO createFunction(Long countryId, FunctionDTO functionDTO){
+    public com.kairos.persistence.model.country.functions.FunctionDTO createFunction(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if(!Optional.ofNullable(country).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
-        Function isAlreadyExists=functionGraphRepository.findByNameIgnoreCase(countryId,functionDTO.getName());
-        if(Optional.ofNullable(isAlreadyExists).isPresent()){
-            exceptionService.duplicateDataException("message.function.name.alreadyExist",functionDTO.getName());
+        Function isAlreadyExists = functionGraphRepository.findByNameIgnoreCase(countryId, functionDTO.getName());
+        if (Optional.ofNullable(isAlreadyExists).isPresent()) {
+            exceptionService.duplicateDataException("message.function.name.alreadyExist", functionDTO.getName());
 
         }
-        List<Level> levels=new ArrayList<>();
-        if(!functionDTO.getOrganizationLevelIds().isEmpty()){
-            levels=countryGraphRepository.getLevelsByIdsIn(countryId,functionDTO.getOrganizationLevelIds());
+        List<Level> levels = new ArrayList<>();
+        if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
+            levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Organization> unions=new ArrayList<>();
-        if(!functionDTO.getUnionIds().isEmpty()){
-            unions= organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
+        List<Organization> unions = new ArrayList<>();
+        if (!functionDTO.getUnionIds().isEmpty()) {
+            unions = organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
-        Function function=new Function(functionDTO.getName(),functionDTO.getDescription(),functionDTO.getStartDate(),functionDTO.getEndDate(),unions,levels,country,functionDTO.getIcon());
+        Function function = new Function(functionDTO.getName(), functionDTO.getDescription(), functionDTO.getStartDate(), functionDTO.getEndDate(), unions, levels, country, functionDTO.getIcon());
         functionGraphRepository.save(function);
-        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO=new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(),function.getName(),function.getDescription(),
-                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels(),function.getIcon());
+        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO = new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon());
 
         return functionResponseDTO;
     }
 
-    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByCountry(long countryId){
+    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByCountry(long countryId) {
         return functionGraphRepository.findFunctionsByCountry(countryId);
 
     }
-    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsIdAndNameByCountry(long countryId){
+
+    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsIdAndNameByCountry(long countryId) {
         return functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
 
     }
 
-    public com.kairos.persistence.model.country.functions.FunctionDTO updateFunction(Long countryId, FunctionDTO functionDTO){
+    public com.kairos.persistence.model.country.functions.FunctionDTO updateFunction(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if(!Optional.ofNullable(country).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
-        Function function=functionGraphRepository.findOne(functionDTO.getId());
-        if(!Optional.ofNullable(function).isPresent() || function.isDeleted() == true){
-            exceptionService.dataNotFoundByIdException("message.function.id.notFound",functionDTO.getId());
+        Function function = functionGraphRepository.findOne(functionDTO.getId());
+        if (!Optional.ofNullable(function).isPresent() || function.isDeleted() == true) {
+            exceptionService.dataNotFoundByIdException("message.function.id.notFound", functionDTO.getId());
 
         }
-        Function isNameAlreadyExists=functionGraphRepository.findByNameExcludingCurrent(countryId,functionDTO.getId(),functionDTO.getName().trim());
-        if(Optional.ofNullable(isNameAlreadyExists).isPresent()){
-            exceptionService.duplicateDataException("message.function.name.alreadyExist",functionDTO.getName());
+        Function isNameAlreadyExists = functionGraphRepository.findByNameExcludingCurrent(countryId, functionDTO.getId(), functionDTO.getName().trim());
+        if (Optional.ofNullable(isNameAlreadyExists).isPresent()) {
+            exceptionService.duplicateDataException("message.function.name.alreadyExist", functionDTO.getName());
 
         }
-        List<Level> levels=new ArrayList<>();
-        if(!functionDTO.getOrganizationLevelIds().isEmpty()){
-            levels=countryGraphRepository.getLevelsByIdsIn(countryId,functionDTO.getOrganizationLevelIds());
+        List<Level> levels = new ArrayList<>();
+        if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
+            levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Organization> unions=new ArrayList<>();
-        if(!functionDTO.getUnionIds().isEmpty()){
-            unions= organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
+        List<Organization> unions = new ArrayList<>();
+        if (!functionDTO.getUnionIds().isEmpty()) {
+            unions = organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
 
         function.setName(functionDTO.getName());
@@ -106,23 +112,70 @@ public class FunctionService {
         function.setOrganizationLevels(levels);
         function.setIcon(functionDTO.getIcon());
         functionGraphRepository.save(function);
-        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO=new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(),function.getName(),function.getDescription(),
-                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels(),function.getIcon());
+        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO = new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon());
 
         return functionResponseDTO;
     }
-    public boolean deleteFunction(long functionId){
-        Function function=functionGraphRepository.findOne(functionId);
-        if(!Optional.ofNullable(function).isPresent() || function.isDeleted() == true){
-            exceptionService.dataNotFoundByIdException("message.function.id.notFound",functionId);
+
+    public boolean deleteFunction(long functionId) {
+        Function function = functionGraphRepository.findOne(functionId);
+        if (!Optional.ofNullable(function).isPresent() || function.isDeleted() == true) {
+            exceptionService.dataNotFoundByIdException("message.function.id.notFound", functionId);
 
         }
         function.setDeleted(true);
         functionGraphRepository.save(function);
         return true;
     }
-    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByExpertiseId(long expertiseId){
+
+    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByExpertiseId(long expertiseId) {
         return functionGraphRepository.getFunctionsByExpertiseId(expertiseId);
 
+    }
+
+    //====================================================================================
+    //TODO test
+    public Map<Long, Map<Long, Set<Date>>> getUnitPositionIdWithFunctionIdShiftDateMap(Set<Long> unitPositionIds) {
+        Map<Long, Map<Long, Set<Date>>> unitPositionWithFunctionIdAndLocalDateMap = new HashMap<>();
+        if (!unitPositionIds.isEmpty()) {
+            List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships = unitPositionFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByUnitPositionId(unitPositionIds);
+            if (!unitPositionFunctionRelationships.isEmpty()) {
+                for (UnitPositionFunctionRelationship unitPositionFunctionRelationship : unitPositionFunctionRelationships) {
+                    Map<Long, Set<Date>> functionIdWithAppliedDates = new HashMap<>();
+                    Set<Date> dateFromLocalDate = unitPositionFunctionRelationship.getDate().stream().map(localDate -> DateUtils.asDate(localDate)).collect(Collectors.toSet());
+                    functionIdWithAppliedDates.put(unitPositionFunctionRelationship.getFunction().getId(), dateFromLocalDate);
+                    unitPositionWithFunctionIdAndLocalDateMap.put(unitPositionFunctionRelationship.getUnitPosition().getId(), functionIdWithAppliedDates);
+                }
+            }
+            return unitPositionWithFunctionIdAndLocalDateMap;
+        } else {
+            //TODO throw exception
+        }
+        return null;
+    }
+
+    //=================================================================================
+    public boolean updateUnitPositionFunctionRelationShipDates(Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithFunctionIdAndLocalDateMap) {
+        boolean result=false ;
+        Set<Long> unitPositionIds=unitPositionWithFunctionIdAndLocalDateMap.keySet();
+        if (!unitPositionWithFunctionIdAndLocalDateMap.isEmpty()) {
+            List<UnitPositionFunctionRelationship> existingUnitPositionFunctionRelationships = unitPositionFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByUnitPositionId(unitPositionIds);
+            List<UnitPositionFunctionRelationship> updatedUnitPositionFunctionRelationships=new ArrayList<>();
+            if (!existingUnitPositionFunctionRelationships.isEmpty()) {
+               for(UnitPositionFunctionRelationship unitPositionFunctionRelationship:existingUnitPositionFunctionRelationships){
+                   Map<Long,Set<LocalDate>> functionWithDates=unitPositionWithFunctionIdAndLocalDateMap.get(unitPositionFunctionRelationship.getUnitPosition().getId());
+                   Set<Long> functionIds=functionWithDates.keySet();
+                   Long existingFunctionId=unitPositionFunctionRelationship.getFunction().getId();
+                   if(!functionIds.isEmpty() && functionIds.contains(existingFunctionId)) {
+                       unitPositionFunctionRelationship.setDate(functionWithDates.get(existingFunctionId));
+                   }
+                   updatedUnitPositionFunctionRelationships.add(unitPositionFunctionRelationship);
+               }
+                unitPositionFunctionRelationshipRepository.saveAll(updatedUnitPositionFunctionRelationships);
+                result = true;
+            }
+        }
+        return result;
     }
 }
