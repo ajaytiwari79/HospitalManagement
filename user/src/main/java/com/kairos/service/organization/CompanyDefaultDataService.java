@@ -54,9 +54,9 @@ public class CompanyDefaultDataService {
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
                 asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
-                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
+                asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
-                            unit.getCountry().getId(), null, orgAndUnitAccessGroupIdsMap.get(unit.getId())), unit.getId()));
+                           null, parentId, orgAndUnitAccessGroupIdsMap.get(unit.getId())), unit.getId()));
         });
         return CompletableFuture.completedFuture(true);
     }
