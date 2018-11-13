@@ -24,6 +24,7 @@ public class StaffExpertiseQueryResult {
     private Integer nextSeniorityLevelInMonths;
     private List<SeniorityLevel> seniorityLevels;
     private Sector sector;
+    private SeniorityLevel applicableSeniorityLevel;
 
     public StaffExpertiseQueryResult() {
         //Default Constructor
@@ -91,5 +92,13 @@ public class StaffExpertiseQueryResult {
 
     public void setSector(Sector sector) {
         this.sector = sector;
+    }
+
+    public SeniorityLevel getApplicableSeniorityLevel() {
+        return applicableSeniorityLevel;
+    }
+
+    public void setApplicableSeniorityLevel(SeniorityLevel applicableSeniorityLevel) {
+        this.applicableSeniorityLevel = applicableSeniorityLevel;
     }
 }

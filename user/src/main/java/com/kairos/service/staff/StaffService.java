@@ -435,17 +435,19 @@ public class StaffService {
         map.put("pregnant", user.isPregnant());
 
 
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId()),SectorAndStaffExpertiseQueryResult.class);
         Set<Long> expertiseIds=new HashSet<>();
         staffExpertiseQueryResults.forEach(staffExpertiseQueryResult -> {
-            staffExpertiseQueryResult.getStaffExpertiseQueryResult().forEach(expertiseQueryResult->{
+            int maxExperience=staffExpertiseQueryResult.getExpertiseWithExperience().stream().max(Comparator.comparingInt(StaffExpertiseQueryResult::getRelevantExperienceInMonths)).get().getRelevantExperienceInMonths();
+            staffExpertiseQueryResult.getExpertiseWithExperience().forEach(expertiseQueryResult->{
             expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
             expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
+            expertiseQueryResult.setApplicableSeniorityLevel(calculateApplicableSeniorityLevel(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
             expertiseIds.add(expertiseQueryResult.getExpertiseId());
         });});
 
         map.put("expertiseIds", expertiseIds);
-        map.put("expertiseWithExperience", staffExpertiseQueryResults);
+        map.put("sectorWiseExpertise", staffExpertiseQueryResults);
 
         // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
@@ -2216,5 +2218,17 @@ public class StaffService {
         staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
+    }
+
+    private SeniorityLevel calculateApplicableSeniorityLevel(List<SeniorityLevel> seniorityLevels, int currentExperienceInMonths){
+        Collections.sort(seniorityLevels);
+        SeniorityLevel seniorityLevel=null;
+        for (int i = 0; i < seniorityLevels.size(); i++) {
+            if (currentExperienceInMonths < seniorityLevels.get(i).getFrom() * 12) {
+                nextSeniorityLevelInMonths = seniorityLevels.get(i).getFrom() * 12 - currentExperienceInMonths;
+                break;
+            }
+        }
+        return nextSeniorityLevelInMonths;
     }
 }

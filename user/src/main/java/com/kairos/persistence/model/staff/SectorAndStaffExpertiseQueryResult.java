@@ -12,7 +12,7 @@ import java.util.List;
 @QueryResult
 public class SectorAndStaffExpertiseQueryResult {
     private Sector sector;
-    private List<StaffExpertiseQueryResult> staffExpertiseQueryResult;
+    private List<StaffExpertiseQueryResult> expertiseWithExperience;
 
     public SectorAndStaffExpertiseQueryResult() {
         //Default Constructor
@@ -26,11 +26,11 @@ public class SectorAndStaffExpertiseQueryResult {
         this.sector = sector;
     }
 
-    public List<StaffExpertiseQueryResult> getStaffExpertiseQueryResult() {
-        return staffExpertiseQueryResult;
+    public List<StaffExpertiseQueryResult> getExpertiseWithExperience() {
+        return expertiseWithExperience;
     }
 
-    public void setStaffExpertiseQueryResult(List<StaffExpertiseQueryResult> staffExpertiseQueryResult) {
-        this.staffExpertiseQueryResult = staffExpertiseQueryResult;
+    public void setExpertiseWithExperience(List<StaffExpertiseQueryResult> expertiseWithExperience) {
+        this.expertiseWithExperience = expertiseWithExperience;
     }
 }

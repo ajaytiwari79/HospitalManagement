@@ -6,6 +6,7 @@ import com.kairos.persistence.model.pay_table.PayGrade;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  * Created by vipul on 27/3/18.
  */
 @NodeEntity
-public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel> {
+public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
     private Integer from;
     private Integer to;
 
