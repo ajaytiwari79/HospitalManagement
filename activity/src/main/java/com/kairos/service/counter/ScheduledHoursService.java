@@ -10,6 +10,8 @@ import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.Map;
  * @dated: Jun/26/2018
  */
 
+@Service
 public class ScheduledHoursService implements CounterService {
 
     @Inject
@@ -43,12 +46,12 @@ public class ScheduledHoursService implements CounterService {
     }
 
     @Override
-    public RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi) {
+    public RawRepresentationData getCalculatedCounter(Map filterBasedCriteria, Long countryId, KPI kpi) {
         return null;
     }
 
     @Override
-    public RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi) {
+    public RawRepresentationData getCalculatedKPI(Map filterBasedCriteria, Long countryId, KPI kpi) {
         return null;
     }
 }

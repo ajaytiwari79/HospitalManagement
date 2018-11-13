@@ -127,8 +127,11 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, unitId, ConfLevel.UNIT));
     }
 
-    @PostMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/{tabId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId, @RequestBody FilterCriteriaDTO filtersDTO){
+    @GetMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId
+            //, @RequestBody FilterCriteriaDTO filtersDTO
+    ){
+        FilterCriteriaDTO filtersDTO = new FilterCriteriaDTO();
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF, filtersDTO));
     }
 

@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
@@ -15,7 +16,6 @@ import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingD
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.dto.activity.counter.distribution.category.StaffKPIGalleryDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.*;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -27,22 +27,15 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.mongodb.client.result.DeleteResult;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -207,13 +200,12 @@ public class CounterDistService extends MongoBaseService {
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
 
-        List<BasicRequirementDTO> basicRequirementDTOS = new ArrayList<>();
-        tabKPIDTOS.forEach(tabKPIDTO -> {
-            basicRequirementDTOS.add(new BasicRequirementDTO(tabKPIDTO.getKpiId(), false, true));
+        filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpiId()).collect(toList()));
+        filters.setUnitId(unitId);
+        Map<BigInteger, RawRepresentationData> data = counterDataService.generateKPIData(filters);
+        tabKPIDTOS.parallelStream().forEach(tabKPIDTO -> {
+            tabKPIDTO.setData(data.get(tabKPIDTO.getKpiId()));
         });
-
-        filters.setDataRequestList(basicRequirementDTOS);
-        counterDataService.generateCounterData(filters);
         return tabKPIDTOS;
     }
 

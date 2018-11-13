@@ -7,7 +7,6 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.counter.CounterServiceMapping;
-import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterSize;
@@ -49,7 +48,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -336,35 +334,39 @@ public class CounterDataService {
 
     }
 
-    public Map generateCounterData(FilterCriteriaDTO filters){
+    public Map generateKPIData(FilterCriteriaDTO filters){
         //get unitPositionIds and get staffIds.
-        List<BigInteger> kpiIds = filters.getDataRequestList().stream().map(requestData -> requestData.getCounterId()).collect(toList());
+        List<BigInteger> kpiIds = filters.getKpiIds();//filters.getDataRequestList().stream().map(requestData -> requestData.getCounterId()).collect(toList());
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(filters.getUnitId());
         List<KPI> kpis = counterRepository.getKPIsByIds(kpiIds);
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
         List<Future<RawRepresentationData>> kpiResults = new ArrayList<>();
         List<Future<RawRepresentationData>> counterResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
+        if(filters.getFilters() != null)
         filters.getFilters().forEach(filter -> {
             filterBasedCriteria.put(filter.getType(), filter.getValues());
         });
-        for(BasicRequirementDTO dataRequest : filters.getDataRequestList()){
-            if(dataRequest.isKpiDataRequired()) {
+        for(BigInteger kpiId : filters.getKpiIds()){
                 Callable<RawRepresentationData> data = () ->{
-                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedKPI(filterBasedCriteria, filters.getCurrentCountryId(), kpiMap.get(dataRequest.getCounterId()));
+                    System.out.println("service: "+counterServiceMapping.getService(kpiMap.get(kpiId).getType()));
+                    return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, countryId, kpiMap.get(kpiId));
                 };
                 Future<RawRepresentationData> responseData = executorService.submit(data);
+
+            System.out.println("service: "+counterServiceMapping.getService(kpiMap.get(kpiId).getType()));
                 kpiResults.add(responseData);
-            }
-            if(dataRequest.isCounterDataRequired()){
-                Callable<RawRepresentationData> data = () ->{
-                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedCounter(filterBasedCriteria, filters.getCurrentCountryId(), kpiMap.get(dataRequest.getCounterId()));
-                };
-                Future<RawRepresentationData> responseData = executorService.submit(data);
-                counterResults.add(responseData);
-            }
         }
 
-        List kpisData = new ArrayList();
+//            if(dataRequest.isCounterDataRequired()){
+//                Callable<RawRepresentationData> data = () ->{
+//                    return counterServiceMapping.getService(kpiMap.get(dataRequest.getCounterId()).getType()).getCalculatedCounter(filterBasedCriteria, filters.getCountryId(), kpiMap.get(dataRequest.getCounterId()));
+//                };
+//                Future<RawRepresentationData> responseData = executorService.submit(data);
+//                counterResults.add(responseData);
+//            }
+
+        List<RawRepresentationData> kpisData = new ArrayList();
         for(Future<RawRepresentationData> data : kpiResults){
             try {
                 kpisData.add(data.get());
@@ -374,7 +376,7 @@ public class CounterDataService {
 
             }
         }
-        return kpisData.stream().collect
+        return kpisData.stream().collect(Collectors.toMap(kpiData -> kpiData.getCounterId(), kpiData -> kpiData));
     }
 
     public Map<Long,Long> calculatePlannedHour(List<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){

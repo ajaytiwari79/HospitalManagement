@@ -36,6 +36,7 @@ public class RestingHoursCalculationService implements CounterService {
     private ActivityService activityService;
 
     public double getTotalRestingHours(List<Shift> shifts, long initTs, long endTs, long restingHoursMillis, boolean dayOffAllowed) {
+        System.out.println("executing resting hours logic");
         //all shifts should be sorted on startDate
         Map<Long, Integer> shiftDayCollisionMap = new HashMap<>();
         long baseInitTs = initTs;
@@ -86,6 +87,10 @@ public class RestingHoursCalculationService implements CounterService {
         List staffIds = null;
         List dates = new ArrayList();
         double multiplicationFactor = 1;
+        List staffIdsSelected = new ArrayList();
+        staffIdsSelected.add(125);
+        staffIdsSelected.add(119);
+        filterBasedCriteria.put(FilterType.SELECTED_STAFF_IDS, staffIdsSelected);
         if(kpi && filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS)!= null){
             staffIds = filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS);
         }else{
@@ -100,8 +105,9 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Long, Double> staffRestingHours = calculateRestingHours(staffIds, countryId, (Date) dates.get(0), (Date) dates.get(1));
         List<DataUnit> dataList = new ArrayList<>();
         for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {
-            dataList.add(new DataUnit("", entry.getKey(), entry.getValue()*multiplicationFactor));
+            dataList.add(new DataUnit(""+entry.getKey(), entry.getKey(), entry.getValue()*multiplicationFactor));
         }
+        System.out.println("executing: data: "+dataList);
         return dataList;
     }
 
