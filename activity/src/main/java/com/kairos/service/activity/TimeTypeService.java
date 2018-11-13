@@ -1,7 +1,6 @@
 package com.kairos.service.activity;
 
 
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
@@ -16,6 +15,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.enums.TimeTypeEnum.*;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
@@ -41,7 +42,7 @@ public class TimeTypeService extends MongoBaseService {
         timeTypeDTOs.forEach(timeTypeDTO -> {
             TimeType timeType;
             if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId() != null) {
-                timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(),upperTimeType.getType(),countryId);
+                timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(),upperTimeType.getSecondLevelType(),countryId);
                 timeType.setCountryId(countryId);
                 //if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
@@ -170,7 +171,7 @@ public class TimeTypeService extends MongoBaseService {
         for (TimeType timeType : topLevelTimeTypes) {
             if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
                 TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor());
-                timeTypeDTO.setType(timeType.getType());
+                timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     timeTypeDTO.setSelected(true);
                 }
@@ -179,7 +180,7 @@ public class TimeTypeService extends MongoBaseService {
                 parentOfWorkingTimeType.add(timeTypeDTO);
             } else {
                 TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor());
-                timeTypeDTO.setType(timeType.getType());
+                timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     timeTypeDTO.setSelected(true);
                 }
@@ -259,7 +260,7 @@ public class TimeTypeService extends MongoBaseService {
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
-                levelTwoTimeTypeDTO.setType(timeType.getType());
+                levelTwoTimeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
                 levelTwoTimeTypeDTO.setTimeTypes(timeType.getTimeTypes().toValue());
                 levelTwoTimeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
                 levelTwoTimeTypeDTO.setUpperLevelTimeTypeId(upperlevelTimeTypeId);
@@ -311,25 +312,25 @@ public class TimeTypeService extends MongoBaseService {
     public Boolean createDefaultTimeType(Long countryId) {
         List<TimeType> allTimeTypes=new ArrayList<>();
         List<TimeType> workingTimeTypes=new ArrayList<>();
-        TimeType presenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", "",TimeTypeEnum.PRESENCE,countryId);
-        TimeType absenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Absence", "", "",TimeTypeEnum.ABSENCE,countryId);
-        TimeType breakTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", "",TimeTypeEnum.BREAK,countryId);
+        TimeType presenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", "",PRESENCE,countryId);
+        TimeType absenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Absence", "", "",ABSENCE,countryId);
+        TimeType breakTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", "",BREAK,countryId);
         workingTimeTypes.add(presenceTimeType);
         workingTimeTypes.add(absenceTimeType);
         workingTimeTypes.add(breakTimeType);
 
         List<TimeType> nonWorkingTimeTypes=new ArrayList<>();
-        TimeType volunteerTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "volunteer time", "", "",null,countryId);
-        TimeType timeBankOffTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "timebank off time", "", "",null,countryId);
-        TimeType unPaidBreakTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid break", "", "",TimeTypeEnum.BREAK,countryId);
-        TimeType timeSplitInShiftTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "time between split shifts", "", "",null,countryId);
-        TimeType dutyFreeTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "duty-free, selfpaid", "", "",null,countryId);
-        TimeType sicknessTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "planned sickness on freedays", "", "",null,countryId);
-        TimeType unavailableTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "unavailable time", "", "",null,countryId);
-        TimeType restingTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "resting time", "", "",null,countryId);
-        TimeType vetoTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", "",null,countryId);
-        TimeType stopBrickTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", "",null,countryId);
-        TimeType availableTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "available time", "", "",null,countryId);
+        TimeType volunteerTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "volunteer time", "", "",VOLUNTEER,countryId);
+        TimeType timeBankOffTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "timebank off time", "", "",TIME_BANK,countryId);
+        TimeType unPaidBreakTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid break", "", "",BREAK,countryId);
+        TimeType timeSplitInShiftTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "time between split shifts", "", "", SHIFT_SPLIT_TIME,countryId);
+        TimeType dutyFreeTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "duty-free, selfpaid", "", "",SELF_PAID,countryId);
+        TimeType sicknessTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "planned sickness on freedays", "", "",PLANNED_SICK_ON_FREE_DAYS,countryId);
+        TimeType unavailableTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "unavailable time", "", "",UNAVAILABLE_TIME,countryId);
+        TimeType restingTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "resting time", "", "",RESTING_TIME,countryId);
+        TimeType vetoTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", "",VETO,countryId);
+        TimeType stopBrickTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", "",STOP_BRICK,countryId);
+        TimeType availableTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "available time", "", "",AVAILABLE_TIME,countryId);
 
         nonWorkingTimeTypes.add(volunteerTimeType);
         nonWorkingTimeTypes.add(timeBankOffTimeType);

@@ -26,10 +26,10 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     Activity findByParentIdAndDeletedFalseAndUnitId(BigInteger parentId, Long unitId);
 
-    @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1}")
+    @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1,'balanceSettingsActivityTab':1}")
     List<ActivityDTO> findByDeletedFalseAndCountryId(Long countryId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1}")
+    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1, 'balanceSettingsActivityTab':1}")
     List<ActivityDTO> findByDeletedFalseAndUnitId(Long unitId);
 
     @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'compositeActivities':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
@@ -54,9 +54,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
-
-    @Query(value = "{'deleted' : false,'_id':?0}",fields = "'locationActivityTab':1")
-    LocationActivityTab findActivityGlideTimeByIdAndEnabled(BigInteger id);
 
     @Query(value = "{deleted:false,'compositeActivities.activityId':?0}",exists = true)
     boolean existsByActivityIdInCompositeActivitiesAndDeletedFalse(BigInteger id);

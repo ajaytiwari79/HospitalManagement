@@ -32,7 +32,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{unitPositionId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
 
-    @Query(value = "{_id: {$ne:?0} ,staffUserId:?1,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?3}}",exists = true)
+    @Query(value = "{_id: {$ne:?0} ,staffUserId:?1,deleted:false, disabled:false,startDate: {$lt: ?3},endDate:{$gt:?2}}",exists = true)
     boolean findShiftBetweenDurationByUnitPositionNotEqualToShiftId(BigInteger shiftId,Long staffUserId, Date startDate, Date endDate);
 
     @Query(value = "{staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
