@@ -341,11 +341,14 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     private void mapClauseCkEditorHtmlAndSortClauseArray(AgreementSection agreementSection, List<Clause> clauseList) {
-        List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>();
-        List<Clause> clauses = clauseList.stream().sorted(Comparator.comparing(Clause::getOrderedIndex)).collect(Collectors.toList());
-        clauses.forEach(clause -> clauseCkEditorVOS.add(new ClauseCkEditorVO(clause.getId(), clause.getTitleHtml(), clause.getDescriptionHtml())));
-        agreementSection.setClauseIdOrderedIndex(clauses.stream().map(Clause::getId).collect(Collectors.toList()));
-        agreementSection.setClauseCkEditorVOS(clauseCkEditorVOS);
+        if (CollectionUtils.isNotEmpty(clauseList)) {
+            List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>();
+            List<Clause> clauses = clauseList.stream().sorted(Comparator.comparing(Clause::getOrderedIndex)).collect(Collectors.toList());
+            clauses.forEach(clause -> clauseCkEditorVOS.add(new ClauseCkEditorVO(clause.getId(), clause.getTitleHtml(), clause.getDescriptionHtml())));
+            agreementSection.setClauseIdOrderedIndex(clauses.stream().map(Clause::getId).collect(Collectors.toList()));
+            agreementSection.setClauseCkEditorVOS(clauseCkEditorVOS);
+        }
+
     }
 
     /**
@@ -371,6 +374,8 @@ public class AgreementSectionService extends MongoBaseService {
             clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
             clause.setTags(Collections.singletonList(defaultTag));
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
+            clause.setTitleHtml(clauseBasicDTO.getTitleHtml());
+            clause.setDescriptionHtml(clauseBasicDTO.getDescriptionHtml());
             clauseList.add(clause);
         }
         List<Clause> existingClause = clauseMongoRepository.findClausesByTitle(countryId, clauseTitles);
@@ -387,31 +392,31 @@ public class AgreementSectionService extends MongoBaseService {
      * @param existingClauseMap
      * @param agreementSectionClauseList
      * @return
-     */
+     *///todo add versioning part here
     private List<Clause> updateExisingClauseListOfAgreementSection(Long countryId, Set<BigInteger> existingClauseId, Map<AgreementSection, List<ClauseBasicDTO>> existingClauseMap, Map<AgreementSection, List<Clause>> agreementSectionClauseList, PolicyAgreementTemplate agreementTemplate) {
 
 
-        Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = agreementSectionMongoRepository.getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(countryId, existingClauseId);
+      /*  Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = agreementSectionMongoRepository.getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(countryId, existingClauseId);
 
         if (CollectionUtils.isNotEmpty(clauseIdListPresentInOtherSectionAndSubSection)) {
             existingClauseId.remove(clauseIdListPresentInOtherSectionAndSubSection);
-        }
+        }*/
         List<Clause> exisitingClauseList = clauseMongoRepository.findClauseByCountryIdAndIdList(countryId, existingClauseId);
         Map<BigInteger, Clause> clauseIdMap = exisitingClauseList.stream().collect(Collectors.toMap(Clause::getId, clause -> clause));
         existingClauseMap.forEach((agreementSection, clauseBasicDTOS) -> {
             List<Clause> clausesRelateToAgreementSection = new ArrayList<>();
             clauseBasicDTOS.forEach(clauseBasicDTO -> {
                 Clause clause;
-                if (clauseIdListPresentInOtherSectionAndSubSection.contains(clauseBasicDTO.getId())) {
+               /* if (clauseIdListPresentInOtherSectionAndSubSection.contains(clauseBasicDTO.getId())) {
                     clause = createVersionOfClause(countryId, clauseBasicDTO, agreementTemplate);
                     exisitingClauseList.add(clause);
 
-                } else {
+                } else {*/
                     clause = clauseIdMap.get(clauseBasicDTO.getId());
                     clause.setTitle(clauseBasicDTO.getTitle());
                     clause.setDescription(clauseBasicDTO.getDescription());
                     clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
-                }
+                /*}*/
                 clause.setTitleHtml(clauseBasicDTO.getTitleHtml());
                 clause.setDescriptionHtml(clauseBasicDTO.getDescriptionHtml());
                 clausesRelateToAgreementSection.add(clause);
