@@ -437,6 +437,7 @@ public class CompanyCreationService {
                 .setVatId(organizationBasicDTO.getVatId())
                 .setTimeZone(ZoneId.of(TIMEZONE_UTC))
                 .setKairosCompanyId(kairosCompanyId)
+                .setBoardingCompleted(organizationBasicDTO.isBoardingCompleted())
                 .createOrganization();
         setDefaultDataFromParentOrganization(unit, parentOrganization, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
@@ -593,7 +594,7 @@ public class CompanyCreationService {
         validateAddressDetails(organizationContactAddresses, exceptionService);
 
         organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
-        organization.setBoardingCompleted(true);
+        //organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
 //        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
 //        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days,LocalTime.of(23,59),JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
@@ -625,11 +626,14 @@ public class CompanyCreationService {
         List<QueryResult> queryResults = new ArrayList<>();
 
         for (Organization childUnits : organization.getChildren()) {
-            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
+            //QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
+            QueryResult childUnit = new QueryResult();
+            childUnit.setId(childUnits.getId());
+            childUnit.setName(childUnits.getName());
             queryResults.add(childUnit);
         }
-
-        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
+        //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
+        QueryResult organizationQueryResult = new QueryResult(organization.getName(), organization.getId(), queryResults);
         organizationQueryResult.setParentOrganization(true);
         queryResults.add(organizationQueryResult);
 

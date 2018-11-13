@@ -903,7 +903,7 @@ public class AccessGroupService {
     public Map<Long, Long> getAccessGroupUsingParentId(Long unitId, Set<Long> accessGroupIds) {
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentIds(unitId,accessGroupIds);
         Map<Long,Map<Long, Long>> response=convertToMap(accessPageQueryResults);
-        return response.get(unitId);
+        return response.get(unitId)!=null?response.get(unitId):new HashMap<>();
     }
 
     public Map<Long,Map<Long, Long>> findAllAccessGroupWithParentOfOrganization(Long organizationId){
