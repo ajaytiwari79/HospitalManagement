@@ -44,6 +44,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -362,7 +363,18 @@ public class CounterDataService {
                 counterResults.add(responseData);
             }
         }
-        return null;
+
+        List kpisData = new ArrayList();
+        for(Future<RawRepresentationData> data : kpiResults){
+            try {
+                kpisData.add(data.get());
+            } catch(InterruptedException ex){
+
+            } catch(ExecutionException ex){
+
+            }
+        }
+        return kpisData.stream().collect
     }
 
     public Map<Long,Long> calculatePlannedHour(List<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
