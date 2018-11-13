@@ -754,18 +754,6 @@ public class ShiftValidatorService {
         });
     }
 
-    public static List<ShiftWithActivityDTO> filterShiftsByIntervalAndVetoAndStopBricksActivity(DateTimeInterval interval,List<ShiftWithActivityDTO> shifts, List<BigInteger> activityIds) {
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
-        shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(activityIds) && CollectionUtils.containsAny(shift.getActivitIds(), activityIds) && interval.overlaps(shift.getDateTimeInterval()));
-            if (isValidShift) {
-                shiftQueryResultWithActivities.add(shift);
-            }
-
-        });
-        return shiftQueryResultWithActivities;
-    }
-
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints,int totalVeto,int totalStopBricks){
         return totalBlockingPoints>=totalVeto*VETO_BLOCKING_POINT+totalStopBricks*STOP_BRICK_BLOCKING_POINT;
 
