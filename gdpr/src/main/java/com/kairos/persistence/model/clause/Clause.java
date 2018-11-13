@@ -34,7 +34,6 @@ public class Clause extends MongoBaseEntity {
     private List<SubServiceCategory> organizationSubServices;
     private List<AccountTypeVO> accountTypes;
     private Long countryId;
-    private Boolean isDefault = true;
     private List<Long> organizationList;
     private BigInteger parentClauseId;
     private List<BigInteger> templateTypes;
@@ -96,14 +95,6 @@ public class Clause extends MongoBaseEntity {
 
     public void setParentClauseId(BigInteger parentClauseId) {
         this.parentClauseId = parentClauseId;
-    }
-
-    public Boolean getDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(Boolean aDefault) {
-        isDefault = aDefault;
     }
 
     public String getTitle() {
