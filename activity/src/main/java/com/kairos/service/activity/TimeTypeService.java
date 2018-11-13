@@ -1,7 +1,6 @@
 package com.kairos.service.activity;
 
 
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
@@ -324,7 +323,7 @@ public class TimeTypeService extends MongoBaseService {
         TimeType volunteerTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "volunteer time", "", "",VOLUNTEER,countryId);
         TimeType timeBankOffTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "timebank off time", "", "",TIME_BANK,countryId);
         TimeType unPaidBreakTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid break", "", "",BREAK,countryId);
-        TimeType timeSplitInShiftTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "time between split shifts", "", "",SPLIT_SHIFT_TIME,countryId);
+        TimeType timeSplitInShiftTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "time between split shifts", "", "", SHIFT_SPLIT_TIME,countryId);
         TimeType dutyFreeTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "duty-free, selfpaid", "", "",SELF_PAID,countryId);
         TimeType sicknessTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "planned sickness on freedays", "", "",PLANNED_SICK_ON_FREE_DAYS,countryId);
         TimeType unavailableTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "unavailable time", "", "",UNAVAILABLE_TIME,countryId);
