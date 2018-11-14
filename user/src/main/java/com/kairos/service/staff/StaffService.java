@@ -212,7 +212,8 @@ public class StaffService {
     private AccessPageRepository accessPageRepository;
     @Inject
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
-    @Inject private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
 
 
     @Inject
@@ -271,21 +272,17 @@ public class StaffService {
 
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
         }
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
-
         }
-        List<Long> expertises=staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
         List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
-        Map<Long,StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap=staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId,Function.identity()));
-        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId,expertises);
-        List<Expertise> expertiseList=expertiseGraphRepository.findAllById(expertises);
-
-        Map<Long,Expertise> expertiseMap=expertiseList.stream().collect(Collectors.toMap(Expertise::getId,Function.identity()));
-
-        List<StaffExpertiseRelationShip> staffExpertiseRelationShips=new ArrayList<>();
+        Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
+        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, expertises);
+        List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
+        Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
             Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
             StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
@@ -307,7 +304,7 @@ public class StaffService {
                 exceptionService.actionNotPermittedException("error.noSeniorityLevelFound", "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
             }
         }
-        if(CollectionUtils.isNotEmpty(staffExpertiseRelationShips)){
+        if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
             staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
         }
 
@@ -315,27 +312,8 @@ public class StaffService {
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         staffToUpdate.setLanguage(language);
-        staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
-        staffToUpdate.setLastName(staffPersonalDetail.getLastName());
-        staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
-        staffToUpdate.setCurrentStatus(staffPersonalDetail.getCurrentStatus());
-        staffToUpdate.setSpeedPercent(staffPersonalDetail.getSpeedPercent());
-        staffToUpdate.setWorkPercent(staffPersonalDetail.getWorkPercent());
-        staffToUpdate.setOvertime(staffPersonalDetail.getOvertime());
-        staffToUpdate.setCostDay(staffPersonalDetail.getCostDay());
-        staffToUpdate.setCostCall(staffPersonalDetail.getCostCall());
-        staffToUpdate.setCostKm(staffPersonalDetail.getCostKm());
-        staffToUpdate.setCostHour(staffPersonalDetail.getCostHour());
-        staffToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
-        staffToUpdate.setCapacity(staffPersonalDetail.getCapacity());
-        staffToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
-        staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
-
-        if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
-            staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
-        }
-        staffToUpdate.setSignature(staffPersonalDetail.getSignature());
-        staffToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
+        // Setting Staff Details
+        setStaffDetails(staffToUpdate, staffPersonalDetail);
         staffGraphRepository.save(staffToUpdate);
 
         if (oldExpertise != null) {
@@ -344,7 +322,6 @@ public class StaffService {
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
         staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
-
 
         // Set if user is female and pregnant
         User user = userGraphRepository.getUserByStaffId(staffId);
@@ -356,14 +333,10 @@ public class StaffService {
         user.setPregnant(user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
         userGraphRepository.save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staffId),SectorAndStaffExpertiseQueryResult.class);
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         return staffPersonalDetail;
     }
-
-
-
-
 
 
     public Map<String, Object> saveNotes(long staffId, String generalNote, String requestFromPerson) {
@@ -1319,7 +1292,6 @@ public class StaffService {
         Organization parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
@@ -1536,7 +1508,6 @@ public class StaffService {
     }
 
 
-
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
@@ -1554,5 +1525,29 @@ public class StaffService {
         StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
         staff.setAccess_token(chatDetails.getAccess_token());
         staff.setUser_id(chatDetails.getUser_id());
+    }
+
+    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
+        staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
+        staffToUpdate.setLastName(staffPersonalDetail.getLastName());
+        staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
+        staffToUpdate.setCurrentStatus(staffPersonalDetail.getCurrentStatus());
+        staffToUpdate.setSpeedPercent(staffPersonalDetail.getSpeedPercent());
+        staffToUpdate.setWorkPercent(staffPersonalDetail.getWorkPercent());
+        staffToUpdate.setOvertime(staffPersonalDetail.getOvertime());
+        staffToUpdate.setCostDay(staffPersonalDetail.getCostDay());
+        staffToUpdate.setCostCall(staffPersonalDetail.getCostCall());
+        staffToUpdate.setCostKm(staffPersonalDetail.getCostKm());
+        staffToUpdate.setCostHour(staffPersonalDetail.getCostHour());
+        staffToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
+        staffToUpdate.setCapacity(staffPersonalDetail.getCapacity());
+        staffToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
+        staffToUpdate.setSignature(staffPersonalDetail.getSignature());
+        staffToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
+        staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
+
+        if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
+            staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
+        }
     }
 }
