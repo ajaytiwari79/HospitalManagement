@@ -145,6 +145,15 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     @Override
     public Set<BigInteger> getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(Long countryId, BigInteger templateId, Set<BigInteger> clauseIds) {
 
+
+
+        String addNonDeletedSubSection="{  '$addFields':" +
+                "{'subSections':" +
+                "{$filter : { " +
+                "'input': '$subSections'," +
+                "as: 'subSections', " +
+                "cond: {$eq: ['$$subSections.deleted'," + false + "]}" +
+                "}}}} ";
         String projectionOperation = "{'$project':{'_id':0,'clauseIds':{" +
                 "                '$cond': [" +
                 "                {'$not': ['$subSections']}," +
@@ -159,6 +168,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 new CustomAggregationOperation(Document.parse(replaceRoot)),
                 match(Criteria.where(DELETED).is(false)),
                 lookup("agreementSection", "subSections", "_id", "subSections"),
+                new CustomAggregationOperation(Document.parse(addNonDeletedSubSection)),
                 unwind("subSections", true),
                 new CustomAggregationOperation(Document.parse(projectionOperation)),
                 new CustomAggregationOperation(Document.parse(groupOperation))
