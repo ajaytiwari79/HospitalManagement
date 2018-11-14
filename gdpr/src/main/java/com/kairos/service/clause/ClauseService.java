@@ -59,7 +59,7 @@ public class ClauseService extends MongoBaseService {
      */
     public ClauseDTO createClause(Long countryId, ClauseDTO clauseDto) {
 
-        Clause previousClause = clauseMongoRepository.findByTitle(countryId, clauseDto.getTitle());
+        Clause previousClause = clauseMongoRepository.findByTitleAndDescription(countryId, clauseDto.getTitle(),clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
         }
@@ -91,7 +91,7 @@ public class ClauseService extends MongoBaseService {
      */
     public ClauseDTO updateClause(Long countryId, BigInteger clauseId, ClauseDTO clauseDto) {
 
-        Clause clause = clauseMongoRepository.findByTitle(countryId, clauseDto.getTitle());
+        Clause clause = clauseMongoRepository.findByTitleAndDescription(countryId, clauseDto.getTitle(),clauseDto.getDescription());
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }

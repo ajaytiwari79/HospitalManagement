@@ -262,7 +262,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @param countryId
      * @param globalAgreementSectionAndClauseDTOListHashMap
      * @param agreementTemplate
-     *///todo refactoring code
+     */
     private List<AgreementSection> saveAndUpdateClauseOfAgreementSection(Long countryId, Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
                                                                          Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap, PolicyAgreementTemplate agreementTemplate) {
 
@@ -396,27 +396,27 @@ public class AgreementSectionService extends MongoBaseService {
     private List<Clause> updateExisingClauseListOfAgreementSection(Long countryId, Set<BigInteger> existingClauseId, Map<AgreementSection, List<ClauseBasicDTO>> existingClauseMap, Map<AgreementSection, List<Clause>> agreementSectionClauseList, PolicyAgreementTemplate agreementTemplate) {
 
 
-      /*  Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = agreementSectionMongoRepository.getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(countryId, existingClauseId);
+        Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = policyAgreementTemplateRepository.getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(countryId, agreementTemplate.getId(), existingClauseId);
 
         if (CollectionUtils.isNotEmpty(clauseIdListPresentInOtherSectionAndSubSection)) {
             existingClauseId.remove(clauseIdListPresentInOtherSectionAndSubSection);
-        }*/
+        }
         List<Clause> exisitingClauseList = clauseMongoRepository.findClauseByCountryIdAndIdList(countryId, existingClauseId);
         Map<BigInteger, Clause> clauseIdMap = exisitingClauseList.stream().collect(Collectors.toMap(Clause::getId, clause -> clause));
         existingClauseMap.forEach((agreementSection, clauseBasicDTOS) -> {
             List<Clause> clausesRelateToAgreementSection = new ArrayList<>();
             clauseBasicDTOS.forEach(clauseBasicDTO -> {
                 Clause clause;
-               /* if (clauseIdListPresentInOtherSectionAndSubSection.contains(clauseBasicDTO.getId())) {
+                if (clauseIdListPresentInOtherSectionAndSubSection.contains(clauseBasicDTO.getId()) && clauseBasicDTO.isRequireUpdate()) {
                     clause = createVersionOfClause(countryId, clauseBasicDTO, agreementTemplate);
                     exisitingClauseList.add(clause);
 
-                } else {*/
+                } else {
                     clause = clauseIdMap.get(clauseBasicDTO.getId());
                     clause.setTitle(clauseBasicDTO.getTitle());
                     clause.setDescription(clauseBasicDTO.getDescription());
                     clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
-                /*}*/
+                }
                 clause.setTitleHtml(clauseBasicDTO.getTitleHtml());
                 clause.setDescriptionHtml(clauseBasicDTO.getDescriptionHtml());
                 clausesRelateToAgreementSection.add(clause);
