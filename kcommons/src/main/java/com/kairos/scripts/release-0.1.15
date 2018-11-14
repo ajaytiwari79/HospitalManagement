@@ -13,7 +13,9 @@ db.time_Type.updateMany( {"label":"Veto"}, { $set: { 'secondLevelType': "VETO"} 
 db.time_Type.updateMany( {"label":"Stopbrick"}, { $set: { 'secondLevelType': "STOP_BRICK"} } );
 db.time_Type.updateMany( {"label":"available time"}, { $set: { 'secondLevelType': "AVAILABLE_TIME"} } );
 
+// To remove old templates
 
+db.wtaBaseRuleTemplate.remove({"wtaTemplateType":"VETO_PER_PERIOD"});
 
 // To add WTA Template
 

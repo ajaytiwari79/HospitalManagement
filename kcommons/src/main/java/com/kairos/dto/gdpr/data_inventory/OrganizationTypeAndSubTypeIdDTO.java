@@ -10,15 +10,18 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganizationMetaDataDTO {
+public class OrganizationTypeAndSubTypeIdDTO {
 
-
+    private Long countryId;
     private List<Long> organizationTypeId;
     private List<Long> organizationSubTypeIds;
     private List<Long> serviceCategoryIds;
     private List<Long> subServiceCategoryIds;
 
-    public OrganizationMetaDataDTO(List<Long> organizationTypeId, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds) {
+    public OrganizationTypeAndSubTypeIdDTO() {
+    }
+
+    public OrganizationTypeAndSubTypeIdDTO(List<Long> organizationTypeId, List<Long> organizationSubTypeIds, List<Long> serviceCategoryIds, List<Long> subServiceCategoryIds) {
         this.organizationTypeId = organizationTypeId;
         this.organizationSubTypeIds = organizationSubTypeIds;
         this.serviceCategoryIds = serviceCategoryIds;
@@ -40,4 +43,8 @@ public class OrganizationMetaDataDTO {
     public List<Long> getSubServiceCategoryIds() { return subServiceCategoryIds; }
 
     public void setSubServiceCategoryIds(List<Long> subServiceCategoryIds) { this.subServiceCategoryIds = subServiceCategoryIds; }
+
+    public Long getCountryId() { return countryId; }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
 }

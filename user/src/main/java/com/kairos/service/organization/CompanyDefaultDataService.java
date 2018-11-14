@@ -13,6 +13,7 @@ import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.service.integration.GdprIntegrationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,8 @@ public class CompanyDefaultDataService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ReasonCodeService reasonCodeService;
+    @Inject
+    private GdprIntegrationService gdprIntegrationService;
 
 
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) throws InterruptedException, ExecutionException {
@@ -53,6 +56,7 @@ public class CompanyDefaultDataService {
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
                 asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
+                asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,unit.getId()));
         });
         return CompletableFuture.completedFuture(true);
     }
@@ -71,6 +75,7 @@ public class CompanyDefaultDataService {
         orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
         asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForUnit(organization,countryId));
+        asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,organization.getId()));
 
         return CompletableFuture.completedFuture(true);
     }
