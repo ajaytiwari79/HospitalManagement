@@ -48,11 +48,11 @@ public class UserVO {
         if (o == null || getClass() != o.getClass()) return false;
         UserVO userVO = (UserVO) o;
         return Objects.equals(id, userVO.id) &&
-                Objects.equals(userName, userVO.userName) &&
+               /* Objects.equals(userName, userVO.userName) &&
                 Objects.equals(firstName, userVO.firstName) &&
-                Objects.equals(lastName, userVO.lastName) &&
-                Objects.equals(email, userVO.email) &&
-                Objects.equals(countryId, userVO.countryId);
+                Objects.equals(lastName, userVO.lastName) &&*/
+                Objects.equals(email, userVO.email);/* &&
+                Objects.equals(countryId, userVO.countryId);*/
     }
 
     @Override
