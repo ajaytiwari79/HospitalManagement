@@ -10,7 +10,8 @@ public interface CustomAgreementSectionRepository {
 
     AgreementSectionResponseDTO getAgreementSectionWithDataById(Long countryId,BigInteger id);
 
-    Set<BigInteger> getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(Long countryId, Set<BigInteger> clauseIds);
+    //todo required if we have to find section containing clausesId
+   // Set<BigInteger> getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(Long countryId, Set<BigInteger> clauseIds);
 
 
 
