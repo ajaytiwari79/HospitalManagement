@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staff;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -22,6 +23,9 @@ public class StaffExpertiseQueryResult {
     private Date expertiseStartDate;
     private Integer nextSeniorityLevelInMonths;
     private List<SeniorityLevel> seniorityLevels;
+    private Sector sector;
+    private SeniorityLevel seniorityLevel;
+    private boolean unitPositionExists;
 
     public StaffExpertiseQueryResult() {
         //Default Constructor
@@ -81,5 +85,29 @@ public class StaffExpertiseQueryResult {
 
     public void setSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
         this.seniorityLevels = seniorityLevels;
+    }
+
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
+    }
+
+    public SeniorityLevel getSeniorityLevel() {
+        return seniorityLevel;
+    }
+
+    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    public boolean isUnitPositionExists() {
+        return unitPositionExists;
+    }
+
+    public void setUnitPositionExists(boolean unitPositionExists) {
+        this.unitPositionExists = unitPositionExists;
     }
 }

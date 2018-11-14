@@ -5,6 +5,7 @@ import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.pay_table.PayTable;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -36,6 +37,7 @@ public class ExpertiseQueryResult {
     private PayTable payTable;
     private List<Map<String, Object>> seniorityLevels;
     private BreakPaymentSetting breakPaymentSetting;
+    private Sector sector;
 
     public String getName() {
         return name;
@@ -175,5 +177,13 @@ public class ExpertiseQueryResult {
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
     }
 }

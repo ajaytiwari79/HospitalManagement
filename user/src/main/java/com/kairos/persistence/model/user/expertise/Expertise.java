@@ -9,6 +9,7 @@ import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.union.Sector;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
@@ -67,6 +68,10 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
 
+
+    //Added by Pavan
+    @Relationship(type = BELONGS_TO_SECTOR)
+    private Sector sector;
 
     public String getDescription() {
         return description;
@@ -286,6 +291,14 @@ public class Expertise extends UserBaseEntity {
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
     }
 
     public Map<String, Object> retrieveDetails() {
