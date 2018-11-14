@@ -451,7 +451,7 @@ public class AssessmentService extends MongoBaseService {
 
     private void saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
 
-          if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+        if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
             List<AssessmentAnswerValueObject> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
             assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> {
@@ -658,13 +658,16 @@ public class AssessmentService extends MongoBaseService {
     }
 
     private List<BigInteger> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
+
         List<BigInteger> entityIdList = new ArrayList<>();
-        if (objectToCast instanceof ArrayList) {
-            List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-            entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
-        } else {
-            LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-            entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+        if (Optional.ofNullable(objectToCast).isPresent()) {
+            if (objectToCast instanceof ArrayList) {
+                List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
+                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
+            } else {
+                LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
+                entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+            }
         }
         return entityIdList;
     }
