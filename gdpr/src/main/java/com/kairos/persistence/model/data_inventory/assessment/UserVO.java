@@ -3,6 +3,8 @@ package com.kairos.persistence.model.data_inventory.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Objects;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserVO {
 
@@ -36,4 +38,26 @@ public class UserVO {
     public Long getCountryId() { return countryId; }
 
     public void setCountryId(Long countryId) { this.countryId = countryId; }
+
+    public UserVO() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserVO userVO = (UserVO) o;
+        return Objects.equals(id, userVO.id) &&
+                Objects.equals(userName, userVO.userName) &&
+                Objects.equals(firstName, userVO.firstName) &&
+                Objects.equals(lastName, userVO.lastName) &&
+                Objects.equals(email, userVO.email) &&
+                Objects.equals(countryId, userVO.countryId);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, userName, firstName, lastName, email, countryId);
+    }
 }
