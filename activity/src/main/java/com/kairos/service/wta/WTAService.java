@@ -107,13 +107,16 @@ public class WTAService extends MongoBaseService {
      * @return
      * @Author Vipul
      */
-    public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO) {
+    public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO, boolean creatingFromCountry) {
 
         //TODO  API functionality has been changed for now KP-958
         //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getSkillId());
-        WorkingTimeAgreement wta = wtaRepository.getWtaByName(wtaDTO.getName(), countryId);
+        WorkingTimeAgreement wta;
+        if(creatingFromCountry){
+        wta = wtaRepository.getWtaByName(wtaDTO.getName(), countryId);
         if (Optional.ofNullable(wta).isPresent()) {
             exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
+        }
         }
         wta = new WorkingTimeAgreement();
         // Link tags to WTA
@@ -128,8 +131,11 @@ public class WTAService extends MongoBaseService {
             wta.setEndDate(endDate);
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
-        if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id", countryId);
+        if(creatingFromCountry) {
+            if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.country.id", countryId);
+            }
+            wta.setCountryId(countryId);
         }
         wta.setStartDate(startDate);
         if (wtaDTO.getTags().size() > 0) {
@@ -153,10 +159,9 @@ public class WTAService extends MongoBaseService {
             wtaResponseDTO.setEndDateMillis(wta.getEndDate().getTime());
         }
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
-        wta.setCountryId(countryId);
         save(wta);
         wtaResponseDTO.setId(wta.getId());
-        assignWTAToNewOrganization(wta, wtaDTO, wtaBasicDetailsDTO);
+        assignWTAToNewOrganization(wta, wtaDTO, wtaBasicDetailsDTO,creatingFromCountry);
 
 
         // Adding this wta to all organization type
@@ -168,14 +173,16 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    private void assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO) {
+    private void assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
 
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
             WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
             wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
-            workingTimeAgreement.setCountryParentWTA(wta.getId());
+            if(creatingFromCountry) {
+                workingTimeAgreement.setCountryParentWTA(wta.getId());
+            }
             workingTimeAgreement.setDisabled(false);
             if (wtadto.getRuleTemplates().size() > 0) {
                 List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);

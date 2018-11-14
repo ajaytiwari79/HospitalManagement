@@ -266,7 +266,7 @@ public class CostTimeAgreementController {
      * @param collectiveTimeAgreementDTO
      * @return
      */
-    @PostMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/cta")
+    @PostMapping(value =UNIT_URL + "/cta")
     @ApiOperation("Create CTA in Organization")
     public ResponseEntity<Map<String, Object>> createCtaInOrganization(@PathVariable Long organizationId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO )  {
