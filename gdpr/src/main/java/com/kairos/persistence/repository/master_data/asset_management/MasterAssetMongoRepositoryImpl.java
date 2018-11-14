@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.master_data.asset_management;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
@@ -136,7 +136,7 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
+    public List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 

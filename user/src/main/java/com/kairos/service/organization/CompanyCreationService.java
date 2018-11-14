@@ -70,6 +70,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -610,9 +611,16 @@ public class CompanyCreationService {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
                 countryId);
         if (parentId == null) {
-            CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
+            List<Future<Object>> hasUpdated = companyDefaultDataService
                     .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId,unitAndStaffId);
-            CompletableFuture.allOf(hasUpdated).join();
+            //CompletableFuture.allOf(hasUpdated).join();
+            hasUpdated.forEach(data -> {
+                try {
+                    data.get();
+                } catch (InterruptedException | ExecutionException ex){
+                    System.out.println("failed...............");
+                }
+            });
             Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganizations(unitIds);
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
                     .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,orgAndUnitAccessGroupIdsMap,unitAndStaffId);

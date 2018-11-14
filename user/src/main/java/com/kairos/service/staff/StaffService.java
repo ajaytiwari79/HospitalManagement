@@ -1313,11 +1313,10 @@ public class StaffService {
         employmentGraphRepository.save(employment);
     }
 
-    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId,boolean parentOrganization) {
+    private void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId,boolean parentOrganization) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
-        employment.setStaff(staff);
         staff.setUser(user);
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
