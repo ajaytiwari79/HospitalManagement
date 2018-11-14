@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.planner.component.exception.ExceptionService;
 import com.planner.domain.solverconfig.common.SolverConfig;
@@ -11,6 +12,8 @@ import com.planner.domain.solverconfig.unit.UnitSolverConfig;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -128,6 +131,10 @@ public class UnitSolverConfigService {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         }
         return true;
+    }
+
+    public SolverConfigDTO getSolverConfigWithConstraints(BigInteger solverConfigId){
+        return solverConfigRepository.getSolverConfigWithConstraints(solverConfigId);
     }
 
 
