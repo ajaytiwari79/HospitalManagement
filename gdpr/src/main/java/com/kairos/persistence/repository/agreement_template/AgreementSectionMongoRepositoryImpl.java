@@ -39,7 +39,7 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
 
     }
 
-
+/*
     @Override
     public Set<BigInteger> getClauseIdListPresentInAgreementSectionAndSubSectionsByCountryIdAndClauseIds(Long countryId, Set<BigInteger> clauseIds) {
 
@@ -58,5 +58,5 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
             if (clauseIdListPresentInSection.contains(clauseId)) clauseIdLIst.add(clauseId);
         });
         return clauseIdLIst;
-    }
+    }*/
 }

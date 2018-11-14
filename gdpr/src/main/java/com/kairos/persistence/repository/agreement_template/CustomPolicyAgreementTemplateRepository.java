@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.agreement_template;
 
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.model.clause.Clause;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
@@ -23,5 +24,7 @@ public interface CustomPolicyAgreementTemplateRepository {
     List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByCountryIdAndClauseId(Long countryId, BigInteger clauseId);
 
     List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds,BigInteger clauseId);
+
+    Set<BigInteger> getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(Long countryId, BigInteger templateId, Set<BigInteger> clauseIds)  ;
 
 }

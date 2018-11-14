@@ -45,6 +45,7 @@ public class Clause extends MongoBaseEntity {
     private String descriptionHtml;
 
 
+
     public Clause(Long countryId, String title, String description) {
         this.countryId = countryId;
         this.title = title;
