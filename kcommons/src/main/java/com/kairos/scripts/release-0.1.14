@@ -92,3 +92,9 @@ MATCH(ag:AccessGroup) set ag.allowedDayTypes=true;
 //To set all breakAllowed to true for existing Activities
 db.activities.updateMany({},{$set:{"rulesActivityTab.breakAllowed":false}});
 
+//to find default tag
+db.getCollection('clauseTag').find({'defaultTag':true,'deleted':false});
+db.getCollection('clauseTag').update({'defaultTag':true,'deleted':false},{$set:{"countryId":NumberLong("country id on qa server")}})
+
+
+
