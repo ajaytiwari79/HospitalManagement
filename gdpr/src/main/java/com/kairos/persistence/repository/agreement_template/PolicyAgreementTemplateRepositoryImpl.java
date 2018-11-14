@@ -157,7 +157,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
                 new CustomAggregationOperation(Document.parse(replaceRoot)),
-                match(Criteria.where("deleted").is(false)),
+                match(Criteria.where(DELETED).is(false)),
                 lookup("agreementSection", "subSections", "_id", "subSections"),
                 unwind("subSections", true),
                 new CustomAggregationOperation(Document.parse(projectionOperation)),
