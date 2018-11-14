@@ -10,6 +10,7 @@ import com.kairos.persistence.model.phase.Phase;
 import org.joda.time.Interval;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +42,7 @@ public class ShiftWithActivityDTO {
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
+    private LocalDate shiftDate;
     private static boolean overrideWeekCount;
     private Long unitId;
     private int scheduledMinutes;
@@ -85,6 +87,14 @@ public class ShiftWithActivityDTO {
             activitiesTimeTypeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
         }
         return activitiesTimeTypeIds;
+    }
+
+    public LocalDate getShiftDate() {
+        return shiftDate;
+    }
+
+    public void setShiftDate(LocalDate shiftDate) {
+        this.shiftDate = shiftDate;
     }
 
     public List<BigInteger> getActivitiesPlannedTimeIds(){
@@ -185,7 +195,7 @@ public class ShiftWithActivityDTO {
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+        this.startDate = getActivitiesStartDate();
     }
 
     public Date getEndDate() {
@@ -203,7 +213,7 @@ public class ShiftWithActivityDTO {
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endDate = getActivitiesEndDate();
     }
 
 

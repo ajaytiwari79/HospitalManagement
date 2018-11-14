@@ -91,10 +91,8 @@ public class AttendanceSettingService extends MongoBaseService {
         Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap = new HashMap<>();
         if(!shifts.isEmpty()) {
             Set<BigInteger> activityIds = shifts.stream().flatMap(shift1 -> shift1.getActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
-            List<Activity> activities = activityMongoRepository.findAllActivitieIdsAndLocationActivityTabByIds(activityIds);
-            //Todo Pradeep please get specific data
-            List<LocationActivityTabWithActivityIdDTO> locationActivityTabWithActivityIds = new ArrayList<>();
-             activityIdAndLocationActivityTabMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getLocationActivityTab()));
+            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
+            activityIdAndLocationActivityTabMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getLocationActivityTab()));
             /*List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
             for(UnitSettingDTO unitSettingDTO:unitSettingDTOS){
                     unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
@@ -156,7 +154,6 @@ public class AttendanceSettingService extends MongoBaseService {
         }
 
         else if(!checkIn){
-
             AttendanceSetting oldAttendanceSetting=attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)),AppConstants.TIME_AND_ATTENDANCE);;
             shift=shiftMap.get(oldAttendanceSetting.getShiftId());
             attendanceSetting= checkOut(staffAndOrganizationIds,shift,oldAttendanceSetting,reasonCodeId);

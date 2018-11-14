@@ -2,12 +2,13 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.dto.gdpr.*;
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
 import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
@@ -162,7 +163,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Template", agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
-        OrganizationMetaDataDTO organizationMetaDataDTO = new OrganizationMetaDataDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
+        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
                 template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
                 template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                 template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
@@ -190,13 +191,25 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
-        agreementSectionResponseDTO.getClauses().clear();
         List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
+        Map<BigInteger, ClauseCkEditorVO> clauseCkEditorVOMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(agreementSectionResponseDTO.getClauseCkEditorVOS())) {
+            clauseCkEditorVOMap = agreementSectionResponseDTO.getClauseCkEditorVOS().stream().collect(Collectors.toMap(ClauseCkEditorVO::getId, clauseCkEditorVO -> clauseCkEditorVO));
+        }
         List<BigInteger> clauseIdOrderIndex = agreementSectionResponseDTO.getClauseIdOrderedIndex();
         for (int i = 0; i < clauseIdOrderIndex.size(); i++) {
-            clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i)));
+            ClauseBasicResponseDTO clause = clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i));
+            if (clauseCkEditorVOMap.containsKey(clause.getId())) {
+                ClauseCkEditorVO clauseCkEditorVO = clauseCkEditorVOMap.get(clause.getId());
+                clause.setTitleHtml(clauseCkEditorVO.getTitleHtml());
+                clause.setDescriptionHtml(clauseCkEditorVO.getDescriptionHtml());
+            }
+
+            clauses.add(clause);
         }
         agreementSectionResponseDTO.setClauses(clauses);
+        agreementSectionResponseDTO.getClauseCkEditorVOS().clear();
+        agreementSectionResponseDTO.getClauseIdOrderedIndex().clear();
     }
 
 
