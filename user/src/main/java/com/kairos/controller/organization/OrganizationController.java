@@ -1469,4 +1469,11 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unitService.onBoardOrganization(organizationBasicDTO,unitId));
     }
+    @ApiOperation(value = "Get eligible  units for create/copy CTA and WTA")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/eligible_units")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEligibleUnitsForCtaAndWtaCreation(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                unitService.getEligibleUnitsForCtaAndWtaCreation(unitId));
+    }
 }
