@@ -17,7 +17,6 @@ public class AssessmentAnswerValueObject {
 
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private BigInteger questionId;
-    @NotBlank(message ="Attribute name can't be empty" )
     private String attributeName;
     private Object value;
     private QuestionType questionType;

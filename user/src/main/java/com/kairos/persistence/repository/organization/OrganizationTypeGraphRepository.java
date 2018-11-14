@@ -175,6 +175,4 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "CASE WHEN organizationService IS NOT NULL THEN collect(distinct {id:id(organizationService),name:organizationService.name}) ELSE [] END as organizationServices ," +
             "CASE WHEN organizationSubService IS NOT NULL THEN  collect(distinct { id:id(organizationSubService),name:organizationSubService.name}) ELSE [] END as organizationSubServices")
     OrganizationTypeSubTypeAndServicesQueryResult getOrganizationTypeSubTypesServiceAndSubServices(Long unitId);
-
-
 }
