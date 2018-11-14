@@ -2,7 +2,7 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.dto.gdpr.*;
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
 import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
@@ -163,7 +163,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Template", agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
-        OrganizationMetaDataDTO organizationMetaDataDTO = new OrganizationMetaDataDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
+        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
                 template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
                 template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                 template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));

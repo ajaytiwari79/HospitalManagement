@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.master_data.asset_management;
 
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
@@ -25,7 +25,7 @@ public interface CustomMasterAssetRepository {
 
     MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long  countryId, BigInteger id);
 
-    List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, OrganizationMetaDataDTO organizationMetaDataDTO);
+    List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
 
 }
