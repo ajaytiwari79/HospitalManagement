@@ -50,15 +50,18 @@ public class CompanyDefaultDataService {
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots,Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap,Map<Long,Long> unitAndStaffId) throws InterruptedException, ExecutionException {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
         units.forEach(unit -> {
-                asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
+            asynchronousService.executeInBackGround(() -> {
+                activityIntegrationService.createDefaultKPISetting(
+                                new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
+                                        null, parentId, orgAndUnitAccessGroupIdsMap.get(unit.getId())), unit.getId());
+                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffId.get(unit.getId()))), unit.getId());
+                    });
+                asynchronousService.executeInBackGround(()->timeSlotService.createDefaultTimeSlots(unit, timeSlots));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
                 asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
-                asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
-                    new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
-                           null, parentId, orgAndUnitAccessGroupIdsMap.get(unit.getId())), unit.getId()));
-               asynchronousService.executeInBackGround(()->activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffId.get(unit.getId()))), unit.getId()));
+
         });
         return CompletableFuture.completedFuture(true);
     }
@@ -68,16 +71,18 @@ public class CompanyDefaultDataService {
         asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO));
         asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(organization));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId()));
-        asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
-                new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(),
-                        organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap.get(organization.getId())), organization.getId()));
+        asynchronousService.executeInBackGround(() -> {
+            activityIntegrationService.createDefaultKPISetting(
+                    new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(),
+                            organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap.get(organization.getId())), organization.getId());
+            activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffId.get(organization.getId()))), organization.getId());
+        });
         asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(organization, timeSlots));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
         asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForUnit(organization,countryId));
-        asynchronousService.executeInBackGround(()->activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffId.get(organization.getId()))), organization.getId()));
         return CompletableFuture.completedFuture(true);
     }
 }
