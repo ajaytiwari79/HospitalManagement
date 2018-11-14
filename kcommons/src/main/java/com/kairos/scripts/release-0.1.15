@@ -3,7 +3,7 @@
 db.time_Type.updateMany( {}, { $rename: { 'type': 'secondLevelType'} } );
 db.time_Type.updateMany( {"label":"volunteer time"}, { $set: { 'secondLevelType': "VOLUNTEER"} } );
 db.time_Type.updateMany( {"label":"timebank off time"}, { $set: { 'secondLevelType': "TIME_BANK"} } );
-db.time_Type.updateMany( {"label":"time between split shifts"}, { $set: { 'secondLevelType': "SPLIT_SHIFT_TIME"} } );
+db.time_Type.updateMany( {"label":"time between split shifts"}, { $set: { 'secondLevelType': "SHIFT_SPLIT_TIME"} } );
 db.time_Type.updateMany( {"label":"duty-free, selfpaid"}, { $set: { 'secondLevelType': "SELF_PAID"} } );
 db.time_Type.updateMany( {"label":"planned sickness on freedays"}, { $set: { 'secondLevelType': "PLANNED_SICK_ON_FREE_DAYS"} } );
 db.time_Type.updateMany( {"label":"unavailable time"}, { $set: { 'secondLevelType': "UNAVAILABLE_TIME"} } );

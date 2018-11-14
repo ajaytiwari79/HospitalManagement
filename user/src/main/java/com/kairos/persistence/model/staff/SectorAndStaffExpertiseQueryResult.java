@@ -11,19 +11,28 @@ import java.util.List;
 
 @QueryResult
 public class SectorAndStaffExpertiseQueryResult {
-    private Sector sector;
+    private Long id;
+    private String name;
     private List<StaffExpertiseQueryResult> expertiseWithExperience;
 
     public SectorAndStaffExpertiseQueryResult() {
         //Default Constructor
     }
 
-    public Sector getSector() {
-        return sector;
+    public Long getId() {
+        return id;
     }
 
-    public void setSector(Sector sector) {
-        this.sector = sector;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<StaffExpertiseQueryResult> getExpertiseWithExperience() {

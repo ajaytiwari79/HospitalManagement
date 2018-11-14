@@ -24,7 +24,8 @@ public class StaffExpertiseQueryResult {
     private Integer nextSeniorityLevelInMonths;
     private List<SeniorityLevel> seniorityLevels;
     private Sector sector;
-    private SeniorityLevel applicableSeniorityLevel;
+    private SeniorityLevel seniorityLevel;
+    private boolean unitPositionExists;
 
     public StaffExpertiseQueryResult() {
         //Default Constructor
@@ -94,11 +95,19 @@ public class StaffExpertiseQueryResult {
         this.sector = sector;
     }
 
-    public SeniorityLevel getApplicableSeniorityLevel() {
-        return applicableSeniorityLevel;
+    public SeniorityLevel getSeniorityLevel() {
+        return seniorityLevel;
     }
 
-    public void setApplicableSeniorityLevel(SeniorityLevel applicableSeniorityLevel) {
-        this.applicableSeniorityLevel = applicableSeniorityLevel;
+    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    public boolean isUnitPositionExists() {
+        return unitPositionExists;
+    }
+
+    public void setUnitPositionExists(boolean unitPositionExists) {
+        this.unitPositionExists = unitPositionExists;
     }
 }

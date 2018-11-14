@@ -18,8 +18,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  */
 @NodeEntity
 public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
-    private Integer from;
-    private Integer to;
+    private Integer from; // this is stored as years
+    private Integer to;   // this is stored as years
 
     @Relationship(type = HAS_BASE_PAY_GRADE)
     private PayGrade payGrade;  // this is payGrade which is coming from payTable
