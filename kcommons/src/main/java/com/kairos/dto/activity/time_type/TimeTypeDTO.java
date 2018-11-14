@@ -22,11 +22,23 @@ public class TimeTypeDTO {
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
 
+    public TimeTypeDTO() {
+    }
+
     public TimeTypeDTO(String timeTypes) {
         this.timeTypes = timeTypes;
 
     }
 
+    public TimeTypeDTO(String timeTypes, String backgroundColor) {
+        this.timeTypes = timeTypes;
+        this.backgroundColor = backgroundColor;
+    }
+
+    public TimeTypeDTO(BigInteger id, String timeTypes) {
+        this.id = id;
+        this.timeTypes = timeTypes;
+    }
 
     public TimeTypeDTO(BigInteger id, String timeTypes, BigInteger upperLevelTimeTypeId) {
         this.id = id;
@@ -34,7 +46,12 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO() {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor) {
+        this.id = id;
+        this.timeTypes = timeTypes;
+        this.label = label;
+        this.description = description;
+        this.backgroundColor=backgroundColor;
     }
 
     public TimeTypeEnum getSecondLevelType() {
@@ -59,20 +76,6 @@ public class TimeTypeDTO {
 
     public void setChildren(List<TimeTypeDTO> children) {
         this.children = children;
-    }
-
-
-    public TimeTypeDTO(BigInteger id, String timeTypes) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-    }
-
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-        this.label = label;
-        this.description = description;
-        this.backgroundColor=backgroundColor;
     }
 
     public BigInteger getUpperLevelTimeTypeId() {
