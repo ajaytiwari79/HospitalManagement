@@ -3,8 +3,8 @@ package com.kairos.dto.user.country.experties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.organization.union.SectorDTO;
+import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.dto.user.country.pay_table.FutureDate;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;
@@ -43,7 +43,8 @@ public class CountryExpertiseDTO {
     private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
-    private Long unionId;
+  /*  private Long unionId;*/
+    private UnionIDNameDTO union;
     private Integer fullTimeWeeklyMinutes ; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
@@ -56,7 +57,7 @@ public class CountryExpertiseDTO {
     @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
 
-    private List<SectorDTO> sectorDTOs;
+    private SectorDTO sector;
 
     public Boolean isPublished() {
         return published;
@@ -140,13 +141,7 @@ public class CountryExpertiseDTO {
         this.organizationServiceIds = organizationServiceIds;
     }
 
-    public Long getUnionId() {
-        return unionId;
-    }
 
-    public void setUnionId(Long unionId) {
-        this.unionId = unionId;
-    }
 
     public Integer getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -177,14 +172,13 @@ public class CountryExpertiseDTO {
     }
 
 
-    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @Valid SeniorityLevelDTO seniorityLevel) {
+    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @Valid SeniorityLevelDTO seniorityLevel) {
         this.name = name;
         this.description = description;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.organizationLevelId = organizationLevelId;
         this.organizationServiceIds = organizationServiceIds;
-        this.unionId = unionId;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.seniorityLevel = seniorityLevel;
@@ -213,11 +207,19 @@ public class CountryExpertiseDTO {
     }
 
 
-    public List<SectorDTO> getSectorDTOs() {
-        return sectorDTOs;
+    public SectorDTO getSector() {
+        return sector;
     }
 
-    public void setSectorDTOs(List<SectorDTO> sectorDTOs) {
-        this.sectorDTOs = sectorDTOs;
+    public void setSector(SectorDTO sector) {
+        this.sector = sector;
+    }
+
+    public UnionIDNameDTO getUnion() {
+        return union;
+    }
+
+    public void setUnion(UnionIDNameDTO union) {
+        this.union = union;
     }
 }

@@ -35,7 +35,7 @@ public class Expertise extends UserBaseEntity {
     Country country;
 
     @Relationship(type = BELONGS_TO)
-    Sector sector;
+    private Sector sector;
 
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
@@ -256,11 +256,10 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
     }
 
-    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,List<Sector> sectors) {
+    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,Sector sector) {
         this.name = name;
         this.description = description;
         this.country = country;
-
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
@@ -269,7 +268,7 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
         this.hasDraftCopy = hasDraftCopy;
         this.history = history;
-        this.sectors = sectors;
+        this.sector = sector;
     }
 
     public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description) {
@@ -305,4 +304,11 @@ public class Expertise extends UserBaseEntity {
     }
 
 
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
+    }
 }
