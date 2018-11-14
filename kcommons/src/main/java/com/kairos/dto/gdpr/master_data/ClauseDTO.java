@@ -27,7 +27,6 @@ public class ClauseDTO {
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
     @Valid
-    @NotEmpty(message = "Tags  can't be empty")
     private List<ClauseTagDTO> tags = new ArrayList<>();
 
     @NotBlank(message = "error.message.description.notNull.orEmpty")

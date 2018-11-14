@@ -2,10 +2,10 @@ package com.kairos.persistence.repository.custom_repository;
 
 import org.neo4j.ogm.session.Session;
 import org.springframework.data.neo4j.repository.support.SimpleNeo4jRepository;
-import org.springframework.data.neo4j.util.PagingAndSortingUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,6 +43,9 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 		return session.load(clazz, id,depth);
 	}
 
-
+	@Override
+	public List<T> findAllById(List<ID> ids){
+		return new ArrayList<>(session.loadAll(clazz, (Collection<ID>) ids, 1));
+	}
 
 }

@@ -33,6 +33,7 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.TimeSlotService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.DateUtil;
@@ -105,6 +106,7 @@ public class SkillService {
     private TagGraphRepository tagGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private StaffRetrievalService staffRetrievalService;
 
     public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
@@ -523,7 +525,7 @@ public class SkillService {
         List<Map<String, Object>> response = new ArrayList<>();
         List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staffList = staffService.getStaffWithBasicInfo(id, false);
+            staffList = staffRetrievalService.getStaffWithBasicInfo(id, false);
             List<Long> staffIds = new ArrayList<>(staffList.size());
             staffList.stream().forEach(staffPersonalDetailDTO -> {
                 staffIds.add(staffPersonalDetailDTO.getId());
