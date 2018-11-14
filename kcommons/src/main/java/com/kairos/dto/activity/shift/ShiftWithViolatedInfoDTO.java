@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ShiftWithViolatedInfoDTO {
     private List<ShiftDTO> shifts;
-    private ViolatedRulesDTO violatedRules;
+    private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
     private List<String> errorMessages = new ArrayList<>();
 
 

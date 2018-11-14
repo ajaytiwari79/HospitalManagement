@@ -158,7 +158,8 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
                 lookup("responsibilityType", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
-                lookup("asset", "assetId", "_id", "asset")
+                lookup("asset", "assetId", "_id", "asset"),
+                lookup("risk","risks","_id","risks")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
