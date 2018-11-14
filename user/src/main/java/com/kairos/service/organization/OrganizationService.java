@@ -1251,7 +1251,7 @@ public class OrganizationService {
         OrderAndActivityDTO orderAndActivityDTO = activityIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
         organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        List<ExpertiseQueryResult> expertise = new ArrayList<>();
+        List<Expertise> expertise = new ArrayList<>();
         if (Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
             expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
         } else {

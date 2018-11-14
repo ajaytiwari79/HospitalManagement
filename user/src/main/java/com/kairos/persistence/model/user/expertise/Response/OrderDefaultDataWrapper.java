@@ -16,7 +16,7 @@ public class OrderDefaultDataWrapper {
     private List<OrderResponseDTO> orders;
     private List<ActivityDTO> activities;
     private List<Skill> skills;
-    private List<ExpertiseQueryResult> expertise;
+    private List<Expertise> expertise;
    // private List<TimeType> timeTypes;
     private List<StaffPersonalDetailDTO> staffList;
     private List<PresenceTypeDTO> plannedTime;
@@ -30,7 +30,7 @@ public class OrderDefaultDataWrapper {
         //Default Constructor
     }
 
-    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<ExpertiseQueryResult> expertise, List<StaffPersonalDetailDTO> staffList,
+    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
                                    List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes,
                                    List<com.kairos.persistence.model.country.DayType> dayTypes, Integer minOpenShiftHours,List<CounterDTO> counters) {
         this.orders = orders;
@@ -71,11 +71,11 @@ public class OrderDefaultDataWrapper {
         this.skills = skills;
     }
 
-    public List<ExpertiseQueryResult> getExpertise() {
+    public List<Expertise> getExpertise() {
         return expertise;
     }
 
-    public void setExpertise(List<ExpertiseQueryResult> expertise) {
+    public void setExpertise(List<Expertise> expertise) {
         this.expertise = expertise;
     }
 

@@ -73,8 +73,6 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = BELONGS_TO_SECTOR)
     private Sector sector;
 
-
-
     public String getDescription() {
         return description;
     }

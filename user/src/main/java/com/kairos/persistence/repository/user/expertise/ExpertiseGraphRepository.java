@@ -162,19 +162,31 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName, Long currentExpertise);
 
 
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) \n" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
+            " match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(l:Level) where id(l) = {2}\n" +
+            "return expertise order by expertise.creationDate")
+    List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds, Long organizationLevelId);
+
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
+            "return expertise order by expertise.creationDate")
+    List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
+
+
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) \n" +
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(l:Level) where id(l) = {2} " +
             "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) \n" +
             "RETURN id(expertise) as id,expertise.name as name,sector as sector order by expertise.creationDate")
-    List<ExpertiseQueryResult> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds, Long organizationLevelId);
+    List<ExpertiseQueryResult> findExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds, Long organizationLevelId);
 
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1} " +
             "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector)\n" +
             "RETURN id(expertise) as id,expertise.name as name,sector as sector order by expertise.creationDate")
-    List<ExpertiseQueryResult> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
+    List<ExpertiseQueryResult> findExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
 
 
 

@@ -40,7 +40,7 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "OPTIONAL MATCH(expertise)<-[expRel:"+HAS_EXPERTISE_IN+"]-(up:UnitPosition)<-["+BELONGS_TO_STAFF+"]-(staff) " +
             "WITH expertise ,rel,seniorityLevels,sector,CASE WHEN count(expRel)>0 THEN true ELSE false END as unitPositionExists " +
             "RETURN id(sector) as id,sector.name as name, COLLECT({id:id(rel), expertiseId:id(expertise), name:expertise.name ,expertiseStartDate:rel.expertiseStartDate ,relevantExperienceInMonths:rel.relevantExperienceInMonths ,unitPositionExists:unitPositionExists,seniorityLevels:seniorityLevels}) as expertiseWithExperience ")
-    List<SectorAndStaffExpertiseQueryResult> getExpertiseWithExperience(Long staffId);
+    List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertiseWithExperience(Long staffId);
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND id(expertise) IN {1}" +
             " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths")
