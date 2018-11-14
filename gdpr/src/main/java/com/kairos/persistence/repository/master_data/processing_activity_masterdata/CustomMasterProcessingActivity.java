@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.master_data.processing_activity_master
 
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
@@ -25,7 +25,7 @@ public interface CustomMasterProcessingActivity {
 
    Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
-   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId,  OrganizationMetaDataDTO organizationMetaDataDTO);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId,  OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
    List<MasterProcessingActivityRiskResponseDTO> getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(Long countryId);
 
