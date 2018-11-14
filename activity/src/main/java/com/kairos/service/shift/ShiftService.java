@@ -306,7 +306,7 @@ public class ShiftService extends MongoBaseService {
         mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
         validateStaffingLevel(phase, mainShift, activityWrapper.getActivity(), true, staffAdditionalInfoDTO);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
-            mainShift.setPlanningPeriodId(shiftWithActivityDTO.getPlanningPeriodId());
+            //mainShift.setPlanningPeriodId(shiftWithActivityDTO.getPlanningPeriodId());
             mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
 

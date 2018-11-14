@@ -6,10 +6,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,8 +43,9 @@ public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRe
     @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates  return id(function)" )
     Long getApplicableFunction(Long unitPositionId, String localDate);
 
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} return collect(rel) " )
-    List<UnitPositionFunctionRelationship> getApplicableFunctionIdWithDatesByUnitPositionId(Set<Long> unitPositionIds);
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false})-[rel:APPLIED_FUNCTION ]->(function:Function{deleted:false}) where id(unitPosition) in {0} return id(rel) as id,rel.appliedDates as appliedDates,unitPosition as unitPosition,function as function  " )
+    List<UnitPositionFunctionRelationshipQueryResult> getApplicableFunctionIdWithDatesByUnitPositionId(Set<Long> unitPositionIds);
 
-
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false})-[rel:APPLIED_FUNCTION ]->(function:Function{deleted:false})  where id(unitPosition) in {0} return unitPosition as unitPosition,function as function ,id(rel) as id, rel.appliedDates as appliedDates ")
+    List<UnitPositionFunctionRelationshipQueryResult> getApplicableFunctionsWithRelationShipIByUnitPositionId(Set<Long> unitPositionIds);
 }

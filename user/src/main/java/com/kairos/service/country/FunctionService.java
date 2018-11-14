@@ -6,7 +6,9 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
+import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationshipQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
@@ -135,16 +137,14 @@ public class FunctionService {
     }
 
     //====================================================================================
-    //TODO test
-    public Map<Long, Map<Long, Set<Date>>> getUnitPositionIdWithFunctionIdShiftDateMap(Set<Long> unitPositionIds) {
-        Map<Long, Map<Long, Set<Date>>> unitPositionWithFunctionIdAndLocalDateMap = new HashMap<>();
+    public Map<Long, Map<Long, Set<LocalDate>>> getUnitPositionIdWithFunctionIdShiftDateMap(Set<Long> unitPositionIds) {
+        Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithFunctionIdAndLocalDateMap = new HashMap<>();
         if (!unitPositionIds.isEmpty()) {
-            List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships = unitPositionFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByUnitPositionId(unitPositionIds);
+            List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationships = unitPositionFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByUnitPositionId(unitPositionIds);
             if (!unitPositionFunctionRelationships.isEmpty()) {
-                for (UnitPositionFunctionRelationship unitPositionFunctionRelationship : unitPositionFunctionRelationships) {
-                    Map<Long, Set<Date>> functionIdWithAppliedDates = new HashMap<>();
-                    Set<Date> dateFromLocalDate = unitPositionFunctionRelationship.getDate().stream().map(localDate -> DateUtils.asDate(localDate)).collect(Collectors.toSet());
-                    functionIdWithAppliedDates.put(unitPositionFunctionRelationship.getFunction().getId(), dateFromLocalDate);
+                for (UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationship : unitPositionFunctionRelationships) {
+                    Map<Long, Set<LocalDate>> functionIdWithAppliedDates = new HashMap<>();
+                    functionIdWithAppliedDates.put(unitPositionFunctionRelationship.getFunction().getId(), unitPositionFunctionRelationship.getAppliedDates());
                     unitPositionWithFunctionIdAndLocalDateMap.put(unitPositionFunctionRelationship.getUnitPosition().getId(), functionIdWithAppliedDates);
                 }
             }
@@ -156,25 +156,37 @@ public class FunctionService {
     }
 
     //=================================================================================
-    public boolean updateUnitPositionFunctionRelationShipDates(Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithFunctionIdAndLocalDateMap) {
-        boolean result=false ;
-        Set<Long> unitPositionIds=unitPositionWithFunctionIdAndLocalDateMap.keySet();
-        if (!unitPositionWithFunctionIdAndLocalDateMap.isEmpty()) {
-            List<UnitPositionFunctionRelationship> existingUnitPositionFunctionRelationships = unitPositionFunctionRelationshipRepository.getApplicableFunctionIdWithDatesByUnitPositionId(unitPositionIds);
-            List<UnitPositionFunctionRelationship> updatedUnitPositionFunctionRelationships=new ArrayList<>();
-            if (!existingUnitPositionFunctionRelationships.isEmpty()) {
-               for(UnitPositionFunctionRelationship unitPositionFunctionRelationship:existingUnitPositionFunctionRelationships){
-                   Map<Long,Set<LocalDate>> functionWithDates=unitPositionWithFunctionIdAndLocalDateMap.get(unitPositionFunctionRelationship.getUnitPosition().getId());
-                   Set<Long> functionIds=functionWithDates.keySet();
-                   Long existingFunctionId=unitPositionFunctionRelationship.getFunction().getId();
-                   if(!functionIds.isEmpty() && functionIds.contains(existingFunctionId)) {
-                       unitPositionFunctionRelationship.setDate(functionWithDates.get(existingFunctionId));
-                   }
-                   updatedUnitPositionFunctionRelationships.add(unitPositionFunctionRelationship);
-               }
-                unitPositionFunctionRelationshipRepository.saveAll(updatedUnitPositionFunctionRelationships);
-                result = true;
+
+    /**
+     * Assuming one function per Date per unitPosition
+     * @param unitPositionIdWithShiftDateFunctionIdMap
+     * @return
+     */
+    public boolean updateUnitPositionFunctionRelationShipDates(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap) {
+        boolean result = false;
+        List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults = unitPositionFunctionRelationshipRepository.getApplicableFunctionsWithRelationShipIByUnitPositionId(unitPositionIdWithShiftDateFunctionIdMap.keySet());
+        List<UnitPositionFunctionRelationship> updatedUnitPositionFunctionRelationshipList = new ArrayList<>();
+        if (!unitPositionFunctionRelationshipQueryResults.isEmpty()) {
+            for (UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult : unitPositionFunctionRelationshipQueryResults) {
+                UnitPositionFunctionRelationship unitPositionFunctionRelationship = new UnitPositionFunctionRelationship();
+                unitPositionFunctionRelationship.setId(unitPositionFunctionRelationshipQueryResult.getId());
+                Function existingFunction = unitPositionFunctionRelationshipQueryResult.getFunction();
+                UnitPosition existingUnitPosition = unitPositionFunctionRelationshipQueryResult.getUnitPosition();
+                unitPositionFunctionRelationship.setFunction(existingFunction);
+                unitPositionFunctionRelationship.setUnitPosition(existingUnitPosition);
+                Set<LocalDate> existingAppliedDates = unitPositionFunctionRelationshipQueryResult.getAppliedDates();
+                Map<LocalDate, Long> localDateFunctionIdMap = unitPositionIdWithShiftDateFunctionIdMap.get(existingUnitPosition.getId());
+                Set<LocalDate> datesToBeAdded = localDateFunctionIdMap.keySet().stream().filter(date -> existingFunction.getId().equals(localDateFunctionIdMap.get(date))).collect(Collectors.toSet());
+                Set<LocalDate> datesToBeRemoved = localDateFunctionIdMap.keySet().stream().filter(date -> ((localDateFunctionIdMap.get(date)==null) && existingAppliedDates.contains(date))).collect(Collectors.toSet());
+                if (!datesToBeAdded.isEmpty() || !datesToBeRemoved.isEmpty()) {
+                    existingAppliedDates.addAll(datesToBeAdded);
+                    existingAppliedDates.removeAll(datesToBeRemoved);
+                }
+                unitPositionFunctionRelationship.setDate(existingAppliedDates);
+                updatedUnitPositionFunctionRelationshipList.add(unitPositionFunctionRelationship);
             }
+            unitPositionFunctionRelationshipRepository.saveAll(updatedUnitPositionFunctionRelationshipList);
+            result = true;
         }
         return result;
     }
