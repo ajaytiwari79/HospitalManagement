@@ -360,7 +360,7 @@ public class AgreementSectionService extends MongoBaseService {
     private List<Clause> buildClauseForAgreementSection(Long countryId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
 
-        ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTag(countryId);
+        ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTagByCountryId(countryId);
         List<String> clauseTitles = new ArrayList<>();
         List<Clause> clauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
