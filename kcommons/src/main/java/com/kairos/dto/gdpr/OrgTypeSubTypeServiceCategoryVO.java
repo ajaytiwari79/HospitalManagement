@@ -1,17 +1,12 @@
-package com.kairos.persistence.model.organization_type;
+package com.kairos.dto.gdpr;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@QueryResult
-public class OrganizationTypeSubTypeAndServicesQueryResult {
+@JsonIgnoreProperties
+public class OrgTypeSubTypeServiceCategoryVO {
 
     private Long id;
     private String name;
