@@ -42,8 +42,8 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "RETURN id(sector) as id,sector.name as name, COLLECT({id:id(rel), expertiseId:id(expertise), name:expertise.name ,expertiseStartDate:rel.expertiseStartDate ,relevantExperienceInMonths:rel.relevantExperienceInMonths ,unitPositionExists:unitPositionExists,seniorityLevels:seniorityLevels}) as expertiseWithExperience ")
     List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertiseWithExperience(Long staffId);
 
-    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND id(expertise) IN {1}" +
-            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths")
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(staff) = {0} AND id(expertise) IN {1}" +
+            "RETURN id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndExpertiseIds(Long staffId, List<Long> expertiseId);
 
 
