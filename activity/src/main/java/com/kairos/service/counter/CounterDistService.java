@@ -199,12 +199,11 @@ public class CounterDistService extends MongoBaseService {
         }
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
-
-        filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpiId()).collect(toList()));
+        filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
         filters.setUnitId(unitId);
         Map<BigInteger, RawRepresentationData> data = counterDataService.generateKPIData(filters);
-        tabKPIDTOS.parallelStream().forEach(tabKPIDTO -> {
-            tabKPIDTO.setData(data.get(tabKPIDTO.getKpiId()));
+        tabKPIDTOS.forEach(tabKPIDTO -> {
+            tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
         });
         return tabKPIDTOS;
     }

@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -127,11 +128,8 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, unitId, ConfLevel.UNIT));
     }
 
-    @GetMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/{tabId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId
-            //, @RequestBody FilterCriteriaDTO filtersDTO
-    ){
-        FilterCriteriaDTO filtersDTO = new FilterCriteriaDTO();
+    @PostMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId, @RequestBody FilterCriteriaDTO filtersDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF, filtersDTO));
     }
 
@@ -272,11 +270,4 @@ public class CounterDistController {
     public ResponseEntity<Map<String, Object>> calculatePlannedHours(@PathVariable Long unitId, @RequestParam List<Long> staffIds, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,counterDataService.calculatePlannedHour(staffIds,unitId,startDate,endDate));
     }
-
-    //for filter criteria
-    @GetMapping(UNIT_URL+"/calculate_resting_hours")
-    public ResponseEntity<Map<String, Object>> calculateRestingHoues(@PathVariable Long unitId,@RequestParam List<Long> staffIds,@RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, restingHoursCalculationService.calculateRestingHours(staffIds, null,  Date.valueOf(startDate),Date.valueOf(endDate)));
-    }
-
 }
