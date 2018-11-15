@@ -397,10 +397,6 @@ public class AgreementSectionService extends MongoBaseService {
 
 
         Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = policyAgreementTemplateRepository.getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(countryId, agreementTemplate.getId(), existingClauseId);
-
-        if (CollectionUtils.isNotEmpty(clauseIdListPresentInOtherSectionAndSubSection)) {
-            existingClauseId.remove(clauseIdListPresentInOtherSectionAndSubSection);
-        }
         List<Clause> exisitingClauseList = clauseMongoRepository.findClauseByCountryIdAndIdList(countryId, existingClauseId);
         Map<BigInteger, Clause> clauseIdMap = exisitingClauseList.stream().collect(Collectors.toMap(Clause::getId, clause -> clause));
         existingClauseMap.forEach((agreementSection, clauseBasicDTOS) -> {
