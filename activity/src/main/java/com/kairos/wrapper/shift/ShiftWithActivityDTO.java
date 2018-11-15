@@ -112,7 +112,6 @@ public class ShiftWithActivityDTO {
         return activityIds;
     }
 
-
     public BigInteger getPlanningPeriodId() {
         return planningPeriodId;
     }
