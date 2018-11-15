@@ -1,5 +1,7 @@
 package com.kairos.dto.user.country.experties;
 
+import com.kairos.dto.user.organization.union.SectorDTO;
+import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.commons.utils.date_validator.FutureLocalDate;
 
@@ -28,7 +30,8 @@ public class CopyExpertiseDTO {
     private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
-    private Long unionId;
+    /*private Long unionId;*/
+    private UnionIDNameDTO union;
     private Integer fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
@@ -40,6 +43,7 @@ public class CopyExpertiseDTO {
     // TODO REMOVE FOR FE compactibility
     private Long startDateMillis;
     private Long endDateMillis;
+    private SectorDTO sectorDTO;
 
     public CopyExpertiseDTO() {
         // DC
@@ -101,13 +105,6 @@ public class CopyExpertiseDTO {
         this.organizationServiceIds = organizationServiceIds;
     }
 
-    public Long getUnionId() {
-        return unionId;
-    }
-
-    public void setUnionId(Long unionId) {
-        this.unionId = unionId;
-    }
 
     public Integer getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -173,17 +170,32 @@ public class CopyExpertiseDTO {
         this.endDateMillis = endDateMillis;
     }
 
-    public CopyExpertiseDTO(@NotBlank(message = "Expertise name is required") String name, LocalDate startDate, LocalDate endDate, String description, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, List<SeniorityLevelDTO> seniorityLevels, @NotNull(message = "Please select payment type") BreakPaymentSetting breakPaymentSetting) {
+    public CopyExpertiseDTO(@NotBlank(message = "Expertise name is required") String name, LocalDate startDate, LocalDate endDate, String description, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, List<SeniorityLevelDTO> seniorityLevels, @NotNull(message = "Please select payment type") BreakPaymentSetting breakPaymentSetting) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.description = description;
         this.organizationLevelId = organizationLevelId;
         this.organizationServiceIds = organizationServiceIds;
-        this.unionId = unionId;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.seniorityLevels = seniorityLevels;
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+    public SectorDTO getSectorDTO() {
+        return sectorDTO;
+    }
+
+    public void setSectorDTO(SectorDTO sectorDTO) {
+        this.sectorDTO = sectorDTO;
+    }
+
+    public UnionIDNameDTO getUnion() {
+        return union;
+    }
+
+    public void setUnion(UnionIDNameDTO union) {
+        this.union = union;
     }
 }

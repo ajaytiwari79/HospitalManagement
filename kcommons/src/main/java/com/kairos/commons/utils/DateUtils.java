@@ -52,7 +52,7 @@ public class DateUtils {
 
     }
     public static LocalDateTime getCurrentLocalDateTime() {
-        return LocalDateTime.now();
+        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
     }
 
@@ -756,5 +756,9 @@ public class DateUtils {
 
     public static LocalDateTime getLocalDateTimeFromMillis(Long longValue) {
         return (longValue == null) ? null : LocalDateTime.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault());
+    }
+
+    public static LocalDateTime getEndOfDayFromLocalDateTime(){
+        return LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
     }
 }

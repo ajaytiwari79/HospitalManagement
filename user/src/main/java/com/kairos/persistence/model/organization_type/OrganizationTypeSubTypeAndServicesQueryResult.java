@@ -15,6 +15,7 @@ public class OrganizationTypeSubTypeAndServicesQueryResult {
 
     private Long id;
     private String name;
+    private Long countryId;
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
@@ -38,4 +39,8 @@ public class OrganizationTypeSubTypeAndServicesQueryResult {
     public List<SubServiceCategory> getOrganizationSubServices() { return organizationSubServices; }
 
     public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+
+    public Long getCountryId() { return countryId; }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
 }

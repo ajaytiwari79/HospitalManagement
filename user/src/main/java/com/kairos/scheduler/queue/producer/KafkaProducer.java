@@ -26,7 +26,7 @@ public class KafkaProducer {
     private KafkaTemplate<Integer,KairosScheduleJobDTO> kafkaTemplateJobQueue;
     @Inject
     private KafkaTemplate<Integer,KairosSchedulerLogsDTO> kafkaTemplateLogsQueue;
-    @Inject
+
     private static Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
 
 

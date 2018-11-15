@@ -93,6 +93,7 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     private String locationName;
     private boolean primary;
 
+
     public String getLocationName() {
         return locationName;
     }
@@ -112,11 +113,28 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     public ContactAddress() {
     }
 
+
+    public ContactAddress(String houseNumber,String province,String street,String city,String regionName) {
+
+        this.houseNumber = houseNumber;
+        this.province = province;
+        this.street = street;
+        this.city = city;
+        this.regionName = regionName;
+    }
+
     public ContactAddress(String street, int floorNumber, String houseNumber, ZipCode zipCode) {
         this.street = street;
         this.floorNumber = floorNumber;
         this.houseNumber = houseNumber;
         this.zipCode = zipCode;
+    }
+    public ContactAddress(String street, int floorNumber, String houseNumber, ZipCode zipCode,Municipality municipality) {
+        this.street = street;
+        this.floorNumber = floorNumber;
+        this.houseNumber = houseNumber;
+        this.zipCode = zipCode;
+        this.municipality = municipality;
     }
 
     public String getDescription() {

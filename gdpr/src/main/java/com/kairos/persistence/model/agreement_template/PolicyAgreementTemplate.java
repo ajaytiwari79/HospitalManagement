@@ -5,6 +5,7 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -29,9 +30,10 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
     private BigInteger templateType;
-    private String coverPageContent;
-    private String coverPageTitle;
-    private String coverPageLogoUrl;
+    private boolean coverPageAdded;
+    private boolean includeContentPage;
+    private CoverPageVO coverPageData;
+
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -42,9 +44,21 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
     }
+
+    public boolean isIncludeContentPage() { return includeContentPage; }
+
+    public void setIncludeContentPage(boolean includeContentPage) { this.includeContentPage = includeContentPage; }
+
     public PolicyAgreementTemplate() {
     }
 
+    public boolean isCoverPageAdded() { return coverPageAdded; }
+
+    public void setCoverPageAdded(boolean coverPageAdded) { this.coverPageAdded = coverPageAdded; }
+
+    public CoverPageVO getCoverPageData() { return coverPageData; }
+
+    public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
 
     public BigInteger getTemplateType() { return templateType; }
 
@@ -104,27 +118,5 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
 
-    public String getCoverPageContent() {
-        return coverPageContent;
-    }
 
-    public void setCoverPageContent(String coverPageContent) {
-        this.coverPageContent = coverPageContent;
-    }
-
-    public String getCoverPageTitle() {
-        return coverPageTitle;
-    }
-
-    public void setCoverPageTitle(String coverPageTitle) {
-        this.coverPageTitle = coverPageTitle;
-    }
-
-    public String getCoverPageLogoUrl() {
-        return coverPageLogoUrl;
-    }
-
-    public void setCoverPageLogoUrl(String coverPageLogoUrl) {
-        this.coverPageLogoUrl = coverPageLogoUrl;
-    }
 }

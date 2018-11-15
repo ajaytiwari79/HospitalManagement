@@ -13,7 +13,7 @@ public enum WTATemplateType {
     SHIFT_LENGTH("Shift length"),
     NUMBER_OF_SHIFTS_IN_INTERVAL("Shifts in Interval"),
     TIME_BANK("Time Bank"),
-    VETO_PER_PERIOD("Veto per period"),
+    VETO_AND_STOP_BRICKS("Veto and stop bricks"),
     DAILY_RESTING_TIME("Daily Resting Time"),
     DURATION_BETWEEN_SHIFTS("Duration Between Shifts"),
     REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS("Rest In Consecutive Days and nights"),

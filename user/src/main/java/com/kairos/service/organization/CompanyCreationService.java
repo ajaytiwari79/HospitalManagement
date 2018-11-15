@@ -1,9 +1,16 @@
 package com.kairos.service.organization;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
+
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
+
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
@@ -36,6 +43,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
@@ -48,15 +56,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -116,7 +128,10 @@ public class CompanyCreationService {
     @Inject
     private ReasonCodeService reasonCodeService;
     @Inject
+    private SchedulerServiceRestClient schedulerRestClient;
+    @Inject
     private TreeStructureService treeStructureService;
+
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -325,13 +340,17 @@ public class CompanyCreationService {
                 // No user is found its first time so we need to validate email and CPR number
                 //validate user email or name
                 if (unitManagerDTO.getCprNumber() != null || unitManagerDTO.getEmail() != null) {
-                    byte userBySameEmailOrCPR = userGraphRepository.findByEmailIgnoreCaseOrCprNumber("(?i)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber());
-                    if (userBySameEmailOrCPR != 0) {
-                        exceptionService.duplicateDataException("user already exist by email or cpr");
+                    User userBySameEmailOrCPR = userGraphRepository.findByCprNumber(unitManagerDTO.getCprNumber());
+                    if (userBySameEmailOrCPR != null) {
+                        user=userBySameEmailOrCPR;
+                        //user.setEmail(unitManagerDTO.getEmail());
+                    }
+                    else{
+                        user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                     }
 
                 }
-                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
@@ -429,8 +448,8 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createDefalutDateForSubUnit(unit, parentOrganization.getId());
-        accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
+        reasonCodeService.createDefalutDataForSubUnit(unit, parentOrganization.getId());
+        accessGroupService.createUnitDefaultAccessGroups(unit, parentOrganization.getId());
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
@@ -562,6 +581,7 @@ public class CompanyCreationService {
 
 
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+        Map<Long,Long> unitAndStaffId=staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v.getStaff().getId()));
         unitIds.add(organizationId);
         if (staffPersonalDetailDTOS.size() != unitIds.size()) {
             exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
@@ -575,32 +595,41 @@ public class CompanyCreationService {
         organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
-
+        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
+        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days, LocalTime.of(23,59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
+        List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
-
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
+        Map<Long,Map<Long, Long>> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
                 countryId);
         if (parentId == null) {
-            CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
-            CompletableFuture.allOf(hasUpdated).join();
-
+            List<Future<Object>> hasUpdated = companyDefaultDataService
+                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId,unitAndStaffId);
+            //CompletableFuture.allOf(hasUpdated).join();
+            hasUpdated.forEach(data -> {
+                try {
+                    data.get();
+                } catch (InterruptedException | ExecutionException ex){
+                   logger.info("failed...............");
+                }
+            });
+            Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganizations(unitIds);
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
+                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,orgAndUnitAccessGroupIdsMap,unitAndStaffId);
             CompletableFuture.allOf(createdInUnit).join();
 
 
         } else {
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots);
+                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots,countryAndOrgAccessGroupIdsMap,unitAndStaffId);
             CompletableFuture.allOf(createdInUnit).join();
         }
 
+        //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         List<QueryResult> childQueryResults = new ArrayList<>();
         for (Organization childUnits : organization.getChildren()) {
@@ -610,6 +639,7 @@ public class CompanyCreationService {
         organizationQueryResult.setChildren(childQueryResults);
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
+
 
     private void addStaffsInChatServer(List<Staff> staffList) {
         staffList.forEach(staff -> {
