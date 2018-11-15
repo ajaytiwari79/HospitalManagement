@@ -174,7 +174,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         );
         AggregationResults<Map> response = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, Map.class);
         Set<BigInteger> clauseIdList = new HashSet<>();
-        if (Optional.ofNullable(response).isPresent()) {
+        if (Optional.ofNullable(response.getUniqueMappedResult()).isPresent()) {
             ArrayList<ArrayList<BigInteger>> arrayLists = (ArrayList<ArrayList<BigInteger>>) response.getUniqueMappedResult().get("clauseIds");
             arrayLists.forEach(bigIntegers -> clauseIdList.addAll(new HashSet<BigInteger>(bigIntegers)));
             return clauseIds.stream().filter(clauseId -> clauseIdList.contains(clauseId.toString())).collect(Collectors.toSet());
