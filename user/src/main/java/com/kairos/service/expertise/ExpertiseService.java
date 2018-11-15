@@ -125,7 +125,11 @@ public class ExpertiseService {
             if (isExpertiseExists) {
                 exceptionService.duplicateDataException("message.duplicate", "expertise");
             }
-
+            if(expertiseDTO.isPublished()) {
+             if(!Optional.ofNullable(expertiseDTO.getUnion().getId()).isPresent()||!organizationGraphRepository.isPublishedUnion(expertiseDTO.getUnion().getId())) {
+                 exceptionService.invalidRequestException("message.publish.expertise.union");
+             }
+            }
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
                     getSector(expertiseDTO.getSector(),country));
@@ -386,35 +390,12 @@ public class ExpertiseService {
 
             validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
 
-           /* if(Optional.ofNullable(expertiseDTO.getSector()).isPresent()&&Optional.ofNullable(currentExpertise.getSector()).isPresent()){
-                if(!expertiseDTO.getSector().getId().equals(currentExpertise.getSector().getId())) {
-                    deleteSector = true;
-                }
-            }
-            else if(Optional.ofNullable(currentExpertise.getSector()).isPresent()&&!Optional.ofNullable(expertiseDTO.getSector()).isPresent()) {
-                deleteSector = true;
-            }
 
-            boolean deleteUnion = false;
-            if(Optional.ofNullable(expertiseDTO.getUnion()).isPresent()&&Optional.ofNullable(currentExpertise.getUnion()).isPresent()){
-                if(!expertiseDTO.getUnion().getId().equals(currentExpertise.getUnion().getId())) {
-                    deleteUnion = true;
-                }
-            }
-            else if(Optional.ofNullable(currentExpertise.getSector()).isPresent()&&!Optional.ofNullable(expertiseDTO.getSector()).isPresent()) {
-                deleteUnion = true;
-            }*/
             boolean levelChanged = updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
             updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get(), levelChanged);
             // organization Level is changed so need to set new
             currentExpertise.setSector(getSector(expertiseDTO.getSector(),country));
-            /*if(deleteSector) {
-                expertiseGraphRepository.deleteExpertiseSectorRelationShip(currentExpertise.getId(),currentExpertise.getSector().getId());
-            }*/
-   /*         if(deleteUnion) {
-                expertiseGraphRepository.deleteExpertiseUnionRelationShip(currentExpertise.getId(),currentExpertise.getUnion().getId());
-            }
-   */         currentExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
+            currentExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
 
 
             expertiseGraphRepository.save(currentExpertise);
@@ -640,6 +621,10 @@ public class ExpertiseService {
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
         }
+            if(!Optional.ofNullable(expertise.getUnion().getId()).isPresent()||!organizationGraphRepository.isPublishedUnion(expertise.getUnion().getId())) {
+                exceptionService.invalidRequestException("message.publish.expertise.union");
+            }
+
         List<Long> seniorityLevelId = new ArrayList<>();
         for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
             seniorityLevel.setPublished(true);

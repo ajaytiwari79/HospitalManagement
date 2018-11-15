@@ -71,11 +71,6 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
 
-
-    //Added by Pavan
-    @Relationship(type = BELONGS_TO_SECTOR)
-    private Sector sector;
-
     public String getDescription() {
         return description;
     }
@@ -316,11 +311,4 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public Sector getSector() {
-        return sector;
-    }
-
-    public void setSector(Sector sector) {
-        this.sector = sector;
-    }
 }
