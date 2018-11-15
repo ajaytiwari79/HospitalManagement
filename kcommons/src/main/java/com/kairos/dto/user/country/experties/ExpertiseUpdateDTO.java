@@ -54,6 +54,8 @@ public class ExpertiseUpdateDTO {
 
     @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
+
+    @NotNull(message="message.sector.null")
     private SectorDTO sector;
 
 
