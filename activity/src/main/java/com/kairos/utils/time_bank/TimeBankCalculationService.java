@@ -331,7 +331,7 @@ public class TimeBankCalculationService {
         timeBankDTO.setStaffId(unitPositionWithCtaDetailsDTO.getStaffId());
         timeBankDTO.setWorkingDaysInWeek(unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
         timeBankDTO.setUnitPositionId(unitPositionWithCtaDetailsDTO.getId());
-        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() + (unitPositionWithCtaDetailsDTO.getTotalWeeklyHours() * 60);
+        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes();
         timeBankDTO.setTotalWeeklyMin(totalWeeklyMinutes);
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = getTimeBankIntervals(unitId,startDate,endDate,totalTimeBankBeforeStartDate, query, intervals, shiftsintervalMap, timeBanksIntervalMap, timeTypeDTOS, unitPositionWithCtaDetailsDTO, payoutTransactionIntervalMap);
         timeBankDTO.setTimeIntervals(timeBankIntervalDTOS);
@@ -511,7 +511,7 @@ public class TimeBankCalculationService {
      */
     public int calculateTimeBankForInterval(List<DateTimeInterval> planningPeriodIntervals,Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, boolean isByOverView, List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
         List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
-        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() + (unitPositionWithCtaDetailsDTO.getTotalWeeklyHours() * 60);
+        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes();
         if (!calculateContractual) {
             dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d -> DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toList());
         }
