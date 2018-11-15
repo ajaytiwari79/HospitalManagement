@@ -32,6 +32,10 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private BigInteger templateType;
     private boolean coverPageAdded;
     private boolean includeContentPage;
+    private boolean signatureComponentAdded;
+    private boolean signatureComponentLeftAlign;
+    private boolean signatureComponentRightAlign;
+    private String  signatureHtml;
     private CoverPageVO coverPageData;
 
 
@@ -118,5 +122,19 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
 
+    public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
 
+    public void setSignatureComponentAdded(boolean signatureComponentAdded) { this.signatureComponentAdded = signatureComponentAdded; }
+
+    public String getSignatureHtml() { return signatureHtml; }
+
+    public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
+
+    public boolean isSignatureComponentLeftAlign() { return signatureComponentLeftAlign; }
+
+    public void setSignatureComponentLeftAlign(boolean signatureComponentLeftAlign) { this.signatureComponentLeftAlign = signatureComponentLeftAlign; }
+
+    public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
+
+    public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
 }
