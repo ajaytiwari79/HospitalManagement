@@ -52,20 +52,13 @@ public class CountryExpertiseDTO {
     private SeniorityLevelDTO seniorityLevel;
 
     private List<Long> tags;
-    private Boolean published;
+    private boolean published;
 
     @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
 
     private SectorDTO sector;
 
-    public Boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(Boolean published) {
-        this.published = published;
-    }
 
 
     public CountryExpertiseDTO() {
@@ -167,9 +160,6 @@ public class CountryExpertiseDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-    public Boolean getPublished() {
-        return published;
-    }
 
 
     public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @Valid SeniorityLevelDTO seniorityLevel) {
@@ -221,5 +211,13 @@ public class CountryExpertiseDTO {
 
     public void setUnion(UnionIDNameDTO union) {
         this.union = union;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 }

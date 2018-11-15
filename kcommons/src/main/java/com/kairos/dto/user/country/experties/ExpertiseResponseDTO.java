@@ -27,7 +27,7 @@ public class ExpertiseResponseDTO {
     private Date endDateMillis;
     private Long organizationLevelId;
     private Set<Long> organizationServiceIds;
-    private UnionIDNameDTO Union;
+    private UnionIDNameDTO union;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
 
@@ -173,10 +173,10 @@ public class ExpertiseResponseDTO {
     }
 
     public UnionIDNameDTO getUnion() {
-        return Union;
+        return union;
     }
 
     public void setUnion(UnionIDNameDTO union) {
-        Union = union;
+        this.union = union;
     }
 }
