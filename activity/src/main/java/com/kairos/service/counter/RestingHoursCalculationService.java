@@ -98,14 +98,13 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     @Override
-    public RawRepresentationData getCalculatedCounter(Map filterBasedCriteria, Long countryId, KPI kpi) {
+    public RawRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), false);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 
     @Override
-    public RawRepresentationData getCalculatedKPI(Map filterBasedCriteria, Long countryId, KPI kpi) {
-        System.out.println("connecting logic...");
+    public RawRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
         List<DataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }

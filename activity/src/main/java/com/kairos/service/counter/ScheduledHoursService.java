@@ -46,12 +46,12 @@ public class ScheduledHoursService implements CounterService {
     }
 
     @Override
-    public RawRepresentationData getCalculatedCounter(Map filterBasedCriteria, Long countryId, KPI kpi) {
+    public RawRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
         return null;
     }
 
     @Override
-    public RawRepresentationData getCalculatedKPI(Map filterBasedCriteria, Long countryId, KPI kpi) {
+    public RawRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
         return null;
     }
 }
