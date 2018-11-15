@@ -4,6 +4,7 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
@@ -32,8 +33,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{unitPositionId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
 
-    @Query(value = "{_id: {$ne:?0} ,staffUserId:?1,deleted:false, disabled:false,startDate: {$lt: ?3},endDate:{$gt:?2}}",exists = true)
-    boolean findShiftBetweenDurationByUnitPositionNotEqualToShiftId(BigInteger shiftId,Long staffUserId, Date startDate, Date endDate);
+    @Query(value = "{_id: {$ne:?0} ,staffUserId:?1,deleted:false, disabled:false,startDate: {$lt: ?3},endDate:{$gt:?2},shiftType:?4}",exists = true)
+    boolean findShiftBetweenDurationByUnitPositionNotEqualToShiftId(BigInteger shiftId, Long staffUserId, Date startDate, Date endDate, ShiftType shiftType);
 
     @Query(value = "{staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationBystaffId(Long staffId, Date startDate, Date endDate);
@@ -73,8 +74,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false, disabled:false, planningPeriodId:?0,unitId:?1}")
     List<Shift> findAllShiftsByPlanningPeriod(BigInteger planningPeriodId, Long unitId);
 
-    @Query(value = "{deleted:false,staffUserId:?0,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists = true)
-    boolean existShiftsBetweenDurationByStaffUserId(Long staffUserId,Date startDate, Date endDate);
+    @Query(value = "{deleted:false,staffUserId:?0,startDate: {$lt: ?2},endDate:{$gt:?1},shiftType:?3}",exists = true)
+    boolean existShiftsBetweenDurationByStaffUserId(Long staffUserId,Date startDate, Date endDate,ShiftType shiftType);
 
     List<Shift> findAllByStaffIdInAndSickShiftTrueAndDeletedFalseAndStartDateGreaterThanEqualAndEndDateLessThanEqual(Set<Long> staffIds, Date startDate, Date endDate);
 
