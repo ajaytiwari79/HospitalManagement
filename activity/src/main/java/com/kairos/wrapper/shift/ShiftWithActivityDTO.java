@@ -42,6 +42,7 @@ public class ShiftWithActivityDTO {
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
+    private LocalDate shiftDate;
     private static boolean overrideWeekCount;
     private Long unitId;
     private int scheduledMinutes;
@@ -87,6 +88,14 @@ public class ShiftWithActivityDTO {
             activitiesTimeTypeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
         }
         return activitiesTimeTypeIds;
+    }
+
+    public LocalDate getShiftDate() {
+        return shiftDate;
+    }
+
+    public void setShiftDate(LocalDate shiftDate) {
+        this.shiftDate = shiftDate;
     }
 
     public List<BigInteger> getActivitiesPlannedTimeIds(){

@@ -15,7 +15,7 @@ import java.util.List;
 public interface CustomClauseRepository {
 
 
-    Clause findByTitle(Long countryId,String title);
+    Clause findByTitleAndDescription(Long countryId, String title,String description);
 
     List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId,FilterSelectionDTO filterSelectionDto);
 

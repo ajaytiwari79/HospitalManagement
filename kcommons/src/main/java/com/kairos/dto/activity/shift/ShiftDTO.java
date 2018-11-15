@@ -43,7 +43,6 @@ public class ShiftDTO {
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
-   // @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private ShiftTemplateDTO template;
