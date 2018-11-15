@@ -3,6 +3,7 @@ package com.kairos.persistence.model.staff.personal_details;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -48,6 +49,7 @@ public class StaffPersonalDetail {
     private Gender gender;
     private boolean pregnant;
     private Long employmentTypeId;
+    private List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise;
 
     public StaffPersonalDetail() {
         //Default Constructor
@@ -259,5 +261,13 @@ public class StaffPersonalDetail {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertise() {
+        return sectorWiseExpertise;
+    }
+
+    public void setSectorWiseExpertise(List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise) {
+        this.sectorWiseExpertise = sectorWiseExpertise;
     }
 }

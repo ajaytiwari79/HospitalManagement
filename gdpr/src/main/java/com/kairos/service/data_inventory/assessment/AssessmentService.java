@@ -451,17 +451,33 @@ public class AssessmentService extends MongoBaseService {
 
     private void saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
 
-        if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+        if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
             List<AssessmentAnswerValueObject> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
-            assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset));
+            assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> {
+                if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
+                    saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset);
+                } else {
+
+                    exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
+                }
+
+            });
             assetMongoRepository.save(asset);
 
-        } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
-            ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, assessment.getAssetId());
+        } else if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
+            ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, assessment.getProcessingActivityId());
             List<AssessmentAnswerValueObject> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
             assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
-                    -> saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity));
+                    -> {
+                if (Optional.ofNullable(processingActivityAssessmentAnswer.getAttributeName()).isPresent()) {
+                    saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
+
+                } else {
+                    exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
+
+                }
+            });
             processingActivityMongoRepository.save(processingActivity);
 
         }
@@ -484,8 +500,7 @@ public class AssessmentService extends MongoBaseService {
         return assessmentMongoRepository.getAllAssessmentByUnitId(unitId);
     }
 
-    public AssessmentSchedulingFrequency [] getSchedulingFrequency()
-    {
+    public AssessmentSchedulingFrequency[] getSchedulingFrequency() {
         return AssessmentSchedulingFrequency.values();
     }
 
@@ -643,13 +658,16 @@ public class AssessmentService extends MongoBaseService {
     }
 
     private List<BigInteger> castObjectIntoLinkedHashMapAndReturnIdList(Object objectToCast) {
+
         List<BigInteger> entityIdList = new ArrayList<>();
-        if (objectToCast instanceof ArrayList) {
-            List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-            entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
-        } else {
-            LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-            entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+        if (Optional.ofNullable(objectToCast).isPresent()) {
+            if (objectToCast instanceof ArrayList) {
+                List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
+                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
+            } else {
+                LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
+                entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+            }
         }
         return entityIdList;
     }

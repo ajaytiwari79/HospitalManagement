@@ -65,6 +65,7 @@ import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.ContactPersonDTO;
@@ -184,6 +185,7 @@ public class ClientService {
     private AsynchronousService asynchronousService;
     @Inject private ClientContactPersonRelationshipRepository clientContactPersonRelationshipRepository;
     @Inject private ClientContactPersonGraphRepository clientContactPersonGraphRepository;
+    @Inject private StaffRetrievalService staffRetrievalService;
 
 
     /*
@@ -905,7 +907,7 @@ public class ClientService {
     public boolean assignMultipleStaffToClient(long unitId, ClientStaffRelation.StaffType staffType) {
 
         long startTime = System.currentTimeMillis();
-        List<Map<String, Object>> staffQueryData = staffService.getStaffWithBasicInfo(unitId);
+        List<Map<String, Object>> staffQueryData = staffRetrievalService.getStaffWithBasicInfo(unitId);
         List<Long> staffIds = new ArrayList<>();
         for (Map<String, Object> map : staffQueryData) {
             staffIds.add((long) ((Map<String, Object>) map.get("data")).get("id"));
@@ -918,7 +920,7 @@ public class ClientService {
 
     public HashMap<String, Object> getAssignedStaffOfCitizen(long unitId) {
         long startTime = System.currentTimeMillis();
-        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResults = staffService.getStaffWithAdditionalInfo(unitId);
+        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResults = staffRetrievalService.getStaffWithAdditionalInfo(unitId);
 
         List<Long> staffIds = new ArrayList<>();
         //TODO append or set image name from query itself than applying a loop here
