@@ -614,7 +614,7 @@ public class CompanyCreationService {
                 try {
                     data.get();
                 } catch (InterruptedException | ExecutionException ex){
-                    System.out.println("failed...............");
+                   logger.info("failed...............");
                 }
             });
             Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganizations(unitIds);
