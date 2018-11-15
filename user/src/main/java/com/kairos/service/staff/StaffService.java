@@ -811,7 +811,7 @@ public class StaffService {
         return staffDTO;
     }
 
-    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData,boolean parentOrganization) {
+    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
         User user = userGraphRepository.findByEmail(staffCreationData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
             SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
@@ -820,7 +820,7 @@ public class StaffService {
             setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
-        setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId(),parentOrganization);
+        setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId());
         return user;
     }
 
@@ -983,7 +983,7 @@ public class StaffService {
         employmentGraphRepository.save(employment);
     }
 
-    private void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId,boolean parentOrganization) {
+    private void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
@@ -991,14 +991,16 @@ public class StaffService {
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-        if (!parentOrganization) {
-            Organization
-                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
-            mainOrganization.getEmployments().add(employment);
-            organizationGraphRepository.save(mainOrganization);
-        } else {
-            organization.getEmployments().add(employment);
-        }
+    //TODO fixed if parent org false than create employment in parent and unit permission in unit
+        //        if (!parentOrganization) {
+//            Organization
+//                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+//            mainOrganization.getEmployments().add(employment);
+//            organizationGraphRepository.save(mainOrganization);
+//        } else {
+//            organization.getEmployments().add(employment);
+//        }
+        organization.getEmployments().add(employment);
         organizationGraphRepository.save(organization);
         if (accessGroupId != null) {
             UnitPermission unitPermission = new UnitPermission();

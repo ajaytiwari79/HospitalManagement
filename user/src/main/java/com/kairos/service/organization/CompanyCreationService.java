@@ -5,14 +5,12 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
+
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
-import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
-
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.organization.UnitManagerDTO;
-import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
@@ -311,7 +309,7 @@ public class CompanyCreationService {
                     StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(),
                             unitManagerDTO.getCprNumber(),
                             null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
-                    staffService.createUnitManagerForNewOrganization(organization, unitManagerData,parentOrganization);
+                    staffService.createUnitManagerForNewOrganization(organization, unitManagerData);
                 }
 
             }
@@ -438,7 +436,6 @@ public class CompanyCreationService {
                 .setVatId(organizationBasicDTO.getVatId())
                 .setTimeZone(ZoneId.of(TIMEZONE_UTC))
                 .setKairosCompanyId(kairosCompanyId)
-                .setBoardingCompleted(organizationBasicDTO.isBoardingCompleted())
                 .createOrganization();
         setDefaultDataFromParentOrganization(unit, parentOrganization, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
@@ -451,7 +448,7 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createDefalutDateForSubUnit(unit, parentOrganization.getId());
+        reasonCodeService.createDefalutDataForSubUnit(unit, parentOrganization.getId());
         accessGroupService.createUnitDefaultAccessGroups(unit, parentOrganization.getId());
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
@@ -596,15 +593,14 @@ public class CompanyCreationService {
         validateAddressDetails(organizationContactAddresses, exceptionService);
 
         organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
-        //organization.setBoardingCompleted(true);
+        organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
-//        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
-//        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days,LocalTime.of(23,59),JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
-//        List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
+        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days, LocalTime.of(23,59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
+        List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
         Map<Long,Map<Long, Long>> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
-//        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
@@ -634,22 +630,16 @@ public class CompanyCreationService {
         }
 
         //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
+        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         List<QueryResult> childQueryResults = new ArrayList<>();
         for (Organization childUnits : organization.getChildren()) {
-            //QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
-            QueryResult childUnit = new QueryResult();
-            childUnit.setId(childUnits.getId());
-            childUnit.setName(childUnits.getName());
+            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
             childQueryResults.add(childUnit);
         }
-        //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
-        QueryResult organizationQueryResult = new QueryResult(organization.getName(), organization.getId(), childQueryResults);
-        organizationQueryResult.setParentOrganization(true);
-        childQueryResults.add(organizationQueryResult);
-
-        return treeStructureService.getTreeStructure(childQueryResults);
-
+        organizationQueryResult.setChildren(childQueryResults);
+        return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
+
 
     private void addStaffsInChatServer(List<Staff> staffList) {
         staffList.forEach(staff -> {

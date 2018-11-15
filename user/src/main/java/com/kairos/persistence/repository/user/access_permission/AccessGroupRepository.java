@@ -345,7 +345,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<AccessPageQueryResult> findAllAccessGroupWithParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization:Organization) where id(organization) IN {0} \n" +
-            "match(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) return id(ag) as id,id(pag) as parentId")
+            "match(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) return id(ag) as id,id(pag) as parentId,id(organization) as unitId")
     List<AccessPageQueryResult> findAllAccessGroupWithParentOfOrganizations(List<Long> organizationIds);
 
     @Query("MATCH (organization:Organization) where id(organization) = {0} \n" +

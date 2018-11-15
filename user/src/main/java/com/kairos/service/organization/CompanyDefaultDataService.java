@@ -1,8 +1,6 @@
 package com.kairos.service.organization;
 
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -51,7 +49,7 @@ public class CompanyDefaultDataService {
     @Inject
     private GdprIntegrationService gdprIntegrationService;
 
-
+    //todo fixed becouse of parent default data not copy properly copy in child like kpi so we use FUTURE
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots,Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap,Map<Long,Long> unitAndStaffId) throws InterruptedException, ExecutionException {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
         units.forEach(unit -> {
@@ -65,42 +63,33 @@ public class CompanyDefaultDataService {
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
-                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
+                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForSubUnit(unit,parentId));
                 asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,unit.getId()));
         });
-        System.out.print("--------------------------------------");
         return CompletableFuture.completedFuture(true);
     }
 
     public List<Future<Object>> createDefaultDataForParentOrganization(Organization organization, Map<Long,Map<Long, Long>> countryAndOrgAccessGroupIdsMap,
                                                                              List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO,Long countryId,Map<Long,Long> unitAndStaffId) throws InterruptedException, ExecutionException {
         List<Future<Object>> futureList = new ArrayList<>();
-        futureList.add(asynchronousService.executeAsynchronously(() -> {
-            activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO);
-            return true;
-        }));
-        futureList.add(asynchronousService.executeAsynchronously(() -> {
-            vrpClientService.createDefaultPreferredTimeWindow(organization);
-            return true;
-        }));
-        futureList.add(asynchronousService.executeAsynchronously(() -> {
-            organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-            return true;
-        }));
-        futureList.add(asynchronousService.executeAsynchronously(() -> {
+
+        asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO));
+        asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(organization));
+        asynchronousService.executeInBackGround(() -> organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId()));
+             futureList.add(asynchronousService.executeAsynchronously(() -> {
             activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(),
                             organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap.get(organization.getId())), organization.getId());
             activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffId.get(organization.getId()))), organization.getId());
             return true;
         }));
-        asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(organization, timeSlots));
+        asynchronousService.executeInBackGround(() ->timeSlotService.createDefaultTimeSlots(organization, timeSlots));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
-        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForUnit(organization,countryId));
-        //asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,organization.getId()));
+        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForUnit(organization,countryId));
+        asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,organization.getId()));
         return futureList;
     }
 }
