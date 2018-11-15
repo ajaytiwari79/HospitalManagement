@@ -4,7 +4,7 @@ package com.kairos.service.clause;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.dto.gdpr.master_data.ClauseDTO;
+import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
@@ -57,7 +57,7 @@ public class ClauseService extends MongoBaseService {
      * @throws DuplicateDataException : if clause already exist for id ,if account type is not selected}
      * @desciption this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
-    public ClauseDTO createClause(Long countryId, ClauseDTO clauseDto) {
+    public MasterClauseDTO createClause(Long countryId, MasterClauseDTO clauseDto) {
 
         Clause previousClause = clauseMongoRepository.findByTitleAndDescription(countryId, clauseDto.getTitle(),clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
@@ -81,6 +81,28 @@ public class ClauseService extends MongoBaseService {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * @param countryId
      * @param clauseId  clause id
@@ -89,7 +111,7 @@ public class ClauseService extends MongoBaseService {
      * @throws DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
      * @description this method update clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
-    public ClauseDTO updateClause(Long countryId, BigInteger clauseId, ClauseDTO clauseDto) {
+    public MasterClauseDTO updateClause(Long countryId, BigInteger clauseId, MasterClauseDTO clauseDto) {
 
         Clause clause = clauseMongoRepository.findByTitleAndDescription(countryId, clauseDto.getTitle(),clauseDto.getDescription());
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {

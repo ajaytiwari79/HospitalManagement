@@ -2,7 +2,7 @@ package com.kairos.controller.clause;
 
 
 
-import com.kairos.dto.gdpr.master_data.ClauseDTO;
+import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -41,7 +41,7 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping( "/clause/add")
-    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDTO clauseDto)  {
+    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody MasterClauseDTO clauseDto)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, clauseDto));
     }
 
@@ -60,7 +60,7 @@ public class ClauseController {
 
     @ApiOperation("update clause description")
     @PutMapping("/clause/update/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable Long countryId,@PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto)  {
+    public ResponseEntity<Object> updateClause(@PathVariable Long countryId,@PathVariable BigInteger clauseId, @Validated @RequestBody MasterClauseDTO clauseDto)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId,  clauseId, clauseDto));
     }
 
