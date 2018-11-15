@@ -94,4 +94,7 @@ public class ClauseController {
     public ResponseEntity<Object> deleteClause(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
     }
+
+
+
 }
