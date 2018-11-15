@@ -168,7 +168,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                 template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
         List<ClauseBasicResponseDTO> clauseListForTemplate = clauseMongoRepository.getClausesByAgreementTemplateMetadata(countryId, organizationMetaDataDTO);
-        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, agreementTemplateId);
+        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByTemplateIdAndCountryId(countryId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
                     Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS = agreementSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
@@ -218,8 +218,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param clauseId
      * @description methos return list of Agreement Template Conatining clause in Section and Sub Sections
      */
-    public List<AgreementTemplateBasicResponseDTO> getAgreementTemplateListContainClause(Long countryId, BigInteger clauseId) {
-        return policyAgreementTemplateRepository.findAgreementTemplateListByCountryIdAndClauseId(countryId, clauseId);
+    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByClauseId(Long countryId, BigInteger clauseId) {
+        return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(countryId,false, clauseId);
     }
 
 

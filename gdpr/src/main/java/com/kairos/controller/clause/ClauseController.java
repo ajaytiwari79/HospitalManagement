@@ -4,14 +4,12 @@ package com.kairos.controller.clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.persistence.model.clause.Clause;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -54,8 +52,8 @@ public class ClauseController {
 
     @ApiOperation("delete master  clause by id")
     @DeleteMapping(COUNTRY_URL + "/clause/{clauseId}")
-    public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId, clauseId));
+    public ResponseEntity<Object> deleteMasterClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClauseById(countryId, false, clauseId));
     }
 
     @ApiOperation("update master clause ")
@@ -91,4 +89,9 @@ public class ClauseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauseByCountryId(unitId));
     }
 
+    @ApiOperation("delete  clause by id")
+    @DeleteMapping(UNIT_URL + "/clause/{clauseId}")
+    public ResponseEntity<Object> deleteClause(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
+    }
 }
