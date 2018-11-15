@@ -244,6 +244,11 @@ public class Organization extends UserBaseEntity {
     public Organization() {
     }
 
+    //constructor for creating Union
+    public Organization(String name,boolean union) {
+        this.name = name;
+        this.union = union;
+    }
     public Organization(String name, List<Sector> sectors, ContactAddress contactAddress,boolean boardingCompleted,Country country,boolean union) {
         this.name = name;
         this.sectors = sectors;
