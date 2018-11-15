@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftType;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -60,6 +61,7 @@ public class ShiftDTO {
     private AccessGroupRole accessGroupRole;
     private boolean editable;
     private boolean functionDeleted;
+    private ShiftType shiftType;
 
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -149,6 +151,14 @@ public class ShiftDTO {
     @JsonIgnore
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
+    }
+
+    public ShiftType getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(ShiftType shiftType) {
+        this.shiftType = shiftType;
     }
 
     public LocalDate getValidated() {
