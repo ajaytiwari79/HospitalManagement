@@ -125,10 +125,8 @@ public class ExpertiseService {
             if (isExpertiseExists) {
                 exceptionService.duplicateDataException("message.duplicate", "expertise");
             }
-            if(expertiseDTO.isPublished()) {
-             if(!Optional.ofNullable(expertiseDTO.getUnion().getId()).isPresent()||!organizationGraphRepository.isPublishedUnion(expertiseDTO.getUnion().getId())) {
-                 exceptionService.invalidRequestException("message.publish.expertise.union");
-             }
+            if(expertiseDTO.isPublished() && (!Optional.ofNullable(expertiseDTO.getUnion().getId()).isPresent()||!organizationGraphRepository.isPublishedUnion(expertiseDTO.getUnion().getId()))) {
+                exceptionService.invalidRequestException("message.publish.expertise.union");
             }
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
@@ -343,7 +341,6 @@ public class ExpertiseService {
             copiedExpertise.setPublished(false);
             copiedExpertise.setParentExpertise(currentExpertise);
             copiedExpertise.setSector(getSector(expertiseDTO.getSector(),country));
-            ;
 
             // copiedExpertise.getSeniorityLevelFunction().clear();
             // Calling this function to get any updates or updated value from DTO.
@@ -364,8 +361,6 @@ public class ExpertiseService {
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
             copiedExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
 
-
-
             // NOW WE need to add the other seniority level which exists in expertise
             // since we have already
             seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.get().getId()));
@@ -382,21 +377,17 @@ public class ExpertiseService {
             }
             expertiseResponseDTO.getUnion().setId(copiedExpertise.getUnion().getId());
 
-
-
         } else {
 
             // update in current expertise :)
 
             validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
 
-
             boolean levelChanged = updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
             updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get(), levelChanged);
             // organization Level is changed so need to set new
             currentExpertise.setSector(getSector(expertiseDTO.getSector(),country));
             currentExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
-
 
             expertiseGraphRepository.save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
@@ -435,8 +426,6 @@ public class ExpertiseService {
             }
             seniorityLevel.setPayGrade(payGrade);
         }
-
-
     }
 
     private boolean updateCurrentExpertise(Long countryId, Expertise expertise, ExpertiseUpdateDTO expertiseDTO) {
@@ -469,8 +458,6 @@ public class ExpertiseService {
             expertise.setOrganizationServices(organizationService);
         }
 
-
-
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
         return levelChanged;
@@ -484,8 +471,6 @@ public class ExpertiseService {
         }
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException("message.expertise.cannotRemoved");
-
-
         }
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
@@ -869,8 +854,7 @@ public class ExpertiseService {
             if (!Optional.ofNullable(union).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "union", unionId);
             }
-        }
-        else {
+        } else {
             union = new Organization(unionName,true);
         }
         return union;
@@ -881,12 +865,10 @@ public class ExpertiseService {
         if(Optional.ofNullable(sectorDTO).isPresent()) {
             if(Optional.ofNullable(sectorDTO.getId()).isPresent()) {
                 sector = new Sector(sectorDTO.getId(),sectorDTO.getName());
-            }
-            else{
+            } else {
                 sector = new Sector(sectorDTO.getName());
                 sector.setCountry(country);
                 // sectorGraphRepository.save(sector);
-
             }
         }
         return sector;
