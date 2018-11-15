@@ -178,13 +178,15 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(l:Level) where id(l) = {2} " +
             "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) \n" +
+            "WITH DISTINCT(expertise) as expertise,sector " +
             "RETURN id(expertise) as id,expertise.name as name,sector as sector order by expertise.creationDate")
     List<ExpertiseQueryResult> findExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds, Long organizationLevelId);
 
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1} " +
-            "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector)\n" +
+            "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) \n" +
+            "WITH DISTINCT(expertise) as expertise,sector " +
             "RETURN id(expertise) as id,expertise.name as name,sector as sector order by expertise.creationDate")
     List<ExpertiseQueryResult> findExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
 
