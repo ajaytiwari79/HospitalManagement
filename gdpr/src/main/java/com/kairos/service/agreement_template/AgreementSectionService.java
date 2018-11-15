@@ -70,6 +70,10 @@ public class AgreementSectionService extends MongoBaseService {
             List<BigInteger> agreementSectionIdList = createOrupdateSectionAndSubSectionOfAgreementTemplate(countryId, agreementTemplateSectionDTO.getSections(), policyAgreementTemplate);
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
+        policyAgreementTemplate.setSignatureComponentAdded(agreementTemplateSectionDTO.isSignatureComponentAdded());
+        policyAgreementTemplate.setSignatureComponentLeftAlign(agreementTemplateSectionDTO.isSignatureComponentLeftAlign());
+        policyAgreementTemplate.setSignatureComponentRightAlign(agreementTemplateSectionDTO.isSignatureComponentRightAlign());
+        policyAgreementTemplate.setSignatureHtml(agreementTemplateSectionDTO.getSignatureHtml());
         policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
         policyAgreementTemplate.setCoverPageData(agreementTemplateSectionDTO.getCoverPageData());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
@@ -397,10 +401,6 @@ public class AgreementSectionService extends MongoBaseService {
 
 
         Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = policyAgreementTemplateRepository.getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(countryId, agreementTemplate.getId(), existingClauseId);
-
-        if (CollectionUtils.isNotEmpty(clauseIdListPresentInOtherSectionAndSubSection)) {
-            existingClauseId.remove(clauseIdListPresentInOtherSectionAndSubSection);
-        }
         List<Clause> exisitingClauseList = clauseMongoRepository.findClauseByCountryIdAndIdList(countryId, existingClauseId);
         Map<BigInteger, Clause> clauseIdMap = exisitingClauseList.stream().collect(Collectors.toMap(Clause::getId, clause -> clause));
         existingClauseMap.forEach((agreementSection, clauseBasicDTOS) -> {

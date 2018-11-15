@@ -177,8 +177,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "copy Expertise")
     @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/copy")
-    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO));
+    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO,@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO,countryId));
     }
 
     @ApiOperation(value = "Get senior Days and child Care days at country")

@@ -45,6 +45,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
@@ -791,6 +792,7 @@ public class OrganizationService {
         return null;
     }
 
+    //todo remove if not use
     public String getWorkPlaceFromTimeCare(GetAllWorkPlacesResponse workPlaces) {
         try {
             logger.info(" workPlaces---> " + workPlaces.getWorkPlaceList().size());
