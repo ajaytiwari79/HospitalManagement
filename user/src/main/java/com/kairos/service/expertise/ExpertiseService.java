@@ -820,7 +820,10 @@ public class ExpertiseService {
     }
 
     public SeniorAndChildCareDaysQueryResult getSeniorAndChildCareDays(Long expertiseId){
-        return expertiseGraphRepository.getSeniorDaysOfExpertise(expertiseId);
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        List<CareDaysQueryResult> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(),CareDaysQueryResult.class);
+        List<CareDaysQueryResult> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(),CareDaysQueryResult.class);
+        return new SeniorAndChildCareDaysQueryResult(seniorDays,childCareDays);
     }
 
 }
