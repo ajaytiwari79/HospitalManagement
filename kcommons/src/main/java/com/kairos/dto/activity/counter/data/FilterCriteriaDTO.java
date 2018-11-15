@@ -1,12 +1,13 @@
 package com.kairos.dto.activity.counter.data;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public class FilterCriteriaDTO {
-    private Long currentCountryId;
-    private Long currentUnitId;
+    private Long unitId;
     private List<FilterCriteria> filters;
-    private List<BasicRequirementDTO> dataRequestList;
+    private List<BigInteger> kpiIds;
+    private List<BigInteger> counterIds;
 
     public FilterCriteriaDTO() {
     }
@@ -15,20 +16,12 @@ public class FilterCriteriaDTO {
         this.filters = filters;
     }
 
-    public Long getCurrentCountryId() {
-        return currentCountryId;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setCurrentCountryId(Long currentCountryId) {
-        this.currentCountryId = currentCountryId;
-    }
-
-    public Long getCurrentUnitId() {
-        return currentUnitId;
-    }
-
-    public void setCurrentUnitId(Long currentUnitId) {
-        this.currentUnitId = currentUnitId;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
     public List<FilterCriteria> getFilters() {
@@ -39,12 +32,19 @@ public class FilterCriteriaDTO {
         this.filters = filters;
     }
 
-    public List<BasicRequirementDTO> getDataRequestList() {
-        return dataRequestList;
+    public List<BigInteger> getKpiIds() {
+        return kpiIds;
     }
 
-    public void setDataRequestList(List<BasicRequirementDTO> dataRequestList) {
-        this.dataRequestList = dataRequestList;
+    public void setKpiIds(List<BigInteger> kpiIds) {
+        this.kpiIds = kpiIds;
     }
 
+    public List<BigInteger> getCounterIds() {
+        return counterIds;
+    }
+
+    public void setCounterIds(List<BigInteger> counterIds) {
+        this.counterIds = counterIds;
+    }
 }
