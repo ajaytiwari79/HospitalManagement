@@ -48,7 +48,6 @@ public class ShiftWithActivityDTO {
     private int scheduledMinutes;
     private int durationMinutes;
     private List<ShiftActivityDTO> activities = new ArrayList<>();
-    private LocalDate shiftDate;
     private List<ShiftStatus> status;
     private String timeType;
     private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
@@ -113,14 +112,6 @@ public class ShiftWithActivityDTO {
         return activityIds;
     }
 
-
-    public LocalDate getShiftDate() {
-        return shiftDate;
-    }
-
-    public void setShiftDate(LocalDate shiftDate) {
-        this.shiftDate = shiftDate;
-    }
 
     public BigInteger getPlanningPeriodId() {
         return planningPeriodId;
