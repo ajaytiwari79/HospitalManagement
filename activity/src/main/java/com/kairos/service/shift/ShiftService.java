@@ -47,11 +47,10 @@ import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
-import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
+import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -77,7 +76,6 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
@@ -133,7 +131,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private ActivityMongoRepository activityRepository;
     @Inject
-    private AttendanceSettingRepository attendanceSettingRepository;
+    private TimeAndAttendanceRepository timeAndAttendanceRepository;
 
     @Inject
     private StaffRestClient staffRestClient;
@@ -1235,7 +1233,7 @@ public class ShiftService extends MongoBaseService {
         if (validatedByStaff) {
             shiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             shiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
-            shiftState.setAttendanceDuration(null);
+            //shiftState.setAttendanceDuration(null);
             shiftState.setId(null);
             shiftState.setValidated(null);
             shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));

@@ -8,17 +8,17 @@ import java.math.BigInteger;
 import java.util.List;
 
 
-public class AttendanceSetting extends MongoBaseEntity {
+public class TimeAndAttendance extends MongoBaseEntity {
     private Long staffId;
     private Long unitId;
     private Long userId;
-    private BigInteger shiftId;
+    //private BigInteger shiftId;
     private Long reasonCodeId;
     private List<AttendanceDuration> attendanceDuration ;
-    public AttendanceSetting() {
+    public TimeAndAttendance() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId,Long userId,Long reasonCodeId,List<AttendanceDuration> attendanceDuration) {
+    public TimeAndAttendance(Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceDuration> attendanceDuration) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.userId=userId;
@@ -26,11 +26,11 @@ public class AttendanceSetting extends MongoBaseEntity {
         this.attendanceDuration=attendanceDuration;
     }
 
-    public AttendanceSetting(BigInteger shiftId,Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceDuration> attendanceDuration) {
+    public TimeAndAttendance(BigInteger shiftId, Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceDuration> attendanceDuration) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.userId = userId;
-        this.shiftId = shiftId;
+     //   this.shiftId = shiftId;
         this.reasonCodeId = reasonCodeId;
         this.attendanceDuration = attendanceDuration;
     }
@@ -75,13 +75,13 @@ public class AttendanceSetting extends MongoBaseEntity {
         this.reasonCodeId = reasonCodeId;
     }
 
-    public BigInteger getShiftId() {
-        return shiftId;
-    }
-
-    public void setShiftId(BigInteger shiftId) {
-        this.shiftId = shiftId;
-    }
+//    public BigInteger getShiftId() {
+//        return shiftId;
+//    }
+//
+//    public void setShiftId(BigInteger shiftId) {
+//        this.shiftId = shiftId;
+//    }
 
 
 }

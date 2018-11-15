@@ -62,7 +62,6 @@ public class Shift extends MongoBaseEntity {
 
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
-    private AttendanceDuration attendanceDuration;
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
@@ -142,15 +141,6 @@ public class Shift extends MongoBaseEntity {
     public void setShiftType(ShiftType shiftType) {
         this.shiftType = shiftType;
     }
-
-    public AttendanceDuration getAttendanceDuration() {
-        return attendanceDuration;
-    }
-
-    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
-        this.attendanceDuration = attendanceDuration;
-    }
-
 
     public Long getUpdatedBy() {
         return updatedBy;
