@@ -28,8 +28,6 @@ public class PhaseServiceUnitTest {
     private PhaseMongoRepository phaseMongoRepository;
     @Mock
     private OrganizationRestClient organizationRestClient;
-    @Mock
-    private CountryRestClient countryRestClient;
 
     @InjectMocks
     private PhaseService phaseService;
