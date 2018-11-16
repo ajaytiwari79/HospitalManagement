@@ -66,7 +66,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            Optional<CareDaysDTO> careDaysOptional = infoWrapper.getChildCareDays().stream().filter(a -> (a.getFrom() <= infoWrapper.getStaffAge() && a.getTo() >= infoWrapper.getStaffAge())).findFirst();
+            Optional<CareDaysDTO> careDaysOptional = infoWrapper.getChildCareDays().stream().filter(careDaysDTO -> (careDaysDTO.getFrom() <= infoWrapper.getStaffAge() && careDaysDTO.getTo() >= infoWrapper.getStaffAge())).findFirst();
             if (careDaysOptional.isPresent()) {
                 int leaveCount = careDaysOptional.get().getLeavesAllowed();
 

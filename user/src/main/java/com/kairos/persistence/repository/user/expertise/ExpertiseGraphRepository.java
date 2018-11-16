@@ -98,7 +98,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
 
 
-    @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:expertise) where id(expertise)={0} \n" +
+    @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
             " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=true ")
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
 
