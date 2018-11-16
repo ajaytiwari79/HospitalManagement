@@ -13,6 +13,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class Clause extends MongoBaseEntity {
 
     @NotBlank
     private String title;
-    @NotNull
+    @NotEmpty
     private List<ClauseTag> tags = new ArrayList<>();
     @NotNull
     private String description;
@@ -52,6 +53,11 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
+    public Clause(@NotBlank String title,@NotNull String description, @NotEmpty List<ClauseTag> tags) {
+        this.title = title;
+        this.description = description;
+        this.tags=tags;
+    }
 
     public Clause(String title, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.title = title;

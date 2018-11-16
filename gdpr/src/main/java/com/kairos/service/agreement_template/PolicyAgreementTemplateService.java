@@ -131,7 +131,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     /**
      * @param countryId
      * @return return agreement section list with empty section array as per front end requirement
-     */// todo done for both country and unit
+     */
     public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByCountryId(Long countryId) {
         return policyAgreementTemplateRepository.findAllTemplateByCountryIdOrUnitId(countryId, false);
     }
@@ -147,7 +147,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     /**
      * @param referenceId                - countryId or unitId
-     * @param -                          isUnitId boolean to check whether referenceId id coutry id or unit id
+     * @param isUnitId                         isUnitId boolean to check whether referenceId id coutry id or unit id
      * @param agreementTemplateId        - AGreement Template id
      * @param policyAgreementTemplateDto
      * @return
@@ -173,15 +173,15 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     * @param referenceId
+     * @param referenceId                - countryId or unitId
+     * @param isUnitId                         isUnitId boolean to check whether referenceId id coutry id or unit id
      * @param agreementTemplateId
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
-    //todo refactored api for country and unit both
-    public AgreementTemplateSectionResponseDTO getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByAgreementTemplateId(Long referenceId,boolean isUnitId, BigInteger agreementTemplateId) {
+    public AgreementTemplateSectionResponseDTO getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
 
-        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByCountryIdAndId(referenceId, agreementTemplateId);
+        PolicyAgreementTemplate template = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndId(referenceId,agreementTemplateId) : policyAgreementTemplateRepository.findByCountryIdAndId(referenceId, agreementTemplateId);
         if (!Optional.ofNullable(template).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
@@ -190,7 +190,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
                 template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                 template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
-        List<ClauseBasicResponseDTO> clauseListForTemplate = clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO);
+        List<ClauseBasicResponseDTO> clauseListForTemplate =isUnitId ? clauseMongoRepository.findAllClauseByUnitId(referenceId) : clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO);
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId,isUnitId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
@@ -244,9 +244,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param countryId
      * @param clauseId
      * @description methos return list of Agreement Template Conatining clause in Section and Sub Sections
-     *///todo working  for unit and country
-    public List<AgreementTemplateBasicResponseDTO> getAgreementTemplateListContainClause(Long countryId, BigInteger clauseId) {
-        return policyAgreementTemplateRepository.findAgreementTemplateListByCountryIdAndClauseId(countryId, clauseId);
+     * */
+    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByCountryIdAndClauseId(Long countryId, BigInteger clauseId) {
+        return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(countryId,false, clauseId);
     }
 
 
@@ -274,7 +274,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param isUnitId    - isUnitId boolean to check whether referenceId id coutry id or unit id
      * @param templateId  - Agreement Template id
      * @return
-     */// todo done for bot country and unit
+     */
     public boolean deletePolicyAgreementTemplate(Long referenceId, boolean isUnitId, BigInteger templateId) {
 
         PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndId(referenceId, templateId) : policyAgreementTemplateRepository.findByCountryIdAndId(referenceId, templateId);

@@ -78,27 +78,27 @@ public class AgreementSectionService extends MongoBaseService {
         policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
         policyAgreementTemplate.setCoverPageData(agreementTemplateSectionDTO.getCoverPageData());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByAgreementTemplateId(countryId,false, templateId);
+        return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId,false, templateId);
     }
 
 
     /**
      * @param countryId
      * @param templateId - Policy Agreement template id
-     * @param id         -agreement section id
+     * @param sectionId  -agreement section id
      * @return -true on successful deletion of section
      */
-    public boolean deleteAgreementSection(Long countryId, BigInteger templateId, BigInteger id) {
+    public boolean deleteAgreementSection(Long countryId, BigInteger templateId, BigInteger sectionId) {
 
-        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndCountryId(countryId, id);
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndCountryId(countryId, sectionId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
         }
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByCountryIdAndId(countryId, templateId);
-        List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
-        agreementSectionIdList.remove(id);
+        policyAgreementTemplate.getAgreementSections().remove(sectionId);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        agreementSectionMongoRepository.delete(agreementSection);
+        delete(agreementSection);
+        agreementSectionMongoRepository.safeDeleteByIds(new HashSet<>(agreementSection.getSubSections()));
         return true;
     }
 
@@ -365,7 +365,7 @@ public class AgreementSectionService extends MongoBaseService {
     private List<Clause> buildClauseForAgreementSection(Long countryId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
 
-        ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTag(countryId);
+        ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTagByCountryId(countryId);
         List<String> clauseTitles = new ArrayList<>();
         List<Clause> clauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {

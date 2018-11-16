@@ -60,8 +60,8 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("get all agreement sections and sub section of master agreement template , country level ")
     @GetMapping(COUNTRY_URL+ "/agreement_template/{agreementTemplateId}/section")
-    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionsAndClausesOfAgreementTemplate(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByAgreementTemplateId(countryId, agreementTemplateId));
+    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionsOfMasterAgreementTemplate(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(countryId,false, agreementTemplateId));
     }
 
 
@@ -92,7 +92,7 @@ public class PolicyAgreementTemplateController {
     @ApiOperation("get All  agreement Template linked with Clauses ")
     @GetMapping(COUNTRY_URL+"/agreement_template/clause/{clauseId}")
     public ResponseEntity<Object> getPolicatAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAgreementTemplateListContainClause(countryId, clauseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryIdAndClauseId(countryId, clauseId));
 
     }
 
@@ -142,6 +142,12 @@ public class PolicyAgreementTemplateController {
     public ResponseEntity<ResponseDTO<List<PolicyAgreementTemplateResponseDTO>>> getAllAgreementTemplateOfUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByUnitId(unitId));
 
+    }
+
+    @ApiOperation("get all agreement sections and sub section of agreement template , unit level ")
+    @GetMapping(UNIT_URL+ "/agreement_template/{agreementTemplateId}/section")
+    public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable BigInteger agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId,true, agreementTemplateId));
     }
 
 

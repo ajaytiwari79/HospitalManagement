@@ -18,13 +18,11 @@ public interface CustomPolicyAgreementTemplateRepository {
 
     PolicyAgreementTemplate findByCountryIdAndName(Long countryId, String templateName);
 
-    //unit
     PolicyAgreementTemplate findByUnitIdAndName(Long unitId, String templateName);
 
+    List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
 
-    List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long countryId, boolean isUnitId, BigInteger agreementTemplateId);
-
-    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByCountryIdAndClauseId(Long countryId, BigInteger clauseId);
+    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long refrenceId, boolean isUnitId, BigInteger clauseId);
 
     List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
 
