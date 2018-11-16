@@ -143,6 +143,7 @@ public class ExpertiseService {
                 expertiseResponseDTO.getSector().setId(expertise.getSector().getId());
             }
             expertiseResponseDTO.getUnion().setId(expertise.getUnion().getId());
+            organizationGraphRepository.linkUnionSector(expertise.getUnion().getId(),expertise.getSector().getId());
 
             TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
             ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
@@ -360,6 +361,7 @@ public class ExpertiseService {
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
             copiedExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
+            organizationGraphRepository.linkUnionSector(copiedExpertise.getUnion().getId(),copiedExpertise.getSector().getId());
 
             // NOW WE need to add the other seniority level which exists in expertise
             // since we have already
@@ -399,6 +401,8 @@ public class ExpertiseService {
                 expertiseResponseDTO.getSector().setId(currentExpertise.getSector().getId());
             }
             expertiseResponseDTO.getUnion().setId(currentExpertise.getUnion().getId());
+            organizationGraphRepository.linkUnionSector(currentExpertise.getUnion().getId(),currentExpertise.getSector().getId());
+
 
 
         }
@@ -844,7 +848,10 @@ public class ExpertiseService {
     }
 
     public SeniorAndChildCareDaysQueryResult getSeniorAndChildCareDays(Long expertiseId){
-        return expertiseGraphRepository.getSeniorDaysOfExpertise(expertiseId);
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        List<CareDaysQueryResult> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(),CareDaysQueryResult.class);
+        List<CareDaysQueryResult> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(),CareDaysQueryResult.class);
+        return new SeniorAndChildCareDaysQueryResult(seniorDays,childCareDays);
     }
 
     private Organization getUnion(Long unionId, String unionName) {
