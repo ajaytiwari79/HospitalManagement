@@ -49,6 +49,12 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
+    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, BigInteger templateType) {
+        this.name = name;
+        this.description = description;
+        this.templateType = templateType;
+    }
+
     public boolean isIncludeContentPage() { return includeContentPage; }
 
     public void setIncludeContentPage(boolean includeContentPage) { this.includeContentPage = includeContentPage; }

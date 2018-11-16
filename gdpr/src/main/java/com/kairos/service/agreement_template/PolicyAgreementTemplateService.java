@@ -2,9 +2,10 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
-import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
+import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
@@ -62,33 +63,40 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     * @param countryId
+     * @param referenceId - countryId or unitId
      * @param policyAgreementTemplateDto
      * @return return object of basic policy agreement template.
      * @description this method creates a basic policy Agreement template with basic detail about organization type,
      * organizationSubTypes ,service Category and sub service Category.
      */
-    public PolicyAgreementTemplateDTO createBasicPolicyAgreementTemplate(Long countryId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+    public <E extends AgreementTemplateDTO> E createBasicPolicyAgreementTemplate(Long referenceId, boolean isUnitId, E policyAgreementTemplateDto) {
 
-        PolicyAgreementTemplate previousTemplate = policyAgreementTemplateRepository.findByName(countryId, policyAgreementTemplateDto.getName());
+        PolicyAgreementTemplate previousTemplate = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndName(referenceId, policyAgreementTemplateDto.getName())
+                : policyAgreementTemplateRepository.findByCountryIdAndName(referenceId, policyAgreementTemplateDto.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.policy.agreementTemplate", policyAgreementTemplateDto.getName());
         }
-        templateTypeService.getTemplateById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
-        PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(
-                policyAgreementTemplateDto.getName(),
-                policyAgreementTemplateDto.getDescription(),
-                countryId,
-                policyAgreementTemplateDto.getOrganizationTypes(),
-                policyAgreementTemplateDto.getOrganizationSubTypes(),
-                policyAgreementTemplateDto.getOrganizationServices(),
-                policyAgreementTemplateDto.getOrganizationSubServices());
-        policyAgreementTemplate.setAccountTypes(policyAgreementTemplateDto.getAccountTypes());
-        policyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
+        PolicyAgreementTemplate policyAgreementTemplate = buildAgreementTemplate(referenceId,isUnitId,policyAgreementTemplateDto);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         policyAgreementTemplateDto.setId(policyAgreementTemplate.getId());
         return policyAgreementTemplateDto;
 
+    }
+
+
+    private <E extends AgreementTemplateDTO> PolicyAgreementTemplate buildAgreementTemplate(Long referenceId, boolean isUnitId, E policyAgreementTemplateDto) {
+
+        PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(policyAgreementTemplateDto.getName(), policyAgreementTemplateDto.getDescription(), policyAgreementTemplateDto.getTemplateTypeId());
+        if (!isUnitId) {
+            MasterAgreementTemplateDTO agreementTemplateDTO = (MasterAgreementTemplateDTO) policyAgreementTemplateDto;
+            policyAgreementTemplate.setOrganizationTypes(agreementTemplateDTO.getOrganizationTypes());
+            policyAgreementTemplate.setOrganizationSubTypes(agreementTemplateDTO.getOrganizationSubTypes());
+            policyAgreementTemplate.setOrganizationServices(agreementTemplateDTO.getOrganizationServices());
+            policyAgreementTemplate.setOrganizationSubServices(agreementTemplateDTO.getOrganizationSubServices());
+            policyAgreementTemplate.setAccountTypes(agreementTemplateDTO.getAccountTypes());
+
+        }
+        return policyAgreementTemplate;
     }
 
 
@@ -128,11 +136,11 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param policyAgreementTemplateDto
      * @return
      */
-    public PolicyAgreementTemplateDTO updatePolicyAgreementTemplateBasicDetails(Long countryId, BigInteger agreementTemplateId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+    public MasterAgreementTemplateDTO updatePolicyAgreementTemplateBasicDetails(Long countryId, BigInteger agreementTemplateId, MasterAgreementTemplateDTO policyAgreementTemplateDto) {
 
-        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByName(countryId, policyAgreementTemplateDto.getName());
+        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByCountryIdAndName(countryId, policyAgreementTemplateDto.getName());
         if (Optional.ofNullable(template).isPresent() && !agreementTemplateId.equals(template.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.policy.agreementTemplate", policyAgreementTemplateDto.getName());
         }
         template = policyAgreementTemplateRepository.findOne(agreementTemplateId);
         template.setName(policyAgreementTemplateDto.getName())
@@ -160,7 +168,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
         PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, agreementTemplateId);
         if (!Optional.ofNullable(template).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Template", agreementTemplateId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
         OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
@@ -250,7 +258,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", id);
         }
         delete(exist);
         return true;

@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
@@ -76,13 +77,23 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     }
 
     @Override
-    public PolicyAgreementTemplate findByName(Long countryId, String templateName) {
+    public PolicyAgreementTemplate findByCountryIdAndName(Long countryId, String templateName) {
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(templateName).and(DELETED).is(false).and(COUNTRY_ID).is(countryId));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, PolicyAgreementTemplate.class);
 
+    }
+
+
+    @Override
+    public PolicyAgreementTemplate findByUnitIdAndName(Long unitId, String templateName) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(templateName).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, PolicyAgreementTemplate.class);
     }
 
     @Override

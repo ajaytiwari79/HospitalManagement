@@ -1,7 +1,7 @@
 package com.kairos.controller.agreement_template;
 
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
-import com.kairos.dto.gdpr.agreement_template.PolicyAgreementTemplateDTO;
+import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
@@ -40,7 +40,7 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/agreement_template", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId, @Validated @RequestBody MasterAgreementTemplateDTO agreementTemplateDto) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createBasicPolicyAgreementTemplate(countryId, agreementTemplateDto));
     }
@@ -72,7 +72,7 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("update Policy agreement Template Basic details")
     @PutMapping("/agreement_template/{agreementTemplateId}")
-    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @Validated @RequestBody MasterAgreementTemplateDTO agreementTemplateDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(countryId, agreementTemplateId, agreementTemplateDto));
 
     }
