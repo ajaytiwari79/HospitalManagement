@@ -66,6 +66,7 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,9 +195,15 @@ public class ActivityService extends MongoBaseService {
         }
         activity.setGeneralActivityTab(generalActivityTab);
 
-     List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
+        List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
+        if(CollectionUtils.isEmpty(phases)){
+            exceptionService.actionNotPermittedException("message.country.phase.notfound");
+        }
         List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
         GlideTimeSettingsDTO glideTimeSettingsDTO = glideTimeSettingsService.getGlideTimeSettings(countryId);
+        if(!Optional.ofNullable(glideTimeSettingsDTO).isPresent()){
+            exceptionService.actionNotPermittedException("error.glidetime.notfound.country");
+        }
         ActivityUtil.initializeActivityTabs(activity,phaseTemplateValues,glideTimeSettingsDTO);
 
     }
