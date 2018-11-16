@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.http.NameValuePair;
@@ -76,6 +77,7 @@ public class SchedulerServiceRestClient {
     public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getSchedulerBaseUrl(isUnit,id)+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
+        V responseData = null;
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
@@ -86,13 +88,13 @@ public class SchedulerServiceRestClient {
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalError(response.getMessage());
             }
-            return response.getData();
+            responseData =  response.getData();
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
-
+        return responseData;
     }
 
 
