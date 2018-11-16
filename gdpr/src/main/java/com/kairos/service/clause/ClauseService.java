@@ -90,13 +90,15 @@ public class ClauseService extends MongoBaseService {
                 ObjectMapperUtils.copyProperties(masterClauseDTO, clause);
             }
         } else {
+            clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags);
             if (isUnitId) {
-                clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription());
                 clause.setOrganizationId(referenceId);
             } else {
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
-                clause = new Clause(masterClauseDTO.getTitle(), masterClauseDTO.getDescription(), referenceId, masterClauseDTO.getOrganizationTypes(), masterClauseDTO.getOrganizationSubTypes()
-                        , masterClauseDTO.getOrganizationServices(), masterClauseDTO.getOrganizationSubServices());
+                clause.setOrganizationTypes(masterClauseDTO.getOrganizationTypes());
+                clause.setOrganizationSubTypes(masterClauseDTO.getOrganizationSubTypes());
+                clause.setOrganizationServices(masterClauseDTO.getOrganizationServices());
+                clause.setOrganizationSubServices(masterClauseDTO.getOrganizationSubServices());
                 clause.setAccountTypes(masterClauseDTO.getAccountTypes());
                 clause.setCountryId(referenceId);
                 clause.setTemplateTypes(masterClauseDTO.getTemplateTypes());

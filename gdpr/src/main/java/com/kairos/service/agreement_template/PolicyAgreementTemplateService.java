@@ -222,7 +222,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param clauseId
      * @description methos return list of Agreement Template Conatining clause in Section and Sub Sections
      */
-    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByClauseId(Long countryId, BigInteger clauseId) {
+    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByCountryIdAndClauseId(Long countryId, BigInteger clauseId) {
         return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(countryId,false, clauseId);
     }
 
