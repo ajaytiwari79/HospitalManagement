@@ -749,5 +749,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH(union)-[:HAS_LOCATION]-(location:Location{deleted:false}) RETURN union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
     List<UnionDataQueryResult> getUnionData(Long countryId);
 
+    @Query("MATCH(union:Organization{deleted:false}) WHERE id(union)={0} RETURN union.boardingCompleted")
+    boolean isPublishedUnion(Long unionId);
 
+    @Query("MATCH(union:Organization) WHERE id(union)={0} " +
+            "MATCH(sector:Sector) WHERE id(sector)={1} " +
+            "CREATE UNIQUE (union)-[:HAS_SECTOR]-(sector)")
+    void linkUnionSector(Long unionId,Long sectorId);
 }

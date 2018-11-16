@@ -19,9 +19,9 @@ public interface CustomPolicyAgreementTemplateRepository {
 
     PolicyAgreementTemplate findByName(Long countryId,String templateName);
 
-    List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId);
+    List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByTemplateIdAndCountryId(Long countryId, BigInteger agreementTemplateId);
 
-    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByCountryIdAndClauseId(Long countryId, BigInteger clauseId);
+    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long refrenceId, boolean isUnitId, BigInteger clauseId);
 
     List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds,BigInteger clauseId);
 

@@ -34,6 +34,9 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     Country country;
 
+    @Relationship(type = BELONGS_TO)
+    private Sector sector;
+
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
     @DateLong
@@ -67,11 +70,6 @@ public class Expertise extends UserBaseEntity {
 
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
-
-
-    //Added by Pavan
-    @Relationship(type = BELONGS_TO_SECTOR)
-    private Sector sector;
 
     public String getDescription() {
         return description;
@@ -257,11 +255,10 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
     }
 
-    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history) {
+    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,Sector sector) {
         this.name = name;
         this.description = description;
         this.country = country;
-
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
@@ -270,6 +267,7 @@ public class Expertise extends UserBaseEntity {
         this.published = published;
         this.hasDraftCopy = hasDraftCopy;
         this.history = history;
+        this.sector = sector;
     }
 
     public Expertise(Long id, @NotBlank(message = "error.Expertise.name.notEmpty")  String name, String description) {
