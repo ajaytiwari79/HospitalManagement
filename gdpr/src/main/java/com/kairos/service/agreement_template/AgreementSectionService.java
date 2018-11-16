@@ -59,9 +59,10 @@ public class AgreementSectionService extends MongoBaseService {
     private AWSBucketService awsBucketService;
 
 
+    //todo refactored for unit and country
     public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, templateId);
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByCountryIdAndId(countryId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", templateId);
         }
@@ -77,7 +78,7 @@ public class AgreementSectionService extends MongoBaseService {
         policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
         policyAgreementTemplate.setCoverPageData(agreementTemplateSectionDTO.getCoverPageData());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
+        return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByAgreementTemplateId(countryId,false, templateId);
     }
 
 
@@ -93,7 +94,7 @@ public class AgreementSectionService extends MongoBaseService {
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + id);
         }
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, templateId);
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByCountryIdAndId(countryId, templateId);
         List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
         agreementSectionIdList.remove(id);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
@@ -374,7 +375,7 @@ public class AgreementSectionService extends MongoBaseService {
             clauseTitles.add(clauseBasicDTO.getTitle());
             Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                     , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
-            clause.setTemplateTypes(Collections.singletonList(policyAgreementTemplate.getTemplateType()));
+            clause.setTemplateTypes(Collections.singletonList(policyAgreementTemplate.getTemplateTypeId()));
             clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
             clause.setTags(Collections.singletonList(defaultTag));
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
@@ -431,7 +432,7 @@ public class AgreementSectionService extends MongoBaseService {
     private Clause createVersionOfClause(Long countryId, ClauseBasicDTO clauseBasicDTO, PolicyAgreementTemplate policyAgreementTemplate) {
         Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                 , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
-        clause.setTemplateTypes(Collections.singletonList(policyAgreementTemplate.getTemplateType()));
+        clause.setTemplateTypes(Collections.singletonList(policyAgreementTemplate.getTemplateTypeId()));
         clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
         clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
         clause.setParentClauseId(clauseBasicDTO.getId());

@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.agreement_template;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
@@ -46,28 +44,25 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long refrenceId, boolean isUnitId, BigInteger agreementTemplateId) {
 
         String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
         String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
         String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},'clauseIdOrderedIndex':{'$first':'$clauseIdOrderedIndex'},'clauseCkEditorVOS':{'$first':'$clauseCkEditorVOS'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' },titleHtml:{$first:'$titleHtml' }}}";
 
-        Document replaceRootOperation = Document.parse(replaceRoot);
-        Document groupOperation = Document.parse(groupSubSections);
-        Document sortSubSectionsOperation = Document.parse(sortSubSections);
-
+        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(refrenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(refrenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(agreementTemplateId).and(DELETED).is(false)),
+                match(criteria),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
-                new CustomAggregationOperation(replaceRootOperation),
+                new CustomAggregationOperation(Document.parse(replaceRoot)),
                 lookup("clause", "clauseIdOrderedIndex", "_id", "clauses"),
                 lookup("agreementSection", "subSections", "_id", "subSections"),
                 unwind("subSections", true),
                 lookup("clause", "subSections.clauseIdOrderedIndex", "_id", "subSections.clauses"),
-                new CustomAggregationOperation(sortSubSectionsOperation),
-                new CustomAggregationOperation(groupOperation),
+                new CustomAggregationOperation(Document.parse(sortSubSections)),
+                new CustomAggregationOperation(Document.parse(groupSubSections)),
                 new CustomAggregationOperation(Document.parse(sortAgreementSection))
 
         );
@@ -97,17 +92,16 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     }
 
     @Override
-    public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateByCountryId(Long countryId) {
+    public List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isUnitId) {
 
-        Document projectionForTemplateTypeElementAtIndexZeroOperation = Document.parse(CustomAggregationQuery.agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero());
-        Document addNonDeletedTemplateTypeOperation = Document.parse(CustomAggregationQuery.addNonDeletedTemplateTyeField());
+        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("templateType", "templateType", "_id", "templateType"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
-                new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation),
+                match(criteria),
+                lookup("templateType", "templateTypeId", "_id", "templateType"),
+                new CustomAggregationOperation(Document.parse(CustomAggregationQuery.addNonDeletedTemplateTyeField())),
+                new CustomAggregationOperation(Document.parse(CustomAggregationQuery.agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero())),
                 sort(Sort.Direction.DESC, "createdAt")
         );
 
