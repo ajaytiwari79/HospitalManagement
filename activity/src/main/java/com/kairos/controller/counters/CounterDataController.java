@@ -54,7 +54,4 @@ public class CounterDataController {
         //get filters and get counter ids.
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, new Object());
     }
-
-
-
 }

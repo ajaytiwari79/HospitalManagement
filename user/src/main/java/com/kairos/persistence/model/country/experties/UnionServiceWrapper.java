@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.country.experties;
 
+import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 
@@ -13,6 +14,7 @@ public class UnionServiceWrapper {
     private List<UnionQueryResult> unions;
     private List<Object> services;
     List<Level> organizationLevels;
+    private List<SectorDTO> sectors;
 
     public UnionServiceWrapper() {
     }
@@ -39,5 +41,13 @@ public class UnionServiceWrapper {
 
     public void setServices(List<Object> services) {
         this.services = services;
+    }
+
+    public List<SectorDTO> getSectors() {
+        return sectors;
+    }
+
+    public void setSectors(List<SectorDTO> sectors) {
+        this.sectors = sectors;
     }
 }

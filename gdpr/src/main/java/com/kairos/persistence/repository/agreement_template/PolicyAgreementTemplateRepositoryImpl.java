@@ -146,8 +146,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     public Set<BigInteger> getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(Long countryId, BigInteger templateId, Set<BigInteger> clauseIds) {
 
 
-
-        String addNonDeletedSubSection="{  '$addFields':" +
+        String addNonDeletedSubSection = "{  '$addFields':" +
                 "{'subSections':" +
                 "{$filter : { " +
                 "'input': '$subSections'," +
@@ -175,9 +174,12 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         );
         AggregationResults<Map> response = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, Map.class);
         Set<BigInteger> clauseIdList = new HashSet<>();
-        ArrayList<ArrayList<BigInteger>> arrayLists = (ArrayList<ArrayList<BigInteger>>) response.getUniqueMappedResult().get("clauseIds");
-        arrayLists.forEach(bigIntegers -> clauseIdList.addAll(new HashSet<BigInteger>(bigIntegers)));
-        return clauseIds.stream().filter(clauseId->clauseIdList.contains(clauseId.toString())).collect(Collectors.toSet());
+        if (Optional.ofNullable(response.getUniqueMappedResult()).isPresent()) {
+            ArrayList<ArrayList<BigInteger>> arrayLists = (ArrayList<ArrayList<BigInteger>>) response.getUniqueMappedResult().get("clauseIds");
+            arrayLists.forEach(bigIntegers -> clauseIdList.addAll(new HashSet<BigInteger>(bigIntegers)));
+            return clauseIds.stream().filter(clauseId -> clauseIdList.contains(clauseId.toString())).collect(Collectors.toSet());
+        }
+        return clauseIdList;
     }
 
 

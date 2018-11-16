@@ -77,7 +77,6 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
                     infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                 }
             }
-            }
         }
 
     }
