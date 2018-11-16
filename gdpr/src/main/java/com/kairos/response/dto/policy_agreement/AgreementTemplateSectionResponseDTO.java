@@ -14,6 +14,10 @@ import java.util.List;
 public class AgreementTemplateSectionResponseDTO {
 
 
+    private boolean signatureComponentAdded;
+    private boolean signatureComponentLeftAlign;
+    private boolean signatureComponentRightAlign;
+    private String  signatureHtml;
     private boolean coverPageAdded;
     private CoverPageVO coverPageData;
 
@@ -36,4 +40,19 @@ public class AgreementTemplateSectionResponseDTO {
 
     public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData;}
 
+    public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
+
+    public void setSignatureComponentAdded(boolean signatureComponentAdded) { this.signatureComponentAdded = signatureComponentAdded; }
+
+    public boolean isSignatureComponentLeftAlign() { return signatureComponentLeftAlign; }
+
+    public void setSignatureComponentLeftAlign(boolean signatureComponentLeftAlign) { this.signatureComponentLeftAlign = signatureComponentLeftAlign; }
+
+    public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
+
+    public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
+
+    public String getSignatureHtml() { return signatureHtml; }
+
+    public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
 }

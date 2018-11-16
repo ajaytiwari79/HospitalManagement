@@ -3,6 +3,8 @@ package com.kairos.dto.user.country.experties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.organization.union.SectorDTO;
+import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import org.joda.time.DateTime;
 
@@ -37,7 +39,9 @@ public class ExpertiseUpdateDTO {
     private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
-    private Long unionId;
+  /*  private Long unionId;*/
+    private UnionIDNameDTO union;
+
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
@@ -50,6 +54,12 @@ public class ExpertiseUpdateDTO {
 
     @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
+
+    @NotNull(message="message.sector.null")
+    private SectorDTO sector;
+
+
+
     public ExpertiseUpdateDTO() {
         //default cons
     }
@@ -108,14 +118,6 @@ public class ExpertiseUpdateDTO {
 
     public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
         this.organizationServiceIds = organizationServiceIds;
-    }
-
-    public Long getUnionId() {
-        return unionId;
-    }
-
-    public void setUnionId(Long unionId) {
-        this.unionId = unionId;
     }
 
     public int getFullTimeWeeklyMinutes() {
@@ -179,5 +181,21 @@ public class ExpertiseUpdateDTO {
             return dateValue;
         }
         return true;
+    }
+
+    public SectorDTO getSector() {
+        return sector;
+    }
+
+    public void setSector(SectorDTO sector) {
+        this.sector = sector;
+    }
+
+    public UnionIDNameDTO getUnion() {
+        return union;
+    }
+
+    public void setUnion(UnionIDNameDTO union) {
+        this.union = union;
     }
 }
