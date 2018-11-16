@@ -6,7 +6,11 @@ import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.experties.*;
+import com.kairos.dto.user.expertise.CareDaysDTO;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
+
 import com.kairos.dto.user.organization.union.SectorDTO;
+
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -847,11 +851,11 @@ public class ExpertiseService {
 
     }
 
-    public SeniorAndChildCareDaysQueryResult getSeniorAndChildCareDays(Long expertiseId){
+    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays(Long expertiseId){
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        List<CareDaysQueryResult> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(),CareDaysQueryResult.class);
-        List<CareDaysQueryResult> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(),CareDaysQueryResult.class);
-        return new SeniorAndChildCareDaysQueryResult(seniorDays,childCareDays);
+        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(),CareDaysDTO.class);
+        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(),CareDaysDTO.class);
+        return new SeniorAndChildCareDaysDTO(seniorDays,childCareDays);
     }
 
     private Organization getUnion(Long unionId, String unionName) {
