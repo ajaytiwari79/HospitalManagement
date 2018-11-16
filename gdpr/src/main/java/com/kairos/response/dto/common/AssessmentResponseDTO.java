@@ -31,6 +31,7 @@ public class AssessmentResponseDTO {
     private List<RiskBasicResponseDTO> risks;
     private LocalDate assessmentScheduledDate;
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
+    private LocalDate startDate;
 
     public BigInteger getId() { return id; }
 
@@ -49,7 +50,6 @@ public class AssessmentResponseDTO {
     public void setCompletedDate(LocalDate completedDate) { this.completedDate = completedDate; }
 
     public String getComment() { return comment;}
-
 
     public void setComment(String comment) { this.comment = comment; }
 
@@ -81,15 +81,15 @@ public class AssessmentResponseDTO {
         return assessmentScheduledDate;
     }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) {
-        this.assessmentScheduledDate = assessmentScheduledDate;
-    }
+    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() {
         return assessmentSchedulingFrequency;
     }
 
-    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) {
-        this.assessmentSchedulingFrequency = assessmentSchedulingFrequency;
-    }
+    public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
+
+    public LocalDate getStartDate() { return startDate; }
+
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 }

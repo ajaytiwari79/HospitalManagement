@@ -58,7 +58,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
 
         String projectionOpertaion = "{ '$project':{'asset':{$arrayElemAt:['$asset',0]},'processingActivity':{'$arrayElemAt':['$processingActivity',0]}," +
-                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 ,assessmentScheduledDate:1,assessmentSchedulingFrequency:1, 'risks':{'_id':1,'name':1}}}";
+                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 ,assessmentScheduledDate:1,startDate:1,assessmentSchedulingFrequency:1, 'risks':{'_id':1,'name':1}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
@@ -129,7 +129,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     @Override
     public List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId) {
 
-        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'assessmentScheduledDate':1,'assessmentSchedulingFrequency':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 , 'risks':{'_id':1,'name':1}}}";
+        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'assessmentScheduledDate':1,'assessmentSchedulingFrequency':1,'endDate':1, startDate:1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 , 'risks':{'_id':1,'name':1}}}";
 
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -146,7 +146,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     @Override
     public List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(Long unitId, BigInteger processingActivityId) {
 
-        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1, 'risks':{'_id':1,'name':1}}}";
+        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,startDate:1,'approver':1,'createdAt':1,'assessmentStatus':1, 'risks':{'_id':1,'name':1}}}";
 
 
         Aggregation aggregation = Aggregation.newAggregation(
