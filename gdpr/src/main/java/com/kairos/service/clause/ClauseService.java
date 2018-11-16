@@ -104,7 +104,6 @@ public class ClauseService extends MongoBaseService {
                 clause.setTemplateTypes(masterClauseDTO.getTemplateTypes());
             }
         }
-        clause.setTags(clauseTags);
         return clause;
     }
 
