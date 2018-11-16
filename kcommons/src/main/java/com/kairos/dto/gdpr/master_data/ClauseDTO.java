@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -24,8 +23,6 @@ public class ClauseDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     protected String description;
 
-    @NotEmpty(message = "error.message.templateType.notNull")
-    protected List<BigInteger> templateTypes;
 
     public ClauseDTO() {
     }
@@ -45,10 +42,6 @@ public class ClauseDTO {
     public String getDescription() { return description; }
 
     public void setDescription(String description) { this.description = description; }
-
-    public List<BigInteger> getTemplateTypes() { return templateTypes; }
-
-    public void setTemplateTypes(List<BigInteger> templateTypes) { this.templateTypes = templateTypes; }
 
 
 

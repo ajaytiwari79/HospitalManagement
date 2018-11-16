@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -84,8 +85,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public List<ClauseResponseDTO> findAllClauseByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
-                lookup("templateType", "templateTypes", "_id", "templateTypes"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
+                project(Fields.fields("id", "title", "tags", "description","createdAt")),
                 sort(Sort.Direction.DESC, "createdAt")
         );
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);

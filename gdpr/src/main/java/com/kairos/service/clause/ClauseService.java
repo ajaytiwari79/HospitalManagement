@@ -91,7 +91,7 @@ public class ClauseService extends MongoBaseService {
             }
         } else {
             if (isUnitId) {
-                clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseDto.getTemplateTypes());
+                clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription());
                 clause.setOrganizationId(referenceId);
             } else {
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
@@ -99,9 +99,9 @@ public class ClauseService extends MongoBaseService {
                         , masterClauseDTO.getOrganizationServices(), masterClauseDTO.getOrganizationSubServices());
                 clause.setAccountTypes(masterClauseDTO.getAccountTypes());
                 clause.setCountryId(referenceId);
+                clause.setTemplateTypes(masterClauseDTO.getTemplateTypes());
             }
         }
-        clause.setTemplateTypes(clauseDto.getTemplateTypes());
         clause.setTags(clauseTags);
         return clause;
     }
@@ -160,7 +160,7 @@ public class ClauseService extends MongoBaseService {
      */
     public Boolean deleteClauseById(Long referenceId, boolean isUnitId, BigInteger clauseId) {
 
-        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(referenceId,isUnitId, clauseId);
+        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }

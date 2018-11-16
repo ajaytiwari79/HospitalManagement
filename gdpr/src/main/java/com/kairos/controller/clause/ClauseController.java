@@ -4,6 +4,7 @@ package com.kairos.controller.clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 
 import static com.kairos.constants.ApiConstant.*;
 
@@ -52,8 +54,8 @@ public class ClauseController {
 
     @ApiOperation("delete master  clause by id")
     @DeleteMapping(COUNTRY_URL + "/clause/{clauseId}")
-    public ResponseEntity<Object> deleteMasterClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClauseById(countryId, false, clauseId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteMasterClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(countryId, false, clauseId));
     }
 
     @ApiOperation("update master clause ")
@@ -65,8 +67,8 @@ public class ClauseController {
 
     @ApiOperation("get all master clause")
     @GetMapping(COUNTRY_URL + "/clause")
-    public ResponseEntity<Object> getAllMasterClause(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauseByCountryId(countryId));
+    public ResponseEntity<ResponseDTO<List<ClauseResponseDTO>>> getAllMasterClause(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.getAllClauseByCountryId(countryId));
     }
 
 
@@ -85,14 +87,14 @@ public class ClauseController {
 
     @ApiOperation("get all clause of unit")
     @GetMapping(UNIT_URL + "/clause")
-    public ResponseEntity<Object> getAllClause(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauseByCountryId(unitId));
+    public ResponseEntity<ResponseDTO<List<ClauseResponseDTO>>> getAllClause(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.getAllClauseByUnitId(unitId));
     }
 
     @ApiOperation("delete  clause by id")
     @DeleteMapping(UNIT_URL + "/clause/{clauseId}")
-    public ResponseEntity<Object> deleteClause(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteClause(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
     }
 
 
