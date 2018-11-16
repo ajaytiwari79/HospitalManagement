@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
@@ -64,6 +65,7 @@ public class Shift extends MongoBaseEntity {
     private AttendanceDuration attendanceDuration;
     private Long functionId;
     private Long staffUserId;
+    private ShiftType shiftType;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -132,6 +134,14 @@ public class Shift extends MongoBaseEntity {
         this.durationMinutes = durationMinutes;
     }
 
+
+    public ShiftType getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(ShiftType shiftType) {
+        this.shiftType = shiftType;
+    }
 
     public AttendanceDuration getAttendanceDuration() {
         return attendanceDuration;

@@ -16,6 +16,14 @@ public class SeniorAndChildCareDaysQueryResult {
     private List<CareDaysQueryResult> seniorDays = new ArrayList<>();
     private List<CareDaysQueryResult> childCareDays = new ArrayList<>();
 
+    public SeniorAndChildCareDaysQueryResult() {
+    }
+
+    public SeniorAndChildCareDaysQueryResult(List<CareDaysQueryResult> seniorDays, List<CareDaysQueryResult> childCareDays) {
+        this.seniorDays = seniorDays;
+        this.childCareDays = childCareDays;
+    }
+
     public List<CareDaysQueryResult> getSeniorDays() {
         return seniorDays;
     }

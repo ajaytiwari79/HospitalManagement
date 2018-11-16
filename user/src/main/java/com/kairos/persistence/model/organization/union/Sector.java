@@ -17,6 +17,10 @@ public class Sector extends UserBaseEntity {
     public Sector() {
 
     }
+    public Sector(Long id, String name) {
+        this.id = id;
+        this.name=name;
+    }
     public Sector(String name) {
         this.name = name;
     }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import org.joda.time.Interval;
@@ -54,6 +55,7 @@ public class ShiftWithActivityDTO {
     private List<BigInteger> activityIds = new ArrayList<>();
     private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
     private BigInteger phaseId;
+    private ShiftType shiftType;
 
     //~ ===================================Constructors=======================================================
     public ShiftWithActivityDTO() {
@@ -87,6 +89,14 @@ public class ShiftWithActivityDTO {
             activitiesTimeTypeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
         }
         return activitiesTimeTypeIds;
+    }
+
+    public ShiftType getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(ShiftType shiftType) {
+        this.shiftType = shiftType;
     }
 
     public LocalDate getShiftDate() {
