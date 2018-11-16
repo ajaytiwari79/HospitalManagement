@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.controller.exception_handler.ResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.http.NameValuePair;
