@@ -242,7 +242,7 @@ public class ShiftValidatorService {
         int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUser(), totalTimeBank, activityWrapperMap,staffAdditionalInfoDTO.getStaffAge());
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUser(), totalTimeBank, activityWrapperMap,staffAdditionalInfoDTO.getStaffAge(),staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(),staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays());
     }
 
     public List<String> validateShiftWhileCopy(ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails) {
@@ -625,14 +625,14 @@ public class ShiftValidatorService {
 
     public static  DateTimeInterval getIntervalByActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap,Date shiftStartDate,List<BigInteger> activityIds){
         LocalDate shiftDate = DateUtils.asLocalDate(shiftStartDate);
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftStartDate,DateUtils.asDate(DateUtils.asZoneDateTime(shiftStartDate).plusDays(1)));
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftStartDate,DateUtils.asDate(shiftDate.plusDays(1)));
         for (BigInteger activityId : activityIds) {
             if(activityWrapperMap.containsKey(activityId)){
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(cutOffInterval -> (cutOffInterval.getStartDate().isBefore(shiftDate) && cutOffInterval.getEndDate().isAfter(shiftDate) || cutOffInterval.getStartDate().isEqual(shiftDate))).findFirst();
+                Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate))&& (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
                 if(cutOffIntervalOptional.isPresent()){
                     CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate())));
+                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
                 }
             }
         }

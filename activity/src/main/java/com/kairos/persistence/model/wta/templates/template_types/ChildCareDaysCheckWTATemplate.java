@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -27,7 +28,6 @@ import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
-    private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
     private boolean carryForwardLeave;
@@ -66,9 +66,9 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            Optional<AgeRange> optionalAgeRange = ageRange.stream().filter(a -> (a.getFrom() <= infoWrapper.getStaffAge() && a.getTo() >= infoWrapper.getStaffAge())).findFirst();
-            if (optionalAgeRange.isPresent()) {
-                int leaveCount = optionalAgeRange.get().getLeavesAllowed();
+            Optional<CareDaysDTO> careDaysOptional = infoWrapper.getChildCareDays().stream().filter(a -> (a.getFrom() <= infoWrapper.getStaffAge() && a.getTo() >= infoWrapper.getStaffAge())).findFirst();
+            if (careDaysOptional.isPresent()) {
+                int leaveCount = careDaysOptional.get().getLeavesAllowed();
                 List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());
                 shifts.add(infoWrapper.getShift());
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
@@ -91,20 +91,12 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         this.cutOffIntervalUnit = cutOffIntervalUnit;
     }
 
-    public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange) {
+    public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description) {
         super(name, description);
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
         this.disabled=disabled;
-        this.ageRange = ageRange;
     }
 
-    public List<AgeRange> getAgeRange() {
-        return ageRange;
-    }
-
-    public void setAgeRange(List<AgeRange> ageRange) {
-        this.ageRange = ageRange;
-    }
 
     public List<BigInteger> getActivityIds() {
         return activityIds;

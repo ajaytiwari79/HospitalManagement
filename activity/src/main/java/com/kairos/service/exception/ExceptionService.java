@@ -22,6 +22,9 @@ public class ExceptionService extends CommonsExceptionUtil {
     public void actionNotPermittedException(String message, Object... params) {
         throw new com.kairos.commons.custom_exception.ActionNotPermittedException(convertMessage(message, params));
     }
+    public void actionNotPermittedExceptionWithoutConvert(String message) {
+        throw new com.kairos.commons.custom_exception.ActionNotPermittedException(message);
+    }
 
     public void invalidRequestException(String message, Object... params) {
         throw new com.kairos.commons.custom_exception.InvalidRequestException(convertMessage(message, params));

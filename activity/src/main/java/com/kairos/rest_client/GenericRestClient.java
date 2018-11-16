@@ -1,5 +1,7 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.controller.exception_handler.ResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.service.exception.ExceptionService;
@@ -73,6 +75,7 @@ public class GenericRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
+            exceptionService.actionNotPermittedExceptionWithoutConvert(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
             throw new RuntimeException("exception occurred in User micro service " + e.getMessage());
         }
 

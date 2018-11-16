@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.expertise;
 
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
@@ -8,7 +9,6 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -97,12 +97,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
 
 
-    @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
+    @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:expertise) where id(expertise)={0} \n" +
             " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=true ")
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
 
 
-    @Query("match (e:Expertise)-[:" + VERSION_OF + "]->(expertise:Expertise) where id(e) = {0}" +
+    @Query("match (e:Expertise)-[:" + VERSION_OF + "]->(expertise:expertise) where id(e) = {0}" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
@@ -208,10 +208,5 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return id(expertise) as id , expertise.name as name")
     List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
 
-    @Query("MATCH (exp:Expertise) where id(exp)={0} \n" +
-            "OPTIONAL MATCH (exp)-[:"+HAS_SENIOR_DAYS+"]->(seniorDays:CareDays)\n" +
-            "OPTIONAL MATCH (exp)-[:"+HAS_CHILD_CARE_DAYS+"]->(childCareDays:CareDays)\n" +
-            "RETURN CASE WHEN count(childCareDays)>0 THEN COLLECT({id:id(childCareDays), from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) ELSE [] END as childCareDays ,CASE WHEN count(seniorDays)>0 THEN COLLECT({id:id(seniorDays), from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) ELSE [] END as seniorDays")
-    SeniorAndChildCareDaysQueryResult getSeniorDaysOfExpertise(Long expertiseId);
 
 }
