@@ -40,9 +40,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StaffExpertiseTest {
 
-
-
-
     @Mock
     private StaffGraphRepository staffGraphRepository;
     @Mock
@@ -53,8 +50,8 @@ public class StaffExpertiseTest {
     StaffService staffService;
     @Mock
     StaffRetrievalService staffRetrievalService;
-      @Mock
-      ExceptionService exceptionService;
+    @Mock
+    ExceptionService exceptionService;
     @Mock
     LanguageGraphRepository languageGraphRepository;
     @Mock
@@ -181,10 +178,9 @@ public class StaffExpertiseTest {
         when(expertiseGraphRepository.findAllById(expertiseIds)).thenReturn(expertiseList);
         when(userGraphRepository.getUserByStaffId(1956L)).thenReturn(user);
         when(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(1956L)).thenReturn(sectorWiseExpertise);
-        //when(staffRetrievalService.getSectorWiseStaffAndExpertise(sectorWiseExpertise)).thenReturn(sectorWiseExpertise);
         StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L,staffPersonalDetail,0l);
         staffPersonalDetail1.setSectorWiseExpertise(sectorWiseExpertise);
-        assertEquals(staffPersonalDetail1.getSectorWiseExpertise(), staffPersonalDetailResult.getSectorWiseExpertise());
+        assertEquals(staffPersonalDetail1, staffPersonalDetailResult);
     }
 
 }
