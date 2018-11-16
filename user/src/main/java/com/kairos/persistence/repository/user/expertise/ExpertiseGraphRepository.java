@@ -103,7 +103,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
 
 
-
     @Query("MATCH (e:Expertise)-[:" + VERSION_OF + "]->(expertise:Expertise) where id(e) = {0}" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +

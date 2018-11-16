@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
@@ -45,7 +46,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByTemplateIdAndCountryId(Long countryId, BigInteger agreementTemplateId) {
 
         String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
         String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
@@ -106,12 +107,21 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByCountryIdAndClauseId(Long countryId, BigInteger clauseId) {
+    public List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long refrenceId, boolean isUnitId, BigInteger clauseId) {
+
         String projectionOperation = "{'$project':{ '_id':1,'name':1 }}";
+        Criteria criteria;
+        if (isUnitId)
+            criteria = Criteria.where(ORGANIZATION_ID).is(refrenceId).and(DELETED).is(false);
+        else
+            criteria = Criteria.where(COUNTRY_ID).is(refrenceId).and(DELETED).is(false);
+
+
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
-                match(Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId).and("agreementSections.deleted").is(false)),
+                unwind("agreementSections"),
+                lookup("agreementSection", "agreementSections.subSections", "_id", "agreementSections.subSections"),
+                match(criteria.orOperator(Criteria.where("agreementSections.subSections.clauseIdOrderedIndex").is(clauseId), Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId))),
                 new CustomAggregationOperation(Document.parse(projectionOperation))
         );
 

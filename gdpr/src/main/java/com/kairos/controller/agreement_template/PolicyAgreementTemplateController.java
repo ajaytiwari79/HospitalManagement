@@ -89,7 +89,7 @@ public class PolicyAgreementTemplateController {
     @ApiOperation("get All  agreement Template linked with Clauses ")
     @GetMapping("/agreement_template/clause/{clauseId}")
     public ResponseEntity<Object> getPolicatAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAgreementTemplateListContainClause(countryId, clauseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryIdAndClauseId(countryId, clauseId));
 
     }
 
