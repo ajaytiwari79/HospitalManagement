@@ -72,7 +72,7 @@ public class OrganizationAssetTypeController {
 
     }
 
-    @ApiOperation("unlinke RISK From Asset Type and delete risk")
+    @ApiOperation("unlink RISK From Asset Type and delete risk")
     @DeleteMapping("/asset_type/{assetTypeId}/risk/{riskId}")
     public ResponseEntity<Object> unlinkRiskFromAssetType(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(unitId, assetTypeId, riskId));
@@ -80,7 +80,7 @@ public class OrganizationAssetTypeController {
     }
 
 
-    @ApiOperation("unlinke RISK From Sub Asset Type and delete risk")
+    @ApiOperation("unlink RISK From Sub Asset Type and delete risk")
     @DeleteMapping("/asset_type/sub_asset_type/{subAssetTypeId}/risk/{riskId}")
     public ResponseEntity<Object> unlinkRiskFromSubAssetType(@PathVariable Long unitId, @PathVariable BigInteger subAssetTypeId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(unitId, subAssetTypeId, riskId));

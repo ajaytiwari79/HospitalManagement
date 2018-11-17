@@ -91,14 +91,14 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("get All  agreement Template linked with Clauses ")
     @GetMapping(COUNTRY_URL+"/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getPolicatAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryIdAndClauseId(countryId, clauseId));
 
     }
 
     @ApiOperation("Replace Old Clause With New Version of Clause")
     @PutMapping(COUNTRY_URL+"/agreement_template/clause/version")
-    public ResponseEntity<Object> updateAgreementTemplateOldClauaseWithNewVersionOfClause(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+    public ResponseEntity<Object> updateAgreementTemplateOldClauseWithNewVersion(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateOldClauseWithNewVersionOfClause(countryId, agreementTemplateClauseUpdateDTO));
 
     }

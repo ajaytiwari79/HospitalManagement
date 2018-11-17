@@ -111,14 +111,14 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long refrenceId, boolean isUnitId, BigInteger clauseId) {
+    public List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId) {
 
         String projectionOperation = "{'$project':{ '_id':1,'name':1 }}";
         Criteria criteria;
         if (isUnitId)
-            criteria = Criteria.where(ORGANIZATION_ID).is(refrenceId).and(DELETED).is(false);
+            criteria = Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false);
         else
-            criteria = Criteria.where(COUNTRY_ID).is(refrenceId).and(DELETED).is(false);
+            criteria = Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
 
 
         Aggregation aggregation = Aggregation.newAggregation(

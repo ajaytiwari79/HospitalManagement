@@ -74,7 +74,7 @@ public class AssessmentController {
     @ApiOperation(value = "delete Assessment by id")
     @DeleteMapping("/assessment/{assessmentId}")
     public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentbyId(unitId,assessmentId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentById(unitId,assessmentId));
     }
 
 
@@ -84,7 +84,7 @@ public class AssessmentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivity(unitId, assessmentId, assessmentAnswerValueObjects.getRequestBody(),status));
     }
 
-    @ApiOperation(value = "getassessment scheduling frequency enum")
+    @ApiOperation(value = "get assessment scheduling frequency enum")
     @GetMapping("/assessment/scheduling")
     public ResponseEntity<ResponseDTO< AssessmentSchedulingFrequency[]>> getSchedulingFrequencyEnumList() {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getSchedulingFrequency());

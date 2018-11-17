@@ -65,7 +65,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     /**
      * @param referenceId                - countryId or unitId
-     * @param -                          isUnitId boolean to check whether referenceId id coutry id or unit id
+     * @param -                          isUnitId boolean to check whether referenceId id country id or unit id
      * @param policyAgreementTemplateDto
      * @return return object of basic policy agreement template.
      * @description this method creates a basic policy Agreement template with basic detail about organization type,
@@ -104,8 +104,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     * @param referenceId         - countryId or unitId
-     * @param -                   isUnitId boolean to check whether referenceId id coutry id or unit id
+     * @param referenceId         - country Id or unitId
+     * @param -                   isUnitId boolean to check whether referenceId id country id or unit id
      * @param agreementTemplateId - Agreement Template id
      * @param coverPageLogo       - Agreement Cover page
      * @return -Url of image uploaded at S3 bucket
@@ -148,11 +148,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     /**
      * @param referenceId                - countryId or unitId
      * @param isUnitId                         isUnitId boolean to check whether referenceId id coutry id or unit id
-     * @param agreementTemplateId        - AGreement Template id
+     * @param agreementTemplateId        - Agreement Template id
      * @param policyAgreementTemplateDto
      * @return
-     */// todo done for both country and unit
-    //todo add script to convert templateType to templateTypeId
+     */
     public <E extends AgreementTemplateDTO> E updatePolicyAgreementTemplateBasicDetails(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId, E policyAgreementTemplateDto) {
 
         PolicyAgreementTemplate template = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndName(referenceId, policyAgreementTemplateDto.getName()) : policyAgreementTemplateRepository.findByCountryIdAndName(referenceId, policyAgreementTemplateDto.getName());
@@ -174,7 +173,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     /**
      * @param referenceId                - countryId or unitId
-     * @param isUnitId                         isUnitId boolean to check whether referenceId id coutry id or unit id
+     * @param isUnitId                         isUnitId boolean to check whether referenceId id country id or unit id
      * @param agreementTemplateId
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
@@ -243,7 +242,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     /**
      * @param countryId
      * @param clauseId
-     * @description methos return list of Agreement Template Conatining clause in Section and Sub Sections
+     * @description   - return list of Agreement Template Conatining clause in Section and Sub Sections
      * */
     public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByCountryIdAndClauseId(Long countryId, BigInteger clauseId) {
         return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(countryId,false, clauseId);
@@ -271,7 +270,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     /**
      * @param referenceId - countryId or unitId
-     * @param isUnitId    - isUnitId boolean to check whether referenceId id coutry id or unit id
+     * @param isUnitId    - isUnitId boolean to check whether referenceId id country id or unit id
      * @param templateId  - Agreement Template id
      * @return
      */

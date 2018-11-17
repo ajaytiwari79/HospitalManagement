@@ -79,14 +79,14 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             subAssetTypeList = buildSubAssetTypeListAndRiskAndLinkedToAssetType(unitId, assetTypeDto.getSubAssetTypes(), riskDTORelatedToAssetTypeAndSubAssetType);
             assetType.setHasSubAsset(true);
         }
-        Map<AssetType, List<Risk>> riskCoresspondingToAssetAndSubAssetType = new HashMap<>();
+        Map<AssetType, List<Risk>> riskCorrespondingToAssetAndSubAssetType = new HashMap<>();
         if (CollectionUtils.isNotEmpty(riskDTORelatedToAssetTypeAndSubAssetType.entrySet().stream().map(Map.Entry::getValue).flatMap(List::stream).collect(Collectors.toList()))) {
-            riskCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTORelatedToAssetTypeAndSubAssetType);
+            riskCorrespondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, riskDTORelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskCoresspondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+                subAssetType.setRisks(riskCorrespondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            if (riskCoresspondingToAssetAndSubAssetType.containsKey(assetType))
-                assetType.setRisks(riskCoresspondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+            if (riskCorrespondingToAssetAndSubAssetType.containsKey(assetType))
+                assetType.setRisks(riskCorrespondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
         if (CollectionUtils.isNotEmpty(subAssetTypeList)) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
@@ -94,10 +94,10 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         }
         assetTypeMongoRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
-        if (CollectionUtils.isNotEmpty(riskCoresspondingToAssetAndSubAssetType.keySet())) {
+        if (CollectionUtils.isNotEmpty(riskCorrespondingToAssetAndSubAssetType.keySet())) {
             List<Risk> risks = new ArrayList<>();
-            riskCoresspondingToAssetAndSubAssetType.forEach((k, v) -> {
-                v.stream().forEach(risk -> risk.setAssetType(k.getId()));
+            riskCorrespondingToAssetAndSubAssetType.forEach((k, v) -> {
+                v.forEach(risk -> risk.setAssetType(k.getId()));
                 risks.addAll(v);
             });
             riskMongoRepository.saveAll(getNextSequence(risks));
@@ -286,7 +286,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     /**
      * @param unitId
      * @param assetTypeId
-     * @param riskId      - risk id linke with asset type and Sub Asset type
+     * @param riskId      - risk id link with asset type and Sub Asset type
      * @return
      * @description - Remove risk id from asset type and soft deleted risk
      */
