@@ -135,17 +135,13 @@ public class AgreementSectionService extends MongoBaseService {
 
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
             AgreementSection agreementSection = new AgreementSection(agreementSectionDTO.getTitle(), agreementSectionDTO.getOrderedIndex(), false, agreementSectionDTO.getTitleHtml());
-            if (isUnitId)
-                agreementSection.setOrganizationId(referenceId);
-            else
-                agreementSection.setCountryId(referenceId);
+            if (isUnitId) agreementSection.setOrganizationId(referenceId);
+            else agreementSection.setCountryId(referenceId);
             List<AgreementSection> subSectionList = new ArrayList<>();
             for (AgreementSectionDTO subSectionDTO : agreementSectionDTO.getSubSections()) {
                 AgreementSection subSection = new AgreementSection(subSectionDTO.getTitle(), subSectionDTO.getOrderedIndex(), true, subSectionDTO.getTitleHtml());
-                if (isUnitId)
-                    subSection.setOrganizationId(referenceId);
-                else
-                    subSection.setCountryId(referenceId);
+                if (isUnitId) subSection.setOrganizationId(referenceId);
+                else subSection.setCountryId(referenceId);
                 if (CollectionUtils.isNotEmpty(subSectionDTO.getClauses())) {
                     globalAgreementSectionAndClauseDTOListHashMap.put(subSection, subSectionDTO.getClauses());
                 }

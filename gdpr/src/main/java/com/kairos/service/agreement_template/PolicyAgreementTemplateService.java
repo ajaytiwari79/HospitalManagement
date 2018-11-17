@@ -178,7 +178,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     /**
      * @param referenceId         - countryId or unitId
-     * @param isUnitId            isUnitId boolean to check whether referenceId id country id or unit id
+     * @param isUnitId            - to check whether referenceId country id or unit id
      * @param agreementTemplateId
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
