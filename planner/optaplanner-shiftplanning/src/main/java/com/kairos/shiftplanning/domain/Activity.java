@@ -15,7 +15,9 @@ import java.util.List;
 
 @XStreamAlias("Activity")
 public class Activity {
+
     private static Logger log= LoggerFactory.getLogger(WorkingTimeConstraints.class);
+
     private String id;
     private List<Skill> skills;
     private int priority;
@@ -25,6 +27,7 @@ public class Activity {
     private int order;
     private int rank;
     private List<Long> expertises;
+
     public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
         this.id = id;
         this.skills = skills;
