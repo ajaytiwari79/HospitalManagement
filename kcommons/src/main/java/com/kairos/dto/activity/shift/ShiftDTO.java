@@ -44,6 +44,7 @@ public class ShiftDTO {
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
+    @NotNull(message = "message.shift.shiftDate")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private ShiftTemplateDTO template;

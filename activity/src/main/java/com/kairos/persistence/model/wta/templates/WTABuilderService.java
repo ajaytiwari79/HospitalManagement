@@ -2,16 +2,21 @@ package com.kairos.persistence.model.wta.templates;
 
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.template_types.*;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.COPY_OF;
 
@@ -25,6 +30,7 @@ public class WTABuilderService extends MongoBaseService {
 
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
+    @Inject private ActivityMongoRepository activityMongoRepository;
 
     public List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplateDTO> WTARuleTemplateDTOS, boolean ignoreId) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
@@ -33,6 +39,51 @@ public class WTABuilderService extends MongoBaseService {
 
         }
         return wtaBaseRuleTemplates;
+    }
+
+    public List<WTABaseRuleTemplate> copyRuleTemplatesWithUpdateActivity(Map<String,BigInteger> activitiesIdsAndUnitIdsMap,Long unitId,List<WTABaseRuleTemplateDTO> WTARuleTemplateDTOS, boolean ignoreId) {
+
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        List<BigInteger> activityIds;
+        for (WTABaseRuleTemplateDTO ruleTemplate : WTARuleTemplateDTOS) {
+            WTABaseRuleTemplate wtaBaseRuleTemplate = copyRuleTemplate(ruleTemplate, ignoreId);
+            switch (ruleTemplate.getWtaTemplateType()) {
+                case VETO_AND_STOP_BRICKS:
+                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate)wtaBaseRuleTemplate;
+                    vetoAndStopBricksWTATemplate.setStopBrickActivityId(activitiesIdsAndUnitIdsMap.get(vetoAndStopBricksWTATemplate.getStopBrickActivityId()+"-"+unitId));
+                    vetoAndStopBricksWTATemplate.setVetoActivityId(activitiesIdsAndUnitIdsMap.get(vetoAndStopBricksWTATemplate.getVetoActivityId()+"-"+unitId));
+                    break;
+                case SENIOR_DAYS_PER_YEAR:
+                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate)wtaBaseRuleTemplate;
+                    activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId,seniorDaysPerYearWTATemplate.getActivityIds());
+                    seniorDaysPerYearWTATemplate.setActivityIds(activityIds);
+                    activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
+                    break;
+                case CHILD_CARE_DAYS_CHECK:
+                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)wtaBaseRuleTemplate;
+                    activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId,childCareDaysCheckWTATemplate.getActivityIds());
+                    childCareDaysCheckWTATemplate.setActivityIds(activityIds);
+                    break;
+                case WTA_FOR_CARE_DAYS:
+                    WTAForCareDays wtaForCareDays = (WTAForCareDays)wtaBaseRuleTemplate;
+                    for (ActivityCareDayCount careDayCount : wtaForCareDays.getCareDayCounts()) {
+                        BigInteger activityId = activitiesIdsAndUnitIdsMap.get(careDayCount.getActivityId()+"-"+unitId);
+                        careDayCount.setActivityId(activityId);
+                    }
+                    break;
+            }
+            wtaBaseRuleTemplates.add(wtaBaseRuleTemplate);
+
+        }
+        return wtaBaseRuleTemplates;
+    }
+
+    private List<BigInteger> getActivityIdsByCountryActvityIds(Map<String,BigInteger> activitiesIdsAndUnitIdsMap,Long unitId,List<BigInteger> activityIds){
+        List<BigInteger> activityIdList = new ArrayList<>();
+        for (BigInteger activityId : activityIds) {
+            activityIdList.add(activitiesIdsAndUnitIdsMap.get(activityId+"-"+unitId));
+        }
+        return activityIdList;
     }
 
     public static WTABaseRuleTemplate copyRuleTemplate(WTABaseRuleTemplateDTO ruleTemplate, Boolean isIdnull) {
