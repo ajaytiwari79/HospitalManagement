@@ -11,6 +11,7 @@ public class ApiConstants {
     public static final String API_ORGANIZATION_URL =  API_V1 + PARENT_ORGANIZATION_URL;
     public static final String API_ORGANIZATION_UNIT_URL = API_ORGANIZATION_URL + UNIT_URL;
     public static final String API_UNIT_URL = API_V1  + UNIT_URL;
+    public static final String SHIFTPLANNING = "/shift_planning";
     public static final String API_PARENT_ORGANIZATION_COUNTRY_URL=API_ORGANIZATION_URL+COUNTRY_URL;
     public static final String API_PARENT_ORGANIZATION_UNIT_URL=API_ORGANIZATION_URL+UNIT_URL;
     public static final String API_PARENT_ORGANIZATION_COUNTRY_SOLVER_CONFIG_URL=API_PARENT_ORGANIZATION_COUNTRY_URL+SOLVER_CONFIG_URL;
