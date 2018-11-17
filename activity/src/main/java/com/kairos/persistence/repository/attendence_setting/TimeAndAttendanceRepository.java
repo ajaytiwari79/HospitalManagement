@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @Repository
-public interface TimeAndAttendanceRepository extends MongoBaseRepository<TimeAndAttendance,BigInteger>,CustomAttendanceSettingRepository {
+public interface TimeAndAttendanceRepository extends MongoBaseRepository<TimeAndAttendance,BigInteger>,CustomTimeAndAttendanceRepository {
 
     @Query(value ="{unitId:?0,staffId:?1,currentDate:?2,deleted:false}" )
     TimeAndAttendance findbyUnitIdAndStaffIdAndDate(Long unitId, Long staffId, LocalDate date);

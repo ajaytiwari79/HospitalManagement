@@ -3,21 +3,16 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
 
 /**

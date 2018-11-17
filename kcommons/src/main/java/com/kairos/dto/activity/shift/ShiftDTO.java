@@ -1,11 +1,9 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftType;
 import org.hibernate.validator.constraints.Range;
@@ -54,7 +52,6 @@ public class ShiftDTO {
     private BigInteger plannedTimeId;
     private Long expertiseId;
     private LocalDate validated;
-    private AttendanceDuration attendanceDuration;
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
     private BigInteger shiftId;
@@ -137,14 +134,6 @@ public class ShiftDTO {
 
     public void setClockOut(LocalDateTime clockOut) {
         this.clockOut = clockOut;
-    }
-
-    public AttendanceDuration getAttendanceDuration() {
-        return attendanceDuration;
-    }
-
-    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
-        this.attendanceDuration = attendanceDuration;
     }
 
 

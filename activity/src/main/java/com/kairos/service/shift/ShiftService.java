@@ -1233,7 +1233,7 @@ public class ShiftService extends MongoBaseService {
         if (validatedByStaff) {
             shiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             shiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
-            //shiftState.setAttendanceDuration(null);
+            //shiftState.setAttendanceTimeSlot(null);
             shiftState.setId(null);
             shiftState.setValidated(null);
             shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
@@ -1254,8 +1254,8 @@ public class ShiftService extends MongoBaseService {
         DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.getDate(), true);
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         for (ShiftDTO shiftDTO : realTimeShift) {
-            shiftDTO.setClockIn(shiftDTO.getAttendanceDuration().getFrom());
-            shiftDTO.setClockOut(shiftDTO.getAttendanceDuration().getTo());
+//            shiftDTO.setClockIn(shiftDTO.getAttendanceTimeSlot().getFrom());
+//            shiftDTO.setClockOut(shiftDTO.getAttendanceTimeSlot().getTo());
             if (shiftDTO.getValidated() == null&&graceInterval.contains(shiftDTO.getStartDate())) {
                     shiftDTO.setEditable(true);
             }

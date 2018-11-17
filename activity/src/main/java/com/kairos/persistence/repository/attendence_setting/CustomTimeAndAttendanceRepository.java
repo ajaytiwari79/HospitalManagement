@@ -6,7 +6,7 @@ import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
 
 import java.util.Date;
 
-public interface CustomAttendanceSettingRepository {
+public interface CustomTimeAndAttendanceRepository {
 
-    TimeAndAttendance findMaxAttendanceCheckIn(Long userId, Date date, String shiftState);
+    TimeAndAttendance findMaxAttendanceCheckIn(Long userId, Date date);
 }

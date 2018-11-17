@@ -77,12 +77,12 @@ public class AbsencePlanningService {
     @Inject
     private ExceptionService exceptionService;
 
-    private @Autowired
-    StaffRestClient staffRestClient;
-    private @Autowired
-    OrganizationRestClient organizationRestClient;
-    private @Autowired
-    GenericIntegrationService genericIntegrationService;
+     @Autowired
+    private StaffRestClient staffRestClient;
+     @Autowired
+    private OrganizationRestClient organizationRestClient;
+     @Autowired
+    private GenericIntegrationService genericIntegrationService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

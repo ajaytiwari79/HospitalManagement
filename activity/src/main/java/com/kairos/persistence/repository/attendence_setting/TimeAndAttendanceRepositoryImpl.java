@@ -10,15 +10,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.Date;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 
-public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingRepository {
+public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-   public TimeAndAttendance findMaxAttendanceCheckIn(Long userId, Date date, String shiftState){
+   public TimeAndAttendance findMaxAttendanceCheckIn(Long userId, Date date){
        Aggregation aggregation = Aggregation.newAggregation(
-               match(Criteria.where("userId").is(userId).and("updatedAt").gte(date).orOperator(Criteria.where("shiftState").exists(true),Criteria.where("shiftState").ne(shiftState))),
+               match(Criteria.where("userId").is(userId).and("updatedAt").gte(date)),
                sort(Sort.Direction.DESC,"updatedAt"),
                limit(1)
        );

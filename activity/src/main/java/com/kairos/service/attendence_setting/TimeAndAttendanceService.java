@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.sql.Date;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -62,12 +61,12 @@ public class TimeAndAttendanceService extends MongoBaseService {
     @Inject private ActivityMongoRepository activityMongoRepository;
 
     public AttendanceDTO getAttendanceSetting() {
-        TimeAndAttendance timeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)),AppConstants.TIME_AND_ATTENDANCE);
+        TimeAndAttendance timeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
         SickSettingsDTO sickSettings = sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
-        return (Optional.ofNullable(timeAndAttendance).isPresent()) ? new AttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceDuration()), sickSettings) : new AttendanceDTO(null, sickSettings);
+        return (Optional.ofNullable(timeAndAttendance).isPresent()) ? new AttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), sickSettings) : new AttendanceDTO(null, sickSettings);
     }
 
-    public AttendanceDTO updateTimeAndAttendance(Long unitId, Long reasonCodeId, boolean checkIn) {
+    public AttendanceDTO updateTimeAndAttendance(Long unitId, Long reasonCodeId,Long unitPositionId,boolean checkIn) {
         AttendanceDTO attendanceDTO = null;
         TimeAndAttendance timeAndAttendance = null;
         Long userId = UserContext.getUserDetails().getId();
@@ -80,92 +79,67 @@ public class TimeAndAttendanceService extends MongoBaseService {
         List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS=staffAndOrganizationIds.stream().map(reasonCode->new OrganizationAndReasonCodeDTO(reasonCode.getUnitId(),reasonCode.getUnitName(),reasonCode.getReasonCodes())).collect(Collectors.toList());
         Shift shift=null;
         List<Shift> shifts=shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
-        Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<Long,List<ReasonCodeDTO>> unitAndReasonCode=staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId,StaffResultDTO::getReasonCodes));
         Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap = new HashMap<>();
         if(!shifts.isEmpty()) {
             Set<BigInteger> activityIds = shifts.stream().flatMap(shift1 -> shift1.getActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             activityIdAndLocationActivityTabMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getLocationActivityTab()));
-            /*List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
-            for(UnitSettingDTO unitSettingDTO:unitSettingDTOS){
-                    unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
-            }*/
         }
-        if(checkIn) {
             for (Shift checkInshift : shifts) {
                 boolean result;
-       if (activityIdAndLocationActivityTabMap.containsKey(checkInshift.getActivities().get(0).getActivityId())) {
-                    /*if(unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId())==null){
-                        exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getUnitId());
-                    }*/
-                    ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
-                    if(!Optional.ofNullable(glideTimeDetails).isPresent()){
-                        exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(0).getActivityName());
+                if (activityIdAndLocationActivityTabMap.containsKey(checkInshift.getActivities().get(0).getActivityId())) {
+                    if (checkIn) {
+                        result = validateGlideTimeWhileCheckIn(checkInshift, unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap);
                     }
-                    ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())).minusMinutes(glideTimeDetails.getBefore());
-                    ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())).plusMinutes(glideTimeDetails.getAfter());
-                    DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
-                    DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
-                    /*result=(Math.abs((Duration.between(DateUtils.getLocalDateTimeFromDate(checkInshift.getStartDate()), DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime());*/
-                    result = glidTimeInterval.contains(checkInshift.getStartDate());
-                    if (interval.contains(DateUtils.getCurrentMillistByTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
-                        result = (result || reasonCodeId != null);
-                        if (!result) {
-                                attendanceDTO = new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(checkInshift.getUnitId()));
-                        }
-                    } else {
-                        if (!result ) {
-                            attendanceDTO = new AttendanceDTO(organizationAndReasonCodeDTOS,new ArrayList<>());
-                        }
+                    else {
+                        result = validateGlideTimeWhileCheckOut(checkInshift, reasonCodeId, unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap);
                     }
+                        DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
+                        if (interval.contains(DateUtils.getCurrentMillistByTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
+                            result = (result || reasonCodeId != null);
+                            if (!result) {
+                                return new AttendanceDTO(new ArrayList<>(), unitAndReasonCode.get(checkInshift.getUnitId()));
+                            }
+                        } else {
+                            if (!result&&checkIn&&reasonCodeId==null) {
+                                return new AttendanceDTO(organizationAndReasonCodeDTOS, new ArrayList<>());
+                            }
+                        }
                     if (result) {
                         shift = checkInshift;
-                            break;
+                        break;
                     }
                 }
             }
-            if(shift==null) {
+            if(shift==null&&checkIn) {
                 timeAndAttendance = checkInWithoutShift(unitId, reasonCodeId, staffAndOrganizationIds);
                 if (timeAndAttendance == null) {
                     return (attendanceDTO!=null)?attendanceDTO:new AttendanceDTO(organizationAndReasonCodeDTOS,new ArrayList<>());
                 }
             }
-        }else{
-            shift=null;//shifts.stream().filter(shift1 -> shift1.getAttendanceDuration()!=null&&shift1.getAttendanceDuration().getFrom()!=null&&shift1.getAttendanceDuration().getTo()==null).findAny().orElse(null);
-        }
-
 
         //If shift exist of User
          if(shift!=null && checkIn){
                 timeAndAttendance = checkInWithShift(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()));
             if(timeAndAttendance ==null){
                 return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
-            }else {
-               // shift.setAttendanceDuration(timeAndAttendance.getAttendanceDuration().get(0));
-                shiftMongoRepository.save(shift);
             }
         }
 
         else if(!checkIn){
-            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)),AppConstants.TIME_AND_ATTENDANCE);;
-            shift=null;//shiftMap.get(oldTimeAndAttendance.getShiftId());
-            timeAndAttendance = checkOut(staffAndOrganizationIds,shift, oldTimeAndAttendance,reasonCodeId);
+            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+            timeAndAttendance = checkOut(staffAndOrganizationIds,shift, oldTimeAndAttendance,reasonCodeId,activityIdAndLocationActivityTabMap);
             if(timeAndAttendance ==null){
-                return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
-            }else if(shift!=null){
-                    //shift.setAttendanceDuration(timeAndAttendance.getAttendanceDuration().get(timeAndAttendance.getAttendanceDuration().size()-1));
-                    shiftMongoRepository.save(shift);
-                }
-
+                return new AttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId()));
+            }
         }
 
 
         if (Optional.ofNullable(timeAndAttendance).isPresent()) {
             save(timeAndAttendance);
-            if(shift!=null)
-            createShiftState(Arrays.asList(shift),checkIn,Arrays.asList(timeAndAttendance));
-            attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceDuration()), null);
+            //createShiftState(Arrays.asList(shift),checkIn,Arrays.asList(timeAndAttendance));
+            attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), null);
         }
         return attendanceDTO;
     }
@@ -180,31 +154,39 @@ public class TimeAndAttendanceService extends MongoBaseService {
             if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
                 exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
             }
-            AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
-            timeAndAttendance = new TimeAndAttendance(unitId, staffAndOrganizationId.getStaffId(), UserContext.getUserDetails().getId(), reasonCodeId, Arrays.asList(attendanceDuration));
+            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+            AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,null,unitId);
+            if(oldTimeAndAttendance !=null){
+                oldTimeAndAttendance.getAttendanceTimeSlot().add(attendanceTimeSlot);
+                timeAndAttendance = oldTimeAndAttendance;
+            }else{
+                timeAndAttendance = new TimeAndAttendance(unitId, staffAndOrganizationId.getStaffId(), UserContext.getUserDetails().getId(), reasonCodeId, Arrays.asList(attendanceTimeSlot));
+            }
         }
         return timeAndAttendance;
     }
 
 
-    private TimeAndAttendance checkOut(List<StaffResultDTO> staffAndOrganizationIds, Shift shift, TimeAndAttendance oldTimeAndAttendance, Long reasonCodeId) {
-        AttendanceDuration duration ;
+    private TimeAndAttendance checkOut(List<StaffResultDTO> staffAndOrganizationIds, Shift shift, TimeAndAttendance oldTimeAndAttendance, Long reasonCodeId,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap) {
+        AttendanceTimeSlot duration ;
         TimeAndAttendance timeAndAttendance = oldTimeAndAttendance;
         if(timeAndAttendance!=null && shift!=null){//.getShiftId()
             Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-            boolean result= validateGlideTimeWhileCheckOut(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone());
+            boolean result= validateGlideTimeWhileCheckOut(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(),activityIdAndLocationActivityTabMap);
             if(!result){
                 return null;
             }
-
+        }else if(reasonCodeId==null){
+            return null;
         }
-        final Long unitId= timeAndAttendance.getUnitId();
+        final Long unitId= timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId();
         if (Optional.ofNullable(timeAndAttendance).isPresent()) {
-            timeAndAttendance.getAttendanceDuration().sort((s1, s2)->s1.getFrom().compareTo(s2.getFrom()));
-            duration = timeAndAttendance.getAttendanceDuration().get(timeAndAttendance.getAttendanceDuration().size()-1);
+            timeAndAttendance.getAttendanceTimeSlot().sort((s1, s2)->s1.getFrom().compareTo(s2.getFrom()));
+            duration = timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size()-1);
             if (!Optional.ofNullable(duration.getTo()).isPresent()) {
                 StaffResultDTO staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
                 duration.setTo(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
+                duration.setClockOutReasonCode(reasonCodeId);
             } else {
                 exceptionService.actionNotPermittedException("message.checkout.exists");
             }
@@ -215,46 +197,52 @@ public class TimeAndAttendanceService extends MongoBaseService {
     }
 
 
-    private AttendanceDurationDTO getAttendanceDTOObject(List<AttendanceDuration> attendanceDuration) {
-        attendanceDuration.sort((a1,a2)->a1.getFrom().compareTo(a2.getFrom()));
+    private AttendanceDurationDTO getAttendanceDTOObject(List<AttendanceTimeSlot> attendanceTimeSlot) {
+        attendanceTimeSlot.sort((a1, a2)->a1.getFrom().compareTo(a2.getFrom()));
         AttendanceDurationDTO attendanceDurationDTO = new AttendanceDurationDTO();
-        attendanceDurationDTO.setClockInDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.get(attendanceDuration.size()-1).getFrom()));
-        attendanceDurationDTO.setClockInTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.get(attendanceDuration.size()-1).getFrom()));
-        if (Optional.ofNullable(attendanceDuration.get(attendanceDuration.size()-1).getTo()).isPresent()) {
-            attendanceDurationDTO.setClockOutDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.get(attendanceDuration.size()-1).getTo()));
-            attendanceDurationDTO.setClockOutTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.get(attendanceDuration.size()-1).getTo()));
+        attendanceDurationDTO.setClockInDate(DateUtils.getLocalDateFromLocalDateTime(attendanceTimeSlot.get(attendanceTimeSlot.size()-1).getFrom()));
+        attendanceDurationDTO.setClockInTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceTimeSlot.get(attendanceTimeSlot.size()-1).getFrom()));
+        if (Optional.ofNullable(attendanceTimeSlot.get(attendanceTimeSlot.size()-1).getTo()).isPresent()) {
+            attendanceDurationDTO.setClockOutDate(DateUtils.getLocalDateFromLocalDateTime(attendanceTimeSlot.get(attendanceTimeSlot.size()-1).getTo()));
+            attendanceDurationDTO.setClockOutTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceTimeSlot.get(attendanceTimeSlot.size()-1).getTo()));
         }
         return attendanceDurationDTO;
     }
 
         private TimeAndAttendance checkInWithShift(Shift shift, Long reasonCodeId, StaffResultDTO staffAndOrganizationId) {
             TimeAndAttendance timeAndAttendance =null;
-                TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findByShiftId(shift.getId());
-                AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())));
+                TimeAndAttendance oldTimeAndAttendance =timeAndAttendanceRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+                AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,shift.getUnitPositionId(),shift.getUnitId());
                 if(oldTimeAndAttendance !=null){
-                    oldTimeAndAttendance.getAttendanceDuration().add(attendanceDuration);
+                    oldTimeAndAttendance.getAttendanceTimeSlot().add(attendanceTimeSlot);
                     timeAndAttendance = oldTimeAndAttendance;
                 }else{
-                    timeAndAttendance = new TimeAndAttendance(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,Arrays.asList(attendanceDuration));
+                    timeAndAttendance = new TimeAndAttendance(shift.getId(),shift.getUnitId(), shift.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,Arrays.asList(attendanceTimeSlot));
                 }
         return timeAndAttendance;
 
     }
 
-    private boolean validateGlideTimeWhileCheckOut(Shift shift, Long reasonCodeId, String timeZone){
-        //Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-        LocationActivityTab locationActivityTab = activityMongoRepository.findActivityByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId()).getLocationActivityTab();
-        ActivityGlideTimeDetails glideTimeDetails = locationActivityTab.getCheckOutGlideTime(LocationEnum.OFFICE);
-        ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(glideTimeDetails.getBefore());
-        ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(glideTimeDetails.getAfter());
+    private boolean validateGlideTimeWhileCheckOut(Shift checkInshift, Long reasonCodeId, String timeZone,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap){
+        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(checkInshift.getActivities().size()-1).getActivityId()).getCheckOutGlideTime(LocationEnum.OFFICE);
+        if(!Optional.ofNullable(glideTimeDetails).isPresent()){
+            exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(checkInshift.getActivities().size()-1).getActivityName());
+        }
+        Date glidStartDateTime=DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getEndDate()).minusMinutes(glideTimeDetails.getBefore()));
+        Date glidEndDateTime =DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getEndDate()).plusMinutes(glideTimeDetails.getAfter()));
         DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
-        //FlexibleTimeSettingDTO flexibleTimeSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(shift.getUnitId()).getFlexibleTimeSettings();
+        return glidTimeInterval.contains(DateUtils.getCurrentMillistByTimeZone(timeZone));
+    }
 
-        //if (flexibleTimeSettingDTO != null) {
-           // Short checkInFlexibleTime = flexibleTimeSettingDTO.getCheckInFlexibleTime();
-             //return  (Math.abs((shift.getEndDate().getTime() - DateUtils.getCurrentMillis()) / ONE_MINUTE) < checkInFlexibleTime || reasonCodeId != null);
-        return glidTimeInterval.contains(shift.getEndDate()) || reasonCodeId!=null;
-       // return false;
+    private boolean validateGlideTimeWhileCheckIn(Shift checkInshift,String timeZone,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap){
+        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
+        if(!Optional.ofNullable(glideTimeDetails).isPresent()){
+            exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(0).getActivityName());
+        }
+        Date glidStartDateTime=DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getStartDate()).minusMinutes(glideTimeDetails.getBefore()));
+        Date glidEndDateTime =DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getStartDate()).plusMinutes(glideTimeDetails.getAfter()));
+        DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
+        return glidTimeInterval.contains(DateUtils.getCurrentMillistByTimeZone(timeZone));
     }
 
     public void createShiftState(List<Shift> shifts,boolean checkIn,List<TimeAndAttendance> timeAndAttendances){
@@ -272,7 +260,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         } else{
             if(!realtimeShiftStates.isEmpty()){
                 realtimeShiftStates.forEach(realtimeShiftState->{
-                   // realtimeShiftState.setAttendanceDuration(shiftMap.get(realtimeShiftState.getShiftId()).getAttendanceDuration());
+                   // realtimeShiftState.setAttendanceTimeSlot(shiftMap.get(realtimeShiftState.getShiftId()).getAttendanceTimeSlot());
                 });
                 shiftStateMongoRepository.saveEntities(realtimeShiftStates);
             }
@@ -321,17 +309,16 @@ public class TimeAndAttendanceService extends MongoBaseService {
                  if (staffIdAndShifts.get(0) != null) {
                      Shift shift = null;//staffIdAndShifts.get(timeAndAttendance.getShiftId());
                      if (!DateUtils.asLocalDate(shift.getEndDate()).isAfter(DateUtils.getCurrentLocalDate())) {
-                         timeAndAttendance.getAttendanceDuration().sort((a1, a2) -> a1.getFrom().compareTo(a2.getFrom()));
-                         timeAndAttendance.getAttendanceDuration().get(timeAndAttendance.getAttendanceDuration().size() - 1).setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
-                         //shift.getAttendanceDuration().setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
+                         timeAndAttendance.getAttendanceTimeSlot().sort((a1, a2) -> a1.getFrom().compareTo(a2.getFrom()));
+                         timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
                          saveShifts.add(shift);
                      }
                  } else {
-                     timeAndAttendance.getAttendanceDuration().get(timeAndAttendance.getAttendanceDuration().size() - 1).setTo(DateUtils.getEndOfDayFromLocalDateTime());
+                     timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).setTo(DateUtils.getEndOfDayFromLocalDateTime());
                  }
              });
              if (!timeAndAttendances.isEmpty()) timeAndAttendanceRepository.saveEntities(timeAndAttendances);
              if (!saveShifts.isEmpty()) shiftMongoRepository.saveEntities(saveShifts);
-             createShiftState(shifts, false, timeAndAttendances);
+             //createShiftState(shifts, false, timeAndAttendances);
          }
 }
