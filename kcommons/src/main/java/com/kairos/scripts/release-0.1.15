@@ -52,3 +52,6 @@ db.wtaBaseRuleTemplate.insert({
 	Match(s:Sector) with s limit 1
     MATCH(e:Expertise{deleted:false})
     Create unique(e)-[r:BELONGS_TO_SECTOR]->(s) return count(r);
+
+
+
