@@ -82,13 +82,13 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     }
 
     @Override
-    public List<ClauseResponseDTO> findAllClauseByUnitId(Long unitId) {
+    public List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 project(Fields.fields("id", "title", "tags", "description","createdAt")),
                 sort(Sort.Direction.DESC, "createdAt")
         );
-        AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
+        AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
         return result.getMappedResults();
     }
 
@@ -133,7 +133,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+    public List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())

@@ -43,7 +43,6 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireT
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
@@ -305,11 +304,11 @@ public class AssessmentService extends MongoBaseService {
     private void getRiskAssessmentAnswer(Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         List<AssessmentAnswerValueObject> assessmentAnswers = assessment.getAssessmentAnswers();
-        Map<BigInteger, Object> riskAssessmentAsnwer = new HashMap<>();
-        assessmentAnswers.forEach(assessmentAnswer -> riskAssessmentAsnwer.put(assessmentAnswer.getQuestionId(), assessmentAnswer.getValue()));
+        Map<BigInteger, Object> riskAssessmentAnswer = new HashMap<>();
+        assessmentAnswers.forEach(assessmentAnswer -> riskAssessmentAnswer.put(assessmentAnswer.getQuestionId(), assessmentAnswer.getValue()));
         for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
             for (QuestionBasicResponseDTO question : questionnaireSectionResponseDTO.getQuestions()) {
-                question.setValue(riskAssessmentAsnwer.get(question.getId()));
+                question.setValue(riskAssessmentAnswer.get(question.getId()));
             }
         }
 
@@ -434,7 +433,7 @@ public class AssessmentService extends MongoBaseService {
                 } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                     exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
                 }
-                saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
+                saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
                 break;
             case NEW:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
@@ -449,7 +448,7 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
-    private void saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
+    private void saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
 
         if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
@@ -504,7 +503,7 @@ public class AssessmentService extends MongoBaseService {
         return AssessmentSchedulingFrequency.values();
     }
 
-    public boolean deleteAssessmentbyId(Long unitId, BigInteger assessmentId) {
+    public boolean deleteAssessmentById(Long unitId, BigInteger assessmentId) {
 
         Assessment assessment = assessmentMongoRepository.findByUnitIdAndIdAndAssessmentStatus(unitId, assessmentId, AssessmentStatus.IN_PROGRESS);
         if (Optional.ofNullable(assessment).isPresent()) {
@@ -537,7 +536,7 @@ public class AssessmentService extends MongoBaseService {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setAssessmentStatus(status);
-            saveAsessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
+            saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         }
         assessmentMongoRepository.save(assessment);
         return assessmentAnswerValueObjects;

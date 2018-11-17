@@ -29,7 +29,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
-    private BigInteger templateType;
+    private BigInteger templateTypeId;
     private boolean coverPageAdded;
     private boolean includeContentPage;
     private boolean signatureComponentAdded;
@@ -49,6 +49,12 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
+    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, BigInteger templateTypeId) {
+        this.name = name;
+        this.description = description;
+        this.templateTypeId = templateTypeId;
+    }
+
     public boolean isIncludeContentPage() { return includeContentPage; }
 
     public void setIncludeContentPage(boolean includeContentPage) { this.includeContentPage = includeContentPage; }
@@ -64,9 +70,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
 
-    public BigInteger getTemplateType() { return templateType; }
+    public BigInteger getTemplateTypeId() { return templateTypeId; }
 
-    public PolicyAgreementTemplate setTemplateType(BigInteger templateType) { this.templateType = templateType; return this; }
+    public void setTemplateTypeId(BigInteger templateTypeId) { this.templateTypeId = templateTypeId; }
 
     public String getName() {
         return name;

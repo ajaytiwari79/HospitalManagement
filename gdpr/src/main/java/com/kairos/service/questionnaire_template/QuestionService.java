@@ -52,7 +52,7 @@ public class QuestionService extends MongoBaseService {
         Set<String> titles = new HashSet<>();
         sectionAndQuestionDTOListMap.forEach((questionnaireSection, questionDTOS) -> {
 
-            List<QuestionDTO> questionListCoresspondingToSection = new ArrayList<>();
+            List<QuestionDTO> questionListCorrespondingToSection = new ArrayList<>();
             questionDTOS.forEach(questionDTO -> {
                 if (titles.contains(questionDTO.getQuestion().toLowerCase().trim())) {
                     exceptionService.duplicateDataException("message.duplicate", " question ", questionDTO.getQuestion());
@@ -61,10 +61,10 @@ public class QuestionService extends MongoBaseService {
                 if (Optional.ofNullable(questionDTO.getId()).isPresent())
                     questionDTOAndIdMap.put(questionDTO.getId(), questionDTO);
                 else
-                    questionListCoresspondingToSection.add(questionDTO);
+                    questionListCorrespondingToSection.add(questionDTO);
             });
-            if (CollectionUtils.isNotEmpty(questionListCoresspondingToSection)) {
-                List<Question> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCoresspondingToSection, templateType);
+            if (CollectionUtils.isNotEmpty(questionListCorrespondingToSection)) {
+                List<Question> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCorrespondingToSection, templateType);
                 sectionQuestionListMap.put(questionnaireSection, questions);
                 globalQuestionList.addAll(questions);
             }

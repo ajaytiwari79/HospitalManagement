@@ -27,9 +27,9 @@ public interface CustomClauseRepository {
 
     List<ClauseResponseDTO> findAllClauseByCountryId(Long countryId);
 
-    List<ClauseResponseDTO> findAllClauseByUnitId(Long unitId);
+    List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId);
 
-    List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
+    List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
     ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id);
 
