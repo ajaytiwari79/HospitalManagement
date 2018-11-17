@@ -102,18 +102,18 @@ public class WTAService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
 
     /**
-     * @param countryId
+     * @param referenceId     refrence id may be countryid or unitId
      * @param wtaDTO
      * @return
      * @Author Vipul
      */
-    public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO, boolean creatingFromCountry) {
+    public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry) {
 
         //TODO  API functionality has been changed for now KP-958
         //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getSkillId());
         WorkingTimeAgreement wta;
         if(creatingFromCountry){
-        wta = wtaRepository.getWtaByName(wtaDTO.getName(), countryId);
+        wta = wtaRepository.getWtaByName(wtaDTO.getName(), referenceId);
         if (Optional.ofNullable(wta).isPresent()) {
             exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
         }
@@ -130,15 +130,15 @@ public class WTAService extends MongoBaseService {
             endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
             wta.setEndDate(endDate);
         }
-        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
+        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), referenceId, 0l, wtaDTO.getOrganizationType(), wtaDTO.getUnitIds());
         if(creatingFromCountry) {
             if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.country.id", countryId);
+                exceptionService.dataNotFoundByIdException("message.country.id", referenceId);
             }
-            wta.setCountryId(countryId);
+            wta.setCountryId(referenceId);
         }
         wta.setStartDate(startDate);
-        if (wtaDTO.getTags().size() > 0) {
+        if (CollectionUtils.isNotEmpty(wtaDTO.getTags())){
             List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA);
             wta.setTags(tags.stream().map(t -> t.getId()).collect(Collectors.toList()));
         }
@@ -238,7 +238,7 @@ public class WTAService extends MongoBaseService {
             logger.info("wta not found while updating at unit %d", wtaId);
             exceptionService.dataNotFoundByIdException("message.wta.id", wtaId);
         }
-        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(updateDTO.getExpertiseId(), updateDTO.getOrganizationSubType(), countryId, 0l, updateDTO.getOrganizationType());
+        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(updateDTO.getExpertiseId(), updateDTO.getOrganizationSubType(), countryId, 0l, updateDTO.getOrganizationType(),Collections.EMPTY_LIST);
         oldWta = prepareWtaWhileUpdate(oldWta, updateDTO, wtaBasicDetailsDTO);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
@@ -381,7 +381,7 @@ public class WTAService extends MongoBaseService {
     public Map<String, Object> setWtaWithOrganizationType(Long countryId, BigInteger wtaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
         /*List<WTARuleTemplateDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTARuleTemplateDTO>();*/
-        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(0L, organizationSubTypeId, countryId, 0L, 0L);
+        WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(0L, organizationSubTypeId, countryId, 0L, 0L, Collections.EMPTY_LIST);
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.subtype.id", organizationSubTypeId);
         }

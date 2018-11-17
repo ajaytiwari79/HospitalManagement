@@ -1317,9 +1317,9 @@ public class OrganizationController {
     @GetMapping(PARENT_ORGANIZATION_URL+"/WTARelatedInfo")
     @ApiOperation("get  Wta related info")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId) {
+    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId,@RequestParam(required = false)  List<Long> unitIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId));
+                organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId, unitIds));
     }
 
     @GetMapping(UNIT_URL+"/time_zone")
@@ -1440,9 +1440,9 @@ public class OrganizationController {
     @ApiOperation(value = "get Cta basic info")
     @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/cta_basic_info")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId) {
+    public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId,@RequestParam(required = false) List<Long> unitIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId));
+                organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId, unitIds));
     }
 
     @ApiOperation(value = "get organization ids by orgSubType ids")

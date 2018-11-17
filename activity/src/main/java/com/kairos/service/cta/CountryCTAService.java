@@ -19,6 +19,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -85,6 +86,9 @@ public class CountryCTAService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
+        if(CollectionUtils.isNotEmpty(collectiveTimeAgreementDTO.getUnitIds())){
+            requestParam.add(new BasicNameValuePair("unitIds", collectiveTimeAgreementDTO.getUnitIds().toString().replace("[", "").replace("]", "")));
+        }
         CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(0L,requestParam);
 
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
