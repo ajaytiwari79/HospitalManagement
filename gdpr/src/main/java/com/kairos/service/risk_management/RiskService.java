@@ -6,7 +6,6 @@ import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.common.RiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;

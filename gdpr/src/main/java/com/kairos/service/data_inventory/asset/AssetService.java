@@ -314,7 +314,7 @@ public class AssetService extends MongoBaseService {
             for (ProcessingActivityBasicResponseDTO processingActivityBasicResponseDTO : processingActivityResponseDTOList) {
 
                 List<ProcessingActivityBasicResponseDTO> subProcessingActivities = processingActivityBasicResponseDTO.getSubProcessingActivities();
-                processingActivityBasicResponseDTO.setSubProcessingActivities(subProcessingActivities.stream().filter(subProcessingActivitiy->subProcessingActivitiesIdsList.contains(subProcessingActivitiy.getId())).collect(Collectors.toList()));
+                processingActivityBasicResponseDTO.setSubProcessingActivities(subProcessingActivities.stream().filter(subProcessingActivity->subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())).collect(Collectors.toList()));
 
             }
         }

@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.AgeRange;
+import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -71,14 +72,13 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            Optional<AgeRange> optionalAgeRange = ageRange.stream().filter(a -> (a.getFrom() <= infoWrapper.getStaffAge() && a.getTo() >= infoWrapper.getStaffAge())).findFirst();
-            if (optionalAgeRange.isPresent()) {
-                int leaveCount = optionalAgeRange.get().getLeavesAllowed();
-                List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());
-                shifts.add(infoWrapper.getShift());
+            Optional<CareDaysDTO> careDaysOptional = infoWrapper.getSeniorCareDays().stream().filter(careDaysDTO -> (careDaysDTO.getFrom() <= infoWrapper.getStaffAge() && careDaysDTO.getTo() >= infoWrapper.getStaffAge())).findFirst();
+            if (careDaysOptional.isPresent()) {
+                int leaveCount = careDaysOptional.get().getLeavesAllowed();
+
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                shifts = shifts.stream().filter(shift -> CollectionUtils.containsAny(shift.getActivitIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                if (leaveCount > shifts.size()) {
+                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivitIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
+                if (leaveCount < (shifts.size()+1)) {
                     WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
                     infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                 }

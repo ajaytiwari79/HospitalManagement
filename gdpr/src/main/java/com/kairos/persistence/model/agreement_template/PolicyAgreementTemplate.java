@@ -29,9 +29,13 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
-    private BigInteger templateType;
+    private BigInteger templateTypeId;
     private boolean coverPageAdded;
     private boolean includeContentPage;
+    private boolean signatureComponentAdded;
+    private boolean signatureComponentLeftAlign;
+    private boolean signatureComponentRightAlign;
+    private String  signatureHtml;
     private CoverPageVO coverPageData;
 
 
@@ -43,6 +47,12 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
+    }
+
+    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, BigInteger templateTypeId) {
+        this.name = name;
+        this.description = description;
+        this.templateTypeId = templateTypeId;
     }
 
     public boolean isIncludeContentPage() { return includeContentPage; }
@@ -60,9 +70,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
 
-    public BigInteger getTemplateType() { return templateType; }
+    public BigInteger getTemplateTypeId() { return templateTypeId; }
 
-    public PolicyAgreementTemplate setTemplateType(BigInteger templateType) { this.templateType = templateType; return this; }
+    public void setTemplateTypeId(BigInteger templateTypeId) { this.templateTypeId = templateTypeId; }
 
     public String getName() {
         return name;
@@ -118,5 +128,19 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
 
+    public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
 
+    public void setSignatureComponentAdded(boolean signatureComponentAdded) { this.signatureComponentAdded = signatureComponentAdded; }
+
+    public String getSignatureHtml() { return signatureHtml; }
+
+    public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
+
+    public boolean isSignatureComponentLeftAlign() { return signatureComponentLeftAlign; }
+
+    public void setSignatureComponentLeftAlign(boolean signatureComponentLeftAlign) { this.signatureComponentLeftAlign = signatureComponentLeftAlign; }
+
+    public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
+
+    public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
 }
