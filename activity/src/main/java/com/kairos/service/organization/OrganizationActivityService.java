@@ -36,6 +36,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -128,6 +129,7 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private GlideTimeSettingsService glideTimeSettingsService;
     @Inject private WTAService wtaService;
+    @Inject private CostTimeAgreementService costTimeAgreementService;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -418,6 +420,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }
             save(activityCopiedList);
+            costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(),orgTypeAndSubTypeDTO.getOrganizationSubTypeId(),unitId);
             wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(),unitId,orgTypeAndSubTypeDTO.getCountryId());
             updateCompositeActivitiesIds(activityCopiedList);
         }
