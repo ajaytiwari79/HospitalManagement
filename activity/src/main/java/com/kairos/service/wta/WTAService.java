@@ -515,7 +515,7 @@ public class WTAService extends MongoBaseService {
         workingTimeAgreement.setStartDate(startDate);
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
-        workingTimeAgreement.setOrganizationParentId(wtaQueryResultDTO.getOrganizationParentId());
+        workingTimeAgreement.setOrganizationParentId(wtaQueryResultDTO.getId());
         workingTimeAgreement.setParentId(wtaResponseDTO.getId());
 
         save(workingTimeAgreement);
