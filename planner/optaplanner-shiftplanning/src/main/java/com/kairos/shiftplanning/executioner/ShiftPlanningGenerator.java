@@ -257,7 +257,7 @@ public class ShiftPlanningGenerator {
 
     public ActivityConstraints getActivityContraints(){
         LongestDuration longestDuration = new LongestDuration(80, ScoreLevel.SOFT,-5);
-        ShortestDuration shortestDuration = new ShortestDuration(20,ScoreLevel.SOFT,-2);
+        ShortestDuration shortestDuration = new ShortestDuration(60,ScoreLevel.HARD,-2);
         MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3,ScoreLevel.MEDIUM,-1);//3
         //ContinousActivityPerShift continousActivityPerShift = new ContinousActivityPerShift(3,ScoreLevel.SOFT,-4);
         MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.MEDIUM,-1);//4

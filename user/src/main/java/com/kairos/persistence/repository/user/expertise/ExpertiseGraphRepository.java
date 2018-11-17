@@ -79,7 +79,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,hasDraftCopy:false}) where id(country) = {0}" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "OPTIONAL MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization) WITH country,expertise,level,union\n" +
-            "OPTIONAL MATCH(expertise)-[:"+BELONGS_TO+"]-(sector:Sector) WITH country,expertise,level,union,sector"+
+            "OPTIONAL MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WITH country,expertise,level,union,sector"+
             " MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
             "with expertise,union,level, Collect(orgService) as services,sector  \n" +
             " MATCH(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)" +
@@ -210,13 +210,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) " +
             "return id(expertise) as id , expertise.name as name")
     List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
-
-
-    @Query("MATCH(expertise:Expertise)-[expertiseSectorRel:BELONGS_TO]->(sector:Sector) where id(expertise)={0} and id(sector)={1} DELETE expertiseSectorRel ")
-    void deleteExpertiseSectorRelationShip(Long expertiseId,Long sectorId);
-
-    @Query("MATCH(expertise:Expertise)-[expertiseUnionRel:SUPPORTED_BY_UNION]->(union:Union) where id(expertise)={0} and id(union)={1} DELETE expertiseUnionRel ")
-    void deleteExpertiseUnionRelationShip(Long expertiseId,Long unionId);
 
 
 }

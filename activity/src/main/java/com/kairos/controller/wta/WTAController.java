@@ -42,7 +42,7 @@ public class WTAController {
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/wta")
     public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @Validated @RequestBody WTADTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta, true));
     }
 
     @ApiOperation(value = "Update WTA")
@@ -276,4 +276,10 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, genericIntegrationService.checkSchedulerLoadBalanceWorking());
     }
 */
+
+    @ApiOperation(value = "Create a New WTA at Organization")
+    @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL+ "/wta")
+    public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId, @Validated @RequestBody WTADTO wta) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(unitId, wta, false));
+    }
 }
