@@ -55,3 +55,11 @@ db.wtaBaseRuleTemplate.insert({
 
 
 
+    //TO Change the existing RelationShip
+
+    MATCH(expertise:Expertise)-[old:BELONGS_TO]-(sector:Sector)
+    create (expertise)-[new:BELONGS_TO_SECTOR]->(sector)
+    delete old
+
+
+
