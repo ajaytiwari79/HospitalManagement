@@ -89,10 +89,10 @@ public class PolicyAgreementTemplateController {
     }
 
 
-    @ApiOperation("get All  agreement Template linked with Clauses ")
+    @ApiOperation("get All Master agreement Template linked with Clause , country level ")
     @GetMapping(COUNTRY_URL+"/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryIdAndClauseId(countryId, clauseId));
+    public ResponseEntity<Object> getAllMasterAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(countryId, false,clauseId));
 
     }
 
@@ -149,6 +149,14 @@ public class PolicyAgreementTemplateController {
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable BigInteger agreementTemplateId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId,true, agreementTemplateId));
     }
+
+    @ApiOperation("get all agreement Template linked with clause , org level ")
+    @GetMapping(UNIT_URL+"/agreement_template/clause/{clauseId}")
+    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(unitId,true, clauseId));
+
+    }
+
 
 
 }

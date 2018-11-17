@@ -68,7 +68,7 @@ public class AgreementSectionDTO {
 
     public String getTitleHtml() {
         if (titleHtml == null) {
-            titleHtml = "<p>" + title + "</p>";
+            titleHtml = "<p>"+title+"</p>";
         }
         return titleHtml.trim();
     }

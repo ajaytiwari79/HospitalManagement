@@ -70,7 +70,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @return return object of basic policy agreement template.
      * @description this method creates a basic policy Agreement template with basic detail about organization type,
      * organizationSubTypes ,service Category and sub service Category.
-     *///todo done for both country and unit
+     */
     public <E extends AgreementTemplateDTO> E saveAgreementTemplate(Long referenceId, boolean isUnitId, E policyAgreementTemplateDto) {
 
         PolicyAgreementTemplate previousTemplate = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndName(referenceId, policyAgreementTemplateDto.getName())
@@ -109,7 +109,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param agreementTemplateId - Agreement Template id
      * @param coverPageLogo       - Agreement Cover page
      * @return -Url of image uploaded at S3 bucket
-     *///todo done for unit and country both
+     */
     public String uploadCoverPageLogo(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId, MultipartFile coverPageLogo) {
 
         PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndId(referenceId, agreementTemplateId) : policyAgreementTemplateRepository.findByCountryIdAndId(referenceId, agreementTemplateId);
@@ -240,12 +240,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     * @param countryId
+     * @param referenceId
      * @param clauseId
      * @description   - return list of Agreement Template Conatining clause in Section and Sub Sections
      * */
-    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByCountryIdAndClauseId(Long countryId, BigInteger clauseId) {
-        return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(countryId,false, clauseId);
+    public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId) {
+        return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(referenceId,isUnitId, clauseId);
     }
 
 

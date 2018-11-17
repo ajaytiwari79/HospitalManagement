@@ -60,9 +60,11 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     }
 
     @Override
-    public List<Clause> findClausesByTitle(Long countryId, List<String> clauseTitles) {
+    public List<Clause> findClauseByReferenceIdAndTitles(Long referenceId,boolean isUnitId, List<String> clauseTitles) {
+
+        Criteria criteria= isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles);
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").in(clauseTitles));
+        query.addCriteria(criteria);
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, Clause.class);

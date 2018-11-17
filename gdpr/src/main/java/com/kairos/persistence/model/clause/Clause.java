@@ -52,7 +52,12 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
-    public Clause(@NotBlank String title,@NotNull String description, @NotEmpty List<ClauseTag> tags) {
+    public Clause(@NotBlank String title, @NotNull String description) {
+        this.title = title;
+        this.description = description;
+    }
+
+    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags) {
         this.title = title;
         this.description = description;
         this.tags=tags;

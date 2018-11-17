@@ -62,11 +62,11 @@ public class AgreementSection extends MongoBaseEntity {
     public AgreementSection(){ }
 
 
-    public AgreementSection(Long countryId , @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex,boolean subSection)
+    public AgreementSection( @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex,boolean subSection,String titleHtml)
     {
         this.title=title;
-        this.countryId=countryId;
         this.orderedIndex=orderedIndex;
         this.subSection=subSection;
+        this.titleHtml=titleHtml;
     }
 }
