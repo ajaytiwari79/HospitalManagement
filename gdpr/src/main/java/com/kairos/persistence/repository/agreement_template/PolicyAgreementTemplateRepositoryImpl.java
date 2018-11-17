@@ -157,8 +157,9 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     }
 
     @Override
-    public Set<BigInteger> getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(Long countryId, BigInteger templateId, Set<BigInteger> clauseIds) {
+    public Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds) {
 
+        Criteria criteria = isUnitId ? Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(referenceId).and("_id").ne(templateId) : Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(referenceId).and("_id").ne(templateId);
 
         String addNonDeletedSubSection = "{  '$addFields':" +
                 "{'subSections':" +
@@ -175,7 +176,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         String groupOperation = "{ '$group' : { '_id' : '$_id' , 'clauseIds':{ '$addToSet' : '$clauseIds'}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and("_id").ne(templateId)),
+                match(criteria),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
                 new CustomAggregationOperation(Document.parse(replaceRoot)),
