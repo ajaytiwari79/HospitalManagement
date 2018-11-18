@@ -59,9 +59,9 @@ public class CountryCTAService extends MongoBaseService {
      * @param collectiveTimeAgreementDTO
      * @return
      */
-    public CollectiveTimeAgreementDTO createCostTimeAgreementInCountry(Long countryId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+    public CollectiveTimeAgreementDTO createCostTimeAgreementInCountry(Long countryId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO,boolean mapWithOrgType) {
         logger.info("saving CostTimeAgreement country {}", countryId);
-        boolean ctaValid = costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName());
+        boolean ctaValid = mapWithOrgType?costTimeAgreementRepository.isCTAExistWithSameOrgTypeAndSubType(collectiveTimeAgreementDTO.getOrganizationType().getId(),collectiveTimeAgreementDTO.getOrganizationSubType().getId(),collectiveTimeAgreementDTO.getName()):costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName());
         if (ctaValid) {
             exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
         }

@@ -42,7 +42,7 @@ public class WTAController {
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/wta")
     public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @Validated @RequestBody WTADTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta, true));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta, true,false));
     }
 
     @ApiOperation(value = "Update WTA")
@@ -64,16 +64,6 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.removeWta(wtaId));
     }
 
-//    /*
-//      *get all WTA by organizationId
-//      * Created by vipul on 9 august 2017
-//    */
-//
-//    @ApiOperation(value = "Get WTA by organization ID")
-//    @RequestMapping(value = COUNTRY_URL + "/wta/ByOrganization", method = RequestMethod.GET)
-//    public ResponseEntity<Map<String, Object>> getAllWTAByOrganizationId(@PathVariable long organizationId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationId(organizationId));
-//    }
 
     /*
      *get all WTA by countryId
@@ -280,6 +270,6 @@ public class WTAController {
     @ApiOperation(value = "Create a New WTA at Organization")
     @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL+ "/wta")
     public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId, @Validated @RequestBody WTADTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(unitId, wta, false));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(unitId, wta, false,false));
     }
 }
