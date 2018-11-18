@@ -5,6 +5,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.client.ClientStaffDTO;
@@ -1468,5 +1469,19 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId,@RequestBody OrganizationBasicDTO organizationBasicDTO) throws InterruptedException ,ExecutionException{
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unitService.onBoardOrganization(organizationBasicDTO,unitId));
+    }
+
+    @ApiOperation(value = "Get Filter For Organization Hierarchy ")
+    @PostMapping (PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy/filter")
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationByFilter(@PathVariable long organizationId,@RequestBody OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationHierarchyService.generateOrganizationHierarchyByFilter(organizationId,organizationHierarchyFilterDTO));
+    }
+
+    @ApiOperation(value = "Get Organization Hierarchy By Filter")
+    @GetMapping (PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy/filter_available")
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationByFilter(@PathVariable long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationHierarchyService.getOrganizationHierarchyFilters(organizationId));
     }
 }

@@ -231,14 +231,18 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             //organizationService Filter
             if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationServiceIds())) {
                 filterQuery = filterQuery + " Match(organizationService:OrganizationService)-[:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]-(" + SUB_ORGANIZATIONS + ") where id(organizationService) in {organizationServiceIds} ";
-                queryParameters.put("organizationServiceTypIds", organizationHierarchyFilterDTO.getOrganizationSubServiceIds());
+                queryParameters.put("organizationServiceIds", organizationHierarchyFilterDTO.getOrganizationServiceIds());
             }
             if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds())) {
                 filterQuery = filterQuery + " Match(organizationSubService:OrganizationService)-[:" + PROVIDE_SERVICE + "]-(" + SUB_ORGANIZATIONS + ") where id(organizationSubService) in {organizationSubServiceIds} ";
                 queryParameters.put("organizationSubServiceIds", organizationHierarchyFilterDTO.getOrganizationSubServiceIds());
             }
+            //Might Require
             /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationServiceIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds())) {
                 filterQuery = filterQuery + " Match(organizationService)-[:" + ORGANIZATION_SUB_SERVICE + "]-(organizationSubService) ";
+            }*/
+            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubTypeIds())) {
+                filterQuery = filterQuery + " Match(organizationSubService)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]-(organizationSubType)  ";
             }*/
             //accountType Filter
             if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationAccountTypeIds())) {

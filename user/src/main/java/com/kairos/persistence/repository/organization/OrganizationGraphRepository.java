@@ -756,4 +756,21 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "MATCH(sector:Sector) WHERE id(sector)={1} " +
             "CREATE UNIQUE (union)-[:HAS_SECTOR]-(sector)")
     void linkUnionSector(Long unionId,Long sectorId);
+
+
+    @Query("Match(parentOrg:Organization{isEnable:true,boardingCompleted: true}) where id(parentOrg)={0}\n" +
+            "Match (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
+            "Optional Match(parentOrganizatinType:OrganizationType)<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizatinType:OrganizationType)\n" +
+            "Optional Match(childOrganizatinType:OrganizationType)<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizatinType:OrganizationType)\n" +
+            "Optional Match(parentOrganizatinService:OrganizationService)<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizatinService:OrganizationService)\n" +
+            "Optional Match(childOrganizatinService:OrganizationService)<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizatinService:OrganizationService)\n" +
+            "Optional Match(parentAccountType:AccountType)<-[:HAS_ACCOUNT_TYPE]-(parentOrg)\n" +
+            "Optional Match(childAccountType:AccountType)<-[:HAS_ACCOUNT_TYPE]-(subOrg)\n" +
+            "return \n" +
+            "{organizationType:case when parentOrganizatinType is null then collect(distinct {id:id(childOrganizatinType),name:childOrganizatinType.name})  else collect(distinct {id:id(parentOrganizatinType),name:parentOrganizatinType.name})  end,\n" +
+            "organizationSubType:case when parentSubOrganizatinType is null then collect(distinct {id:id(childSubOrganizatinType),name:childSubOrganizatinType.name})  else collect(distinct {id:id(parentSubOrganizatinType),name:parentSubOrganizatinType.name})  end,\n" +
+            "organizationService:case when parentOrganizatinService is null then collect(distinct {id:id(childOrganizatinService),name:childOrganizatinService.name})  else collect(distinct {id:id(parentOrganizatinType),name:parentOrganizatinType.name})  end,\n" +
+            "organizationSubService:case when parentSubOrganizatinService is null then collect(distinct {id:id(childSubOrganizatinService),name:childSubOrganizatinService.name})  else collect(distinct {id:id(parentSubOrganizatinService),name:parentSubOrganizatinService.name})  end,\n" +
+            "accountType:case when parentAccountType is null then collect(distinct {id:id(childAccountType),name:childAccountType.name})  else collect(distinct {id:id(parentAccountType),name:parentAccountType.name})  end}")
+    Map<String,Object> getFiltersByParentOrganizationId(long parentOrganizationId);
 }

@@ -240,4 +240,11 @@ public class OrganizationHierarchyService {
         return treeStructureService.getTreeStructure(list);
     }
 
+    //======================================================================
+
+    public Map<String,Object> getOrganizationHierarchyFilters(long parentOrganizationId) {
+
+        return organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
+
+    }
 }
