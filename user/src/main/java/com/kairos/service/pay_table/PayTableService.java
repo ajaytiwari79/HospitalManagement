@@ -22,6 +22,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.utils.DateUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -190,7 +192,7 @@ public class PayTableService {
 
     // update basic detail of pay Table we are not making any copy as this time  as this does not impact any calculation
     public PayTableResponse updatePayTable(Long countryId, Long payTableId, PayTableUpdateDTO payTableDTO) {
-        PayTable payTable = payTableGraphRepository.findOne(payTableId);
+        PayTable payTable = payTableGraphRepository.findByIdAndDeletedFalse(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
@@ -529,6 +531,20 @@ public class PayTableService {
 
         return payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
+    }
+
+    public boolean updateAmountRelatedToPayTable(BigDecimal percentagesToUpdate, Long payTableId ){
+        PayTable payTable=payTableGraphRepository.findByIdAndDeletedFalse(payTableId);
+        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips=payTableRelationShipGraphRepository.findAllByPayTableId(payTableId);
+        if(CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)){
+            for(PayGradePayGroupAreaRelationShip current: payGradePayGroupAreaRelationShips)
+            {
+                if(current.getPayGroupAreaAmount()!=null){
+                    current.setPayGroupAreaAmount(current.getPayGroupAreaAmount().multiply(percentagesToUpdate).divide(new BigDecimal("100")));
+                }
+            }
+        }
+        return true;
     }
 
 
