@@ -253,7 +253,7 @@ public class AttendanceSettingService extends MongoBaseService {
         return glidTimeInterval.contains(DateUtils.getCurrentMillistByTimeZone(timeZone));
     }
 
-    public void createShiftState(List<Shift> shifts,boolean checkIn,List<AttendanceSetting> attendanceSettings){
+    private void createShiftState(List<Shift> shifts,boolean checkIn,List<AttendanceSetting> attendanceSettings){
         List<ShiftState> realtimeShiftStates;
         List<ShiftState> timeAndAttendanceShiftStates=null;
        Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
@@ -277,7 +277,7 @@ public class AttendanceSettingService extends MongoBaseService {
      }
     }
 
-    public ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,List<AttendanceSetting> attendanceSetting){
+    private ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,List<AttendanceSetting> attendanceSetting){
         realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
         realtimeShiftState.setId(null);
         realtimeShiftState.setShiftId(shift.getId());
@@ -286,7 +286,7 @@ public class AttendanceSettingService extends MongoBaseService {
         return realtimeShiftState;
     }
 
-    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<AttendanceSetting> attendanceSetting){
+    private List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<AttendanceSetting> attendanceSetting){
         timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndActualPhase(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),AppConstants.TIME_AND_ATTENDANCE);
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=timeAndAttendanceShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
