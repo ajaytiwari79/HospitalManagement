@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
@@ -99,9 +100,9 @@ public class PayTableController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
     }
 
-    @PutMapping(value = "/update_pay_table_amount/{payTableId}")
-    public ResponseEntity<Map<String,Object>> updatePayTableAmount(@PathVariable @NotNull Long payTableId, @RequestParam @NotNull Float percentagesToUpdate){
-       return ResponseHandler.generateResponse(HttpStatus.OK,true,payTableService.updateAmountRelatedToPayTable(percentagesToUpdate,payTableId));
+    @PutMapping(value = "/pay_table/{payTableId}/amount")
+    public ResponseEntity<Map<String,Object>> updatePayTableAmount(@PathVariable @NotNull Long payTableId,PayTableDTO payTableDTO){
+       return ResponseHandler.generateResponse(HttpStatus.OK,true,payTableService.updateAmountRelatedToPayTable(payTableId,payTableDTO));
     }
 
 }

@@ -253,13 +253,13 @@ public class PayTableService {
         if (!payTable.isPublished()) {
             payGradesData.add(addPayGradeInCurrentPayTable(payTable, payGradeDTO));
         } else {
-            payGradesData = createCopyOfPayTableAndAddPayGrade(payTable, payGradeDTO);
+            payGradesData = createCopyOfPayTableAndAddPayGrade(payTable, payGradeDTO,null,false);
         }
         return payGradesData;
 
     }
 
-    private List<PayGradeResponse> createCopyOfPayTableAndAddPayGrade(PayTable payTable, PayGradeDTO payGradeDTO) {
+    private List<PayGradeResponse> createCopyOfPayTableAndAddPayGrade(PayTable payTable, PayGradeDTO payGradeDTO,List<PayGradePayGroupAreaRelationShip> payGradesPayGroupAreaRelationShips,boolean updateValues) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         PayTable copiedPayTable = new PayTable();
         BeanUtils.copyProperties(payTable, copiedPayTable);
@@ -274,13 +274,17 @@ public class PayTableService {
         List<PayGrade> payGradesObjects = new ArrayList<>();
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
-            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
-            HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
-            payTableMatrix.forEach(currentObj -> {
-                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                        = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
-                payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
-            });
+            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips=payGradesPayGroupAreaRelationShips==null?new ArrayList<>():payGradesPayGroupAreaRelationShips ;
+            if(!updateValues){
+                HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
+
+                payTableMatrix.forEach(currentObj -> {
+                    PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
+                            = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
+                    payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
+                });
+            }
+
             payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
             payGradesObjects.add(newPayGrade);
             PayGradeResponse payGradeResponse =
@@ -533,17 +537,22 @@ public class PayTableService {
 
     }
 
-    public boolean updateAmountRelatedToPayTable(BigDecimal percentagesToUpdate, Long payTableId ){
+    public boolean updateAmountRelatedToPayTable(Long payTableId , PayTableDTO payTableDTO){
+        if(payTableDTO.getPercentageValue()==null){
+            exceptionService.actionNotPermittedException("exception.null.percentageValue");
+        }
         PayTable payTable=payTableGraphRepository.findByIdAndDeletedFalse(payTableId);
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips=payTableRelationShipGraphRepository.findAllByPayTableId(payTableId);
         if(CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)){
             for(PayGradePayGroupAreaRelationShip current: payGradePayGroupAreaRelationShips)
             {
                 if(current.getPayGroupAreaAmount()!=null){
-                    current.setPayGroupAreaAmount(current.getPayGroupAreaAmount().multiply(percentagesToUpdate).divide(new BigDecimal("100")));
+                    current.setPayGroupAreaAmount(current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal("100")));
+                    current.setId(null);
                 }
             }
         }
+        createCopyOfPayTableAndAddPayGrade(payTable,null,payGradePayGroupAreaRelationShips,true);
         return true;
     }
 
