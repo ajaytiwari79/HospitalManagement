@@ -41,6 +41,11 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " appliedFunctions as appliedFunctions")
     UnitPositionQueryResult getUnitPositionById(Long unitPositionId,String shiftDate);
 
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
+            "optional MATCH (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
+            "WITH unitPosition,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions "+
+            " RETURN  id(unitPosition) as id , appliedFunctions as appliedFunctions")
+    UnitPositionQueryResult findAppliedFunctionsAtUnitPosition(Long unitPositionId,String shiftDate);
 
     @Query("MATCH(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
             "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
