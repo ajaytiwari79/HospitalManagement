@@ -57,7 +57,7 @@ public class ClauseTagService extends MongoBaseService {
 
 
     public List<ClauseTag> getAllClauseTagByCountryId(Long countryId) {
-        return clauseTagMongoRepository.findAllClauseTagByCountryId(countryId);
+        return clauseTagMongoRepository.findAllByCountryId(countryId);
     }
 
     public List<ClauseTag> getAllClauseTagByUnitId(Long unitId) {

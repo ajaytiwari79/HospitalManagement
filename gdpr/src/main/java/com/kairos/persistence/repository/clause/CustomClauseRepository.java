@@ -33,4 +33,6 @@ public interface CustomClauseRepository {
 
     ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id);
 
+    List<Clause> getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
+
 }
