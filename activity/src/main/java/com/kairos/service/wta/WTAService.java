@@ -186,8 +186,6 @@ public class WTAService extends MongoBaseService {
                 wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
                 if (creatingFromCountry) {
                     workingTimeAgreement.setCountryParentWTA(wta.getId());
-                    workingTimeAgreement.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(),wtaBasicDetailsDTO.getOrganizationType().getName(),wtaBasicDetailsDTO.getOrganizationType().getDescription()));
-                    workingTimeAgreement.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(),wtaBasicDetailsDTO.getOrganizationSubType().getName(),wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
                 }
                 workingTimeAgreement.setDisabled(false);
                 if (wtadto.getRuleTemplates().size() > 0) {
@@ -201,6 +199,8 @@ public class WTAService extends MongoBaseService {
                 }
 
                 workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
+                workingTimeAgreement.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(),wtaBasicDetailsDTO.getOrganizationType().getName(),wtaBasicDetailsDTO.getOrganizationType().getDescription()));
+                workingTimeAgreement.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(),wtaBasicDetailsDTO.getOrganizationSubType().getName(),wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
                 workingTimeAgreements.add(workingTimeAgreement);
             }
         });
