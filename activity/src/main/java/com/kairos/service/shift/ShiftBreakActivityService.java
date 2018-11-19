@@ -136,11 +136,10 @@ public class ShiftBreakActivityService {
             }
             if (breakAvailability.getStartAfterMinutes() == 0) { // this means no start restriction is set, so we are adding the break at start
                 workedShiftDuration = workedShiftDuration + (breakSettings.get(0).getShiftDurationInMinute() / 2);
-                currentlyAllottedDurationInMinute=workedShiftDuration;
             } else {
                 workedShiftDuration = workedShiftDuration + breakAvailability.getStartAfterMinutes();
-                currentlyAllottedDurationInMinute=workedShiftDuration;
             }
+            currentlyAllottedDurationInMinute=workedShiftDuration;
             endDateMillis = startDateMillis + (workedShiftDuration * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis), false));
             shiftDurationInMinute -= workedShiftDuration;
