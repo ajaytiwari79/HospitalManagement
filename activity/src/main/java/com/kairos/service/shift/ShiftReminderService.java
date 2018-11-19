@@ -59,13 +59,13 @@ public class ShiftReminderService extends MongoBaseService {
 
     public void updateReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
         // TODO Find better approach
-        List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
+        /*List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         deleteReminderTrigger(jobIds, shift.getUnitId());
-        setReminderTrigger(activityWrapperMap, shift);
+        setReminderTrigger(activityWrapperMap, shift);*/
     }
 
     public void setReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
-        List<SchedulerPanelDTO> scheduledJobs = new ArrayList<>(shift.getActivities().size());
+        /*List<SchedulerPanelDTO> scheduledJobs = new ArrayList<>(shift.getActivities().size());
         shift.getActivities().forEach(currentShift -> {
             if (!currentShift.isBreakShift() && activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().isAllowCommunicationReminder()
                     && !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
@@ -83,7 +83,7 @@ public class ShiftReminderService extends MongoBaseService {
                     (scheduledJobs, shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
                     });
             //save(shift);
-        }
+        }*/
     }
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
