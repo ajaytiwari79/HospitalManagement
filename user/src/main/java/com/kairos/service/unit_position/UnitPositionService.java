@@ -71,6 +71,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.staff.EmploymentService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateUtil;
 import com.kairos.wrapper.PositionWrapper;
@@ -177,6 +178,8 @@ public class UnitPositionService {
     private AsynchronousService asynchronousService;
     @Inject
     private UnitPositionLineFunctionRelationShipGraphRepository positionLineFunctionRelationRepository;
+    @Inject private StaffRetrievalService staffRetrievalService;
+
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException, Exception {
         Organization organization = organizationService.getOrganizationDetail(id, type);
@@ -1118,8 +1121,9 @@ public class UnitPositionService {
         } else if (unitPositionFunctionRelationship) {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
-       // StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION);
-       // activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
+        Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString),staffId , unitPositionId, unitId, ORGANIZATION);
+        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
         return true;
     }
 
