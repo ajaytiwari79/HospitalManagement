@@ -80,7 +80,12 @@ public class CountryCTAService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement,CollectiveTimeAgreementDTO.class);
     }
 
-    public CollectiveTimeAgreementDTO createCostTimeAgreementInOrganization(Long organizationId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+    public CollectiveTimeAgreementDTO createCostTimeAgreementInOrganization(Long unitId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+
+        boolean ctaExistInOrganization = costTimeAgreementRepository.isCTAExistWithSameNameInOrganization(unitId, collectiveTimeAgreementDTO.getName());
+        if (ctaExistInOrganization) {
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+        }
 
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
