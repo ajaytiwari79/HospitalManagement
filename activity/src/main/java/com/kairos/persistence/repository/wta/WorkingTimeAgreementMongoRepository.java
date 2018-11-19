@@ -31,7 +31,7 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     boolean isWTAExistWithSameOrgTypeAndSubType(Long orgType,Long orgSubType, String name);
 
     @Query(value = "{name:?1,deleted:false,disabled:false,'organization._id':{$in:?0}}")
-    List<WorkingTimeAgreement> findWTAByUnitIdAndOrgTypeAndName(List<Long> organizationIds,String name);
+    List<WorkingTimeAgreement> findWTAByUnitIdsAndName(List<Long> organizationIds, String name);
     
 
 }
