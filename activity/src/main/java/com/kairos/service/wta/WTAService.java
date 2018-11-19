@@ -177,7 +177,7 @@ public class WTAService extends MongoBaseService {
     private void assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
         List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(o -> o.getId()).collect(Collectors.toList());
-        List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdAndOrgTypeAndName(organizationIds, wtadto.getName());
+        List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdsAndName(organizationIds, wtadto.getName());
         Map<String, WorkingTimeAgreement> workingTimeAgreementMap = workingTimeAgreementList.stream().collect(Collectors.toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v));
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
@@ -188,7 +188,7 @@ public class WTAService extends MongoBaseService {
                     workingTimeAgreement.setCountryParentWTA(wta.getId());
                 }
                 workingTimeAgreement.setDisabled(false);
-                if (wtadto.getRuleTemplates().size() > 0) {
+                if (CollectionUtils.isNotEmpty(wtadto.getRuleTemplates())) {
                     List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
                     ruleTemplates.forEach(wtaBaseRuleTemplate -> {
                         wtaBaseRuleTemplate.setCountryId(null);
@@ -348,7 +348,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId,long countryId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationSubType(organizationSubTypeId,countryId);
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationSubTypeIdAndCountryId(organizationSubTypeId,countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
             wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
