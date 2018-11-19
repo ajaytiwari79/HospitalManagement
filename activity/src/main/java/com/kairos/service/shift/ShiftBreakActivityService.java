@@ -164,7 +164,7 @@ public class ShiftBreakActivityService {
                     if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
 
                         endDateMillis = startDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                        shifts.add(++itemsAddedFromBeginning, getShiftObject("BREAK", new BigInteger("2"), new Date(startDateMillis), new Date(endDateMillis), true));
+                        shifts.add(++itemsAddedFromBeginning, getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true));
                         shiftDurationInMinute -=  allowedBreakDurationInMinute;
                         startDateMillis=endDateMillis;
                         lastBreakEndedOnInMillis=endDateMillis;
@@ -192,7 +192,7 @@ public class ShiftBreakActivityService {
                         if (gapBetweenBothBreaks<breakWTATemplate.getBreakGapMinutes()){
                             // function reduce shift
 
-                            System.out.println("GAP is not sufficient as required ");
+                            logger.info("GAP is not sufficient as required ");
                         }
                         endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                         shifts.add(++itemsAddedFromBeginning,getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true));
