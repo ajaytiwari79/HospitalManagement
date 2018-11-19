@@ -98,8 +98,8 @@ public class WTAController {
 
     @ApiOperation(value = "Get WTA by Organization sub type  by using sub type Id")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/organization_type/{organizationSubTypeId}/wta/OrganizationSubType", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getAllWTAByOrganizationSubType(@PathVariable long organizationSubTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(organizationSubTypeId));
+    public ResponseEntity<Map<String, Object>> getAllWTAByOrganizationSubType(@PathVariable long countryId,@PathVariable long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(organizationSubTypeId,countryId));
     }
 
     /**

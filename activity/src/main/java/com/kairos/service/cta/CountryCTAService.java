@@ -1,5 +1,6 @@
 package com.kairos.service.cta;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
@@ -31,10 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.CTA_BASIC_INFO;
@@ -149,10 +147,13 @@ public class CountryCTAService extends MongoBaseService {
         HashMap<Long, HashMap<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds,organizationIds);
         List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(organizationIds.size());
         costTimeAgreement.setCountryId(null);
+        List<CostTimeAgreement> costTimeAgreementList=costTimeAgreementRepository.findCTAByUnitIdAndOrgTypeAndName(organizationIds,collectiveTimeAgreementDTO.getName());
+        Map<String,CostTimeAgreement> costTimeAgreementMap = costTimeAgreementList.stream().collect(Collectors.toMap(k->k.getName()+"_"+k.getOrganization().getId()+"_"+k.getOrganizationType().getId(),v->v, (previous, current) -> previous));
         ctaBasicDetailsDTO.getOrganizations().forEach(organization ->{
-                CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(costTimeAgreement,collectiveTimeAgreementDTO, unitActivities.get(organization.getId()),ctaBasicDetailsDTO,organization);
-                costTimeAgreements.add(newCostTimeAgreement);
-
+                    if(costTimeAgreementMap.get(collectiveTimeAgreementDTO.getName()+"_"+organization.getId()+"_"+costTimeAgreement.getOrganizationType().getId())==null){
+                        CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(costTimeAgreement,collectiveTimeAgreementDTO, unitActivities.get(organization.getId()),ctaBasicDetailsDTO,organization);
+                        costTimeAgreements.add(newCostTimeAgreement);
+                    }
         });
         if(!costTimeAgreements.isEmpty()) {
             save(costTimeAgreements);
