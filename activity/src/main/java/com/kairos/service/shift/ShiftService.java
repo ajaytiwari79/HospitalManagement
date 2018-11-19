@@ -377,7 +377,7 @@ public class ShiftService extends MongoBaseService {
         }
         shiftMongoRepository.save(shift);
         if(!updateShift) {
-//            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
         }
     }
 
