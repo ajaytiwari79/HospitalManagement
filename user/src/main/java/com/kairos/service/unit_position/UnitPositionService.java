@@ -1124,8 +1124,12 @@ public class UnitPositionService {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString),staffId , unitPositionId, unitId, ORGANIZATION);
+=======
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION);
+>>>>>>> 5a21fbf... fixed uncommented code
 =======
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION);
 >>>>>>> 5a21fbf... fixed uncommented code
