@@ -128,6 +128,8 @@ public class UnitPositionService {
     @Inject
     private StaffService staffService;
     @Inject
+    private StaffRetrievalService staffRetrievalService;
+    @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
     private OrganizationService organizationService;
@@ -178,7 +180,7 @@ public class UnitPositionService {
     private AsynchronousService asynchronousService;
     @Inject
     private UnitPositionLineFunctionRelationShipGraphRepository positionLineFunctionRelationRepository;
-    @Inject private StaffRetrievalService staffRetrievalService;
+
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException, Exception {
