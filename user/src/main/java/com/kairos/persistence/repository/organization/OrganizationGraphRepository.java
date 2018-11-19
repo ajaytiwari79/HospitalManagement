@@ -760,12 +760,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("Match(parentOrg:Organization{isEnable:true,boardingCompleted: true}) where id(parentOrg)={0}\n" +
             "Match (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
-            "Optional Match(parentOrganizatinType:OrganizationType)<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizatinType:OrganizationType)\n" +
-            "Optional Match(childOrganizatinType:OrganizationType)<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizatinType:OrganizationType)\n" +
-            "Optional Match(parentOrganizatinService:OrganizationService)<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizatinService:OrganizationService)\n" +
-            "Optional Match(childOrganizatinService:OrganizationService)<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizatinService:OrganizationService)\n" +
-            "Optional Match(parentAccountType:AccountType)<-[:HAS_ACCOUNT_TYPE]-(parentOrg)\n" +
-            "Optional Match(childAccountType:AccountType)<-[:HAS_ACCOUNT_TYPE]-(subOrg)\n" +
+            "Optional Match(parentOrganizatinType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizatinType:OrganizationType{deleted:false})\n" +
+            "Optional Match(childOrganizatinType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizatinType:OrganizationType{deleted:false})\n" +
+            "Optional Match(parentOrganizatinService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizatinService:OrganizationService{deleted:false})\n" +
+            "Optional Match(childOrganizatinService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizatinService:OrganizationService{deleted:false})\n" +
+            "Optional Match(parentAccountType:AccountType{deleted:false})<-[:HAS_ACCOUNT_TYPE]-(parentOrg)\n" +
+            "Optional Match(childAccountType:AccountType{deleted:false})<-[:HAS_ACCOUNT_TYPE]-(subOrg)\n" +
             "return \n" +
             "{organizationType:case when parentOrganizatinType is null then collect(distinct {id:id(childOrganizatinType),name:childOrganizatinType.name})  else collect(distinct {id:id(parentOrganizatinType),name:parentOrganizatinType.name})  end,\n" +
             "organizationSubType:case when parentSubOrganizatinType is null then collect(distinct {id:id(childSubOrganizatinType),name:childSubOrganizatinType.name})  else collect(distinct {id:id(parentSubOrganizatinType),name:parentSubOrganizatinType.name})  end,\n" +
