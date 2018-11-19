@@ -100,7 +100,7 @@ public class SchedulerPanelService extends MongoBaseService {
     public List<SchedulerPanelDTO> createSchedulerPanel(long unitId, List<SchedulerPanelDTO> schedulerPanelDTOs) {
 
         //logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
-
+        String timezone=null;
         if(schedulerPanelDTOs.isEmpty()) {
             exceptionService.invalidRequestException("request.invalid");
         }
@@ -143,11 +143,12 @@ public class SchedulerPanelService extends MongoBaseService {
             //dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
 
             schedulerPanels.add(schedulerPanel);
+            timezone=schedulerPanelDTO.getTimezone();
         }
         save(schedulerPanels);
-        String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
-
-        schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone));
+        timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
+        String defalutTimezone=timezone;
+        schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,defalutTimezone));
         for(SchedulerPanel schedulerPanel:schedulerPanels) {
             dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
         }
