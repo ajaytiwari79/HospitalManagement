@@ -176,27 +176,33 @@ public class WTAService extends MongoBaseService {
 
     private void assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
-
+        List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(o -> o.getId()).collect(Collectors.toList());
+        List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdAndOrgTypeAndName(organizationIds, wtadto.getName());
+        Map<String, WorkingTimeAgreement> workingTimeAgreementMap = workingTimeAgreementList.stream().collect(Collectors.toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v));
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
-            WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
-            wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
-            if (creatingFromCountry) {
-                workingTimeAgreement.setCountryParentWTA(wta.getId());
-            }
-            workingTimeAgreement.setDisabled(false);
-            if (wtadto.getRuleTemplates().size() > 0) {
-                List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
-                ruleTemplates.forEach(wtaBaseRuleTemplate -> {
-                    wtaBaseRuleTemplate.setCountryId(null);
-                });
-                save(ruleTemplates);
-                List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
-                workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
-            }
+            if (workingTimeAgreementMap.get(wtadto.getName() + "_" + organization.getId() + "_" + wta.getOrganizationType().getId()) == null) {
+                WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
+                wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
+                if (creatingFromCountry) {
+                    workingTimeAgreement.setCountryParentWTA(wta.getId());
+                    workingTimeAgreement.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(),wtaBasicDetailsDTO.getOrganizationType().getName(),wtaBasicDetailsDTO.getOrganizationType().getDescription()));
+                    workingTimeAgreement.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(),wtaBasicDetailsDTO.getOrganizationSubType().getName(),wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
+                }
+                workingTimeAgreement.setDisabled(false);
+                if (wtadto.getRuleTemplates().size() > 0) {
+                    List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
+                    ruleTemplates.forEach(wtaBaseRuleTemplate -> {
+                        wtaBaseRuleTemplate.setCountryId(null);
+                    });
+                    save(ruleTemplates);
+                    List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
+                    workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
+                }
 
-            workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
-            workingTimeAgreements.add(workingTimeAgreement);
+                workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
+                workingTimeAgreements.add(workingTimeAgreement);
+            }
         });
         if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);
@@ -341,8 +347,8 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTOS;
     }
 
-    public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationSubType(organizationSubTypeId);
+    public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId,long countryId) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationSubType(organizationSubTypeId,countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
             wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
@@ -403,7 +409,7 @@ public class WTAService extends MongoBaseService {
 //            wtaBuilderService.copyRuleTemplateToNewWTA(wta, newWtaObject);
 //            save(newWtaObject);
             List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateGraphRepository.findAllByIdIn(wta.getRuleTemplateIds());
-            WTADTO wtadto = new WTADTO(COPY_OF+wta.getName(), wta.getDescription(), wta.getExpertise().getId(), wta.getStartDate().getTime(),wta.getEndDate()==null?null: wta.getEndDate().getTime(), wtaBaseRuleTemplates, wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getId());
+            WTADTO wtadto = new WTADTO(COPY_OF + wta.getName(), wta.getDescription(), wta.getExpertise().getId(), wta.getStartDate().getTime(), wta.getEndDate() == null ? null : wta.getEndDate().getTime(), wtaBaseRuleTemplates, wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getId());
             WTAResponseDTO wtaResponseDTO = createWta(wta.getCountryId(), wtadto, true, true);
 //            WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wta.getId());
 //            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
