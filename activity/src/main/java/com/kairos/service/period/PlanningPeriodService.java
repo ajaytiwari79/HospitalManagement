@@ -669,16 +669,16 @@ public class PlanningPeriodService extends MongoBaseService {
         Map<Long, Map<LocalDate,Long>> unitPositionIdWithShiftDateFunctionIdMap = new HashMap<>();
         if(CollectionUtils.isNotEmpty(shiftStates)){
             for(ShiftState shiftState:shiftStates){
-                Map<LocalDate,Long> dateWithApplicableFunctionId=unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shiftState.getUnitPositionId(),new HashMap<LocalDate,Long>());
-                dateWithApplicableFunctionId.put(DateUtils.asLocalDate(shiftState.getStartDate()),shiftState.getFunctionId());
-                unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shiftState.getUnitPositionId(),dateWithApplicableFunctionId);
+                Map<LocalDate,Long> dateFunctionId=unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shiftState.getUnitPositionId(),new HashMap<LocalDate,Long>());
+                dateFunctionId.put(DateUtils.asLocalDate(shiftState.getStartDate()),shiftState.getFunctionId());
+                unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shiftState.getUnitPositionId(),dateFunctionId);
             }
         }
         if(CollectionUtils.isNotEmpty(currentPhaseShifts)) {
             for (Shift shift : currentPhaseShifts) {
-                Map<LocalDate, Long> dateWithApplicableFunctionId = unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shift.getUnitPositionId(), new HashMap<LocalDate, Long>());
-                dateWithApplicableFunctionId.put(DateUtils.asLocalDate(shift.getStartDate()), null);
-                unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shift.getUnitPositionId(), dateWithApplicableFunctionId);
+                Map<LocalDate, Long> dateFunctionId = unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shift.getUnitPositionId(), new HashMap<LocalDate, Long>());
+                dateFunctionId.put(DateUtils.asLocalDate(shift.getStartDate()), null);
+                unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shift.getUnitPositionId(), dateFunctionId);
 
             }
         }
