@@ -9,16 +9,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.APPLIED_FUNCTION;
+
 /**
  * Created by oodles on 5/6/18.
  */
 @Repository
 public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRepository<UnitPositionFunctionRelationship, Long> {
 
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION]->(function:Function) where id(unitPosition) = {0} AND id(function)={1} AND {2} IN rel.appliedDates  \n" +
+    @Query("MATCH (unitPosition:UnitPosition)-[rel:"+APPLIED_FUNCTION+"]->(function:Function) where id(unitPosition) = {0}  AND {2} IN rel.appliedDates  \n" +
             "with unitPosition, function, count(rel.appliedDates) as dateCount \n" +
             "return case when dateCount > 0 then true else false end as result")
-    Boolean getUnitPositionFunctionRelationshipByUnitPositionAndFunction(Long unitPositionId, Long functionId, String localDate);
+    Boolean getUnitPositionFunctionRelationshipByUnitPositionAndFunction(Long unitPositionId, String localDate);
 
     @Query("MATCH (unitPosition:UnitPosition)  where id(unitPosition) = {0} \n" +
             "match (function:Function) where id(function)={1}\n" +
