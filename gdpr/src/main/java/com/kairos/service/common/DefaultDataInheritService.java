@@ -284,7 +284,7 @@ public class DefaultDataInheritService extends MongoBaseService {
     private void copyClauseFromCountry(Long unitId, List<Clause> clauses) {
         if (CollectionUtils.isNotEmpty(clauses)) {
 
-            Map<BigInteger, ClauseTag> bigIntegerClauseTagMap = new HashMap<>();
+            Set<BigInteger> clauseTagIds = new HashSet<>();
             List<ClauseTag> clauseTags = new ArrayList<>();
             List<Clause> clauseList = new ArrayList<>();
             clauses.forEach(clauseResponse -> {
@@ -292,11 +292,11 @@ public class DefaultDataInheritService extends MongoBaseService {
                 clause.setOrganizationId(unitId);
                 List<ClauseTag> tags = new ArrayList<>();
                 clauseResponse.getTags().forEach(clauseTag -> {
-                    if (!bigIntegerClauseTagMap.containsKey(clauseTag.getId())) {
+                    if (!clauseTagIds.contains(clauseTag.getId())) {
                         ClauseTag tag = new ClauseTag(clauseTag.getName());
                         tag.setOrganizationId(unitId);
                         tag.setDefaultTag(clauseTag.isDefaultTag());
-                        bigIntegerClauseTagMap.put(clauseTag.getId(), clauseTag);
+                        clauseTagIds.add(clauseTag.getId());
                         tags.add(clauseTag);
                     }
                 });
