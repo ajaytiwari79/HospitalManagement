@@ -158,4 +158,11 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
+    //=======================================================================================
+
+    @ApiOperation(value = "get UnitPositions Per Staff")
+    @GetMapping(value = "/getStaffUnitPositions/{staffId}")
+    public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,@RequestParam boolean withLinkedOrganizations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(staffId, unitId,withLinkedOrganizations));
+    }
 }

@@ -313,6 +313,19 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "RETURN id(positionLine) as id,  CASE WHEN functionalPayment.paymentUnit='MONTHLY' THEN hourlyCost*12   ELSE hourlyCost END as hourlyCost ")
     List<UnitPositionLinesQueryResult> findFunctionalHourlyCost(List<Long> unitPositionIds);
 
-
+//====================================================
+@Query("OPTIONAL MATCH (organization:Organization)  where id(organization)={0}\n" +
+        "OPTIONAL MATCH (staff:Staff)  where id(staff)={1}\n" +
+        "OPTIONAL MATCH(organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:BELONGS_TO]-(staff)\n" +
+        "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true}) \n" +
+        "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode)" +
+        "RETURN \n" +
+        "CASE \n" +
+        "WHEN organization IS NULL THEN \"org\" \n" +
+        "WHEN staff IS NULL THEN \"staff\"\n" +
+        "WHEN employment IS NULL THEN  \"emp\" \n" +
+        "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
+        "ELSE collect({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
+        Object getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
 }
