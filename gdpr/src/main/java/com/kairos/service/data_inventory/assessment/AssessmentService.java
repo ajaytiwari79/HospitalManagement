@@ -408,8 +408,6 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
-    //todo modifying method
-
     /**
      * @param unitId
      * @param assessmentId
@@ -486,7 +484,7 @@ public class AssessmentService extends MongoBaseService {
     /**
      * @param unitId
      * @return
-     *///todo add message here
+     */
     public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentOfCurrentLoginUser(Long unitId) {
 
         Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -662,10 +660,11 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(objectToCast).isPresent()) {
             if (objectToCast instanceof ArrayList) {
                 List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
+                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("id"))));
             } else {
                 LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-                entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+                entityIdList.add(new BigInteger((String) entityKeyValueMap.get("id")));
+
             }
         }
         return entityIdList;
