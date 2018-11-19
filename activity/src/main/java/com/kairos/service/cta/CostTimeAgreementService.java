@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.enums.cta.CalculateValueType.FIXED_VALUE;
 import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
@@ -492,11 +493,10 @@ public class CostTimeAgreementService extends MongoBaseService {
     public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) {
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO1 = null;
         if (checked) {
-            CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(ctaId);
-            String name = collectiveTimeAgreementDTO.getName() + "_for_" + ctaResponseDTO.getOrganizationSubType().getName();
+            String name = COPY_OF+collectiveTimeAgreementDTO.getName();
             collectiveTimeAgreementDTO.setName(name);
             collectiveTimeAgreementDTO.setOrganizationSubType(new OrganizationTypeDTO(organizationSubTypeId));
-            collectiveTimeAgreementDTO1 = countryCTAService.createCostTimeAgreementInCountry(countryId, collectiveTimeAgreementDTO);
+            collectiveTimeAgreementDTO1 = countryCTAService.createCostTimeAgreementInCountry(countryId, collectiveTimeAgreementDTO,true);
         } else {
             CostTimeAgreement cta = costTimeAgreementRepository.getCTAByIdAndOrganizationSubTypeAndCountryId(organizationSubTypeId, countryId, ctaId);
             if (!Optional.ofNullable(cta).isPresent())
