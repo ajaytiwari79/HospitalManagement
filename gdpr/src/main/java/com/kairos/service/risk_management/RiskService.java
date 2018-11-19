@@ -126,9 +126,10 @@ public class RiskService extends MongoBaseService {
         for (E riskDTO : riskDTOS) {
             OrganizationLevelRiskDTO organizationLevelRiskDTO = (OrganizationLevelRiskDTO) riskDTO;
             Risk risk = new Risk(organizationLevelRiskDTO.getName(), organizationLevelRiskDTO.getDescription(),
-                    organizationLevelRiskDTO.getRiskRecommendation(), organizationLevelRiskDTO.getRiskLevel(), organizationLevelRiskDTO.getDueDate());
+                    organizationLevelRiskDTO.getRiskRecommendation(), organizationLevelRiskDTO.getRiskLevel());
+            risk.setReminderActive(organizationLevelRiskDTO.isReminderActive());
+            risk.setDaysToReminderBefore(organizationLevelRiskDTO.getDaysToReminderBefore());
             risk.setOrganizationId(unitId);
-            risk.setRiskOwner(organizationLevelRiskDTO.getRiskOwner());
             riskList.add(risk);
         }
         return riskList;
