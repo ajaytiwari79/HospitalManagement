@@ -17,7 +17,7 @@ public interface ClauseTagMongoRepository extends MongoBaseRepository<ClauseTag,
     ClauseTag findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<ClauseTag> findAllClauseTagByCountryId(Long countryId);
+    List<ClauseTag> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,organizationId:?0}")
     List<ClauseTag> findAllClauseTagByUnitId(Long unitId);
