@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.config.codec.BigIntegerCodecProvider;
 import com.kairos.config.codec.BigIntegerTransformer;
+import com.kairos.utils.user_context.UserContext;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -29,7 +30,9 @@ import org.springframework.core.annotation.Order;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -39,7 +42,6 @@ public class JaversMongoConfig {
 
     @Inject
     private EnvConfig environment;
-
 
 
     @Bean
@@ -63,7 +65,7 @@ public class JaversMongoConfig {
         MongoClientOptions.Builder builder = MongoClientOptions.builder()
                 .codecRegistry(codecRegistry);
         final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(), environment.getDataBaseName(), environment.getMongoPassword().toCharArray()));
-        return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList,builder.build());
+        return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList, builder.build());
 
     }
 
@@ -85,10 +87,9 @@ public class JaversMongoConfig {
 
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return () -> ImmutableMap.of("key", "ok");
+        String userName = UserContext.getUserDetails().getFirstName() + UserContext.getUserDetails().getLastName();
+        return () -> ImmutableMap.of("userName", userName);
     }
-
-
 
 
 }
