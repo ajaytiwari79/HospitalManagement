@@ -11,12 +11,10 @@ public class SpringSecurityAuthorProviderConfig implements AuthorProvider {
     @Override
     public String provide() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userName = UserContext.getUserDetails().getFirstName() + " " + UserContext.getUserDetails().getLastName();
-
         if (auth == null) {
             return "unauthenticated";
         }
-
+        String userName = UserContext.getUserDetails().getFirstName() + " " + UserContext.getUserDetails().getLastName();
         return auth.getName() + "(" + userName + ")";
     }
 
