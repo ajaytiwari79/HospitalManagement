@@ -60,7 +60,7 @@ public class BreakSettingsService extends MongoBaseService {
         parentIds.addAll(childTimeType.stream().map(TimeType::getId).collect(Collectors.toList()));
         List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);
 
-        List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
+        List<BreakSettingsDTO> breakSettings = getBreakSettingsByExpertiseId(expertiseId);
         // TODO VIPUL FIX
         /*UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
@@ -94,6 +94,8 @@ public class BreakSettingsService extends MongoBaseService {
         save(breakSettings);
         return breakSettingsDTO;
     }
-
+    public List<BreakSettingsDTO> getBreakSettingsByExpertiseId(Long expertiseId) {
+       return   breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
+    }
 
 }

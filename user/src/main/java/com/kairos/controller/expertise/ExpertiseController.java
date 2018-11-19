@@ -7,6 +7,7 @@ import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
@@ -40,11 +41,12 @@ public class ExpertiseController {
     private ExpertiseService expertiseService;
     @Inject
     private UnitPositionService unitPositionService;
-    @Autowired
+    @Inject
     private LocaleService localeService;
-    @Autowired
+    @Inject
     private FunctionalPaymentService functionalPaymentService;
-
+    @Inject
+    ExpertiseUnitService expertiseUnitService;
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -114,7 +116,7 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.saveFunctionalPayment(expertiseId, functionalPaymentDTO));
     }
 
-    @ApiOperation(value = "save a functional payment settings for expertise")
+    @ApiOperation(value = "get  functional payment settings of expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getFunctionalPayment(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
@@ -186,6 +188,20 @@ public class ExpertiseController {
     public ResponseEntity<Map<String, Object>> getSeniorAndChildCareDaysAtCountry(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId));
     }
+    //-------------------UNIT LEVEL ----------------------\\
+
+
+    @ApiOperation(value = "get all expertise at unit level to show")
+    @PutMapping(value = UNIT_URL + "/expertise")
+    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertise(unitId));
+    }
+    @ApiOperation(value = "get a functional payment settings for expertise")
+    @RequestMapping(value = UNIT_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getFunctionalPaymentForUnit(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
+    }
+
 /*
     @ApiOperation(value = "Get senior Days and child Care days at unit")
     @GetMapping(value =  "/expertise/{expertiseId}/senior_and_child_care_days")
