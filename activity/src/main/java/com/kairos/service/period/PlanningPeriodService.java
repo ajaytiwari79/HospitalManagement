@@ -33,6 +33,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.shift.ShiftService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -604,9 +605,10 @@ public class PlanningPeriodService extends MongoBaseService {
         List<Shift> shiftList = shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(), unitId);
         List<StaffingLevelState> staffingLevelStates = staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId, planningPeriod.getCurrentPhaseId(), unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
-        restoreFunctions(shiftStates,  unitId);
         restoreShifts(shiftStates, shiftList, unitId);
         restoreAvailabilityCount(staffingLevels, staffingLevelStates);
+        List<Shift> currentPhaseShiftsForPhaseRestoration=shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
+        restoreFunctions(shiftStates,  unitId,currentPhaseShiftsForPhaseRestoration);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
         return true;
     }
@@ -616,7 +618,6 @@ public class PlanningPeriodService extends MongoBaseService {
         //Question:- Planning Period required or not(phase within particular lies or not)
         List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(phaseId, unitId, shiftIds);
         //shiftList is zero
-        restoreFunctions(shiftStates,unitId);
         restoreShifts(shiftStates, new ArrayList(), unitId);
         return true;
     }
@@ -661,15 +662,25 @@ public class PlanningPeriodService extends MongoBaseService {
      * @param shiftStates
      * @param unitId
      */
-    public void restoreFunctions(List<ShiftState> shiftStates, Long unitId){
-        if(shiftStates.isEmpty()){
+    public void restoreFunctions(List<ShiftState> shiftStates, Long unitId, List<Shift> currentPhaseShiftsForPhaseRestoration){
+        if(shiftStates.isEmpty() && currentPhaseShiftsForPhaseRestoration.isEmpty()){
             return;
         }
         Map<Long, Map<LocalDate,Long>> unitPositionIdWithShiftDateFunctionIdMap = new HashMap<>();
-        Map<LocalDate,Long> dateWithApplicableFunctionId=new HashMap<>();
-        for(ShiftState shiftState:shiftStates){
-            dateWithApplicableFunctionId.put(DateUtils.asLocalDate(shiftState.getStartDate()),shiftState.getFunctionId());
-            unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shiftState.getUnitPositionId(),dateWithApplicableFunctionId);
+        if(CollectionUtils.isNotEmpty(shiftStates)){
+            for(ShiftState shiftState:shiftStates){
+                Map<LocalDate,Long> dateWithApplicableFunctionId=unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shiftState.getUnitPositionId(),new HashMap<LocalDate,Long>());
+                dateWithApplicableFunctionId.put(DateUtils.asLocalDate(shiftState.getStartDate()),shiftState.getFunctionId());
+                unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shiftState.getUnitPositionId(),dateWithApplicableFunctionId);
+            }
+        }
+        if(CollectionUtils.isNotEmpty(currentPhaseShiftsForPhaseRestoration)) {
+            for (Shift shift : currentPhaseShiftsForPhaseRestoration) {
+                Map<LocalDate, Long> dateWithApplicableFunctionId = unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shift.getUnitPositionId(), new HashMap<LocalDate, Long>());
+                dateWithApplicableFunctionId.put(DateUtils.asLocalDate(shift.getStartDate()), null);
+                unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shift.getUnitPositionId(), dateWithApplicableFunctionId);
+
+            }
         }
         genericIntegrationService.restoreFunctionsWithDatesByUnitPositionIds(unitPositionIdWithShiftDateFunctionIdMap,unitId);
     }
