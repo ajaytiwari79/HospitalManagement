@@ -128,6 +128,8 @@ public class UnitPositionService {
     @Inject
     private StaffService staffService;
     @Inject
+    private StaffRetrievalService staffRetrievalService;
+    @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
     private OrganizationService organizationService;
@@ -1121,8 +1123,12 @@ public class UnitPositionService {
         } else if (unitPositionFunctionRelationship) {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
+<<<<<<< HEAD
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString),staffId , unitPositionId, unitId, ORGANIZATION);
+=======
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION);
+>>>>>>> 5a21fbf... fixed uncommented code
         activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
         return true;
     }
