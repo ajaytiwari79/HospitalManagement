@@ -607,8 +607,8 @@ public class PlanningPeriodService extends MongoBaseService {
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
         restoreShifts(shiftStates, shiftList, unitId);
         restoreAvailabilityCount(staffingLevels, staffingLevelStates);
-        List<Shift> currentPhaseShiftsForPhaseRestoration=shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
-        restoreFunctions(shiftStates,  unitId,currentPhaseShiftsForPhaseRestoration);
+        List<Shift> currentPhaseShifts=shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
+        restoreFunctions(shiftStates,  unitId,currentPhaseShifts);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
         return true;
     }
@@ -662,8 +662,8 @@ public class PlanningPeriodService extends MongoBaseService {
      * @param shiftStates
      * @param unitId
      */
-    public void restoreFunctions(List<ShiftState> shiftStates, Long unitId, List<Shift> currentPhaseShiftsForPhaseRestoration){
-        if(shiftStates.isEmpty() && currentPhaseShiftsForPhaseRestoration.isEmpty()){
+    public void restoreFunctions(List<ShiftState> shiftStates, Long unitId, List<Shift> currentPhaseShifts){
+        if(shiftStates.isEmpty() && currentPhaseShifts.isEmpty()){
             return;
         }
         Map<Long, Map<LocalDate,Long>> unitPositionIdWithShiftDateFunctionIdMap = new HashMap<>();
@@ -674,8 +674,8 @@ public class PlanningPeriodService extends MongoBaseService {
                 unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shiftState.getUnitPositionId(),dateWithApplicableFunctionId);
             }
         }
-        if(CollectionUtils.isNotEmpty(currentPhaseShiftsForPhaseRestoration)) {
-            for (Shift shift : currentPhaseShiftsForPhaseRestoration) {
+        if(CollectionUtils.isNotEmpty(currentPhaseShifts)) {
+            for (Shift shift : currentPhaseShifts) {
                 Map<LocalDate, Long> dateWithApplicableFunctionId = unitPositionIdWithShiftDateFunctionIdMap.getOrDefault(shift.getUnitPositionId(), new HashMap<LocalDate, Long>());
                 dateWithApplicableFunctionId.put(DateUtils.asLocalDate(shift.getStartDate()), null);
                 unitPositionIdWithShiftDateFunctionIdMap.putIfAbsent(shift.getUnitPositionId(), dateWithApplicableFunctionId);
