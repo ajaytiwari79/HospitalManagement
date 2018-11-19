@@ -87,8 +87,8 @@ public class JaversMongoConfig {
 
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        String userName = UserContext.getUserDetails().getFirstName() + UserContext.getUserDetails().getLastName();
-        return () -> ImmutableMap.of("userName", userName);
+        //String userName = UserContext.getUserDetails().getFirstName() + UserContext.getUserDetails().getLastName();
+        return () -> ImmutableMap.of("key", "ok");
     }
 
 
