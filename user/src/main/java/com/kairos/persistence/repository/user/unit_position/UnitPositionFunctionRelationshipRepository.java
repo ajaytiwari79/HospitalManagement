@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
 public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRepository<UnitPositionFunctionRelationship, Long> {
 
     @Query("MATCH (unitPosition:UnitPosition)-[rel:"+APPLIED_FUNCTION+"]->(function:Function) where id(unitPosition) = {0}  AND {2} IN rel.appliedDates  \n" +
-            "with unitPosition, function, count(rel.appliedDates) as dateCount \n" +
+            "WITH unitPosition, function, count(rel.appliedDates) as dateCount \n" +
             "return case when dateCount > 0 then true else false end as result")
     Boolean getUnitPositionFunctionRelationshipByUnitPositionAndFunction(Long unitPositionId, String localDate);
 
@@ -30,7 +30,7 @@ public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRe
     void createUnitPositionFunctionRelationship(Long unitPositionId, Long functionId, List<String> localDate);
 
 
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates with rel,function,\n" +
+    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates WITH rel,function,\n" +
             "FILTER (x IN rel.appliedDates WHERE x <> {1}) as filteredDates\n" +
             "SET rel.appliedDates = filteredDates return id(function)")
     Long removeDateFromUnitPositionFunctionRelationship(Long unitPositionId, String localDate);
