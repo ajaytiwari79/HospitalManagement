@@ -1,8 +1,10 @@
-version '0.0.1-SNAPSHOT'
+version '0.0.1'
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'net.researchgate.release'
+
 sourceCompatibility = 1.8
 
 repositories {
@@ -33,3 +35,28 @@ dependencies {
 
 }
 
+release {
+    tagTemplate = 'kairos-$version'
+    failOnCommitNeeded = false
+    failOnSnapshotDependencies=false
+    buildTasks = ['build']
+    scmAdapters = [
+            net.researchgate.release.GitAdapter
+    ]
+
+    git {
+        requireBranch = 'temp_001'
+        pushToRemote = 'origin'
+        pushToBranchPrefix = ''
+    }
+}
+
+task(startmessage) << {
+    println 'starting build'
+}
+
+task(printversion) << {
+    println project.version
+}
+
+//wrapper.gradleVersion = '4.4'

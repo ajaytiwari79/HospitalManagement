@@ -91,6 +91,4 @@ task(printversion) << {
     println project.version
 }
 
-beforeReleaseBuild.dependsOn startmessage
-afterReleaseBuild.dependsOn printversion
 wrapper.gradleVersion = '4.4'
