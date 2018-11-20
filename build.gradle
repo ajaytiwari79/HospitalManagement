@@ -83,12 +83,8 @@ release {
     }
 }
 
-task(startmessage) << {
-    println 'starting build'
-}
+task beforeReleaseCheck(dependsOn:":kcommons:build") << {}
 
-task(printversion) << {
-    println project.version
-}
+beforeReleaseBuild.dependsOn(beforeReleaseCheck)
 
 wrapper.gradleVersion = '4.4'
