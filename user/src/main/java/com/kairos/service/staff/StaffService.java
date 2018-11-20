@@ -933,7 +933,7 @@ public class StaffService {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
 
         unitPermission = unitPermission == null ? new UnitPermission() : unitPermission;
-        AccessGroup accessGroup =accessGroupRepository.findOne(accessGroupId); //union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
+        AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
             linkAccessOfModules(accessGroup, unitPermission);
@@ -973,7 +973,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);//union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
@@ -983,23 +983,15 @@ public class StaffService {
         employmentGraphRepository.save(employment);
     }
 
-    private void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
+    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
+        employment.setStaff(staff);
         staff.setUser(user);
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-    //TODO fixed if parent org false than create employment in parent and unit permission in unit
-        //        if (!parentOrganization) {
-//            Organization
-//                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
-//            mainOrganization.getEmployments().add(employment);
-//            organizationGraphRepository.save(mainOrganization);
-//        } else {
-//            organization.getEmployments().add(employment);
-//        }
         organization.getEmployments().add(employment);
         organizationGraphRepository.save(organization);
         if (accessGroupId != null) {
@@ -1013,7 +1005,7 @@ public class StaffService {
         }
 
         employmentGraphRepository.save(employment);
-
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())), organization.getId());
 
     }
 
