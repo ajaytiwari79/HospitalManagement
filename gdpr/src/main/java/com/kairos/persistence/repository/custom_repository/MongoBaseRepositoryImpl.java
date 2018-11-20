@@ -6,7 +6,6 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
-import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;

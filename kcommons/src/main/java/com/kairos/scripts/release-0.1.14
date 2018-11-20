@@ -13,12 +13,12 @@ db.glideTimeSettings.createIndex( { "countryId": 1 }, { unique: true } )
 
 // To add WTA Template
 
-db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequence"},{$inc: { sequenceNumber: 1 }});
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequence"},{$inc: { sequenceNumber: 1 }},{new:true});
 
 db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
 
 db.wtaBaseRuleTemplate.insert({
-    "_id" : "723", // this must be replaced by updated sequence
+    "_id" : "37", // this must be replaced by updated sequence
     "name" : "WTA for breaks in shift",
     "description" : "WTA for breaks in shift",
     "disabled" : false,
@@ -65,10 +65,19 @@ NEO
 MATCH p=()-[r:HAS_FUNCTIONAL_AMOUNT]->()
 set r.amountEditableAtUnit=FALSE
 
-
 MATCH(slf:SeniorityLevelFunction)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function:Function)
 set rel.amountEditableAtUnit=false;
 
+match(a:AccountType{deleted:false}) return a;
+
+MATCH(o:Organization)-[:HAS_ACCOUNT_TYPE]-(ac:AccountType)
+       with collect(id(o)) as list
+       return list;
+
+
+MATCH(o:Organization) where NOT id(o)  IN [ABOVE LIST]
+MATCH (ac:AccountType {{name: "Official"})
+MERGE (o)-[:HAS_ACCOUNT_TYPE]->(ac)
 
 
 // Kairos Activity
@@ -81,7 +90,7 @@ MATCH(ag:AccessGroup) set ag.allowedDayTypes=true;
 
 
 //To set all breakAllowed to true for existing Activities
-db.activities.updateMany({},{$set:{"rulesActivityTab.breakAllowed":true}});
+db.activities.updateMany({},{$set:{"rulesActivityTab.breakAllowed":false}});
 
 //to find default tag
 db.getCollection('clauseTag').find({'defaultTag':true,'deleted':false});

@@ -137,11 +137,11 @@ public class RuleTemplateService extends MongoBaseService {
         averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(averageScheduledTimeWTATemplate);
 
-        VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate = new VetoPerPeriodWTATemplate("Maximum veto per period", false, "Maximum veto per period");
-        vetoPerPeriodWTATemplate.setCountryId(countryDTO.getId());
-        //vetoPerPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        vetoPerPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        wtaBaseRuleTemplates1.add(vetoPerPeriodWTATemplate);
+        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = new VetoAndStopBricksWTATemplate("Veto and stop bricks", "Veto and stop bricks",1,LocalDate.now(),null,null);
+        vetoAndStopBricksWTATemplate.setCountryId(countryDTO.getId());
+        //vetoAndStopBricksWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        vetoAndStopBricksWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplates1.add(vetoAndStopBricksWTATemplate);
 
         NumberOfWeekendShiftsInPeriodWTATemplate numberofWeekendShiftsInPeriodWTATemplate = new NumberOfWeekendShiftsInPeriodWTATemplate("Weekend off Distribution", false, "Weekend off Distribution", TUESDAY, LocalTime.of(10, 30), TUESDAY, LocalTime.of(10, 30));
         numberofWeekendShiftsInPeriodWTATemplate.setCountryId(countryDTO.getId());
@@ -207,7 +207,7 @@ public class RuleTemplateService extends MongoBaseService {
         seniorDaysPerYearWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(seniorDaysPerYearWTATemplate);
 
-        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check", Arrays.asList(range));
+        ChildCareDaysCheckWTATemplate careDaysCheck = new ChildCareDaysCheckWTATemplate("Child Care Days Check", false, "Child Care Days Check");
         careDaysCheck.setCountryId(countryDTO.getId());
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
@@ -290,7 +290,7 @@ public class RuleTemplateService extends MongoBaseService {
 
     }
 
-    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList, List<WTABaseRuleTemplateDTO> templateList) {
+    private void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList, List<WTABaseRuleTemplateDTO> templateList) {
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
             for (WTABaseRuleTemplateDTO ruleTemplateResponseDTO : templateList) {
                 if (ruleTemplateCategoryTagDTO.getId() != null && ruleTemplateResponseDTO != null && ruleTemplateCategoryTagDTO.getId().equals(ruleTemplateResponseDTO.getRuleTemplateCategoryId())) {

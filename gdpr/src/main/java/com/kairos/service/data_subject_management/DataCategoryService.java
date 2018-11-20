@@ -93,14 +93,19 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public boolean deleteDataCatgeoryById(Long refrenceId, boolean isUnitId, BigInteger dataCatgeoryId) {
+    public boolean deleteDataCategoryById(Long refrenceId, boolean isUnitId, BigInteger dataCategoryId) {
 
-        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(refrenceId, dataCatgeoryId)
-                : dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(refrenceId, dataCatgeoryId);
+        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(refrenceId, dataCategoryId)
+                : dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(refrenceId, dataCategoryId);
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
             exceptionService.invalidRequestException("message.cannot.delete.dataCategory", dataSubjectLinkedWithDataCategory.stream().map(DataSubjectMappingBasicResponseDTO::getName).collect(Collectors.joining(",")));
         }
-        dataCategoryMongoRepository.safeDeleteById(dataCatgeoryId);
+        DataCategory dataCategory = dataCategoryMongoRepository.findOne(dataCategoryId);
+        if (!Optional.ofNullable(dataCategory).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
+        }
+        dataCategoryMongoRepository.safeDeleteById(dataCategoryId);
+        dataElementMongoRepository.safeDeleteByIds(new HashSet<>(dataCategory.getDataElements()));
         return true;
 
     }

@@ -31,7 +31,7 @@ public class DataElementService extends MongoBaseService {
 
 
     /**
-     * @param referenceId     refrence id may be countryid or unitId
+     * @param referenceId     reference id may be country id or unitId
      * @param dataElementsDto request body for creating New Data Elements
      * @return map of Data Elements  List  and new Data Elements ids
      * @decription method create new Data Elements throw exception if data element already exist
@@ -80,16 +80,16 @@ public class DataElementService extends MongoBaseService {
                 dataElements.add(dataElement);
             }
         });
-        List<DataElement> previousDataELementList = isUnitId ? dataElementMongoRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementMongoRepository.findByCountryIdAndNames(referenceId, dataElementNames);
-        previousDataELementList.forEach(dataElement -> {
+        List<DataElement> previousDataElementList = isUnitId ? dataElementMongoRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementMongoRepository.findByCountryIdAndNames(referenceId, dataElementNames);
+        previousDataElementList.forEach(dataElement -> {
 
             if (!dataElementDTOMap.containsKey(dataElement.getId())) {
                 exceptionService.duplicateDataException("message.duplicate", "Data Element", dataElement.getName());
             }
         });
-        previousDataELementList = isUnitId ? dataElementMongoRepository.findByUnitIdAndIds(referenceId, dataElementDTOMap.keySet()) : dataElementMongoRepository.findByCountryIdAndIds(referenceId, dataElementDTOMap.keySet());
-        previousDataELementList.forEach(dataElement -> dataElement.setName(dataElementDTOMap.get(dataElement.getId()).getName()));
-        dataElements.addAll(previousDataELementList);
+        previousDataElementList = isUnitId ? dataElementMongoRepository.findByUnitIdAndIds(referenceId, dataElementDTOMap.keySet()) : dataElementMongoRepository.findByCountryIdAndIds(referenceId, dataElementDTOMap.keySet());
+        previousDataElementList.forEach(dataElement -> dataElement.setName(dataElementDTOMap.get(dataElement.getId()).getName()));
+        dataElements.addAll(previousDataElementList);
         return dataElementMongoRepository.saveAll(getNextSequence(dataElements));
     }
 
@@ -97,16 +97,16 @@ public class DataElementService extends MongoBaseService {
 
     public Set<String> checkForDuplicacyInName(List<DataElementDTO> dataElementDTOs) {
 
-        Set<String> dataELementNames = new HashSet<>();
+        Set<String> dataElementNames = new HashSet<>();
         List<String> dataElementNamesLowerCase = new ArrayList<>();
         dataElementDTOs.forEach(dataElementDTO -> {
             if (dataElementNamesLowerCase.contains(dataElementDTO.getName().toLowerCase())) {
                 throw new DuplicateDataException("Duplicate Entry with name " + dataElementDTO.getName());
             }
-            dataELementNames.add(dataElementDTO.getName());
+            dataElementNames.add(dataElementDTO.getName());
             dataElementNamesLowerCase.add(dataElementDTO.getName().toLowerCase());
         });
-        return dataELementNames;
+        return dataElementNames;
     }
 
 

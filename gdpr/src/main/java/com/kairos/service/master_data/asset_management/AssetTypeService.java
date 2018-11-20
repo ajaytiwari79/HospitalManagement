@@ -1,7 +1,6 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
@@ -13,7 +12,6 @@ import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -75,14 +73,14 @@ public class AssetTypeService extends MongoBaseService {
             subAssetTypeList = buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, assetTypeDto.getSubAssetTypes(), riskRelatedToAssetTypeAndSubAssetType);
             assetType.setHasSubAsset(true);
         }
-        Map<AssetType, List<Risk>> riskIdsCoresspondingToAssetAndSubAssetType;
+        Map<AssetType, List<Risk>> riskIdsCorrespondingToAssetAndSubAssetType;
         if (CollectionUtils.isNotEmpty(riskRelatedToAssetTypeAndSubAssetType.entrySet().stream().map(Map.Entry::getValue).flatMap(List::stream).collect(Collectors.toList()))) {
-            riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskRelatedToAssetTypeAndSubAssetType);
+            riskIdsCorrespondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskRelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+                subAssetType.setRisks(riskIdsCorrespondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
             }
-            if (riskIdsCoresspondingToAssetAndSubAssetType.containsKey(assetType))
-                assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
+            if (riskIdsCorrespondingToAssetAndSubAssetType.containsKey(assetType))
+                assetType.setRisks(riskIdsCorrespondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
         }
         if (!subAssetTypeList.isEmpty()) {
             assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));

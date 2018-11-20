@@ -1,8 +1,6 @@
 package com.kairos.service.organization;
 
-import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.dto.user.organization.CompanyUnitType;
-import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
@@ -11,6 +9,7 @@ import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -54,6 +54,8 @@ public class UnitService {
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
     private CompanyCreationService companyCreationService;
+    @Inject
+    private AccessGroupRepository accessGroupRepository;
 
 
     private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {
@@ -61,7 +63,7 @@ public class UnitService {
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
         response.put("accountType", parentOrg.getAccountType());
-        response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
+        response.put("accessGroups", accessGroupRepository.getAccessGroups(parentOrg.getId()));
         response.put("businessTypes", parentOrg.getBusinessTypes());
         response.put("companyCategory", parentOrg.getCompanyCategory());
         response.put("level", parentOrg.getLevel());
@@ -108,15 +110,46 @@ public class UnitService {
     public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long unitId) throws InterruptedException, ExecutionException {
         if (organizationBasicDTO.getId() == null) {
             companyCreationService.addNewUnit(organizationBasicDTO, unitId);
-
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
         Country country = organizationGraphRepository.getCountry(unitId);
+
         companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), unitId);
         organizationBasicDTO.setBoardingCompleted(true);
         return organizationBasicDTO;
 
     }
+
+    public Map<String, Object> getEligibleUnitsForCtaAndWtaCreation(Long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId, 2);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+        }
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO();
+        orgTypeAndSubTypeDTO.setOrganizationTypeId(organization.getOrganizationType().getId());
+        orgTypeAndSubTypeDTO.setOrganizationTypeName(organization.getOrganizationType().getName());
+        orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
+        orgTypeAndSubTypeDTO.setOrganizationSubTypeName(organization.getOrganizationSubTypes().get(0).getName());
+
+        OrganizationCommonDTO organizationCommonDTO;
+        List<OrganizationCommonDTO> organizationCommonDTOS = new ArrayList<>();
+        for(Organization unit : organization.getChildren()){
+            organizationCommonDTO = new OrganizationCommonDTO();
+            organizationCommonDTO.setId(unit.getId());
+            organizationCommonDTO.setName(unit.getName());
+            organizationCommonDTOS.add(organizationCommonDTO);
+        }
+        organizationCommonDTO = new OrganizationCommonDTO();
+        organizationCommonDTO.setId(organization.getId());
+        organizationCommonDTO.setName(organization.getName());
+        organizationCommonDTOS.add(organizationCommonDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("eligibleUnits",organizationCommonDTOS);
+        response.put("orgTypeAndSubTypeDTO",orgTypeAndSubTypeDTO);
+        return response;
+    }
+
 
 }

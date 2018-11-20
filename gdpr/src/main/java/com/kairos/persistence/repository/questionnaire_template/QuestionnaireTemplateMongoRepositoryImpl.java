@@ -68,17 +68,18 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
-                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation)
+                new CustomAggregationOperation(groupDataOperation),
+                sort(Sort.Direction.DESC, "createdAt")
 
-        );
+
+                );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
     }
@@ -90,7 +91,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
@@ -120,7 +121,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(templateId)),
                 lookup("questionnaireSection", "sections", "_id", "sections"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("assetType", "assetTypeId", "_id", "assetType"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
                 unwind("sections", true),
@@ -145,11 +146,11 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
-                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation)
+                new CustomAggregationOperation(groupDataOperation),
+                sort(Sort.Direction.DESC, "createdAt")
 
-        );
+                );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
     }
@@ -179,7 +180,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findRiskTemplateByAsssociatedProcessingActivityAndCountryId(Long countryId) {
+    public QuestionnaireTemplate findRiskTemplateByAssociatedProcessingActivityAndCountryId(Long countryId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)

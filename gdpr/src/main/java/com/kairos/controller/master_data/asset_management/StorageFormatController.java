@@ -83,7 +83,7 @@ public class StorageFormatController {
     @PutMapping("/storage_format")
     public ResponseEntity<Object> updateSuggestedStatusOfStorageFormats(@PathVariable Long countryId, @RequestBody Set<BigInteger> storageFormatIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(storageFormatIds)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "STorage Format is Not Selected");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Storage Format is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }

@@ -2,7 +2,7 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
@@ -19,13 +18,11 @@ public class AgreementSectionResponseDTO {
 
     @NotBlank
     private String title;
-
+    private String titleHtml;
     private Integer orderedIndex;
-
     private List<BigInteger> clauseIdOrderedIndex;
-
     private List<ClauseBasicResponseDTO> clauses;
-
+    private List<ClauseCkEditorVO> clauseCkEditorVOS;
     private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
@@ -71,6 +68,14 @@ public class AgreementSectionResponseDTO {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+
+    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
+
+    public String getTitleHtml() { return titleHtml; }
+
+    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
     public AgreementSectionResponseDTO() {
 

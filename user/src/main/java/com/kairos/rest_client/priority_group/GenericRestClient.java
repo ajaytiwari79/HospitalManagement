@@ -1,8 +1,10 @@
 package com.kairos.rest_client.priority_group;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.ResponseEnvelope;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -73,6 +75,7 @@ public class GenericRestClient {
     public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit,id)+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
+        V responseData = null;
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
@@ -83,13 +86,13 @@ public class GenericRestClient {
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalServerError(response.getMessage());
             }
-            return response.getData();
+            responseData = response.getData();
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
-
+        return responseData;
     }
 
     public String getURIWithParam(List<NameValuePair> queryParam){

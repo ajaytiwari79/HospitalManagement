@@ -6,7 +6,6 @@ import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.common.RiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -127,9 +126,10 @@ public class RiskService extends MongoBaseService {
         for (E riskDTO : riskDTOS) {
             OrganizationLevelRiskDTO organizationLevelRiskDTO = (OrganizationLevelRiskDTO) riskDTO;
             Risk risk = new Risk(organizationLevelRiskDTO.getName(), organizationLevelRiskDTO.getDescription(),
-                    organizationLevelRiskDTO.getRiskRecommendation(), organizationLevelRiskDTO.getRiskLevel(), organizationLevelRiskDTO.getDueDate());
+                    organizationLevelRiskDTO.getRiskRecommendation(), organizationLevelRiskDTO.getRiskLevel());
+            risk.setReminderActive(organizationLevelRiskDTO.isReminderActive());
+            risk.setDaysToReminderBefore(organizationLevelRiskDTO.getDaysToReminderBefore());
             risk.setOrganizationId(unitId);
-            risk.setRiskOwner(organizationLevelRiskDTO.getRiskOwner());
             riskList.add(risk);
         }
         return riskList;

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.Optional;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;

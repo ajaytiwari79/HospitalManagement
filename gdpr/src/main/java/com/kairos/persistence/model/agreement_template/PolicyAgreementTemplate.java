@@ -5,8 +5,11 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -28,10 +31,17 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
-    private BigInteger templateType;
-    private String coverPageContent;
-    private String coverPageTitle;
-    private String coverPageLogoUrl;
+    private BigInteger templateTypeId;
+    private boolean coverPageAdded;
+    private boolean includeContentPage;
+    private boolean signatureComponentAdded;
+    private boolean signatureComponentLeftAlign;
+    private boolean signatureComponentRightAlign;
+    private String  signatureHtml;
+    private CoverPageVO coverPageData;
+    @Transient
+    private ClauseTag defaultClauseTag;
+
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
@@ -42,13 +52,31 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
     }
+
+    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, BigInteger templateTypeId) {
+        this.name = name;
+        this.description = description;
+        this.templateTypeId = templateTypeId;
+    }
+
+    public boolean isIncludeContentPage() { return includeContentPage; }
+
+    public void setIncludeContentPage(boolean includeContentPage) { this.includeContentPage = includeContentPage; }
+
     public PolicyAgreementTemplate() {
     }
 
+    public boolean isCoverPageAdded() { return coverPageAdded; }
 
-    public BigInteger getTemplateType() { return templateType; }
+    public void setCoverPageAdded(boolean coverPageAdded) { this.coverPageAdded = coverPageAdded; }
 
-    public PolicyAgreementTemplate setTemplateType(BigInteger templateType) { this.templateType = templateType; return this; }
+    public CoverPageVO getCoverPageData() { return coverPageData; }
+
+    public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
+
+    public BigInteger getTemplateTypeId() { return templateTypeId; }
+
+    public void setTemplateTypeId(BigInteger templateTypeId) { this.templateTypeId = templateTypeId; }
 
     public String getName() {
         return name;
@@ -104,27 +132,23 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
 
-    public String getCoverPageContent() {
-        return coverPageContent;
-    }
+    public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
 
-    public void setCoverPageContent(String coverPageContent) {
-        this.coverPageContent = coverPageContent;
-    }
+    public void setSignatureComponentAdded(boolean signatureComponentAdded) { this.signatureComponentAdded = signatureComponentAdded; }
 
-    public String getCoverPageTitle() {
-        return coverPageTitle;
-    }
+    public String getSignatureHtml() { return signatureHtml; }
 
-    public void setCoverPageTitle(String coverPageTitle) {
-        this.coverPageTitle = coverPageTitle;
-    }
+    public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
 
-    public String getCoverPageLogoUrl() {
-        return coverPageLogoUrl;
-    }
+    public boolean isSignatureComponentLeftAlign() { return signatureComponentLeftAlign; }
 
-    public void setCoverPageLogoUrl(String coverPageLogoUrl) {
-        this.coverPageLogoUrl = coverPageLogoUrl;
-    }
+    public void setSignatureComponentLeftAlign(boolean signatureComponentLeftAlign) { this.signatureComponentLeftAlign = signatureComponentLeftAlign; }
+
+    public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
+
+    public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
+
+    public ClauseTag getDefaultClauseTag() { return defaultClauseTag; }
+
+    public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
 }

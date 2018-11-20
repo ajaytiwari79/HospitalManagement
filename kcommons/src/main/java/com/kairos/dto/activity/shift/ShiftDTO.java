@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftType;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -42,7 +44,6 @@ public class ShiftDTO {
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
-    @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private ShiftTemplateDTO template;
@@ -52,14 +53,15 @@ public class ShiftDTO {
     private int durationMinutes;
     private BigInteger plannedTimeId;
     private Long expertiseId;
-    private LocalDate validatedByStaffDate;
-    private LocalDate validatedByPlannerDate;
+    private LocalDate validated;
     private AttendanceDuration attendanceDuration;
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
     private BigInteger shiftId;
+    private AccessGroupRole accessGroupRole;
     private boolean editable;
     private boolean functionDeleted;
+    private ShiftType shiftType;
 
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -145,25 +147,26 @@ public class ShiftDTO {
         this.attendanceDuration = attendanceDuration;
     }
 
-    public LocalDate getValidatedByStaffDate() {
-        return validatedByStaffDate;
-    }
-
-    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
-        this.validatedByStaffDate = validatedByStaffDate;
-    }
 
     @JsonIgnore
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
 
-    public LocalDate getValidatedByPlannerDate() {
-        return validatedByPlannerDate;
+    public ShiftType getShiftType() {
+        return shiftType;
     }
 
-    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
-        this.validatedByPlannerDate = validatedByPlannerDate;
+    public void setShiftType(ShiftType shiftType) {
+        this.shiftType = shiftType;
+    }
+
+    public LocalDate getValidated() {
+        return validated;
+    }
+
+    public void setValidated(LocalDate validated) {
+        this.validated = validated;
     }
 
     public Long getExpertiseId() {
@@ -202,7 +205,13 @@ public class ShiftDTO {
         this.shiftDate = shiftDate;
     }
 
+    public AccessGroupRole getAccessGroupRole() {
+        return accessGroupRole;
+    }
 
+    public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
+        this.accessGroupRole = accessGroupRole;
+    }
 
     public BigInteger getId() {
         return id;

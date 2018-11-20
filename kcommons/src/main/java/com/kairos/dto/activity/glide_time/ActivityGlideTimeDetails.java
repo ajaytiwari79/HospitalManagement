@@ -8,6 +8,7 @@ import com.kairos.enums.LocationEnum;
 
 public class ActivityGlideTimeDetails {
     private LocationEnum location;
+
     private short before; // storing in minutes
     private short after;  // storing in minutes
     private boolean eligible;
@@ -30,19 +31,19 @@ public class ActivityGlideTimeDetails {
         this.location = location;
     }
 
-    public Short getBefore() {
+    public short getBefore() {
         return before;
     }
 
-    public void setBefore(Short before) {
+    public void setBefore(short before) {
         this.before = before;
     }
 
-    public Short getAfter() {
+    public short getAfter() {
         return after;
     }
 
-    public void setAfter(Short after) {
+    public void setAfter(short after) {
         this.after = after;
     }
 

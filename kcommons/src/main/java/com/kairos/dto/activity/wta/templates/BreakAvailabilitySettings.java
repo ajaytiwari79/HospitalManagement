@@ -15,7 +15,11 @@ public class BreakAvailabilitySettings {
     public BreakAvailabilitySettings() {
         //Default Constructor
     }
+    public BreakAvailabilitySettings( short startAfterMinutes, short endBeforeMinutes) {
 
+        this.startAfterMinutes = startAfterMinutes;
+        this.endBeforeMinutes = endBeforeMinutes;
+    }
     public BreakAvailabilitySettings(PartOfDay timeSlot, short startAfterMinutes, short endBeforeMinutes) {
         this.timeSlot = timeSlot;
         this.startAfterMinutes = startAfterMinutes;

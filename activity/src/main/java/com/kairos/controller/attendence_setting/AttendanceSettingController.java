@@ -13,6 +13,7 @@ import java.util.Map;
 
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
@@ -32,6 +33,11 @@ public class AttendanceSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,reasonCodeId,checkIn));
     }
 
+    @PutMapping(value = UNIT_URL+"/attendance_setting_job")
+    public ResponseEntity<Map<String,Object>> updateAttendanceSettingByJob(@PathVariable("unitId") Long unitId){
+        attendanceSettingService.checkOutBySchedulerJob(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
 
 }
 

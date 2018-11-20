@@ -22,8 +22,9 @@ public class TimeType extends MongoBaseEntity{
     private String description;
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
-    private BreakPaymentSetting breakPaymentSetting;
     private TimeTypeEnum type;
+    private BreakPaymentSetting breakPaymentSetting;
+    private TimeTypeEnum secondLevelType;
 
     public TimeType() {}
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
@@ -34,13 +35,13 @@ public class TimeType extends MongoBaseEntity{
 
 
 
-    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum type,Long countryId) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
         this.backgroundColor=backgroundColor;
         this.leafNode = true;
-        this.type=type;
+        this.secondLevelType=secondLevelType;
         this.countryId=countryId;
     }
 
@@ -109,15 +110,22 @@ public class TimeType extends MongoBaseEntity{
         this.backgroundColor = backgroundColor;
     }
 
-    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-        this.breakPaymentSetting = breakPaymentSetting;
-    }
 
     public TimeTypeEnum getType() {
         return type;
     }
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
+    }
 
-    public void setType(TimeTypeEnum type) {
+    public TimeTypeEnum getSecondLevelType() {
+        return secondLevelType;
+    }
+
+    public void setSecondLevelType(TimeTypeEnum secondLevelType) {
+        this.secondLevelType = secondLevelType;
+    }
+       public void setType(TimeTypeEnum type) {
         this.type = type;
     }
 }

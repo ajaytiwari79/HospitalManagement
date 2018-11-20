@@ -13,15 +13,18 @@ import java.util.Set;
 public interface CustomPolicyAgreementTemplateRepository {
 
 
+    List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isUnitId);
 
-    List<PolicyAgreementTemplateResponseDTO>  getAllPolicyAgreementTemplateByCountryId(Long countryId);
+    PolicyAgreementTemplate findByCountryIdAndName(Long countryId, String templateName);
 
-    PolicyAgreementTemplate findByName(Long countryId,String templateName);
+    PolicyAgreementTemplate findByUnitIdAndName(Long unitId, String templateName);
 
-    List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId);
+    List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
 
-    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByCountryIdAndClauseId(Long countryId, BigInteger clauseId);
+    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId);
 
-    List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds,BigInteger clauseId);
+    List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
+
+    Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds);
 
 }

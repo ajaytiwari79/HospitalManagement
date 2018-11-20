@@ -17,12 +17,11 @@ public class ClauseBasicDTO {
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
-
+    private String titleHtml;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-
+    private String descriptionHtml;
     private boolean requireUpdate;
-
     @NotNull(message = "Clause order is Not defined")
     private Integer orderedIndex;
 
@@ -34,29 +33,58 @@ public class ClauseBasicDTO {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title.trim(); }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
     public String getDescription() {
-        return description;
+        return description.trim();
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public boolean isRequireUpdate() { return requireUpdate; }
+    public boolean isRequireUpdate() {
+        return requireUpdate;
+    }
 
-    public void setRequireUpdate(boolean requireUpdate) { this.requireUpdate = requireUpdate; }
+    public void setRequireUpdate(boolean requireUpdate) {
+        this.requireUpdate = requireUpdate;
+    }
 
-    public Integer getOrderedIndex() { return orderedIndex; }
+    public Integer getOrderedIndex() {
+        return orderedIndex;
+    }
 
-    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
+    public void setOrderedIndex(Integer orderedIndex) {
+        this.orderedIndex = orderedIndex;
+    }
+
+    public String getTitleHtml() {
+
+        if (titleHtml == null) {
+            titleHtml = "<p>"+title+"</p>";
+        }
+        return titleHtml.trim();
+    }
+
+    public void setTitleHtml(String titleHtml) {
+        this.titleHtml = titleHtml;
+    }
+
+    public String getDescriptionHtml() {
+        if (descriptionHtml == null) {
+            descriptionHtml = "<p>"+description+"</p>";
+        }
+        return descriptionHtml.trim();
+    }
+
+    public void setDescriptionHtml(String descriptionHtml) {
+        this.descriptionHtml = descriptionHtml;
+    }
 
     public ClauseBasicDTO() {
     }

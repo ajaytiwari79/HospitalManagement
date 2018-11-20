@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 

@@ -253,6 +253,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_OPEN_SHIFT_SETTINGS="HAS_OPEN_SHIFT_SETTINGS";
     public final static String EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT = "EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT";
     public final static String HAS_PREFERED_TIME_WINDOW = "HAS_PREFERED_TIME_WINDOW";
+    public final static String BELONGS_TO_SECTOR="BELONGS_TO_SECTOR";
 
 // System Langugae
 
@@ -267,6 +268,13 @@ public abstract class RelationshipConstants {
 
     public static final String DAY_TYPES="DAY_TYPES";
     public static final String HAS_PARENT_ACCESS_GROUP="HAS_PARENT_ACCESS_GROUP";
+
+    public static final String COUNTRY_HAS_SECTOR = "COUNTRY_HAS_SECTOR";
+    public static final String HAS_LOCATION = "HAS_LOCATION";
+    public static final String LOCATION_HAS_ADDRESS = "LOCATION_HAS_ADDRESS";
+    public static final String HAS_SECTOR = "HAS_SECTOR";
+
+
 
     /**
      * Default constructor

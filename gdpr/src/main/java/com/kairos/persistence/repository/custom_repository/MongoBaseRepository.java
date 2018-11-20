@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.custom_repository;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.List;

@@ -2,6 +2,8 @@ package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.organization.union.SectorDTO;
+import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ public class ExpertiseResponseDTO {
     private Date endDateMillis;
     private Long organizationLevelId;
     private Set<Long> organizationServiceIds;
-    private Long unionId;
+    private UnionIDNameDTO union;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
 
@@ -34,6 +36,7 @@ public class ExpertiseResponseDTO {
     private Boolean published;
     private Boolean editable;
     private BreakPaymentSetting breakPaymentSetting;
+    private SectorDTO sector;
 
     public ExpertiseResponseDTO() {
     }
@@ -102,13 +105,7 @@ public class ExpertiseResponseDTO {
         this.organizationServiceIds = organizationServiceIds;
     }
 
-    public Long getUnionId() {
-        return unionId;
-    }
 
-    public void setUnionId(Long unionId) {
-        this.unionId = unionId;
-    }
 
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -165,5 +162,21 @@ public class ExpertiseResponseDTO {
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+    public SectorDTO getSector() {
+        return sector;
+    }
+
+    public void setSector(SectorDTO sector) {
+        this.sector = sector;
+    }
+
+    public UnionIDNameDTO getUnion() {
+        return union;
+    }
+
+    public void setUnion(UnionIDNameDTO union) {
+        this.union = union;
     }
 }

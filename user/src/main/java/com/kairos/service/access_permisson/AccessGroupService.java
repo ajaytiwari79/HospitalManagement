@@ -33,6 +33,7 @@ import com.kairos.persistence.repository.user.country.default_data.AccountTypeGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.DateUtil;
@@ -80,6 +81,7 @@ public class AccessGroupService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject private StaffRetrievalService staffRetrievalService;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
@@ -226,22 +228,31 @@ public class AccessGroupService {
         });
     }
 
+    public void createUnitDefaultAccessGroups(Organization unit, Long parentId) {
+        List<AccessGroupQueryResult> accessGroupList = accessGroupRepository.getPatentAccessGroupByorganizationId(parentId);
+        createDefaultAccessGroupsInOrganization(unit, accessGroupList, false);
+    }
+
     /**
      * @param organization,accountTypeId
      * @author vipul
      * this method will create accessgroup to the organization
      * @Extra Need to optimize
      */
-    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroupQueryResult> accessGroupList, boolean company) {
+    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization,
+                                                                   List<AccessGroupQueryResult> accessGroupList, boolean company) {
 
 
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
 
         List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
         for (AccessGroupQueryResult currentAccessGroup : accessGroupList) {
-            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(),
+                    currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             parent.setId(currentAccessGroup.getId());
-            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(),
+                    currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(),
+                    company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
             accessGroup.setParentAccessGroup(parent);
             accessGroup.setLastModificationDate(accessGroup.getCreationDate());
@@ -886,24 +897,34 @@ public class AccessGroupService {
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
-        Long staffId = staffService.getStaffIdOfLoggedInUser(unitId);
+        Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
         return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
 
     }
 
     public Map<Long, Long> getAccessGroupUsingParentId(Long unitId, Set<Long> accessGroupIds) {
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentIds(unitId,accessGroupIds);
-        return convertToMap(accessPageQueryResults);
+        Map<Long,Map<Long, Long>> response=convertToMap(accessPageQueryResults);
+        return response.get(unitId)!=null?response.get(unitId):new HashMap<>();
     }
-    public Map<Long, Long> findAllAccessGroupWithParentOfOrganization(Long organizationId){
+
+    public Map<Long,Map<Long, Long>> findAllAccessGroupWithParentOfOrganization(Long organizationId){
         List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganization(organizationId);
         return convertToMap(accessPageQueryResults);
     }
 
-    private Map<Long, Long> convertToMap(List<AccessPageQueryResult> accessPageQueryResults){
-        Map<Long, Long > response=new HashMap<>();
+    public Map<Long,Map<Long, Long>> findAllAccessGroupWithParentOfOrganizations(List<Long> organizationIds){
+        List<AccessPageQueryResult> accessPageQueryResults= accessGroupRepository.findAllAccessGroupWithParentOfOrganizations(organizationIds);
+        return convertToMap(accessPageQueryResults);
+    }
+
+    private Map<Long,Map<Long, Long>> convertToMap(List<AccessPageQueryResult> accessPageQueryResults){
+        Map<Long,Map<Long, Long>> response=new HashMap<>();
         accessPageQueryResults.forEach(accessPageQueryResult -> {
-            response.put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
+            response.put(accessPageQueryResult.getUnitId(),new HashMap<Long,Long>());
+        });
+        accessPageQueryResults.forEach(accessPageQueryResult -> {
+            response.get(accessPageQueryResult.getUnitId()).put(accessPageQueryResult.getParentId(),accessPageQueryResult.getId());
         });
         return response;
     }

@@ -56,7 +56,7 @@ public class DataCategoryController {
     @ApiOperation("delete data category by id ")
     @DeleteMapping(COUNTRY_URL + "/data_category/{dataCategoryId}")
     public ResponseEntity<ResponseDTO<Boolean>> deleteDataCategory(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCatgeoryById(countryId,false,dataCategoryId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategoryById(countryId,false,dataCategoryId));
 
     }
 
@@ -74,7 +74,7 @@ public class DataCategoryController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.saveDataCategoryAndDataElement(unitId, true, dataCategoryDto));
     }
 
-    @ApiOperation("orgnaization update data category by id ")
+    @ApiOperation("organization update data category by id ")
     @PutMapping(UNIT_URL + "/data_category/{dataCategoryId}")
     public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateOrganizationDataCategoryAndDataElement(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(unitId, true, dataCategoryId, dataCategoryDto));
@@ -97,8 +97,8 @@ public class DataCategoryController {
 
     @ApiOperation("organization ,delete data category by id ")
     @DeleteMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganziationDataCategory(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCatgeoryById(unitId,true,dataCategoryId));
+    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataCategory(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategoryById(unitId,true,dataCategoryId));
 
     }
 

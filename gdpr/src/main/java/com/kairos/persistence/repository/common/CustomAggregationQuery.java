@@ -63,7 +63,8 @@ public class CustomAggregationQuery {
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
                 "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}," +
-                "'templateStatus':{'$first':'$templateStatus'}" +
+                "'templateStatus':{'$first':'$templateStatus'}," +
+                "'createdAt':{'$first':'$createdAt'}" +
                 "}}";
     }
 
@@ -77,7 +78,8 @@ public class CustomAggregationQuery {
                 "      'description':1," +
                 "     'templateType':1," +
                 "'defaultAssetTemplate':1," +
-                "'templateStatus':1" +
+                "'templateStatus':1," +
+                "'createdAt':1" +
                 "            }}";
     }
 
@@ -113,7 +115,7 @@ public class CustomAggregationQuery {
         return "{'$project':{" +
                 "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
                 "      'name':1," +
-                "      'sections':1," +
+                "      'sections':[]," +
                 "      'description':1," +
                 "       'accountTypes':1," +
                 "             'organizationTypes':1," +
@@ -129,9 +131,9 @@ public class CustomAggregationQuery {
 
     public static String addNonDeletedTemplateTyeField() {
         return " {  '$addFields':" +
-                "                {'templateTypes':" +
+                "                {'templateType':" +
                 "                {'$filter' : { " +
-                "                'input': '$templateTypes'," +
+                "                'input': '$templateType'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
                 "                }}}}";
@@ -161,25 +163,18 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
-                "'hostingType':{$arrayElemAt:['$hostingType',0]}," +
                 "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
-                "'dataDisposal':{$arrayElemAt:['$dataDisposal',0]}," +
-                "'hostingProvider':{$arrayElemAt:['$hostingProvider',0]}," +
                 "  'name':1," +
                 "  'description':1," +
                 "  'hostingLocation':1," +
                 "  'managingDepartment':1," +
                 "  'assetOwner':1," +
-                "  'storageFormats':1," +
-                "  'orgSecurityMeasures':1," +
-                "  'technicalSecurityMeasures':1," +
                 "  'dataRetentionPeriod':1," +
                 "  'minDataSubjectVolume':1," +
                 "  'maxDataSubjectVolume':1," +
                 "  'active':1," +
                 " 'assetAssessor':1," +
                 "'suggested':1" +
-
                 "            }}";
     }
 

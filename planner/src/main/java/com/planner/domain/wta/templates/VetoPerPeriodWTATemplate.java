@@ -91,12 +91,12 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
+        wtaTemplateType = WTATemplateType.VETO_AND_STOP_BRICKS;
 
     }
 
     public VetoPerPeriodWTATemplate() {
-        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
+        wtaTemplateType = WTATemplateType.VETO_AND_STOP_BRICKS;
     }
 
 

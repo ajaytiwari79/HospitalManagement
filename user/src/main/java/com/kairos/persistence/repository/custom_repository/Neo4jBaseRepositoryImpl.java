@@ -5,6 +5,9 @@ import org.springframework.data.neo4j.repository.support.SimpleNeo4jRepository;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Neo4jBaseRepositoryImpl<T, ID extends Serializable>
 extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
@@ -39,4 +42,10 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 		Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 		return session.load(clazz, id,depth);
 	}
+
+	@Override
+	public List<T> findAllById(List<ID> ids){
+		return new ArrayList<>(session.loadAll(clazz, (Collection<ID>) ids, 1));
+	}
+
 }

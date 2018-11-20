@@ -3,6 +3,7 @@ package com.kairos.response.dto.policy_agreement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 
 import java.util.ArrayList;
@@ -13,9 +14,12 @@ import java.util.List;
 public class AgreementTemplateSectionResponseDTO {
 
 
-    private String coverPageContent;
-    private String coverPageTitle;
-    private String coverPageLogoUrl;
+    private boolean signatureComponentAdded;
+    private boolean signatureComponentLeftAlign;
+    private boolean signatureComponentRightAlign;
+    private String  signatureHtml;
+    private boolean coverPageAdded;
+    private CoverPageVO coverPageData;
 
     private List<ClauseBasicResponseDTO> clauseListForTemplate = new ArrayList<>();
     private List<AgreementSectionResponseDTO> sections = new ArrayList<>();
@@ -28,15 +32,27 @@ public class AgreementTemplateSectionResponseDTO {
 
     public void setSections(List<AgreementSectionResponseDTO> sections) { this.sections = sections; }
 
-    public String getCoverPageContent() { return coverPageContent; }
+    public boolean isCoverPageAdded() { return coverPageAdded; }
 
-    public void setCoverPageContent(String coverPageContent) { this.coverPageContent = coverPageContent; }
+    public void setCoverPageAdded(boolean coverPageAdded) { this.coverPageAdded = coverPageAdded; }
 
-    public String getCoverPageTitle() { return coverPageTitle; }
+    public CoverPageVO getCoverPageData() { return coverPageData; }
 
-    public void setCoverPageTitle(String coverPageTitle) { this.coverPageTitle = coverPageTitle; }
+    public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData;}
 
-    public String getCoverPageLogoUrl() { return coverPageLogoUrl; }
+    public boolean isSignatureComponentAdded() { return signatureComponentAdded; }
 
-    public void setCoverPageLogoUrl(String coverPageLogoUrl) { this.coverPageLogoUrl = coverPageLogoUrl; }
+    public void setSignatureComponentAdded(boolean signatureComponentAdded) { this.signatureComponentAdded = signatureComponentAdded; }
+
+    public boolean isSignatureComponentLeftAlign() { return signatureComponentLeftAlign; }
+
+    public void setSignatureComponentLeftAlign(boolean signatureComponentLeftAlign) { this.signatureComponentLeftAlign = signatureComponentLeftAlign; }
+
+    public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
+
+    public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
+
+    public String getSignatureHtml() { return signatureHtml; }
+
+    public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
 }

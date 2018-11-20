@@ -23,6 +23,11 @@ public class ExceptionService extends CommonsExceptionUtil {
         throw new com.kairos.commons.custom_exception.ActionNotPermittedException(convertMessage(message, params));
     }
 
+    //This method is for throwing exception without converting message in RestClient
+    public void exceptionWithoutConvertInRestClient(String message) {
+        throw new com.kairos.commons.custom_exception.ActionNotPermittedException(message);
+    }
+
     public void invalidRequestException(String message, Object... params) {
         throw new com.kairos.commons.custom_exception.InvalidRequestException(convertMessage(message, params));
     }

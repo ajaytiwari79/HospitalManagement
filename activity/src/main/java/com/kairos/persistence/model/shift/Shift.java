@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
@@ -58,13 +59,13 @@ public class Shift extends MongoBaseEntity {
     private BigInteger copiedFromShiftId;
 
     private boolean sickShift;
-    private LocalDate validatedByStaffDate;
-    private LocalDate validatedByPlannerDate;
-    private Long createdBy;
-    private Long updatedBy;
+
+    private Long createdBy ;//= UserContext.getUserDetails().getId();
+    private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
     private Long functionId;
     private Long staffUserId;
+    private ShiftType shiftType;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -134,6 +135,14 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+    public ShiftType getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(ShiftType shiftType) {
+        this.shiftType = shiftType;
+    }
+
     public AttendanceDuration getAttendanceDuration() {
         return attendanceDuration;
     }
@@ -187,24 +196,6 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
     }
 
-
-
-
-    public LocalDate getValidatedByStaffDate() {
-        return validatedByStaffDate;
-    }
-
-    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
-        this.validatedByStaffDate = validatedByStaffDate;
-    }
-
-    public LocalDate getValidatedByPlannerDate() {
-        return validatedByPlannerDate;
-    }
-
-    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
-        this.validatedByPlannerDate = validatedByPlannerDate;
-    }
 
     public Date getStartDate() {
         return startDate;

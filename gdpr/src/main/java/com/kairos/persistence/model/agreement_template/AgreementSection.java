@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.agreement_template;
 
 
+import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,18 +17,15 @@ public class AgreementSection extends MongoBaseEntity {
 
     @NotBlank(message = "Section Title cannot be empty")
     private String title;
-
+    private String titleHtml;
     private boolean subSection;
-
     // clause id are saved in order way
     private List<BigInteger> clauseIdOrderedIndex=new ArrayList<>();
-
+    private List<ClauseCkEditorVO> clauseCkEditorVOS=new ArrayList<>();
     private List<BigInteger> subSections=new ArrayList<>();
-
-    @NotNull(message = "Clause order is Not defined")
     private Integer orderedIndex;
-
     private Long countryId;
+
 
     public boolean isSubSection() { return subSection; }
 
@@ -53,14 +51,22 @@ public class AgreementSection extends MongoBaseEntity {
 
     public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
 
+    public String getTitleHtml() { return titleHtml; }
+
+    public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
+
+    public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+
+    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
+
     public AgreementSection(){ }
 
 
-    public AgreementSection(Long countryId , @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex,boolean subSection)
+    public AgreementSection( @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex,boolean subSection,String titleHtml)
     {
         this.title=title;
-        this.countryId=countryId;
         this.orderedIndex=orderedIndex;
         this.subSection=subSection;
+        this.titleHtml=titleHtml;
     }
 }

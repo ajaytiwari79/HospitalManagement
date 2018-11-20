@@ -74,14 +74,14 @@ public class DataElementController {
 
     @ApiOperation("organization ,get data Element by id")
     @GetMapping(UNIT_URL + "/data_element/{dataElementId}")
-    public ResponseEntity<ResponseDTO<DataElementBasicResponseDTO>> getOrgaznitionDataElementById(@PathVariable Long unitId, @PathVariable BigInteger dataElementId) {
+    public ResponseEntity<ResponseDTO<DataElementBasicResponseDTO>> getOrganizationDataElementById(@PathVariable Long unitId, @PathVariable BigInteger dataElementId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getDataElementById(dataElementId));
 
     }
 
     @ApiOperation("organization, get All data Element ")
     @GetMapping(UNIT_URL + "/data_element")
-    public ResponseEntity<ResponseDTO<List<DataElementBasicResponseDTO>>> getAllOrgaznitionDataElement(@PathVariable Long unitId) {
+    public ResponseEntity<ResponseDTO<List<DataElementBasicResponseDTO>>> getAllOrganizationDataElement(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getAllDataElementByUnitId(unitId));
 
     }
