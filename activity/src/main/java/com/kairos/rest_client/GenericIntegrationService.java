@@ -381,6 +381,14 @@ public class GenericIntegrationService {
         }, staffId, unitEmploymentId);
     }
 
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffWithUnitId(Long unitId,LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("type", type));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, staffId, unitEmploymentId);
+    }
+
     public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(LocalDate shiftDate, Long staffId, Long unitPositionId) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
