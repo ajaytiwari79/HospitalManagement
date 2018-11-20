@@ -39,7 +39,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.sql.Date;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -96,28 +95,13 @@ public class AttendanceSettingService extends MongoBaseService {
             Set<BigInteger> activityIds = shifts.stream().flatMap(shift1 -> shift1.getActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             activityIdAndLocationActivityTabMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getLocationActivityTab()));
-            /*List<UnitSettingDTO> unitSettingDTOS=unitSettingRepository.getGlideTimeByUnitIds(staffAndOrganizationIds.stream().map(s->s.getUnitId()).collect(Collectors.toList()));
-            for(UnitSettingDTO unitSettingDTO:unitSettingDTOS){
-                    unitIdAndFlexibleTimeMap.put(unitSettingDTO.getUnitId(),unitSettingDTO.getFlexibleTimeSettings());
-            }*/
         }
         if(checkIn) {
             for (Shift checkInshift : shifts) {
                 boolean result;
        if (activityIdAndLocationActivityTabMap.containsKey(checkInshift.getActivities().get(0).getActivityId())) {
-                    /*if(unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId())==null){
-                        exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getUnitId());
-                    }*/
-                    ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
-                    if(!Optional.ofNullable(glideTimeDetails).isPresent()){
-                        exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(0).getActivityName());
-                    }
-                    ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())).minusMinutes(glideTimeDetails.getBefore());
-                    ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())).plusMinutes(glideTimeDetails.getAfter());
-                    DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
+            result=validateGlideTimeWhileCheckIn(checkInshift,unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(),activityIdAndLocationActivityTabMap);
                     DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
-                    /*result=(Math.abs((Duration.between(DateUtils.getLocalDateTimeFromDate(checkInshift.getStartDate()), DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone())))).toMinutes()) < unitIdAndFlexibleTimeMap.get(checkInshift.getUnitId()).getCheckInFlexibleTime());*/
-                    result = glidTimeInterval.contains(checkInshift.getStartDate());
                     if (interval.contains(DateUtils.getCurrentMillistByTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
                         result = (result || reasonCodeId != null);
                         if (!result) {
@@ -168,7 +152,6 @@ public class AttendanceSettingService extends MongoBaseService {
                 }
 
         }
-
 
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
             save(attendanceSetting);
@@ -251,22 +234,29 @@ public class AttendanceSettingService extends MongoBaseService {
     }
 
     private boolean validateGlideTimeWhileCheckOut(Shift shift, Long reasonCodeId, String timeZone){
-        //Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
         LocationActivityTab locationActivityTab = activityMongoRepository.findActivityByIdAndEnabled(shift.getActivities().get(shift.getActivities().size()-1).getActivityId()).getLocationActivityTab();
         ActivityGlideTimeDetails glideTimeDetails = locationActivityTab.getCheckOutGlideTime(LocationEnum.OFFICE);
-        ZonedDateTime glidStartDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(glideTimeDetails.getBefore());
-        ZonedDateTime glidEndDateTime = DateUtils.getZonedDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(glideTimeDetails.getAfter());
+        if(!Optional.ofNullable(glideTimeDetails).isPresent()){
+            exceptionService.dataNotFoundException("error.glidetime.notfound",shift.getActivities().get(shift.getActivities().size()-1).getActivityName());
+        }
+        Date glidStartDateTime=DateUtils.asDate(DateUtils.dateToLocalDateTime(shift.getEndDate()).minusMinutes(glideTimeDetails.getBefore()));
+        Date glidEndDateTime =DateUtils.asDate(DateUtils.dateToLocalDateTime(shift.getEndDate()).plusMinutes(glideTimeDetails.getAfter()));
         DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
-        //FlexibleTimeSettingDTO flexibleTimeSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(shift.getUnitId()).getFlexibleTimeSettings();
-
-        //if (flexibleTimeSettingDTO != null) {
-           // Short checkInFlexibleTime = flexibleTimeSettingDTO.getCheckInFlexibleTime();
-             //return  (Math.abs((shift.getEndDate().getTime() - DateUtils.getCurrentMillis()) / ONE_MINUTE) < checkInFlexibleTime || reasonCodeId != null);
-        return glidTimeInterval.contains(shift.getEndDate()) || reasonCodeId!=null;
-       // return false;
+        return glidTimeInterval.contains(DateUtils.getCurrentMillistByTimeZone(timeZone)) || reasonCodeId!=null;
     }
 
-    public void createShiftState(List<Shift> shifts,boolean checkIn,List<AttendanceSetting> attendanceSettings){
+    private boolean validateGlideTimeWhileCheckIn(Shift checkInshift,String timeZone,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap){
+        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
+        if(!Optional.ofNullable(glideTimeDetails).isPresent()){
+            exceptionService.dataNotFoundException("error.glidetime.notfound",checkInshift.getActivities().get(0).getActivityName());
+        }
+        Date glidStartDateTime=DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getStartDate()).minusMinutes(glideTimeDetails.getBefore()));
+        Date glidEndDateTime =DateUtils.asDate(DateUtils.dateToLocalDateTime(checkInshift.getStartDate()).plusMinutes(glideTimeDetails.getAfter()));
+        DateTimeInterval glidTimeInterval = new DateTimeInterval(glidStartDateTime,glidEndDateTime);
+        return glidTimeInterval.contains(DateUtils.getCurrentMillistByTimeZone(timeZone));
+    }
+
+    private void createShiftState(List<Shift> shifts,boolean checkIn,List<AttendanceSetting> attendanceSettings){
         List<ShiftState> realtimeShiftStates;
         List<ShiftState> timeAndAttendanceShiftStates=null;
        Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
@@ -290,7 +280,7 @@ public class AttendanceSettingService extends MongoBaseService {
      }
     }
 
-    public ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,List<AttendanceSetting> attendanceSetting){
+    private ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,List<AttendanceSetting> attendanceSetting){
         realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
         realtimeShiftState.setId(null);
         realtimeShiftState.setShiftId(shift.getId());
@@ -299,7 +289,7 @@ public class AttendanceSettingService extends MongoBaseService {
         return realtimeShiftState;
     }
 
-    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<AttendanceSetting> attendanceSetting){
+    private List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<AttendanceSetting> attendanceSetting){
         timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndActualPhase(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),AppConstants.TIME_AND_ATTENDANCE);
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=timeAndAttendanceShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
