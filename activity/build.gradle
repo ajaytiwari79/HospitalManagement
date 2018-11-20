@@ -104,24 +104,7 @@ release {
     tagTemplate = 'kairos-$version'
     failOnCommitNeeded = false
     failOnSnapshotDependencies=false
-    buildTasks = ['build']
-    scmAdapters = [
-            net.researchgate.release.GitAdapter
-    ]
-
-    git {
-        requireBranch = 'temp_001'
-        pushToRemote = 'origin'
-        pushToBranchPrefix = ''
-    }
-}
-
-task(startmessage) << {
-    println 'starting build'
-}
-
-task(printversion) << {
-    println project.version
+    buildTasks = ['bootJar']
 }
 
 wrapper.gradleVersion = '4.4'
