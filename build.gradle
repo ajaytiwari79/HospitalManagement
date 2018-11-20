@@ -29,7 +29,14 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 */
+plugins {
+    id 'net.researchgate.release' version '2.6.0'
+}
+
+version '0.0.1'
+
 apply plugin: 'java'
+apply plugin: 'net.researchgate.release'
 
 repositories {
     mavenCentral()
@@ -59,3 +66,30 @@ subprojects{
 subprojects {
     task allDeps(type: DependencyReportTask) {}
 }
+
+release {
+    tagTemplate = 'kairos-$version'
+    failOnCommitNeeded = false
+    failOnSnapshotDependencies=false
+    scmAdapters = [
+            net.researchgate.release.GitAdapter
+    ]
+
+    git {
+        requireBranch = 'temp_001'
+        pushToRemote = 'origin'
+        pushToBranchPrefix = ''
+    }
+}
+
+task(startmessage) << {
+    println 'starting build'
+}
+
+task(printversion) << {
+    println project.version
+}
+
+beforeReleaseBuild.dependsOn startmessage
+afterReleaseBuild.dependsOn printversion
+wrapper.gradleVersion = '4.4'
