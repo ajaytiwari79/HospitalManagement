@@ -101,7 +101,7 @@ public class PayTableController {
     }
 
     @PutMapping(value = "/pay_table/{payTableId}/amount")
-    public ResponseEntity<Map<String,Object>> updatePayTableAmount(@PathVariable @NotNull Long payTableId,PayTableDTO payTableDTO){
+    public ResponseEntity<Map<String,Object>> updatePayTableAmount(@PathVariable @NotNull Long payTableId,@RequestBody PayTableDTO payTableDTO){
        return ResponseHandler.generateResponse(HttpStatus.OK,true,payTableService.updateAmountRelatedToPayTable(payTableId,payTableDTO));
     }
 

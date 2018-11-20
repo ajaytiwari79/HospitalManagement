@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @Repository
 public interface PayTableRelationShipGraphRepository extends Neo4jBaseRepository<PayGradePayGroupAreaRelationShip, Long> {
 
-    @Query("MATCH(payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea:PayGroupArea) where id(payTable)={0} return pgaRel")
+    @Query("MATCH(payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea:PayGroupArea) where id(payTable)={0} return id(pgaRel) as id, pgaRel.payGroupAreaAmount as payGroupAreaAmount,payGrade,payGroupArea")
     List<PayGradePayGroupAreaRelationShip> findAllByPayTableId(Long payTableId);
 }
 

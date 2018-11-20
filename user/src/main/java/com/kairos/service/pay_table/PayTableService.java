@@ -1,6 +1,8 @@
 package com.kairos.service.pay_table;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
@@ -266,7 +268,9 @@ public class PayTableService {
         copiedPayTable.setId(null);
         copiedPayTable.setPayTable(payTable);
         copiedPayTable.setPayGrades(null);
-        payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
+        if(payGradeDTO!=null){
+            payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
+        }
         payTable.setHasTempCopy(true);
         copiedPayTable.setPublished(false);
         payTableGraphRepository.save(copiedPayTable);
@@ -284,8 +288,11 @@ public class PayTableService {
                     payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
                 });
             }
-
-            payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
+            if(payGradesPayGroupAreaRelationShips!=null){
+                payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
+                Map<Long,Long> payGradeMap=payGradePayGroupAreaRelationShips.stream().collect(Collectors.toMap(k->k.getPayGrade().getPayGradeLevel(),k->k.getPayGrade().getId()));
+                newPayGrade.setId(payGradeMap.get(newPayGrade.getPayGradeLevel()));
+            }
             payGradesObjects.add(newPayGrade);
             PayGradeResponse payGradeResponse =
                     new PayGradeResponse(copiedPayTable.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
@@ -506,6 +513,9 @@ public class PayTableService {
             exceptionService.actionNotPermittedException("message.paytable.published");
 
         }
+        if(CollectionUtils.isEmpty(payTable.getPayGrades())){
+            exceptionService.actionNotPermittedException("message.paygrade.absent");
+        }
         List<PayTable> response = new ArrayList<>();
 
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
@@ -524,6 +534,7 @@ public class PayTableService {
         payTable.setPayTable(null);
         payTable.setPublished(true);
         payTable.setStartDateMillis(new Date(publishedDateMillis));
+
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
         response.add(payTable);
@@ -538,17 +549,19 @@ public class PayTableService {
     }
 
     public boolean updateAmountRelatedToPayTable(Long payTableId , PayTableDTO payTableDTO){
-        if(payTableDTO.getPercentageValue()==null){
+        if(payTableDTO.getPercentageValue()==null || payTableDTO.getPercentageValue().equals(new BigDecimal(0))){
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }
-        PayTable payTable=payTableGraphRepository.findByIdAndDeletedFalse(payTableId);
-        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips=payTableRelationShipGraphRepository.findAllByPayTableId(payTableId);
+        PayTable payTable=payTableGraphRepository.findOne(payTableId);
+        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips=ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId),PayGradePayGroupAreaRelationShip.class);
         if(CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)){
             for(PayGradePayGroupAreaRelationShip current: payGradePayGroupAreaRelationShips)
             {
                 if(current.getPayGroupAreaAmount()!=null){
-                    current.setPayGroupAreaAmount(current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal("100")));
+                    BigDecimal valueToAdd=current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100));
+                    current.setPayGroupAreaAmount(current.getPayGroupAreaAmount().add(valueToAdd));
                     current.setId(null);
+                    current.getPayGrade().setId(null);
                 }
             }
         }
