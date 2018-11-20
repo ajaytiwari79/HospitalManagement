@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.clause_tag;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;

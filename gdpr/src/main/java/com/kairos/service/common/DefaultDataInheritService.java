@@ -4,6 +4,8 @@ package com.kairos.service.common;
 import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
+import com.kairos.persistence.model.clause.Clause;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
@@ -15,6 +17,8 @@ import com.kairos.persistence.model.questionnaire_template.Question;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
+import com.kairos.persistence.repository.clause.ClauseMongoRepository;
+import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
@@ -39,6 +43,8 @@ import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRep
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
+import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
@@ -119,6 +125,10 @@ public class DefaultDataInheritService extends MongoBaseService {
     private DataElementMongoRepository dataElementMongoRepository;
     @Inject
     private DataSubjectMappingRepository dataSubjectMappingRepository;
+    @Inject
+    private ClauseTagMongoRepository clauseTagMongoRepository;
+    @Inject
+    private ClauseMongoRepository clauseMongoRepository;
 
 
     private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
@@ -133,9 +143,10 @@ public class DefaultDataInheritService extends MongoBaseService {
                 orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
         List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
-        saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
         List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
+        saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
         copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
+
 
         List<Callable<Boolean>> callables = new ArrayList<>();
         Callable<Boolean> dataDispoaslTask = () -> {
@@ -224,6 +235,11 @@ public class DefaultDataInheritService extends MongoBaseService {
             copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
             return true;
         };
+        Callable<Boolean> clauseTask = () -> {
+            List<Clause> clauses = clauseMongoRepository.getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
+            copyClauseFromCountry(unitId, clauses);
+            return true;
+        };
 
         callables.add(hostingProviderTask);
         callables.add(dataDispoaslTask);
@@ -241,6 +257,7 @@ public class DefaultDataInheritService extends MongoBaseService {
         callables.add(questionniareTemplateTask);
         callables.add(assetTask);
         callables.add(dataSubjectTask);
+        callables.add(clauseTask);
         asynchronousService.executeAsynchronously(callables);
         return true;
     }
@@ -262,9 +279,37 @@ public class DefaultDataInheritService extends MongoBaseService {
             }
             assetMongoRepository.saveAll(getNextSequence(assets));
         }
+    }
 
+    private void copyClauseFromCountry(Long unitId, List<Clause> clauses) {
+        if (CollectionUtils.isNotEmpty(clauses)) {
+
+            Set<BigInteger> clauseTagIds = new HashSet<>();
+            List<ClauseTag> clauseTags = new ArrayList<>();
+            List<Clause> clauseList = new ArrayList<>();
+            clauses.forEach(clauseResponse -> {
+                Clause clause = new Clause(clauseResponse.getTitle(), clauseResponse.getDescription());
+                clause.setOrganizationId(unitId);
+                List<ClauseTag> tags = new ArrayList<>();
+                clauseResponse.getTags().forEach(clauseTag -> {
+                    if (!clauseTagIds.contains(clauseTag.getId())) {
+                        ClauseTag tag = new ClauseTag(clauseTag.getName());
+                        tag.setOrganizationId(unitId);
+                        tag.setDefaultTag(clauseTag.isDefaultTag());
+                        clauseTagIds.add(clauseTag.getId());
+                        tags.add(clauseTag);
+                    }
+                });
+                clause.setTags(tags);
+                clauseTags.addAll(tags);
+                clauseList.add(clause);
+            });
+            clauseTagMongoRepository.saveAll(clauseTags);
+            clauseMongoRepository.saveAll(clauseList);
+        }
 
     }
+
 
     private void copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(Long unitId, List<MasterProcessingActivityResponseDTO> masterProcessingActivityDTOS) {
 

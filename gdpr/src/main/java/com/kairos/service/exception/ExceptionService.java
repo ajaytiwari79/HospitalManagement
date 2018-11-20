@@ -5,8 +5,6 @@ import com.kairos.custom_exception.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-
 
 /**
  * Created by vipul on 10/5/18.

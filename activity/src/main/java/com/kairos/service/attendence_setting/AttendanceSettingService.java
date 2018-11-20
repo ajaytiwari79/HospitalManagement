@@ -8,6 +8,7 @@ import com.kairos.dto.activity.activity.LocationActivityTabWithActivityIdDTO;
 import com.kairos.dto.activity.activity.activity_tabs.LocationActivityTabDTO;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
@@ -55,7 +57,8 @@ public class AttendanceSettingService extends MongoBaseService {
 
     @Inject
     private ShiftService shiftService;
-
+    @Inject
+    private MongoSequenceRepository mongoSequenceRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -310,6 +313,7 @@ public class AttendanceSettingService extends MongoBaseService {
                     timeAndAttendanceShiftState.setId(null);
                     timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
                     timeAndAttendanceShiftState.setActualPhaseState(AppConstants.TIME_AND_ATTENDANCE);
+                    timeAndAttendanceShiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                     timeAndAttendanceShiftStates.add(timeAndAttendanceShiftState);
                 }
             }

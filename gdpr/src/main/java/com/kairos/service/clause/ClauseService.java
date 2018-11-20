@@ -11,6 +11,7 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.service.clause_tag.ClauseTagService;
@@ -139,7 +140,7 @@ public class ClauseService extends MongoBaseService {
         return clauseMongoRepository.findAllClauseByCountryId(countryId);
     }
 
-    public List<ClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
+    public List<ClauseBasicResponseDTO> getAllClauseByUnitId(Long unitId) {
         return clauseMongoRepository.findAllClauseByUnitId(unitId);
     }
 

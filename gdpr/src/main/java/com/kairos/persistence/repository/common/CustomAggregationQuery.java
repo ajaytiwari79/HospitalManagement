@@ -115,7 +115,7 @@ public class CustomAggregationQuery {
         return "{'$project':{" +
                 "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
                 "      'name':1," +
-                "      'sections':1," +
+                "      'sections':[]," +
                 "      'description':1," +
                 "       'accountTypes':1," +
                 "             'organizationTypes':1," +
@@ -131,9 +131,9 @@ public class CustomAggregationQuery {
 
     public static String addNonDeletedTemplateTyeField() {
         return " {  '$addFields':" +
-                "                {'templateTypes':" +
+                "                {'templateType':" +
                 "                {'$filter' : { " +
-                "                'input': '$templateTypes'," +
+                "                'input': '$templateType'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
                 "                }}}}";
