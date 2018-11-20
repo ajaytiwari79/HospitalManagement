@@ -793,6 +793,7 @@ public class OrganizationService {
         return null;
     }
 
+    //todo remove if not use
     public String getWorkPlaceFromTimeCare(GetAllWorkPlacesResponse workPlaces) {
         try {
             logger.info(" workPlaces---> " + workPlaces.getWorkPlaceList().size());
