@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
+import com.kairos.persistence.model.organization.union.Location;
+import com.kairos.persistence.model.organization.union.LocationQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
@@ -249,4 +251,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels ,seniorDays,childCareDays order by expertise.creationDate")
     List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, List<Long> organizationServicesIds);
 
+    @Query("MATCH (expertise:Expertise{deleted:false}) where id(expertise) = {0}" +
+            "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  RETURN location as name ORDER BY location.name ASC" )
+    List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 }

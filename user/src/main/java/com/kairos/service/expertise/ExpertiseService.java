@@ -884,5 +884,12 @@ public class ExpertiseService {
         }
         return sector;
     }
+    public Map<String, Object> getPlannedTimeAndEmploymentTypeForUnit(Long unitId){
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+        }
+        return getPlannedTimeAndEmploymentType(organization.getCountry().getId());
+    }
 
 }

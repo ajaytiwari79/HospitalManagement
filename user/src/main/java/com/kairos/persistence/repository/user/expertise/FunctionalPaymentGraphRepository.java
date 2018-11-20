@@ -1,17 +1,13 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.FunctionalPayment;
-import com.kairos.persistence.model.user.expertise.FunctionalPaymentMatrix;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixPayGroupAreaQR;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -32,7 +28,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " WITH functionalPaymentMatrix ,COLLECT (id(pga)) as payGroupAreaIds \n" +
             " MATCH(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)" +
             " MATCH(seniorityLevel:SeniorityLevel)<-[:" + FOR_SENIORITY_LEVEL + "]- (seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) " +
-            " WITH functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, COLLECT({functionId:id(function),functionName:function.name,amountEditableAtUnit:function_amt.amountEditableAtUnit, amount:function_amt.amount}) as functions\n" +
+            " WITH functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, COLLECT({functionId:id(function),amountEditableAtUnit:function_amt.amountEditableAtUnit, amount:function_amt.amount}) as functions\n" +
             " RETURN id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,COLLECT ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction")
     List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrix(Long functionalPaymentId);
 
@@ -74,14 +70,5 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " CREATE UNIQUE(newSL)-[:"+HAS_FUNCTIONAL_AMOUNT+"{amount:0,amountEditableAtUnit:oldRel.amountEditableAtUnit}]->(currentFunction))")
     void linkWithFunctionPayment(Long expertiseId,Long seniorityLevelId);
 
-    @Query(" MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment)={0}\n" +
-            " MATCH(functionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPaymentMatrix:FunctionalPaymentMatrix)\n" +
-            " MATCH(functionalPaymentMatrix)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n " +
-            " WITH functionalPaymentMatrix ,COLLECT ({id:id(pga),name:pga.name}) as payGroupAreas \n" +
-            " MATCH(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)" +
-            " MATCH(seniorityLevel:SeniorityLevel)<-[:" + FOR_SENIORITY_LEVEL + "]- (seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) " +
-            " WITH functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreas, COLLECT({functionId:id(function),functionName:function.name,amountEditableAtUnit:function_amt.amountEditableAtUnit, amount:function_amt.amount}) as functions\n" +
-            " RETURN id(functionalPaymentMatrix) as id,payGroupAreas as payGroupAreas ,COLLECT ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction")
-    List<FunctionalPaymentMatrixPayGroupAreaQR> getFunctionalPaymentMatrixData(Long functionalPaymentId);
 
 }

@@ -44,7 +44,7 @@ public class BreakSettingsService extends MongoBaseService {
         if (Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
         }
-        breakSettings = new BreakSettings(countryId,breakSettingsDTO.getShiftDurationInMinute(),breakSettingsDTO.getBreakDurationInMinute(),expertiseId,breakSettingsDTO.getActivityId());
+        breakSettings = new BreakSettings(countryId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), expertiseId, breakSettingsDTO.getActivityId());
         save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
@@ -56,7 +56,7 @@ public class BreakSettingsService extends MongoBaseService {
             exceptionService.duplicateDataException("error.expertise.notfound");
         }
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId, expertise.getBreakPaymentSetting().toString());
-        List<BigInteger> parentIds=timeTypes.stream().map(TimeType::getId).collect(Collectors.toList());
+        List<BigInteger> parentIds = timeTypes.stream().map(TimeType::getId).collect(Collectors.toList());
         List<TimeType> childTimeType = timeTypeMongoRepository.findAllChildTimeTypeByParentId(parentIds);
         parentIds.addAll(childTimeType.stream().map(TimeType::getId).collect(Collectors.toList()));
         List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);
@@ -97,8 +97,10 @@ public class BreakSettingsService extends MongoBaseService {
     }
 
 
-    public List<BreakSettingsResponseDTO> getBreakSettingsByExpertiseId(Long expertiseId) {
-       return  breakSettingMongoRepository.findAllBreakSettingsByExpertise(expertiseId);
+    public BreakSettingAndActivitiesWrapper getBreakSettingsByExpertiseId(Long expertiseId) {
+        List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
+        List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndIdsIn(breakSettings.stream().map(BreakSettingsDTO::getActivityId).collect(Collectors.toSet()));
+        return new BreakSettingAndActivitiesWrapper(breakSettings, activities);
     }
 
 }
