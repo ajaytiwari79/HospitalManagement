@@ -35,10 +35,10 @@ dependencies {
 
 }
 
-release {
-    tagTemplate = 'kairos-$version'
-    failOnCommitNeeded = false
-    failOnSnapshotDependencies=false
-    buildTasks = ['build']
-}
-
+//release {
+//    tagTemplate = 'kairos-$version'
+//    failOnCommitNeeded = false
+//    failOnSnapshotDependencies=false
+//    buildTasks = ['build']
+//}
+//

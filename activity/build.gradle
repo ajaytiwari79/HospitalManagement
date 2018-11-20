@@ -100,11 +100,11 @@ dependencyManagement {
 }
 
 
-release {
-    tagTemplate = 'kairos-$version'
-    failOnCommitNeeded = false
-    failOnSnapshotDependencies=false
-    buildTasks = ['bootJar']
-}
-
-wrapper.gradleVersion = '4.4'
+//release {
+//    tagTemplate = 'kairos-$version'
+//    failOnCommitNeeded = false
+//    failOnSnapshotDependencies=false
+//    buildTasks = ['bootJar']
+//}
+//
+//wrapper.gradleVersion = '4.4'
