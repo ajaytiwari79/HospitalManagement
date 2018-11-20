@@ -68,7 +68,7 @@ subprojects {
 }
 
 release {
-    tagTemplate = 'kairos-$version'
+    tagTemplate = '$version Release'
     failOnCommitNeeded = false
     failOnSnapshotDependencies=false
     buildTasks = ['build']
@@ -77,22 +77,22 @@ release {
     ]
 
     git {
-        requireBranch = 'master|temp_001'
+        requireBranch = 'master|release'
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
     }
 }
 
 task verifyRelease {
-//    dependsOn ":kcommons:build"
-//    dependsOn ":user:build"
-//    dependsOn ":gdpr:build"
-//    dependsOn ":activity:build"
-//    dependsOn ":scheduler-service:build"
-//    dependsOn ":planner:optaplanner-shiftplanning:build"
-//    dependsOn ":planner:optaplanner-taskplanning:build"
-//    dependsOn ":planner:optaplanner-vrp-taskplanning:build"
-//    dependsOn ":planner:responseWrapper:build"
+    dependsOn ":kcommons:build"
+    dependsOn ":user:build"
+    dependsOn ":gdpr:build"
+    dependsOn ":activity:build"
+    dependsOn ":scheduler-service:build"
+    dependsOn ":planner:optaplanner-shiftplanning:build"
+    dependsOn ":planner:optaplanner-taskplanning:build"
+    dependsOn ":planner:optaplanner-vrp-taskplanning:build"
+    dependsOn ":planner:responseWrapper:build"
 }
 
 beforeReleaseBuild.dependsOn verifyRelease
