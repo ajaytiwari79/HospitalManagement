@@ -1242,25 +1242,28 @@ public class UnitPositionService {
 
     }
 
-    //TODO update with all associated organizations
     //===========================================================================
-    public List<Map<String,Object>> getUnitPositionsByStaffId(Long staffId, Long unitId, boolean withLinkedOrganizations) {
-        Object object=unitPositionGraphRepository.getUnitPositionsByUnitIdAndStaffId(unitId,staffId);
-        if(object instanceof String){
-            if("org".equals(object)){
-               exceptionService.unitNotFoundException("message.organization.id.notFound",unitId);
-            }
-            else if("staff".equals(object)){
-                exceptionService.dataNotFoundByIdException("message.dataNotFound","Staff",staffId);
-            }
-            else if("emp".equals(object)){
-                exceptionService.actionNotPermittedException("");
-            }
-            else if("unitPosition".equals(object)){
+    public List<UnitPositionDTO> getUnitPositionsByStaffId(Long unitId, Long staffId) {
+        Object object = unitPositionGraphRepository.getUnitPositionsByUnitIdAndStaffId(unitId, staffId);
+        if (object instanceof String) {
+            if ("org".equals(object)) {
+                exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
+            } else if ("staff".equals(object)) {
+                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
+            } else if ("emp".equals(object)) {
+                exceptionService.dataNotFoundByIdException("error.Employement.notExist", unitId, staffId);
+            } else if ("unitPosition".equals(object)) {
                 //Might throw exception
             }
         }
-        List<Map<String,Object>> unitPositions=(List<Map<String,Object>>)object;
-        return unitPositions;
+        List<Map<Object, Object>> unitPositions = (List<Map<Object, Object>>) object;
+        List<UnitPositionDTO> unitPositionDTOList = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositions, UnitPositionDTO.class);
+        return unitPositionDTOList;
+    }
+
+    //=========================================================================================
+    //TODO work
+    public Object getPositionLinesByStaffAndUnitPositionId(Long unitId, Long staffId, Long unitPositionId) {
+        return null;
     }
 }

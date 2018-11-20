@@ -316,9 +316,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 //====================================================
 @Query("OPTIONAL MATCH (organization:Organization)  where id(organization)={0}\n" +
         "OPTIONAL MATCH (staff:Staff)  where id(staff)={1}\n" +
-        "OPTIONAL MATCH(organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:BELONGS_TO]-(staff)\n" +
+        "OPTIONAL MATCH(organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff)\n" +
         "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true}) \n" +
-        "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode)" +
+        "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode) " +
         "RETURN \n" +
         "CASE \n" +
         "WHEN organization IS NULL THEN \"org\" \n" +
@@ -327,5 +327,35 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
         "ELSE collect({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
         Object getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
+
+//==========================================================
+    @Query("OPTIONAL MATCH(organization:Organization) WHERE id(unitId)={0} \n" +
+            "OPTIONAL MATCH(staff:Staff) WHERE id(staff)={1} \n" +
+            "OPTIONAL MATCH(unitPosition:UnitPosition) WHERE id(unitPosition)={2} \n" +
+            "OPTIONAL MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+IN_UNIT+"]-(organization) \n" +
+            "OPTIONAL MATCH(staff)-[unitPositionStaffRel:"+BELONGS_TO_STAFF+"]->(unitPosition) \n" +
+            "WITH organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel \n" +
+            "MATCH(positionLine:UnitPositionLine)-[:"+HAS_POSITION_LINES+"]-(unitPosition) \n" +
+            "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]-(payGrade:PayGrade) \n" +
+            "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise{published:true}) \n" +
+            "OPTIONAL MATCH(organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGrade) \n" +
+            "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,positionLine,payGrade,expertise,seniorityLevel, " +
+            "CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as basePayAmount \n" +
+            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate}))) \n" +
+            "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,functionalPayment,seniorityLevel,function,basePayAmount \n" +
+            "OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) \n" +
+            "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,seniorityLevel,function,functionalPayment,basePayAmount \n" +
+            "OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) \n" +
+            "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,slf,function,functionalPayment,basePayAmount \n" +
+            "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function)\n" +
+            "RETURN " +
+            "CASE " +
+            "WHEN organization IS NULL THEN \"org\" \n" +
+            "WHEN staff IS NULL THEN \"staff\" \n " +
+            "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
+            "WHEN unitPositionOrgRel IS NULL THEN  \"unitPositionOrgRel\" \n" +
+            "WHEN unitPositionStaffRel IS NULL THEN  \"unitPositionStaffRel\" \n" +
+            "ELSE END ")
+         Object getFunctionalHourlyCostByUnitPositionId(Long unitId,Long staffId,Long unitPositionId);
 
 }

@@ -66,6 +66,7 @@ public class UnitPositionDTO {
     private Long timeCareExternalId;
     private boolean published;
     private Long accessGroupId;
+    private String positionCodeName;
 
 
 
@@ -218,13 +219,14 @@ public class UnitPositionDTO {
     }
 
 
-    public long getEmploymentTypeId() {
+    public Long getEmploymentTypeId() {
         return employmentTypeId;
     }
 
-    public void setEmploymentTypeId(long employmentTypeId) {
+
+    /*public void setEmploymentTypeId(long employmentTypeId) {
         this.employmentTypeId = employmentTypeId;
-    }
+    }*/
 
     public Long getStaffId() {
         return staffId;
@@ -329,5 +331,13 @@ public class UnitPositionDTO {
 
     public void setPositionLineId(Long positionLineId) {
         this.positionLineId = positionLineId;
+    }
+
+    public String getPositionCodeName() {
+        return positionCodeName;
+    }
+
+    public void setPositionCodeName(String positionCodeName) {
+        this.positionCodeName = positionCodeName;
     }
 }

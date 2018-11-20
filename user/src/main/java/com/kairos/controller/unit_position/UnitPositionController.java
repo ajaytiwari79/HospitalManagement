@@ -161,8 +161,14 @@ public class UnitPositionController {
     //=======================================================================================
 
     @ApiOperation(value = "get UnitPositions Per Staff")
-    @GetMapping(value = "/getStaffUnitPositions/{staffId}")
-    public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,@RequestParam boolean withLinkedOrganizations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(staffId, unitId,withLinkedOrganizations));
+    @GetMapping(value = "staff/{staffId}/getStaffUnitPositions")
+    public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(unitId, staffId));
+    }
+
+    @ApiOperation(value = "get UnitPositions Per Staff")
+    @GetMapping(value = "staff/{staffId}/unitPosition/{unitPositionId}/getPositionLines")
+    public ResponseEntity<Map<String, Object>> getPositionLinesByStaffAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesByStaffAndUnitPositionId(unitId, staffId,unitPositionId));
     }
 }
