@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
@@ -32,7 +33,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
 
     @Override
-    public Asset findByName( Long organizationId, String name) {
+    public Asset findByName(Long organizationId, String name) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, Asset.class);
@@ -41,7 +42,27 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
 
     @Override
-    public AssetResponseDTO findAssetWithMetaDataById( Long organizationId, BigInteger id) {
+    public AssetResponseDTO getAssetWithRiskAndRelatedProcessingActivitiesById(Long organizationId, BigInteger id) {
+
+        String addSelectedSubProcessingActivity = "{'$addFields':{" +
+                "    'processingActivities.subProcessingActivities':{   " +
+                "     '$filter': {" +
+                "      'input': '$processingActivities.subProcessingActivities'," +
+                "      'as': 'subProcess'," +
+                "      'cond': { '$in': [ '$$subProcess._id', '$subProcessingActivityIds' ] }}" +
+                "     }}}";
+        String addAssetType = "{'$addFields':{'assetType':{'$arrayElemAt':['$assetType',0]}}}";
+        String addSubAssetType = "{'$addFields':{'assetSubType':{'$arrayElemAt':['$assetSubType',0]}}}";
+        String groupOperation = "{'$group':{" +
+                "       '_id':'$_id','processingActivities':{'$addToSet':'$processingActivities'},'assetType':{'$first':'$assetType'},'technicalSecurityMeasures':{'$first':'$technicalSecurityMeasures'},\n" +
+                "       'assetSubType':{'$first':'$assetSubType'},'description':{'$first':'$description'},'hostingLocation':{'$first':'$hostingLocation'},'assetAssessor':{'$first':'$assetAssessor'},\n" +
+                "        'name':{'$first':'$name'},'storageFormats':{'$first':'$storageFormats'},'orgSecurityMeasures':{'$first':'$orgSecurityMeasures'},'active':{'$first':'$active'},\n" +
+                "        'hostingType':{'$first':{'$arrayElemAt':['$hostingType',0]}}," +
+                "        'dataDisposal':{'$first':{'$arrayElemAt':['$dataDisposal',0]}}," +
+                "        'hostingProvider':{'$first':{'$arrayElemAt':['$hostingProvider',0]}}" +
+                "   }}";
+
+
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
@@ -52,7 +73,15 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("hostingProvider", "hostingProviderId", "_id", "hostingProvider"),
                 lookup("hostingType", "hostingTypeId", "_id", "hostingType"),
                 lookup("dataDisposal", "dataDisposalId", "_id", "dataDisposal"),
-                new CustomAggregationOperation(projectionOperation)
+                new CustomAggregationOperation(Document.parse(addAssetType)),
+                new CustomAggregationOperation(Document.parse(addSubAssetType)),
+                lookup("risk", "assetType.risks", "_id", "assetType.riskList"),
+                lookup("risk", "assetSubType.risks", "_id", "assetSubType.riskList"),
+                lookup("processingActivity", "processingActivityIds", "_id", "processingActivities"),
+                unwind("processingActivities", true),
+                lookup("processingActivity", "processingActivities.subProcessingActivities", "_id", "processingActivities.subProcessingActivities"),
+                new CustomAggregationOperation(Document.parse(addSelectedSubProcessingActivity)),
+                new CustomAggregationOperation(Document.parse(groupOperation))
         );
 
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
@@ -61,25 +90,18 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
     }
 
     @Override
-    public List<AssetResponseDTO> findAllAssetWithMetaData( Long organizationId) {
+    public List<AssetResponseDTO> findAllByUnitId(Long organizationId) {
 
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
-                lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
-                lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
-                lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
                 lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
                 lookup("assetType", "assetTypeId", "_id", "assetType"),
-                lookup("hostingProvider", "hostingProviderId", "_id", "hostingProvider"),
-                lookup("hostingType", "hostingTypeId", "_id", "hostingType"),
-                lookup("dataDisposal", "dataDisposalId", "_id", "dataDisposal"),
                 sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation)
 
 
-
-                );
+        );
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
         return results.getMappedResults();
     }

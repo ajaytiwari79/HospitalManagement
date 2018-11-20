@@ -1,9 +1,10 @@
 package com.kairos.service.data_inventory.asset;
 
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
-import com.kairos.dto.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
@@ -12,11 +13,11 @@ import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.asset_management.MasterAssetService;
+import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -61,19 +62,37 @@ public class AssetService extends MongoBaseService {
     @Inject
     private MasterAssetService masterAssetService;
 
+    @Inject
+    private RiskService riskService;
 
-    public AssetDTO createAssetWithBasicDetail(Long unitId, AssetDTO assetDTO) {
+
+    public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
         Asset previousAsset = assetMongoRepository.findByName(unitId, assetDTO.getName());
-        if (Optional.ofNullable(previousAsset).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
-        }
-        AssetType assetType = assetTypeMongoRepository.findOne(assetDTO.getAssetTypeId());
-        if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetTypeId());
-        }
-        Asset asset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
-                assetDTO.getAssetTypeId(), assetDTO.getAssetSubTypeId(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner());
+        Optional.ofNullable(previousAsset).ifPresent(asset ->
+                {
+                    if (assetDTO.getId() == null || (assetDTO.getId() != null && !asset.getId().equals(assetDTO.getId()))) {
+                        exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
+                    }
+                }
+        );
+        Asset asset = buildAsset(unitId, assetDTO);
+        saveAssetTypeSubTypeAndRisk(unitId, asset, assetDTO);
+        assetMongoRepository.save(asset);
+        assetDTO.setId(asset.getId());
+        return assetDTO;
+    }
+
+
+    private Asset buildAsset(Long unitId, AssetDTO assetDTO) {
+
+        Asset asset;
+        if (Optional.ofNullable(assetDTO.getId()).isPresent())
+            asset = assetMongoRepository.findOne(assetDTO.getId());
+        else
+            asset = new Asset();
         asset.setOrganizationId(unitId);
+        asset.setName(assetDTO.getName());
+        asset.setDescription(assetDTO.getDescription());
         asset.setHostingProviderId(assetDTO.getHostingProvider());
         asset.setHostingTypeId(assetDTO.getHostingType());
         asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
@@ -83,16 +102,72 @@ public class AssetService extends MongoBaseService {
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         asset.setSuggested(assetDTO.isSuggested());
-        assetMongoRepository.save(asset);
-        assetDTO.setId(asset.getId());
-        return assetDTO;
+        asset.setManagingDepartment(assetDTO.getManagingDepartment());
+        asset.setAssetOwner(assetDTO.getAssetOwner());
+        asset.setHostingLocation(assetDTO.getHostingLocation());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        asset.setProcessingActivityIds(assetDTO.getProcessingActivityIds());
+        asset.setSubProcessingActivityIds(assetDTO.getSubProcessingActivityIds());
+        return asset;
+    }
+
+
+    private void saveAssetTypeSubTypeAndRisk(Long unitId, Asset asset, AssetDTO assetDTO) {
+
+        Map<AssetType, List<OrganizationLevelRiskDTO>> assetTypeRiskListMap = new HashMap<>();
+        AssetType assetType;
+        AssetType assetSubType = null;
+        if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
+            assetType = assetTypeMongoRepository.findOne(assetDTO.getAssetType().getId());
+            assetTypeRiskListMap.put(assetType, assetDTO.getAssetType().getRisks());
+            if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
+                if (assetDTO.getAssetSubType().getId() != null)
+                    assetSubType = assetTypeMongoRepository.findOne(assetDTO.getAssetSubType().getId());
+                else
+                    assetSubType = new AssetType(assetDTO.getAssetSubType().getName());
+                assetSubType.setOrganizationId(unitId);
+                assetSubType.setSubAssetType(true);
+                assetTypeRiskListMap.put(assetSubType, assetDTO.getAssetSubType().getRisks());
+            }
+        } else {
+            AssetType previousAssetType = assetTypeMongoRepository.findByNameAndUnitId(unitId, assetDTO.getAssetType().getName());
+            if (Optional.ofNullable(previousAssetType).isPresent()) {
+                exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
+            }
+            assetType = new AssetType(assetDTO.getAssetType().getName());
+            assetType.setOrganizationId(unitId);
+            assetTypeRiskListMap.put(assetType, assetDTO.getAssetType().getRisks());
+            if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
+                assetSubType = new AssetType(assetDTO.getAssetSubType().getName());
+                assetSubType.setOrganizationId(unitId);
+                assetSubType.setSubAssetType(true);
+                assetTypeRiskListMap.put(assetSubType, assetDTO.getAssetSubType().getRisks());
+            }
+
+        }
+        Map<AssetType, List<Risk>> assetTypeMap = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, assetTypeRiskListMap);
+        assetTypeMap.forEach((k, v) -> {
+            if (CollectionUtils.isNotEmpty(v)) k.setRisks(v.stream().map(Risk::getId).collect(Collectors.toSet()));
+            else k.setRisks(new HashSet<>());
+
+        });
+        asset.setAssetSubTypeId(null);
+        if (assetSubType != null) {
+            assetType.getSubAssetTypes().add(assetTypeMongoRepository.save(assetSubType).getId());
+            asset.setAssetSubTypeId(assetSubType.getId());
+        }
+        assetTypeMongoRepository.save(assetType);
+        asset.setAssetTypeId(assetType.getId());
+
+
     }
 
 
     public Map<String, Object> deleteAssetById(Long organizationId, BigInteger assetId) {
         Asset asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + assetId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + assetId);
         }
         List<ProcessingActivityBasicDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
         Map<String, Object> result = new HashMap<>();
@@ -128,12 +203,12 @@ public class AssetService extends MongoBaseService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @param id
      * @return method return Asset with Meta Data (storage format ,data Disposal, hosting type and etc)
      */
-    public AssetResponseDTO getAssetWithMetadataById(Long organizationId, BigInteger id) {
-        AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(organizationId, id);
+    public AssetResponseDTO getAssetWithRelatedDataAndRiskByUnitIdAndId(Long unitId, BigInteger id) {
+        AssetResponseDTO asset = assetMongoRepository.getAssetWithRiskAndRelatedProcessingActivitiesById(unitId, id);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
@@ -143,11 +218,11 @@ public class AssetService extends MongoBaseService {
 
     /**
      * @param
-     * @param organizationId
+     * @param unitId
      * @return return list Of Asset With Meta Data
      */
-    public List<AssetResponseDTO> getAllAssetWithMetadata(Long organizationId) {
-        return assetMongoRepository.findAllAssetWithMetaData(organizationId);
+    public List<AssetResponseDTO> getAllAssetByUnitId(Long unitId) {
+        return assetMongoRepository.findAllByUnitId(unitId);
     }
 
 
@@ -173,68 +248,6 @@ public class AssetService extends MongoBaseService {
     }
 
     /**
-     * @param
-     * @param organizationId
-     * @param assetId        - asset id
-     * @param assetDTO       - asset dto contain meta data about asset
-     * @return - updated Asset
-     */
-    public AssetDTO updateAssetData(Long organizationId, BigInteger assetId, AssetDTO assetDTO) {
-
-        Asset asset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
-        if (Optional.ofNullable(asset).isPresent() && !assetId.equals(asset.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "Asset", assetDTO.getName());
-        }
-        asset = assetMongoRepository.findOne(assetId);
-        if (!asset.isActive()) {
-            exceptionService.invalidRequestException("message.asset.inactive");
-        }
-        AssetType assetType = assetTypeMongoRepository.findOne(assetDTO.getAssetTypeId());
-        if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetTypeId());
-        }
-        asset.setName(assetDTO.getName());
-        asset.setDescription(assetDTO.getDescription());
-        asset.setHostingProviderId(assetDTO.getHostingProvider());
-        asset.setHostingTypeId(assetDTO.getHostingType());
-        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
-        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
-        asset.setStorageFormats(assetDTO.getStorageFormats());
-        asset.setDataDisposalId(assetDTO.getDataDisposal());
-        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-        asset.setAssetAssessor(assetDTO.getAssetAssessor());
-        asset.setSuggested(assetDTO.isSuggested());
-        asset.setManagingDepartment(assetDTO.getManagingDepartment());
-        asset.setAssetOwner(assetDTO.getAssetOwner());
-        asset.setHostingLocation(assetDTO.getHostingLocation());
-        asset.setStorageFormats(assetDTO.getStorageFormats());
-        asset.setAssetTypeId(assetDTO.getAssetTypeId());
-        asset.setAssetSubTypeId(assetDTO.getAssetSubTypeId());
-        assetMongoRepository.save(asset);
-        return assetDTO;
-    }
-
-
-    /**
-     * @param unitId
-     * @param assetId
-     * @param assetRelateProcessingActivityDTO
-     * @return
-     * @description map asset with Processing activity
-     */
-    public Asset addProcessingActivitiesAndSubProcessingActivitiesToAsset(Long unitId, BigInteger assetId, AssetRelateProcessingActivityDTO assetRelateProcessingActivityDTO) {
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
-        }
-        asset.setProcessingActivities(assetRelateProcessingActivityDTO.getProcessingActivities());
-        asset.setSubProcessingActivities(assetRelateProcessingActivityDTO.getSubProcessingActivities());
-        assetMongoRepository.save(asset);
-        return asset;
-    }
-
-
-    /**
      * @param unitId
      * @param assetId              - asset Id
      * @param processingActivityId Processing Activity id link with Asset
@@ -245,7 +258,7 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
-        asset.getProcessingActivities().remove(processingActivityId);
+        asset.getProcessingActivityIds().remove(processingActivityId);
         assetMongoRepository.save(asset);
         return true;
 
@@ -263,7 +276,7 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
-        asset.getSubProcessingActivities().remove(subProcessingActivityId);
+        asset.getSubProcessingActivityIds().remove(subProcessingActivityId);
         assetMongoRepository.save(asset);
         return true;
 
@@ -291,34 +304,11 @@ public class AssetService extends MongoBaseService {
     public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
 
         Map<String, AssetDTO> result = new HashMap<>();
-        assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
+        assetDTO = saveAsset(unitId, assetDTO);
         AssetDTO masterAsset = masterAssetService.saveSuggestedAssetFromUnit(countryId, unitId, assetDTO);
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
         return result;
-    }
-
-
-    public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {
-
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
-        }
-        Set<BigInteger> processingActivityIds = asset.getProcessingActivities();
-        List<ProcessingActivityBasicResponseDTO> processingActivityResponseDTOList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(processingActivityIds)) {
-            processingActivityResponseDTOList = processingActivityMongoRepository.getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, processingActivityIds);
-            Set<BigInteger> subProcessingActivitiesIdsList = asset.getSubProcessingActivities();
-
-            for (ProcessingActivityBasicResponseDTO processingActivityBasicResponseDTO : processingActivityResponseDTOList) {
-
-                List<ProcessingActivityBasicResponseDTO> subProcessingActivities = processingActivityBasicResponseDTO.getSubProcessingActivities();
-                processingActivityBasicResponseDTO.setSubProcessingActivities(subProcessingActivities.stream().filter(subProcessingActivity->subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())).collect(Collectors.toList()));
-
-            }
-        }
-        return processingActivityResponseDTOList;
     }
 
 

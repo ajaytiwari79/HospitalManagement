@@ -10,8 +10,8 @@ public interface CustomAssetRepository {
 
     Asset findByName( Long organizationId, String name);
 
-    AssetResponseDTO findAssetWithMetaDataById( Long organizationId, BigInteger id);
+    AssetResponseDTO getAssetWithRiskAndRelatedProcessingActivitiesById(Long organizationId, BigInteger id);
 
-    List<AssetResponseDTO> findAllAssetWithMetaData( Long organizationId);
+    List<AssetResponseDTO> findAllByUnitId(Long unitId);
 
 }
