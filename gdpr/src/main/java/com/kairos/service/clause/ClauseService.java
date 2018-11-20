@@ -90,6 +90,7 @@ public class ClauseService extends MongoBaseService {
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
                 ObjectMapperUtils.copyProperties(masterClauseDTO, clause);
             }
+            clause.setTags(clauseTags);
         } else {
             clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags);
             if (isUnitId) {

@@ -11,6 +11,7 @@ import com.kairos.response.dto.common.*;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -39,85 +40,165 @@ public class AssetResponseDTO {
     private boolean suggested;
     private List<ProcessingActivityBasicResponseDTO> processingActivities;
 
-    public boolean isSuggested() { return suggested; }
+    public boolean isSuggested() {
+        return suggested;
+    }
 
-    public void setSuggested(boolean suggested) { this.suggested = suggested; }
+    public void setSuggested(boolean suggested) {
+        this.suggested = suggested;
+    }
 
-    public AssetAssessor getAssetAssessor() { return assetAssessor; }
+    public AssetAssessor getAssetAssessor() {
+        return assetAssessor;
+    }
 
-    public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
+    public void setAssetAssessor(AssetAssessor assetAssessor) {
+        this.assetAssessor = assetAssessor;
+    }
 
-    public BigInteger getId() { return id; }
+    public BigInteger getId() {
+        return id;
+    }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public void setDescription(String description) { this.description = description; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public String getHostingLocation() { return hostingLocation; }
+    public String getHostingLocation() {
+        return hostingLocation;
+    }
 
-    public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
+    public void setHostingLocation(String hostingLocation) {
+        this.hostingLocation = hostingLocation;
+    }
 
-    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() {
+        return managingDepartment;
+    }
 
-    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) {
+        this.managingDepartment = managingDepartment;
+    }
 
-    public Staff getAssetOwner() { return assetOwner; }
+    public Staff getAssetOwner() {
+        return assetOwner;
+    }
 
-    public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
+    public void setAssetOwner(Staff assetOwner) {
+        this.assetOwner = assetOwner;
+    }
 
-    public List<StorageFormatResponseDTO> getStorageFormats() { return storageFormats; }
+    public List<StorageFormatResponseDTO> getStorageFormats() {
+        return storageFormats;
+    }
 
-    public void setStorageFormats(List<StorageFormatResponseDTO> storageFormats) { this.storageFormats = storageFormats; }
+    public void setStorageFormats(List<StorageFormatResponseDTO> storageFormats) {
+        this.storageFormats = storageFormats;
+    }
 
-    public List<OrganizationalSecurityMeasureResponseDTO> getOrgSecurityMeasures() { return orgSecurityMeasures; }
+    public List<OrganizationalSecurityMeasureResponseDTO> getOrgSecurityMeasures() {
+        return orgSecurityMeasures;
+    }
 
-    public void setOrgSecurityMeasures(List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasures) { this.orgSecurityMeasures = orgSecurityMeasures; }
+    public void setOrgSecurityMeasures(List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasures) {
+        this.orgSecurityMeasures = orgSecurityMeasures;
+    }
 
-    public List<TechnicalSecurityMeasureResponseDTO> getTechnicalSecurityMeasures() { return technicalSecurityMeasures; }
+    public List<TechnicalSecurityMeasureResponseDTO> getTechnicalSecurityMeasures() {
+        return technicalSecurityMeasures;
+    }
 
-    public void setTechnicalSecurityMeasures(List<TechnicalSecurityMeasureResponseDTO> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
+    public void setTechnicalSecurityMeasures(List<TechnicalSecurityMeasureResponseDTO> technicalSecurityMeasures) {
+        this.technicalSecurityMeasures = technicalSecurityMeasures;
+    }
 
-    public HostingProviderResponseDTO getHostingProvider() { return hostingProvider; }
+    public HostingProviderResponseDTO getHostingProvider() {
+        return hostingProvider;
+    }
 
-    public void setHostingProvider(HostingProviderResponseDTO hostingProvider) { this.hostingProvider = hostingProvider; }
+    public void setHostingProvider(HostingProviderResponseDTO hostingProvider) {
+        this.hostingProvider = hostingProvider;
+    }
 
-    public HostingTypeResponseDTO getHostingType() { return hostingType; }
+    public HostingTypeResponseDTO getHostingType() {
+        return hostingType;
+    }
 
-    public void setHostingType(HostingTypeResponseDTO hostingType) { this.hostingType = hostingType; }
+    public void setHostingType(HostingTypeResponseDTO hostingType) {
+        this.hostingType = hostingType;
+    }
 
-    public DataDisposalResponseDTO getDataDisposal() { return dataDisposal; }
+    public DataDisposalResponseDTO getDataDisposal() {
+        return dataDisposal;
+    }
 
-    public void setDataDisposal(DataDisposalResponseDTO dataDisposal) { this.dataDisposal = dataDisposal; }
+    public void setDataDisposal(DataDisposalResponseDTO dataDisposal) {
+        this.dataDisposal = dataDisposal;
+    }
 
-    public AssetTypeBasicResponseDTO getAssetType() { return assetType; }
+    public AssetTypeBasicResponseDTO getAssetType() {
+        return assetType;
+    }
 
-    public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType; }
+    public void setAssetType(AssetTypeBasicResponseDTO assetType) {
+        this.assetType = assetType;
+    }
 
-    public AssetTypeBasicResponseDTO getAssetSubType() { return assetSubType; }
+    public AssetTypeBasicResponseDTO getAssetSubType() {
+        return assetSubType;
+    }
 
-    public void setAssetSubType(AssetTypeBasicResponseDTO assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(AssetTypeBasicResponseDTO assetSubType) {
+        this.assetSubType = assetSubType;
+    }
 
-    public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
+    public Integer getDataRetentionPeriod() {
+        return dataRetentionPeriod;
+    }
 
-    public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
+    public void setDataRetentionPeriod(Integer dataRetentionPeriod) {
+        this.dataRetentionPeriod = dataRetentionPeriod;
+    }
 
-    public Long getMinDataSubjectVolume() { return minDataSubjectVolume; }
+    public Long getMinDataSubjectVolume() {
+        return minDataSubjectVolume;
+    }
 
-    public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
+    public void setMinDataSubjectVolume(Long minDataSubjectVolume) {
+        this.minDataSubjectVolume = minDataSubjectVolume;
+    }
 
-    public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
+    public Long getMaxDataSubjectVolume() {
+        return maxDataSubjectVolume;
+    }
 
-    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) { this.maxDataSubjectVolume = maxDataSubjectVolume; }
+    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) {
+        this.maxDataSubjectVolume = maxDataSubjectVolume;
+    }
 
-    public RiskSeverity getRisk() { return risk; }
+    public RiskSeverity getRisk() {
+        return risk;
+    }
 
-    public void setRisk(RiskSeverity risk) { this.risk = risk; }
+    public void setRisk(RiskSeverity risk) {
+        this.risk = risk;
+    }
 
     public boolean isActive() {
         return active;
@@ -127,7 +208,15 @@ public class AssetResponseDTO {
         this.active = active;
     }
 
-    public List<ProcessingActivityBasicResponseDTO> getProcessingActivities() { return processingActivities; }
+    public List<ProcessingActivityBasicResponseDTO> getProcessingActivities() {
 
-    public void setProcessingActivities(List<ProcessingActivityBasicResponseDTO> processingActivities) { this.processingActivities = processingActivities; }
+        if (!Optional.ofNullable(processingActivities.get(0).getId()).isPresent()) {
+            processingActivities.clear();
+        }
+        return processingActivities;
+    }
+
+    public void setProcessingActivities(List<ProcessingActivityBasicResponseDTO> processingActivities) {
+        this.processingActivities = processingActivities;
+    }
 }

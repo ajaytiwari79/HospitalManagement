@@ -2,7 +2,6 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
-import com.kairos.dto.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -35,7 +34,7 @@ public class AssetController {
     @PostMapping("/asset")
     public ResponseEntity<Object> createAssetWithBasicDetail(@PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
         asset.setSuggested(false);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAssetWithBasicDetail(unitId, asset));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAsset(unitId, asset));
 
     }
 
@@ -58,26 +57,18 @@ public class AssetController {
     }
 
 
-  /*  @ApiOperation(value = "update asset basic detail")
-    @PutMapping("/asset/update/{assetId}")
-    public ResponseEntity<Object> updateAssetData(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetDTO asset) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateAssetData(unitId, assetId, asset));
-    }
-*/
-
     @ApiOperation(value = "Get Asset With meta data by Id")
     @GetMapping("/asset/{assetId}")
     public ResponseEntity<Object> getAssetWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetWithMetadataById(unitId, assetId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetWithRelatedDataAndRiskByUnitIdAndId(unitId, assetId));
     }
 
 
     @ApiOperation(value = "Get All Asset With meta data ")
     @GetMapping("/asset")
     public ResponseEntity<Object> getAllAssetWithMetaData(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetWithMetadata(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetByUnitId(unitId));
     }
 
 
@@ -87,19 +78,6 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId));
     }
 
-
-   /* @ApiOperation(value = "Add processing Activity to Asset ")
-    @PutMapping("/asset/{assetId}/processing_activity")
-    public ResponseEntity<Object> relateProcessingActivitiesAndSubProcessingActivitiesToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetRelateProcessingActivityDTO relateProcessingActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addProcessingActivitiesAndSubProcessingActivitiesToAsset(unitId, assetId, relateProcessingActivityDTO));
-    }
-
-    @ApiOperation(value = "get Processing activity and Sub processing Activity  related with asset")
-    @GetMapping("/asset/{assetId}/processing_activity")
-    public ResponseEntity<Object> getRelatedSubProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllRelatedProcessingActivityAndSubProcessingActivities(unitId, assetId));
-    }
-*/
 
     @ApiOperation(value = "Unlink Processing Activity From asset ")
     @DeleteMapping("/asset/{assetId}/processing_activity/{processingActivityId}")

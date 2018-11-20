@@ -49,8 +49,8 @@ public class AssetDTO {
     private AssetAssessor assetAssessor;
     private boolean suggested;
     @NotNull(message = "error.message.assetType.notNull")
-    private AssetTypeDTO assetType;
-    private AssetTypeDTO assetSubType;
+    private AssetTypeOrganizationLevelDTO assetType;
+    private AssetTypeOrganizationLevelDTO assetSubType;
     private Set<BigInteger> processingActivityIds;
     private Set<BigInteger> subProcessingActivityIds;
 
@@ -132,13 +132,13 @@ public class AssetDTO {
 
     public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
 
-    public AssetTypeDTO getAssetType() { return assetType; }
+    public AssetTypeOrganizationLevelDTO getAssetType() { return assetType; }
 
-    public void setAssetType(AssetTypeDTO assetType) { this.assetType = assetType; }
+    public void setAssetType(AssetTypeOrganizationLevelDTO assetType) { this.assetType = assetType; }
 
-    public AssetTypeDTO getAssetSubType() { return assetSubType; }
+    public AssetTypeOrganizationLevelDTO getAssetSubType() { return assetSubType; }
 
-    public void setAssetSubType(AssetTypeDTO assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(AssetTypeOrganizationLevelDTO assetSubType) { this.assetSubType = assetSubType; }
 
     public Set<BigInteger> getProcessingActivityIds() { return processingActivityIds; }
 
