@@ -58,13 +58,13 @@ public class AssetController {
     }
 
 
-    @ApiOperation(value = "update asset basic detail")
+  /*  @ApiOperation(value = "update asset basic detail")
     @PutMapping("/asset/update/{assetId}")
     public ResponseEntity<Object> updateAssetData(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetDTO asset) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateAssetData(unitId, assetId, asset));
     }
-
+*/
 
     @ApiOperation(value = "Get Asset With meta data by Id")
     @GetMapping("/asset/{assetId}")
@@ -88,7 +88,7 @@ public class AssetController {
     }
 
 
-    @ApiOperation(value = "Add processing Activity to Asset ")
+   /* @ApiOperation(value = "Add processing Activity to Asset ")
     @PutMapping("/asset/{assetId}/processing_activity")
     public ResponseEntity<Object> relateProcessingActivitiesAndSubProcessingActivitiesToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetRelateProcessingActivityDTO relateProcessingActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addProcessingActivitiesAndSubProcessingActivitiesToAsset(unitId, assetId, relateProcessingActivityDTO));
@@ -99,7 +99,7 @@ public class AssetController {
     public ResponseEntity<Object> getRelatedSubProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllRelatedProcessingActivityAndSubProcessingActivities(unitId, assetId));
     }
-
+*/
 
     @ApiOperation(value = "Unlink Processing Activity From asset ")
     @DeleteMapping("/asset/{assetId}/processing_activity/{processingActivityId}")

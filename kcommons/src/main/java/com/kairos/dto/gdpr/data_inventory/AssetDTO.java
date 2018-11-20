@@ -3,6 +3,7 @@ package com.kairos.dto.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
@@ -15,6 +16,7 @@ import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -39,15 +41,20 @@ public class AssetDTO {
     private BigInteger hostingProvider;
     private BigInteger hostingType;
     private BigInteger dataDisposal;
-    @NotNull(message = "error.message.assetType.notNull")
-    private BigInteger assetTypeId;
-    private BigInteger assetSubTypeId;
+
     private Integer dataRetentionPeriod;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
     private RiskSeverity riskLevel;
     private AssetAssessor assetAssessor;
     private boolean suggested;
+    @NotNull(message = "error.message.assetType.notNull")
+    private AssetTypeDTO assetType;
+    private AssetTypeDTO assetSubType;
+    private Set<BigInteger> processingActivityIds;
+    private Set<BigInteger> subProcessingActivityIds;
+
+
 
     public boolean isSuggested() { return suggested; }
 
@@ -83,10 +90,6 @@ public class AssetDTO {
     public BigInteger getHostingType() { return hostingType; }
 
     public BigInteger getDataDisposal() { return dataDisposal; }
-
-    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
-
-    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
@@ -129,10 +132,23 @@ public class AssetDTO {
 
     public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
 
+    public AssetTypeDTO getAssetType() { return assetType; }
+
+    public void setAssetType(AssetTypeDTO assetType) { this.assetType = assetType; }
+
+    public AssetTypeDTO getAssetSubType() { return assetSubType; }
+
+    public void setAssetSubType(AssetTypeDTO assetSubType) { this.assetSubType = assetSubType; }
+
+    public Set<BigInteger> getProcessingActivityIds() { return processingActivityIds; }
+
+    public void setProcessingActivityIds(Set<BigInteger> processingActivityIds) { this.processingActivityIds = processingActivityIds; }
+
+    public Set<BigInteger> getSubProcessingActivityIds() { return subProcessingActivityIds; }
+
+    public void setSubProcessingActivityIds(Set<BigInteger> subProcessingActivityIds) { this.subProcessingActivityIds = subProcessingActivityIds; }
+
     public AssetDTO() {
     }
 
-    public BigInteger getAssetTypeId() { return assetTypeId; }
-
-    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
 }

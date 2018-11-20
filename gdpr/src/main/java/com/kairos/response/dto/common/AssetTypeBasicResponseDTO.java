@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -16,6 +18,7 @@ public class AssetTypeBasicResponseDTO {
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
     private Set<BigInteger> risks;
+    private List<RiskBasicResponseDTO> risksList=new ArrayList<>();
 
     public Set<BigInteger> getRisks() { return risks; }
 
@@ -40,4 +43,8 @@ public class AssetTypeBasicResponseDTO {
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
+
+    public List<RiskBasicResponseDTO> getRisksList() { return risksList; }
+
+    public void setRisksList(List<RiskBasicResponseDTO> risksList) { this.risksList = risksList; }
 }
