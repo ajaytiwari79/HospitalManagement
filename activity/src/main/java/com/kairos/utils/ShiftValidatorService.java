@@ -175,6 +175,7 @@ public class ShiftValidatorService {
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getActivitiesStartDate());
             activitySpecification.and(activityDayTypeSpec);
         }
+        //TODO
         activitySpecification.validateRules(shift);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);

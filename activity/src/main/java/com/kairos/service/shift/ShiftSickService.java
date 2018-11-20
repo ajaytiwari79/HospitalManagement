@@ -151,7 +151,7 @@ public class ShiftSickService extends MongoBaseService {
         }
         //shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate());
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate(),null);
             shiftService.saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
         }
     }
@@ -258,7 +258,7 @@ public class ShiftSickService extends MongoBaseService {
         }
         if (CollectionUtils.isNotEmpty(shifts)) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate());
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate(),null);
             shiftService.saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
         }
     }
