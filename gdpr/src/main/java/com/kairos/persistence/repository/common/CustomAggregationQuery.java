@@ -131,9 +131,9 @@ public class CustomAggregationQuery {
 
     public static String addNonDeletedTemplateTyeField() {
         return " {  '$addFields':" +
-                "                {'templateTypes':" +
+                "                {'templateType':" +
                 "                {'$filter' : { " +
-                "                'input': '$templateTypes'," +
+                "                'input': '$templateType'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
                 "                }}}}";
