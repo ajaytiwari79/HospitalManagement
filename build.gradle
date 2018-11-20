@@ -84,15 +84,16 @@ release {
 }
 
 task verifyRelease {
-    dependsOn ":kcommons:build"
-    dependsOn ":user:build"
-    dependsOn ":gdpr:build"
-    dependsOn ":activity:build"
-    dependsOn ":scheduler-service:build"
-    dependsOn ":planner:optaplanner-shiftplanning:build"
-    dependsOn ":planner:optaplanner-taskplanning:build"
-    dependsOn ":planner:optaplanner-vrp-taskplanning:build"
-    dependsOn ":planner:responseWrapper:build"
+//    dependsOn ":kcommons:build"
+//    dependsOn ":user:build"
+//    dependsOn ":gdpr:build"
+//    dependsOn ":activity:build"
+//    dependsOn ":scheduler-service:build"
+//    dependsOn ":planner:optaplanner-shiftplanning:build"
+//    dependsOn ":planner:optaplanner-taskplanning:build"
+//    dependsOn ":planner:optaplanner-vrp-taskplanning:build"
+//    dependsOn ":planner:responseWrapper:build"
 }
 
+beforeReleaseBuild.dependsOn verifyRelease
 wrapper.gradleVersion = '4.4'
