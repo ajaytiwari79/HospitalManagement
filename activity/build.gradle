@@ -22,7 +22,6 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
-apply plugin: 'net.researchgate.release'
 
 version = "$projectVersion-SNAPSHOT"
 
@@ -98,13 +97,3 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
-
-
-//release {
-//    tagTemplate = 'kairos-$version'
-//    failOnCommitNeeded = false
-//    failOnSnapshotDependencies=false
-//    buildTasks = ['bootJar']
-//}
-//
-//wrapper.gradleVersion = '4.4'

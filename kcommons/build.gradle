@@ -3,7 +3,6 @@ version '0.0.1'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-apply plugin: 'net.researchgate.release'
 
 sourceCompatibility = 1.8
 
@@ -34,11 +33,3 @@ dependencies {
     //compile 'org.neo4j:neo4j:3.3.4'
 
 }
-
-//release {
-//    tagTemplate = 'kairos-$version'
-//    failOnCommitNeeded = false
-//    failOnSnapshotDependencies=false
-//    buildTasks = ['build']
-//}
-//

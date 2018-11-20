@@ -77,7 +77,7 @@ release {
     ]
 
     git {
-        requireBranch = 'master|release|temp_001'
+        requireBranch = 'master|temp_001'
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
     }
@@ -94,8 +94,5 @@ task verifyRelease {
     dependsOn ":planner:optaplanner-vrp-taskplanning:build"
     dependsOn ":planner:responseWrapper:build"
 }
-
-
-//beforeReleaseBuild.dependsOn(verifyRelease)
 
 wrapper.gradleVersion = '4.4'
