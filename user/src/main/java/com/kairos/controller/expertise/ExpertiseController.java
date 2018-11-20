@@ -1,11 +1,11 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
@@ -13,7 +13,6 @@ import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -193,13 +190,26 @@ public class ExpertiseController {
 
     @ApiOperation(value = "get all expertise at unit level to show")
     @PutMapping(value = UNIT_URL + "/expertise")
-    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> findAllExpertise(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertise(unitId));
     }
-    @ApiOperation(value = "get a functional payment settings for expertise")
+    @ApiOperation(value = "get functional payment  for expertise")
     @RequestMapping(value = UNIT_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getFunctionalPaymentForUnit(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPaymentMatrixData(expertiseId));
+    }
+
+
+    @ApiOperation(value = "get functional payment matrix for functional payment at unit level")
+    @RequestMapping(value = UNIT_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getMatrixOfFunctionalPaymentForUnit(@PathVariable Long functionalPaymentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getMatrixOfFunctionalPayment(functionalPaymentId));
+    }
+
+    @ApiOperation(value = "get planned time for employment type and expertise ")
+    @RequestMapping(value = UNIT_URL+ "/expertise/{expertiseId}/planned_time", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getPlannedTimeOfExpertise(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeInExpertise(expertiseId));
     }
 
 /*

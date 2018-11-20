@@ -14,19 +14,18 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL)
-@Api(API_ORGANIZATION_URL+COUNTRY_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 public class ExpertiseNightWorkerSettingController {
 
     @Inject
     ExpertiseNightWorkerSettingService expertiseNightWorkerSettingService;
 
     @ApiOperation(value = "create expertise night worker settings")
-    @PostMapping(value = "/expertise/{expertiseId}/night_worker_setting")
+    @PostMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,
                                                                                @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {
@@ -34,17 +33,26 @@ public class ExpertiseNightWorkerSettingController {
     }
 
     @ApiOperation(value = "get expertise night worker settings")
-    @GetMapping(value = "/expertise/{expertiseId}/night_worker_setting")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(countryId,expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(expertiseId));
     }
 
     @ApiOperation(value = "update expertise night worker settings")
-    @PutMapping(value = "/expertise/{expertiseId}/night_worker_setting")
+    @PutMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,
                                                                                @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.updateExpertiseNightWorkerSettings(countryId, expertiseId, expertiseNightWorkerSettingDTO));
     }
+    //---------------------UNIT LEVEL------------------//
+
+    @ApiOperation(value = "get expertise night worker settings for unit ")
+    @GetMapping(value = UNIT_URL+"/expertise/{expertiseId}/night_worker_setting")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getExpertiseNightWorkerSettingsForUnit(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(expertiseId));
+    }
+
 }

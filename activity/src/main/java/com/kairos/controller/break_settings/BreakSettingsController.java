@@ -49,6 +49,7 @@ public class BreakSettingsController {
     public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,@PathVariable BigInteger breakSettingsId, @RequestBody @Validated BreakSettingsDTO breakSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true,breakSettingsService.updateBreakSettings(countryId,expertiseId,breakSettingsId,breakSettingsDTO));
     }
+
     @ApiOperation("Get all break settings  by expertise id")
     @GetMapping(UNIT_URL+API_EXPERTISE_BREAK_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

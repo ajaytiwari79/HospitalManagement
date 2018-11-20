@@ -3,6 +3,7 @@ package com.kairos.service.expertise;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixPayGroupAreaQR;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
@@ -270,6 +271,10 @@ public class FunctionalPaymentService{
         functionalPaymentGraphRepository.save(functionalPayment.get());
         return parentFunctionalPayment;
 
+    }
+
+    public List<FunctionalPaymentMatrixPayGroupAreaQR> getFunctionalPaymentMatrixData(Long functionalPaymentId) {
+        return functionalPaymentGraphRepository.getFunctionalPaymentMatrixData(functionalPaymentId);
     }
 
 }

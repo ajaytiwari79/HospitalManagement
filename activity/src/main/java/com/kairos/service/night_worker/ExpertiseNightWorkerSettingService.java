@@ -2,13 +2,11 @@ package com.kairos.service.night_worker;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
@@ -41,8 +39,8 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 
-    public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long countryId, Long expertiseId){
-        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByCountryAndExpertise(countryId, expertiseId);
+    public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long expertiseId){
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseId(expertiseId);
         if(!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()){
             exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", expertiseId);
         }
@@ -50,7 +48,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     }
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
-        ExpertiseNightWorkerSetting expertiseNightWorkerSetting   = expertiseNightWorkerSettingRepository.findByCountryAndExpertise(countryId, expertiseId);
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting   = expertiseNightWorkerSettingRepository.findByExpertiseId(expertiseId);
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", expertiseId);
         }
