@@ -292,14 +292,10 @@ public class PhaseService extends MongoBaseService {
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndName(unitId,TENTATIVE);
         LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(LocalDate.now(),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
-        LocalDateTime endDateTime=null;
-        if(Optional.ofNullable(endDate).isPresent()) {
-            endDateTime = DateUtils.asLocalDateTime(endDate);
-        }
+        LocalDateTime endDateTime=Optional.ofNullable(endDate).isPresent()? DateUtils.asLocalDateTime(endDate):null;
         Phase phase;
         if(startDateTime.isAfter(untilTentativeDate)){
             phase= planningPeriodMongoRepository.getCurrentPhaseByDateUsingPlanningPeriod(unitId,DateUtils.asLocalDate(startDate));
-
         }
         else {
             List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
@@ -354,19 +350,12 @@ public class PhaseService extends MongoBaseService {
      */
     private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime,LocalDateTime endDateTime, LocalDateTime previousMondayLocalDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,String timeZone){
         Phase phase=null;
-        DateTimeInterval interval=null;
         int minutesToCalculate=phaseMap.get(REALTIME).getRealtimeDuration();
         LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
         LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
-        if(Optional.ofNullable(endDateTime).isPresent()){
-            interval=new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime));
-        }
-        boolean result;
-        if(Optional.ofNullable(endDateTime).isPresent()){
-            result=interval.contains(DateUtils.asDate(localDateTimeAfterMinus))||interval.contains(DateUtils.asDate(localDateTimeAfterPlus));
-        }else{
-            result=startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
-        }
+        DateTimeInterval interval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime)):null;
+        boolean result=Optional.ofNullable(endDateTime).isPresent()?interval.contains(DateUtils.asDate(localDateTimeAfterMinus))||interval.contains(DateUtils.asDate(localDateTimeAfterPlus)):
+                startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
         if (startDateTime.isBefore(previousMondayLocalDateTime)) {
             phase= phaseMap.get(PAYROLL);
         } else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime.plusDays(1))) {
