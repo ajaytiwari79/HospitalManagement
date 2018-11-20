@@ -15,18 +15,24 @@ import java.util.List;
 public interface CustomClauseRepository {
 
 
-    Clause findByTitleAndDescription(Long countryId, String title,String description);
+    Clause findByCountryIdAndTitleAndDescription(Long countryId, String title, String description);
+
+    Clause findByUnitIdAndTitleAndDescription(Long unitId, String title, String description);
 
     List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId,FilterSelectionDTO filterSelectionDto);
 
     Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
-    List<Clause> findClausesByTitle(Long countryId,List<String> clauseTitles);
+    List<Clause> findClauseByReferenceIdAndTitles(Long referenceId,boolean isUnitId, List<String> clauseTitles);
 
-    List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId);
+    List<ClauseResponseDTO> findAllClauseByCountryId(Long countryId);
 
-    List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
+    List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId);
+
+    List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
     ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id);
+
+    List<Clause> getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
 }

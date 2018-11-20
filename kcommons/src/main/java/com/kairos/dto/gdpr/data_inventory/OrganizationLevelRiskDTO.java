@@ -11,19 +11,12 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
 
-    @NotNull(message = "error.message.risk.due.date")
-    private LocalDate dueDate;
-    private Staff riskOwner;
+    //property may add in future
+   // @NotNull(message = "error.message.risk.due.date")
+    //private LocalDate dueDate;
+    //private Staff riskOwner;
     private boolean reminderActive;
     private int daysToReminderBefore;
-
-    public Staff getRiskOwner() { return riskOwner; }
-
-    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
-
-    public LocalDate getDueDate() { return dueDate; }
-
-    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 
     public boolean isReminderActive() { return reminderActive; }
 

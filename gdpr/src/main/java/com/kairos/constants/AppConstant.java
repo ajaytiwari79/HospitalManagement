@@ -32,14 +32,14 @@ public class AppConstant {
 
 
     //metaData reference key for asset and processing activity
-    public static final String ASSET_TYPE_KEY = "assetType";
-    public static final String ASSET_SUB_TYPE_KEY = "assetSubTypes";
+    public static final String ASSET_TYPE_KEY = "assetTypeId";
+    public static final String ASSET_SUB_TYPE_KEY = "assetSubTypeId";
     public static final String STORAGE_FORMAT_KEY = "storageFormats";
     public static final String ORG_SECURITY_MEASURE_KEY = "orgSecurityMeasures";
     public static final String TECHNICAL_SECURITY_MEASURE_KEY = "technicalSecurityMeasures";
-    public static final String HOSTING_PROVIDER_KEY = "hostingProvider";
-    public static final String HOSTING_TYPE_KEY = "hostingType";
-    public static final String DATA_DISPOSAL_KEY = "dataDisposal";
+    public static final String HOSTING_PROVIDER_KEY = "hostingProviderId";
+    public static final String HOSTING_TYPE_KEY = "hostingTypeId";
+    public static final String DATA_DISPOSAL_KEY = "dataDisposalId";
     public static final String PROCESSING_PURPOSE_KEY = "processingPurposes";
     public static final String DATA_SOURCE_KEY = "dataSources";
     public static final String TRANSFER_METHOD_KEY = "transferMethods";

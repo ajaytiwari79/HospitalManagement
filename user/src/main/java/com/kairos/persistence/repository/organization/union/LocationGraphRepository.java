@@ -21,15 +21,15 @@ public interface LocationGraphRepository extends Neo4jBaseRepository<Location, L
     @Query("MATCH(union:Organization{deleted:false})-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) WHERE id(union)={0} RETURN location")
     List<Location> findLocationsByUnion(Long unionId);
 
-    @Query("MATCH(location:Location{deleted:false}) WHERE location.name={0} RETURN COUNT(location)>0")
-    boolean existsByName(String name);
+    @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false}) WHERE LOWER(location.name)=LOWER({0}) and id(union)={1} RETURN COUNT(location)>0")
+    boolean existsByName(String name,Long unionId);
 
-    @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]->(location:Location{deleted:false}) WHERE id(location)={0} or location.name={1} WITH union,location " +
+    @Query("MATCH(union:Organization)-[:"+HAS_LOCATION+"]->(location:Location{deleted:false}) WHERE (id(location)={0} or LOWER(location.name)=LOWER({1})) and id(union)={2} WITH union,location " +
             "OPTIONAL MATCH(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) WITH union,location,address" +
             " OPTIONAL MATCH(address)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) WITH union,location,address,zipCode " +
             "OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality) OPTIONAL MATCH(zipCode)-[:"+MUNICIPALITY+"]-(linkedMunicipality:Municipality)  RETURN location,id(address)AS addressId," +
             "id(zipCode)AS zipCodeId,id(municipality) AS municipalityId, id(union) AS unionId,address,collect(linkedMunicipality) AS municipalities ")
-    List<LocationQueryResult> findByIdOrNameAndDeletedFalse(Long locationId, String locationName);
+    List<LocationQueryResult> findByIdOrNameAndDeletedFalse(Long locationId, String locationName,Long unionId);
 
     @Query("MATCH(location:Location{deleted:false}) WHERE id(location)={0} RETURN location")
     Location findByIdAndDeletedFalse(Long locationId);

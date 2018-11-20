@@ -1,13 +1,17 @@
 package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AssetTypeBasicResponseDTO {
 
     private BigInteger id;
@@ -16,6 +20,7 @@ public class AssetTypeBasicResponseDTO {
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
     private Set<BigInteger> risks;
+    private List<RiskBasicResponseDTO> riskList;
 
     public Set<BigInteger> getRisks() { return risks; }
 
@@ -40,4 +45,8 @@ public class AssetTypeBasicResponseDTO {
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
+
+    public List<RiskBasicResponseDTO> getRiskList() { return riskList; }
+
+    public void setRiskList(List<RiskBasicResponseDTO> riskList) { this.riskList = riskList; }
 }

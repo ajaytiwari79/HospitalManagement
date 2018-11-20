@@ -1,10 +1,12 @@
 package com.kairos.wrapper.wta;
 
 import com.kairos.dto.activity.shift.ViolatedRulesDTO;
+import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
@@ -32,9 +34,13 @@ public class RuleTemplateSpecificInfo {
     private ViolatedRulesDTO violatedRules;
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
+    private List<CareDaysDTO> childCareDays;
+    private List<CareDaysDTO> seniorCareDays;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank,Map<BigInteger, ActivityWrapper> activityWrapperMap,int staffAge) {
+
+
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -47,6 +53,25 @@ public class RuleTemplateSpecificInfo {
         this.violatedRules = new ViolatedRulesDTO();
         this.activityWrapperMap = activityWrapperMap;
         this.staffAge = staffAge;
+        this.childCareDays = childCareDays;
+        this.seniorCareDays = seniorCareDays;
+    }
+
+
+    public List<CareDaysDTO> getChildCareDays() {
+        return childCareDays;
+    }
+
+    public void setChildCareDays(List<CareDaysDTO> childCareDays) {
+        this.childCareDays = childCareDays;
+    }
+
+    public List<CareDaysDTO> getSeniorCareDays() {
+        return seniorCareDays;
+    }
+
+    public void setSeniorCareDays(List<CareDaysDTO> seniorCareDays) {
+        this.seniorCareDays = seniorCareDays;
     }
 
     public int getStaffAge() {

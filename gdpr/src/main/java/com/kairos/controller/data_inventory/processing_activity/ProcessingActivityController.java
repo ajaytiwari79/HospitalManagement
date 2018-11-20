@@ -80,7 +80,7 @@ public class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Reponse For related tab in  Asset")
+    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
@@ -167,7 +167,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "unlink  risk form Processing activity and Sub Processing Activity")
     @DeleteMapping("/processing_activity/{processingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unLinkRiskDromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
+    public ResponseEntity<Object> unLinkRiskfromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));
     }
 

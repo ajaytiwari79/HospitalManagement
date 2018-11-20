@@ -23,7 +23,7 @@ public class AgreementSectionDTO {
     private String titleHtml;
     @Valid
     private List<ClauseBasicDTO> clauses = new ArrayList<>();
-
+    @Valid
     private List<AgreementSectionDTO> subSections = new ArrayList<>();
 
     public List<AgreementSectionDTO> getSubSections() {
@@ -68,7 +68,7 @@ public class AgreementSectionDTO {
 
     public String getTitleHtml() {
         if (titleHtml == null) {
-            titleHtml = "<p>" + title + "</p>";
+            titleHtml = "<p>"+title+"</p>";
         }
         return titleHtml.trim();
     }

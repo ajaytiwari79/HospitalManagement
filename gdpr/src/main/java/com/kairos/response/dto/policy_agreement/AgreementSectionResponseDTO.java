@@ -2,7 +2,6 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 

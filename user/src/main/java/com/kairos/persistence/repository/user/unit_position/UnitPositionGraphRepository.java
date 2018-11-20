@@ -223,16 +223,21 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
      * return unitPosition,expertise,sl,activePositionLine,nextSeniorityLevel//seniorityLevel,unitPosition,unitPositionEmploymentTypeRelationShip,employmentType,positionLine
      */
 
-    @Query( "MATCH(staff:Staff)-[expertise_from_date:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise{deleted:false}) where expertise_from_date.expertiseStartDate is not null\n" +
-            "and datetime({epochmillis:expertise_from_date.expertiseStartDate}).month=datetime().month and\n" +
-            "datetime({epochmillis:expertise_from_date.expertiseStartDate}).day=datetime().day and datetime({epochmillis:expertise_from_date.expertiseStartDate}).year<>datetime().year \n" +
-            "MATCH(activePositionLine:UnitPositionLine)<-[:"+HAS_POSITION_LINES+"]-(unitPosition:UnitPosition{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise) where activePositionLine.endDate is null OR activePositionLine.endDate >= date()\n" +
-            "WITH staff,expertise,unitPosition,activePositionLine, datetime().year-datetime({epochmillis:expertise_from_date.expertiseStartDate}).year as years_experience_in_expertise \n" +
-            "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise) WITH staff,unitPosition,expertise,years_experience_in_expertise,activePositionLine\n" +
-            "MATCH(activePositionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) where sl.to<=years_experience_in_expertise \n" +
-            "MATCH(activePositionLine)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) \n" +
-            " MATCH(expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(nextSeniorityLevel:SeniorityLevel) where nextSeniorityLevel.from <= years_experience_in_expertise and (nextSeniorityLevel.to > years_experience_in_expertise or nextSeniorityLevel.to is null) \n" +
-            "return id(unitPosition) as unitPositionId,unitPositionEmploymentTypeRelationShip,employmentType,activePositionLine as positionLine,nextSeniorityLevel as seniorityLevel")
+    @Query( "MATCH(sector:Sector)-[:"+BELONGS_TO_SECTOR+"]-(expertise:Expertise{deleted:false}) \n" +
+            "WITH sector,expertise \n" +
+            "MATCH(staff:Staff)-[expertise_from_date:"+STAFF_HAS_EXPERTISE+"]->(expertise)\n" +
+            "WITH staff,sector,expertise,expertise_from_date \n" +
+            "WITH MIN(expertise_from_date.expertiseStartDate) as expertise_from_date,staff,expertise\n" +
+            "WHERE expertise_from_date IS NOT NULL AND datetime({epochmillis:expertise_from_date}).month=datetime().month AND \n" +
+            "datetime({epochmillis:expertise_from_date}).day=datetime().day AND datetime({epochmillis:expertise_from_date}).year<>datetime().year \n" +
+            "MATCH(activePositionLine:UnitPositionLine)<-[:"+HAS_POSITION_LINES+"]-(unitPosition:UnitPosition{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise) WHERE activePositionLine.endDate IS NULL OR activePositionLine.endDate >= date()\n" +
+            "WITH staff,expertise,unitPosition,activePositionLine, datetime().year-datetime({epochmillis:expertise_from_date}).year as years_experience_in_expertise  \n" +
+            "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise) " +
+            "WITH staff,unitPosition,expertise,years_experience_in_expertise,activePositionLine \n" +
+            "MATCH(activePositionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE sl.to<=years_experience_in_expertise \n" +
+            "MATCH(activePositionLine)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType)\n" +
+            "MATCH(expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(nextSeniorityLevel:SeniorityLevel) WHERE nextSeniorityLevel.from <= years_experience_in_expertise and (nextSeniorityLevel.to > years_experience_in_expertise or nextSeniorityLevel.to is null) \n" +
+            "RETURN id(unitPosition) as unitPositionId,unitPositionEmploymentTypeRelationShip as unitPositionLineEmploymentTypeRelationShip ,employmentType,activePositionLine as positionLine,nextSeniorityLevel as seniorityLevel")
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
 //
 

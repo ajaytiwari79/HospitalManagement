@@ -26,6 +26,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -140,7 +141,7 @@ public class ShiftSickService extends MongoBaseService {
 
     private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts, Set<LocalDate> dates) {
         Map<LocalDate, Long> dateLongMap = new HashMap<>();
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         if (staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions() != null) {
             dateLongMap = genericIntegrationService.removeFunctionFromUnitPositionByDates(staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getUnitPosition().getId(), dates);
         }
@@ -255,8 +256,11 @@ public class ShiftSickService extends MongoBaseService {
         if (functionRestored != null && !functionRestored) {
             logger.error("error occurred in User service while restoring functions");
         }
-        if (!shifts.isEmpty())
-            save(shifts);
+        if (CollectionUtils.isNotEmpty(shifts)) {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate());
+            shiftService.saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
+        }
     }
 
 }

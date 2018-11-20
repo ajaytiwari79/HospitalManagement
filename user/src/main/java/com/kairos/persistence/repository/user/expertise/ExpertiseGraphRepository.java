@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.expertise;
 
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
@@ -8,7 +9,6 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -79,7 +79,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,hasDraftCopy:false}) where id(country) = {0}" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "OPTIONAL MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization) WITH country,expertise,level,union\n" +
-            "OPTIONAL MATCH(expertise)-[:"+BELONGS_TO+"]-(sector:Sector) WITH country,expertise,level,union,sector"+
+            "OPTIONAL MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WITH country,expertise,level,union,sector"+
             " MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
             "with expertise,union,level, Collect(orgService) as services,sector  \n" +
             " MATCH(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)" +
@@ -210,18 +210,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) " +
             "return id(expertise) as id , expertise.name as name")
     List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
-
-    @Query("MATCH (exp:Expertise) where id(exp)={0} \n" +
-            "OPTIONAL MATCH (exp)-[:"+HAS_SENIOR_DAYS+"]->(seniorDays:CareDays)\n" +
-            "OPTIONAL MATCH (exp)-[:"+HAS_CHILD_CARE_DAYS+"]->(childCareDays:CareDays)\n" +
-            "RETURN CASE WHEN count(childCareDays)>0 THEN COLLECT({id:id(childCareDays), from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) ELSE [] END as childCareDays ,CASE WHEN count(seniorDays)>0 THEN COLLECT({id:id(seniorDays), from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) ELSE [] END as seniorDays")
-    SeniorAndChildCareDaysQueryResult getSeniorDaysOfExpertise(Long expertiseId);
-
-    @Query("MATCH(expertise:Expertise)-[expertiseSectorRel:BELONGS_TO]->(sector:Sector) where id(expertise)={0} and id(sector)={1} DELETE expertiseSectorRel ")
-    void deleteExpertiseSectorRelationShip(Long expertiseId,Long sectorId);
-
-    @Query("MATCH(expertise:Expertise)-[expertiseUnionRel:SUPPORTED_BY_UNION]->(union:Union) where id(expertise)={0} and id(union)={1} DELETE expertiseUnionRel ")
-    void deleteExpertiseUnionRelationShip(Long expertiseId,Long unionId);
 
 
 }

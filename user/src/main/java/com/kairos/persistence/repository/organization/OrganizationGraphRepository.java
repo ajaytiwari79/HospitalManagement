@@ -758,6 +758,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     void linkUnionSector(Long unionId,Long sectorId);
 
 
+
     @Query("Match(parentOrg:Organization{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
             "Match (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
             "Optional Match(parentOrganizatinType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizatinType:OrganizationType{deleted:false})\n" +
@@ -773,4 +774,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "organizationSubService:CASE WHEN parentSubOrganizatinService IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizatinService),name:childSubOrganizatinService.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizatinService),name:parentSubOrganizatinService.name})  END,\n" +
             "accountType:CASE WHEN parentAccountType IS NULL THEN collect(distinct {id:id(childAccountType),name:childAccountType.name})  ELSE COLLECT(DISTINCT {id:id(parentAccountType),name:parentAccountType.name})  END}")
     Map<String,Object> getFiltersByParentOrganizationId(long parentOrganizationId);
+
+
+    @Query("MATCH (organizations:Organization{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
+    List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 }
+

@@ -16,22 +16,22 @@ import java.util.Set;
 @Repository
 public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger>, CustomWorkingTimeAgreementMongoRepostory {
 
-    @Query("{name:?0,countryId:?1,deleted:false}")
-    WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
+    @Query(value = "{name:?0,countryId:?1,deleted:false}",exists = true)
+    boolean getWtaByName(String wtaName, Long countryId);
 
 
     @Query("{countryId:?0,id:?1,deleted:false}")
     WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);
 
-    @Query("{id:?0,deleted:false}")
-    WorkingTimeAgreement removeOldParentWTAMapping(BigInteger wtaId);
-
-
-    List<WorkingTimeAgreement> findAllByUnitPositionIdInAndDeletedFalse(Set<Long> unitPositionId);
-
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<WorkingTimeAgreement> findAllByIdsInAndDeletedFalse(Set<BigInteger> ids);
+
+    @Query(value = "{name:?2,deleted:false,disabled:false,'organizationType._id':?0,'organizationSubType._id':?1}",exists = true)
+    boolean isWTAExistWithSameOrgTypeAndSubType(Long orgType,Long orgSubType, String name);
+
+    @Query(value = "{name:?1,deleted:false,disabled:false,'organization._id':{$in:?0}}")
+    List<WorkingTimeAgreement> findWTAByUnitIdsAndName(List<Long> organizationIds, String name);
     
 
 }
