@@ -177,8 +177,8 @@ public class ShiftPlanningInitializationService {
                     }
                 }
             }
-            if (activityListPerDay.size() > 0) activitiesPerDay.put(jodaLocalDate, activityListPerDay);
-            if (perDayALIList.size() > 0) {
+            if (!activityListPerDay.isEmpty()) activitiesPerDay.put(jodaLocalDate, activityListPerDay);
+            if (!perDayALIList.isEmpty()) {
                 dateWiseALIList.put(localDateListEntry.getKey(), perDayALIList);
                 activityLineIntervalList.addAll(perDayALIList);
             }

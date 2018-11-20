@@ -1,7 +1,7 @@
 group 'optaplanner-shiftplanning'
 version '0.0.2'
 ext {
-    versionoptaplannerbom='7.7.0.Final'
+    versionoptaplannerbom='7.14.0.Final'
    // versionslf4j='1.7.23'
    // versionlogback='1.2.3'
 }

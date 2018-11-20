@@ -75,6 +75,7 @@ public class ShiftPlanningSolver {
 
     public ShiftPlanningSolver(){
         solverFactory = SolverFactory.createFromXmlResource(config2);
+        solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(4));
         solver = solverFactory.buildSolver();
         solverFactoryBreaks = SolverFactory.createFromXmlResource(config_breaks);
         solverBreaks = solverFactoryBreaks.buildSolver();

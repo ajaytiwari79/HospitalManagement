@@ -38,8 +38,8 @@ public class ShiftRequestPhase implements Shift{
    //@InverseRelationShadowVariable(sourceVariableName =  "breakShift")
     //These breaks are not useful while planner as those are realy planner entities
     private List<ShiftBreak> breaks= new ArrayList<>();
-private java.time.LocalDate startDate;
-private java.time.LocalDate endDate;
+    private java.time.LocalDate startDate;
+    private java.time.LocalDate endDate;
 
     //@CustomShadowVariable(variableListenerClass = ShiftIntervalListener.class, sources = {
     //        @PlanningVariableReference(variableName = "startTime"),@PlanningVariableReference(variableName = "endTime") })
