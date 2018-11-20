@@ -1141,8 +1141,12 @@ public class UnitPositionService {
         return true;
     }
 
-    public Long removeFunction(Long unitPositionId, Date appliedDate) {
-        return unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+    public Long removeFunction(Long unitId,Long unitPositionId, Date appliedDate) {
+        Long functionId = unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+        Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(appliedDate),staffId , unitPositionId, unitId, ORGANIZATION);
+        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(appliedDate), staffAdditionalInfoDTO);
+        return functionId;
     }
 
 
