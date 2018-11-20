@@ -189,21 +189,21 @@ public class ExpertiseController {
 
 
     @ApiOperation(value = "get all expertise at unit level to show")
-    @PutMapping(value = UNIT_URL + "/expertise")
+    @GetMapping(value = UNIT_URL + "/expertise")
     public ResponseEntity<Map<String, Object>> findAllExpertise(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertise(unitId));
     }
     @ApiOperation(value = "get functional payment  for expertise")
     @RequestMapping(value = UNIT_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getFunctionalPaymentForUnit(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPaymentMatrixData(expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
     }
 
 
     @ApiOperation(value = "get functional payment matrix for functional payment at unit level")
     @RequestMapping(value = UNIT_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getMatrixOfFunctionalPaymentForUnit(@PathVariable Long functionalPaymentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getMatrixOfFunctionalPayment(functionalPaymentId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPaymentMatrixData(functionalPaymentId));
     }
 
     @ApiOperation(value = "get planned time for employment type and expertise ")

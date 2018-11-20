@@ -3,6 +3,7 @@ package com.kairos.service.break_settings;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.break_settings.BreakSettingAndActivitiesWrapper;
+import com.kairos.dto.activity.break_settings.BreakSettingsResponseDTO;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -60,7 +61,7 @@ public class BreakSettingsService extends MongoBaseService {
         parentIds.addAll(childTimeType.stream().map(TimeType::getId).collect(Collectors.toList()));
         List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);
 
-        List<BreakSettingsDTO> breakSettings = getBreakSettingsByExpertiseId(expertiseId);
+        List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
         // TODO VIPUL FIX
         /*UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
@@ -94,8 +95,10 @@ public class BreakSettingsService extends MongoBaseService {
         save(breakSettings);
         return breakSettingsDTO;
     }
-    public List<BreakSettingsDTO> getBreakSettingsByExpertiseId(Long expertiseId) {
-       return   breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
+
+
+    public List<BreakSettingsResponseDTO> getBreakSettingsByExpertiseId(Long expertiseId) {
+       return  breakSettingMongoRepository.findAllBreakSettingsByExpertise(expertiseId);
     }
 
 }
