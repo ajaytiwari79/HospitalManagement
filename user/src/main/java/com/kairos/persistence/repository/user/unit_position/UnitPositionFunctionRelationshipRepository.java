@@ -17,13 +17,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
 @Repository
 public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRepository<UnitPositionFunctionRelationship, Long> {
 
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:"+APPLIED_FUNCTION+"]->(function:Function) where id(unitPosition) = {0}  AND {2} IN rel.appliedDates  \n" +
+    @Query("MATCH (unitPosition:UnitPosition)-[rel:"+APPLIED_FUNCTION+"]->(function:Function) where id(unitPosition) = {0}  AND {1} IN rel.appliedDates  \n" +
             "WITH unitPosition, function, count(rel.appliedDates) as dateCount \n" +
-            "return case when dateCount > 0 then true else false end as result")
+            "RETURN case when dateCount > 0 then true else false end as result")
     Boolean getUnitPositionFunctionRelationshipByUnitPositionAndFunction(Long unitPositionId, String localDate);
 
     @Query("MATCH (unitPosition:UnitPosition)  where id(unitPosition) = {0} \n" +
-            "match (function:Function) where id(function)={1}\n" +
+            "MATCH (function:Function) where id(function)={1}\n" +
             "MERGE(unitPosition)-[rel:APPLIED_FUNCTION ]->(function)\n" +
             "ON CREATE set rel.appliedDates = {2} " +
             "ON MATCH set rel.appliedDates = rel.appliedDates+{2} ")
@@ -32,22 +32,22 @@ public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRe
 
     @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates WITH rel,function,\n" +
             "FILTER (x IN rel.appliedDates WHERE x <> {1}) as filteredDates\n" +
-            "SET rel.appliedDates = filteredDates return id(function)")
+            "SET rel.appliedDates = filteredDates RETURN id(function)")
     Long removeDateFromUnitPositionFunctionRelationship(Long unitPositionId, String localDate);
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) ,(function:Function{deleted:false})  where id(unitPosition) = {0} AND id(function) IN {1} " +
-            "MATCH(unitPosition)-[rel:APPLIED_FUNCTION]->(function) return id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates ")
+            "MATCH(unitPosition)-[rel:APPLIED_FUNCTION]->(function) RETURN id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates ")
     List<UnitPositionFunctionRelationshipQueryResult> findAllByFunctionIdAndUnitPositionId(Long unitPositionId,Set<Long> functionIds);
 
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND any(x IN rel.appliedDates WHERE x IN {1}) return id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates")
+    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND any(x IN rel.appliedDates WHERE x IN {1}) RETURN id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates")
     List<UnitPositionFunctionRelationshipQueryResult> findAllByAppliedDatesIn(Long unitPositionId, Set<String> appliedDates);
 
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates  return id(function)" )
+    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates  RETURN id(function)" )
     Long getApplicableFunction(Long unitPositionId, String localDate);
 
-    @Query("MATCH (unitPosition:UnitPosition{deleted:false})-[rel:APPLIED_FUNCTION ]->(function:Function{deleted:false}) where id(unitPosition) in {0} return id(rel) as id,rel.appliedDates as appliedDates,unitPosition as unitPosition,function as function  " )
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false})-[rel:APPLIED_FUNCTION ]->(function:Function{deleted:false}) where id(unitPosition) in {0} RETURN id(rel) as id,rel.appliedDates as appliedDates,unitPosition as unitPosition,function as function  " )
     List<UnitPositionFunctionRelationshipQueryResult> getApplicableFunctionIdWithDatesByUnitPositionId(Set<Long> unitPositionIds);
 
-    @Query("MATCH (unitPosition:UnitPosition{deleted:false})-[rel:APPLIED_FUNCTION ]->(function:Function{deleted:false})  where id(unitPosition) in {0} return unitPosition as unitPosition,function as function ,id(rel) as id, rel.appliedDates as appliedDates ")
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false})-[rel:APPLIED_FUNCTION ]->(function:Function{deleted:false})  where id(unitPosition) in {0} RETURN unitPosition as unitPosition,function as function ,id(rel) as id, rel.appliedDates as appliedDates ")
     List<UnitPositionFunctionRelationshipQueryResult> getApplicableFunctionsWithRelationShipIByUnitPositionId(Set<Long> unitPositionIds);
 }
