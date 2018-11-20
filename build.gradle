@@ -71,6 +71,7 @@ release {
     tagTemplate = 'kairos-$version'
     failOnCommitNeeded = false
     failOnSnapshotDependencies=false
+    buildTasks = ['build']
     scmAdapters = [
             net.researchgate.release.GitAdapter
     ]
