@@ -32,6 +32,7 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
+import com.kairos.enums.shift.ViewType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -47,7 +48,6 @@ import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
@@ -77,7 +77,6 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
@@ -976,12 +975,31 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate) {
+    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate,ViewType viewType) {
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
         UserAccessRoleDTO userAccessRoleDTO = genericIntegrationService.getAccessRolesOfStaff(unitId);
         List<OpenShift> openShifts = userAccessRoleDTO.getManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) :
                 openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
+        ButtonConfig buttonConfig = null;
 
+        if(Optional.ofNullable(viewType).isPresent()&&viewType.toString().equalsIgnoreCase(ViewType.WEEKLY.toString())) {
+            if(!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY)||
+                    !DateUtils.getLocalDateFromDate(endDate).getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                exceptionService.invalidRequestException("message.weeklyview.incorrect.date");
+            }
+            buttonConfig = new ButtonConfig();
+            Set<BigInteger> shiftIds = assignedShifts.stream().map(shiftDTO -> shiftDTO.getShiftId()).collect(Collectors.toSet());
+            if(userAccessRoleDTO.getManagement()){
+                List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT);
+                Set<BigInteger> shiftStateIds = shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toSet());
+                for(BigInteger shiftId:shiftIds){
+                    if(!shiftStateIds.contains(shiftId))  {
+                        buttonConfig.setSendToPayrollEnabled(true);
+                        break;
+                    }
+                }
+            }
+        }
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {
             OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
@@ -1000,7 +1018,7 @@ public class ShiftService extends MongoBaseService {
             roles.add(AccessGroupRole.STAFF);
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), roles);
-        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO);
+        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO,buttonConfig);
     }
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
