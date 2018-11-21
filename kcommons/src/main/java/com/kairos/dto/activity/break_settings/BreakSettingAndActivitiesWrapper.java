@@ -17,7 +17,11 @@ public class BreakSettingAndActivitiesWrapper {
     public BreakSettingAndActivitiesWrapper() {
         //Default Constructor
     }
+    public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> activities) {
+        this.breakSettings = breakSettings;
+        this.activities=activities;
 
+    }
     public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> activities, FlexibleTimeSettingDTO flexibleTimeSettings) {
         this.breakSettings = breakSettings;
         this.activities=activities;

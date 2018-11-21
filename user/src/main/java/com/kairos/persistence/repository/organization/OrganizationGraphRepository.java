@@ -58,7 +58,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Group getGroups(Long organizationId, Long groupId);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
-            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true}) RETURN org limit 1")
+            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) RETURN org limit 1")
     Organization getParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
