@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -72,7 +73,7 @@ public class UnionController {
     @PutMapping(COUNTRY_URL+"/unions/{unionId}/locations/{locationId}")
     @ApiOperation("Update location")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateLocation(@PathVariable long locationId,@PathVariable long unionId, @RequestBody LocationDTO locationDTO) {
+    public ResponseEntity<Map<String, Object>> updateLocation(@PathVariable long locationId,@PathVariable long unionId, @Validated @RequestBody LocationDTO locationDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unionService.updateLocation(locationDTO,unionId,locationId));
     }
@@ -86,7 +87,7 @@ public class UnionController {
     @PostMapping(value = COUNTRY_URL+"/unions/{unionId}/locations")
     @ApiOperation("Create location")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createLocation(@PathVariable long unionId,@RequestBody LocationDTO locationDTO) {
+    public ResponseEntity<Map<String, Object>> createLocation(@PathVariable long unionId, @Validated @RequestBody LocationDTO locationDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unionService.createLocation(locationDTO,unionId));
     }

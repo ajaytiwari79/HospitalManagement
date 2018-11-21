@@ -131,7 +131,7 @@ public class ExpertiseService {
             expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                     expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
                     getSector(expertiseDTO.getSector(),country));
-            prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
+            prepareExpertiseWhileCreate(expertise, expertiseDTO, country);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
@@ -253,8 +253,8 @@ public class ExpertiseService {
     }
 
 
-    private void prepareExpertiseWhileCreate(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
-        Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
+    private void prepareExpertiseWhileCreate(Expertise expertise, CountryExpertiseDTO expertiseDTO, Country country) {
+        Level level = countryGraphRepository.getLevel(country.getId(), expertiseDTO.getOrganizationLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "level", expertiseDTO.getOrganizationLevelId());
         }
@@ -264,7 +264,7 @@ public class ExpertiseService {
             exceptionService.dataNotFoundByIdException("message.multipleDataNotFound", "services");
         }
         expertise.setOrganizationServices(organizationService);
-        expertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
+        expertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country));
 
         SeniorityLevel seniorityLevel = null;
         if (expertiseDTO.getSeniorityLevel() != null) {
@@ -360,7 +360,7 @@ public class ExpertiseService {
 
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
-            copiedExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
+            copiedExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country));
             organizationGraphRepository.linkUnionSector(copiedExpertise.getUnion().getId(),copiedExpertise.getSector().getId());
 
             // NOW WE need to add the other seniority level which exists in expertise
@@ -389,7 +389,7 @@ public class ExpertiseService {
             updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get(), levelChanged);
             // organization Level is changed so need to set new
             currentExpertise.setSector(getSector(expertiseDTO.getSector(),country));
-            currentExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
+            currentExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country));
 
             expertiseGraphRepository.save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
@@ -776,12 +776,12 @@ public class ExpertiseService {
                 copyExpertiseDTO.getNumberOfWorkingDaysInWeek() != null ? copyExpertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, copyExpertiseDTO.getBreakPaymentSetting(), false, false, false,
                 getSector(copyExpertiseDTO.getSectorDTO(),country));
 
-        prepareExpertiseWhileCopy(targetExpertise, copyExpertiseDTO, sourceExpertise.get());
+        prepareExpertiseWhileCopy(targetExpertise, copyExpertiseDTO, sourceExpertise.get(),country);
         copyExpertiseDTO.getSectorDTO().setId(targetExpertise.getSector().getId());
         return copyExpertiseDTO;
     }
 
-    private void prepareExpertiseWhileCopy(Expertise targetExpertise, CopyExpertiseDTO expertiseDTO, Expertise sourceExpertise) {
+    private void prepareExpertiseWhileCopy(Expertise targetExpertise, CopyExpertiseDTO expertiseDTO, Expertise sourceExpertise,Country country) {
         if (!expertiseDTO.getOrganizationLevelId().equals(sourceExpertise.getOrganizationLevel().getId())) {
             Level level = countryGraphRepository.getLevel(sourceExpertise.getCountry().getId(), expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {
@@ -798,7 +798,7 @@ public class ExpertiseService {
             exceptionService.dataNotFoundByIdException("message.multipleDataNotFound", "services");
         }
         targetExpertise.setOrganizationServices(organizationService);
-        targetExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName()));
+        targetExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country));
         expertiseGraphRepository.save(targetExpertise);
         createDefaultSettings(targetExpertise, sourceExpertise);
         expertiseDTO.setId(targetExpertise.getId());
@@ -854,7 +854,7 @@ public class ExpertiseService {
         return new SeniorAndChildCareDaysQueryResult(seniorDays,childCareDays);
     }
 
-    private Organization getUnion(Long unionId, String unionName) {
+    private Organization getUnion(Long unionId, String unionName,Country country) {
         Organization union;
         if(Optional.ofNullable(unionId).isPresent()) {
             union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
@@ -862,7 +862,7 @@ public class ExpertiseService {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "union", unionId);
             }
         } else {
-            union = new Organization(unionName,true);
+            union = new Organization(unionName,true,country);
         }
         return union;
     }
