@@ -60,7 +60,7 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOs;
     }
 
-    public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
+    /*public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
         List<TimeType> timeTypes = new ArrayList<>();
         List<BigInteger> timeTypeIds = timeTypeDTOS.stream().map(timeTypeId -> timeTypeId.getId()).collect(Collectors.toList());
         List<String> timeTypeLabels = timeTypeDTOS.stream().map(timeTypeId -> timeTypeId.getLabel()).collect(Collectors.toList());
@@ -103,9 +103,8 @@ public class TimeTypeService extends MongoBaseService {
         });
         save(timeTypes);
         return timeTypeDTOS;
-    }
+    }*/
 
-    //TODO By Yasir:- CO-ordinate with front-end to send and receive single time type in api and use below method instead of above.
     public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
 
         Boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
@@ -287,7 +286,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
 
-    public Boolean createDefaultTimeType(Long countryId) {
+    public Boolean createDefaultTimeTypes(Long countryId) {
         List<TimeType> allTimeTypes=new ArrayList<>();
         List<TimeType> workingTimeTypes=new ArrayList<>();
         TimeType presenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", AppConstants.WORKING_TYPE_COLOR,PRESENCE,countryId);
