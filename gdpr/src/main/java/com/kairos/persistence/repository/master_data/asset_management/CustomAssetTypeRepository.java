@@ -13,7 +13,7 @@ public interface CustomAssetTypeRepository {
 
     List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(Long countryId);
 
-    AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id);
+    AssetTypeResponseDTO getAssetTypeWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id);
 
     AssetType findByNameAndUnitId(Long organizationId, String name);
 

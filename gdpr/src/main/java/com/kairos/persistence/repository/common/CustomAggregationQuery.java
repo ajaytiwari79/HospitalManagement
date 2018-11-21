@@ -145,7 +145,7 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
-                "         'assetSubTypes':1," +
+                "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
                 "         'name':1," +
                 "       'description':1," +
                 "       'organizationSubTypes':1," +
