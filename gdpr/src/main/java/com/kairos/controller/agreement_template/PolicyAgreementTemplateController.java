@@ -99,7 +99,7 @@ public class PolicyAgreementTemplateController {
     @ApiOperation("Replace Old Clause With New Version of Clause, country level ")
     @PutMapping(COUNTRY_URL+"/agreement_template/clause/version")
     public ResponseEntity<Object> updateMasterAgreementTemplateOldClauseWithNewVersion(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateOldClauseWithNewVersionByReferenceIdAndTemplateIds(countryId, false,agreementTemplateClauseUpdateDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(countryId, false,agreementTemplateClauseUpdateDTO));
 
     }
 
@@ -161,7 +161,7 @@ public class PolicyAgreementTemplateController {
     @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
     @PutMapping(UNIT_URL+"/agreement_template/clause/version")
     public ResponseEntity<Object> updateTemplateOldClauseWithNewVersion(@PathVariable Long unitId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateOldClauseWithNewVersionByReferenceIdAndTemplateIds(unitId, true,agreementTemplateClauseUpdateDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(unitId, true,agreementTemplateClauseUpdateDTO));
 
     }
 
