@@ -58,7 +58,7 @@ public class ShiftPlanningGenerator {
         unresolvedSolution.setActivitiesPerDay((Map<LocalDate, List<Activity>>) objects[2]);
         unresolvedSolution.setActivityLineIntervals(activityLineIntervals);
         unresolvedSolution.setSkillLineIntervals(skillLineIntervals);
-        unresolvedSolution.setShifts(generateShiftForAssignments( employees));
+        unresolvedSolution.setShifts(generateShiftForAssignments( employees,activityLineIntervals));
         unresolvedSolution.setActivitiesIntervalsGroupedPerDay(groupActivityLineIntervals(unresolvedSolution.getActivityLineIntervals()));
         //unresolvedSolution.setBreaks(generateBreaks(generateShiftForAssignments(employees.get(0))));
         unresolvedSolution.setWeekDates(getPlanningDays());
@@ -240,14 +240,34 @@ public class ShiftPlanningGenerator {
         return shifts;
     }
 
-    public List<ShiftRequestPhase> generateShiftForAssignments(List<Employee> employees) {
+    public List<ShiftRequestPhase> generateShiftForAssignments(List<Employee> employees,List<ActivityLineInterval> activityLineIntervals) {
         List<ShiftRequestPhase> shiftList = new ArrayList<>();
+        int i = 0;
         for(Employee emp:employees){
             for(LocalDate date:getPlanningDays()) {
+                List<ActivityLineInterval> activityLineIntervalList = activityLineIntervals.subList(i,i=i+5);
+                activityLineIntervalList.sort(Comparator.comparing(ActivityLineInterval::getStart));
+                ActivityLineInterval ali = null;
                 ShiftRequestPhase sa = new ShiftRequestPhase();
                 sa.setEmployee(emp);
                 sa.setId(UUID.randomUUID());
+                sa.setActivityLineIntervals(activityLineIntervalList);
                 sa.setDate(date);
+                sa.setStartTime(activityLineIntervalList.get(0).getStart().toLocalTime());
+                sa.setEndTime(activityLineIntervalList.get(activityLineIntervalList.size()-1).getEnd().toLocalTime());
+                int j= 0;
+                for (ActivityLineInterval activityLineInterval : activityLineIntervalList) {
+                        activityLineInterval.setPrevious(ali);
+                        activityLineInterval.setShift(sa);
+                    j=j+1;
+                    if(j<activityLineIntervalList.size()) {
+                        ali = activityLineIntervalList.get(j);
+
+                    }else {
+                        ali = null;
+                    }
+                    activityLineInterval.setNext(ali);
+                }
                 shiftList.add(sa);
             }
         }
