@@ -36,10 +36,7 @@ import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryR
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.unit_position.*;
-import com.kairos.persistence.model.user.unit_position.query_result.PositionCtaWtaQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
@@ -88,6 +85,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -1242,11 +1240,15 @@ public class UnitPositionService {
 
     }
 
-    //===========================================================================
+    /**
+     * @param unitId
+     * @param staffId
+     * @return
+     */
     public List<UnitPositionDTO> getUnitPositionsByStaffId(Long unitId, Long staffId) {
         Object object = unitPositionGraphRepository.getUnitPositionsByUnitIdAndStaffId(unitId, staffId);
         if (object instanceof String) {
-            if ("org".equals(object)) {
+            if ("organization".equals(object)) {
                 exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
             } else if ("staff".equals(object)) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
@@ -1261,9 +1263,45 @@ public class UnitPositionService {
         return unitPositionDTOList;
     }
 
-    //=========================================================================================
-    //TODO work
-    public Object getPositionLinesByStaffAndUnitPositionId(Long unitId, Long staffId, Long unitPositionId) {
-        return null;
+    /**PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE=7.4
+     * @param unitId
+     * @param staffId
+     * @param unitPositionId
+     * @return
+     */
+    public List<UnitPositionLineFunctionQueryResult> getPositionLinesByStaffAndUnitPositionId(Long unitId, Long staffId, Long unitPositionId) {
+        String isDataValid = unitPositionGraphRepository.validateOrganizationStaffUnitPosition(unitId, staffId, unitPositionId);
+        final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE=7.4f;//
+        if ("organization".equals(isDataValid)) {
+            exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
+        } else if ("staff".equals(isDataValid)) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
+        } else if ("unitPosition".equals(isDataValid)) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "UnitPosition", unitPositionId);
+        } else if ("unitPositionOrgRel".equals(isDataValid)) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionOrgRel");
+        } else if ("unitPositionStaffRel".equals(isDataValid)) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionStaffRel");
+        }
+        List<UnitPositionLineFunctionQueryResult> hourlyCostByUnitPositionLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, staffId, unitPositionId);
+        float leapYear = (float) (1 / (366 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
+        float nonLeapYear = (float) (1 / (365 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
+        hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines,UnitPositionLineFunctionQueryResult.class);
+        for (UnitPositionLineFunctionQueryResult unitPositionLineFunctionQueryResult : hourlyCostByUnitPositionLines) {
+            float hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYear : nonLeapYear;
+            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount() * hourlyCostCalculationFactor);
+            unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost() * hourlyCostCalculationFactor);
+            List<FunctionDTO> functionList=unitPositionLineFunctionQueryResult.getFunctions();
+            Iterator<FunctionDTO> iterator=functionList.iterator();
+            while (iterator.hasNext()) {
+                FunctionDTO function=iterator.next();
+                if(function.getAmount()!=null){
+                function.setAmount(function.getAmount().multiply(new BigDecimal(hourlyCostCalculationFactor)).setScale(2, RoundingMode.CEILING));}
+
+            else{
+                    iterator.remove();
+            } }
+        }
+        return hourlyCostByUnitPositionLines;
     }
 }

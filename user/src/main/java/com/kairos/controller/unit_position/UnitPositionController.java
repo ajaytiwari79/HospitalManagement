@@ -158,16 +158,15 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
-    //=======================================================================================
 
     @ApiOperation(value = "get UnitPositions Per Staff")
-    @GetMapping(value = "staff/{staffId}/getStaffUnitPositions")
+    @GetMapping(value = "staff/{staffId}/unit_positions")
     public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(unitId, staffId));
     }
 
-    @ApiOperation(value = "get UnitPositions Per Staff")
-    @GetMapping(value = "staff/{staffId}/unitPosition/{unitPositionId}/getPositionLines")
+    @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
+    @GetMapping(value = "staff/{staffId}/unitPosition/{unitPositionId}/position_lines")
     public ResponseEntity<Map<String, Object>> getPositionLinesByStaffAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesByStaffAndUnitPositionId(unitId, staffId,unitPositionId));
     }
