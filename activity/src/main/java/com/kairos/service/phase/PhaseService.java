@@ -290,7 +290,7 @@ public class PhaseService extends MongoBaseService {
     public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date startDate,Date endDate){
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndName(unitId,TENTATIVE);
-        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(LocalDate.now(ZoneId.of(timeZone)),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
         LocalDateTime endDateTime=Optional.ofNullable(endDate).isPresent()? DateUtils.asLocalDateTime(endDate):null;
         Phase phase;
@@ -318,8 +318,8 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(Phase::getName, v->v));
         Map<BigInteger,Phase> phaseAndIdMap=phases.stream().collect(Collectors.toMap(Phase::getId, v->v));
-        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(LocalDate.now(), phaseMap.get(TENTATIVE).getUntilNextDay()).atStartOfDay().minusSeconds(1);
-        LocalDateTime previousMonday=DateUtils.getDateForPreviousDay(LocalDate.now(),DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone), phaseMap.get(TENTATIVE).getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime previousMonday=DateUtils.getDateForPreviousDay(DateUtils.getLocalDateFromTimezone(timeZone),DayOfWeek.MONDAY).atStartOfDay();
         Set<LocalDate> localDates=new HashSet<>();
         dates.forEach(d->{localDates.add(d.toLocalDate());});
         List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
@@ -353,12 +353,13 @@ public class PhaseService extends MongoBaseService {
         int minutesToCalculate=phaseMap.get(REALTIME).getRealtimeDuration();
         LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
         LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
-        DateTimeInterval interval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime)):null;
-        boolean result=Optional.ofNullable(endDateTime).isPresent()?interval.contains(DateUtils.asDate(localDateTimeAfterMinus))||interval.contains(DateUtils.asDate(localDateTimeAfterPlus)):
+        DateTimeInterval shiftInterval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime)):null;
+        DateTimeInterval realtimeInterval=new DateTimeInterval(DateUtils.asDate(localDateTimeAfterMinus),DateUtils.asDate(localDateTimeAfterPlus));
+        boolean realTime=Optional.ofNullable(endDateTime).isPresent()?shiftInterval.overlaps(realtimeInterval):
                 startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
         if (startDateTime.isBefore(previousMondayLocalDateTime)) {
             phase= phaseMap.get(PAYROLL);
-        }else if(result){
+        }else if(realTime){
             phase= phaseMap.get(REALTIME);
         }else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime.plusDays(1))) {
             phase= phaseMap.get(TIME_AND_ATTENDANCE);
