@@ -154,26 +154,29 @@ public class ShiftValidatorService {
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
-        Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
-                .and(wtaRulesSpecification)
-                .and(staffEmploymentSpecification);
+                .and(wtaRulesSpecification);
+
         if (byUpdate) {
             Specification<ShiftWithActivityDTO> activityPhaseSettingSpecification = new ActivityPhaseSettingSpecification(staffAdditionalInfoDTO, phase, activityWrapperMap.values(), oldShift);
-            activitySpecification.and(activityPhaseSettingSpecification);
+            activitySpecification = activitySpecification.and(activityPhaseSettingSpecification);
+        }
+        if(!byUpdate){
+            Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
+            activitySpecification = activitySpecification.and(staffEmploymentSpecification);
         }
         if (!byTandAPhase) {
             Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan();
-            activitySpecification.and(shiftTimeLessThan);
+            activitySpecification = activitySpecification.and(shiftTimeLessThan);
         }
         List<Long> dayTypeIds = shift.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getActivity().getRulesActivityTab().getDayTypes().stream()).collect(Collectors.toList());
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(dayTypeIds)) {
             Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
             Set<DayOfWeek> validDays = getValidDays(dayTypeDTOMap, dayTypeIds);
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getActivitiesStartDate());
-            activitySpecification.and(activityDayTypeSpec);
+            activitySpecification= activitySpecification.and(activityDayTypeSpec);
         }
         //TODO
         activitySpecification.validateRules(shift);

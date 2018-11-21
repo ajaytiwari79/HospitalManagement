@@ -50,7 +50,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        /*for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+        for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues();
             PhaseTemplateValue phaseTemplateValue1 = null;
             for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
@@ -67,7 +67,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                     ShiftValidatorService.throwException("message.staff.employmentType.absent");
                 }
             }
-        }*/
+        }
     }
 
     @Override
