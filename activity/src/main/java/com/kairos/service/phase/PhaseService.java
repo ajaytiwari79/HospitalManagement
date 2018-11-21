@@ -358,11 +358,11 @@ public class PhaseService extends MongoBaseService {
                 startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
         if (startDateTime.isBefore(previousMondayLocalDateTime)) {
             phase= phaseMap.get(PAYROLL);
-        } else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime.plusDays(1))) {
-            phase= phaseMap.get(TIME_AND_ATTENDANCE);
-        } else if(result){
+        }else if(result){
             phase= phaseMap.get(REALTIME);
-        } else if ((startDateTime).isBefore(untilTentativeDate.plusDays(1)) && startDateTime.isAfter(localDateTimeAfterPlus)) {
+        }else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime.plusDays(1))) {
+            phase= phaseMap.get(TIME_AND_ATTENDANCE);
+        }else if ((startDateTime).isBefore(untilTentativeDate.plusDays(1)) && startDateTime.isAfter(localDateTimeAfterPlus)) {
             phase=phaseMap.get(TENTATIVE);
         }
         return phase;
