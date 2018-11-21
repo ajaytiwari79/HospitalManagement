@@ -1,6 +1,10 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
+import com.kairos.persistence.model.organization.union.Location;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.Map;
 
 /**
  * CreatedBy vipulpandey on 20/11/18
@@ -8,7 +12,9 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class ExpertiseLocationStaffQueryResult {
     private Long expertiseId;
-    private Long locationId;
+    private Location location;
+    private Map<String,Object> staff; // Due to limitation its map We will remove later-->Can not set com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO field com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult.staff to java.util.Collections$UnmodifiableMap
+
 
     public ExpertiseLocationStaffQueryResult() {
         // DC
@@ -22,11 +28,19 @@ public class ExpertiseLocationStaffQueryResult {
         this.expertiseId = expertiseId;
     }
 
-    public Long getLocationId() {
-        return locationId;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setLocationId(Long locationId) {
-        this.locationId = locationId;
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Map<String, Object> getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Map<String, Object> staff) {
+        this.staff = staff;
     }
 }

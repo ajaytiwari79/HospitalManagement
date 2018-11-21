@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
@@ -43,7 +44,7 @@ public class ExpertiseUnitService {
     @Inject
     private OrganizationPersonalizeLocationRelationShipGraphRepository organizationLocationRelationShipGraphRepository;
 
-    public Map<String, Object>  findAllExpertise(Long unitId) {
+    public List<ExpertiseQueryResult> findAllExpertise(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
@@ -59,10 +60,14 @@ public class ExpertiseUnitService {
         List<Long> expertiseIds = expertise.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLocationStaffQueryResult> locations= organizationLocationRelationShipGraphRepository.getExpertiseWiseLocationInOrganization(expertiseIds,unitId);
         List<ExpertiseLocationStaffQueryResult> staffs=staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds,unitId);
-        response.put("ex",expertise);
-        response.put("locations",locations);
-        response.put("staffs",staffs);
-        return response;
+
+        Map<Long,Map<String,Object>> staffMap= staffs.stream().collect(Collectors.toMap(current->current.getExpertiseId(),v->v.getStaff()));
+        Map<Long,Location> locationMap= locations.stream().collect(Collectors.toMap(current->current.getExpertiseId(),v->v.getLocation()));
+        expertise.forEach(current->{
+            current.setUnionRepresentative(staffMap.get(current.getId()));
+            current.setLocation(locationMap.get(current.getId()));
+        });
+        return expertise;
 
     }
 

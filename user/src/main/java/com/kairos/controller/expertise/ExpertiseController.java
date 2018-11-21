@@ -215,7 +215,7 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "get all staff who has this expertise assigned ")
-    @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/staffs")
+    @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/staff_location")
     public ResponseEntity<Map<String, Object>> getStaffListOfExpertise(@PathVariable Long expertiseId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.getStaffListOfExpertise(expertiseId, unitId));
     }

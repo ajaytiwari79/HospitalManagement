@@ -427,8 +427,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     int assignStaffAsUnionRepresentativeOfExpertise(Long staffId, Long expertiseId);
 
     @Query("MATCH (organization:Organization),(expertise:Expertise) WHERE id(organization)={1} AND id(expertise) IN {0} " +
-            "MATCH (organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise)  WHERE rel.unionRepresentative \n" +
-            " RETURN id(staff) as staffId,id(expertise) as expertiseId")
+            "MATCH (organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "{unionRepresentative:true}]->(expertise) \n" +
+            " MATCH(staff)-[:"+BELONGS_TO+"]-(user:User)\n" +
+            "return {id:id(staff),name:user.firstName} as staff,id(expertise) as expertiseId")
     List<ExpertiseLocationStaffQueryResult> findAllUnionRepresentativeOfExpertiseInUnit(List<Long> expertiseIds, Long unitId);
 }
 
