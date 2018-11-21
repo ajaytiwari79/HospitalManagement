@@ -618,6 +618,7 @@ public class CounterDistService extends MongoBaseService {
         List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
         List<BigInteger> applicableKpiIds = counterRepository.getApplicableKPIIdsByReferenceId(kpiIds, Arrays.asList(refId), level);
+        //TODO code update for parent child access group fetching
         if(!Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
             List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
             accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, applicableKpiIds, level, refId);
