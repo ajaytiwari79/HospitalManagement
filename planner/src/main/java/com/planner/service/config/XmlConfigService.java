@@ -1,6 +1,6 @@
 package com.planner.service.config;
 
-import com.planner.responseDto.config.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class XmlConfigService {
 
     private static Logger logger = LoggerFactory.getLogger(XmlConfigService.class);
 
-    public InputStream getXmlConfigStream(SolverConfigDTO solverConfigDTO,String xmlPath){
+    public InputStream getXmlConfigStream(SolverConfigDTO solverConfigDTO, String xmlPath){
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
         Document doc = null;
@@ -35,7 +35,8 @@ public class XmlConfigService {
             docBuilder = docFactory.newDocumentBuilder();
             doc = docBuilder.parse(new File(xmlPath));
             Node terminationTag = doc.getElementsByTagName("secondsSpentLimit").item(0);
-            terminationTag.setTextContent(solverConfigDTO.getTerminationTime().toString());
+            //TODO pradeep need Refactor
+            //terminationTag.setTextContent(solverConfigDTO.getTerminationTime().toString());
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
