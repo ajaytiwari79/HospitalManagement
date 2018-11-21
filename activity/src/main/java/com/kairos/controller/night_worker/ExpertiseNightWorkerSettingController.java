@@ -36,7 +36,7 @@ public class ExpertiseNightWorkerSettingController {
     @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(countryId, expertiseId));
     }
 
     @ApiOperation(value = "update expertise night worker settings")
@@ -51,8 +51,15 @@ public class ExpertiseNightWorkerSettingController {
     @ApiOperation(value = "get expertise night worker settings for unit ")
     @GetMapping(value = UNIT_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseNightWorkerSettingsForUnit(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettings(expertiseId));
+    public ResponseEntity<Map<String, Object>> getExpertiseNightWorkerSettingsForUnit(@PathVariable Long expertiseId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.getExpertiseNightWorkerSettingsForUnit(unitId,expertiseId));
+    }
+    @ApiOperation(value = "update expertise night worker settings")
+    @PutMapping(value = UNIT_URL+"/expertise/{expertiseId}/night_worker_setting")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateExpertiseNightWorkerSettingsInUnit(@PathVariable Long unitId,
+                                                                                  @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.updateExpertiseNightWorkerSettingsInUnit(unitId, expertiseNightWorkerSettingDTO));
     }
 
 }

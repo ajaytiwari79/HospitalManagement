@@ -4,8 +4,10 @@ import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 
-public class ExpertiseNightWorkerSettingDTO {
+import java.math.BigInteger;
 
+public class ExpertiseNightWorkerSettingDTO {
+    private BigInteger id;
     private TimeSlot timeSlot;
     private Integer minMinutesToCheckNightShift;
     private DurationType intervalUnitToCheckNightWorker;
@@ -29,6 +31,14 @@ public class ExpertiseNightWorkerSettingDTO {
         this.minShiftsUnitToCheckNightWorker = minShiftsUnitToCheckNightWorker;
         this.countryId = countryId;
         this.expertiseId = expertiseId;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public TimeSlot getTimeSlot() {

@@ -39,16 +39,16 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 
-    public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long expertiseId){
-        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseId(expertiseId);
-        if(!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()){
+    public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long countryId, Long expertiseId) {
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
+        if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", expertiseId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
-        ExpertiseNightWorkerSetting expertiseNightWorkerSetting   = expertiseNightWorkerSettingRepository.findByExpertiseId(expertiseId);
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", expertiseId);
         }
@@ -63,29 +63,52 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
         return nightWorkerSettingDTO;
     }
 
-    public Boolean updateNightWorkerStatusByUnitId(Long unitId){
-        Map<Long,Long> unitPositionIdAndExpertiseMap = genericIntegrationService.getUnitPositionExpertiseMap(unitId, unitId);
+    public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettingsInUnit(Long unitId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findOne(nightWorkerSettingDTO.getId());
+        if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", nightWorkerSettingDTO.getId());
+        }
+        if (expertiseNightWorkerSetting.getCountryId() != null) {  // this is country's night worker settings so we are personalizing and creating for unit
+            expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
+            expertiseNightWorkerSetting.setUnitId(unitId);
+            expertiseNightWorkerSetting.setCountryId(null);
+            expertiseNightWorkerSetting.setId(null); // making null so that a new Object is constructed and saved
+        } else {
+            expertiseNightWorkerSetting.setTimeSlot(nightWorkerSettingDTO.getTimeSlot());
+            expertiseNightWorkerSetting.setMinMinutesToCheckNightShift(nightWorkerSettingDTO.getMinMinutesToCheckNightShift());
+            expertiseNightWorkerSetting.setIntervalUnitToCheckNightWorker(nightWorkerSettingDTO.getIntervalUnitToCheckNightWorker());
+            expertiseNightWorkerSetting.setIntervalValueToCheckNightWorker(nightWorkerSettingDTO.getIntervalValueToCheckNightWorker());
+            expertiseNightWorkerSetting.setMinShiftsValueToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsValueToCheckNightWorker());
+            expertiseNightWorkerSetting.setMinShiftsUnitToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsUnitToCheckNightWorker());
+        }
+        save(expertiseNightWorkerSetting);
+        nightWorkerSettingDTO.setId(expertiseNightWorkerSetting.getId());
+        return nightWorkerSettingDTO;
+    }
+
+    public Boolean updateNightWorkerStatusByUnitId(Long unitId) {
+        Map<Long, Long> unitPositionIdAndExpertiseMap = genericIntegrationService.getUnitPositionExpertiseMap(unitId, unitId);
         List<ShiftDTO> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
         Map<Long, List<ShiftDTO>> shiftsOfStaff = new HashMap<>();
 
         shifts.forEach(shiftQueryResult -> {
             shiftQueryResult.setExpertiseId(unitPositionIdAndExpertiseMap.get(shiftQueryResult.getUnitPositionId()));
 
-            if(shiftsOfStaff.containsKey(shiftQueryResult.getStaffId())){
+            if (shiftsOfStaff.containsKey(shiftQueryResult.getStaffId())) {
                 shiftsOfStaff.get(shiftQueryResult.getStaffId()).add(shiftQueryResult);
             } else {
                 shiftsOfStaff.put(shiftQueryResult.getStaffId(), new ArrayList<>(Arrays.asList(shiftQueryResult)));
             }
         });
 
-        List<Long> expertiseIds =  (List<Long>) unitPositionIdAndExpertiseMap.values();
+        List<Long> expertiseIds = (List<Long>) unitPositionIdAndExpertiseMap.values();
         List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByCountryAndExpertiseIds(expertiseIds);
 
         Map<Long, ExpertiseNightWorkerSettingDTO> expertiseSettingMap = new HashMap<>();
         expertiseNightWorkerSettings.stream().forEach(expertiseNightWorkerSetting -> {
             expertiseSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),
                     ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class)
-                    );
+            );
         });
 
         shiftsOfStaff.forEach((staffId, shiftQueryResults) -> {
@@ -97,12 +120,22 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     }
 
     // Method to be triggered when job will be executed for checking status of night worker as per the shifts done by staff
-    public boolean updateNightWorkerStatus(){
+    public boolean updateNightWorkerStatus() {
         List<Long> unitIds = shiftMongoRepository.getUnitIdListOfShiftBeforeDate(DateUtils.getDate());
 
         unitIds.forEach(unitId -> {
             updateNightWorkerStatusByUnitId(unitId);
         });
         return true;
+    }
+
+    public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettingsForUnit(Long unitId, Long expertiseId) {
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndUnitId( expertiseId,unitId);
+        if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
+            // find country level settings
+            expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(expertiseId);
+
+        }
+        return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 }
