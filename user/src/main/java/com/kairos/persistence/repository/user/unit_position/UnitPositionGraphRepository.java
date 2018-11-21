@@ -341,13 +341,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGrade) \n" +
             "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,positionLine,payGrade,expertise,seniorityLevel, " +
             "CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as basePayAmount \n" +
+            "OPTIONAL MATCH (positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) \n" +
             "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate}))) \n" +
             "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,functionalPayment,seniorityLevel,function,basePayAmount \n" +
             "OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) \n" +
             "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,seniorityLevel,function,functionalPayment,basePayAmount \n" +
             "OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) \n" +
             "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,slf,function,functionalPayment,basePayAmount \n" +
-            "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function)\n" +
+            "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function)\n " +
+            "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,slf,function,functionalPayment,basePayAmount,, sum(toInteger(rel.amount)) as totalCostOfFunctions" +
             "RETURN " +
             "CASE " +
             "WHEN organization IS NULL THEN \"org\" \n" +
@@ -355,7 +357,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
             "WHEN unitPositionOrgRel IS NULL THEN  \"unitPositionOrgRel\" \n" +
             "WHEN unitPositionStaffRel IS NULL THEN  \"unitPositionStaffRel\" \n" +
-            "ELSE END ")
+            "ELSE {id:id(positionLine),startDate:positionLine.startDate,basePayAmount:basePayAmount,function:COLLECT({id:id(function),amount:rel.amount}),hourlyCost:basePayAmount+totalCostOfFunctions} END ")
          Object getFunctionalHourlyCostByUnitPositionId(Long unitId,Long staffId,Long unitPositionId);
 
 }
