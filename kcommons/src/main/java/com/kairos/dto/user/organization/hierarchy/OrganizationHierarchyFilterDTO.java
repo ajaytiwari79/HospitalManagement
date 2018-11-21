@@ -5,13 +5,11 @@ import java.util.Set;
 
 public class OrganizationHierarchyFilterDTO {
 
-    Set<Long> organizationTypeIds;
-    Set<Long> organizationSubTypeIds;
-    Set<Long> organizationServiceIds;
-    Set<Long> organizationSubServiceIds;
-    Set<Long> organizationAccountTypeIds;
-
-    //=========================================================
+    private Set<Long> organizationTypeIds;
+    private Set<Long> organizationSubTypeIds;
+    private Set<Long> organizationServiceIds;
+    private Set<Long> organizationSubServiceIds;
+    private Set<Long> organizationAccountTypeIds;
 
 
     public Set<Long> getOrganizationTypeIds() {

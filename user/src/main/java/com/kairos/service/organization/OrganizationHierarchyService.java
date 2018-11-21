@@ -181,9 +181,12 @@ public class OrganizationHierarchyService {
         return treeStructureService.getTreeStructure(list);
     }
 
-
-    //========================================================================
-    //TODO Test
+    /**
+     *
+     * @param parentOrganizationId
+     * @param organizationHierarchyFilterDTO
+     * @return
+     */
     public QueryResult generateOrganizationHierarchyByFilter(long parentOrganizationId,OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId,organizationHierarchyFilterDTO);
 
@@ -240,8 +243,12 @@ public class OrganizationHierarchyService {
         return treeStructureService.getTreeStructure(list);
     }
 
-    //======================================================================
 
+    /**
+     *
+     * @param parentOrganizationId
+     * @return
+     */
     public Map<String,Object> getOrganizationHierarchyFilters(long parentOrganizationId) {
 
         return organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
