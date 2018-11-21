@@ -761,18 +761,18 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH(parentOrg:Organization{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
             "MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
-            "OPTIONAL MATCH(parentOrganizatinType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizatinType:OrganizationType{deleted:false})\n" +
-            "OPTIONAL MATCH(childOrganizatinType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizatinType:OrganizationType{deleted:false})\n" +
-            "OPTIONAL MATCH(parentOrganizatinService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizatinService:OrganizationService{deleted:false})\n" +
-            "OPTIONAL MATCH(childOrganizatinService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizatinService:OrganizationService{deleted:false})\n" +
+            "OPTIONAL MATCH(parentOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizationType:OrganizationType{deleted:false})\n" +
+            "OPTIONAL MATCH(childOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizationType:OrganizationType{deleted:false})\n" +
+            "OPTIONAL MATCH(parentOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizationService:OrganizationService{deleted:false})\n" +
+            "OPTIONAL MATCH(childOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizatioonService:OrganizationService{deleted:false})\n" +
             "OPTIONAL MATCH(parentAccountType:AccountType{deleted:false})<-[:HAS_ACCOUNT_TYPE]-(parentOrg)\n" +
             "OPTIONAL MATCH(childAccountType:AccountType{deleted:false})<-[:HAS_ACCOUNT_TYPE]-(subOrg)\n" +
             "RETURN \n" +
-            "{organizationType:CASE WHEN parentOrganizatinType IS NULL THEN COLLECT(DISTINCT {id:id(childOrganizatinType),name:childOrganizatinType.name})  ELSE COLLECT(DISTINCT {id:id(parentOrganizatinType),name:parentOrganizatinType.name})  END,\n" +
-            "organizationSubType:CASE WHEN parentSubOrganizatinType IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizatinType),name:childSubOrganizatinType.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizatinType),name:parentSubOrganizatinType.name})  END,\n" +
-            "organizationService:CASE WHEN parentOrganizatinService IS NULL THEN COLLECT(DISTINCT {id:id(childOrganizatinService),name:childOrganizatinService.name})  ELSE COLLECT(DISTINCT {id:id(parentOrganizatinType),name:parentOrganizatinType.name})  END,\n" +
-            "organizationSubService:CASE WHEN parentSubOrganizatinService IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizatinService),name:childSubOrganizatinService.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizatinService),name:parentSubOrganizatinService.name})  END,\n" +
-            "accountType:CASE WHEN parentAccountType IS NULL THEN collect(distinct {id:id(childAccountType),name:childAccountType.name})  ELSE COLLECT(DISTINCT {id:id(parentAccountType),name:parentAccountType.name})  END}")
+            "{organizationType:CASE WHEN parentOrganizationType IS NULL THEN COLLECT(DISTINCT {id:id(childOrganizationType),name:childOrganizationType.name})  ELSE COLLECT(DISTINCT {id:id(parentOrganizatinType),name:parentOrganizationType.name})  END,\n" +
+            "organizationSubType:CASE WHEN parentSubOrganizationType IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizationType),name:childSubOrganizationType.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizatinType),name:parentSubOrganizationType.name})  END,\n" +
+            "organizationService:CASE WHEN parentOrganizationService IS NULL THEN COLLECT(DISTINCT {id:id(childOrganizationService),name:childOrganizationService.name})  ELSE COLLECT(DISTINCT {id:id(parentOrganizatinType),name:parentOrganizationType.name})  END,\n" +
+            "organizationSubService:CASE WHEN parentSubOrganizationService IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizationService),name:childSubOrganizationService.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizationService),name:parentSubOrganizationService.name})  END,\n" +
+            "accountType:CASE WHEN parentAccountType IS NULL THEN COLLECT(DISTINCT {id:id(childAccountType),name:childAccountType.name})  ELSE COLLECT(DISTINCT {id:id(parentAccountType),name:parentAccountType.name})  END}")
     Map<String,Object> getFiltersByParentOrganizationId(long parentOrganizationId);
 
 
