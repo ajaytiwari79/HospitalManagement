@@ -290,7 +290,7 @@ public class PhaseService extends MongoBaseService {
     public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date startDate,Date endDate){
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndName(unitId,TENTATIVE);
-        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(LocalDate.now(),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(LocalDate.now(ZoneId.of(timeZone)),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
         LocalDateTime endDateTime=Optional.ofNullable(endDate).isPresent()? DateUtils.asLocalDateTime(endDate):null;
         Phase phase;

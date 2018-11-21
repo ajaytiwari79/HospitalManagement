@@ -197,6 +197,8 @@ public class ActivityUtil {
     public  static void initializeActivityTabs(Activity activity,List<PhaseTemplateValue> phaseTemplateValues,GlideTimeSettingsDTO glideTimeSettingsDTO){
 
         RulesActivityTab rulesActivityTab = new RulesActivityTab();
+        PQLSettings pqlSettings=new PQLSettings();
+        rulesActivityTab.setPqlSettings(pqlSettings);
         activity.setRulesActivityTab(rulesActivityTab);
 
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0L, true, LocalTime.of(7, 0), 1d);
