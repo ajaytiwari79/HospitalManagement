@@ -57,9 +57,9 @@ public class ExpertiseNightWorkerSettingController {
     @ApiOperation(value = "update expertise night worker settings")
     @PutMapping(value = UNIT_URL+"/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertiseNightWorkerSettingsInUnit(@PathVariable Long unitId,
+    public ResponseEntity<Map<String, Object>> updateExpertiseNightWorkerSettingsInUnit(@PathVariable Long unitId,@PathVariable Long expertiseId,
                                                                                   @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.updateExpertiseNightWorkerSettingsInUnit(unitId, expertiseNightWorkerSettingDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseNightWorkerSettingService.updateExpertiseNightWorkerSettingsInUnit(unitId, expertiseId,expertiseNightWorkerSettingDTO));
     }
 
 }

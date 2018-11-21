@@ -104,4 +104,19 @@ public class ExpertiseNightWorkerSettingDTO {
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
     }
+
+    @Override
+    public String toString() {
+        return "ExpertiseNightWorkerSettingDTO{" +
+                "id=" + id +
+                ", timeSlot=" + timeSlot +
+                ", minMinutesToCheckNightShift=" + minMinutesToCheckNightShift +
+                ", intervalUnitToCheckNightWorker=" + intervalUnitToCheckNightWorker +
+                ", intervalValueToCheckNightWorker=" + intervalValueToCheckNightWorker +
+                ", minShiftsValueToCheckNightWorker=" + minShiftsValueToCheckNightWorker +
+                ", minShiftsUnitToCheckNightWorker=" + minShiftsUnitToCheckNightWorker +
+                ", countryId=" + countryId +
+                ", expertiseId=" + expertiseId +
+                '}';
+    }
 }

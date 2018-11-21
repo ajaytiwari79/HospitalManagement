@@ -228,7 +228,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "update location and staff representative in expertise")
     @PutMapping(value = UNIT_URL + "/expertise/{expertiseId}")
-    public ResponseEntity<Map<String, Object>> updateExpertiseAtUnit(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("locationId") Long locationId, @RequestParam("staffId") Long staffId) {
+    public ResponseEntity<Map<String, Object>> updateExpertiseAtUnit(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("unionLocationId") Long locationId, @RequestParam("unionRepresentativeId") Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.updateExpertiseAtUnit(unitId, staffId, expertiseId, locationId));
     }
 /*

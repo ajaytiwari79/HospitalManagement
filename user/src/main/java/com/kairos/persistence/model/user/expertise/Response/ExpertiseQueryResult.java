@@ -40,7 +40,7 @@ public class ExpertiseQueryResult {
     private BreakPaymentSetting breakPaymentSetting;
     private Sector sector;
     private Map<String,Object> unionRepresentative;// in case of expertise at unit level only
-    private Location location;// in case of expertise at unit level only
+    private Location unionLocation;// in case of expertise at unit level only
 
     public ExpertiseQueryResult() {
         //default  const
@@ -199,11 +199,11 @@ public class ExpertiseQueryResult {
         this.unionRepresentative = unionRepresentative;
     }
 
-    public Location getLocation() {
-        return location;
+    public Location getUnionLocation() {
+        return unionLocation;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setUnionLocation(Location unionLocation) {
+        this.unionLocation = unionLocation;
     }
 }

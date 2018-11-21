@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
@@ -56,7 +55,6 @@ public class ExpertiseUnitService {
         } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
             expertise = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(organization.getCountry().getId(), servicesAndLevel.getServicesId());
         }
-        Map<String, Object> response = new HashMap<>();
         List<Long> expertiseIds = expertise.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLocationStaffQueryResult> locations= organizationLocationRelationShipGraphRepository.getExpertiseWiseLocationInOrganization(expertiseIds,unitId);
         List<ExpertiseLocationStaffQueryResult> staffs=staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds,unitId);
@@ -65,7 +63,7 @@ public class ExpertiseUnitService {
         Map<Long,Location> locationMap= locations.stream().collect(Collectors.toMap(current->current.getExpertiseId(),v->v.getLocation()));
         expertise.forEach(current->{
             current.setUnionRepresentative(staffMap.get(current.getId()));
-            current.setLocation(locationMap.get(current.getId()));
+            current.setUnionLocation(locationMap.get(current.getId()));
         });
         return expertise;
 
@@ -82,6 +80,7 @@ public class ExpertiseUnitService {
         }
         List<StaffPersonalDetailDTO> staff = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(organization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
         List<Location> locations = expertiseGraphRepository.findAllLocationsOfUnionInExpertise(expertiseId);
+
         response.put("staff", staff);
         response.put("locations", locations);
         return response;

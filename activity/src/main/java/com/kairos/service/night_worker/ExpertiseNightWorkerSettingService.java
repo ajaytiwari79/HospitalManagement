@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.*;
 
 @Service
@@ -63,7 +64,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
         return nightWorkerSettingDTO;
     }
 
-    public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettingsInUnit(Long unitId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
+    public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettingsInUnit(Long unitId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findOne(nightWorkerSettingDTO.getId());
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", nightWorkerSettingDTO.getId());
@@ -72,8 +73,10 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
             expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
             expertiseNightWorkerSetting.setUnitId(unitId);
             expertiseNightWorkerSetting.setCountryId(null);
+            expertiseNightWorkerSetting.setExpertiseId(expertiseId);
             expertiseNightWorkerSetting.setId(null); // making null so that a new Object is constructed and saved
         } else {
+            expertiseNightWorkerSetting.setExpertiseId(expertiseId);
             expertiseNightWorkerSetting.setTimeSlot(nightWorkerSettingDTO.getTimeSlot());
             expertiseNightWorkerSetting.setMinMinutesToCheckNightShift(nightWorkerSettingDTO.getMinMinutesToCheckNightShift());
             expertiseNightWorkerSetting.setIntervalUnitToCheckNightWorker(nightWorkerSettingDTO.getIntervalUnitToCheckNightWorker());
