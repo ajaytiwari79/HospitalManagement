@@ -1481,7 +1481,7 @@ public class OrganizationController {
 
     @ApiOperation(value = "Get Organization Hierarchy By Filter")
     @GetMapping (PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy/filter_available")
-    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationByFilter(@PathVariable long organizationId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyFilters(@PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationHierarchyService.getOrganizationHierarchyFilters(organizationId));
     }
