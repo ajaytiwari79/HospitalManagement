@@ -1,7 +1,6 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
@@ -10,6 +9,7 @@ import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
@@ -250,20 +250,32 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @description - return list of Agreement Template Conatining clause in Section and Sub Sections
      */
     public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId) {
-        return policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+        return policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
     }
 
 
     /**
-     * @param countryId
+     * @param referenceId
      * @param agreementTemplateClauseUpdateDTO - agreement template ids , clause previous id and new clause id
      * @Description method update agreement template section containing previous clause with new clause
      */
-    public boolean updateAgreementTemplateOldClauseWithNewVersionOfClause(Long countryId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+    public boolean updateAgreementTemplateOldClauseWithNewVersionByReferenceIdAndTemplateIds(Long referenceId, boolean isUnitId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
 
-        List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(countryId, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+        List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(referenceId, isUnitId, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
+        Clause clause = clauseMongoRepository.findOne(agreementTemplateClauseUpdateDTO.getNewClauseId());
+
         if (CollectionUtils.isNotEmpty(agreementSectionsAndSubSectionsContainingClause)) {
             agreementSectionsAndSubSectionsContainingClause.forEach(agreementSection -> {
+                ClauseCkEditorVO clauseCkEditorVO = new ClauseCkEditorVO(agreementTemplateClauseUpdateDTO.getNewClauseId(), "<p>" + clause.getTitle() + "</p>", "<p>" + clause.getDescription() + "</p>");
+                List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>(agreementSection.getClauseCkEditorVOS());
+                ListIterator<ClauseCkEditorVO> clauseCkEditorVOIterator = clauseCkEditorVOS.listIterator();
+                while (clauseCkEditorVOIterator.hasNext()) {
+                    ClauseCkEditorVO clauseCkEditorVO1 = clauseCkEditorVOIterator.next();
+                    if (agreementTemplateClauseUpdateDTO.getPreviousClauseId().equals(clauseCkEditorVO1.getId())) {
+                        clauseCkEditorVOIterator.set(clauseCkEditorVO);
+                    }
+                }
+                agreementSection.setClauseCkEditorVOS(new HashSet<>(clauseCkEditorVOS));
                 int clauseIndex = agreementSection.getClauseIdOrderedIndex().indexOf(agreementTemplateClauseUpdateDTO.getPreviousClauseId());
                 agreementSection.getClauseIdOrderedIndex().set(clauseIndex, agreementTemplateClauseUpdateDTO.getNewClauseId());
             });
