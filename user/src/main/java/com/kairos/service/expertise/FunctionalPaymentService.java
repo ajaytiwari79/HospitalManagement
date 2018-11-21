@@ -183,15 +183,14 @@ public class FunctionalPaymentService{
     }
 
     public FunctionalSeniorityLevelDTO updateMatrixInFunctionalPayment(FunctionalSeniorityLevelDTO functionalSeniorityLevelDTO) {
-        List<FunctionalPaymentMatrixDTO> functionalPaymentMatrixDTOS = functionalSeniorityLevelDTO.getFunctionalPaymentMatrix();
-        List<FunctionalPaymentMatrix> list = new ArrayList<FunctionalPaymentMatrix>(1);
-        List<Function> functions = getFunctions(functionalPaymentMatrixDTOS);
-        List<SeniorityLevel> seniorityLevels = getSeniorityLevel(functionalPaymentMatrixDTOS);
-
         Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalSeniorityLevelDTO.getFunctionalPaymentId());
         if (!functionalPayment.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalSeniorityLevelDTO.getFunctionalPaymentId());
         }
+        List<FunctionalPaymentMatrixDTO> functionalPaymentMatrixDTOS = functionalSeniorityLevelDTO.getFunctionalPaymentMatrix();
+        List<FunctionalPaymentMatrix> list = new ArrayList<>(1);
+        List<Function> functions = getFunctions(functionalPaymentMatrixDTOS);
+        List<SeniorityLevel> seniorityLevels = getSeniorityLevel(functionalPaymentMatrixDTOS);
 
         if (functionalPayment.get().isPublished()) {
             // functional payment is published so we need to create a  new copy and update in same
