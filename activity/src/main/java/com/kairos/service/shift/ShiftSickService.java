@@ -34,7 +34,9 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -151,8 +153,9 @@ public class ShiftSickService extends MongoBaseService {
         }
         //shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate(),null);
-            shiftService.saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
+            Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
+            Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
+            shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
         }
     }
 
@@ -258,8 +261,9 @@ public class ShiftSickService extends MongoBaseService {
         }
         if (CollectionUtils.isNotEmpty(shifts)) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate(),null);
-            shiftService.saveShiftWithActivity(phase, shifts, staffAdditionalInfoDTO);
+            Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
+            Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dates);
+            shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
         }
     }
 

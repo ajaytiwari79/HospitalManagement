@@ -357,11 +357,11 @@ public class PhaseService extends MongoBaseService {
         DateTimeInterval realtimeInterval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(localDateTimeAfterMinus),DateUtils.asDate(localDateTimeAfterPlus)):null;
         boolean realTime=Optional.ofNullable(endDateTime).isPresent()?shiftInterval.overlaps(realtimeInterval):
                 startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
-        if (startDateTime.isBefore(previousMondayLocalDateTime)) {
+        if (startDateTime.isBefore(previousMondayLocalDateTime)) {phase= phaseMap.get(REALTIME);
             phase= phaseMap.get(PAYROLL);
         }else if(realTime){
             phase= phaseMap.get(REALTIME);
-        }else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime.plusDays(1))) {
+        }else if (startDateTime.isBefore(localDateTimeAfterMinus) && startDateTime.isAfter(previousMondayLocalDateTime)) {
             phase= phaseMap.get(TIME_AND_ATTENDANCE);
         }else if ((startDateTime).isBefore(untilTentativeDate.plusDays(1)) && startDateTime.isAfter(localDateTimeAfterPlus)) {
             phase=phaseMap.get(TENTATIVE);
