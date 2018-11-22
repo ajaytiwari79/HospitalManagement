@@ -271,4 +271,11 @@ public class FunctionalPaymentService{
 
     }
 
+
+   public void updateAmountInFunctionalTable(Long payTableId){
+
+        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships=seniorityLevelFunctionRelationshipGraphRepository.findAllActiveByTableId(payTableId);
+
+    }
+
 }

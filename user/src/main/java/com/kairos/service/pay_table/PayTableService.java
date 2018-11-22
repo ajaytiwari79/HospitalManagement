@@ -2,6 +2,7 @@ package com.kairos.service.pay_table;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
@@ -507,6 +508,9 @@ public class PayTableService {
     }
 
     public List<PayTable> publishPayTable(Long payTableId, Long publishedDateMillis) {
+//        if(publishedDateMillis<DateUtils.getCurrentMillis()){
+//            exceptionService.actionNotPermittedException("message.startdate.lessthan");
+//        }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
@@ -540,6 +544,7 @@ public class PayTableService {
 
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
+        functionalPaymentService.updateAmountInFunctionalTable(payTableId,payTable.getStartDateMillis(),payTable.getEndDateMillis());
         response.add(payTable);
         return response;
     }
@@ -556,6 +561,7 @@ public class PayTableService {
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
+        payTable.setPercentageValue(payTableDTO.getPercentageValue());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
             if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
                 for (PayGradePayGroupAreaRelationShip current : payGradePayGroupAreaRelationShips) {
@@ -575,6 +581,7 @@ public class PayTableService {
                 }
                 else {
                     payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
+                    payTableGraphRepository.save(payTable);
 
                 }
             }
