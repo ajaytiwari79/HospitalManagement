@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 @QueryResult
 public class FunctionQR {
     private Long functionId;
+    private Long functionName; // this is for FE compatibility
     private BigDecimal amount; // amount which is added to this function;
 
     public FunctionQR() {
@@ -27,5 +28,13 @@ public class FunctionQR {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public Long getFunctionName() {
+        return functionName;
+    }
+
+    public void setFunctionName(Long functionName) {
+        this.functionName = functionName;
     }
 }

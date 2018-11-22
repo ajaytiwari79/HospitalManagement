@@ -15,15 +15,16 @@ public interface CustomPolicyAgreementTemplateRepository {
 
     List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isUnitId);
 
+
     PolicyAgreementTemplate findByCountryIdAndName(Long countryId, String templateName);
 
     PolicyAgreementTemplate findByUnitIdAndName(Long unitId, String templateName);
 
     List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
 
-    List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId);
+    List<AgreementTemplateBasicResponseDTO> findAllByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId);
 
-    List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
+    List<AgreementSection> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long countryId, boolean isUnitId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
 
     Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds);
 

@@ -131,13 +131,13 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      */
     private List<AssetType> updateSubAssetTypes(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, Map<AssetType, List<OrganizationLevelRiskDTO>> riskRelatedToSubAssetTypes) {
 
-        List<BigInteger> subAssetTypesIds = new ArrayList<>();
+        Set<BigInteger> subAssetTypesIds = new HashSet<>();
         Map<BigInteger, AssetTypeOrganizationLevelDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
         subAssetTypesDto.forEach(subAssetTypeDto -> {
             subAssetTypesIds.add(subAssetTypeDto.getId());
             subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
         });
-        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypeByUnitIdAndIds(unitId, subAssetTypesIds);
+        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllByUnitIdAndIds(unitId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
             AssetTypeOrganizationLevelDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
