@@ -160,13 +160,13 @@ public class UnitPositionController {
 
 
     @ApiOperation(value = "get UnitPositions Per Staff")
-    @GetMapping(value = "staff/{staffId}/unit_positions")
+    @GetMapping(value = "/staff/{staffId}/unit_positions")
     public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(unitId, staffId));
     }
 
     @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
-    @GetMapping(value = "staff/{staffId}/unit_position/{unitPositionId}/hourly_cost")
+    @GetMapping(value = "/staff/{staffId}/unit_position/{unitPositionId}/hourly_cost")
     public ResponseEntity<Map<String, Object>> getPositionLinesByStaffAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesByStaffAndUnitPositionId(unitId, staffId,unitPositionId));
     }
