@@ -259,11 +259,11 @@ public class OrganizationHierarchyService {
      */
     public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long parentOrganizationId) {
         FilterAndFavouriteFilterDTO filterAndFavouriteFilter=new FilterAndFavouriteFilterDTO();
-        Map<String,Object> stringObjectMap= organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
+        Map<String,Object> filterTypeDataMap= organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
         List<FilterResponseDTO> filterResponseDTOList=new ArrayList<>();
-        for(String s:stringObjectMap.keySet()){
+        for(String filterType:filterTypeDataMap.keySet()){
             FilterResponseDTO filterResponseDTO=new FilterResponseDTO();
-            switch(s)
+            switch(filterType)
             {
                 case ORGANIZATION_TYPES:
                     filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_TYPES.value);
