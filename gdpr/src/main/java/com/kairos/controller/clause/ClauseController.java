@@ -40,7 +40,7 @@ public class ClauseController {
 
 
     @ApiOperation("add new clause")
-    @PostMapping( "/clause/add")
+    @PostMapping( "/clause")
     public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDTO clauseDto)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, clauseDto));
     }
@@ -53,13 +53,13 @@ public class ClauseController {
 
 
     @ApiOperation("delete clause by id")
-    @DeleteMapping("/clause/delete/{clauseId}")
+    @DeleteMapping("/clause/{clauseId}")
     public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId,clauseId));
     }
 
     @ApiOperation("update clause description")
-    @PutMapping("/clause/update/{clauseId}")
+    @PutMapping("/clause/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable Long countryId,@PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId,  clauseId, clauseDto));
     }
@@ -67,7 +67,7 @@ public class ClauseController {
 
 
     @ApiOperation("get All clauses")
-    @GetMapping("/clause/all")
+    @GetMapping("/clause")
     public ResponseEntity<Object> getAllClauses(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses(countryId));
     }
