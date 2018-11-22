@@ -269,7 +269,11 @@ public class AccessGroupService {
     }
 
     public List<AccessGroupQueryResult> getAccessGroupsForUnit(long organizationId) {
-        return accessGroupRepository.getAccessGroupsForUnit(organizationId);
+        Organization unit = organizationGraphRepository.findOne(organizationId, 0);
+        if(!unit.isParentOrganization()){
+            unit=organizationGraphRepository.getParentOfOrganization(unit.getId());
+        }
+        return accessGroupRepository.getAccessGroupsForUnit(unit.getId());
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {

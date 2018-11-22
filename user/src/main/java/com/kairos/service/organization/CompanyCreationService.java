@@ -82,7 +82,6 @@ import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
 @Transactional
 public class CompanyCreationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CompanyCreationService.class);
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
