@@ -312,9 +312,9 @@ public class PhaseService extends MongoBaseService {
      * @param dates
      * @return
      */
-    public Map<LocalDate,Phase> getPhasesByDates(Long unitId, Set<LocalDateTime> dates) {
+    public Map<Date,Phase> getPhasesByDates(Long unitId, Set<LocalDateTime> dates) {
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
-        Map<LocalDate,Phase> localDatePhaseStatusMap=new HashMap<>();
+        Map<Date,Phase> localDatePhaseStatusMap=new HashMap<>();
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(Phase::getName, v->v));
         Map<BigInteger,Phase> phaseAndIdMap=phases.stream().collect(Collectors.toMap(Phase::getId, v->v));
@@ -334,7 +334,7 @@ public class PhaseService extends MongoBaseService {
             else {
                phase= getActualPhaseApplicableForDate(requestedDate,null,previousMonday,phaseMap,untilTentative,timeZone);
             }
-            localDatePhaseStatusMap.put(requestedDate.toLocalDate(),phase);
+            localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate),phase);
         }
         return localDatePhaseStatusMap;
     }
