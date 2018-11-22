@@ -241,4 +241,11 @@ public class AppConstants {
      * at ~/.credentials/calendar-java-quickstart
      */
     private static final List<String> SCOPES =  Arrays.asList(CalendarScopes.CALENDAR_READONLY);
+
+    //organization Hierarchy Filter constants
+    public static final String ORGANIZATION_TYPES = "organizationType";
+    public static final String ORGANIZATION_SUB_TYPES = "organizationSubType";
+    public static final String ORGANIZATION_SERVICES = "organizationService";
+    public static final String ORGANIZATION_SUB_SERVICES = "organizationSubService";
+    public static final String ACCOUNT_TYPES = "accountType";
 }
