@@ -330,27 +330,27 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
         "ELSE COLLECT({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
         Object getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
-    @Query("MATCH(staff:Staff)-[unitPositionStaffRel: "+BELONGS_TO_STAFF +"]->(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
-            "WHERE id(organization)={0} AND id(staff)={1} AND id(unitPosition)={2} \n" +
+    @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
+            "WHERE id(organization)={0}  AND id(unitPosition)={1} \n" +
             "MATCH(positionLine:UnitPositionLine)-[:"+ HAS_POSITION_LINES+" ]-(unitPosition)   \n" +
             "MATCH(positionLine)-[: "+HAS_SENIORITY_LEVEL +"]->(seniorityLevel:SeniorityLevel)-[: HAS_BASE_PAY_GRADE ]-(payGrade:PayGrade)   \n" +
             "MATCH(unitPosition)-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})   \n" +
             "OPTIONAL MATCH(organization)-[: "+CONTACT_ADDRESS +"]->(contactAddress:ContactAddress)-[:"+ MUNICIPALITY +"]->(municipality:Municipality)-[:"+ HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+ HAS_PAY_GROUP_AREA+" ]-(payGrade)   \n" +
-            "WITH  organization,staff,unitPosition,unitPositionOrgRel,unitPositionStaffRel,positionLine,payGrade,expertise,seniorityLevel,  \n" +
+            "WITH  positionLine,payGrade,expertise,seniorityLevel,  \n" +
             "CASE WHEN pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END AS basePayGradeAmount   \n" +
             "OPTIONAL MATCH (positionLine)-[: "+APPLICABLE_FUNCTION+" ]-(function:Function)   \n" +
             "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[: "+APPLICABLE_FOR_EXPERTISE+" ]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate})))   \n" +
-            "WITH  organization,staff,unitPosition,positionLine,unitPositionOrgRel,unitPositionStaffRel,expertise,functionalPayment,seniorityLevel,function,basePayGradeAmount   \n" +
+            "WITH  positionLine,expertise,functionalPayment,seniorityLevel,function,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(functionalPayment)-[: "+FUNCTIONAL_PAYMENT_MATRIX+" ]->(fpm:FunctionalPaymentMatrix)    \n" +
-            "WITH  organization,staff,unitPosition,positionLine,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,seniorityLevel,function,functionalPayment,basePayGradeAmount   \n" +
+            "WITH  positionLine,expertise,fpm,seniorityLevel,function,functionalPayment,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(fpm)-[: "+SENIORITY_LEVEL_FUNCTIONS+" ]->(slf:SeniorityLevelFunction)-[: "+FOR_SENIORITY_LEVEL+" ]->(seniorityLevel)   \n" +
-            " WITH  organization,staff,unitPosition,positionLine,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,slf,function,functionalPayment,basePayGradeAmount   \n" +
+            " WITH  positionLine,expertise,fpm,slf,function,functionalPayment,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(slf)-[rel: "+HAS_FUNCTIONAL_AMOUNT +"]-(function)   \n" +
-            "WITH  organization,staff,unitPosition,positionLine,unitPositionOrgRel,unitPositionStaffRel,expertise,fpm,slf,function,functionalPayment,basePayGradeAmount,rel, sum(toInteger(rel.amount)) as totalCostOfFunctions," +
+            "WITH  positionLine,expertise,fpm,slf,function,functionalPayment,basePayGradeAmount,rel, sum(toInteger(rel.amount)) as totalCostOfFunctions," +
             "COLLECT({id:id(function),amount:rel.amount,name:function.name}) AS functions " +
             "RETURN  \n" +
             "positionLine.startDate AS startDate,basePayGradeAmount AS basePayGradeAmount,functions,basePayGradeAmount+totalCostOfFunctions AS hourlyCost ")
-    List<UnitPositionLineFunctionQueryResult> getFunctionalHourlyCostByUnitPositionId(Long unitId, Long staffId, Long unitPositionId);
+    List<UnitPositionLineFunctionQueryResult> getFunctionalHourlyCostByUnitPositionId(Long unitId, Long unitPositionId);
 
     @Query("OPTIONAL MATCH(organization:Organization) WHERE id(organization)={0}\n" +
             "OPTIONAL MATCH(staff:Staff) WHERE id(staff)={1}\n" +

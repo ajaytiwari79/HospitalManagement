@@ -1268,15 +1268,17 @@ public class UnitPositionService {
         return unitPositionDTOList;
     }
 
-    /**PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE=7.4
+    /**
+     * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE=7.4
+     *
      * @param unitId
      * @param staffId
      * @param unitPositionId
      * @return
      */
-    public List<UnitPositionLineFunctionQueryResult> getPositionLinesByStaffAndUnitPositionId(Long unitId, Long staffId, Long unitPositionId) {
+    public List<UnitPositionLineFunctionQueryResult> getPositionLinesWithHourlyCost(Long unitId, Long staffId, Long unitPositionId) {
         String isDataValid = unitPositionGraphRepository.validateOrganizationStaffUnitPosition(unitId, staffId, unitPositionId);
-        final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE=7.4f;//
+        final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = 7.4f;//
         if ("organization".equals(isDataValid)) {
             exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
         } else if ("staff".equals(isDataValid)) {
@@ -1288,24 +1290,24 @@ public class UnitPositionService {
         } else if ("unitPositionStaffRel".equals(isDataValid)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionStaffRel");
         }
-        List<UnitPositionLineFunctionQueryResult> hourlyCostByUnitPositionLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, staffId, unitPositionId);
-        float leapYear = (float) (1 / (366 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
-        float nonLeapYear = (float) (1 / (365 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
-        hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines,UnitPositionLineFunctionQueryResult.class);
+        List<UnitPositionLineFunctionQueryResult> hourlyCostByUnitPositionLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, unitPositionId);
+        final float LEAP_YEAR_CONST = (float) (1 / (366 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
+        final float NON_LEAP_YEAR_CONST = (float) (1 / (365 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
+        hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines, UnitPositionLineFunctionQueryResult.class);
         for (UnitPositionLineFunctionQueryResult unitPositionLineFunctionQueryResult : hourlyCostByUnitPositionLines) {
-            float hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYear : nonLeapYear;
+            float hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? LEAP_YEAR_CONST : NON_LEAP_YEAR_CONST;
             unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount() * hourlyCostCalculationFactor);
             unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost() * hourlyCostCalculationFactor);
-            List<FunctionDTO> functionList=unitPositionLineFunctionQueryResult.getFunctions();
-            Iterator<FunctionDTO> iterator=functionList.iterator();
+            List<FunctionDTO> functionList = unitPositionLineFunctionQueryResult.getFunctions();
+            Iterator<FunctionDTO> iterator = functionList.iterator();
             while (iterator.hasNext()) {
-                FunctionDTO function=iterator.next();
-                if(function.getAmount()!=null){
-                function.setAmount(function.getAmount().multiply(new BigDecimal(hourlyCostCalculationFactor)).setScale(2, RoundingMode.CEILING));}
-
-            else{
+                FunctionDTO function = iterator.next();
+                if (function.getAmount() != null) {
+                    function.setAmount(function.getAmount().multiply(new BigDecimal(hourlyCostCalculationFactor)).setScale(2, RoundingMode.CEILING));
+                } else {
                     iterator.remove();
-            } }
+                }
+            }
         }
         return hourlyCostByUnitPositionLines;
     }
