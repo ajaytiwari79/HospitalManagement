@@ -168,8 +168,8 @@ public class ShiftSickService extends MongoBaseService {
             List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-
-            shifts.forEach( shift-> {
+            for (Shift shift : shifts) {
+                staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()),shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
                 WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
                 CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts.get(0).getActivities().get(0).getStartDate());
                 if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
@@ -178,8 +178,7 @@ public class ShiftSickService extends MongoBaseService {
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                 shiftService.saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
-               // shiftService.updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
-            });
+            }
         }
     }
 
@@ -197,7 +196,7 @@ public class ShiftSickService extends MongoBaseService {
             currentShift.setPhaseId(planningPeriodForSameDate.getPhaseId());
         }
     }
-
+    //TODO Refactor db queries
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
@@ -296,8 +295,9 @@ public class ShiftSickService extends MongoBaseService {
             Date startDate = DateUtils.asDate(DateUtils.asZoneDateTime(shifts.get(0).getStartDate()).truncatedTo(ChronoUnit.DAYS));
             Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(shifts.get(shifts.size()-1).getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
             timeBankRepository.deleteDailyTimeBank(Arrays.asList(staffAdditionalInfoDTO.getUnitPosition().getId()), startDate, endDate);
-            shifts.forEach( shift-> {
+            for (Shift shift : shifts) {
                 if(!shift.isDeleted()){
+                    staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaffWithUnitId(unitId,DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
                     CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts.get(0).getActivities().get(0).getStartDate());
                     if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
                         exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
@@ -306,7 +306,7 @@ public class ShiftSickService extends MongoBaseService {
                     shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     shiftService.updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
                 }
-            });
+            }
         }
     }
 
