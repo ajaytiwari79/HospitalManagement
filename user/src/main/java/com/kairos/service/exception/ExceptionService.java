@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExceptionService extends CommonsExceptionUtil {
 
-
-
-
     public void usernameNotFoundException(String message,Object... params) {
         throw new UsernameNotFoundException(convertMessage(message, params));
     }
@@ -35,6 +32,10 @@ public class ExceptionService extends CommonsExceptionUtil {
     }
     public void flsCredentialException(String message,Object... params) {
         throw new FlsCredentialException(convertMessage(message, params));
+    }
+
+    public void exceptionWithoutConvertInRestClient(String message) {
+        throw new com.kairos.commons.custom_exception.ActionNotPermittedException(message);
     }
     public void flsCallException(String message,Object... params) {
         throw new FlsCallException(convertMessage(message, params));

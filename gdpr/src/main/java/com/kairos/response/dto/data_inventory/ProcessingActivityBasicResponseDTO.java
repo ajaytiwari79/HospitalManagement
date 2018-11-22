@@ -2,6 +2,7 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.ManagingOrganization;
 
 import javax.validation.constraints.NotBlank;
@@ -10,30 +11,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProcessingActivityBasicResponseDTO {
 
     private BigInteger id;
-    @NotBlank(message = "Name can't be empty")
     private String name;
-    @NotBlank(message = "Description can't be empty")
     private String description;
     private ManagingOrganization managingDepartment;
-    private boolean selected=false;
     List<ProcessingActivityBasicResponseDTO> subProcessingActivities=new ArrayList<>();
-    private boolean suggested;
+    private Boolean suggested;
 
 
-    public boolean isSuggested() { return suggested; }
+    public Boolean getSuggested() { return suggested; }
 
-    public void setSuggested(boolean suggested) { this.suggested = suggested; }
+    public void setSuggested(Boolean suggested) { this.suggested = suggested; }
 
     public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 
     public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
-
-    public boolean isSelected() { return selected; }
-
-    public void setSelected(boolean selected) { this.selected = selected; }
 
     public BigInteger getId() { return id;}
 

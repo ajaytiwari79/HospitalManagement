@@ -11,6 +11,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -269,5 +270,29 @@ public class StaffPersonalDetail {
 
     public void setSectorWiseExpertise(List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise) {
         this.sectorWiseExpertise = sectorWiseExpertise;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StaffPersonalDetail that = (StaffPersonalDetail) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(firstName, that.firstName) &&
+                Objects.equals(contactDetail, that.contactDetail) &&
+                currentStatus == that.currentStatus &&
+                Objects.equals(expertiseIds, that.expertiseIds) &&
+                Objects.equals(expertiseWithExperience, that.expertiseWithExperience) &&
+                Objects.equals(cprNumber, that.cprNumber) &&
+                Objects.equals(familyName, that.familyName) &&
+                gender == that.gender &&
+                Objects.equals(sectorWiseExpertise, that.sectorWiseExpertise);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, firstName, contactDetail, currentStatus, expertiseIds, expertiseWithExperience, cprNumber, familyName, gender, sectorWiseExpertise);
     }
 }

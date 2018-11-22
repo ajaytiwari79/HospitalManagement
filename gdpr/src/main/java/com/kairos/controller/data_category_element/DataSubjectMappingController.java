@@ -68,7 +68,7 @@ public class DataSubjectMappingController {
     // todo working on it
 
 
-    @ApiOperation("organziation, save  data Subject ")
+    @ApiOperation("organization, save  data Subject ")
     @PostMapping(UNIT_URL+"/data_subject")
     public ResponseEntity<Object> saveOrganizationDataSubject(@PathVariable Long unitId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.saveOrganizationDataSubject(unitId, dataSubjectDTO));

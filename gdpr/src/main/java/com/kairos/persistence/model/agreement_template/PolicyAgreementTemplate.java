@@ -7,7 +7,9 @@ import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -29,7 +31,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
-    private BigInteger templateType;
+    private BigInteger templateTypeId;
     private boolean coverPageAdded;
     private boolean includeContentPage;
     private boolean signatureComponentAdded;
@@ -37,6 +39,8 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private boolean signatureComponentRightAlign;
     private String  signatureHtml;
     private CoverPageVO coverPageData;
+    @Transient
+    private ClauseTag defaultClauseTag;
 
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
@@ -47,6 +51,12 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
+    }
+
+    public PolicyAgreementTemplate(@NotBlank(message = "Name cannot be empty") String name, @NotBlank(message = "Description cannot be empty") String description, BigInteger templateTypeId) {
+        this.name = name;
+        this.description = description;
+        this.templateTypeId = templateTypeId;
     }
 
     public boolean isIncludeContentPage() { return includeContentPage; }
@@ -64,9 +74,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public void setCoverPageData(CoverPageVO coverPageData) { this.coverPageData = coverPageData; }
 
-    public BigInteger getTemplateType() { return templateType; }
+    public BigInteger getTemplateTypeId() { return templateTypeId; }
 
-    public PolicyAgreementTemplate setTemplateType(BigInteger templateType) { this.templateType = templateType; return this; }
+    public void setTemplateTypeId(BigInteger templateTypeId) { this.templateTypeId = templateTypeId; }
 
     public String getName() {
         return name;
@@ -137,4 +147,8 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
 
     public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
+
+    public ClauseTag getDefaultClauseTag() { return defaultClauseTag; }
+
+    public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
 }

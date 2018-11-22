@@ -4,15 +4,20 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.*;
 import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
+import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
@@ -45,6 +50,9 @@ public class MasterAssetService extends MongoBaseService {
     @Inject
     private GenericRestClient restClient;
 
+    @Inject
+    private AssetTypeMongoRepository assetTypeMongoRepository;
+
 
     /**
      * @param countryId
@@ -57,16 +65,52 @@ public class MasterAssetService extends MongoBaseService {
 
         MasterAsset previousAsset = masterAssetMongoRepository.findByName(countryId, masterAssetDto.getName());
         if (Optional.ofNullable(previousAsset).isPresent()) {
-            throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
+            exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
         }
-        assetTypeService.getAssetTypeById(countryId, masterAssetDto.getAssetTypeId());
         MasterAsset masterAsset = new MasterAsset(masterAssetDto.getName(), masterAssetDto.getDescription(), countryId, masterAssetDto.getOrganizationTypes(), masterAssetDto.getOrganizationSubTypes()
-                , masterAssetDto.getOrganizationServices(), masterAssetDto.getOrganizationSubServices(), SuggestedDataStatus.APPROVED)
-                .setAssetType(masterAssetDto.getAssetTypeId())
-                .setAssetSubTypes(masterAssetDto.getAssetSubTypes());
+                , masterAssetDto.getOrganizationServices(), masterAssetDto.getOrganizationSubServices(), SuggestedDataStatus.APPROVED);
+        saveAndUpdateAssetType(countryId, masterAsset, masterAssetDto);
         masterAssetMongoRepository.save(masterAsset);
         masterAssetDto.setId(masterAsset.getId());
         return masterAssetDto;
+    }
+
+
+    private void saveAndUpdateAssetType(Long countryId, MasterAsset masterAsset, MasterAssetDTO masterAssetDTO) {
+
+
+        if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
+
+            AssetType assetType = assetTypeMongoRepository.findOne(masterAssetDTO.getAssetType().getId());
+            masterAsset.setAssetSubTypeId(assetType.getId());
+            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeBasicDTO -> {
+                if (assetSubTypeBasicDTO.getId() != null) {
+                    masterAsset.setAssetSubTypeId(assetSubTypeBasicDTO.getId());
+                } else {
+                    AssetType assetSubType = new AssetType(assetSubTypeBasicDTO.getName(), countryId, SuggestedDataStatus.APPROVED);
+                    assetSubType.setSubAssetType(true);
+                    assetTypeMongoRepository.save(assetSubType);
+                    assetType.getSubAssetTypes().add(assetSubType.getId());
+                    masterAsset.setAssetSubTypeId(assetSubType.getId());
+                }
+            });
+        } else {
+            AssetType previousAssetType = assetTypeMongoRepository.findByNameAndCountryId(countryId, masterAssetDTO.getAssetType().getName());
+            Optional.ofNullable(previousAssetType).ifPresent(assetType -> {
+                exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType.getName());
+            });
+            AssetType assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
+            Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeDto -> {
+
+                AssetType assetSubType = new AssetType(assetSubTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
+                assetSubType.setSubAssetType(true);
+                assetTypeMongoRepository.save(assetSubType);
+                assetType.getSubAssetTypes().add(assetSubType.getId());
+                masterAsset.setAssetSubTypeId(assetSubType.getId());
+            });
+            assetTypeMongoRepository.save(assetType);
+            masterAsset.setAssetTypeId(assetType.getId());
+        }
     }
 
 
@@ -96,15 +140,13 @@ public class MasterAssetService extends MongoBaseService {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
         masterAsset = masterAssetMongoRepository.findOne(id);
-        assetTypeService.getAssetTypeById(countryId, masterAssetDto.getAssetTypeId());
         masterAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes())
                 .setOrganizationSubTypes(masterAssetDto.getOrganizationSubTypes())
                 .setOrganizationServices(masterAssetDto.getOrganizationServices())
                 .setOrganizationSubServices(masterAssetDto.getOrganizationSubServices())
                 .setName(masterAssetDto.getName())
-                .setAssetType(masterAssetDto.getAssetTypeId())
-                .setAssetSubTypes(masterAssetDto.getAssetSubTypes())
                 .setDescription(masterAssetDto.getDescription());
+        saveAndUpdateAssetType(countryId, masterAsset, masterAssetDto);
         masterAssetMongoRepository.save(masterAsset);
         return masterAssetDto;
     }

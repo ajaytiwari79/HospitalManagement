@@ -1,7 +1,5 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
-import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
@@ -37,6 +35,7 @@ public class SchedulerPanelDTO {
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
+    private String timezone;
 
 
 
@@ -61,11 +60,12 @@ public class SchedulerPanelDTO {
         this.entityId = entityId;
     }
 
-    public SchedulerPanelDTO(List<DayOfWeek> days, LocalTime runOnce, JobType jobType, JobSubType jobSubType) {
+    public SchedulerPanelDTO(List<DayOfWeek> days, LocalTime runOnce, JobType jobType, JobSubType jobSubType,String timezone) {
         this.days = days;
         this.runOnce = runOnce;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
+        this.timezone=timezone;
     }
 
     public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
@@ -302,5 +302,11 @@ public class SchedulerPanelDTO {
         this.selectedHours = selectedHours;
     }
 
+    public String getTimezone() {
+        return timezone;
+    }
 
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
 }

@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.agreement_template;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
@@ -22,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
@@ -45,28 +44,25 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
 
         String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
         String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
         String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},'clauseIdOrderedIndex':{'$first':'$clauseIdOrderedIndex'},'clauseCkEditorVOS':{'$first':'$clauseCkEditorVOS'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' },titleHtml:{$first:'$titleHtml' }}}";
 
-        Document replaceRootOperation = Document.parse(replaceRoot);
-        Document groupOperation = Document.parse(groupSubSections);
-        Document sortSubSectionsOperation = Document.parse(sortSubSections);
-
+        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").is(agreementTemplateId).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(agreementTemplateId).and(DELETED).is(false)),
+                match(criteria),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
-                new CustomAggregationOperation(replaceRootOperation),
+                new CustomAggregationOperation(Document.parse(replaceRoot)),
                 lookup("clause", "clauseIdOrderedIndex", "_id", "clauses"),
                 lookup("agreementSection", "subSections", "_id", "subSections"),
                 unwind("subSections", true),
                 lookup("clause", "subSections.clauseIdOrderedIndex", "_id", "subSections.clauses"),
-                new CustomAggregationOperation(sortSubSectionsOperation),
-                new CustomAggregationOperation(groupOperation),
+                new CustomAggregationOperation(Document.parse(sortSubSections)),
+                new CustomAggregationOperation(Document.parse(groupSubSections)),
                 new CustomAggregationOperation(Document.parse(sortAgreementSection))
 
         );
@@ -76,7 +72,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     }
 
     @Override
-    public PolicyAgreementTemplate findByName(Long countryId, String templateName) {
+    public PolicyAgreementTemplate findByCountryIdAndName(Long countryId, String templateName) {
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(templateName).and(DELETED).is(false).and(COUNTRY_ID).is(countryId));
         query.collation(Collation.of("en").
@@ -85,18 +81,27 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
     }
 
-    @Override
-    public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateByCountryId(Long countryId) {
 
-        Document projectionForTemplateTypeElementAtIndexZeroOperation = Document.parse(CustomAggregationQuery.agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero());
-        Document addNonDeletedTemplateTypeOperation = Document.parse(CustomAggregationQuery.addNonDeletedTemplateTyeField());
+    @Override
+    public PolicyAgreementTemplate findByUnitIdAndName(Long unitId, String templateName) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(templateName).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, PolicyAgreementTemplate.class);
+    }
+
+    @Override
+    public List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isUnitId) {
+
+        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("templateType", "templateType", "_id", "templateType"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
-                new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation),
+                match(criteria),
+                lookup("templateType", "templateTypeId", "_id", "templateType"),
+                new CustomAggregationOperation(Document.parse(CustomAggregationQuery.addNonDeletedTemplateTyeField())),
+                new CustomAggregationOperation(Document.parse(CustomAggregationQuery.agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero())),
                 sort(Sort.Direction.DESC, "createdAt")
         );
 
@@ -106,12 +111,21 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementTemplateBasicResponseDTO> findAgreementTemplateListByCountryIdAndClauseId(Long countryId, BigInteger clauseId) {
+    public List<AgreementTemplateBasicResponseDTO> findAllByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId) {
+
         String projectionOperation = "{'$project':{ '_id':1,'name':1 }}";
+        Criteria criteria;
+        if (isUnitId)
+            criteria = Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false);
+        else
+            criteria = Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false);
+
+
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
-                match(Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId).and("agreementSections.deleted").is(false)),
+                unwind("agreementSections"),
+                lookup("agreementSection", "agreementSections.subSections", "_id", "agreementSections.subSections"),
+                match(criteria.orOperator(Criteria.where("agreementSections.subSections.clauseIdOrderedIndex").is(clauseId), Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId))),
                 new CustomAggregationOperation(Document.parse(projectionOperation))
         );
 
@@ -122,16 +136,18 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSection> getAllAgreementSectionAndSubSectionByCountryIdAndClauseId(Long countryId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId) {
+    public List<AgreementSection> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId) {
 
         String groupOperation = "{'$group':{ '_id':'$_id','agreementSections':{$addToSet:'$agreementSections'},subSections:{$first:'$subSections'}}}";
         String projectionOperation = "{ '$project': {  'agreementSections': { '$setUnion': [ '$agreementSections', '$subSections' ] } } }";
 
+        Criteria criteria= isUnitId ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").in(agreementTemplateIds).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").in(agreementTemplateIds).and(DELETED).is(false);
+
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").in(agreementTemplateIds).and(DELETED).is(false)),
-                lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
+                match(criteria),
+                lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections", true),
-                lookup("agreement_section", "agreementSections.subSections", "_id", "subSections"),
+                lookup("agreementSection", "agreementSections.subSections", "_id", "subSections"),
                 new CustomAggregationOperation(Document.parse(groupOperation)),
                 new CustomAggregationOperation(Document.parse(projectionOperation)),
                 unwind("agreementSections"),
@@ -143,8 +159,9 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     }
 
     @Override
-    public Set<BigInteger> getListOfClausePresentInOtherAgreementTemplateSectionByCountryIdAndClauseId(Long countryId, BigInteger templateId, Set<BigInteger> clauseIds) {
+    public Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds) {
 
+        Criteria criteria = isUnitId ? Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(referenceId).and("_id").ne(templateId) : Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(referenceId).and("_id").ne(templateId);
 
         String addNonDeletedSubSection = "{  '$addFields':" +
                 "{'subSections':" +
@@ -161,7 +178,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         String groupOperation = "{ '$group' : { '_id' : '$_id' , 'clauseIds':{ '$addToSet' : '$clauseIds'}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and("_id").ne(templateId)),
+                match(criteria),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
                 new CustomAggregationOperation(Document.parse(replaceRoot)),

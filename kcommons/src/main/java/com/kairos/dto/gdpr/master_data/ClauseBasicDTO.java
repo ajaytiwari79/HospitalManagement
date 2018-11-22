@@ -33,9 +33,7 @@ public class ClauseBasicDTO {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title.trim();
-    }
+    public String getTitle() { return title.trim(); }
 
     public void setTitle(String title) {
         this.title = title;

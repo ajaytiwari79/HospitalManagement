@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.wta.rule_template;
 
 
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -25,5 +26,7 @@ public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<
 
     @Query("{countryId:?0,name:?1,deleted:false}")
     WTABaseRuleTemplate existsByName(Long countryId, String name);
+
+    List<WTABaseRuleTemplateDTO> findAllByIdIn(List<BigInteger> ids);
 
 }
