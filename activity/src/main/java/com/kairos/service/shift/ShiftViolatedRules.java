@@ -15,7 +15,7 @@ import java.util.List;
 @Document
 public class ShiftViolatedRules extends MongoBaseEntity{
 
-    //We need proper discussion because i think it should be per phase
+    //TODO We need proper discussion it should be per phase
     private Shift shift;
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
