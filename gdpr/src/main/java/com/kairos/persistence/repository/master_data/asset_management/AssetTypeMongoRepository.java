@@ -35,7 +35,7 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
     List<AssetType> findAllAssetTypeByCountryIdAndIds(Long countryId, List<BigInteger> ids);
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
-    List<AssetType> findAllAssetTypeByUnitIdAndIds(Long unitId, List<BigInteger> ids);
+    List<AssetType> findAllByUnitIdAndIds(Long unitId, Set<BigInteger> ids);
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1},subAssetType:true}")
     List<AssetType> findAllAssetSubTypeByUnitIdAndIds(Long unitId, Set<BigInteger> ids);

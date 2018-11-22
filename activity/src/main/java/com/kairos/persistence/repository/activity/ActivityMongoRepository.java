@@ -17,9 +17,7 @@ import java.util.Set;
  * Created by pawanmandhan on 17/8/17.
  */
 @Repository
-public interface ActivityMongoRepository extends MongoBaseRepository<Activity, BigInteger>,
-        CustomActivityMongoRepository {
-
+public interface ActivityMongoRepository extends MongoBaseRepository<Activity, BigInteger>,CustomActivityMongoRepository {
 
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);
@@ -42,13 +40,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
 
-
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
-
-    @Query(value = "{'_id':{'$in':?0}, 'deleted':false}")
-    List<Activity> findAllActivitieIdsAndLocationActivityTabByIds(Set<BigInteger> activityIds);
-
 
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "'_id':1, 'phaseSettingsActivityTab':1")
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
@@ -60,5 +53,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{'balanceSettingsActivityTab.timeTypeId':{$in:[?0]}, deleted:false}", fields = "{_id:1}")
     List<Activity>  getActivitiesByTimeTypeId(List<BigInteger> timeTypeIds);
+
+    @Query(value = "{'_id':{'$in':?0}, 'deleted':false}",fields = "{'name':1,'description':1}")
+    List<ActivityDTO> findByDeletedFalseAndIdsIn(Set<BigInteger> activityIds);
 
 }

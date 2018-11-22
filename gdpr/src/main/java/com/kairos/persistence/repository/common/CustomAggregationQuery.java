@@ -131,9 +131,9 @@ public class CustomAggregationQuery {
 
     public static String addNonDeletedTemplateTyeField() {
         return " {  '$addFields':" +
-                "                {'templateTypes':" +
+                "                {'templateType':" +
                 "                {'$filter' : { " +
-                "                'input': '$templateTypes'," +
+                "                'input': '$templateType'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
                 "                }}}}";
@@ -145,7 +145,7 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
-                "         'assetSubTypes':1," +
+                "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
                 "         'name':1," +
                 "       'description':1," +
                 "       'organizationSubTypes':1," +
@@ -163,25 +163,18 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
-                "'hostingType':{$arrayElemAt:['$hostingType',0]}," +
                 "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
-                "'dataDisposal':{$arrayElemAt:['$dataDisposal',0]}," +
-                "'hostingProvider':{$arrayElemAt:['$hostingProvider',0]}," +
                 "  'name':1," +
                 "  'description':1," +
                 "  'hostingLocation':1," +
                 "  'managingDepartment':1," +
                 "  'assetOwner':1," +
-                "  'storageFormats':1," +
-                "  'orgSecurityMeasures':1," +
-                "  'technicalSecurityMeasures':1," +
                 "  'dataRetentionPeriod':1," +
                 "  'minDataSubjectVolume':1," +
                 "  'maxDataSubjectVolume':1," +
                 "  'active':1," +
                 " 'assetAssessor':1," +
                 "'suggested':1" +
-
                 "            }}";
     }
 

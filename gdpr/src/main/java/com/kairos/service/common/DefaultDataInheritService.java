@@ -271,9 +271,8 @@ public class DefaultDataInheritService extends MongoBaseService {
                 asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
                 asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
-                if (CollectionUtils.isNotEmpty(masterAssetDTO.assetSubTypes)) {
-                    List<BigInteger> subAssetTypeIds = new ArrayList<>();
-                    masterAssetDTO.assetSubTypes.forEach(subAssetType -> subAssetTypeIds.add(globalAssetTypeAndSubAssetTypeMap.get(subAssetType.getName().toLowerCase().trim())));
+                if (Optional.of(masterAssetDTO.getAssetSubType()).isPresent()) {
+                    asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getAssetSubType().getName().toLowerCase().trim()));
                 }
                 assets.add(asset);
             }

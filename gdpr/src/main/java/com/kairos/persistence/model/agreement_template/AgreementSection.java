@@ -9,7 +9,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Document
 public class AgreementSection extends MongoBaseEntity {
@@ -21,7 +23,7 @@ public class AgreementSection extends MongoBaseEntity {
     private boolean subSection;
     // clause id are saved in order way
     private List<BigInteger> clauseIdOrderedIndex=new ArrayList<>();
-    private List<ClauseCkEditorVO> clauseCkEditorVOS=new ArrayList<>();
+    private Set<ClauseCkEditorVO> clauseCkEditorVOS=new HashSet<>();
     private List<BigInteger> subSections=new ArrayList<>();
     private Integer orderedIndex;
     private Long countryId;
@@ -55,9 +57,9 @@ public class AgreementSection extends MongoBaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+    public Set<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
 
-    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
+    public void setClauseCkEditorVOS(Set<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
 
     public AgreementSection(){ }
 
