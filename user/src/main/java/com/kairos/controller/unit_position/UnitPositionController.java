@@ -166,7 +166,7 @@ public class UnitPositionController {
     }
 
     @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
-    @GetMapping(value = "staff/{staffId}/unitPosition/{unitPositionId}/position_lines")
+    @GetMapping(value = "staff/{staffId}/unit_position/{unitPositionId}/hourly_cost")
     public ResponseEntity<Map<String, Object>> getPositionLinesByStaffAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesByStaffAndUnitPositionId(unitId, staffId,unitPositionId));
     }
