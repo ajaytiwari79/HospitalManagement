@@ -9,6 +9,7 @@ import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -31,8 +32,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
-
-import static com.kairos.enums.TimeTypeEnum.BREAK;
+import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
+import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -540,9 +541,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds) {
+        List<TimeTypeEnum> breakTypes=new ArrayList<>();
+        breakTypes.add(PAID_BREAK);
+        breakTypes.add(UNPAID_BREAK);
         Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("isParentActivity").is(true).and("deleted").is(false))
                 ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                match(Criteria.where("state").nin("DRAFT").orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds),Criteria.where("timeType.type").is(BREAK))));
+                match(Criteria.where("state").nin("DRAFT").orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds),Criteria.where("timeType.secondLevelType").in(breakTypes))));
         AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
         return result.getMappedResults();
     }
