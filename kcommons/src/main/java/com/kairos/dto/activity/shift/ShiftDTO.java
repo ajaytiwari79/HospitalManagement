@@ -64,6 +64,14 @@ public class ShiftDTO {
     private ShiftType shiftType;
 
 
+   public ShiftDTO(BigInteger id, Date startDate,Date endDate,Long unitId,Long staffId) {
+       this.id = id;
+       this.startDate = startDate;
+       this.endDate = endDate;
+       this.unitId = unitId;
+       this.staffId = staffId;
+   }
+
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activities = activities;
         this.unitId = unitId;

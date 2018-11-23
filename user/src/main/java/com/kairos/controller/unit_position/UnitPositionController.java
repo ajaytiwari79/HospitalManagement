@@ -96,8 +96,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "remove function to unit position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitPositionId, appliedDate));
+    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitId,unitPositionId, appliedDate));
     }
 
     /**
@@ -158,4 +158,16 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
+
+    @ApiOperation(value = "get UnitPositions Per Staff")
+    @GetMapping(value = "/staff/{staffId}/unit_positions")
+    public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(unitId, staffId));
+    }
+
+    @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
+    @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
+    public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
+    }
 }
