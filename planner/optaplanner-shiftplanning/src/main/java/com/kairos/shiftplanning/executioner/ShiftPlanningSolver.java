@@ -20,6 +20,7 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.solver.EnvironmentMode;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
@@ -53,7 +54,10 @@ public class ShiftPlanningSolver {
         List<File> droolsFiles = getDroolFilesByConstraints(solverConfig);
         solverFactory = SolverFactory.createFromXmlResource(config2);
         solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(droolsFiles);
+       // solverFactory.getSolverConfig().setEnvironmentMode(EnvironmentMode.FULL_ASSERT);
         solver = solverFactory.buildSolver();
+        //solverFactoryBreaks = SolverFactory.createFromXmlResource(config_breaks);
+        //solverBreaks = solverFactoryBreaks.buildSolver();
     }
     public ShiftPlanningSolver(File solverConfigXml){
         solverFactory = SolverFactory.createFromXmlFile(solverConfigXml);

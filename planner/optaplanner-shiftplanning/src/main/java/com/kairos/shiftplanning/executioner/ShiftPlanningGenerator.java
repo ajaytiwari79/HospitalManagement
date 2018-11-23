@@ -251,8 +251,8 @@ public class ShiftPlanningGenerator {
                 ShiftRequestPhase sa = new ShiftRequestPhase();
                 sa.setEmployee(emp);
                 sa.setId(UUID.randomUUID());
-                sa.setActivityLineIntervals(activityLineIntervalList);
                 sa.setDate(date);
+                sa.setActivityLineIntervals(activityLineIntervalList);
                 sa.setStartTime(activityLineIntervalList.get(0).getStart().toLocalTime());
                 sa.setEndTime(activityLineIntervalList.get(activityLineIntervalList.size()-1).getEnd().toLocalTime());
                 int j= 0;

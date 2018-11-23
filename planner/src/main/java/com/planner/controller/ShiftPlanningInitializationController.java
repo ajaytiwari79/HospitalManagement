@@ -45,8 +45,10 @@ private CTAService ctaService;
      * @return
      */
 
+
+
     @GetMapping(value = "/ShiftPlanning")
-    ResponseEntity<Map<String, Object>> initializeShiftPlanning() {
+    ResponseEntity<Map<String, Object>> initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         Long[] staffIds = {34246L,27075L,27079L,34251L,34246L,34272L};
         shiftPlanningInitializationService.initializeShiftPlanning(25120L, new Date(1530383400000l), new Date(1532975400000l), staffIds);
 
