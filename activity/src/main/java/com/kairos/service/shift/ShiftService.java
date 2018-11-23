@@ -379,6 +379,7 @@ public class ShiftService extends MongoBaseService {
             shift.getActivities().remove(0);
             shift.getActivities().addAll(breakActivities);
         }
+        shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
         shiftMongoRepository.save(shift);
         if(!updateShift) {
             updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);

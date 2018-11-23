@@ -23,7 +23,6 @@ public class TimeType extends MongoBaseEntity{
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum type;
-    private BreakPaymentSetting breakPaymentSetting;
     private TimeTypeEnum secondLevelType;
 
     public TimeType() {}
@@ -110,12 +109,8 @@ public class TimeType extends MongoBaseEntity{
         this.backgroundColor = backgroundColor;
     }
 
-
     public TimeTypeEnum getType() {
         return type;
-    }
-    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-        this.breakPaymentSetting = breakPaymentSetting;
     }
 
     public TimeTypeEnum getSecondLevelType() {

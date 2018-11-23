@@ -246,7 +246,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeType> workingTimeTypes=new ArrayList<>();
         TimeType presenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", AppConstants.WORKING_TYPE_COLOR,PRESENCE,countryId);
         TimeType absenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Absence", "", AppConstants.WORKING_TYPE_COLOR,ABSENCE,countryId);
-        TimeType breakTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR,BREAK,countryId);
+        TimeType breakTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR,PAID_BREAK,countryId);
         workingTimeTypes.add(presenceTimeType);
         workingTimeTypes.add(absenceTimeType);
         workingTimeTypes.add(breakTimeType);
@@ -254,7 +254,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeType> nonWorkingTimeTypes=new ArrayList<>();
         TimeType volunteerTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Volunteer Time", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId);
         TimeType timeBankOffTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Timebank Off Time", "", AppConstants.NON_WORKING_TYPE_COLOR, TIME_BANK, countryId);
-        TimeType unPaidBreakTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid Break", "", AppConstants.NON_WORKING_TYPE_COLOR, BREAK, countryId);
+        TimeType unPaidBreakTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid Break", "", AppConstants.NON_WORKING_TYPE_COLOR, UNPAID_BREAK, countryId);
         TimeType timeSplitInShiftTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Time between Split Shifts", "", AppConstants.NON_WORKING_TYPE_COLOR, SHIFT_SPLIT_TIME, countryId);
         TimeType dutyFreeTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Duty-free, Self-Paid", "", AppConstants.NON_WORKING_TYPE_COLOR, SELF_PAID, countryId);
         TimeType sicknessTimeType=new TimeType(TimeTypes.NON_WORKING_TYPE, "Planned Sickness on Freedays", "", AppConstants.NON_WORKING_TYPE_COLOR, PLANNED_SICK_ON_FREE_DAYS, countryId);
