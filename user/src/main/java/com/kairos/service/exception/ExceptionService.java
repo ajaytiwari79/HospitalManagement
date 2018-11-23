@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExceptionService extends CommonsExceptionUtil {
 
-
-
-
     public void usernameNotFoundException(String message,Object... params) {
         throw new UsernameNotFoundException(convertMessage(message, params));
     }

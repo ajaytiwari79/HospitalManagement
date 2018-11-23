@@ -28,6 +28,7 @@ import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import io.jsonwebtoken.lang.Assert;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -189,7 +190,7 @@ public class UnionService {
         return locations;
     }
     public LocationDTO createLocation(LocationDTO locationDTO, Long unionId) {
-        if(locationGraphRepository.existsByName(locationDTO.getName())) {
+        if(locationGraphRepository.existsByName(locationDTO.getName(),unionId)) {
             exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
         }
         Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
@@ -211,7 +212,7 @@ public class UnionService {
         return locationDTO;
     }
     public LocationDTO updateLocation(LocationDTO locationDTO, Long unionId, Long locationId) {
-        List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId,locationDTO.getName());
+        List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId,locationDTO.getName(),unionId);
 
         if(CollectionUtils.isEmpty(locationqueryResults)||!locationqueryResults.get(0).getLocation().getId().equals(locationId)) {
             exceptionService.dataNotFoundByIdException("message.location.not.found",locationId);
@@ -379,13 +380,13 @@ public class UnionService {
 
 
     public boolean validateAddress(ContactAddressDTO addressDTO) {
-        Assert.notNull(addressDTO.getHouseNumber(),"meessage.houseNumber.null");
-        Assert.notNull(addressDTO.getProvince(),"meessage.province.null");
-        Assert.notNull(addressDTO.getStreet(),"meessage.street.null");
-        Assert.notNull(addressDTO.getCity(),"meessage.city.null");
-        Assert.notNull(addressDTO.getRegionName(),"meessage.region.null");
-        Assert.notNull(addressDTO.getZipCodeId(),"message.zipCodeId.null");
-        Assert.notNull(addressDTO.getMunicipalityId(),"message.municipality.null");
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()),exceptionService.convertMessage("message.houseNumber.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()),exceptionService.convertMessage("message.province.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getStreet()),exceptionService.convertMessage("message.street.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getCity()),exceptionService.convertMessage("message.city.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getRegionName()),exceptionService.convertMessage("message.region.null"));
+        Assert.notNull(addressDTO.getZipCodeId(),exceptionService.convertMessage("message.zipCodeId.null"));
+        Assert.notNull(addressDTO.getMunicipalityId(),exceptionService.convertMessage("message.municipality.null"));
         return true;
     }
    /* public ContactAddress updateAddress(ContactAddress address, ContactAddressDTO addressDTO, ZipCode zipCode, Municipality municipality) {

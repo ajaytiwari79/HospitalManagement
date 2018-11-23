@@ -7,6 +7,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.region.Municipality;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -22,6 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LE
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
+@QueryResult
 public class PayGroupArea extends UserBaseEntity {
     private String name;
     private String description;

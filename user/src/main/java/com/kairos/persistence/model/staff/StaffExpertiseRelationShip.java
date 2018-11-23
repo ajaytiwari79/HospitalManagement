@@ -31,6 +31,7 @@ public class StaffExpertiseRelationShip extends UserBaseEntity{
     private Integer relevantExperienceInMonths;
     @DateLong
     private Date expertiseStartDate;
+    private boolean unionRepresentative;
 
     public StaffExpertiseRelationShip() {
         //Default Constructor
@@ -68,7 +69,15 @@ public class StaffExpertiseRelationShip extends UserBaseEntity{
         this.expertiseStartDate = expertiseStartDate;
     }
 
-    public StaffExpertiseRelationShip(Long id,Staff staff, Expertise expertise, Integer relevantExperienceInMonths,Date expertiseStartDate) {
+    public boolean isUnionRepresentative() {
+        return unionRepresentative;
+    }
+
+    public void setUnionRepresentative(boolean unionRepresentative) {
+        this.unionRepresentative = unionRepresentative;
+    }
+
+    public StaffExpertiseRelationShip(Long id, Staff staff, Expertise expertise, Integer relevantExperienceInMonths, Date expertiseStartDate) {
         this.id=id;
         this.staff = staff;
         this.expertise = expertise;

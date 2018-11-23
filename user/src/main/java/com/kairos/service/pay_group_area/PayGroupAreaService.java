@@ -1,5 +1,6 @@
 package com.kairos.service.pay_group_area;
 
+import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
@@ -230,5 +231,8 @@ public class PayGroupAreaService {
         }
         return true;
     }
-
+    public List<PayGroupAreaQueryResult>  getPayGroupAreaByLevel(Long levelId) {
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(levelId);
+        return payGroupAreas;
+    }
 }

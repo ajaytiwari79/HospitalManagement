@@ -131,7 +131,7 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        AssetResponseDTO assetResponseDTO = assetMongoRepository.findAssetWithMetaDataById(unitId, assetId);
+        AssetResponseDTO assetResponseDTO = assetMongoRepository.getAssetWithRiskAndRelatedProcessingActivitiesById(unitId, assetId);
         if (!Optional.ofNullable(assetResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
@@ -190,7 +190,7 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssigneeList(), assessmentDTO.getApprover(), assessmentDTO.getComment());
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssigneeList(), assessmentDTO.getApprover(), assessmentDTO.getComment(),assessmentDTO.getStartDate());
         assessment.setOrganizationId(unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
@@ -408,8 +408,6 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
-    //todo modifying method
-
     /**
      * @param unitId
      * @param assessmentId
@@ -486,7 +484,7 @@ public class AssessmentService extends MongoBaseService {
     /**
      * @param unitId
      * @return
-     *///todo add message here
+     */
     public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentOfCurrentLoginUser(Long unitId) {
 
         Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -585,10 +583,10 @@ public class AssessmentService extends MongoBaseService {
                 asset.setOrgSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
                 break;
             case MANAGING_DEPARTMENT:
-                asset.setManagingDepartment((ManagingOrganization) assetAttributeValue);
+                asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue,ManagingOrganization.class));
                 break;
             case ASSET_OWNER:
-                asset.setAssetOwner((Staff) assetAttributeValue);
+                asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue,Staff.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
@@ -630,10 +628,10 @@ public class AssessmentService extends MongoBaseService {
                 processingActivity.setDataSources(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
                 break;
             case MANAGING_DEPARTMENT:
-                processingActivity.setManagingDepartment((ManagingOrganization) processingActivityAttributeValue);
+                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue,ManagingOrganization.class));
                 break;
             case PROCESS_OWNER:
-                processingActivity.setProcessOwner((Staff) processingActivityAttributeValue);
+                processingActivity.setProcessOwner(objectMapper.convertValue(processingActivityAttributeValue,Staff.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 processingActivity.setDataRetentionPeriod((Integer) processingActivityAttributeValue);
@@ -662,10 +660,11 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(objectToCast).isPresent()) {
             if (objectToCast instanceof ArrayList) {
                 List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id"))));
+                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger(entityKeyValueMap.get("id").toString())));
             } else {
                 LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-                entityIdList.add(new BigInteger((String) entityKeyValueMap.get("_id")));
+                entityIdList.add(new BigInteger( entityKeyValueMap.get("id").toString()));
+
             }
         }
         return entityIdList;

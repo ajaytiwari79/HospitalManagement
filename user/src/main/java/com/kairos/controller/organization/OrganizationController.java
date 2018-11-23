@@ -5,6 +5,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.client.ClientStaffDTO;
@@ -1317,9 +1318,9 @@ public class OrganizationController {
     @GetMapping(PARENT_ORGANIZATION_URL+"/WTARelatedInfo")
     @ApiOperation("get  Wta related info")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId) {
+    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId,@RequestParam(required = false)  List<Long> unitIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId));
+                organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId, unitIds));
     }
 
     @GetMapping(UNIT_URL+"/time_zone")
@@ -1440,9 +1441,9 @@ public class OrganizationController {
     @ApiOperation(value = "get Cta basic info")
     @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/cta_basic_info")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId) {
+    public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId,@RequestParam(required = false) List<Long> unitIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId));
+                organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId, unitIds));
     }
 
     @ApiOperation(value = "get organization ids by orgSubType ids")
@@ -1468,5 +1469,28 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId,@RequestBody OrganizationBasicDTO organizationBasicDTO) throws InterruptedException ,ExecutionException{
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unitService.onBoardOrganization(organizationBasicDTO,unitId));
+    }
+
+
+    @ApiOperation(value = "Get Filter For Organization Hierarchy ")
+    @PostMapping (PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy/filter")
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationByFilter(@PathVariable long organizationId,@RequestBody OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationHierarchyService.generateOrganizationHierarchyByFilter(organizationId,organizationHierarchyFilterDTO));
+    }
+
+    @ApiOperation(value = "Get Organization Hierarchy By Filter")
+    @GetMapping (PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy/filter_available")
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyFilters(@PathVariable long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationHierarchyService.getOrganizationHierarchyFilters(organizationId));
+    }
+    @ApiOperation(value = "Get eligible  units for create/copy CTA and WTA")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/eligible_units")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEligibleUnitsForCtaAndWtaCreation(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                unitService.getEligibleUnitsForCtaAndWtaCreation(unitId));
+
     }
 }

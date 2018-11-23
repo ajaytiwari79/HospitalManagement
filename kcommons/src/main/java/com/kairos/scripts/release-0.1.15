@@ -52,3 +52,13 @@ db.wtaBaseRuleTemplate.insert({
 	Match(s:Sector) with s limit 1
     MATCH(e:Expertise{deleted:false})
     Create unique(e)-[r:BELONGS_TO_SECTOR]->(s) return count(r);
+
+    //TO Change the existing RelationShip
+
+    MATCH(expertise:Expertise)-[old:BELONGS_TO]-(sector:Sector)
+    create (expertise)-[new:BELONGS_TO_SECTOR]->(sector)
+    delete old
+
+
+    // gdpr 20 nov
+    db.getCollection('policyAgreementTemplate').updateMany({},{$rename:{'templateType':'templateTypeId'}});

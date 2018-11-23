@@ -5,6 +5,7 @@ import com.kairos.persistence.model.country.functions.Function;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 
@@ -13,7 +14,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_F
 /**
  * Created by vipul on 28/3/18.
  */
+
 @RelationshipEntity(type = HAS_FUNCTIONAL_AMOUNT)
+@QueryResult
 public class SeniorityLevelFunctionsRelationship extends UserBaseEntity {
     @StartNode
     private SeniorityLevelFunction seniorityLevelFunction;

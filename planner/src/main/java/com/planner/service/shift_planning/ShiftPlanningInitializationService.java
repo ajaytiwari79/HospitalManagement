@@ -13,6 +13,7 @@ import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.Employee;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
+import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.planner.domain.query_results.staff.StaffQueryResult;
 import com.planner.domain.shift_planning.Shift;
 import org.joda.time.DateTime;
@@ -54,7 +55,7 @@ public class ShiftPlanningInitializationService {
     /**
      * ShiftRequestPhasePlanningSolution(Opta-planner planning Solution)
      */
-    public void initializeShiftPlanning(Long unitId, Date fromPlanningDate, Date toPlanningDate, Long[] staffIds) {
+    public ShiftRequestPhasePlanningSolution initializeShiftPlanning(Long unitId, Date fromPlanningDate, Date toPlanningDate, Long[] staffIds) {
         //Prepare Data
         List<StaffQueryResult> staffWithSkillsAndUnitPostionIds = userNeo4jService.getStaffWithSkillsAndUnitPostionIds(unitId, staffIds);
         List<Long> unitPositionIds = staffWithSkillsAndUnitPostionIds.stream().map(s -> s.getStaffUnitPosition()).collect(Collectors.toList());
@@ -78,7 +79,7 @@ public class ShiftPlanningInitializationService {
         //4.)Initialize shifts(Opta-planner PlanningEntity(as fact))
         Map<java.time.LocalDate, List<ActivityLineInterval>> dateWiseALIsList = (Map<java.time.LocalDate, List<ActivityLineInterval>>) activityLineIntervalsAndActivitiesPerDay[2];
         List<ShiftRequestPhase> shiftRequestPhase = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList, dateWiseALIsList);
-
+        return null;
 
     }
 

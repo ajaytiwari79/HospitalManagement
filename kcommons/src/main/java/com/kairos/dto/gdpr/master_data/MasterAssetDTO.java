@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -47,29 +48,16 @@ public class MasterAssetDTO {
     private List<SubServiceCategory> organizationSubServices=new ArrayList<>();
 
     @NotNull(message = "error.message.assetType.notNull")
-    private BigInteger assetTypeId;
+    private AssetTypeBasicDTO assetType;
+    private AssetTypeBasicDTO assetSubType;
 
-    private List<BigInteger> assetSubTypes=new ArrayList<>();
 
-    public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
-
-    public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
-
-    public BigInteger getAssetTypeId() {
-        return assetTypeId;
-    }
-
-    public void setAssetTypeId(BigInteger assetTypeId) {
-        this.assetTypeId = assetTypeId;
-    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name; }
 
     public String getDescription() {
         return description;
@@ -83,33 +71,25 @@ public class MasterAssetDTO {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
 
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     public BigInteger getId() {
         return id;
@@ -118,4 +98,12 @@ public class MasterAssetDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    public AssetTypeBasicDTO getAssetType() { return assetType; }
+
+    public void setAssetType(AssetTypeBasicDTO assetType) { this.assetType = assetType; }
+
+    public AssetTypeBasicDTO getAssetSubType() { return assetSubType; }
+
+    public void setAssetSubType(AssetTypeBasicDTO assetSubType) { this.assetSubType = assetSubType; }
 }

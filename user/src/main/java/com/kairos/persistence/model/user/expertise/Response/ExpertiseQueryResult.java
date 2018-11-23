@@ -5,6 +5,7 @@ import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.pay_table.PayTable;
@@ -38,6 +39,13 @@ public class ExpertiseQueryResult {
     private List<Map<String, Object>> seniorityLevels;
     private BreakPaymentSetting breakPaymentSetting;
     private Sector sector;
+    private Map<String,Object> unionRepresentative;// in case of expertise at unit level only
+    private Location unionLocation;// in case of expertise at unit level only
+
+    public ExpertiseQueryResult() {
+        //default  const
+    }
+
 
     public String getName() {
         return name;
@@ -151,10 +159,6 @@ public class ExpertiseQueryResult {
         this.history = history;
     }
 
-    public ExpertiseQueryResult() {
-        //default  const
-    }
-
     public List<CareDays> getSeniorDays() {
         return seniorDays;
     }
@@ -185,5 +189,21 @@ public class ExpertiseQueryResult {
 
     public void setSector(Sector sector) {
         this.sector = sector;
+    }
+
+    public Map<String, Object> getUnionRepresentative() {
+        return unionRepresentative;
+    }
+
+    public void setUnionRepresentative(Map<String, Object> unionRepresentative) {
+        this.unionRepresentative = unionRepresentative;
+    }
+
+    public Location getUnionLocation() {
+        return unionLocation;
+    }
+
+    public void setUnionLocation(Location unionLocation) {
+        this.unionLocation = unionLocation;
     }
 }

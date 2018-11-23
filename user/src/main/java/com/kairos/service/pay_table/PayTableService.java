@@ -84,26 +84,26 @@ public class PayTableService {
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
         List<FunctionDTO> functions = functionGraphRepository.getFunctionsByOrganizationLevel(organizationLevelId);
         List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate);
-        PayTableResponse result = null;
+        PayTableResponse payTable = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
             for (PayTableResponse currentPayTable : payTableQueryResults) {
                 if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
                         (new DateTime(currentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(currentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
                         && (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
-                    result = currentPayTable;
+                    payTable = currentPayTable;
                     break;
                 }
                 if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
                         (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
-                    result = currentPayTable;
+                    payTable = currentPayTable;
                     break;
                 }
             }
         } else if (payTableQueryResults.size() == 1)
-            result = payTableQueryResults.get(0);
+            payTable = payTableQueryResults.get(0);
 
-        return new PayTableResponseWrapper(payGroupAreaQueryResults, result, functions);
+        return new PayTableResponseWrapper(payGroupAreaQueryResults, payTable, functions);
 
     }
 
@@ -544,7 +544,7 @@ public class PayTableService {
 
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
-        functionalPaymentService.updateAmountInFunctionalTable(payTableId,payTable.getStartDateMillis(),payTable.getEndDateMillis());
+        functionalPaymentService.updateAmountInFunctionalTable(parentPayTable.getId(),payTable.getStartDateMillis(),payTable.getEndDateMillis(),payTable.getPercentageValue());
         response.add(payTable);
         return response;
     }

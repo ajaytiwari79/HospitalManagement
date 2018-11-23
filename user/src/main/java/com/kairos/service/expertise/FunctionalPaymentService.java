@@ -1,9 +1,16 @@
 package com.kairos.service.expertise;
 
+import com.google.common.base.Functions;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.country.experties.FunctionalPaymentMatrixDTO;
+import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.dto.user.country.experties.FunctionsDTO;
+import com.kairos.dto.user.country.experties.SeniorityLevelFunctionDTO;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentQueryResult;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.*;
@@ -13,15 +20,12 @@ import com.kairos.rule_validator.functional_paymment.IsFunctionalPaymentAvailabl
 import com.kairos.rule_validator.functional_paymment.IsGreaterThanStartDate;
 import com.kairos.rule_validator.functional_paymment.IsGreaterThanToday;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.experties.FunctionalPaymentMatrixDTO;
-import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
-import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.dto.user.country.experties.SeniorityLevelFunctionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -272,10 +276,110 @@ public class FunctionalPaymentService{
     }
 
 
-   public void updateAmountInFunctionalTable(Long payTableId){
+    public void updateAmountInFunctionalTable(Long payTableId, Date startDate, Date endDate, BigDecimal percentageValue){
 
-        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships=seniorityLevelFunctionRelationshipGraphRepository.findAllActiveByTableId(payTableId);
+        List<FunctionalPayment> functionalPaymentList=seniorityLevelFunctionRelationshipGraphRepository.findAllActiveByPayTableId(payTableId,startDate.getTime(),null);
+        List<FunctionalPayment> toBreakInNewList=new ArrayList<>();
+        List<FunctionalPayment> toUpdateInExisting=new ArrayList<>();
+        for (FunctionalPayment functionalPayment:functionalPaymentList){
+            if(endDate==null){
+                if(functionalPayment.getStartDate().isAfter(DateUtils.asLocalDate(startDate).minusDays(1))){
+                    toUpdateInExisting.add(functionalPayment);
+                }
+                else if(functionalPayment.getStartDate().isBefore(DateUtils.asLocalDate(startDate))){
+                    toBreakInNewList.add(functionalPayment);
+                }
+            }
+            else {
+                if(functionalPayment.getEndDate()!=null || (functionalPayment.getStartDate().isAfter(DateUtils.asLocalDate(startDate).minusDays(1)) && functionalPayment.getEndDate().isBefore(DateUtils.asLocalDate(startDate).plusDays(1)))){
+                    toUpdateInExisting.add(functionalPayment);
+                }
+                else {
+                    toBreakInNewList.add(functionalPayment);
+                }
+            }
+        }
+
+        functionalPaymentGraphRepository.updateFunctionalAmount(toUpdateInExisting.stream().map(FunctionalPayment::getId).collect(Collectors.toList()),percentageValue);
+        List<FunctionalPaymentQueryResult> functionalPaymentQueryResults=functionalPaymentGraphRepository.getFunctionalPaymentDataT(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
+        List<FunctionalPayment> functionalPayments=functionalPaymentGraphRepository.findAllById(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
+        Map<Long,FunctionalPayment> functionalPaymentMap=functionalPayments.stream().collect(Collectors.toMap(FunctionalPayment::getId,Functions.identity()));
+        List<FunctionalPayment> outside=new ArrayList<>();
+        List<FunctionalPayment> inside=new ArrayList<>();
+        List<FunctionalPayment> allFunctionalPayments=new ArrayList<>();
+
+
+        for (FunctionalPaymentQueryResult functionalPaymentQueryResult:functionalPaymentQueryResults){
+
+            if(functionalPaymentQueryResult.getEndDate()==null && functionalPaymentQueryResult.getStartDate().isBefore(DateUtils.asLocalDate(startDate))){
+                FunctionalPayment existing=functionalPaymentMap.get(functionalPaymentQueryResult.getId());
+                existing.setStartDate(functionalPaymentQueryResult.getStartDate());
+                existing.setEndDate(DateUtils.asLocalDate(startDate).minusDays(1));
+
+                outside.add(existing);
+
+                //Creating new and updating values
+                List<SeniorityLevel> seniorityLevels=getSeniorityLevelFromFunctionalPaymentMatrix(functionalPaymentQueryResult.getFunctionalPaymentMatrices());
+                List<Function> functions=getFunctionsFromFunctionalPaymentMatrix(functionalPaymentQueryResult.getFunctionalPaymentMatrices());
+
+                FunctionalPayment createNew=new FunctionalPayment(null,DateUtils.asLocalDate(startDate),functionalPaymentQueryResult.getEndDate());
+
+                FunctionalPayment functionalPaymentCopy = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), functionalPaymentQueryResult.getStartDate(),
+                        functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
+
+                functionalPaymentQueryResult.getFunctionalPaymentMatrices().forEach(functionalPaymentMatrixDTO -> {
+                    FunctionalPaymentMatrix functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrixDTO, seniorityLevels, functions);
+                    functionalPaymentMatrixDTO.setId(functionalPaymentMatrix.getId());
+                    list.add(functionalPaymentMatrix);
+                });
+                functionalPaymentCopy.setFunctionalPaymentMatrices(list);
+
+                functionalPayment.get().setHasDraftCopy(true);
+                functionalPaymentCopy.setParentFunctionalPayment(functionalPayment.get());
+                functionalPaymentGraphRepository.save(functionalPaymentCopy);
+
+                createNew.setFunctionalPaymentMatrices(functionalPaymentQueryResult.getFunctionalPaymentMatrices());
+                createNew.setPaymentUnit(functionalPaymentQueryResult.getPaymentUnit());
+                inside.add(createNew);
+            }
+        }
+        allFunctionalPayments.addAll(inside);
+        allFunctionalPayments.addAll(outside);
+        functionalPaymentGraphRepository.saveAll(allFunctionalPayments);
+
+
+
+
 
     }
+
+
+    public List<FunctionalPaymentQueryResult> test(List<Long> ids){
+        List<FunctionalPaymentQueryResult> functionalPaymentQueryResults=functionalPaymentGraphRepository.getFunctionalPaymentDataT(Arrays.asList(new Long("23509")));
+        return functionalPaymentQueryResults;
+
+    }
+
+    private List<SeniorityLevel> getSeniorityLevelFromFunctionalPaymentMatrix(List<FunctionalPaymentMatrix> functionalPaymentMatrices){
+        List<SeniorityLevel> seniorityLevels=new ArrayList<>();
+        for (FunctionalPaymentMatrix functionalPaymentMatrix:functionalPaymentMatrices){
+            for(SeniorityLevelFunction seniorityLevelFunction:functionalPaymentMatrix.getSeniorityLevelFunction()){
+                seniorityLevels.add(seniorityLevelFunction.getSeniorityLevel());
+            }
+        }
+        return seniorityLevels;
+    }
+
+    private List<Function> getFunctionsFromFunctionalPaymentMatrix(List<FunctionalPaymentMatrix> functionalPaymentMatrices){
+        List<Function> functions=new ArrayList<>();
+        for (FunctionalPaymentMatrix functionalPaymentMatrix:functionalPaymentMatrices){
+            for(SeniorityLevelFunction seniorityLevelFunction:functionalPaymentMatrix.getSeniorityLevelFunction()){
+                seniorityLevels.add(seniorityLevelFunction.getSeniorityLevel());
+            }
+        }
+        return functions;
+    }
+
+
 
 }

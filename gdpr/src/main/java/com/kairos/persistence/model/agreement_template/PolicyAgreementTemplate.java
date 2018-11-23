@@ -7,7 +7,9 @@ import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -37,6 +39,8 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private boolean signatureComponentRightAlign;
     private String  signatureHtml;
     private CoverPageVO coverPageData;
+    @Transient
+    private ClauseTag defaultClauseTag;
 
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
@@ -143,4 +147,8 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     public boolean isSignatureComponentRightAlign() { return signatureComponentRightAlign; }
 
     public void setSignatureComponentRightAlign(boolean signatureComponentRightAlign) { this.signatureComponentRightAlign = signatureComponentRightAlign; }
+
+    public ClauseTag getDefaultClauseTag() { return defaultClauseTag; }
+
+    public void setDefaultClauseTag(ClauseTag defaultClauseTag) { this.defaultClauseTag = defaultClauseTag; }
 }

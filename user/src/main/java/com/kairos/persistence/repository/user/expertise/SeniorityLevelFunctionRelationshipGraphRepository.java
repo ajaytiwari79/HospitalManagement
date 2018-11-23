@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.expertise;
 
+import com.kairos.persistence.model.user.expertise.FunctionalPayment;
 import com.kairos.persistence.model.user.expertise.SeniorityLevelFunctionsRelationship;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -19,9 +20,9 @@ public interface SeniorityLevelFunctionRelationshipGraphRepository extends Neo4j
    @Query("MATCH(p:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(sl:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(f:Function)\n" +
            "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(fp:FunctionalPayment)\n" +
            "WHERE id(p)={0} AND  \n" +
-           "(p.endDateMillis IS NULL AND (fp.endDateMillis IS NULL OR fp.endDateMillis > p.startDateMillis))\n" +
+           "({2} IS NULL AND (fp.endDateMillis IS NULL OR fp.endDateMillis > {1}))\n" +
            "OR \n" +
-           "(p.endDateMillis IS NOT NULL AND  (p.startDateMillis < fp.endDateMillis OR p.endDateMillis>fp.startDateMillis))\n" +
-           "return id(rel) as id,rel.amount as amount, rel.amountEditableAtUnit as amountEditableAtUnit,seniorityLevelFunction,function")
-   List<SeniorityLevelFunctionsRelationship> findAllActiveByTableId(Long payTableId);
+           "({2} IS NOT NULL AND  ({1} < fp.endDateMillis OR {2}>fp.startDateMillis))\n" +
+           "return fp")
+   List<FunctionalPayment> findAllActiveByPayTableId(Long payTableId,Long startDate,Long endDate);
 }

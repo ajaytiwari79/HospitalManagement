@@ -1,0 +1,17 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Activity Rules*******/
+rule "Max Different Activity"
+salience 20
+    when
+        $ac:Activity()
+        $shift:ShiftRequestPhase(!activityLineIntervals.isEmpty())
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,4))
+    then
+        $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality,  4);
+end

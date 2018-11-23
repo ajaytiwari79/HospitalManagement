@@ -23,7 +23,7 @@ public interface CustomClauseRepository {
 
     Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
-    List<Clause> findClausesByTitle(Long countryId,List<String> clauseTitles);
+    List<Clause> findClauseByReferenceIdAndTitles(Long referenceId,boolean isUnitId, List<String> clauseTitles);
 
     List<ClauseResponseDTO> findAllClauseByCountryId(Long countryId);
 
@@ -32,5 +32,7 @@ public interface CustomClauseRepository {
     List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
     ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id);
+
+    List<Clause> getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
 }

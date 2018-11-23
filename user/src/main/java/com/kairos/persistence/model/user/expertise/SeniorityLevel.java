@@ -5,6 +5,7 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  * Created by vipul on 27/3/18.
  */
 @NodeEntity
+@QueryResult
 public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years

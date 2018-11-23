@@ -89,17 +89,17 @@ public class PolicyAgreementTemplateController {
     }
 
 
-    @ApiOperation("get All  agreement Template linked with Clauses ")
+    @ApiOperation("get All Master agreement Template linked with Clause , country level ")
     @GetMapping(COUNTRY_URL+"/agreement_template/clause/{clauseId}")
-    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByCountryIdAndClauseId(countryId, clauseId));
+    public ResponseEntity<Object> getAllMasterAgreementTemplateByClauseId(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(countryId, false,clauseId));
 
     }
 
-    @ApiOperation("Replace Old Clause With New Version of Clause")
+    @ApiOperation("Replace Old Clause With New Version of Clause, country level ")
     @PutMapping(COUNTRY_URL+"/agreement_template/clause/version")
-    public ResponseEntity<Object> updateAgreementTemplateOldClauseWithNewVersion(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateOldClauseWithNewVersionOfClause(countryId, agreementTemplateClauseUpdateDTO));
+    public ResponseEntity<Object> updateMasterAgreementTemplateClauseWithNewVersion(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(countryId, false,agreementTemplateClauseUpdateDTO));
 
     }
 
@@ -148,6 +148,21 @@ public class PolicyAgreementTemplateController {
     @GetMapping(UNIT_URL+ "/agreement_template/{agreementTemplateId}/section")
     public ResponseEntity<ResponseDTO<AgreementTemplateSectionResponseDTO>> getAllAgreementSectionWithSubSectionOfAgreementTemplate(@PathVariable Long unitId, @PathVariable BigInteger agreementTemplateId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(unitId,true, agreementTemplateId));
+    }
+
+    @ApiOperation("get all agreement Template linked with clause , org level ")
+    @GetMapping(UNIT_URL+"/agreement_template/clause/{clauseId}")
+    public ResponseEntity<Object> getPolicyAgreementTemplateByClauseId(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementTemplateByReferenceIdAndClauseId(unitId,true, clauseId));
+
+    }
+
+
+    @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
+    @PutMapping(UNIT_URL+"/agreement_template/clause/version")
+    public ResponseEntity<Object> updateTemplateClauseWithNewVersion(@PathVariable Long unitId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(unitId, true,agreementTemplateClauseUpdateDTO));
+
     }
 
 
