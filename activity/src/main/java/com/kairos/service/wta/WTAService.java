@@ -118,7 +118,11 @@ public class WTAService extends MongoBaseService {
             if (alreadyExists) {
                 exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
             }
+
+        } else if(wtaRepository.isWTAExistByOrganizationIdAndName(referenceId, wtaDTO.getName())){
+            exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
         }
+
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
         // Link tags to WTA
         Date startDate = (wtaDTO.getStartDateMillis() == 0) ? DateUtils.getCurrentDate() : new Date(wtaDTO.getStartDateMillis());

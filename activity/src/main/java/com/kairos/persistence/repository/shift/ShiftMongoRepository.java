@@ -33,7 +33,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{unitPositionId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
 
-    @Query(value = "{_id: {$ne:?0} ,staffUserId:?1,deleted:false, disabled:false,startDate: {$lt: ?3},endDate:{$gt:?2},shiftType:?4}",exists = true)
+    @Query(value = "{_id: {$ne:?0} ,disabled:false,staffUserId:?1,deleted:false, disabled:false,startDate: {$lt: ?3},endDate:{$gt:?2},shiftType:?4}",exists = true)
     boolean findShiftBetweenDurationByUnitPositionNotEqualToShiftId(BigInteger shiftId, Long staffUserId, Date startDate, Date endDate, ShiftType shiftType);
 
     @Query(value = "{staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
@@ -74,7 +74,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false, disabled:false, planningPeriodId:?0,unitId:?1}")
     List<Shift> findAllShiftsByPlanningPeriod(BigInteger planningPeriodId, Long unitId);
 
-    @Query(value = "{deleted:false,staffUserId:?0,startDate: {$lt: ?2},endDate:{$gt:?1},shiftType:?3}",exists = true)
+    @Query(value = "{disabled:false,deleted:false,staffUserId:?0,startDate: {$lt: ?2},endDate:{$gt:?1},shiftType:?3}",exists = true)
     boolean existShiftsBetweenDurationByStaffUserId(Long staffUserId,Date startDate, Date endDate,ShiftType shiftType);
 
     List<Shift> findAllByStaffIdInAndSickShiftTrueAndDeletedFalseAndStartDateGreaterThanEqualAndEndDateLessThanEqual(Set<Long> staffIds, Date startDate, Date endDate);

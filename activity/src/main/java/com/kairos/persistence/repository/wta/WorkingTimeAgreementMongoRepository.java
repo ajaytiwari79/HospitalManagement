@@ -19,10 +19,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query(value = "{name:?0,countryId:?1,deleted:false}",exists = true)
     boolean getWtaByName(String wtaName, Long countryId);
 
-
     @Query("{countryId:?0,id:?1,deleted:false}")
     WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);
-
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<WorkingTimeAgreement> findAllByIdsInAndDeletedFalse(Set<BigInteger> ids);
@@ -32,6 +30,9 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
     @Query(value = "{name:?1,deleted:false,disabled:false,'organization._id':{$in:?0}}")
     List<WorkingTimeAgreement> findWTAByUnitIdsAndName(List<Long> organizationIds, String name);
-    
+
+    @Query(value = "{'organization._id':?0, name:?1, deleted:false}", exists = true)
+    boolean isWTAExistByOrganizationIdAndName(long organizationId, String wtaName);
+
 
 }

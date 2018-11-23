@@ -21,7 +21,6 @@ public class AccessPageQueryResult {
     private boolean active;
     private String moduleId;
     private Long parentId;
-    private Long unitId;
 
     public String getModuleId() {
         return moduleId;
@@ -104,14 +103,6 @@ public class AccessPageQueryResult {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
     }
 
     @Override
