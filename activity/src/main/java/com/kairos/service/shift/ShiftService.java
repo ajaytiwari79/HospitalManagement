@@ -35,6 +35,7 @@ import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -1191,16 +1192,13 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationBystaffId(staffId, shiftStartDate, endDate);
         shifts.forEach(shift -> shift.setDurationMinutes((int) shift.getInterval().getMinutes()));
         List<ShiftState> shiftStatesList=shiftStateMongoRepository.findAllShiftStateByShiftIdAndActualPhase(shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList()), AppConstants.TIME_AND_ATTENDANCE,shiftStartDate,endDate);
-        if(shiftStatesList.isEmpty()){
-            shiftStatesList=shiftStateMongoRepository.findAllShiftStateByShiftIdAndActualPhase(shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList()), AppConstants.REALTIME,shiftStartDate,endDate);
-        }
         shiftStatesList.forEach(shiftState -> shiftState.setDurationMinutes((int) shiftState.getInterval().getMinutes()));
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
-
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeAttendanceGracePeriod, shifts, shiftStatesList);
-        return new DetailViewDTO(shiftDetailViewDTO, reasonCodeDTOS);
+        TimeAndAttendance timeAndAttendance=timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffId),shiftStartDate);
+        return new DetailViewDTO(shiftDetailViewDTO, reasonCodeDTOS,(Optional.ofNullable(timeAndAttendance).isPresent())?timeAndAttendance.getAttendanceTimeSlot():new ArrayList<>());
     }
 
 
@@ -1262,7 +1260,7 @@ public class ShiftService extends MongoBaseService {
         });
         save(shiftState);
         if (validatedByStaff) {
-            shiftState.setTAndARole(AccessGroupRole.MANAGEMENT);
+            shiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             //shiftState.setAttendanceTimeSlot(null);
             shiftState.setId(null);
             shiftState.setValidated(null);
@@ -1279,7 +1277,7 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftDetailViewDTO getShiftDetailsOfStaff(TimeAttendanceGracePeriod timeAttendanceGracePeriod, List<Shift> shifts, List<ShiftState> shiftStatesList) {
         List<ShiftDTO> plannedShifts = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
-        List<ShiftDTO> realTimeShift = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList.stream().filter(s -> s.getTAndARole().equals(AccessGroupRole.STAFF)).collect(Collectors.toList()),ShiftDTO.class);
+        List<ShiftDTO> realTimeShift = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList.stream().filter(s -> s.getAccessGroupRole().equals(AccessGroupRole.STAFF)).collect(Collectors.toList()),ShiftDTO.class);
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList, ShiftDTO.class);
         DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.getDate(), true);
         List<ShiftDTO> updateRealTime = new ArrayList<>();
@@ -1316,7 +1314,6 @@ public class ShiftService extends MongoBaseService {
         List<ShiftState> shiftStates = shiftStateMongoRepository.getAllByStaffsByIdsBetweenDate(staffIds, shiftStartDate, endDate);
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
-
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         Map<Long, List<Shift>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
         Map<Long, List<ShiftState>> shiftStateMap = shiftStates.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));

@@ -28,16 +28,16 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
     @Query("{deleted:false,staffId:{$in:?0}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<ShiftState> getAllByStaffsByIdsBetweenDate(List<Long> staffIds, Date startDate, Date endDate);
 
-    @Query("{deleted:false,shiftId:?0,actualPhaseState:?1}")
+    @Query("{deleted:false,shiftId:?0}")
     ShiftState findShiftStateByShiftIdAndActualPhase(BigInteger shiftId, String actualPhaseState);
 
-    @Query("{deleted:false,shiftId:{$in:?0},actualPhaseState:?1}")
-    List<ShiftState> findShiftStateByShiftIdsAndActualPhase(List<BigInteger> shiftId, String actualPhaseState);
+    @Query("{deleted:false,shiftId:{$in:?0},shiftStatePhaseId:?1}")
+    List<ShiftState> findShiftStateByShiftIdsAndPhaseId(List<BigInteger> shiftId, BigInteger shiftStatePhaseId);
 
-    @Query("{deleted:false,shiftId:?0,actualPhaseState:?1,accessGroupRole:?2}")
+    @Query("{deleted:false,shiftId:?0}")
     ShiftState findShiftStateByShiftIdAndActualPhaseAndRole(BigInteger shiftId, String actualPhaseState, AccessGroupRole role);
 
-    @Query("{deleted:false,staffId:{$in:?0},actualPhaseState:?1,startDate: {$lt: ?3},endDate:{$gt:?2}}")
+    @Query("{deleted:false,staffId:{$in:?0},startDate: {$lt: ?3},endDate:{$gt:?2}}")
     List<ShiftState> findAllShiftStateByShiftIdAndActualPhase(List<Long> staffIds, String actualPhaseState,Date startDate, Date endDate);
 
     @Query(value = "{shiftId:?0}",delete = true)

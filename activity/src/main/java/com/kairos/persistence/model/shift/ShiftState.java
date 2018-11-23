@@ -12,7 +12,7 @@ public class ShiftState extends Shift {
 
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
-    private AccessGroupRole TAndARole;
+    private AccessGroupRole accessGroupRole;
     private LocalDate validated;
 
     public ShiftState() {
@@ -22,7 +22,7 @@ public class ShiftState extends Shift {
         this.shiftId = shiftId;
         this.accessGroupRole = accessGroupRole;
         this.validated = validated;
-        this.actualPhaseState = actualPhaseState;
+        //this.actualPhaseState = actualPhaseState;
         super.setStartDate(startDate) ;
         super.setEndDate(endDate);
         super.setUnitId(unitId);
@@ -45,12 +45,12 @@ public class ShiftState extends Shift {
         this.shiftStatePhaseId = shiftStatePhaseId;
     }
 
-    public AccessGroupRole getTAndARole() {
-        return TAndARole;
+    public AccessGroupRole getAccessGroupRole() {
+        return accessGroupRole;
     }
 
-    public void setTAndARole(AccessGroupRole TAndARole) {
-        this.TAndARole = TAndARole;
+    public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
+        this.accessGroupRole = accessGroupRole;
     }
 
     public LocalDate getValidated() {

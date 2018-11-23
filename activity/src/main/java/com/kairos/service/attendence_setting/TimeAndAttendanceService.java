@@ -6,7 +6,9 @@ import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.enums.LocationEnum;
@@ -17,6 +19,7 @@ import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRep
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
@@ -44,7 +47,8 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
     @Inject
     private GenericIntegrationService genericIntegrationService;
-
+    @Inject
+    private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private ShiftService shiftService;
     @Inject
@@ -100,11 +104,11 @@ public class TimeAndAttendanceService extends MongoBaseService {
                         if (interval.contains(DateUtils.getCurrentMillistByTimeZone(unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone()))) {
                             result = (result || reasonCodeId != null);
                             if (!result) {
-                                return new TimeAndAttendanceDTO(new ArrayList<>(), unitAndReasonCode.get(checkInshift.getUnitId()));
+                                timeAndAttendanceDTO= new TimeAndAttendanceDTO(new ArrayList<>(), unitAndReasonCode.get(checkInshift.getUnitId()));
                             }
                         } else {
                             if (!result&&checkIn&&reasonCodeId==null) {
-                                return new TimeAndAttendanceDTO(organizationAndReasonCodeDTOS, new ArrayList<>());
+                                timeAndAttendanceDTO= new TimeAndAttendanceDTO(organizationAndReasonCodeDTOS, new ArrayList<>());
                             }
                         }
                     if (result) {
@@ -116,7 +120,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
             if(shift==null&&checkIn) {
                 timeAndAttendance = checkInWithoutShift(unitId, reasonCodeId,unitPositionId, staffAndOrganizationIds);
                 if (timeAndAttendance == null) {
-                    return (timeAndAttendanceDTO !=null)? timeAndAttendanceDTO :new TimeAndAttendanceDTO(organizationAndReasonCodeDTOS,new ArrayList<>());
+                    timeAndAttendanceDTO= (timeAndAttendanceDTO !=null)? timeAndAttendanceDTO :new TimeAndAttendanceDTO(organizationAndReasonCodeDTOS,new ArrayList<>());
                 }
             }
 
@@ -124,7 +128,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
          if(shift!=null && checkIn){
                 timeAndAttendance = checkInWithShift(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()));
             if(timeAndAttendance ==null){
-                return new TimeAndAttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
+                timeAndAttendanceDTO= new TimeAndAttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(shift.getUnitId()));
             }
         }
 
@@ -132,13 +136,13 @@ public class TimeAndAttendanceService extends MongoBaseService {
             TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(staffAndOrganizationIds.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
             timeAndAttendance = checkOut(staffAndOrganizationIds,shift, oldTimeAndAttendance,reasonCodeId,activityIdAndLocationActivityTabMap);
             if(timeAndAttendance ==null){
-                return new TimeAndAttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId()));
+                timeAndAttendanceDTO= new TimeAndAttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId()));
             }
         }
 
         if (Optional.ofNullable(timeAndAttendance).isPresent()) {
             save(timeAndAttendance);
-            //createShiftState(Arrays.asList(shift),checkIn,Arrays.asList(timeAndAttendance));
+            createShiftState(Arrays.asList(shift),checkIn,Arrays.asList(timeAndAttendance),unitId);
             timeAndAttendanceDTO = new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), null);
         }
         return timeAndAttendanceDTO;
@@ -154,8 +158,8 @@ public class TimeAndAttendanceService extends MongoBaseService {
             if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
                 exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
             }
-            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(UserContext.getUserDetails().getId()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
-            AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,null,unitId);
+            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+            AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,unitPositionId,unitId);
             if(oldTimeAndAttendance !=null){
                 oldTimeAndAttendance.getAttendanceTimeSlot().add(attendanceTimeSlot);
                 timeAndAttendance = oldTimeAndAttendance;
@@ -170,13 +174,10 @@ public class TimeAndAttendanceService extends MongoBaseService {
     private TimeAndAttendance checkOut(List<StaffResultDTO> staffAndOrganizationIds, Shift shift, TimeAndAttendance oldTimeAndAttendance, Long reasonCodeId,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap) {
         AttendanceTimeSlot duration ;
         TimeAndAttendance timeAndAttendance = oldTimeAndAttendance;
-        if(timeAndAttendance!=null && shift!=null){
-            Map<Long,StaffResultDTO> unitIdAndStaffResultMap=staffAndOrganizationIds.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
-            boolean result= validateGlideTimeWhileCheckOut(shift,reasonCodeId,unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(),activityIdAndLocationActivityTabMap);
-            if(!result){
-                return null;
-            }
-        }else if(reasonCodeId==null){
+        if(timeAndAttendance!=null && shift!=null) {
+            Map<Long, StaffResultDTO> unitIdAndStaffResultMap = staffAndOrganizationIds.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v));
+        }
+         if(reasonCodeId==null){
             return null;
         }
         final Long unitId= timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId();
@@ -211,7 +212,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
         private TimeAndAttendance checkInWithShift(Shift shift, Long reasonCodeId, StaffResultDTO staffAndOrganizationId) {
             TimeAndAttendance timeAndAttendance =null;
-                TimeAndAttendance oldTimeAndAttendance =timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(UserContext.getUserDetails().getId()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+                TimeAndAttendance oldTimeAndAttendance =timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
                 AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,shift.getUnitPositionId(),shift.getUnitId());
                 if(oldTimeAndAttendance !=null){
                     oldTimeAndAttendance.getAttendanceTimeSlot().add(attendanceTimeSlot);
@@ -246,50 +247,49 @@ public class TimeAndAttendanceService extends MongoBaseService {
     }
 
 
-    public void createShiftState(List<Shift> shifts,boolean checkIn,List<TimeAndAttendance> timeAndAttendances){
+    public void createShiftState(List<Shift> shifts,boolean checkIn,List<TimeAndAttendance> timeAndAttendances,Long unitId){
+        List<Phase> phases=phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.REALTIME.toString(),PhaseDefaultName.TIME_ATTENDANCE.toString());
         List<ShiftState> realtimeShiftStates;
         List<ShiftState> timeAndAttendanceShiftStates=null;
        Map<BigInteger,Shift> shiftMap=shifts.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-        realtimeShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndActualPhase(shifts.stream().map(s->s.getId()).collect(Collectors.toList()), AppConstants.REALTIME);
+        realtimeShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(s->s.getId()).collect(Collectors.toList()),phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.REALTIME)).findFirst().get().getId());
         if(shifts!=null&&checkIn) {
             if(realtimeShiftStates.isEmpty()) {
                 ShiftState shiftState=null;
-                shiftState=createRealTimeShiftState(shiftState,shifts.get(0), timeAndAttendances);
+                shiftState=createRealTimeShiftState(shiftState,shifts.get(0), timeAndAttendances,phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.REALTIME)).findFirst().get().getId());
                 realtimeShiftStates.add(shiftState);
             }
             shiftStateMongoRepository.saveEntities(realtimeShiftStates);
-        } else{
-            if(!realtimeShiftStates.isEmpty()){
-                realtimeShiftStates.forEach(realtimeShiftState->{
-                   // realtimeShiftState.setAttendanceTimeSlot(shiftMap.get(realtimeShiftState.getShiftId()).getAttendanceTimeSlot());
-                });
-                shiftStateMongoRepository.saveEntities(realtimeShiftStates);
-            }
-            timeAndAttendanceShiftStates=createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates,realtimeShiftStates,shifts, timeAndAttendances);
-            if(!timeAndAttendanceShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(timeAndAttendanceShiftStates);
+        }else {
+            timeAndAttendanceShiftStates = createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates, realtimeShiftStates, shifts, timeAndAttendances, phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.TIME_ATTENDANCE)).findFirst().get().getId());
+            if (!timeAndAttendanceShiftStates.isEmpty())
+                shiftStateMongoRepository.saveEntities(timeAndAttendanceShiftStates);
+        }
      }
-    }
-    public ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,List<TimeAndAttendance> timeAndAttendance){
+
+    public ShiftState createRealTimeShiftState(ShiftState realtimeShiftState,Shift shift,List<TimeAndAttendance> timeAndAttendance,BigInteger phaseId){
         realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
         realtimeShiftState.setId(null);
         realtimeShiftState.setShiftId(shift.getId());
-        realtimeShiftState.setTAndARole(AccessGroupRole.STAFF);
+        realtimeShiftState.setShiftStatePhaseId(phaseId);
+        realtimeShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
         return realtimeShiftState;
     }
 
-    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<TimeAndAttendance> timeAndAttendance){
-        timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndActualPhase(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),AppConstants.TIME_AND_ATTENDANCE);
+    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<TimeAndAttendance> timeAndAttendance,BigInteger phaseId){
+        timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),phaseId);
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=timeAndAttendanceShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         for (Shift shift:shifts) {
             if (timeAndAttendanceShiftStateMap.get(shift.getId()) != null) {
-                ObjectMapperUtils.copyProperties(realtimeShiftStateMap.get(shift.getId()), timeAndAttendanceShiftStateMap.get(shift.getId()), "id", "actualPhaseState", "accessGroupRole","attendanceSettingId");
+                ObjectMapperUtils.copyProperties(realtimeShiftStateMap.get(shift.getId()), timeAndAttendanceShiftStateMap.get(shift.getId()), "id","shiftStatePhaseId", "accessGroupRole","attendanceSettingId");
                 timeAndAttendanceShiftStates.add(timeAndAttendanceShiftStateMap.get(shift.getId()));
             } else {
                 if (realtimeShiftStateMap.get(shift.getId()) != null) {
                     ShiftState timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftStateMap.get(shift.getId()), ShiftState.class);
                     timeAndAttendanceShiftState.setId(null);
-                    timeAndAttendanceShiftState.setTAndARole(AccessGroupRole.STAFF);
+                    timeAndAttendanceShiftState.setShiftStatePhaseId(phaseId);
+                    timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
                     timeAndAttendanceShiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                     timeAndAttendanceShiftStates.add(timeAndAttendanceShiftState);
                 }
@@ -318,6 +318,6 @@ public class TimeAndAttendanceService extends MongoBaseService {
              });
              if (!timeAndAttendances.isEmpty()) timeAndAttendanceRepository.saveEntities(timeAndAttendances);
              if (!saveShifts.isEmpty()) shiftMongoRepository.saveEntities(saveShifts);
-             //createShiftState(shifts, false, timeAndAttendances);
+             createShiftState(shifts, false, timeAndAttendances,unitId);
          }
 }
