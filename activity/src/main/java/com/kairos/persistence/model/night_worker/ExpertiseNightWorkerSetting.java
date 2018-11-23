@@ -14,6 +14,7 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
     private Integer minShiftsValueToCheckNightWorker;
     private CalculationUnit minShiftsUnitToCheckNightWorker;
     private Long countryId;
+    private Long unitId;
     private Long expertiseId;
 
     public ExpertiseNightWorkerSetting(){
@@ -94,5 +95,32 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
 
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    @Override
+    public String toString() {
+        return "ExpertiseNightWorkerSetting{" +
+                "timeSlot=" + timeSlot +
+                ", minMinutesToCheckNightShift=" + minMinutesToCheckNightShift +
+                ", intervalUnitToCheckNightWorker=" + intervalUnitToCheckNightWorker +
+                ", intervalValueToCheckNightWorker=" + intervalValueToCheckNightWorker +
+                ", minShiftsValueToCheckNightWorker=" + minShiftsValueToCheckNightWorker +
+                ", minShiftsUnitToCheckNightWorker=" + minShiftsUnitToCheckNightWorker +
+                ", countryId=" + countryId +
+                ", unitId=" + unitId +
+                ", expertiseId=" + expertiseId +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deleted=" + deleted +
+                '}';
     }
 }

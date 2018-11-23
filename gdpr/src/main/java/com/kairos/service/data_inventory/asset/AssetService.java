@@ -212,6 +212,9 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
+        if (!Optional.ofNullable(asset.getProcessingActivities().get(0).getId()).isPresent()) {
+            asset.getProcessingActivities().clear();
+        }
         return asset;
     }
 

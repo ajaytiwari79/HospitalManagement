@@ -583,10 +583,10 @@ public class AssessmentService extends MongoBaseService {
                 asset.setOrgSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
                 break;
             case MANAGING_DEPARTMENT:
-                asset.setManagingDepartment((ManagingOrganization) assetAttributeValue);
+                asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue,ManagingOrganization.class));
                 break;
             case ASSET_OWNER:
-                asset.setAssetOwner((Staff) assetAttributeValue);
+                asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue,Staff.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
@@ -628,10 +628,10 @@ public class AssessmentService extends MongoBaseService {
                 processingActivity.setDataSources(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
                 break;
             case MANAGING_DEPARTMENT:
-                processingActivity.setManagingDepartment((ManagingOrganization) processingActivityAttributeValue);
+                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue,ManagingOrganization.class));
                 break;
             case PROCESS_OWNER:
-                processingActivity.setProcessOwner((Staff) processingActivityAttributeValue);
+                processingActivity.setProcessOwner(objectMapper.convertValue(processingActivityAttributeValue,Staff.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 processingActivity.setDataRetentionPeriod((Integer) processingActivityAttributeValue);
@@ -660,10 +660,10 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(objectToCast).isPresent()) {
             if (objectToCast instanceof ArrayList) {
                 List<LinkedHashMap<String, Object>> entityList = (List<LinkedHashMap<String, Object>>) objectToCast;
-                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger((String) entityKeyValueMap.get("id"))));
+                entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger(entityKeyValueMap.get("id").toString())));
             } else {
                 LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-                entityIdList.add(new BigInteger((String) entityKeyValueMap.get("id")));
+                entityIdList.add(new BigInteger( entityKeyValueMap.get("id").toString()));
 
             }
         }

@@ -60,52 +60,6 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOs;
     }
 
-    public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
-        List<TimeType> timeTypes = new ArrayList<>();
-        List<BigInteger> timeTypeIds = timeTypeDTOS.stream().map(timeTypeId -> timeTypeId.getId()).collect(Collectors.toList());
-        List<String> timeTypeLabels = timeTypeDTOS.stream().map(timeTypeId -> timeTypeId.getLabel()).collect(Collectors.toList());
-        Boolean timeTypesExists = timeTypeMongoRepository.findByIdNotEqualAndLabelAndCountryId(timeTypeIds, timeTypeLabels, countryId);
-        if (timeTypesExists) {
-            exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
-        }
-        List<TimeType> timeTypesResult = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
-        Map<BigInteger, TimeType> timeTypeMap = timeTypesResult.stream().collect(Collectors.toMap(timetype -> timetype.getId(), timetype -> timetype));
-        List<TimeType> childTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(timeTypeIds);
-        Map<BigInteger, List<TimeType>> childTimeTypesMap = childTimeTypes.stream().collect(Collectors.groupingBy(t -> t.getUpperLevelTimeTypeId(), Collectors.toList()));
-        List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(timetype -> timetype.getId()).collect(Collectors.toList());
-        List<TimeType> leafTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
-        Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
-        timeTypeDTOS.forEach(timeTypeDTO -> {
-            TimeType timeType = timeTypeMap.get(timeTypeDTO.getId());
-            if (Optional.ofNullable(timeType).isPresent()) {
-                timeType.setLabel(timeTypeDTO.getLabel());
-                timeType.setDescription(timeTypeDTO.getDescription());
-                timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
-                if (Optional.ofNullable(childTimeTypeList).isPresent()) {
-                    childTimeTypeList.forEach(childTimeType -> {
-                        childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                        List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
-                        if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
-                            leafTimeTypeList.forEach(leafTimeType -> {
-                                leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                            });
-                            timeTypes.addAll(leafTimeTypeList);
-                        }
-                    });
-                    timeTypes.addAll(childTimeTypeList);
-                }
-                timeTypes.add(timeType);
-                if (timeType.isLeafNode()) {
-                    activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
-                }
-            }
-        });
-        save(timeTypes);
-        return timeTypeDTOS;
-    }
-
-    //TODO By Yasir:- CO-ordinate with front-end to send and receive single time type in api and use below method instead of above.
     public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
 
         Boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
@@ -287,7 +241,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
 
-    public Boolean createDefaultTimeType(Long countryId) {
+    public Boolean createDefaultTimeTypes(Long countryId) {
         List<TimeType> allTimeTypes=new ArrayList<>();
         List<TimeType> workingTimeTypes=new ArrayList<>();
         TimeType presenceTimeType=new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", AppConstants.WORKING_TYPE_COLOR,PRESENCE,countryId);
