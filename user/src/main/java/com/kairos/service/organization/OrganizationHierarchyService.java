@@ -1,7 +1,12 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.gdpr.filter.FilterAndFavouriteFilterDTO;
+import com.kairos.dto.gdpr.filter.FilterAttributes;
+import com.kairos.dto.gdpr.filter.FilterResponseDTO;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -11,10 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.ORGANIZATION_LABEL;
+import static com.kairos.constants.AppConstants.*;
 
 
 /**
@@ -249,9 +257,41 @@ public class OrganizationHierarchyService {
      * @param parentOrganizationId
      * @return
      */
-    public Map<String,Object> getOrganizationHierarchyFilters(long parentOrganizationId) {
-
-        return organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
-
+    public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long parentOrganizationId) {
+        FilterAndFavouriteFilterDTO filterAndFavouriteFilter=new FilterAndFavouriteFilterDTO();
+        Map<String,Object> filterTypeDataMap= organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
+        List<FilterResponseDTO> filterResponseDTOList=new ArrayList<>();
+        for(String filterType:filterTypeDataMap.keySet()){
+            FilterResponseDTO filterResponseDTO=new FilterResponseDTO();
+            switch(filterType)
+            {
+                case ORGANIZATION_TYPES:
+                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_TYPES.value);
+                    filterResponseDTO.setName(FilterType.ORGANIZATION_TYPES);
+                    break;
+                case ORGANIZATION_SUB_TYPES:
+                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SUB_TYPES.value);
+                    filterResponseDTO.setName(FilterType.ORGANIZATION_SUB_TYPES);
+                    break;
+                case ORGANIZATION_SERVICES:
+                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SERVICES.value);
+                    filterResponseDTO.setName(FilterType.ORGANIZATION_SERVICES);
+                    break;
+                case ORGANIZATION_SUB_SERVICES:
+                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SUB_SERVICES.value);
+                    filterResponseDTO.setName(FilterType.ORGANIZATION_SUB_SERVICES);
+                    break;
+                case ACCOUNT_TYPES:
+                    filterResponseDTO.setDisplayName(FilterType.ACCOUNT_TYPES.value);
+                    filterResponseDTO.setName(FilterType.ACCOUNT_TYPES);
+                    break;
+                    default:
+            }
+            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOfListByMapper((List<Map>)filterTypeDataMap.get(filterType), FilterAttributes.class);
+            filterResponseDTO.setFilterData(filterAttributes);
+            filterResponseDTOList.add(filterResponseDTO);
+      }
+        filterAndFavouriteFilter.setAllFilters(filterResponseDTOList);
+       return filterAndFavouriteFilter;
     }
 }
