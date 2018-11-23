@@ -4,13 +4,11 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable

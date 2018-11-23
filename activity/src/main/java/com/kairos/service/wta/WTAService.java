@@ -118,6 +118,7 @@ public class WTAService extends MongoBaseService {
             if (alreadyExists) {
                 exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
             }
+
         } else if(wtaRepository.isWTAExistByOrganizationIdAndName(referenceId, wtaDTO.getName())){
             exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
         }

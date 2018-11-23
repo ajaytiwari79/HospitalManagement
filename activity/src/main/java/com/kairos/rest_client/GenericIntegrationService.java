@@ -694,6 +694,11 @@ public class GenericIntegrationService {
     public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
         return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
     }
+
+    public String getTimeZoneByUnitId(Long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT_WITHOUT_PARENT_ORG,HttpMethod.GET,UNIT_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        });
+    }
 }
 
 

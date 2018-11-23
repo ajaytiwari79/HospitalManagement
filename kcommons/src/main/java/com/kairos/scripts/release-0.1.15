@@ -58,3 +58,7 @@ db.wtaBaseRuleTemplate.insert({
     MATCH(expertise:Expertise)-[old:BELONGS_TO]-(sector:Sector)
     create (expertise)-[new:BELONGS_TO_SECTOR]->(sector)
     delete old
+
+
+    // gdpr 20 nov
+    db.getCollection('policyAgreementTemplate').updateMany({},{$rename:{'templateType':'templateTypeId'}});

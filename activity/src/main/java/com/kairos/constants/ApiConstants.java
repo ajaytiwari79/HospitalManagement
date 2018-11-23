@@ -115,7 +115,7 @@ public final class ApiConstants {
     public static final String CLIENT_BY_IDS="/client/clientsByIds";
     public static final String GET_UNIT_IDS_BY_CLIENT_IDS="/client/client_ids_by_unitIds";
     public  static  final  String API_EXPERTISE_URL ="/expertise/{expertiseId}";
-    public  static  final  String API_EXPERTISE_BREAK_URL =API_V1+COUNTRY_URL+"/expertise/{expertiseId}/break";
+    public  static  final  String API_EXPERTISE_BREAK_URL ="/expertise/{expertiseId}/break";
 
     public static final String GET_ORGANIZATION_WITH_COUNTRY_ID = "/getOrganisationWithCountryId";
     public static final String COMMON_DATA = "/common_data";
@@ -144,6 +144,6 @@ public final class ApiConstants {
     public static final String APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS="/appliedFunctionsByUnitPositionIds";
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION="/updateFunctionOnPhaseRestoration";
     public static final String GET_FUNCTIONS_OF_UNIT_POSITION=STAFF_WITH_STAFF_ID+"/unit_position/{unitPositionId}/functions";
-
+    public static final String UNIT_TIMEZONE="/time_zone";
 
 }

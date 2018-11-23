@@ -1,9 +1,11 @@
 package com.kairos.persistence.repository.repository_impl;
 
+import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.ModuleId;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
@@ -52,11 +54,11 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " MATCH(unitPos)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+            matchRelationshipQueryForStaff += " MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
                     " MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  ";
         } else {
-            matchRelationshipQueryForStaff += " OPTIONAL MATCH(unitPos)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+            matchRelationshipQueryForStaff += " OPTIONAL MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
                     " with staff, user, positionLine OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  ";
         }
 
@@ -87,7 +89,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
+    public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, String moduleId,
                                          Map<FilterType, List<String>> filters, String searchText, String imagePath) {
 
         Map<String, Object> queryParameters = new HashMap();
@@ -151,7 +153,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         String dynamicWhereQuery = "";
         queryParameters.put("unitId", organizationId);
 
-        if (clientFilterDTO.getName() != null&& !StringUtils.isBlank(clientFilterDTO.getName())) {
+        if (clientFilterDTO.getName() != null && !StringUtils.isBlank(clientFilterDTO.getName())) {
             queryParameters.put("name", clientFilterDTO.getName());
             dynamicWhereQuery += "AND ( user.firstName=~{name} OR user.lastName=~{name})";
         }
@@ -175,16 +177,16 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
 
         if (citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()) {
-            query = "MATCH (user:User)<-[:" + IS_A + "]-(c:Client)-[r:"+GET_SERVICE_FROM+"]->(o:Organization) WHERE id(o)= {unitId} AND c.healthStatus IN {healthStatus} " + dynamicWhereQuery + "  with c,r,user\n";
+            query = "MATCH (user:User)<-[:" + IS_A + "]-(c:Client)-[r:" + GET_SERVICE_FROM + "]->(o:Organization) WHERE id(o)= {unitId} AND c.healthStatus IN {healthStatus} " + dynamicWhereQuery + "  with c,r,user\n";
         } else {
-            query = "MATCH (user:User)<-[:" + IS_A + "]-(c:Client{healthStatus:'ALIVE'})-[r:"+GET_SERVICE_FROM+"]->(o:Organization) WHERE id(o)= {unitId} AND id(c) in {citizenIds} AND c.healthStatus IN {healthStatus} " +dynamicWhereQuery+ " with c,r,user\n";
+            query = "MATCH (user:User)<-[:" + IS_A + "]-(c:Client{healthStatus:'ALIVE'})-[r:" + GET_SERVICE_FROM + "]->(o:Organization) WHERE id(o)= {unitId} AND id(c) in {citizenIds} AND c.healthStatus IN {healthStatus} " + dynamicWhereQuery + " with c,r,user\n";
 
         }
-        query +=   "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,user\n";
-        query+=    "OPTIONAL MATCH (c)-[houseHoldRel:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHold) with ca,c,r,houseHoldRel,houseHold,user\n";
+        query += "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,user\n";
+        query += "OPTIONAL MATCH (c)-[houseHoldRel:" + PEOPLE_IN_HOUSEHOLD_LIST + "]-(houseHold) with ca,c,r,houseHoldRel,houseHold,user\n";
         if (clientFilterDTO.getPhoneNumber() == null) {
             query += "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) with cd,ca,c,r,houseHoldRel,houseHold,user\n";
-        }else{
+        } else {
             query += "MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {phoneNumber} with cd,ca,c,r,houseHoldRel,houseHold,user\n";
         }
         if (clientFilterDTO.getClientStatus() == null) {
@@ -201,6 +203,66 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         query += "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, ";
         query += "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END,houseHoldList:case when houseHoldRel is null then [] else collect({id:id(houseHold),firstName:houseHold.firstName,lastName:houseHold.lastName}) end}  as Client ORDER BY Client.name ASC SKIP {skip} LIMIT 20 ";
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
+
+    }
+
+    @Override
+    public List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
+        String filterQuery = "";
+        final String SUB_ORGANIZATIONS = "subOrganizations";
+        Map<String, Object> queryParameters = new HashMap();
+        queryParameters.put("parentOrganizationId", parentOrganizationId);
+
+        if (organizationHierarchyFilterDTO != null) {
+            //organizationType Filter
+            if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationTypeIds())) {
+                filterQuery = filterQuery + " Match(organizationType:OrganizationType)-[:" + TYPE_OF + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationType) IN {organizationTypeIds} ";
+                queryParameters.put("organizationTypeIds", organizationHierarchyFilterDTO.getOrganizationTypeIds());
+            }
+            if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubTypeIds())) {
+                filterQuery = filterQuery + " Match(organizationSubType:OrganizationType)-[:" + SUB_TYPE_OF + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationSubType) IN {organizationSubTypeIds} ";
+                queryParameters.put("organizationSubTypeIds", organizationHierarchyFilterDTO.getOrganizationSubTypeIds());
+            }
+            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationTypeIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubTypeIds())) {
+                filterQuery = filterQuery + " Match(organizationType)-[:" + HAS_SUB_TYPE + "]-(organizationSubType) ";
+            }*/
+            //organizationService Filter
+            if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationServiceIds())) {
+                filterQuery = filterQuery + " Match(organizationService:OrganizationService)-[:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationService) IN {organizationServiceIds} ";
+                queryParameters.put("organizationServiceIds", organizationHierarchyFilterDTO.getOrganizationServiceIds());
+            }
+            if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds())) {
+                filterQuery = filterQuery + " Match(organizationSubService:OrganizationService)-[:" + PROVIDE_SERVICE + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationSubService) IN {organizationSubServiceIds} ";
+                queryParameters.put("organizationSubServiceIds", organizationHierarchyFilterDTO.getOrganizationSubServiceIds());
+            }
+            //Might Require
+            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationServiceIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds())) {
+                filterQuery = filterQuery + " Match(organizationService)-[:" + ORGANIZATION_SUB_SERVICE + "]-(organizationSubService) ";
+            }*/
+            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubTypeIds())) {
+                filterQuery = filterQuery + " Match(organizationSubService)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]-(organizationSubType)  ";
+            }*/
+            //accountType Filter
+            if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationAccountTypeIds())) {
+                filterQuery = filterQuery + " Match(accountType:AccountType)-[:" + HAS_ACCOUNT_TYPE + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(accountType) IN {accountTypeIds} ";
+                queryParameters.put("accountTypeIds", organizationHierarchyFilterDTO.getOrganizationAccountTypeIds());
+            }
+        }
+
+        String query = "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team)" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
+                "UNION\n" +
+                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})-[:HAS_GROUP]->(group:Group)" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
+                "UNION\n" +
+                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Organization{isEnable:true,boardingCompleted: true})" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data \n" +
+                "UNION\n" +
+                "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data";
+
+        Iterator<Map> mapIterator = session.query(Map.class, query, queryParameters).iterator();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        while (mapIterator.hasNext()) {
+            mapList.add(mapIterator.next());
+        }
+        return mapList;
 
     }
 }

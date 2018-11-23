@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.clause_tag;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -14,6 +13,13 @@ public class ClauseTag extends MongoBaseEntity {
     private String name;
     private boolean defaultTag;
     private Long countryId;
+
+    public ClauseTag(@NotBlank(message = "Name cannot be  empty") String name) {
+        this.name = name;
+    }
+
+    public ClauseTag() {
+    }
 
     public boolean isDefaultTag() { return defaultTag; }
 

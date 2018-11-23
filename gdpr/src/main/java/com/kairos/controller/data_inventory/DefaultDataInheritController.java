@@ -2,7 +2,6 @@ package com.kairos.controller.data_inventory;
 
 
 import com.kairos.dto.gdpr.OrgTypeSubTypeServiceCategoryVO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.service.common.DefaultDataInheritService;
 import com.kairos.utils.ResponseHandler;

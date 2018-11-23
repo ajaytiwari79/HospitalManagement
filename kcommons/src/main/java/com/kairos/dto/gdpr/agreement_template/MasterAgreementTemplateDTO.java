@@ -22,22 +22,11 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PolicyAgreementTemplateDTO {
-
-
-    private BigInteger id;
-
-    @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
-    private String name;
-
-    @NotBlank(message = "error.message.description.notNull.orEmpty")
-    private String description;
+public class MasterAgreementTemplateDTO extends AgreementTemplateDTO{
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
     private List<OrganizationType> organizationTypes = new ArrayList<>();
-
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
@@ -55,42 +44,6 @@ public class PolicyAgreementTemplateDTO {
     @Valid
     @NotEmpty(message = "error.message.accountType.not.Selected")
     private List<AccountTypeVO> accountTypes=new ArrayList<>();
-
-
-    @NotNull(message = "error.message.templateType.notNull")
-    private BigInteger templateTypeId;
-
-    public BigInteger getTemplateTypeId() {
-        return templateTypeId;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public void setTemplateTypeId(BigInteger templateTypeId) {
-        this.templateTypeId = templateTypeId;
-    }
-
-    public String getName() {
-        return name.trim();
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;

@@ -1,14 +1,11 @@
 package com.kairos.controller.country;
 
-import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.enums.payroll_system.PayRollType;
-import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
@@ -45,15 +42,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**
@@ -124,8 +118,7 @@ public class CountryController {
     private TimeSlotService timeSlotService;
     @Inject
     private AccessPageService accessPageService;
-    @Inject
-    private FunctionService functionService;
+
     @Inject private CompanyCreationService companyCreationService;
 
 
@@ -1124,36 +1117,6 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
     }
 
-    //Functions
-
-    @ApiOperation(value = "Add function by countryId")
-    @RequestMapping(value = COUNTRY_URL + "/function", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.createFunction(countryId, functionDTO));
-    }
-
-    @ApiOperation(value = "Get functions by countryId")
-    @RequestMapping(value = COUNTRY_URL + "/functions", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getFunctions(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByCountry(countryId));
-
-    }
-
-    @ApiOperation(value = "Update functions")
-    @RequestMapping(value = COUNTRY_URL + "/function/{functionId}", method = RequestMethod.PUT)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateFunction(countryId, functionDTO));
-    }
-
-    @ApiOperation(value = "Delete function by functionId")
-    @RequestMapping(value = COUNTRY_URL + "/function/{functionId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteFunction(@PathVariable long functionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.deleteFunction(functionId));
-    }
 
     // API to get Union And Levels
     @ApiOperation(value = "Get Unions and Levels by countryId")
@@ -1172,13 +1135,6 @@ public class CountryController {
 
     }
 
-    @ApiOperation(value = "Get functions by expertise id")
-    @RequestMapping(value =  "/function", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = "expertise") Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByExpertiseId(expertiseId));
-
-    }
 
     @ApiOperation(value = "Map Selected Payroll Types to country ")
     @PutMapping(value = COUNTRY_URL + "/map_pay_rolls_country")

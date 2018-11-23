@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,11 +25,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.constants.AppConstant.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.ID;
-import static com.kairos.constants.AppConstant.DELETED;
 
 
 public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
@@ -42,7 +40,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public Clause findByTitleAndDescription(Long countryId, String title,String description) {
+    public Clause findByCountryIdAndTitleAndDescription(Long countryId, String title, String description) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").is(title).and("description").is(description));
@@ -53,9 +51,20 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<Clause> findClausesByTitle(Long countryId, List<String> clauseTitles) {
+    public Clause findByUnitIdAndTitleAndDescription(Long unitId, String title, String description) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").in(clauseTitles));
+        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("title").is(title).and("description").is(description));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, Clause.class);
+    }
+
+    @Override
+    public List<Clause> findClauseByReferenceIdAndTitles(Long referenceId, boolean isUnitId, List<String> clauseTitles) {
+
+        Criteria criteria = isUnitId ? Criteria.where(ORGANIZATION_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles) : Criteria.where(COUNTRY_ID).is(referenceId).and(DELETED).is(false).and("title").in(clauseTitles);
+        Query query = new Query();
+        query.addCriteria(criteria);
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, Clause.class);
@@ -63,7 +72,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId) {
+    public List<ClauseResponseDTO> findAllClauseByCountryId(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("templateType", "templateTypes", "_id", "templateTypes"),
@@ -71,6 +80,17 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 sort(Sort.Direction.DESC, "createdAt")
         );
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
+                project(Fields.fields("id", "title", "tags", "description", "createdAt")),
+                sort(Sort.Direction.DESC, "createdAt")
+        );
+        AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
         return result.getMappedResults();
     }
 
@@ -115,7 +135,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+    public List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
@@ -147,9 +167,17 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 throw new InvalidRequestException("data not found for FilterType " + filterType);
 
         }
-
-
     }
 
 
+    @Override
+    public List<Clause> getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                        .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds()))
+        );
+        return mongoTemplate.aggregate(aggregation, Clause.class, Clause.class).getMappedResults();
+    }
 }

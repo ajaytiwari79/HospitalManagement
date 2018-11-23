@@ -45,7 +45,7 @@ public class BreakSettingsServiceIntegrationTest {
 
     @Test
     public void case1_createBreakSettings() {
-        BreakSettingsDTO breakSettingsDTO = new BreakSettingsDTO(64L, 1360L, 30L, 2L);
+        BreakSettingsDTO breakSettingsDTO = new BreakSettingsDTO(1360L, 30L);
         HttpEntity<BreakSettingsDTO> entity = new HttpEntity<>(breakSettingsDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<BreakSettingsDTO>> typeReference =
@@ -72,7 +72,7 @@ public class BreakSettingsServiceIntegrationTest {
 
     @Test
     public void case3_updateBreakSettings() {
-        BreakSettingsDTO breakSettingsDTO = new BreakSettingsDTO(64L, 500L, 30L, 2L);
+        BreakSettingsDTO breakSettingsDTO = new BreakSettingsDTO(500L, 30L);
         HttpEntity<BreakSettingsDTO> entity = new HttpEntity<>(breakSettingsDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<BreakSettingsDTO>> typeReference =

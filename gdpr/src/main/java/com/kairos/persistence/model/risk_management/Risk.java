@@ -22,6 +22,8 @@ public class Risk extends MongoBaseEntity {
     private String riskRecommendation;
     private boolean isReminderActive;
     private int daysToReminderBefore;
+   // private LocalDate dueDate;
+    // private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
     private BigInteger assetType;
@@ -40,6 +42,7 @@ public class Risk extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+
     public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
                 @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
@@ -56,7 +59,6 @@ public class Risk extends MongoBaseEntity {
     public BigInteger getProcessingActivity() { return processingActivity; }
 
     public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
-
 
     public String getName() {
         return name;
