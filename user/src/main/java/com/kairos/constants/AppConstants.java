@@ -244,7 +244,15 @@ public class AppConstants {
     private static final List<String> SCOPES =  Arrays.asList(CalendarScopes.CALENDAR_READONLY);
 
     //constants for hourly Cost calculation
-    public static final BigDecimal PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = new BigDecimal(7.4);
-    public static final BigDecimal LEAP_YEAR_CONST = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(366));
-    public static final BigDecimal NON_LEAP_YEAR_CONST = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(365));
+    public static final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = 7.4f;
+    public static final int LEAP_YEAR = 366;
+    public static final int NON_LEAP_YEAR = 365;
+
+    public static final String STAFF="staff";
+    public static final String UNIT_POSITION="unitPosition";
+    public static final String UNIT_POSITION_ORGANIZATION_RELATIONSHIP="unitPositionOrgRel";
+    public static final String UNIT_POSITION_STAFF_RELATIONSHIP="unitPositionStaffRel";
+    public static final String EMPLOYMENT="emp";
+
+
 }
