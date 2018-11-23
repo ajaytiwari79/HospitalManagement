@@ -99,6 +99,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.AppConstants.LEAP_YEAR_CONST;
+import static com.kairos.constants.AppConstants.NON_LEAP_YEAR_CONST;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 
@@ -1259,8 +1261,6 @@ public class UnitPositionService {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
             } else if ("emp".equals(object)) {
                 exceptionService.dataNotFoundByIdException("error.Employement.notExist", unitId, staffId);
-            } else if ("unitPosition".equals(object)) {
-                //Might throw exception
             }
         }
         List<Map<Object, Object>> unitPositions = (List<Map<Object, Object>>) object;
@@ -1277,33 +1277,31 @@ public class UnitPositionService {
      * @return
      */
     public List<UnitPositionLineFunctionQueryResult> getPositionLinesWithHourlyCost(Long unitId, Long staffId, Long unitPositionId) {
-        String isDataValid = unitPositionGraphRepository.validateOrganizationStaffUnitPosition(unitId, staffId, unitPositionId);
-        final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = 7.4f;//
-        if ("organization".equals(isDataValid)) {
+        String inValidField = unitPositionGraphRepository.validateOrganizationStaffUnitPosition(unitId, staffId, unitPositionId);
+
+        if ("organization".equals(inValidField)) {
             exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
-        } else if ("staff".equals(isDataValid)) {
+        } else if ("staff".equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
-        } else if ("unitPosition".equals(isDataValid)) {
+        } else if ("unitPosition".equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "UnitPosition", unitPositionId);
-        } else if ("unitPositionOrgRel".equals(isDataValid)) {
+        } else if ("unitPositionOrgRel".equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionOrgRel");
-        } else if ("unitPositionStaffRel".equals(isDataValid)) {
+        } else if ("unitPositionStaffRel".equals(inValidField)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionStaffRel");
         }
         List<UnitPositionLineFunctionQueryResult> hourlyCostByUnitPositionLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, unitPositionId);
-        final float LEAP_YEAR_CONST = (float) (1 / (366 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
-        final float NON_LEAP_YEAR_CONST = (float) (1 / (365 * PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE));
         hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines, UnitPositionLineFunctionQueryResult.class);
         for (UnitPositionLineFunctionQueryResult unitPositionLineFunctionQueryResult : hourlyCostByUnitPositionLines) {
-            float hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? LEAP_YEAR_CONST : NON_LEAP_YEAR_CONST;
-            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount() * hourlyCostCalculationFactor);
-            unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost() * hourlyCostCalculationFactor);
+            BigDecimal hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? LEAP_YEAR_CONST : NON_LEAP_YEAR_CONST;
+            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(hourlyCostCalculationFactor.multiply(new BigDecimal(unitPositionLineFunctionQueryResult.getBasePayGradeAmount())).floatValue());
+            unitPositionLineFunctionQueryResult.setHourlyCost(hourlyCostCalculationFactor.multiply(new BigDecimal(unitPositionLineFunctionQueryResult.getHourlyCost())).floatValue() );
             List<FunctionDTO> functionList = unitPositionLineFunctionQueryResult.getFunctions();
             Iterator<FunctionDTO> iterator = functionList.iterator();
             while (iterator.hasNext()) {
                 FunctionDTO function = iterator.next();
                 if (function.getAmount() != null) {
-                    function.setAmount(function.getAmount().multiply(new BigDecimal(hourlyCostCalculationFactor)).setScale(2, RoundingMode.CEILING));
+                    function.setAmount(function.getAmount().multiply(hourlyCostCalculationFactor).setScale(2, RoundingMode.CEILING));
                 } else {
                     iterator.remove();
                 }

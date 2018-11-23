@@ -340,13 +340,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "CASE WHEN pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END AS basePayGradeAmount   \n" +
             "OPTIONAL MATCH (positionLine)-[: "+APPLICABLE_FUNCTION+" ]-(function:Function)   \n" +
             "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[: "+APPLICABLE_FOR_EXPERTISE+" ]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate})))   \n" +
-            "WITH  positionLine,expertise,functionalPayment,seniorityLevel,function,basePayGradeAmount   \n" +
+            "WITH  positionLine,functionalPayment,seniorityLevel,function,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(functionalPayment)-[: "+FUNCTIONAL_PAYMENT_MATRIX+" ]->(fpm:FunctionalPaymentMatrix)    \n" +
-            "WITH  positionLine,expertise,fpm,seniorityLevel,function,functionalPayment,basePayGradeAmount   \n" +
+            "WITH  positionLine,fpm,seniorityLevel,function,functionalPayment,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(fpm)-[: "+SENIORITY_LEVEL_FUNCTIONS+" ]->(slf:SeniorityLevelFunction)-[: "+FOR_SENIORITY_LEVEL+" ]->(seniorityLevel)   \n" +
-            " WITH  positionLine,expertise,fpm,slf,function,functionalPayment,basePayGradeAmount   \n" +
+            " WITH  positionLine,fpm,slf,function,functionalPayment,basePayGradeAmount   \n" +
             "OPTIONAL MATCH(slf)-[rel: "+HAS_FUNCTIONAL_AMOUNT +"]-(function)   \n" +
-            "WITH  positionLine,expertise,fpm,slf,function,functionalPayment,basePayGradeAmount,rel, sum(toInteger(rel.amount)) as totalCostOfFunctions," +
+            "WITH  positionLine,fpm,slf,function,functionalPayment,basePayGradeAmount,rel, sum(toInteger(rel.amount)) as totalCostOfFunctions," +
             "COLLECT({id:id(function),amount:rel.amount,name:function.name}) AS functions " +
             "RETURN  \n" +
             "positionLine.startDate AS startDate,basePayGradeAmount AS basePayGradeAmount,functions,basePayGradeAmount+totalCostOfFunctions AS hourlyCost ")

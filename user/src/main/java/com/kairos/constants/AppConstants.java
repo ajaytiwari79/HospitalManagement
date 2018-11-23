@@ -7,6 +7,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -241,4 +242,9 @@ public class AppConstants {
      * at ~/.credentials/calendar-java-quickstart
      */
     private static final List<String> SCOPES =  Arrays.asList(CalendarScopes.CALENDAR_READONLY);
+
+    //constants for hourly Cost calculation
+    public static final BigDecimal PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = new BigDecimal(7.4);
+    public static final BigDecimal LEAP_YEAR_CONST = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(366));
+    public static final BigDecimal NON_LEAP_YEAR_CONST = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(365));
 }
