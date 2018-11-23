@@ -359,7 +359,7 @@ public class AgreementSectionService extends MongoBaseService {
 
     private void mapClauseCkEditorHtmlAndSortClauseArray(AgreementSection agreementSection, List<Clause> clauseList) {
         if (CollectionUtils.isNotEmpty(clauseList)) {
-            List<ClauseCkEditorVO> clauseCkEditorVOS = new ArrayList<>();
+            Set<ClauseCkEditorVO> clauseCkEditorVOS = new HashSet<>();
             List<Clause> clauses = clauseList.stream().sorted(Comparator.comparing(Clause::getOrderedIndex)).collect(Collectors.toList());
             clauses.forEach(clause -> clauseCkEditorVOS.add(new ClauseCkEditorVO(clause.getId(), clause.getTitleHtml(), clause.getDescriptionHtml())));
             agreementSection.setClauseIdOrderedIndex(clauses.stream().map(Clause::getId).collect(Collectors.toList()));

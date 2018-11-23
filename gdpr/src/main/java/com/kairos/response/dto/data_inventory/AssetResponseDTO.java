@@ -209,10 +209,6 @@ public class AssetResponseDTO {
     }
 
     public List<ProcessingActivityBasicResponseDTO> getProcessingActivities() {
-
-        if (!Optional.ofNullable(processingActivities.get(0).getId()).isPresent()) {
-            processingActivities.clear();
-        }
         return processingActivities;
     }
 

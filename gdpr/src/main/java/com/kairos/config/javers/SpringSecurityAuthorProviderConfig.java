@@ -15,7 +15,7 @@ public class SpringSecurityAuthorProviderConfig implements AuthorProvider {
             return "unauthenticated";
         }
         String userName = UserContext.getUserDetails().getFirstName() + " " + UserContext.getUserDetails().getLastName();
-        return auth.getName() + "(" + userName + ")";
+        return auth.getName() + "-" + userName ;
     }
 
 

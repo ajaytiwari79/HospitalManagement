@@ -163,7 +163,7 @@ public class ClauseService extends MongoBaseService {
      */
     public Boolean deleteClauseById(Long referenceId, boolean isUnitId, BigInteger clauseId) {
 
-        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
