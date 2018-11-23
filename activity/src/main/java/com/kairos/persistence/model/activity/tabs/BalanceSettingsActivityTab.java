@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.enums.TimeTypeEnum;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -11,6 +13,7 @@ public class BalanceSettingsActivityTab implements Serializable{
 
     private Integer addTimeTo;
     private BigInteger timeTypeId;
+    private TimeTypeEnum type; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
 
@@ -75,5 +78,13 @@ public class BalanceSettingsActivityTab implements Serializable{
 
     public void setNegativeDayBalancePresent(Boolean negativeDayBalancePresent) {
         this.negativeDayBalancePresent = negativeDayBalancePresent;
+    }
+
+    public TimeTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(TimeTypeEnum type) {
+        this.type = type;
     }
 }

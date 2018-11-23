@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.TimeTypeEnum;
 
 import java.math.BigInteger;
 
@@ -16,7 +17,7 @@ public class BalanceSettingActivityTabDTO {
     private BigInteger timeTypeId;
     private boolean onCallTimePresent;
     private Boolean negativeDayBalancePresent;
-
+    private TimeTypeEnum type; // This is used to verify the activity is of  paid break or unpaid break
     public Long getActivityId() {
         return activityId;
     }
@@ -63,5 +64,13 @@ public class BalanceSettingActivityTabDTO {
 
     public void setOnCallTimePresent(boolean onCallTimePresent) {
         this.onCallTimePresent = onCallTimePresent;
+    }
+
+    public TimeTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(TimeTypeEnum type) {
+        this.type = type;
     }
 }

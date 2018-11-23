@@ -1,0 +1,7 @@
+db.activities.updateMany({"balanceSettingsActivityTab.timeTypeId":"3"},{$set:{type:"PAID_BREAK"}})
+db.activities.updateMany({"balanceSettingsActivityTab.timeTypeId":"3"},{$set:{type:"PAID_BREAK"}})  // unpaid
+db.time_Type.find({label:"Unpaid Break"})
+db.time_Type.find({label:"Paid Break"})
+db.time_Type.updateMany({label:"Paid Break"},{"$set":{type:"PAID_BREAK"}})
+db.time_Type.updateMany({label:"Unpaid Break"},{"$set":{type:"UNPAID_BREAK"}})
+
