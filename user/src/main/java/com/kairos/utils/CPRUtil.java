@@ -14,7 +14,7 @@ import java.util.Date;
 public class CPRUtil {
 
     public static Integer getAgeFromCPRNumber(String cprNumber) {
-        return StringUtils.isNotBlank(cprNumber) ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : null;
+        return StringUtils.isNotBlank(cprNumber) ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : 0;
     }
 
     public static Date fetchDateOfBirthFromCPR(String cprNumber) {

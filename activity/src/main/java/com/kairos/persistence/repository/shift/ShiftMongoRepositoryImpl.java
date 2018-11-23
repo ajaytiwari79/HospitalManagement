@@ -252,7 +252,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
-    public List<Shift> findShiftAfterRestorePhase(BigInteger planningPeriodId, BigInteger phaseId) {
+    public List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId) {
         Query query=new Query(Criteria.where("planningPeriodId").is(planningPeriodId).and("phaseId").is(phaseId));
        return mongoTemplate.find(query,Shift.class);
     }

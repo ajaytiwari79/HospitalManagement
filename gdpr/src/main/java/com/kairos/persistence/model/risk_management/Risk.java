@@ -20,10 +20,10 @@ public class Risk extends MongoBaseEntity {
     private Long countryId;
     @NotBlank(message = "error.message.risk.recommendation")
     private String riskRecommendation;
-   // private LocalDate dueDate;
     private boolean isReminderActive;
     private int daysToReminderBefore;
-   // private Staff riskOwner;
+   // private LocalDate dueDate;
+    // private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
     private BigInteger assetType;
@@ -43,8 +43,8 @@ public class Risk extends MongoBaseEntity {
     }
 
 
-
-    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description, @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
+    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -83,7 +83,6 @@ public class Risk extends MongoBaseEntity {
     public void setRiskRecommendation(String riskRecommendation) {
         this.riskRecommendation = riskRecommendation;
     }
-
     public boolean isReminderActive() {
         return isReminderActive;
     }

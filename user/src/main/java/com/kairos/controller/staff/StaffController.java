@@ -564,6 +564,14 @@ public class StaffController {
                                                                       @PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
+    // We need only limited data so we are making a substitute of above API
+    @RequestMapping(value = "/{staffId}/unit_position/{unitPositionId}/functions", method = RequestMethod.GET)
+    @ApiOperation("API for check unit position of staff and available functions")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate,
+                                                                      @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(shiftDate,unitPositionId));
+    }
 
     @RequestMapping(value = "/verifyUnitEmployments", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")

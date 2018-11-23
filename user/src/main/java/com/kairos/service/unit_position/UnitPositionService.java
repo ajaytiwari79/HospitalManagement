@@ -178,6 +178,8 @@ public class UnitPositionService {
     @Inject
     private UnitPositionLineFunctionRelationShipGraphRepository positionLineFunctionRelationRepository;
 
+
+
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException, Exception {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
@@ -923,6 +925,18 @@ public class UnitPositionService {
         return unitPositionDetails;
     }
 
+    public com.kairos.dto.activity.shift.StaffUnitPositionDetails findAppliedFunctionsAtUnitPosition(Long unitPositionId,LocalDate shiftDate) {
+
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.findAppliedFunctionsAtUnitPosition(unitPositionId,shiftDate.toString());
+        com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails= null;
+        if (unitPosition!=null) {
+            unitPositionDetails= new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            unitPositionDetails.setId(unitPosition.getId());
+            unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
+        }
+        return unitPositionDetails;
+    }
+
 
     private UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
         LocalDate startDate = DateUtils.getLocalDateFromString(timeCareEmploymentDTO.getStartDate());
@@ -1111,7 +1125,7 @@ public class UnitPositionService {
         Map<String, Object> functionMap = (Map<String, Object>) payload.get(dateAsString);
         Long functionId = new Long((Integer) functionMap.get("id"));
 
-        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId, functionId, dateAsString);
+        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId,  dateAsString);
 
         if (unitPositionFunctionRelationship == null) {
             unitPositionFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId, Collections.singletonList(dateAsString));
@@ -1125,8 +1139,12 @@ public class UnitPositionService {
         return true;
     }
 
-    public Long removeFunction(Long unitPositionId, Date appliedDate) {
-        return unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+    public Long removeFunction(Long unitId,Long unitPositionId, Date appliedDate) {
+        Long functionId = unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+        Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(appliedDate),staffId , unitPositionId, unitId, ORGANIZATION);
+        activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(appliedDate), staffAdditionalInfoDTO);
+        return functionId;
     }
 
 

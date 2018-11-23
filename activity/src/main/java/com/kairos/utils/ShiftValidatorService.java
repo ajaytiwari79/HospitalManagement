@@ -53,6 +53,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -360,8 +361,11 @@ public class ShiftValidatorService {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
                 TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
-                    TimeInterval interval = new TimeInterval(((timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute()), ((timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute()));
-                    if (interval.contains(DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
+                    int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
+                    int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
+                    TimeInterval interval = new TimeInterval(startMinutesOfInterval,endMinutesOfInterval );
+                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    if (minuteOfTheDay==(int)interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                         timeInterval = interval;
                         break;
                     }
