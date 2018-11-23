@@ -983,22 +983,7 @@ public class ShiftService extends MongoBaseService {
         ButtonConfig buttonConfig = null;
 
         if(Optional.ofNullable(viewType).isPresent()&&viewType.toString().equalsIgnoreCase(ViewType.WEEKLY.toString())) {
-            if(!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY)||
-                    !DateUtils.getLocalDateFromDate(endDate).getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-                exceptionService.invalidRequestException("message.weeklyview.incorrect.date");
-            }
-            buttonConfig = new ButtonConfig();
-            Set<BigInteger> shiftIds = assignedShifts.stream().map(shiftDTO -> shiftDTO.getShiftId()).collect(Collectors.toSet());
-            if(userAccessRoleDTO.getManagement()){
-                List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT);
-                Set<BigInteger> shiftStateIds = shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toSet());
-                for(BigInteger shiftId:shiftIds){
-                    if(!shiftStateIds.contains(shiftId))  {
-                        buttonConfig.setSendToPayrollEnabled(true);
-                        break;
-                    }
-                }
-            }
+            buttonConfig = findButtonConfig(assignedShifts,startDate,endDate,userAccessRoleDTO.getManagement());
         }
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {
@@ -1021,6 +1006,27 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWrapper(assignedShifts, openShiftResponseDTOS, staffAccessRoleDTO,buttonConfig);
     }
 
+    public ButtonConfig findButtonConfig(List<ShiftDTO> shifts,Date startDate,Date endDate,boolean management) {
+        if(!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY)||
+                !DateUtils.getLocalDateFromDate(endDate).getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            exceptionService.invalidRequestException("message.weeklyview.incorrect.date");
+        }
+        ButtonConfig buttonConfig = new ButtonConfig();
+        Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
+        if(management){
+            List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT);
+            Set<BigInteger> shiftStateIds = shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toSet());
+            for(BigInteger shiftId:shiftIds){
+                if(!shiftStateIds.contains(shiftId))  {
+                    buttonConfig.setSendToPayrollEnabled(false);
+                    break;
+                }
+                buttonConfig.setSendToPayrollEnabled(true);
+            }
+        }
+
+        return buttonConfig;
+    }
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<DateWiseShiftResponse> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
         if (!Optional.ofNullable(shifts).isPresent() || shifts.isEmpty()) {
