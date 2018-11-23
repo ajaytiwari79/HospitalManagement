@@ -1,0 +1,4 @@
+//for adding pql settings in previous activities
+
+db.activities.updateMany({},{$set:{"rulesActivityTab.pqlSettings":{"approvalTimeInAdvance":{},
+"approvalPercentageWithoutMovement":{},"approvalWithMovement":{},"appreciable":{},"acceptable":{},"critical":{}}}});
