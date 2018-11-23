@@ -158,4 +158,16 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
+
+    @ApiOperation(value = "get UnitPositions Per Staff")
+    @GetMapping(value = "/staff/{staffId}/unit_positions")
+    public ResponseEntity<Map<String, Object>> getUnitPositionsByStaffId(@PathVariable Long unitId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsByStaffId(unitId, staffId));
+    }
+
+    @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
+    @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
+    public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
+    }
 }
