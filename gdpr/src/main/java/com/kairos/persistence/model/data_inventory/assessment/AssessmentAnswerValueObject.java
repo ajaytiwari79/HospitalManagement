@@ -17,10 +17,9 @@ public class AssessmentAnswerValueObject {
 
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private BigInteger questionId;
-    @NotBlank(message ="Attribute name can't be empty" )
     private String attributeName;
     private Object value;
-   // private QuestionType questionType;
+    private QuestionType questionType;
 
 
 
@@ -31,16 +30,16 @@ public class AssessmentAnswerValueObject {
         this.questionId = questionId;
         this.attributeName = attributeName;
         this.value = value;
-     //   this.questionType= questionType;
+        this.questionType= questionType;
     }
 
-  /*  public QuestionType getQuestionType() {
+    public QuestionType getQuestionType() {
         return questionType;
     }
 
     public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
-    }*/
+    }
 
     public BigInteger getQuestionId() { return questionId; }
 

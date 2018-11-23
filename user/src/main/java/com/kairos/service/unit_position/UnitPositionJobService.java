@@ -77,7 +77,7 @@ public class UnitPositionJobService {
                 List<UnitPositionLineEmploymentTypeRelationShip> unitPositionLineEmploymentTypeRelationShips = new ArrayList<>();
 
                 for (Map.Entry<UnitPositionIdDTO, UnitPositionLine> currentMap : newPositionLineWithParentId.entrySet()) {
-                    UnitPositionSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey());
+                    UnitPositionSeniorityLevelQueryResult currentObject = unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldUnitPositionID());
                     if (currentObject != null) {
                         UnitPositionLineEmploymentTypeRelationShip unitPositionLineEmploymentTypeRelationShip =
                                 new UnitPositionLineEmploymentTypeRelationShip(currentMap.getValue(), currentObject.getEmploymentType(),

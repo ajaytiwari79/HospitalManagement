@@ -2,10 +2,16 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.employment.EmploymentDTO;
+import com.kairos.dto.user.employment.employment_dto.EmploymentOverlapDTO;
+import com.kairos.dto.user.employment.employment_dto.MainEmploymentResultDTO;
 import com.kairos.enums.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
@@ -43,11 +49,11 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.DateUtil;
-import com.kairos.commons.utils.DateUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -67,7 +73,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.kairos.constants.AppConstants.*;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 
 /**
@@ -127,6 +132,7 @@ public class EmploymentService {
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject private OrganizationService organizationService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -259,23 +265,6 @@ public class EmploymentService {
         return response;
     }
 
-    public Map<String, Object> updateEmployment(long unitEmploymentId, Map<String, Object> wageDetails) throws
-            ParseException {
-
-     /*   wageDetails.put("startDate", DateConverter.parseDate(((String) wageDetails.get("startDate"))).getTime());
-        wageDetails.put("endDate", DateConverter.parseDate(((String) wageDetails.get("endDate"))).getTime());
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        Wage wage = objectMapper.convertValue(wageDetails, Wage.class);
-        UnitPermission unitPermission = unitPermissionGraphRepository.findOne(unitEmploymentId);
-        unitPermission.getWages().add(wage);
-        unitPermissionGraphRepository.save(unitPermission);
-        wageDetails.put("id", wage.getId());
-     */
-        wageDetails.put("message", "Operation currently disabled");
-        return wageDetails;
-
-    }
 
     public List<Map<String, Object>> getEmployments(long staffId, long unitId, String type) {
 
@@ -345,124 +334,6 @@ public class EmploymentService {
 
     }
 
-    private List<AccessPageQueryResult> getAccessPages(AccessPermission accessPermission) {
-        List<Map<String, Object>> accessPages = accessPageRepository.getStaffPermission(accessPermission.getId());
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<AccessPageQueryResult> queryResults = new ArrayList<>();
-        for (Map<String, Object> accessPage : accessPages) {
-            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue((Map<String, Object>) accessPage.get("data"), AccessPageQueryResult.class);
-            queryResults.add(accessPageQueryResult);
-        }
-        List<AccessPageQueryResult> treeData = accessGroupService.getAccessPageHierarchy(queryResults, queryResults);
-
-        List<AccessPageQueryResult> modules = new ArrayList<>();
-        for (AccessPageQueryResult accessPageQueryResult : treeData) {
-            if (accessPageQueryResult.isModule()) {
-                modules.add(accessPageQueryResult);
-            }
-        }
-        return modules;
-    }
-
-    /**
-     * @param staff
-     * @param unitId
-     * @return
-     * @author prabjot
-     * TODO for visitour testing,i am going to keep contact address of staff same as office address,after i will update it
-     */
-
-    public boolean syncStaffInVisitour(Staff staff, long unitId, Map<String, String> flsCredentials) {
-
-            /*
-                    By Yasir
-                Commented below method as we are no longer using FLS Visitour
-             */
-
-        /*logger.info("Syncing staff in fls");
-
-        ContactDetail staffContactDetail = staffGraphRepository.getContactDetail(staff.getId());
-
-        OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(unitId);
-        ContactAddress officeAddress = organizationContactData.getContactAddress();
-        if (officeAddress == null) {
-            throw new InternalError("organization address is null");
-        }
-        ZipCode officeZipCode = organizationContactData.getZipCode();
-
-        if (officeZipCode == null) {
-            throw new InternalError("office zip code can not null");
-        }
-
-        List<String> skillsToUpdate = staffGraphRepository.getStaffVisitourIdWithLevel(unitId, staff.getId());
-
-        String visitourSkillRequestData = "";
-        for (String skill : skillsToUpdate) {
-            visitourSkillRequestData = skill + "," + visitourSkillRequestData;
-        }
-
-        Map<String, Object> engineerMetaData = new HashMap<>();
-
-        //personal details
-        if (staff.getEngineerType() != null) {
-            String type = staff.getEngineerType().getVisitourCode();
-            engineerMetaData.put("type", type);
-        }
-
-        engineerMetaData.put("fmvtid", staff.getId());
-        engineerMetaData.put("fmextID", staff.getId());
-        engineerMetaData.put("active", true);
-        engineerMetaData.put("prename", staff.getLastName());
-        engineerMetaData.put("name", staff.getFirstName());
-
-        //staff contact address
-        engineerMetaData.put("scountry", "DK");
-        engineerMetaData.put("szip", officeZipCode.getZipCode());
-        engineerMetaData.put("scity", officeAddress.getCity());
-        engineerMetaData.put("sstreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
-
-        //personal details
-        engineerMetaData.put("email", staff.getEmail());
-        if (staff.getContactDetail() != null) {
-            engineerMetaData.put("phone", staffContactDetail.getPrivatePhone());
-            engineerMetaData.put("mobile", staffContactDetail.getMobilePhone());
-        }
-        //office address
-        engineerMetaData.put("ecountry", "DK");
-        engineerMetaData.put("ezip", officeZipCode.getZipCode());
-        engineerMetaData.put("ecity", officeAddress.getCity());
-        engineerMetaData.put("estreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
-
-        //skills of staff
-        engineerMetaData.put("lskills", visitourSkillRequestData);
-
-        logger.info("AddressDTO to verify from fls" + engineerMetaData);
-        int code = scheduler.createEngineer(engineerMetaData, flsCredentials);
-        logger.info("FLS staff sync status-->" + code);
-        if (code == 0) {
-            return true;
-        }*/
-        return false;
-
-    }
-
-
-    /*
-        By Yasir
-    Commented below method as we are no longer using FLS Visitour
- */
-    private boolean removeStaffFromFls(Staff staff, Map<String, String> flsCredentials) {
-        /*Map<String, Object> engineerMetaData = new HashMap<>();
-        engineerMetaData.put("fmvtid", staff.getId());
-        engineerMetaData.put("fmextID", staff.getId());
-        engineerMetaData.put("active", false);
-        int code = scheduler.createEngineer(engineerMetaData, flsCredentials);
-        logger.info("FLS staff sync status-->" + code);
-        if (code == 0) {
-            return true;
-        }*/
-        return false;
-    }
 
     public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId, String type) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -848,5 +719,152 @@ public class EmploymentService {
         schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,unitId,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.EMPLOYMENT_END);
 
         kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
+    }
+
+    public MainEmploymentResultDTO updateMainEmployment(Long unitId, Long staffId, EmploymentDTO employmentDTO, Boolean confirmMainEmploymentOverriding) {
+        if (employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())) {
+            exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
+        }
+        Long mainEmploymentStartDate = DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentStartDate());
+        Long mainEmploymentEndDate = null;
+        if (employmentDTO.getMainEmploymentEndDate() != null) {
+            mainEmploymentEndDate = DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentEndDate());
+            if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
+                exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
+            }
+        }
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Boolean userAccessRoleDTO = accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(), staffId);
+        if (!userAccessRoleDTO) {
+            exceptionService.runtimeException("message.mainemployment.permission");
+        }
+        List<MainEmploymentQueryResult> mainEmploymentQueryResults = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
+        MainEmploymentResultDTO mainEmploymentResultDTO = new MainEmploymentResultDTO();
+        DateTimeInterval newEmploymentInterval = new DateTimeInterval(mainEmploymentStartDate, mainEmploymentEndDate);
+        List<Employment> employments = new ArrayList<>();
+        if (!mainEmploymentQueryResults.isEmpty()) {
+            for (MainEmploymentQueryResult mainEmploymentQueryResult : mainEmploymentQueryResults) {
+                Employment employment = mainEmploymentQueryResult.getEmployment();
+                EmploymentOverlapDTO employmentOverlapDTO = new EmploymentOverlapDTO();
+                if (employment.getMainEmploymentEndDate() != null && employmentDTO.getMainEmploymentEndDate() != null) {
+                    DateTimeInterval employmentInterval = new DateTimeInterval(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()), DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate()));
+                    if (newEmploymentInterval.containsInterval(employmentInterval)) {
+                        exceptionService.invalidRequestException("message.employment.alreadyexist", mainEmploymentQueryResult.getOrganizationName());
+                    } else {
+                        if (employmentInterval.contains(newEmploymentInterval.getStartDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentEndDate(newEmploymentInterval.getStartLocalDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else if (employmentInterval.contains(newEmploymentInterval.getEndDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentStartDate(newEmploymentInterval.getEndLocalDate().plusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        }
+                    }
+                } else {
+                    if (employment.getMainEmploymentEndDate() == null && employmentDTO.getMainEmploymentEndDate() != null) {
+                        if (DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()) > mainEmploymentStartDate && DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()) <= mainEmploymentEndDate) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else if (employment.getMainEmploymentStartDate().isBefore(employmentDTO.getMainEmploymentStartDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentEndDate(newEmploymentInterval.getStartLocalDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else {
+                            exceptionService.invalidRequestException("message.employment.alreadyexist", mainEmploymentQueryResult.getOrganizationName());
+                        }
+                    } else if (employment.getMainEmploymentEndDate() == null && employmentDTO.getMainEmploymentEndDate() == null) {
+                        if (employment.getMainEmploymentStartDate().isBefore(employmentDTO.getMainEmploymentStartDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else if (employment.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentStartDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else {
+                            exceptionService.invalidRequestException("message.employment.alreadyexist", mainEmploymentQueryResult.getOrganizationName());
+                        }
+                    } else {
+                        if (employment.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentStartDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else if (mainEmploymentStartDate > DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()) && mainEmploymentStartDate <= DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else if (employment.getMainEmploymentStartDate().isEqual(employmentDTO.getMainEmploymentStartDate())) {
+                            exceptionService.invalidRequestException("message.employment.alreadyexist", mainEmploymentQueryResult.getOrganizationName());
+                        }
+                    }
+                }
+                if (employment.getMainEmploymentEndDate() != null && employment.getMainEmploymentEndDate().isBefore(employment.getMainEmploymentStartDate())) {
+                    employment.setMainEmploymentStartDate(null);
+                    employment.setMainEmploymentEndDate(null);
+                    employment.setMainEmployment(false);
+                    getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                }
+                employments.add(employment);
+                mainEmploymentResultDTO.getEmploymentOverlapList().add(employmentOverlapDTO);
+            }
+
+            if (!confirmMainEmploymentOverriding) {
+                mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
+                return mainEmploymentResultDTO;
+            } else {
+                Employment employment = getEmployment(staffId, employmentDTO);
+                employments.add(employment);
+                employmentGraphRepository.saveAll(employments);
+            }
+        } else {
+            Employment employment = getEmployment(staffId, employmentDTO);
+            employmentGraphRepository.save(employment);
+        }
+        mainEmploymentResultDTO.setEmploymentOverlapList(null);
+        mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
+        return mainEmploymentResultDTO;
+    }
+
+    private Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        if (employment.getStartDateMillis() > DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())) {
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if (employment.getEndDateMillis() != null && (employment.getEndDateMillis() < DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentEndDate()))) {
+            exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
+        }
+        employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
+        employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
+        employment.setMainEmployment(true);
+        employmentDTO.setMainEmployment(true);
+        return employment;
+    }
+
+    private void getOldMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment, MainEmploymentQueryResult mainEmploymentQueryResult) {
+        employmentOverlapDTO.setMainEmploymentStartDate(employment.getMainEmploymentStartDate());
+        employmentOverlapDTO.setMainEmploymentEndDate(employment.getMainEmploymentEndDate());
+        employmentOverlapDTO.setOrganizationName(mainEmploymentQueryResult.getOrganizationName());
+    }
+
+    private void getAfterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment) {
+        if (employment.getStartDateMillis() > DateUtils.getLongFromLocalDate(employment.getMainEmploymentStartDate())) {
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if (employment.getEndDateMillis() != null && (employment.getEndDateMillis() < DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate()))) {
+            exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
+        }
+        employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
+        employmentOverlapDTO.setAfterChangeEndDate(employment.getMainEmploymentEndDate());
+    }
+
+    public boolean removeMainEmployment(Long staffId) {
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        employment.setMainEmploymentStartDate(null);
+        employment.setMainEmploymentEndDate(null);
+        employment.setMainEmployment(false);
+        employmentGraphRepository.save(employment);
+        return true;
     }
 }

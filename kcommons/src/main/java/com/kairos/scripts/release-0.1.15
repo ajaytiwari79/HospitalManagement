@@ -1,0 +1,60 @@
+// To add enum at second level time type
+
+db.time_Type.updateMany( {}, { $rename: { 'type': 'secondLevelType'} } );
+db.time_Type.updateMany( {"label":"volunteer time"}, { $set: { 'secondLevelType': "VOLUNTEER"} } );
+db.time_Type.updateMany( {"label":"timebank off time"}, { $set: { 'secondLevelType': "TIME_BANK"} } );
+db.time_Type.updateMany( {"label":"time between split shifts"}, { $set: { 'secondLevelType': "SHIFT_SPLIT_TIME"} } );
+db.time_Type.updateMany( {"label":"duty-free, selfpaid"}, { $set: { 'secondLevelType': "SELF_PAID"} } );
+db.time_Type.updateMany( {"label":"planned sickness on freedays"}, { $set: { 'secondLevelType': "PLANNED_SICK_ON_FREE_DAYS"} } );
+db.time_Type.updateMany( {"label":"unavailable time"}, { $set: { 'secondLevelType': "UNAVAILABLE_TIME"} } );
+db.time_Type.updateMany( {"label":"Ordinary Non Available"}, { $set: { 'secondLevelType': "UNAVAILABLE_TIME"} } );
+db.time_Type.updateMany( {"label":"resting time"}, { $set: { 'secondLevelType': "RESTING_TIME"} } );
+db.time_Type.updateMany( {"label":"Veto"}, { $set: { 'secondLevelType': "VETO"} } );
+db.time_Type.updateMany( {"label":"Stopbrick"}, { $set: { 'secondLevelType': "STOP_BRICK"} } );
+db.time_Type.updateMany( {"label":"available time"}, { $set: { 'secondLevelType': "AVAILABLE_TIME"} } );
+
+// To remove old templates
+
+db.wtaBaseRuleTemplate.remove({"wtaTemplateType":"VETO_PER_PERIOD"});
+
+// To add WTA Template
+
+db.kairos_sequence.findOneAndUpdate({"sequenceName" : "WTABaseRuleTemplateSequence"},{$inc: { sequenceNumber: 1 }});
+
+db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
+
+//To find the rule template categoryId of NONE in WTA
+
+db.ruleTemplateCategory.find({"name":"NONE","ruleTemplateCategoryType" : "WTA"}).pretty();
+
+db.wtaBaseRuleTemplate.insert({
+
+	"_id" : "747", // this must be replaced by updated sequence
+	"numberOfWeeks" : 1,
+	"validationStartDate" : ISODate("2018-11-26T00:00:00Z"),
+	"vetoActivityId" : ,
+	"stopBrickActivityId" : ,
+	"totalBlockingPoints" : 1,
+	"name" : "Veto and stop bricks",
+	"description" : "Veto and stop bricks",
+	"disabled" : false,
+	"ruleTemplateCategoryId" : "4", // It should be in NONE Category of WTA to verify please execute above Query
+	"lastUpdatedBy" : "Ulrik",
+	"wtaTemplateType" : "VETO_AND_STOP_BRICKS",
+	"phaseTemplateValues" : [ ],
+	"createdAt" : ISODate("2018-11-12T12:55:12.194Z"),
+	"updatedAt" : ISODate("2018-11-12T12:55:12.194Z"),
+	"deleted" : false,
+	"_class" : "com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate" });
+
+
+    //TO Assign Sector to all expertise
+	Match(s:Sector) with s limit 1
+    MATCH(e:Expertise{deleted:false})
+    Create unique(e)-[r:BELONGS_TO_SECTOR]->(s) return count(r);
+
+    //TO Change the existing RelationShip
+
+    MATCH(expertise:Expertise)-[old:BELONGS_TO]-(sector:Sector)
+    create (expertise)-[new:BELONGS_TO_SECTOR]->(sector)
+    delete old

@@ -4,7 +4,9 @@ import java.util.List;
 
 public class OrgTypeAndSubTypeDTO {
     private Long organizationTypeId;
+    private String organizationTypeName;
     private Long organizationSubTypeId;
+    private String organizationSubTypeName;
     private List<Long> subTypeId; // same as above but its list We will change
     private Long countryId;
     private Long parentOrganizationId;
@@ -68,5 +70,21 @@ public class OrgTypeAndSubTypeDTO {
 
     public void setParentOrganizationId(Long parentOrganizationId) {
         this.parentOrganizationId = parentOrganizationId;
+    }
+
+    public String getOrganizationTypeName() {
+        return organizationTypeName;
+    }
+
+    public void setOrganizationTypeName(String organizationTypeName) {
+        this.organizationTypeName = organizationTypeName;
+    }
+
+    public String getOrganizationSubTypeName() {
+        return organizationSubTypeName;
+    }
+
+    public void setOrganizationSubTypeName(String organizationSubTypeName) {
+        this.organizationSubTypeName = organizationSubTypeName;
     }
 }

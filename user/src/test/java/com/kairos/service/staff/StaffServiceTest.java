@@ -37,6 +37,7 @@ public class StaffServiceTest {
     private StaffService staffService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private StaffRetrievalService staffRetrievalService;
 
     @Test
     public void addStaffFavouriteFilters() throws Exception {
@@ -73,7 +74,7 @@ public class StaffServiceTest {
 
     @Test
     public void getAllStaffByUnitId() throws Exception {
-        staffService.getStaffWithBasicInfo(95L);
+        staffRetrievalService.getStaffWithBasicInfo(95L);
     }
 
     public final String getBaseUrl(Long organizationId, Long unitId) {

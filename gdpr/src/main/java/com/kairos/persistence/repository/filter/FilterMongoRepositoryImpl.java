@@ -40,7 +40,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     public Map<String, AggregationOperation> getFilterCriteria(Long countryId,  List<FilterType> filterTypes, FilterGroup filterGroup) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
         if (filterGroup.getAccessModule().get(0).getModuleId().equals(MASTER_PROCESSING_ACTIVITY_MODULE_ID)) {
-            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false)));
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)));
 
         } else {
             aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));

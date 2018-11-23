@@ -53,6 +53,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ import java.math.BigInteger;
 import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,16 +110,16 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
-        DateTimeInterval graceInterval;
+    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
+        DateTimeInterval graceInterval = null;
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
             graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         } else {
-            if (shiftDTO.getValidatedByStaffDate() == null) {
+            if (staffShiftDTO.getValidated() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(staffShiftDTO.getValidated()), validatedByStaff);
         }
         if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
@@ -125,13 +127,12 @@ public class ShiftValidatorService {
     }
 
     public DateTimeInterval getGracePeriodInterval(TimeAttendanceGracePeriod timeAttendanceGracePeriod, Date date, boolean forStaff) {
-
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = DateUtils.asZoneDateTime(date).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        ZonedDateTime endDate = null;
         if (forStaff) {
-            startDate = startDate.minusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
+            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
         } else {
-            startDate = startDate.minusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
+            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
         }
         return new DateTimeInterval(startDate, endDate);
     }
@@ -149,6 +150,7 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shift.getStartDate());
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap);
+
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
@@ -194,16 +196,16 @@ public class ShiftValidatorService {
             LocalTime earliestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getEarliestStartTime() : staffActivitySettingMap.get(activityId).getEarliestStartTime();
             LocalTime latestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getLatestStartTime() : staffActivitySettingMap.get(activityId).getLatestStartTime();
             if (shortestTime != null && shiftTimeDetails.getTotalTime() < shortestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration.less_than.shortest_time",shortestTime));
             }
             if (longestTime != null && shiftTimeDetails.getTotalTime() > longestTime) {
-                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.shift.duration_exceeds_longest_time",longestTime));
             }
             if (earliestStartTime != null && earliestStartTime.isAfter(shiftTimeDetails.getActivityStartTime())) {
-                errorMessages.add(exceptionService.convertMessage("error.start_time.greater_than.earliest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.start_time.greater_than.earliest_time",earliestStartTime));
             }
             if (latestStartTime != null && latestStartTime.isBefore(shiftTimeDetails.getActivityStartTime())) {
-                errorMessages.add(exceptionService.convertMessage("error.start_time.less_than.latest_time"));
+                errorMessages.add(exceptionService.convertMessage("error.start_time.less_than.latest_time",latestStartTime));
             }
             if (!errorMessages.isEmpty()) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
@@ -356,8 +358,11 @@ public class ShiftValidatorService {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
                 TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
-                    TimeInterval interval = new TimeInterval(((timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute()), ((timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute()));
-                    if (interval.contains(DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
+                    int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
+                    int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
+                    TimeInterval interval = new TimeInterval(startMinutesOfInterval,endMinutesOfInterval );
+                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    if (minuteOfTheDay==(int)interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                         timeInterval = interval;
                         break;
                     }
@@ -455,13 +460,17 @@ public class ShiftValidatorService {
         }
         DateTimeInterval dateTimeInterval;
         LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
-        while (true) {
-            dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
-            endDate = validationStartDate.plusWeeks(numberOfWeeks);
-            if (dateTimeInterval.contains(shift.getStartDate())) {
-                break;
+        if(validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(shift.getStartDate()))) {
+            while (true) {
+                dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
+                if (dateTimeInterval.contains(shift.getStartDate())) {
+                    break;
+                }
+                validationStartDate = endDate;
+                endDate = validationStartDate.plusWeeks(numberOfWeeks);
             }
-            validationStartDate = endDate;
+        }else{
+            dateTimeInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         }
         return dateTimeInterval;
     }
@@ -558,9 +567,9 @@ public class ShiftValidatorService {
                     AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate) ruleTemplate;
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, averageScheduledTimeWTATemplate.getIntervalUnit(), averageScheduledTimeWTATemplate.getIntervalLength()));
                     break;
-                case VETO_PER_PERIOD:
-                    VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate = (VetoPerPeriodWTATemplate) ruleTemplate;
-                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, vetoPerPeriodWTATemplate.getNumberOfWeeks(), vetoPerPeriodWTATemplate.getValidationStartDate()));
+                case VETO_AND_STOP_BRICKS:
+                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) ruleTemplate;
+                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate()));
 
                     break;
                 case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
@@ -748,5 +757,10 @@ public class ShiftValidatorService {
             }
 
         });
+    }
+
+    public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints,int totalVeto,int totalStopBricks){
+        return totalBlockingPoints>=totalVeto*VETO_BLOCKING_POINT+totalStopBricks*STOP_BRICK_BLOCKING_POINT;
+
     }
 }

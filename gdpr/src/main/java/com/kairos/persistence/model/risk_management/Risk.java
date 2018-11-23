@@ -20,10 +20,8 @@ public class Risk extends MongoBaseEntity {
     private Long countryId;
     @NotBlank(message = "error.message.risk.recommendation")
     private String riskRecommendation;
-    private LocalDate dueDate;
     private boolean isReminderActive;
     private int daysToReminderBefore;
-    private Staff riskOwner;
     @NotNull(message = "error.message.risk.level")
     private RiskSeverity riskLevel;
     private BigInteger assetType;
@@ -43,15 +41,7 @@ public class Risk extends MongoBaseEntity {
     }
 
     public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
-                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel, LocalDate dueDates) {
-        this.name = name;
-        this.description = description;
-        this.riskRecommendation = riskRecommendation;
-        this.riskLevel = riskLevel;
-        this.dueDate = dueDates;
-    }
-
-    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description, @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "RISK Level can't be null") RiskSeverity riskLevel) {
         this.name = name;
         this.description = description;
         this.riskRecommendation = riskRecommendation;
@@ -67,9 +57,6 @@ public class Risk extends MongoBaseEntity {
 
     public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
 
-    public Staff getRiskOwner() { return riskOwner; }
-
-    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
 
     public String getName() {
         return name;
@@ -94,15 +81,6 @@ public class Risk extends MongoBaseEntity {
     public void setRiskRecommendation(String riskRecommendation) {
         this.riskRecommendation = riskRecommendation;
     }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
-
     public boolean isReminderActive() {
         return isReminderActive;
     }

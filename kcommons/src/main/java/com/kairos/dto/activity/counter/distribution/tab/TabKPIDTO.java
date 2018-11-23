@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.counter.distribution.tab;
 
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
+import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
@@ -13,7 +14,7 @@ public class TabKPIDTO {
     private String tabId;
     private KPIDTO kpi;
     private BigInteger kpiId;
-    private String data;
+    private RawRepresentationData data;
     private KPIPosition position;
     private CounterSize size;
     private ConfLevel level;
@@ -45,14 +46,6 @@ public class TabKPIDTO {
 
     public void setKpi(KPIDTO kpi) {
         this.kpi = kpi;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
     }
 
     public KPIPosition getPosition() {
@@ -109,5 +102,13 @@ public class TabKPIDTO {
 
     public void setKpiId(BigInteger kpiId) {
         this.kpiId = kpiId;
+    }
+
+    public RawRepresentationData getData() {
+        return data;
+    }
+
+    public void setData(RawRepresentationData data) {
+        this.data = data;
     }
 }

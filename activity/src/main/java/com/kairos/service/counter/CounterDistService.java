@@ -3,6 +3,9 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
@@ -13,7 +16,6 @@ import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingD
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.dto.activity.counter.distribution.category.StaffKPIGalleryDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.*;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -25,22 +27,15 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.mongodb.client.result.DeleteResult;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -60,6 +55,8 @@ import static java.util.stream.Collectors.toSet;
 public class CounterDistService extends MongoBaseService {
     @Inject
     private CounterRepository counterRepository;
+    @Inject
+    private CounterDataService counterDataService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -193,14 +190,22 @@ public class CounterDistService extends MongoBaseService {
         return priority;
     }
 
-    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level) {
+    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(unitId);
         List<BigInteger> kpiIds = new ArrayList<>();
         if (!accessGroupPermissionCounterDTO.getCountryAdmin()) {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }
-        List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), 4l, unitId, level);
-        return filterTabKpiDate(tabKPIDTOS);
+        List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
+        tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
+        filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
+        filters.setUnitId(unitId);
+        Map<BigInteger, RawRepresentationData> data = counterDataService.generateKPIData(filters);
+        tabKPIDTOS.forEach(tabKPIDTO -> {
+            tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
+        });
+        return tabKPIDTOS;
     }
 
     public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS) {
@@ -223,7 +228,6 @@ public class CounterDistService extends MongoBaseService {
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaffPriority(String moduleId, Long unitId, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds = new ArrayList<>();
-        ;
         if (!accessGroupPermissionCounterDTO.getCountryAdmin()) {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }
@@ -607,17 +611,26 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void setDefaultSettingUnit(DefaultKPISettingDTO defalutKPISettingDTO, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
-        Long refId = ConfLevel.COUNTRY.equals(level) ? defalutKPISettingDTO.getCountryId() : defalutKPISettingDTO.getParentUnitId();
+        List<AccessGroupMappingDTO> accessGroupMappingDTOS =null;
+                Long refId = ConfLevel.COUNTRY.equals(level) ? defalutKPISettingDTO.getCountryId() : defalutKPISettingDTO.getParentUnitId();
         List<CategoryKPIConf> categoryKPIConfToSave = new ArrayList<>();
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
         List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
         List<BigInteger> applicableKpiIds = counterRepository.getApplicableKPIIdsByReferenceId(kpiIds, Arrays.asList(refId), level);
-        List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
-        List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, applicableKpiIds, level, refId);
-        accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> {
-            accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT));
-        });
+        //TODO code update for parent child access group fetching
+        if(!Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
+            List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
+            accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, applicableKpiIds, level, refId);
+            accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> {
+                accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT));
+            });
+        }else{
+            accessGroupMappingDTOS=counterRepository.getAccessGroupKPIEntryAccessGroupIds(new ArrayList<>(), applicableKpiIds, level, refId);
+            accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> {
+                accessGroupKPIEntries.add(new AccessGroupKPIEntry(accessGroupMappingDTO.getAccessGroupId(), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT));
+            });
+        }
         List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, refId, level);
         tabKPIConf.stream().forEach(tabKPIConfKPI -> {
             tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, unitId, null, ConfLevel.UNIT, null, KPIValidity.BASIC, LocationType.FIX, calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX)));

@@ -96,8 +96,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "remove function to unit position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}/applyFunction")
-    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitPositionId, appliedDate));
+    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitId,unitPositionId, appliedDate));
     }
 
     /**

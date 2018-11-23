@@ -14,6 +14,7 @@ import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
@@ -34,12 +35,17 @@ import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
@@ -370,11 +376,25 @@ public class GenericIntegrationService {
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate.toString()));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
     }
 
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffWithUnitId(Long unitId,LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("type", type));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, staffId, unitEmploymentId);
+    }
+
+    public StaffAdditionalInfoDTO verifyUnitPositionAndFindFunctionsAfterDate(LocalDate shiftDate, Long staffId, Long unitPositionId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_UNIT_POSITION, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, staffId, unitPositionId);
+    }
     public StaffDTO getStaffByUser(Long userId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, userId);
@@ -415,13 +435,16 @@ public class GenericIntegrationService {
     }
 
     //WTADetailRestClient
-    public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId) {
+    public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId, List<Long> unitIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("countryId", countryId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationTypeId", organizationTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationSubTypeId", organizationSubTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("expertiseId", expertiseId.toString()));
+        if(CollectionUtils.isNotEmpty(unitIds)){
+            queryParamList.add(new BasicNameValuePair("unitIds", unitIds.toString().replace("[", "").replace("]", "")));
+        }
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, WTA_RULE_INFO, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTABasicDetailsDTO>>() {
         });
     }
@@ -645,12 +668,12 @@ public class GenericIntegrationService {
     }
 
     public String getTimezone() {
-        return userRestClientForScheduler.publishRequest(null,2567L,RestClientUrlType.UNIT,HttpMethod.GET,"/time_zone",null,new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
+        return userRestClientForScheduler.publishRequest(null,2567L,RestClientUrlType.UNIT,HttpMethod.GET,MicroService.USER,"/time_zone",null,new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<String>>() {
         });
     }
 
     public StaffDTO getStaff(Long unitId,Long staffId) {
-        return userRestClientForScheduler.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<StaffDTO>>() {
+        return userRestClientForScheduler.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET,MicroService.USER, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<StaffDTO>>() {
         }, staffId);
     }
 
@@ -658,6 +681,19 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY_WITHOUT_PARENT_ORG, HttpMethod.GET,API_EXPERTISE_URL , null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {},expertiseId);
     }
 
+
+    public Map<Long,Map<Long,Set<LocalDate>>> getUnitPositionIdWithFunctionIdShiftDateMap(Long unitId, Set<Long> unitPositionIds) {
+        return genericRestClient.publishRequest(unitPositionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Map<Long,Set<LocalDate>>>>>() {
+        });
+    }
+
+    public void restoreFunctionsWithDatesByUnitPositionIds(Map<Long, Map<LocalDate, Long>> unitPositionIdWithShiftDateFunctionIdMap, Long unitId) {
+        Boolean AreFunctionsRestored = genericRestClient.publishRequest(unitPositionIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
+    }
+    public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
+        return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+    }
 }
 
 

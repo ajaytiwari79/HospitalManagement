@@ -20,13 +20,25 @@ public class TimeTypeDTO {
     private boolean selected;
     private List<TimeTypeDTO> children = new ArrayList<>();
     private String backgroundColor;
-    private TimeTypeEnum type;
+    private TimeTypeEnum secondLevelType;
+
+    public TimeTypeDTO() {
+    }
 
     public TimeTypeDTO(String timeTypes) {
         this.timeTypes = timeTypes;
 
     }
 
+    public TimeTypeDTO(String timeTypes, String backgroundColor) {
+        this.timeTypes = timeTypes;
+        this.backgroundColor = backgroundColor;
+    }
+
+    public TimeTypeDTO(BigInteger id, String timeTypes) {
+        this.id = id;
+        this.timeTypes = timeTypes;
+    }
 
     public TimeTypeDTO(BigInteger id, String timeTypes, BigInteger upperLevelTimeTypeId) {
         this.id = id;
@@ -34,15 +46,20 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO() {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor) {
+        this.id = id;
+        this.timeTypes = timeTypes;
+        this.label = label;
+        this.description = description;
+        this.backgroundColor=backgroundColor;
     }
 
-    public TimeTypeEnum getType() {
-        return type;
+    public TimeTypeEnum getSecondLevelType() {
+        return secondLevelType;
     }
 
-    public void setType(TimeTypeEnum type) {
-        this.type = type;
+    public void setSecondLevelType(TimeTypeEnum secondLevelType) {
+        this.secondLevelType = secondLevelType;
     }
 
     public boolean isSelected() {
@@ -59,20 +76,6 @@ public class TimeTypeDTO {
 
     public void setChildren(List<TimeTypeDTO> children) {
         this.children = children;
-    }
-
-
-    public TimeTypeDTO(BigInteger id, String timeTypes) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-    }
-
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-        this.label = label;
-        this.description = description;
-        this.backgroundColor=backgroundColor;
     }
 
     public BigInteger getUpperLevelTimeTypeId() {

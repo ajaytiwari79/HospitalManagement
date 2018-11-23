@@ -33,6 +33,7 @@ import com.kairos.persistence.repository.user.country.default_data.AccountTypeGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.DateUtil;
@@ -80,6 +81,7 @@ public class AccessGroupService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject private StaffRetrievalService staffRetrievalService;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
@@ -267,7 +269,11 @@ public class AccessGroupService {
     }
 
     public List<AccessGroupQueryResult> getAccessGroupsForUnit(long organizationId) {
-        return accessGroupRepository.getAccessGroupsForUnit(organizationId);
+        Organization unit = organizationGraphRepository.findOne(organizationId, 0);
+        if(!unit.isParentOrganization()){
+            unit=organizationGraphRepository.getParentOfOrganization(unit.getId());
+        }
+        return accessGroupRepository.getAccessGroupsForUnit(unit.getId());
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
@@ -886,7 +892,7 @@ public class AccessGroupService {
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
-        Long staffId = staffService.getStaffIdOfLoggedInUser(unitId);
+        Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
         return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
 
     }

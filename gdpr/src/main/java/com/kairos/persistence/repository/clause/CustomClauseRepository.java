@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.clause;
 
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
@@ -15,7 +15,7 @@ import java.util.List;
 public interface CustomClauseRepository {
 
 
-    Clause findByTitle(Long countryId,String title);
+    Clause findByTitleAndDescription(Long countryId, String title,String description);
 
     List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId,FilterSelectionDTO filterSelectionDto);
 
@@ -25,7 +25,7 @@ public interface CustomClauseRepository {
 
     List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId);
 
-    List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO);
+    List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
 
     ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id);
 

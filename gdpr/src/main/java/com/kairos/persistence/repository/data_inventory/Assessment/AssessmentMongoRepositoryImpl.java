@@ -74,7 +74,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     }
 
     @Override
-    public Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId) {
+    public Assessment findPreviousLaunchedAssessmentByUnitIdAndAssetId(Long unitId, BigInteger assetId) {
 
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and(DELETED).is(false)
@@ -85,7 +85,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     }
 
     @Override
-    public Assessment findPreviousLaunchedAssessmentOfProcessingActivityByUnitId(Long unitId, BigInteger processingActivityId) {
+    public Assessment findPreviousLaunchedAssessmentByUnitIdAndProcessingActivityId(Long unitId, BigInteger processingActivityId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and(DELETED).is(false)
                 .and("processingActivityId").is(processingActivityId)
@@ -106,7 +106,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
 
 
     @Override
-    public Assessment findPreviousLaunchedAssessmentForAssetRisksByUnitId(Long unitId, BigInteger assetId) {
+    public Assessment findPreviousLaunchedRiskAssessmentByUnitIdAndAssetId(Long unitId, BigInteger assetId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and(DELETED).is(false)
                 .and("assetId").is(assetId)
@@ -116,7 +116,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     }
 
     @Override
-    public Assessment findPreviousLaunchedAssessmentForProcessingActivityRisksByUnitId(Long unitId, BigInteger processingActivityId) {
+    public Assessment findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(Long unitId, BigInteger processingActivityId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId)
                 .and(DELETED).is(false)
                 .and("processingActivityId").is(processingActivityId)
@@ -129,7 +129,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     @Override
     public List<AssessmentBasicResponseDTO> findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(Long unitId, BigInteger assetId) {
 
-        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 , 'risks':{'_id':1,'name':1}}}";
+        String projectionOpertaion = "{ '$project':{'_id':1,'name':1,'assessmentScheduledDate':1,'assessmentSchedulingFrequency':1,'endDate':1,'completedDate':1,'comment':1,'assigneeList':1,'approver':1,'createdAt':1,'assessmentStatus':1 , 'risks':{'_id':1,'name':1}}}";
 
 
         Aggregation aggregation = Aggregation.newAggregation(

@@ -16,9 +16,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * @author pradeep
@@ -44,7 +42,7 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> createCTA(@PathVariable Long countryId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO )  {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                countryCTAService.createCostTimeAgreementInCountry(countryId,collectiveTimeAgreementDTO));
+                countryCTAService.createCostTimeAgreementInCountry(countryId,collectiveTimeAgreementDTO,false));
     }
 
     /**
@@ -260,6 +258,20 @@ public class CostTimeAgreementController {
     @GetMapping(value = UNIT_URL + "/get_default_cta/expertise/{expertiseId}")
     public ResponseEntity<Map<String, Object>> getDefaultCTA(@PathVariable Long unitId,@PathVariable Long expertiseId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultCTA(unitId,expertiseId));
+    }
+
+    /**
+     *
+     * @param unitId
+     * @param collectiveTimeAgreementDTO
+     * @return
+     */
+    @PostMapping(value =UNIT_URL + "/cta")
+    @ApiOperation("Create CTA in Organization")
+    public ResponseEntity<Map<String, Object>> createCtaInOrganization(@PathVariable Long unitId
+            , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO )  {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                countryCTAService.createCostTimeAgreementInOrganization(unitId,collectiveTimeAgreementDTO));
     }
 
 

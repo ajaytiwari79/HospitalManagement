@@ -19,14 +19,12 @@ public class AgreementSectionDTO {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String title;
-
-    @NotNull(message = "Section order is Not defined")
     private Integer orderedIndex;
-
+    private String titleHtml;
     @Valid
-    private List<ClauseBasicDTO> clauses=new ArrayList<>();
+    private List<ClauseBasicDTO> clauses = new ArrayList<>();
 
-    private List<AgreementSectionDTO> subSections=new ArrayList<>();
+    private List<AgreementSectionDTO> subSections = new ArrayList<>();
 
     public List<AgreementSectionDTO> getSubSections() {
         return subSections;
@@ -53,16 +51,31 @@ public class AgreementSectionDTO {
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public Integer getOrderedIndex() { return orderedIndex; }
+    public Integer getOrderedIndex() {
+        return orderedIndex;
+    }
 
-    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
+    public void setOrderedIndex(Integer orderedIndex) {
+        this.orderedIndex = orderedIndex;
+    }
+
+    public String getTitleHtml() {
+        if (titleHtml == null) {
+            titleHtml = "<p>" + title + "</p>";
+        }
+        return titleHtml.trim();
+    }
+
+    public void setTitleHtml(String titleHtml) {
+        this.titleHtml = titleHtml;
+    }
 
     public AgreementSectionDTO() {
     }

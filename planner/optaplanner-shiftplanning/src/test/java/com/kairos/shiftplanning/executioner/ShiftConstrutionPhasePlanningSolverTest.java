@@ -1,5 +1,9 @@
 package com.kairos.shiftplanning.executioner;
 
+import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.shiftplanning.domain.Shift;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
@@ -18,6 +22,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.kairos.enums.constraint.ConstraintSubType.*;
+
 
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftConstrutionPhasePlanningSolverTest {
@@ -25,7 +31,8 @@ public class ShiftConstrutionPhasePlanningSolverTest {
     public void test() {
         //RequestedTask requestedTask =  new RequestedTask();
         //requestedTask.loadXMLFromDB();
-        new ShiftPlanningSolver().runSolver();
+        SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
+        new ShiftPlanningSolver(solverConfigDTO).runSolver();
 
     }
 
@@ -40,6 +47,14 @@ public class ShiftConstrutionPhasePlanningSolverTest {
         new ShiftPlanningSolver().runBenchmarker();
     }
 
+
+    public SolverConfigDTO getSolverConfigDTO(){
+        List<ConstraintDTO> constraintDTOS = new ArrayList<>();
+        /*constraintDTOS.add(new ConstraintDTO(null, DURATION_BETWEEN_SHIFTS.toString(), commonDescription+"ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS", ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ConstraintLevel.HARD, penaltyHard, PLANNING_PROBLEM_ID, null, COUNTRY_ID, ORGANIZATION_SERVICE_ID, ORGANIZATION_SUB_SERVICE_ID));*/
+        constraintDTOS.add(new ConstraintDTO("Shortest duration for this activity, relative to shift length","Shortest duration for this activity, relative to shift length", ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ConstraintLevel.HARD, 5, 5l));
+        constraintDTOS.add(new ConstraintDTO("Max number of allocations pr. shift for this activity per staff", "Max number of allocations pr. shift for this activity per staff",  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ConstraintLevel.HARD, 5,5l));
+        return new SolverConfigDTO(constraintDTOS);
+    }
 
 	/*@Test
     @Ignore

@@ -59,17 +59,22 @@ public class ClauseService extends MongoBaseService {
      */
     public ClauseDTO createClause(Long countryId, ClauseDTO clauseDto) {
 
-        Clause previousClause = clauseMongoRepository.findByTitle(countryId, clauseDto.getTitle());
+        Clause previousClause = clauseMongoRepository.findByTitleAndDescription(countryId, clauseDto.getTitle(),clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
         }
-        Clause newClause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), countryId, clauseDto.getOrganizationTypes(), clauseDto.getOrganizationSubTypes()
+        Clause clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), countryId, clauseDto.getOrganizationTypes(), clauseDto.getOrganizationSubTypes()
                 , clauseDto.getOrganizationServices(), clauseDto.getOrganizationSubServices());
-        newClause.setAccountTypes(clauseDto.getAccountTypes());
-        newClause.setTemplateTypes(clauseDto.getTemplateTypes());
-        newClause.setTags(clauseTagService.addClauseTagAndGetClauseTagList(countryId, clauseDto.getTags()));
-        clauseMongoRepository.save(newClause);
-        clauseDto.setId(newClause.getId());
+        clause.setAccountTypes(clauseDto.getAccountTypes());
+        clause.setTemplateTypes(clauseDto.getTemplateTypes());
+        if (CollectionUtils.isNotEmpty(clauseDto.getTags())) {
+            clause.setTags(clauseTagService.addClauseTagAndGetClauseTagList(countryId, clauseDto.getTags()));
+        } else {
+            clause.setTags(Collections.singletonList(clauseTagMongoRepository.findDefaultTag(countryId)));
+        }
+        clauseMongoRepository.save(clause);
+
+        clauseDto.setId(clause.getId());
         return clauseDto;
 
 
@@ -86,7 +91,7 @@ public class ClauseService extends MongoBaseService {
      */
     public ClauseDTO updateClause(Long countryId, BigInteger clauseId, ClauseDTO clauseDto) {
 
-        Clause clause = clauseMongoRepository.findByTitle(countryId, clauseDto.getTitle());
+        Clause clause = clauseMongoRepository.findByTitleAndDescription(countryId, clauseDto.getTitle(),clauseDto.getDescription());
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
@@ -98,7 +103,11 @@ public class ClauseService extends MongoBaseService {
         clause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
         clause.setTitle(clauseDto.getTitle());
         clause.setDescription(clauseDto.getDescription());
-        clause.setTags(clauseTagService.addClauseTagAndGetClauseTagList(countryId, clauseDto.getTags()));
+        if (CollectionUtils.isNotEmpty(clauseDto.getTags())) {
+            clause.setTags(clauseTagService.addClauseTagAndGetClauseTagList(countryId, clauseDto.getTags()));
+        } else {
+            clause.setTags(Collections.singletonList(clauseTagMongoRepository.findDefaultTag(countryId)));
+        }
         clause.setTemplateTypes(clauseDto.getTemplateTypes());
         clauseMongoRepository.save(clause);
         return clauseDto;

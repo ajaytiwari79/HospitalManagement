@@ -100,7 +100,12 @@ public class DataCategoryService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
             exceptionService.invalidRequestException("message.cannot.delete.dataCategory", dataSubjectLinkedWithDataCategory.stream().map(DataSubjectMappingBasicResponseDTO::getName).collect(Collectors.joining(",")));
         }
+        DataCategory dataCategory = dataCategoryMongoRepository.findOne(dataCatgeoryId);
+        if (!Optional.ofNullable(dataCategory).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCatgeoryId);
+        }
         dataCategoryMongoRepository.safeDeleteById(dataCatgeoryId);
+        dataElementMongoRepository.safeDeleteByIds(new HashSet<>(dataCategory.getDataElements()));
         return true;
 
     }

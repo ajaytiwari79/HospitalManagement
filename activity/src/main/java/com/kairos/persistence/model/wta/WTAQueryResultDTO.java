@@ -6,12 +6,15 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
 
 /**
  * @author pradeep
@@ -170,5 +173,10 @@ public class WTAQueryResultDTO {
         this.organizationSubType = organizationSubType;
     }
 
+    public BreakWTATemplate getBreakRule(){
+        BreakWTATemplate breakWTATemplate=(BreakWTATemplate)
+        this.getRuleTemplates().stream().filter(current->current.getWtaTemplateType().toString().equals(WTA_FOR_BREAKS_IN_SHIFT.toString())).findFirst().orElse(null);
+        return breakWTATemplate;
+    }
 
 }

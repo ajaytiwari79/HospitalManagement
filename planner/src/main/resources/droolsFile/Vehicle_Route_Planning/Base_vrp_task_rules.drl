@@ -1,0 +1,37 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Task Rules*******/
+
+
+
+rule "Unassigned Task"
+salience 20
+    when
+        $task:Task(shift==null);
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-1);
+end
+
+
+/*
+rule "Same road side tasks perference"
+salience 22
+    when
+        Task(!shiftBreak && $pt:getPreviousValidTask() && $pt!=null &&  !isOnOneWayStreet() && getFullStreetName().equals($pt.getFullStreetName()) && !areHouseNumberSameLane($pt))
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-4);
+end
+*/
+
+rule "tasks location right side preference"
+salience 22
+    when
+        Task(!shiftBreak && $pt:getPreviousValidTask() ,$pt!=null, !isOnOneWayStreet() && !isTaskLocationOnRightSide($pt))
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-4);
+end

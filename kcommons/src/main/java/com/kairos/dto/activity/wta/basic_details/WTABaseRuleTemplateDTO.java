@@ -28,7 +28,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = ShiftLengthWTATemplateDTO.class, name = "SHIFT_LENGTH"),
         @JsonSubTypes.Type(value = ShiftsInIntervalWTATemplateDTO.class, name = "NUMBER_OF_SHIFTS_IN_INTERVAL"),
         @JsonSubTypes.Type(value = TimeBankWTATemplateDTO.class, name = "TIME_BANK"),
-        @JsonSubTypes.Type(value = VetoPerPeriodWTATemplateDTO.class, name = "VETO_PER_PERIOD"),
+        @JsonSubTypes.Type(value = VetoAndStopBricksWTATemplateDTO.class, name = "VETO_AND_STOP_BRICKS"),
         @JsonSubTypes.Type(value = DurationBetweenShiftsWTATemplateDTO.class, name = "DURATION_BETWEEN_SHIFTS"),
         @JsonSubTypes.Type(value = ConsecutiveRestPartOfDayWTATemplateDTO.class, name = "REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS"),
         @JsonSubTypes.Type(value = WeeklyRestPeriodWTATemplateDTO.class, name = "WEEKLY_REST_PERIOD"),

@@ -405,6 +405,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName")
     List<StaffTimezoneQueryResult> getAllStaffsAndUnitDetailsByUserId(Long userId);
 
+    @Query("Optional MATCH (o:Organization)-[:"+HAS_EMPLOYMENTS+"]-(e:Employment)-[:"+BELONGS_TO+"]-(s:Staff) WHERE s.email=~{0} AND id(o)={1} RETURN s")
+    Staff findStaffByEmailInOrganization(String email,Long unitId);
+
 /*
  @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
             "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+

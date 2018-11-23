@@ -33,6 +33,7 @@ public class CollectiveTimeAgreementDTO {
     @NotNull(message = "error.cta.startDate.notNull")
     private LocalDate startDate;
     private LocalDate endDate;
+    private List<Long> unitIds;
 
     public CollectiveTimeAgreementDTO() {
 
@@ -110,6 +111,13 @@ public class CollectiveTimeAgreementDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
+    public List<Long> getUnitIds() {
+        return unitIds;
+    }
+
+    public void setUnitIds(List<Long> unitIds) {
+        this.unitIds = unitIds;
+    }
 
     @Override
     public String toString() {

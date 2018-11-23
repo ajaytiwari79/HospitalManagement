@@ -3,6 +3,7 @@ package com.kairos.controller.user;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.staff.UserSickService;
 import com.kairos.utils.response.ResponseHandler;
@@ -40,6 +41,7 @@ public class UserController {
     private UserSickService userSickService;
     @Inject
     private AccessGroupService accessGroupService;
+    @Inject private StaffRetrievalService staffRetrievalService;
    /* @Inject
     TaskReportService taskReportService;*/
     /**
@@ -134,21 +136,21 @@ public class UserController {
     @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staffs")
     @ApiOperation("get staff ids by userid")
     ResponseEntity<Map<String, Object>> getStaffIdsAndReasonCodeByUserId(@PathVariable long userId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsAndReasonCodeByUserId(userId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffIdsAndReasonCodeByUserId(userId));
     }
 
     @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/user/staffId")
     @ApiOperation("get staffId by userId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffIdOfLoggedInUser(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffIdOfLoggedInUser(unitId));
     }
 
 
     @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/user/accessgroup")
     @ApiOperation("get accessgroup ids and iscountryadmin")
     public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaffs(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessGroupIdsOfStaff(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAccessGroupIdsOfStaff(unitId));
     }
 
 

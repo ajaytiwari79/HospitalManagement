@@ -2,6 +2,7 @@ package com.kairos.dto.activity.counter.chart;
 
 public class DataUnit {
     private String label;
+    private Number refId;
     private double value;
 
     /*
@@ -9,9 +10,10 @@ public class DataUnit {
      * @dated: Jun/29/2018
      */
 
-    public DataUnit(String label, double value) {
+    public DataUnit(String label, Number refId, double value) {
         this.label = label;
         this.value = value;
+        this.refId = refId;
     }
 
     public String getLabel() {
@@ -28,5 +30,13 @@ public class DataUnit {
 
     public void setValue(double value) {
         this.value = value;
+    }
+
+    public Number getRefId() {
+        return refId;
+    }
+
+    public void setRefId(Number refId) {
+        this.refId = refId;
     }
 }

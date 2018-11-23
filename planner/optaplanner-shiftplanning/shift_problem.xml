@@ -14,8 +14,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="5">2018-06-09 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="6">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="5">2018-11-10 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="6">2018-11-10 14:00:00.0 UTC</prevShiftEnd>
       <name>Sachin Verma</name>
       <skillSet id="7">
         <com.kairos.shiftplanning.domain.Skill id="8">
@@ -50,8 +50,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="13">2018-06-09 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="14">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="13">2018-11-10 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="14">2018-11-10 14:00:00.0 UTC</prevShiftEnd>
       <name>Pradeep Singh</name>
       <skillSet id="15">
         <com.kairos.shiftplanning.domain.Skill id="16">
@@ -86,8 +86,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="21">2018-06-09 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="22">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="21">2018-11-10 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="22">2018-11-10 14:00:00.0 UTC</prevShiftEnd>
       <name>Arvind Das</name>
       <skillSet id="23">
         <com.kairos.shiftplanning.domain.Skill id="24">
@@ -122,8 +122,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="29">2018-06-09 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="30">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="29">2018-11-10 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="30">2018-11-10 14:00:00.0 UTC</prevShiftEnd>
       <name>Ulrik</name>
       <skillSet id="31">
         <com.kairos.shiftplanning.domain.Skill id="32">
@@ -158,8 +158,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="37">2018-06-09 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="38">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="37">2018-11-10 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="38">2018-11-10 14:00:00.0 UTC</prevShiftEnd>
       <name>Ramanuj</name>
       <skillSet id="39">
         <com.kairos.shiftplanning.domain.Skill id="40">
@@ -194,8 +194,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="45">2018-06-09 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="46">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="45">2018-11-10 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="46">2018-11-10 14:00:00.0 UTC</prevShiftEnd>
       <name>Dravid</name>
       <skillSet id="47">
         <com.kairos.shiftplanning.domain.Skill id="48">
@@ -222,7 +222,7 @@
   </weekDates>
   <shifts id="53">
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="54">
-      <id>91b6da4f-fe1e-4c6b-9754-49c065e54adc</id>
+      <id>c4805712-2caf-48a9-beca-892d1ef1c358</id>
       <employee reference="3"/>
       <breaks id="55"/>
       <activityLineIntervals id="56"/>
@@ -231,7 +231,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="58">
-      <id>8ef44dad-4abd-4b15-9405-15125cc74f36</id>
+      <id>ed30fdd7-56f2-4f74-b0b3-28edf2dd92b3</id>
       <employee reference="11"/>
       <breaks id="59"/>
       <activityLineIntervals id="60"/>
@@ -240,7 +240,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="62">
-      <id>0e79770f-5bc1-4a2e-8f3a-203a71a03996</id>
+      <id>31d8f5ca-1591-4c82-8f7e-ba517d56f39b</id>
       <employee reference="19"/>
       <breaks id="63"/>
       <activityLineIntervals id="64"/>
@@ -249,7 +249,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="66">
-      <id>3f94ff55-f70f-4a4c-a936-51c8cdeb01e2</id>
+      <id>631e087c-2100-441c-b958-82f9b6305283</id>
       <employee reference="27"/>
       <breaks id="67"/>
       <activityLineIntervals id="68"/>
@@ -258,7 +258,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="70">
-      <id>ef14abe7-095d-4c54-b5a4-e22bb1fc1fc9</id>
+      <id>adf33b7a-479b-43ab-a00a-75fceb405366</id>
       <employee reference="35"/>
       <breaks id="71"/>
       <activityLineIntervals id="72"/>
@@ -267,7 +267,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="74">
-      <id>e79d4e23-9b68-438b-aa97-2842bdb302cc</id>
+      <id>6b1f5dbe-b817-40d7-a5ea-96cc97cd613a</id>
       <employee reference="43"/>
       <breaks id="75"/>
       <activityLineIntervals id="76"/>
@@ -278,7 +278,7 @@
   </shifts>
   <activities id="78">
     <com.kairos.shiftplanning.domain.Activity id="79">
-      <id>55b7296e-9aab-4ea8-8b6b-6f23fa07e53a</id>
+      <id>791add03-d201-4caf-8fe8-805167d271b8</id>
       <skills id="80">
         <com.kairos.shiftplanning.domain.Skill id="81">
           <id>102l</id>
@@ -302,8 +302,8 @@
           <weight>-5</weight>
         </longestDuration>
         <shortestDuration id="85">
-          <shortestDuration>20</shortestDuration>
-          <level>SOFT</level>
+          <shortestDuration>60</shortestDuration>
+          <level>HARD</level>
           <weight>-2</weight>
         </shortestDuration>
         <maxAllocationPerShift id="86">
@@ -323,14 +323,14 @@
         </minimumLengthofActivity>
       </activityConstraints>
       <timeType id="89">
-        <id>1210aead-679a-441f-bef1-2df9dec12b3b</id>
+        <id>29664418-dee8-4696-a7b1-ab3e093b3d2c</id>
         <name>presence</name>
       </timeType>
       <order>1</order>
       <rank>10</rank>
     </com.kairos.shiftplanning.domain.Activity>
     <com.kairos.shiftplanning.domain.Activity id="90">
-      <id>e8fa500a-a0fa-4769-9abc-8021a1a93890</id>
+      <id>283ad4dd-bddd-47d7-8a8b-432722264b0d</id>
       <skills id="91">
         <com.kairos.shiftplanning.domain.Skill id="92">
           <id>111l</id>
@@ -354,8 +354,8 @@
           <weight>-5</weight>
         </longestDuration>
         <shortestDuration id="96">
-          <shortestDuration>20</shortestDuration>
-          <level>SOFT</level>
+          <shortestDuration>60</shortestDuration>
+          <level>HARD</level>
           <weight>-2</weight>
         </shortestDuration>
         <maxAllocationPerShift id="97">
@@ -379,7 +379,7 @@
       <rank>9</rank>
     </com.kairos.shiftplanning.domain.Activity>
     <com.kairos.shiftplanning.domain.Activity id="100">
-      <id>c6731594-5329-4c1b-ab2b-7d82e166cb54</id>
+      <id>c7e2922b-07fc-4b6c-83d1-25e02c8435a7</id>
       <skills id="101">
         <com.kairos.shiftplanning.domain.Skill id="102">
           <id>111l</id>
@@ -403,8 +403,8 @@
           <weight>-5</weight>
         </longestDuration>
         <shortestDuration id="106">
-          <shortestDuration>20</shortestDuration>
-          <level>SOFT</level>
+          <shortestDuration>60</shortestDuration>
+          <level>HARD</level>
           <weight>-2</weight>
         </shortestDuration>
         <maxAllocationPerShift id="107">
@@ -424,14 +424,14 @@
         </minimumLengthofActivity>
       </activityConstraints>
       <timeType id="110">
-        <id>7c75525e-fd5f-4ee0-8e03-eafaa998e7f0</id>
+        <id>2612cabd-f88a-47c1-8924-9c6a4f7aa245</id>
         <name>absence</name>
       </timeType>
       <order>3</order>
       <rank>2</rank>
     </com.kairos.shiftplanning.domain.Activity>
     <com.kairos.shiftplanning.domain.Activity id="111">
-      <id>2ee7899f-2d3b-4406-b6c5-a6739b30d477</id>
+      <id>d965988d-5232-48f6-80b2-359bf14a40c9</id>
       <skills id="112">
         <com.kairos.shiftplanning.domain.Skill id="113">
           <id>111l</id>
@@ -455,8 +455,8 @@
           <weight>-5</weight>
         </longestDuration>
         <shortestDuration id="117">
-          <shortestDuration>20</shortestDuration>
-          <level>SOFT</level>
+          <shortestDuration>60</shortestDuration>
+          <level>HARD</level>
           <weight>-2</weight>
         </shortestDuration>
         <maxAllocationPerShift id="118">
@@ -4079,18 +4079,18 @@
   </staffingLevelMatrix>
   <activitiesIntervalsGroupedPerDay id="878">
     <entry>
-      <string>12/11/2017_e8fa500a-a0fa-4769-9abc-8021a1a93890_0</string>
+      <string>12/11/2017_791add03-d201-4caf-8fe8-805167d271b8_1</string>
       <list id="879">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="158"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="160"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="162"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="164"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="166"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="168"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="134"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="136"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="138"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="140"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="142"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="144"/>
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_55b7296e-9aab-4ea8-8b6b-6f23fa07e53a_2</string>
+      <string>12/11/2017_791add03-d201-4caf-8fe8-805167d271b8_2</string>
       <list id="880">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="146"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="148"/>
@@ -4101,64 +4101,8 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_55b7296e-9aab-4ea8-8b6b-6f23fa07e53a_0</string>
+      <string>12/11/2017_d965988d-5232-48f6-80b2-359bf14a40c9_0</string>
       <list id="881">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="122"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="124"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="126"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="128"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="130"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="132"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_e8fa500a-a0fa-4769-9abc-8021a1a93890_1</string>
-      <list id="882">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="170"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="172"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="174"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="176"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="178"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="180"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_55b7296e-9aab-4ea8-8b6b-6f23fa07e53a_1</string>
-      <list id="883">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="134"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="136"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="138"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="140"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="142"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="144"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_e8fa500a-a0fa-4769-9abc-8021a1a93890_2</string>
-      <list id="884">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="182"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="184"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="186"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="188"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="190"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="192"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_c6731594-5329-4c1b-ab2b-7d82e166cb54_1</string>
-      <list id="885">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="196"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_c6731594-5329-4c1b-ab2b-7d82e166cb54_0</string>
-      <list id="886">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="194"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_2ee7899f-2d3b-4406-b6c5-a6739b30d477_0</string>
-      <list id="887">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="198"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="200"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="202"/>
@@ -4258,8 +4202,53 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_2ee7899f-2d3b-4406-b6c5-a6739b30d477_1</string>
-      <list id="888">
+      <string>12/11/2017_283ad4dd-bddd-47d7-8a8b-432722264b0d_0</string>
+      <list id="882">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="158"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="160"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="162"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="164"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="166"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="168"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_c7e2922b-07fc-4b6c-83d1-25e02c8435a7_1</string>
+      <list id="883">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="196"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_283ad4dd-bddd-47d7-8a8b-432722264b0d_1</string>
+      <list id="884">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="170"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="172"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="174"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="176"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="178"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="180"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_283ad4dd-bddd-47d7-8a8b-432722264b0d_2</string>
+      <list id="885">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="182"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="184"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="186"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="188"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="190"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="192"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_c7e2922b-07fc-4b6c-83d1-25e02c8435a7_0</string>
+      <list id="886">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="194"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_d965988d-5232-48f6-80b2-359bf14a40c9_1</string>
+      <list id="887">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="390"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="392"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="394"/>
@@ -4359,7 +4348,18 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_2ee7899f-2d3b-4406-b6c5-a6739b30d477_2</string>
+      <string>12/11/2017_791add03-d201-4caf-8fe8-805167d271b8_0</string>
+      <list id="888">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="122"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="124"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="126"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="128"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="130"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="132"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_d965988d-5232-48f6-80b2-359bf14a40c9_2</string>
       <list id="889">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="582"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="584"/>
