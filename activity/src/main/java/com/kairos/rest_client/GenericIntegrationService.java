@@ -45,6 +45,7 @@ import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
@@ -126,6 +127,11 @@ public class GenericIntegrationService {
 
     public List<StaffResultDTO> getStaffIdsByUserId(Long userId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, USER_USERID_STAFFS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffResultDTO>>>() {
+        }, userId);
+    }
+
+    public List<StaffResultDTO> getStaffIdsAndUnitByUserId(Long userId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, STAFFID_UNITID_MAPPING, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffResultDTO>>>() {
         }, userId);
     }
 
@@ -375,7 +381,7 @@ public class GenericIntegrationService {
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate.toString()));
+        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
     }
@@ -420,13 +426,16 @@ public class GenericIntegrationService {
     }
 
     //WTADetailRestClient
-    public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId) {
+    public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId, List<Long> unitIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("countryId", countryId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationTypeId", organizationTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationSubTypeId", organizationSubTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("expertiseId", expertiseId.toString()));
+        if(CollectionUtils.isNotEmpty(unitIds)){
+            queryParamList.add(new BasicNameValuePair("unitIds", unitIds.toString().replace("[", "").replace("]", "")));
+        }
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, WTA_RULE_INFO, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTABasicDetailsDTO>>() {
         });
     }
@@ -675,6 +684,11 @@ public class GenericIntegrationService {
     }
     public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
         return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+    }
+
+    public String getTimeZoneByUnitId(Long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT_WITHOUT_PARENT_ORG,HttpMethod.GET,UNIT_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        });
     }
 }
 

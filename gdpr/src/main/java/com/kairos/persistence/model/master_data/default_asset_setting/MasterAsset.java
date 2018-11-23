@@ -27,8 +27,8 @@ public class MasterAsset extends MongoBaseEntity {
     private List <ServiceCategory> organizationServices;
     private List <SubServiceCategory> organizationSubServices;
     private Long countryId;
-    private BigInteger assetType;
-    private List<BigInteger> assetSubTypes;
+    private BigInteger assetTypeId;
+    private BigInteger assetSubTypeId;
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
@@ -62,17 +62,15 @@ public class MasterAsset extends MongoBaseEntity {
 
     public MasterAsset setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus;return this; }
 
-    public BigInteger getAssetType() { return assetType; }
+    public Long getCountryId() { return countryId; }
 
-    public MasterAsset setAssetType(BigInteger assetType) { this.assetType = assetType;return this; }
+    public BigInteger getAssetTypeId() { return assetTypeId; }
 
-    public Long getCountryId() {
-        return countryId;
-    }
+    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
 
-    public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
+    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
 
-    public MasterAsset setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; return this;}
+    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
 
     public MasterAsset setCountryId(Long countryId) { this.countryId = countryId; return this;}
 

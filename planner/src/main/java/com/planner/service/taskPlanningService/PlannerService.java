@@ -20,6 +20,8 @@ import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
 import com.planner.service.config.DroolsConfigService;
 import com.planner.service.config.PathProvider;
 import com.planner.service.rest_client.PlannerRestClient;
+import com.planner.service.shift_planning.ShiftPlanningInitializationService;
+import com.planner.service.solverconfiguration.UnitSolverConfigService;
 import com.planner.service.tomtomService.TomTomService;
 import com.planner.service.vrpService.VRPGeneratorService;
 import com.planner.util.wta.FileIOUtil;
@@ -29,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
+import javax.inject.Inject;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -54,6 +57,8 @@ public class PlannerService {
     @Autowired private PlannerRestClient plannerRestClient;
     @Autowired private VRPPlannerService vrpPlannerService;
     @Autowired private IndictmentMongoRepository indictmentMongoRepository;
+    @Inject private ShiftPlanningInitializationService shiftPlanningInitializationService;
+    @Inject private UnitSolverConfigService unitSolverConfigService;
 
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
@@ -107,19 +112,20 @@ public class PlannerService {
 
 
     public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
-        ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
+        ShiftRequestPhasePlanningSolution problem=shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
-        Document solverConfig=null;//solverConfigService.createShiftPlanningSolverConfig(planningSubmissionDTO.getSolverConfigId());
-        FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());
+        SolverConfigDTO solverConfig=unitSolverConfigService.getSolverConfigWithConstraints(planningSubmissionDTO.getSolverConfigId());
+        //FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());
         try {
-            startShiftPlanningSolverOnThisVM(problem,pathProvider.getProblemXmlpath());
+            startShiftPlanningSolverOnThisVM(problem,solverConfig);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new PlanningSubmissonResponseDTO();
     }
-    public boolean startShiftPlanningSolverOnThisVM(ShiftRequestPhasePlanningSolution problem,String solverConfigPath){
-        ShiftPlanningSolver shiftPlanningSolver=new ShiftPlanningSolver(solverConfigPath);
+    public boolean startShiftPlanningSolverOnThisVM(ShiftRequestPhasePlanningSolution problem,SolverConfigDTO solverConfig){
+
+        ShiftPlanningSolver shiftPlanningSolver=new ShiftPlanningSolver(solverConfig);
         ShiftRequestPhasePlanningSolution solution=shiftPlanningSolver.runSolverOnRequest(problem);
         return true;
     }

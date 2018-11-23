@@ -58,7 +58,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Group getGroups(Long organizationId, Long groupId);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
-            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true}) RETURN org limit 1")
+            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) RETURN org limit 1")
     Organization getParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
@@ -752,4 +752,31 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(union:Organization{deleted:false}) WHERE id(union)={0} RETURN union.boardingCompleted")
     boolean isPublishedUnion(Long unionId);
 
+    @Query("MATCH(union:Organization) WHERE id(union)={0} " +
+            "MATCH(sector:Sector) WHERE id(sector)={1} " +
+            "CREATE UNIQUE (union)-[:HAS_SECTOR]-(sector)")
+    void linkUnionSector(Long unionId,Long sectorId);
+
+
+
+    @Query("MATCH(parentOrg:Organization{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
+            "OPTIONAL MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
+            "OPTIONAL MATCH(parentOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizationType:OrganizationType{deleted:false})\n" +
+            "OPTIONAL MATCH(childOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizationType:OrganizationType{deleted:false})\n" +
+            "OPTIONAL MATCH(parentOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizationService:OrganizationService{deleted:false})\n" +
+            "OPTIONAL MATCH(childOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizationService:OrganizationService{deleted:false})\n" +
+            "OPTIONAL MATCH(parentAccountType:AccountType{deleted:false})<-[:HAS_ACCOUNT_TYPE]-(parentOrg)\n" +
+            "OPTIONAL MATCH(childAccountType:AccountType{deleted:false})<-[:HAS_ACCOUNT_TYPE]-(subOrg)\n" +
+            "RETURN \n" +
+            "{organizationType:CASE WHEN parentOrganizationType IS NULL THEN COLLECT(DISTINCT {id:id(childOrganizationType),name:childOrganizationType.name})  ELSE COLLECT(DISTINCT {id:id(parentOrganizationType),name:parentOrganizationType.name})  END,\n" +
+            "organizationSubType:CASE WHEN parentSubOrganizationType IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizationType),name:childSubOrganizationType.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizationType),name:parentSubOrganizationType.name})  END,\n" +
+            "organizationService:CASE WHEN parentOrganizationService IS NULL THEN COLLECT(DISTINCT {id:id(childOrganizationService),name:childOrganizationService.name})  ELSE COLLECT(DISTINCT {id:id(parentOrganizationType),name:parentOrganizationType.name})  END,\n" +
+            "organizationSubService:CASE WHEN parentSubOrganizationService IS NULL THEN COLLECT(DISTINCT {id:id(childSubOrganizationService),name:childSubOrganizationService.name})  ELSE COLLECT(DISTINCT {id:id(parentSubOrganizationService),name:parentSubOrganizationService.name})  END,\n" +
+            "accountType:CASE WHEN parentAccountType IS NULL THEN COLLECT(DISTINCT {id:id(childAccountType),name:childAccountType.name})  ELSE COLLECT(DISTINCT {id:id(parentAccountType),name:parentAccountType.name})  END}")
+    Map<String,Object> getFiltersByParentOrganizationId(long parentOrganizationId);
+
+
+    @Query("MATCH (organizations:Organization{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
+    List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 }
+

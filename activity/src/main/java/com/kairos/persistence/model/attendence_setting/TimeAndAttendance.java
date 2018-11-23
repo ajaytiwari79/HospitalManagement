@@ -12,17 +12,19 @@ import java.util.List;
 @Document
 public class TimeAndAttendance extends MongoBaseEntity {
     private Long userId;
+    private Long staffid;
     private LocalDate date;
     private List<AttendanceTimeSlot> attendanceTimeSlot;
     public TimeAndAttendance() {
     }
 
-    public TimeAndAttendance(Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceTimeSlot> attendanceTimeSlot) {
+    public TimeAndAttendance(Long staffId, Long userId, List<AttendanceTimeSlot> attendanceTimeSlot) {
+        this.staffid=staffId;
         this.userId=userId;
         this.attendanceTimeSlot = attendanceTimeSlot;
     }
 
-    public TimeAndAttendance(BigInteger shiftId, Long unitId, Long staffId, Long userId, Long reasonCodeId, List<AttendanceTimeSlot> attendanceTimeSlot) {
+    public TimeAndAttendance(Long userId, List<AttendanceTimeSlot> attendanceTimeSlot) {
         this.userId = userId;
         this.attendanceTimeSlot = attendanceTimeSlot;
     }
@@ -43,4 +45,19 @@ public class TimeAndAttendance extends MongoBaseEntity {
         this.attendanceTimeSlot = attendanceTimeSlot;
     }
 
+    public Long getStaffid() {
+        return staffid;
+    }
+
+    public void setStaffid(Long staffid) {
+        this.staffid = staffid;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 }

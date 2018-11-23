@@ -72,7 +72,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
 
     @Override
-    public AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id) {
+    public AssetTypeResponseDTO getAssetTypeWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("subAssetType").is(false).and(DELETED).is(false).and("_id").is(id)),

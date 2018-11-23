@@ -17,10 +17,10 @@ public interface UnitPositionEmploymentTypeRelationShipGraphRepository extends N
             "MATCH(unitPosition)-[relation:" + HAS_EMPLOYMENT_TYPE + "]-(emp:EmploymentType) return emp as employmentType ,relation.employmentTypeCategory as employmentTypeCategory")
     UnitPositionLineEmploymentTypeRelationShip findEmploymentTypeWithCategoryByUnitPositionId(Long unitPositionId);
 
-    @Query("match(positionLine:UnitPositionLine),(newEmployment:EmploymentType) where id(newEmployment)={2} AND id(positionLine)={0} "+
-    "match(positionLine)-[oldRelation:HAS_EMPLOYMENT_TYPE]-(emp:EmploymentType) "+
-    "detach delete oldRelation "+
-    "MERGE(positionLine)-[newRelation:HAS_EMPLOYMENT_TYPE]->(newEmployment) "+
+    @Query("MATCH(positionLine:UnitPositionLine),(newEmployment:EmploymentType) WHERE id(newEmployment)={2} AND id(positionLine)={0} "+
+    "MATCH(positionLine)-[oldRelation:"+HAS_EMPLOYMENT_TYPE+"]-(emp:EmploymentType) "+
+    "DETACH DELETE oldRelation "+
+    "MERGE(positionLine)-[newRelation:"+HAS_EMPLOYMENT_TYPE+"]->(newEmployment) "+
     "set newRelation.employmentTypeCategory={2} ")
     void updateEmploymentTypeInCurrentUnitPositionLine(Long positionLineId,Long newEmploymentType,EmploymentCategory newCategory);
 }

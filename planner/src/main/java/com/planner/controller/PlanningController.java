@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
+import static com.planner.constants.ApiConstants.SHIFTPLANNING;
 
 @RestController
 @RequestMapping(API_UNIT_URL + "/planner")
@@ -24,7 +25,9 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 public class PlanningController {
 	private static final Logger log = LoggerFactory.getLogger(PlanningController.class);
 	@Autowired private PlannerService plannerService;
-	@RequestMapping(value = "/start", method = RequestMethod.POST)
+
+
+	@RequestMapping(value = SHIFTPLANNING+"/start", method = RequestMethod.POST)
     	ResponseEntity<Map<String, Object>> startShiftPlanningSolver(@RequestBody PlanningSubmissionDTO planningSubmissionDTO, @PathVariable Long unitId) {
         plannerService.submitShiftPlanningProblem(unitId,planningSubmissionDTO);
 		return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED);

@@ -2,6 +2,7 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.planner.constarints.ConstraintDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -24,9 +25,22 @@ public class SolverConfigDTO {
     protected Long planningProblemId;
     protected List<BigInteger> constraintIds;
     protected BigInteger parentSolverConfigId;
+    private List<ConstraintDTO> constraints;
 
+    public SolverConfigDTO() {
+    }
 
+    public SolverConfigDTO(List<ConstraintDTO> constraints) {
+        this.constraints = constraints;
+    }
 
+    public List<ConstraintDTO> getConstraints() {
+        return constraints;
+    }
+
+    public void setConstraints(List<ConstraintDTO> constraints) {
+        this.constraints = constraints;
+    }
 
 
     //Setters and Getters

@@ -139,6 +139,12 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffIdsAndReasonCodeByUserId(userId));
     }
 
+    @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staff_unit_mapping")
+    @ApiOperation("get staff ids and unit ids by userid")
+    ResponseEntity<Map<String, Object>> getStaffIdsUnitByUserId(@PathVariable long userId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffIdsUnitByUserId(userId));
+    }
+
     @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/user/staffId")
     @ApiOperation("get staffId by userId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

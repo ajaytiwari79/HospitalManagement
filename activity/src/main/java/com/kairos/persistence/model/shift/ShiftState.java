@@ -11,8 +11,7 @@ public class ShiftState extends Shift {
 
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
-    private AccessGroupRole accessGroupRole;
-    private String actualPhaseState;
+    private AccessGroupRole TAndARole;
     private LocalDate validated;
 
     public BigInteger getShiftId() {
@@ -31,21 +30,12 @@ public class ShiftState extends Shift {
         this.shiftStatePhaseId = shiftStatePhaseId;
     }
 
-    public String getActualPhaseState() {
-        return actualPhaseState;
+    public AccessGroupRole getTAndARole() {
+        return TAndARole;
     }
 
-    public void setActualPhaseState(String actualPhaseState) {
-        this.actualPhaseState = actualPhaseState;
-    }
-
-
-    public AccessGroupRole getAccessGroupRole() {
-        return accessGroupRole;
-    }
-
-    public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
-        this.accessGroupRole = accessGroupRole;
+    public void setTAndARole(AccessGroupRole TAndARole) {
+        this.TAndARole = TAndARole;
     }
 
     public LocalDate getValidated() {

@@ -1,5 +1,7 @@
 package com.kairos.dto.user.staff.client;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Created by pavan on 27/2/18.
  */
@@ -46,7 +48,7 @@ public class ContactAddressDTO {
     }
 
     public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
+        this.houseNumber = StringUtils.trim(houseNumber);
     }
 
     public Integer getFloorNumber() {
@@ -62,7 +64,7 @@ public class ContactAddressDTO {
     }
 
     public void setStreet(String street) {
-        this.street = street;
+        this.street = StringUtils.trim(street);
     }
 
     public Long getZipCodeId() {
@@ -78,7 +80,7 @@ public class ContactAddressDTO {
     }
 
     public void setCity(String city) {
-        this.city = city;
+        this.city = StringUtils.trim(city);
     }
 
     public Long getMunicipalityId() {
@@ -94,7 +96,7 @@ public class ContactAddressDTO {
     }
 
     public void setRegionName(String regionName) {
-        this.regionName = regionName;
+        this.regionName = StringUtils.trim(regionName);
     }
 
     public String getCountry() {
@@ -102,7 +104,7 @@ public class ContactAddressDTO {
     }
 
     public void setCountry(String country) {
-        this.country = country;
+        this.country = StringUtils.trim(country);
     }
 
     public Float getLatitude() {
@@ -126,7 +128,7 @@ public class ContactAddressDTO {
     }
 
     public void setProvince(String province) {
-        this.province = province;
+        this.province = StringUtils.trim(province);
     }
 
     public String getStreetUrl() {
@@ -134,7 +136,7 @@ public class ContactAddressDTO {
     }
 
     public void setStreetUrl(String streetUrl) {
-        this.streetUrl = streetUrl;
+        this.streetUrl = StringUtils.trim(streetUrl);
     }
 
     public Boolean getAddressProtected() {
@@ -166,7 +168,7 @@ public class ContactAddressDTO {
     }
 
     public void setMunicipalityName(String municipalityName) {
-        this.municipalityName = municipalityName;
+        this.municipalityName = StringUtils.trim(municipalityName);
     }
 }
 

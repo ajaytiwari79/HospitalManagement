@@ -1,11 +1,8 @@
 package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
-import com.kairos.persistence.model.clause_tag.ClauseTag;
 
-import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

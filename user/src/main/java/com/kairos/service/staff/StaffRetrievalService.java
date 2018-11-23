@@ -9,6 +9,7 @@ import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
@@ -54,6 +55,7 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionFunction
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.CPRUtil;
@@ -101,6 +103,7 @@ public class StaffRetrievalService {
     @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject private ExpertiseService expertiseService;
 
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId, String type) {
@@ -226,6 +229,12 @@ public class StaffRetrievalService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
     }
+    public List<StaffResultDTO> getStaffIdsUnitByUserId(Long UserId) {
+        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffIdsAndUnitByUserId(UserId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
+
+    }
+
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
         return unitPositionGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
@@ -486,7 +495,8 @@ public class StaffRetrievalService {
             } else {
                 userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
             }
-
+            SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(unitPosition.getExpertise().getId());
+            staffAdditionalInfoDTO.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         }
         return staffAdditionalInfoDTO;

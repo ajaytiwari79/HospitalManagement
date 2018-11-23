@@ -16,7 +16,7 @@ public class BreakSettingsDTO {
         //Default Constructor
     }
 
-    public BreakSettingsDTO(Long shiftDurationInMinute, Long breakDurationInMinute, Long expertiseId) {
+    public BreakSettingsDTO(Long shiftDurationInMinute, Long breakDurationInMinute) {
         this.shiftDurationInMinute = shiftDurationInMinute;
         this.breakDurationInMinute = breakDurationInMinute;
     }

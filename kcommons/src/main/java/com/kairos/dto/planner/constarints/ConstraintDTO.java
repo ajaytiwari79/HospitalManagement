@@ -18,6 +18,18 @@ public class ConstraintDTO {
     protected Long planningProblemId;
 
 
+    public ConstraintDTO() {
+    }
+
+    public ConstraintDTO(String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, Long planningProblemId) {
+        this.name = name;
+        this.description = description;
+        this.constraintType = constraintType;
+        this.constraintSubType = constraintSubType;
+        this.constraintLevel = constraintLevel;
+        this.penalty = penalty;
+        this.planningProblemId = planningProblemId;
+    }
 
     // =================================================
     public BigInteger getId() {

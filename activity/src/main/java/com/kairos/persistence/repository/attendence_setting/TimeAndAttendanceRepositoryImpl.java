@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
@@ -18,9 +19,9 @@ public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceR
     @Autowired
     private MongoTemplate mongoTemplate;
 
-   public TimeAndAttendance findMaxAttendanceCheckIn(Long userId, Date date){
+   public TimeAndAttendance findMaxAttendanceCheckIn(List<Long> staffIds, Date date){
        Aggregation aggregation = Aggregation.newAggregation(
-               match(Criteria.where("userId").is(userId).and("updatedAt").gte(date)),
+               match(Criteria.where("staffid").in(staffIds).and("updatedAt").gte(date)),
                sort(Sort.Direction.DESC,"updatedAt"),
                limit(1)
        );

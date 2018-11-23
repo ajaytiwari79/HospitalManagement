@@ -28,8 +28,21 @@ public class WTADTO {
     private Long organizationSubType;
     private List<BigInteger> tags;
     private LocalDate unitPositionEndDate;
+    private List<Long> unitIds;
+
     public WTADTO() {
         //default cons
+    }
+
+    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, @NotNull(message = "error.RuleTemplate.description.notnull") List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
+        this.name = name;
+        this.description = description;
+        this.expertiseId = expertiseId;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.ruleTemplates = ruleTemplates;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
     }
 
     public LocalDate getEndDate() {
@@ -144,17 +157,14 @@ public class WTADTO {
         this.unitPositionEndDate = unitPositionEndDate;
     }
 
-    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
-        this.name = name;
-        this.description = description;
-        this.expertiseId = expertiseId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.expiryDate = expiryDate;
-        this.ruleTemplates = ruleTemplates;
-        this.organizationType = organizationType;
-        this.organizationSubType = organizationSubType;
+    public List<Long> getUnitIds() {
+        return unitIds;
     }
+
+    public void setUnitIds(List<Long> unitIds) {
+        this.unitIds = unitIds;
+    }
+
 
     @Override
     public String toString() {

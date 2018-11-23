@@ -30,7 +30,7 @@ public class TimeAndAttendanceController {
 
     @PostMapping(value = "/attendance_setting")
     public ResponseEntity<Map<String,Object>> updateTimeAndAttendance(@RequestParam(value = "unitId",required=false) Long unitId, @RequestParam(value = "reasonCodeId",required=false) Long reasonCodeId,@RequestParam(value = "unitPositionId",required=false) Long unitPositionId, @RequestParam("checkIn") boolean checkIn){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeAndAttendanceService.updateTimeAndAttendance(unitId,reasonCodeId,unitPositionId,checkIn));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeAndAttendanceService.updateTimeAndAttendance(unitId,reasonCodeId,4l,checkIn));
     }
 
     @PutMapping(value = UNIT_URL+"/attendance_setting_job")

@@ -1,5 +1,7 @@
 package com.kairos.shiftplanning.executioner;
 
+import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
@@ -47,9 +49,10 @@ public class ShiftPlanningSolver {
     static{
         System.setProperty("user.timezone", "UTC");
     }
-    public ShiftPlanningSolver(InputStream xmlInputStream,String drlFilePath){
-        solverFactory = SolverFactory.createFromXmlInputStream(xmlInputStream);
-        solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(Arrays.asList(new File(drlFilePath)));
+    public ShiftPlanningSolver(SolverConfigDTO solverConfig){
+        List<File> droolsFiles = getDroolFilesByConstraints(solverConfig);
+        solverFactory = SolverFactory.createFromXmlResource(config2);
+        solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(droolsFiles);
         solver = solverFactory.buildSolver();
     }
     public ShiftPlanningSolver(File solverConfigXml){
@@ -57,9 +60,17 @@ public class ShiftPlanningSolver {
         solver = solverFactory.buildSolver();
     }
 
-    public ShiftPlanningSolver(String xmlFilePath){
-        solverFactory = SolverFactory.createFromXmlFile(new File(xmlFilePath));
-        solver = solverFactory.buildSolver();
+    private List<File> getDroolFilesByConstraints(SolverConfigDTO solverConfig){
+        File[] drlFiles = new File("/media/pradeep/bak/kairos/kairos-user/planner/src/main/resources/droolsFile/Shift_Planning").listFiles();
+        Map<String,File> fileMap = Arrays.asList(drlFiles).stream().collect(Collectors.toMap(k->k.getName(),v->v));
+        List<File> droolsFiles = new ArrayList<>();
+        droolsFiles.add(fileMap.get("SHIFTPLANNING_BASE.drl"));
+        for (ConstraintDTO constraintDTO : solverConfig.getConstraints()) {
+            if(fileMap.containsKey(constraintDTO.getConstraintSubType().toString()+".drl")) {
+                droolsFiles.add(fileMap.get(constraintDTO.getConstraintSubType().toString()+".drl"));
+            }
+        }
+        return droolsFiles;
     }
 
     public ShiftPlanningSolver(){

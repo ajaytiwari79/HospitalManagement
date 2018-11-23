@@ -5,8 +5,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
 import java.util.List;
 
-public class AttendanceDTO {
-
+public class TimeAndAttendanceDTO {
 
     private AttendanceDurationDTO duration;
     private List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes;
@@ -14,16 +13,16 @@ public class AttendanceDTO {
     private List<ReasonCodeDTO> reasonCode;
     private SickSettingsDTO sickSettings;
 
-    public AttendanceDTO() {
+    public TimeAndAttendanceDTO() {
     }
 
-    public AttendanceDTO(AttendanceDurationDTO duration, SickSettingsDTO sickSettings) {
+    public TimeAndAttendanceDTO(AttendanceDurationDTO duration, SickSettingsDTO sickSettings) {
         this.duration = duration;
         this.sickSettings = sickSettings;
     }
 
 
-    public AttendanceDTO(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes, List<ReasonCodeDTO> reasonCode) {
+    public TimeAndAttendanceDTO(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes, List<ReasonCodeDTO> reasonCode) {
         this.organizationAndReasonCodes = organizationAndReasonCodes;
         this.reasonCode = reasonCode;
     }

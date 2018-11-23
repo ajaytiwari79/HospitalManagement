@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 
 @Repository
-public interface SolverConfigRepository  extends MongoBaseRepository<SolverConfig,BigInteger> {
+public interface SolverConfigRepository  extends MongoBaseRepository<SolverConfig,BigInteger>,CustomSolverConfigRepository {
 
 }
