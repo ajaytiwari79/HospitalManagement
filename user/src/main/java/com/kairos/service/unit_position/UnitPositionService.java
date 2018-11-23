@@ -1301,15 +1301,6 @@ public class UnitPositionService {
                 functionDTO.setAmount(functionDTO.getAmount().divide(hourlyCostCalculationFactor,3, RoundingMode.CEILING));
             }
             unitPositionLineFunctionQueryResult.setFunctions(functionList);
-            /*
-            while (iterator.hasNext()) {
-                FunctionDTO function = iterator.next();
-                if (function.getAmount() != null) {
-
-                } else {
-                    iterator.remove();
-                }
-            }*/
         }
         return hourlyCostByUnitPositionLines;
     }
