@@ -13,7 +13,7 @@ public class BalanceSettingsActivityTab implements Serializable{
 
     private Integer addTimeTo;
     private BigInteger timeTypeId;
-    private TimeTypeEnum type; // This is used to verify the activity is of  paid break or unpaid break
+    private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
 
@@ -80,11 +80,11 @@ public class BalanceSettingsActivityTab implements Serializable{
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
 
-    public TimeTypeEnum getType() {
-        return type;
+    public TimeTypeEnum getTimeType() {
+        return timeType;
     }
 
-    public void setType(TimeTypeEnum type) {
-        this.type = type;
+    public void setTimeType(TimeTypeEnum timeType) {
+        this.timeType = timeType;
     }
 }
