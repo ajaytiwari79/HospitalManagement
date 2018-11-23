@@ -3,7 +3,6 @@ package com.kairos.dto.activity.shift;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
 
-import java.awt.*;
 import java.util.List;
 
 /**
