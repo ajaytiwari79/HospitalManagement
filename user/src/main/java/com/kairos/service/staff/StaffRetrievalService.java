@@ -319,13 +319,13 @@ public class StaffRetrievalService {
         List<Long> dayTypeIds = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupQueryResult.getDayTypes())) {
             for (DayType dayType : accessGroupQueryResult.getDayTypes()) {
-                List<Day> dayTypeList = dayType.getValidDays();
-                if (CollectionUtils.isNotEmpty(dayTypeList) && !dayType.isHolidayType() && !dayType.isAllowTimeSettings()) {
-                    dayTypeList = dayTypeList.stream().filter(day -> loginDay.equals(day) || "EVERYDAY".equals(day)).collect(Collectors.toList());
-                    if (CollectionUtils.isNotEmpty(dayTypeList)) {
+                List<Day> dayList = dayType.getValidDays();
+                if (CollectionUtils.isNotEmpty(dayList) && !dayType.isHolidayType() && !dayType.isAllowTimeSettings()) {
+                    dayList = dayList.stream().filter(day -> loginDay.equals(day) || "EVERYDAY".equals(day)).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(dayList)) {
                         dayTypeIds.add(dayType.getId());
                     }
-                } else if (CollectionUtils.isNotEmpty(dayTypeList) && !dayType.isHolidayType() && dayType.isAllowTimeSettings()) {
+                } else if (CollectionUtils.isNotEmpty(dayList) && !dayType.isHolidayType() && dayType.isAllowTimeSettings()) {
 
                 } else if (dayType.isHolidayType() && !dayType.isAllowTimeSettings()) {
 

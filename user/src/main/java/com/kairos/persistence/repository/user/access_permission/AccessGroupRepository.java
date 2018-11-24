@@ -355,9 +355,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "CASE WHEN currentOrganization.isParentOrganization=true THEN currentOrganization  ELSE parentOrganizationOptional END AS parentOrganization\n" +
             "MATCH(parentOrganization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff)\n" +
             "WITH currentOrganization,parentOrganization,staff,employment\n" +
-            " MATCH(employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:MANAGEMENT})<-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(parentOrganization)\n" +
+            " MATCH(employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:\"MANAGEMENT\"})<-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(parentOrganization)\n" +
             "WITH currentOrganization,staff, accessGroup\n" +
-            " MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType)\n" +
+            "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType)\n" +
             "RETURN \n" +
             "currentOrganization,id(staff) AS staffId,COLLECT(DISTINCT dayTypes) AS dayTypes")
     AccessGroupStaffQueryResult getManagementRoleDayTypesAndStaffId(Long unitId, Long userId);
