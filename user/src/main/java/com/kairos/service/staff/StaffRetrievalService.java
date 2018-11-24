@@ -7,6 +7,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -14,10 +15,12 @@ import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.Day;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
+import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
@@ -63,13 +66,16 @@ import com.kairos.utils.DateConverter;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -296,11 +302,51 @@ public class StaffRetrievalService {
         if (Optional.ofNullable(staff).isPresent()) {
             map.put("staffList", staff);
         }
-
+        staff=filterStaffByRoles((List<StaffPersonalDetailDTO>) map.get("staffList"), unitId, UserContext.getUserDetails().getId());
+        map.put("staffList", staff);
         map.put("engineerTypes", engineerTypes);
         map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
         map.put("roles", roles);
         return map;
+    }
+
+    private List<StaffPersonalDetailDTO> filterStaffByRoles(List<StaffPersonalDetailDTO> staff, Long unitId, Long userId) {
+        List<StaffPersonalDetailDTO> staffListByRole;
+        AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getManagementRoleDayTypesAndStaffId(unitId, userId);
+        ZonedDateTime loginDate = ZonedDateTime.now(accessGroupQueryResult.getCurrentOrganization().getTimeZone());
+        DayOfWeek loginDay = loginDate.getDayOfWeek();
+        String STAFF_CURRENT_ROLE = AccessGroupRole.STAFF.name();
+        List<Long> dayTypeIds = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accessGroupQueryResult.getDayTypes())) {
+            for (DayType dayType : accessGroupQueryResult.getDayTypes()) {
+                List<Day> dayTypeList = dayType.getValidDays();
+                if (CollectionUtils.isNotEmpty(dayTypeList) && !dayType.isHolidayType() && !dayType.isAllowTimeSettings()) {
+                    dayTypeList = dayTypeList.stream().filter(day -> loginDay.equals(day) || "EVERYDAY".equals(day)).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(dayTypeList)) {
+                        dayTypeIds.add(dayType.getId());
+                    }
+                } else if (CollectionUtils.isNotEmpty(dayTypeList) && !dayType.isHolidayType() && dayType.isAllowTimeSettings()) {
+
+                } else if (dayType.isHolidayType() && !dayType.isAllowTimeSettings()) {
+
+                } else if (dayType.isHolidayType() && dayType.isAllowTimeSettings()) {
+
+                }
+                if (CollectionUtils.isNotEmpty(dayTypeIds)) {
+                    STAFF_CURRENT_ROLE = AccessGroupRole.MANAGEMENT.name();
+                    break;
+                }
+            }
+            if ("STAFF".equals(STAFF_CURRENT_ROLE)) {
+                StaffPersonalDetailDTO staffPersonalDetailDTO = staff.stream().filter(staffId -> staffId.getStaff().getId() == accessGroupQueryResult.getStaffId()).findFirst().get();
+                staffListByRole = Arrays.asList(staffPersonalDetailDTO);
+            } else {
+                staffListByRole = staff;
+            } ;
+        } else {
+            staffListByRole = staff;
+        }
+        return staffListByRole;
     }
 
 
@@ -334,6 +380,8 @@ public class StaffRetrievalService {
         map.put("roles", roles);
         return map;
     }
+
+
 
     /* @Modified by VIPUL
      * */

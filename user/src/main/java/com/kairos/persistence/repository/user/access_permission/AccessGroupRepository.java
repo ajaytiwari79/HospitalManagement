@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.user.access_permission;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
@@ -348,6 +349,18 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) WHERE ID(pag) IN {1} return id(ag) as id,id(pag) as parentId")
     List<AccessPageQueryResult> findAllAccessGroupWithParentIds(Long organizationId,Set<Long> parentAccessGroupsIds);
 
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPosition:UnitPosition)-[:"+IN_UNIT+"]-(currentOrganization:Organization) WHERE id(currentOrganization)={0} AND id(user)={1}\n" +
+            "OPTIONAL MATCH(currentOrganization)<-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganizationOptional:Organization)\n" +
+            "WITH user,currentOrganization,parentOrganizationOptional,staff,unitPosition,\n" +
+            "CASE WHEN currentOrganization.isParentOrganization=true THEN currentOrganization  ELSE parentOrganizationOptional END AS parentOrganization\n" +
+            "MATCH(parentOrganization)-[:"+HAS_EMPLOYMENTS+"]->(emp:Employment)-[:"+BELONGS_TO+"]->(staff)\n" +
+            "WITH user,currentOrganization,parentOrganization,staff,unitPosition,emp\n" +
+            " MATCH(emp)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:MANAGEMENT})<-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(parentOrganization)\n" +
+            "WITH user,currentOrganization,parentOrganization,staff,unitPosition,emp,unitPermission, accessGroup\n" +
+            " MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType)\n" +
+            "RETURN " +
+            " currentOrganization,id(staff) AS staffId,COLLECT(DISTINCT dayTypes) AS dayTypes")
+    AccessGroupStaffQueryResult getManagementRoleDayTypesAndStaffId(Long unitId, Long userId);
 }
 
 
