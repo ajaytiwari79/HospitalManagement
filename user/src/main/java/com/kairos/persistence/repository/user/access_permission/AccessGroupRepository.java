@@ -351,15 +351,15 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPosition:UnitPosition)-[:"+IN_UNIT+"]-(currentOrganization:Organization) WHERE id(currentOrganization)={0} AND id(user)={1}\n" +
             "OPTIONAL MATCH(currentOrganization)<-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganizationOptional:Organization)\n" +
-            "WITH user,currentOrganization,parentOrganizationOptional,staff,unitPosition,\n" +
+            "WITH currentOrganization,parentOrganizationOptional,staff,\n" +
             "CASE WHEN currentOrganization.isParentOrganization=true THEN currentOrganization  ELSE parentOrganizationOptional END AS parentOrganization\n" +
-            "MATCH(parentOrganization)-[:"+HAS_EMPLOYMENTS+"]->(emp:Employment)-[:"+BELONGS_TO+"]->(staff)\n" +
-            "WITH user,currentOrganization,parentOrganization,staff,unitPosition,emp\n" +
-            " MATCH(emp)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:MANAGEMENT})<-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(parentOrganization)\n" +
-            "WITH user,currentOrganization,parentOrganization,staff,unitPosition,emp,unitPermission, accessGroup\n" +
+            "MATCH(parentOrganization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff)\n" +
+            "WITH currentOrganization,parentOrganization,staff,employment\n" +
+            " MATCH(employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:MANAGEMENT})<-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(parentOrganization)\n" +
+            "WITH currentOrganization,staff, accessGroup\n" +
             " MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType)\n" +
-            "RETURN " +
-            " currentOrganization,id(staff) AS staffId,COLLECT(DISTINCT dayTypes) AS dayTypes")
+            "RETURN \n" +
+            "currentOrganization,id(staff) AS staffId,COLLECT(DISTINCT dayTypes) AS dayTypes")
     AccessGroupStaffQueryResult getManagementRoleDayTypesAndStaffId(Long unitId, Long userId);
 }
 
