@@ -261,7 +261,7 @@ public class FunctionalPaymentService{
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
         if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
-                    functionalPaymentDTO.getStartDate().minusDays(1L).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+                    functionalPaymentDTO.getStartDate().minusDays(1L));
             parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
             if (functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
                 functionalPayment.get().setEndDate(null);

@@ -3,6 +3,7 @@ package com.kairos.persistence.model.staff.employment;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -15,7 +16,7 @@ public class StaffEmploymentDetail {
     private String email;
     private boolean copyKariosMailToLogin;
     @NotNull(message = "error.Staff.employedsince.notnull")
-    private String employedSince;
+    private LocalDate employedSince;
     private long visitourId;
     private long engineerTypeId;
     private Long timeCareExternalId;
@@ -54,11 +55,11 @@ public class StaffEmploymentDetail {
         this.copyKariosMailToLogin = copyKariosMailToLogin;
     }
 
-    public String getEmployedSince() {
+    public LocalDate getEmployedSince() {
         return employedSince;
     }
 
-    public void setEmployedSince(String employedSince) {
+    public void setEmployedSince(LocalDate employedSince) {
         this.employedSince = employedSince;
     }
 

@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
 
     @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} set emp.startDateMillis = {1}")
-    void updateEmploymentStartDate(Long staffId, Long endDateMillis);
+    void updateEmploymentStartDate(Long staffId, LocalDate endDateMillis);
 
     @Query("Match(staff:Staff)-[:" + BELONGS_TO + "]-(emp:Employment) Match(emp)-[r:"+ HAS_REASON_CODE +"]-(reasonCode:ReasonCode) where id(staff)={0} delete r")
     void deleteEmploymentReasonCodeRelation(Long staffId);

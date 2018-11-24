@@ -1298,7 +1298,7 @@ public class ClientService {
         taskAddress.setStreet(homeAddress.getStreet());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(), new Date());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(), LocalDate.now());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
@@ -1724,7 +1724,7 @@ public class ClientService {
 
         List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(), organization.getTimeSlotMode(),
-                new Date());
+                LocalDate.now());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
         ClientPersonalCalenderPrerequisiteDTO clientPersonalCalenderPrerequisiteDTO = new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
                 temporaryAddressList, timeSlotWrappers);

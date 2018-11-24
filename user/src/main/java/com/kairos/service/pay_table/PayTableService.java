@@ -67,7 +67,7 @@ public class PayTableService {
     private final Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
-    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
+    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, LocalDate startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");

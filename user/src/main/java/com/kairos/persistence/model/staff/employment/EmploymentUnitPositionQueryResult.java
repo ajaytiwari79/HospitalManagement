@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.staff.employment;
 
+
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.time.LocalDate;
 
 /**
  * Created by yatharth on 16/4/18.
@@ -9,22 +12,22 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class EmploymentUnitPositionQueryResult {
 
-Long earliestUnitPositionStartDateMillis;
-Long employmentEndDateMillis;
+private LocalDate earliestUnitPositionStartDateMillis;
+private LocalDate employmentEndDateMillis;
 
-    public Long getEarliestUnitPositionStartDateMillis() {
+    public LocalDate getEarliestUnitPositionStartDateMillis() {
         return earliestUnitPositionStartDateMillis;
     }
 
-    public void setEarliestUnitPositionStartDateMillis(Long earliestUnitPositionStartDateMillis) {
+    public void setEarliestUnitPositionStartDateMillis(LocalDate earliestUnitPositionStartDateMillis) {
         this.earliestUnitPositionStartDateMillis = earliestUnitPositionStartDateMillis;
     }
 
-    public Long getEmploymentEndDateMillis() {
+    public LocalDate getEmploymentEndDateMillis() {
         return employmentEndDateMillis;
     }
 
-    public void setEmploymentEndDateMillis(Long employmentEndDateMillis) {
+    public void setEmploymentEndDateMillis(LocalDate employmentEndDateMillis) {
         this.employmentEndDateMillis = employmentEndDateMillis;
     }
 }

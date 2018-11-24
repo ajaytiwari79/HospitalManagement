@@ -249,7 +249,7 @@ public class TimeSlotService {
     }
 
     private Map<String, Object> prepareTimeSlotResponse(Organization unit) {
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode(), new Date());
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode(),LocalDate.now());
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);
         response.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
@@ -389,7 +389,7 @@ public class TimeSlotService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode(), new Date());
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode(),LocalDate.now());
         return timeSlotWrappers;
     }
 
@@ -399,7 +399,7 @@ public class TimeSlotService {
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId, new Date());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId, LocalDate.now());
         return timeSlotMap;
     }
 

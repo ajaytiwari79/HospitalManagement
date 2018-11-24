@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -45,7 +46,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
     @Query("MATCH(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) \n" +
             "WHERE id(childFunctionalPayment)={0} AND id(functionalPayment)={1}\n" +
             " set functionalPayment.hasDraftCopy=false set functionalPayment.endDate={2} detach delete relation")
-    void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, Long endDate);
+    void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, LocalDate endDate);
 
     @Query("MATCH(parent:Expertise)-[:VERSION_OF]-(child:Expertise) WHERE id(parent)={0} AND id(child)={1}\n" +
             "MATCH(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +

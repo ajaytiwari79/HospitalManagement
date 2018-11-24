@@ -32,7 +32,7 @@ public class PayTableController {
     private PayTableService payTableService;
 
     @RequestMapping(value = "/pay_table_data", method = GET)
-    public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,@RequestParam Long startDate,
+    public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,@RequestParam LocalDate startDate,
                                                                                @RequestParam Long organizationLevel) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayTablesByOrganizationLevel(countryId, organizationLevel,startDate));
     }

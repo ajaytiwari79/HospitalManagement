@@ -307,7 +307,7 @@ public class UnitPositionService {
     private List<FunctionWithAmountQueryResult> findAndValidateFunction(UnitPositionDTO unitPositionDTO) {
         List<Long> funIds = unitPositionDTO.getFunctions().stream().map(FunctionsDTO::getId).collect(Collectors.toList());
         List<FunctionWithAmountQueryResult> functions = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevelAndIds
-                (unitPositionDTO.getUnitId(), unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(), DateUtils.getLongFromLocalDate(unitPositionDTO.getStartDate()),
+                (unitPositionDTO.getUnitId(), unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(), unitPositionDTO.getStartDate(),
                         funIds);
 
         if (functions.size() != unitPositionDTO.getFunctions().size()) {
@@ -791,7 +791,7 @@ public class UnitPositionService {
             if (selectedDate == null) {
                 selectedDate = DateUtils.getCurrentLocalDate();
             }
-            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), DateUtils.getLongFromLocalDate(selectedDate), appliedSeniorityLevel.getId(), unitId);
+            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate, appliedSeniorityLevel.getId(), unitId);
             seniorityLevel.setFunctions(functionDTOs);
         }
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);

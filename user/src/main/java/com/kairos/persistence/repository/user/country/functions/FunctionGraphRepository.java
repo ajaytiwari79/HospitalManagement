@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -57,7 +58,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
             " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +
             "RETURN distinct id(function) as id,function.name as name,rel.amount as amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
-    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,Long selectedDate,Long seniorityLevelId,Long unitId);
+    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,LocalDate selectedDate,Long seniorityLevelId,Long unitId);
 
 
     @Query("MATCH (unit:Organization) where id(unit)={0} \n" +
@@ -69,5 +70,5 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) WHERE ID(function) IN {4} \n" +
             " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +
             "RETURN distinct function as function,rel.amount as amount,rel.amountEditableAtUnit as amountEditableAtUnit")
-    List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId,Long expertiseId, Long seniorityLevelId,Long selectedDate, List<Long> functions);
+    List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId, Long expertiseId, Long seniorityLevelId, LocalDate selectedDate, List<Long> functions);
 }

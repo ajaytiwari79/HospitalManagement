@@ -58,7 +58,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "OPTIONAL MATCH(payTable)-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false})\n" +
             "RETURN id(payTable) as id,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis," +
             " payTable.name as name ,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
-    List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId, Long startDate);
+    List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId, LocalDate startDate);
 
     @Query("MATCH (payTable:PayTable)<-[rel:" + HAS_TEMP_PAY_TABLE + "]-(parentPayTable:PayTable{deleted:false}) where id(payTable)={0}  detach delete rel \n" +
             "set parentPayTable.hasTempCopy=false " +
