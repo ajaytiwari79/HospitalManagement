@@ -14,6 +14,7 @@ import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributi
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
@@ -89,6 +90,12 @@ public class TimeBankCalculationService {
         DailyTimeBankEntry dailyTimeBank = null;
         if (CollectionUtils.isNotEmpty(shifts)) {
             StaffUnitPositionDetails ctaDto = staffAdditionalInfoDTO.getUnitPosition();
+            Optional<AppliedFunctionDTO> appliedFunctionDTO=ctaDto.getAppliedFunctions().stream().filter(function->function.getAppliedDates().contains(DateUtils.asLocalDate(shifts.get(0).getStartDate()))).findFirst();
+            Long functionId=null;
+            if(appliedFunctionDTO.isPresent()){
+                functionId= appliedFunctionDTO.get().getId();
+            }
+            Long requiredFunctionId=ctaDto.getFunctionId()!=null?ctaDto.getFunctionId():functionId;
             int totalWeeklyMinutes = ctaDto.getTotalWeeklyMinutes() + (ctaDto.getTotalWeeklyHours() * 60);
             dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(ctaDto.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate())));
             int totalDailyTimebank = 0;
@@ -127,7 +134,7 @@ public class TimeBankCalculationService {
                                         }
 
                                     } else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
-                                        if (ruleTemplate.getStaffFunctions().contains(ctaDto.getFunctionId())) {
+                                        if (ruleTemplate.getStaffFunctions().contains(requiredFunctionId)) {
                                             float value = ctaDto.getHourlyCost() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / ctaDto.getHourlyCost() * 60 : 0;
                                             ctaTimeBankMin += value;
                                             totalDailyTimebank += ctaTimeBankMin;
