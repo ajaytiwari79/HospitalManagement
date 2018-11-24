@@ -161,8 +161,8 @@ public class ClientAddressService{
         address.put("municipalityId", (municipality == null) ? null : municipality.getId());
         address.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
         address.put("addressProtected", contactAddress.isAddressProtected());
-        address.put("startDate", DateConverter.getDate(contactAddress.getStartDate()));
-        address.put("endDate", DateConverter.getDate(contactAddress.getEndDate()));
+        address.put("startDate", contactAddress.getStartDate());
+        address.put("endDate", contactAddress.getEndDate());
         address.put("description", contactAddress.getDescription());
         address.put("street1", contactAddress.getStreet());
         address.put("locationName",contactAddress.getLocationName());

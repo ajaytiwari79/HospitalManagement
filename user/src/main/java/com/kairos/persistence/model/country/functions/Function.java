@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -24,10 +25,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class Function extends UserBaseEntity {
     private String name;
     private String description;
-    @DateLong
-    private Date startDate;
-    @DateLong
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @Relationship(type = HAS_UNION)
     private List<Organization> unions;
@@ -47,7 +46,7 @@ public class Function extends UserBaseEntity {
         this.id = id;
     }
 
-    public Function(String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels, Country country, String icon) {
+    public Function(String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, Country country, String icon) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
@@ -74,19 +73,19 @@ public class Function extends UserBaseEntity {
         this.description = description;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

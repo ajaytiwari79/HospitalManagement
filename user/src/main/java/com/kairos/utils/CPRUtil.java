@@ -17,8 +17,8 @@ public class CPRUtil {
         return StringUtils.isNotBlank(cprNumber) ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : 0;
     }
 
-    public static Date fetchDateOfBirthFromCPR(String cprNumber) {
-         return cprNumber!=null?DateUtils.getDateByLocalDate(getDateOfBirthFromCPR(cprNumber)):null;
+    public static LocalDate fetchDateOfBirthFromCPR(String cprNumber) {
+         return cprNumber!=null?getDateOfBirthFromCPR(cprNumber):null;
     }
 
     public static Gender getGenderFromCPRNumber(String cprNumber) {

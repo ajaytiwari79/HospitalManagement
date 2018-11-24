@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
@@ -94,7 +95,7 @@ public class PayTableController {
     }
 
     @RequestMapping(value = "/pay_table/{payTableId}/publish", method = POST)
-    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDate) {
+    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
     }
 

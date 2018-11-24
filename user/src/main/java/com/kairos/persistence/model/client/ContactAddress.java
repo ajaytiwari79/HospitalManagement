@@ -13,6 +13,8 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -46,9 +48,9 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     @NotNull(message = "error.ContactAddress.latitude.notnull")
     private float latitude;
 
-    private long startDate;
+    private LocalDate startDate;
 
-    private long endDate;
+    private LocalDate endDate;
 
     private String country;
 
@@ -187,20 +189,20 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         this.country = country;
     }
 
-    public void setStartDate(long startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public void setEndDate(long endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public long getStartDate() {
+    public LocalDate getStartDate() {
 
         return startDate;
     }
 
-    public long getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 

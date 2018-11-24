@@ -2,6 +2,8 @@ package com.kairos.dto.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.time.LocalDate;
+
 /**
  * Created by prabjot on 19/1/17.
  */
@@ -31,8 +33,8 @@ public class AddressDTO {
     private boolean isVerifiedByGoogleMap;
     private boolean addressProtected;
     private boolean verifiedByVisitour;
-    private long startDate;
-    private long endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     private String description;
     private Long municipalityId;
@@ -56,19 +58,19 @@ public class AddressDTO {
         this.description = description;
     }
 
-    public long getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(long startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public long getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(long endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

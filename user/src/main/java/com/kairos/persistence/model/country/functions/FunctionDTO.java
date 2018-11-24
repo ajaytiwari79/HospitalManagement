@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -21,10 +22,8 @@ public class FunctionDTO {
     private Long id;
     private String name;
     private String description;
-    @DateLong
-    private Date startDate;
-    @DateLong
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean amountEditableAtUnit;
     private BigDecimal amount;
     private List<Organization> unions;
@@ -37,7 +36,7 @@ public class FunctionDTO {
         //Default Constructor
     }
 
-    public FunctionDTO(Long id, String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels, String icon) {
+    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, String icon) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -72,19 +71,19 @@ public class FunctionDTO {
         this.description = description;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

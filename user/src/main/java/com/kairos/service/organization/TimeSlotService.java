@@ -147,8 +147,8 @@ public class TimeSlotService {
                 timeSlotSetToValidate.setDeleted(true);
                 timeSlotSetsToUpdate.add(timeSlotSetToValidate);
             } else {
-                LocalDate dateAsLocalDate = DateUtil.asLocalDate(timeSlotSetDTO.getEndDate());
-                timeSlotSetToValidate.setStartDate(DateUtil.asDate(dateAsLocalDate.plusDays(1)));
+                LocalDate dateAsLocalDate = timeSlotSetDTO.getEndDate();
+                timeSlotSetToValidate.setStartDate(dateAsLocalDate.plusDays(1));
                 timeSlotSetsToUpdate.add(timeSlotSetToValidate);
                 break;
             }
@@ -259,7 +259,7 @@ public class TimeSlotService {
 
     public void createDefaultTimeSlots(Organization organization, TimeSlotType timeSlotType) {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
-        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(), organization.getTimeSlotMode());
+        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode());
         timeSlotSet.setDefaultSet(true);
         timeSlotSet.setTimeSlotType(timeSlotType);
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
@@ -317,8 +317,8 @@ public class TimeSlotService {
              timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         }
         List<TimeSlotSet> timeSlotSets = new ArrayList<>();
-        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
-        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(), organization.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
+        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
+        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(0)));
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(1)));

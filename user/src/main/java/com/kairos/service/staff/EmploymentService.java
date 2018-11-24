@@ -186,7 +186,7 @@ public class EmploymentService {
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId", staff.getExternalId());
-        LocalDate dateOfBirth = (user.getDateOfBirth()) == null ? null : DateUtils.getLocalDateFromDate(user.getDateOfBirth());
+        LocalDate dateOfBirth = (user.getDateOfBirth());
         map.put("dateOfBirth", dateOfBirth);
 
         return map;
@@ -235,14 +235,14 @@ public class EmploymentService {
             } else if(!Optional.ofNullable(unitPermission).isPresent()){
                 unitPermission = new UnitPermission();
                 unitPermission.setOrganization(unit);
-                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                unitPermission.setStartDate(LocalDate.now());
             }
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
             logger.info(unitPermission.getId() + " Currently created Unit Permission ");
-            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
-            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
+            response.put("startDate", unitPermission.getStartDate());
+            response.put("endDate", unitPermission.getEndDate());
             response.put("id", unitPermission.getId());
 
 
@@ -611,7 +611,7 @@ public class EmploymentService {
                 if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
                     unitPermission.setOrganization(organizations.get(currentElement));
-                    unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                    unitPermission.setStartDate(LocalDate.now());
                 }
                 unitPermission.setAccessGroup(accessGroupDB);
                 employment.getUnitPermissions().add(unitPermission);

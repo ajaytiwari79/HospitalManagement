@@ -5,6 +5,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -47,7 +48,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[rel:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
             " set payTable.endDateMillis={1} set payTable.hasTempCopy=false set payTable.published=true detach delete rel")
-    void changeStateOfRelationShip(Long payTableId, Long endDateMillis);
+    void changeStateOfRelationShip(Long payTableId, LocalDate endDateMillis);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
             "return payTable1")

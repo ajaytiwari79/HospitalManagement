@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -18,10 +19,8 @@ import java.util.Date;
 public class TimeSlotSet extends UserBaseEntity{
 
     private String name;
-    @DateLong
-    private Date startDate;
-    @DateLong
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private TimeSlotMode timeSlotMode;
     private TimeSlotType timeSlotType;
     private boolean deleted;
@@ -34,12 +33,12 @@ public class TimeSlotSet extends UserBaseEntity{
         //default constructor
     }
 
-    public TimeSlotSet(String name, Date startDate,TimeSlotMode timeSlotMode) {
+    public TimeSlotSet(String name, LocalDate startDate,TimeSlotMode timeSlotMode) {
         this.name = name;
         this.startDate = startDate;
         this.timeSlotMode = timeSlotMode;
     }
-    public TimeSlotSet(String name, Date startDate,TimeSlotMode timeSlotMode,TimeSlotType timeSlotType) {
+    public TimeSlotSet(String name, LocalDate startDate,TimeSlotMode timeSlotMode,TimeSlotType timeSlotType) {
         this.name = name;
         this.startDate = startDate;
         this.timeSlotMode = timeSlotMode;
@@ -55,19 +54,19 @@ public class TimeSlotSet extends UserBaseEntity{
         this.name = name;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

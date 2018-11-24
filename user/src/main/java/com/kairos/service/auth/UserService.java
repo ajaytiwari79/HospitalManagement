@@ -666,8 +666,6 @@ public class UserService {
         List<User> users = userGraphRepository.findAll();
 
         users.stream().forEach(user -> {
-            String cprNumber = user.getCprNumber();
-            Date dateOfBirth = Optional.ofNullable(user.getCprNumber()).isPresent() ? CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : DateUtils.getCurrentDate();
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });

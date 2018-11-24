@@ -43,8 +43,7 @@ public class User extends UserBaseEntity {
     private String email;
     private Long lastSelectedParentOrgId;
     private Long lastSelectedChildOrgId;
-    @DateLong
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     //uniqueness of user
     private String timeCareExternalId;
@@ -355,7 +354,7 @@ public class User extends UserBaseEntity {
      * @param dateOfBirth
      * @Use while uploading multiple client in batch
      */
-    public User(String firstName, String lastName, String cprNumber, Date dateOfBirth) {
+    public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -483,11 +482,11 @@ public class User extends UserBaseEntity {
         this.pregnant = pregnant;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

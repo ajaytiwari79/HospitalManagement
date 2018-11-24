@@ -30,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -128,20 +129,20 @@ public class PayTableService {
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), payTableDTO.getPaymentUnit(), true);
         payTableGraphRepository.save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis(), payTable.getEndDateMillis() , payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
         return payTableResponse;
     }
 
 
-    private void validatePayLevel(PayTableResponse payTableToValidate, Date startDateMillis, Date endDateMillis) {
+    private void validatePayLevel(PayTableResponse payTableToValidate, LocalDate startDateMillis, LocalDate endDateMillis) {
         if (payTableToValidate.getEndDateMillis() != null) {
-            logger.info("new  startDate{}", new DateTime(startDateMillis).toLocalDate() + "  End date " + new DateTime(payTableToValidate.getEndDateMillis()).toLocalDate());
+            logger.info("new  startDate{}", startDateMillis + "  End date " + endDateMillis);
             Days days = Days.daysBetween(new DateTime(startDateMillis).toLocalDate(), new DateTime(payTableToValidate.getEndDateMillis()).toLocalDate());
             logger.info("difference in days" + days);
             if (days.getDays() != -1) {
-                exceptionService.actionNotPermittedException("message.startdate.allowed",new DateTime(payTableToValidate.getEndDateMillis() + ONE_DAY));
+                exceptionService.actionNotPermittedException("message.startdate.allowed",new DateTime(payTableToValidate.getEndDateMillis().plusDays(1)));
 
             }
         } else {
@@ -215,7 +216,7 @@ public class PayTableService {
         payTable.setPaymentUnit(payTableDTO.getPaymentUnit());
         prepareDates(payTable, payTableDTO);
         payTableGraphRepository.save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis(), payTable.getEndDateMillis(), payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
     }
@@ -490,7 +491,7 @@ public class PayTableService {
         return payGradeResponses;
     }
 
-    public List<PayTable> publishPayTable(Long payTableId, Long publishedDateMillis) {
+    public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
@@ -503,21 +504,21 @@ public class PayTableService {
         List<PayTable> response = new ArrayList<>();
 
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
-        logger.debug(new DateTime(payTable.getStartDateMillis()).toLocalDate() + "----" + (new DateTime(publishedDateMillis).toLocalDate()));
+        logger.debug(payTable.getStartDateMillis() + "----" + publishedDate);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
-            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDateMillis - ONE_DAY);
-            parentPayTable.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDate.minusDays(1));
+            parentPayTable.setEndDateMillis(publishedDate);
             parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
 
-        } else if (!new DateTime(payTable.getStartDateMillis()).toLocalDate().equals(new DateTime(publishedDateMillis).toLocalDate())) {
+        } else if (!payTable.getStartDateMillis().equals(publishedDate)) {
             exceptionService.actionNotPermittedException("message.paytable.published.samedate");
 
         }
         payTable.setPayTable(null);
         payTable.setPublished(true);
-        payTable.setStartDateMillis(new Date(publishedDateMillis));
+        payTable.setStartDateMillis(publishedDate);
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
         response.add(payTable);

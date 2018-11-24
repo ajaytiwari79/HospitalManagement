@@ -6,6 +6,8 @@ import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.time.LocalDate;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_IN_UNIT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_GROUP;
 
@@ -19,8 +21,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 public class UnitPermission extends UserBaseEntity {
 
     private String place;
-    private long startDate;
-    private long endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private int weeklyHours;
 
     @Relationship(type = APPLICABLE_IN_UNIT)
@@ -37,11 +39,11 @@ public class UnitPermission extends UserBaseEntity {
         return place;
     }
 
-    public long getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public long getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -51,12 +53,12 @@ public class UnitPermission extends UserBaseEntity {
     }
 
 
-    public void setEndDate(long endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
 
-    public void setStartDate(long startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 

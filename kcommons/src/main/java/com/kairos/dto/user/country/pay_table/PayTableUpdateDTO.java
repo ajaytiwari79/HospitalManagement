@@ -1,6 +1,7 @@
 package com.kairos.dto.user.country.pay_table;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -13,9 +14,9 @@ public class PayTableUpdateDTO {
     private String shortName;
     private String description;
     @NotNull(message = "Start date can't be null")
-    private Date startDateMillis;
+    private LocalDate startDateMillis;
 
-    private Date endDateMillis;
+    private LocalDate endDateMillis;
     @NotNull(message = "Level can not be null")
     private Long levelId;
     @NotNull(message = "Please provide payment unit type")
@@ -57,19 +58,19 @@ public class PayTableUpdateDTO {
         this.description = description;
     }
 
-    public Date getStartDateMillis() {
+    public LocalDate getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Date startDateMillis) {
+    public void setStartDateMillis(LocalDate startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public LocalDate getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(LocalDate endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -81,7 +82,7 @@ public class PayTableUpdateDTO {
         this.levelId = levelId;
     }
 
-    public PayTableUpdateDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, String paymentUnit, Long levelId) {
+    public PayTableUpdateDTO(String name, String shortName, String description, LocalDate startDateMillis, LocalDate endDateMillis, String paymentUnit, Long levelId) {
         this.name = name;
         this.shortName = shortName;
         this.description = description;
