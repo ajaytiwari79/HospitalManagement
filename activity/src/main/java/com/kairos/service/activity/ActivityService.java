@@ -340,7 +340,7 @@ public class ActivityService extends MongoBaseService {
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
-        activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
+        //activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
         //updating activity category based on time type
         Long countryId = activity.getCountryId();
         if (countryId == null)
