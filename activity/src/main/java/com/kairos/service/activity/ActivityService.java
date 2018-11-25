@@ -32,6 +32,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.skill.Skill;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -768,6 +769,7 @@ public class ActivityService extends MongoBaseService {
         }
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
+        List<ReasonCodeDTO> reasonCodes = reas
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, userAccessRoleDTO, shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId));
     }
 

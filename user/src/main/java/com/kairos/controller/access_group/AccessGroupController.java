@@ -224,6 +224,14 @@ public class AccessGroupController {
 
     }
 
+    @RequestMapping(value = UNIT_URL+"/current_user/access_role_and_reason_codes", method = RequestMethod.GET)
+    @ApiOperation("To fetch Access Role (Staff/Management) of current logged in user and fetch reasoncodes for absence")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessRoleAndReasonCodes(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAbsenceReasonCodesAndAccessRole(unitId));
+
+    }
+
     @ApiOperation("Get country Access Groups for hub and organization")
     @RequestMapping(value = COUNTRY_URL + "/access_group/hub_and_organization" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

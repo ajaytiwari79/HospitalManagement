@@ -10,14 +10,18 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
@@ -29,6 +33,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessPermission
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -81,7 +86,11 @@ public class AccessGroupService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
-    @Inject private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
+
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(),accessGroupDTO.getDayTypeIds());
@@ -872,6 +881,12 @@ public class AccessGroupService {
         return new UserAccessRoleDTO(userId, unitId,isStaff,isManagementStaff);
     }
 
+    public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
+        UserAccessRoleDTO userAccessRoleDTO = checkIfUserHasAccessByRoleInUnit(unitId);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId,ReasonCodeType.ABSENCE),ReasonCodeDTO.class);
+
+        return new ReasonCodeWrapper(reasonCodes,userAccessRoleDTO);
+    }
 
     public UserAccessRoleDTO getStaffAccessRoles(Long unitId, Long staffId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
