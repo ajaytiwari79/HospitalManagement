@@ -40,10 +40,12 @@ public class ClauseController {
     @Inject
     private ClauseService clauseService;
 
+
     @ApiOperation("save  master clause")
     @PostMapping(COUNTRY_URL + "/clause")
     public ResponseEntity<ResponseDTO<MasterClauseDTO>> saveMasterClause(@PathVariable Long countryId, @Validated @RequestBody MasterClauseDTO clauseDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.createClause(countryId, false, clauseDto));
+
     }
 
     @ApiOperation("get master clause by id")
@@ -63,6 +65,7 @@ public class ClauseController {
     @PutMapping(COUNTRY_URL + "/clause/{clauseId}")
     public ResponseEntity<ResponseDTO<MasterClauseDTO>> updateMasterClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody MasterClauseDTO clauseDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.updateClause(countryId, false, clauseId, clauseDto));
+
     }
 
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -41,6 +42,8 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
 
     @Query(value = "{shiftId:?0}",delete = true)
     void deleteShiftStateByShiftId(BigInteger shiftId);
+
+    List<ShiftState> findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(Set<BigInteger> shiftIds, AccessGroupRole accessGroupRole);
 
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
+import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
@@ -29,7 +30,7 @@ public class ActivityWithCompositeDTO {
     private RulesActivityTab rulesActivityTab;
     private SkillActivityTab skillActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
-
+    private BalanceSettingsActivityTab balanceSettingsActivityTab;
 
 
     public ActivityWithCompositeDTO() {
@@ -116,5 +117,13 @@ public class ActivityWithCompositeDTO {
 
     public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
+    }
+
+    public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
+        return balanceSettingsActivityTab;
+    }
+
+    public void setBalanceSettingsActivityTab(BalanceSettingsActivityTab balanceSettingsActivityTab) {
+        this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 }

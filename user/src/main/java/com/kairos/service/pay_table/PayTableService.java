@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
@@ -45,6 +46,7 @@ import static javax.management.timer.Timer.ONE_DAY;
  * Created by prabjot on 26/12/17.
  */
 @Service
+@Transactional
 public class PayTableService {
 
     @Inject
@@ -313,7 +315,7 @@ public class PayTableService {
     private PayGradeResponse addPayGradeInCurrentPayTable(PayTable payTable, PayGradeDTO payGradeDTO) {
         Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
 
-        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
+        List<PayGroupArea> payGroupAreas = ObjectMapperUtils.copyPropertiesOfListByMapper(payGroupAreaGraphRepository.findAllByIds(payGroupAreasId),PayGroupArea.class);
         if (payGroupAreas.size() != payGroupAreasId.size()) {
             exceptionService.dataNotMatchedException("message.paygrouparea.unabletoget");
 
@@ -544,7 +546,10 @@ public class PayTableService {
 
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
-        functionalPaymentService.updateAmountInFunctionalTable(parentPayTable.getId(),payTable.getStartDateMillis(),payTable.getEndDateMillis(),payTable.getPercentageValue());
+        if(payTable.getPercentageValue()!=null){
+            functionalPaymentService.updateAmountInFunctionalTable(parentPayTable.getId(),payTable.getStartDateMillis(),payTable.getEndDateMillis(),payTable.getPercentageValue());
+        }
+
         response.add(payTable);
         return response;
     }

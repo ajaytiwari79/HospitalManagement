@@ -24,14 +24,14 @@ public class StaffWTACounter extends MongoBaseEntity{
     private boolean userHasStaffRole;
 
 
-    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId,String ruleTemplateName, Long unitPositionId, Long unitId, int count) {
+    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId,String ruleTemplateName, Long unitPositionId, Long unitId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.ruleTemplateId = ruleTemplateId;
         this.ruleTemplateName = ruleTemplateName;
         this.unitPositionId = unitPositionId;
         this.unitId = unitId;
-        this.count = count;
+
     }
 
     public StaffWTACounter() {

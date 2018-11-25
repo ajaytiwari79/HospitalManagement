@@ -761,4 +761,8 @@ public  class DateUtils {
     public static LocalDateTime getEndOfDayFromLocalDateTime(){
         return LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
     }
+
+    public static LocalDate getLocalDateFromTimezone(String timeZone){
+        return LocalDate.now(ZoneId.of(timeZone));
+    }
 }

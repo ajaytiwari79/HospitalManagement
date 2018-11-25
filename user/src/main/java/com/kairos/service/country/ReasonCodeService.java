@@ -135,12 +135,12 @@ public class ReasonCodeService {
         return true;
     }
 
-   public void createDefalutDataForUnit(Organization organization, long countryId){
+   public void createDefalutDateForUnit(Organization organization,long countryId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
        createDefaultData(reasonCodeResponseDTO,organization);
    }
 
-    public void createDefalutDataForSubUnit(Organization organization, long parentId){
+    public void createDefalutDateForSubUnit(Organization organization,long parentId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
         createDefaultData(reasonCodeResponseDTO,organization);
     }

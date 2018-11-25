@@ -29,8 +29,8 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
     public void validateRules(ShiftWithActivityDTO shift) {
         shift.getActivities().forEach(shiftActivityDTO -> {
             Duration duration = Duration.between(DateUtils.getLocalDateTime(), DateUtils.asLocalDateTime(shiftActivityDTO.getStartDate()));
-            int calculatedValue = shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getType().equals(DurationType.DAYS) ? (int)duration.toDays() : (int)duration.toHours();
-            if (calculatedValue < shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
+            int calculatedValue = DurationType.DAYS.equals(shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getType()) ? (int)duration.toDays() : (int)duration.toHours();
+            if (shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()!=null && calculatedValue < shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
                 ShiftValidatorService.throwException("message.shift.plannedTime.less");
             }
         });

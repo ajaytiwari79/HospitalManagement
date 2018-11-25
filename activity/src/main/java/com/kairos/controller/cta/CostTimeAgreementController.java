@@ -262,16 +262,16 @@ public class CostTimeAgreementController {
 
     /**
      *
-     * @param organizationId
+     * @param unitId
      * @param collectiveTimeAgreementDTO
      * @return
      */
     @PostMapping(value =UNIT_URL + "/cta")
     @ApiOperation("Create CTA in Organization")
-    public ResponseEntity<Map<String, Object>> createCtaInOrganization(@PathVariable Long organizationId
+    public ResponseEntity<Map<String, Object>> createCtaInOrganization(@PathVariable Long unitId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO )  {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                countryCTAService.createCostTimeAgreementInOrganization(organizationId,collectiveTimeAgreementDTO));
+                countryCTAService.createCostTimeAgreementInOrganization(unitId,collectiveTimeAgreementDTO));
     }
 
 

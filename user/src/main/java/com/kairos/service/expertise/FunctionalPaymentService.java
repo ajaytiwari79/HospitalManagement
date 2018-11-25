@@ -2,6 +2,7 @@ package com.kairos.service.expertise;
 
 import com.google.common.base.Functions;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.experties.FunctionalPaymentMatrixDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
@@ -134,10 +135,12 @@ public class FunctionalPaymentService{
         return functionalPaymentMatrix;
     }
 
-    private List<SeniorityLevelFunction> getSeniorityLevelFunction(List<SeniorityLevelFunctionDTO> seniorityLevelFunctionDTOS, List<SeniorityLevel> seniorityLevels, List<Function> functions) {
+    private List<SeniorityLevelFunction> getSeniorityLevelFunction(List<SeniorityLevelFunctionDTO> seniorityLevelFunctionDTOS, List<SeniorityLevel> seniorityLevels1, List<Function> functions) {
         List<SeniorityLevelFunction> seniorityLevelFunctions = new ArrayList<>();
+        List<SeniorityLevel> seniorityLevels=ObjectMapperUtils.copyPropertiesOfListByMapper(seniorityLevels1,SeniorityLevel.class);
         seniorityLevelFunctionDTOS.forEach(currentSRLevelFunction -> {
             List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
+
             SeniorityLevel seniorityLevel = seniorityLevels.stream().
                     filter(seniorityLevel1 -> seniorityLevel1.getId().equals(currentSRLevelFunction.getSeniorityLevelId())).findAny().get();
             SeniorityLevelFunction seniorityLevelFunction = new SeniorityLevelFunction();
@@ -194,7 +197,7 @@ public class FunctionalPaymentService{
         List<FunctionalPaymentMatrixDTO> functionalPaymentMatrixDTOS = functionalSeniorityLevelDTO.getFunctionalPaymentMatrix();
         List<FunctionalPaymentMatrix> list = new ArrayList<>(1);
         List<Function> functions = getFunctions(functionalPaymentMatrixDTOS);
-        List<SeniorityLevel> seniorityLevels = getSeniorityLevel(functionalPaymentMatrixDTOS);
+        List<SeniorityLevel> seniorityLevels = ObjectMapperUtils.copyPropertiesOfListByMapper(getSeniorityLevel(functionalPaymentMatrixDTOS),SeniorityLevel.class);
 
         if (functionalPayment.get().isPublished()) {
             // functional payment is published so we need to create a  new copy and update in same
@@ -319,43 +322,24 @@ public class FunctionalPaymentService{
                 outside.add(existing);
 
                 //Creating new and updating values
-                List<SeniorityLevel> seniorityLevels=getSeniorityLevelFromFunctionalPaymentMatrix(functionalPaymentQueryResult.getFunctionalPaymentMatrices());
-                List<Function> functions=getFunctionsFromFunctionalPaymentMatrix(functionalPaymentQueryResult.getFunctionalPaymentMatrices());
 
-                FunctionalPayment createNew=new FunctionalPayment(null,DateUtils.asLocalDate(startDate),functionalPaymentQueryResult.getEndDate());
 
-                FunctionalPayment functionalPaymentCopy = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), functionalPaymentQueryResult.getStartDate(),
+                FunctionalPayment createNew = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), functionalPaymentQueryResult.getStartDate(),
                         functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
 
-                functionalPaymentQueryResult.getFunctionalPaymentMatrices().forEach(functionalPaymentMatrixDTO -> {
-                    FunctionalPaymentMatrix functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrixDTO, seniorityLevels, functions);
-                    functionalPaymentMatrixDTO.setId(functionalPaymentMatrix.getId());
-                    list.add(functionalPaymentMatrix);
-                });
-                functionalPaymentCopy.setFunctionalPaymentMatrices(list);
-
-                functionalPayment.get().setHasDraftCopy(true);
-                functionalPaymentCopy.setParentFunctionalPayment(functionalPayment.get());
-                functionalPaymentGraphRepository.save(functionalPaymentCopy);
-
+                //createNewMatrixInFunctionalPayment(functionalPaymentQueryResult,createNew);
                 createNew.setFunctionalPaymentMatrices(functionalPaymentQueryResult.getFunctionalPaymentMatrices());
-                createNew.setPaymentUnit(functionalPaymentQueryResult.getPaymentUnit());
                 inside.add(createNew);
             }
         }
         allFunctionalPayments.addAll(inside);
         allFunctionalPayments.addAll(outside);
         functionalPaymentGraphRepository.saveAll(allFunctionalPayments);
-
-
-
-
-
-    }
+}
 
 
     public List<FunctionalPaymentQueryResult> test(List<Long> ids){
-        List<FunctionalPaymentQueryResult> functionalPaymentQueryResults=functionalPaymentGraphRepository.getFunctionalPaymentDataT(Arrays.asList(new Long("23509")));
+        List<FunctionalPaymentQueryResult> functionalPaymentQueryResults=functionalPaymentGraphRepository.getFunctionalPaymentDataT(Arrays.asList(new Long("3362")));
         return functionalPaymentQueryResults;
 
     }
@@ -370,15 +354,39 @@ public class FunctionalPaymentService{
         return seniorityLevels;
     }
 
-    private List<Function> getFunctionsFromFunctionalPaymentMatrix(List<FunctionalPaymentMatrix> functionalPaymentMatrices){
-        List<Function> functions=new ArrayList<>();
-        for (FunctionalPaymentMatrix functionalPaymentMatrix:functionalPaymentMatrices){
-            for(SeniorityLevelFunction seniorityLevelFunction:functionalPaymentMatrix.getSeniorityLevelFunction()){
-                seniorityLevels.add(seniorityLevelFunction.getSeniorityLevel());
-            }
-        }
-        return functions;
-    }
+//    private List<Function> getFunctionsFromFunctionalPaymentMatrix(List<FunctionalPaymentMatrix> functionalPaymentMatrices){
+//        List<Function> functions=new ArrayList<>();
+//        for (FunctionalPaymentMatrix functionalPaymentMatrix:functionalPaymentMatrices){
+//            for(SeniorityLevelFunction seniorityLevelFunction:functionalPaymentMatrix.getSeniorityLevelFunction()){
+//                functions.add();
+//            }
+//        }
+//        return functions;
+//    }
+
+
+//    public FunctionalSeniorityLevelDTO createNewMatrixInFunctionalPayment(FunctionalPaymentQueryResult functionalSeniorityLevelDTO,FunctionalPayment functionalPayment) {
+//        List<FunctionalPaymentMatrix> functionalPaymentMatrixDTOS = functionalSeniorityLevelDTO.getFunctionalPaymentMatrices();
+//        List<FunctionalPaymentMatrix> list = new ArrayList<>(1);
+//        List<Function> functions =getFunctionsFromFunctionalPaymentMatrix(functionalSeniorityLevelDTO.getFunctionalPaymentMatrices());
+//        List<SeniorityLevel> seniorityLevels = getSeniorityLevel(functionalPaymentMatrixDTOS);
+//
+//            // functional payment is published so we need to create a  new copy and update in same
+//            FunctionalPayment functionalPaymentCopy = new FunctionalPayment(functionalPayment.getExpertise(), functionalPayment.getStartDate(),
+//                    functionalPayment.getEndDate(), functionalPayment.getPaymentUnit());
+//
+//            functionalPaymentMatrixDTOS.forEach(functionalPaymentMatrixDTO -> {
+//                FunctionalPaymentMatrix functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrixDTO, seniorityLevels, functions);
+//                functionalPaymentMatrixDTO.setId(functionalPaymentMatrix.getId());
+//                list.add(functionalPaymentMatrix);
+//            });
+//            functionalPaymentCopy.setFunctionalPaymentMatrices(list);
+//
+//            functionalPayment.setHasDraftCopy(true);
+//            functionalPaymentCopy.setParentFunctionalPayment(functionalPayment);
+//            functionalPaymentGraphRepository.save(functionalPaymentCopy);
+//            functionalSeniorityLevelDTO.setFunctionalPaymentId(functionalPaymentCopy.getId());
+//    }
 
 
 

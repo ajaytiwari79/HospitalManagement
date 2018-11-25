@@ -498,6 +498,15 @@ public class StaffRetrievalService {
         return staffAdditionalInfoDTO;
 
     }
+    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, Long unitPositionId) {
+        StaffUnitPositionDetails unitPosition = unitPositionService.findAppliedFunctionsAtUnitPosition(unitPositionId, shiftDate);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO =null;
+        if (Optional.ofNullable(unitPosition).isPresent()) {
+            staffAdditionalInfoDTO= new StaffAdditionalInfoDTO();
+            staffAdditionalInfoDTO.setUnitPosition(unitPosition);
+        }
+        return staffAdditionalInfoDTO;
+    }
 
     public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds, List<Long> unitPositionIds, long id, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);

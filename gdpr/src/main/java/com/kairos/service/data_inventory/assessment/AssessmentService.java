@@ -583,10 +583,11 @@ public class AssessmentService extends MongoBaseService {
                 asset.setOrgSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
                 break;
             case MANAGING_DEPARTMENT:
-                asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue,ManagingOrganization.class));
+                asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue, ManagingOrganization.class));
                 break;
             case ASSET_OWNER:
-                asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue,Staff.class));
+                asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue, Staff.class));
+                asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue,ManagingOrganization.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
@@ -628,10 +629,12 @@ public class AssessmentService extends MongoBaseService {
                 processingActivity.setDataSources(castObjectIntoLinkedHashMapAndReturnIdList(processingActivityAttributeValue));
                 break;
             case MANAGING_DEPARTMENT:
-                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue,ManagingOrganization.class));
+
+                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue, ManagingOrganization.class));
                 break;
             case PROCESS_OWNER:
-                processingActivity.setProcessOwner(objectMapper.convertValue(processingActivityAttributeValue,Staff.class));
+                processingActivity.setProcessOwner(objectMapper.convertValue(processingActivityAttributeValue, Staff.class));
+                processingActivity.setManagingDepartment(objectMapper.convertValue(processingActivityAttributeValue,ManagingOrganization.class));
                 break;
             case DATA_RETENTION_PERIOD:
                 processingActivity.setDataRetentionPeriod((Integer) processingActivityAttributeValue);
@@ -663,8 +666,7 @@ public class AssessmentService extends MongoBaseService {
                 entityList.forEach(entityKeyValueMap -> entityIdList.add(new BigInteger(entityKeyValueMap.get("id").toString())));
             } else {
                 LinkedHashMap<String, Object> entityKeyValueMap = (LinkedHashMap<String, Object>) objectToCast;
-                entityIdList.add(new BigInteger( entityKeyValueMap.get("id").toString()));
-
+                entityIdList.add(new BigInteger(entityKeyValueMap.get("id").toString()));
             }
         }
         return entityIdList;

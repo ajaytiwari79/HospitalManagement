@@ -91,7 +91,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)\n" +
             "MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)\n" +
             "MATCH(sl:SeniorityLevel)-[:"+FOR_SENIORITY_LEVEL+"]-(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
-            "WITH functionalPayment,fpm,expertise,collect({id:id(rel),seniorityLevel:{id:id(sl) , name:sl.name, from:sl.from, to:sl.to },function:{id:id(function),name:function.name},amount:rel.amount,amountEditableAtUnit:rel.amountEditableAtUnit}) as seniorityLevelFunction\n" +
+            "WITH functionalPayment,fpm,expertise,collect({seniorityLevel:{id:id(sl) , name:sl.name, from:sl.from, to:sl.to },function:{id:id(function),name:function.name},amount:rel.amount,amountEditableAtUnit:rel.amountEditableAtUnit}) as seniorityLevelFunction\n" +
             "MATCH(fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea)  \n" +
             "WITH functionalPayment,fpm,seniorityLevelFunction,expertise,collect({id:id(pga),name:pga.name}) as payGroupAreas\n" +
             "RETURN id(functionalPayment) as id, functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreas:payGroupAreas,seniorityLevelFunction:seniorityLevelFunction}) as functionalPaymentMatrices")

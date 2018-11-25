@@ -53,6 +53,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,27 +155,30 @@ public class ShiftValidatorService {
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
-        Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
-                .and(wtaRulesSpecification)
-                .and(staffEmploymentSpecification);
+                .and(wtaRulesSpecification);
+
         if (byUpdate) {
             Specification<ShiftWithActivityDTO> activityPhaseSettingSpecification = new ActivityPhaseSettingSpecification(staffAdditionalInfoDTO, phase, activityWrapperMap.values(), oldShift);
-            activitySpecification.and(activityPhaseSettingSpecification);
+            activitySpecification = activitySpecification.and(activityPhaseSettingSpecification);
+        }else{
+            Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
+            activitySpecification = activitySpecification.and(staffEmploymentSpecification);
         }
         if (!byTandAPhase) {
             Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan();
-            activitySpecification.and(shiftTimeLessThan);
+            activitySpecification = activitySpecification.and(shiftTimeLessThan);
         }
         List<Long> dayTypeIds = shift.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getActivity().getRulesActivityTab().getDayTypes().stream()).collect(Collectors.toList());
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(dayTypeIds)) {
             Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
             Set<DayOfWeek> validDays = getValidDays(dayTypeDTOMap, dayTypeIds);
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getActivitiesStartDate());
-            activitySpecification.and(activityDayTypeSpec);
+            activitySpecification= activitySpecification.and(activityDayTypeSpec);
         }
+        //TODO
         activitySpecification.validateRules(shift);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
@@ -357,8 +361,11 @@ public class ShiftValidatorService {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
                 TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
-                    TimeInterval interval = new TimeInterval(((timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute()), ((timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute()));
-                    if (interval.contains(DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
+                    int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
+                    int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
+                    TimeInterval interval = new TimeInterval(startMinutesOfInterval,endMinutesOfInterval );
+                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    if (minuteOfTheDay==(int)interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                         timeInterval = interval;
                         break;
                     }
