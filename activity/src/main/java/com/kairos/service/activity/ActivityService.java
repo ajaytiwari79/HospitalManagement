@@ -377,7 +377,6 @@ public class ActivityService extends MongoBaseService {
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
-        activity.getBalanceSettingsActivityTab().setTimeType(generalActivityTabDTO.getTimeType());
         updateActivityCategory(activity, countryId);
         /*save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
