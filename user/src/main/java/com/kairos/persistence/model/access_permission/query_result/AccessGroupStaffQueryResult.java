@@ -11,7 +11,7 @@ public class AccessGroupStaffQueryResult {
     private Organization organization;
     private Long staffId;
     private List<AccessGroupDayTypesQueryResult> dayTypesByAccessGroup;
-    private List<DayType> dayTypes;
+
 
     public Organization getOrganization() {
         return organization;
@@ -29,13 +29,6 @@ public class AccessGroupStaffQueryResult {
         this.staffId = staffId;
     }
 
-    public List<DayType> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<DayType> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
 
     public List<AccessGroupDayTypesQueryResult> getDayTypesByAccessGroup() {
         return dayTypesByAccessGroup;

@@ -9,7 +9,8 @@ import java.util.List;
 @QueryResult
 public class AccessGroupDayTypesQueryResult {
     AccessGroup accessGroup;
-    List<DayType> dayTypes;
+    //List<DayType> dayTypes;
+    List<DayTypeCountryHolidayCalenderQueryResult> dayTypes;
 
     public AccessGroup getAccessGroup() {
         return accessGroup;
@@ -19,11 +20,27 @@ public class AccessGroupDayTypesQueryResult {
         this.accessGroup = accessGroup;
     }
 
-    public List<DayType> getDayTypes() {
+   /* public List<DayType> getDayTypes() {
         return dayTypes;
     }
 
     public void setDayTypes(List<DayType> dayTypes) {
+        this.dayTypes = dayTypes;
+    }*/
+
+    /*public List<DayTypeCountryHolidayCalenderQueryResult> getDayTypesWithHolidayType() {
+        return dayTypesWithHolidayType;
+    }
+
+    public void setDayTypesWithHolidayType(List<DayTypeCountryHolidayCalenderQueryResult> dayTypesWithHolidayType) {
+        this.dayTypesWithHolidayType = dayTypesWithHolidayType;
+    }*/
+
+    public List<DayTypeCountryHolidayCalenderQueryResult> getDayTypes() {
+        return dayTypes;
+    }
+
+    public void setDayTypes(List<DayTypeCountryHolidayCalenderQueryResult> dayTypes) {
         this.dayTypes = dayTypes;
     }
 }
