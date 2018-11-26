@@ -250,6 +250,7 @@ public class ShiftBreakActivityService {
                     // merge and remove
                     shifts.get(i).setStartDate(shifts.get(i-1).getStartDate());
                     shifts.remove(i-1);
+                    i--;
                 }
             }
         }
@@ -259,11 +260,9 @@ public class ShiftBreakActivityService {
         return shifts;
     }
     private  void reAdjustShiftDuration(Activity breakActivity,Shift mainShift,List<ShiftActivity> shifts, boolean lastBlockingShiftAdded, BreakAvailabilitySettings breakAvailability, List<BreakSettings> breakSettings) {
-        System.out.println("I have to readjust the following data \n");
-
         for (BreakSettings breakSetting : breakSettings) {
             long requiredReduceShiftByMinutes = breakSetting.getShiftDurationInMinute() + breakSetting.getBreakDurationInMinute();
-            logger.info(" we need to add shift/break"+requiredReduceShiftByMinutes);
+            logger.info(" add shift/break for the following duration"+requiredReduceShiftByMinutes);
             long currentReduceShiftByMinutes = 0l;
             for (int i = shifts.size() - 1; i > 0; i--) {
                 if (!shifts.get(i).isBreakShift()) {
