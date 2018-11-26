@@ -38,7 +38,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private boolean signatureComponentLeftAlign;
     private boolean signatureComponentRightAlign;
     private String  signatureHtml;
-    private CoverPageVO coverPageData;
+    private CoverPageVO coverPageData = new CoverPageVO();
     @Transient
     private ClauseTag defaultClauseTag;
 

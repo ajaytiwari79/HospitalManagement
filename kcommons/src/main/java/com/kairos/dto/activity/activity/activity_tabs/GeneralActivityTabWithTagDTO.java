@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.enums.TimeTypeEnum;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -32,8 +33,87 @@ public class GeneralActivityTabWithTagDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<TagDTO> tags = new ArrayList<>();
+    private Integer addTimeTo;
+    private BigInteger timeTypeId;
+    private boolean onCallTimePresent;
+    private Boolean negativeDayBalancePresent;
+    private TimeTypeEnum timeType;
+    private String content;
+    private String originalDocumentName;
+    private String modifiedDocumentName;
+    private boolean eligibleForCopy;
 
-   //=======================================================================
+    public Integer getAddTimeTo() {
+        return addTimeTo;
+    }
+
+    public void setAddTimeTo(Integer addTimeTo) {
+        this.addTimeTo = addTimeTo;
+    }
+
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
+    public boolean isOnCallTimePresent() {
+        return onCallTimePresent;
+    }
+
+    public void setOnCallTimePresent(boolean onCallTimePresent) {
+        this.onCallTimePresent = onCallTimePresent;
+    }
+
+    public Boolean getNegativeDayBalancePresent() {
+        return negativeDayBalancePresent;
+    }
+
+    public void setNegativeDayBalancePresent(Boolean negativeDayBalancePresent) {
+        this.negativeDayBalancePresent = negativeDayBalancePresent;
+    }
+
+    public TimeTypeEnum getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(TimeTypeEnum timeType) {
+        this.timeType = timeType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getOriginalDocumentName() {
+        return originalDocumentName;
+    }
+
+    public void setOriginalDocumentName(String originalDocumentName) {
+        this.originalDocumentName = originalDocumentName;
+    }
+
+    public String getModifiedDocumentName() {
+        return modifiedDocumentName;
+    }
+
+    public void setModifiedDocumentName(String modifiedDocumentName) {
+        this.modifiedDocumentName = modifiedDocumentName;
+    }
+
+    public boolean isEligibleForCopy() {
+        return eligibleForCopy;
+    }
+
+    public void setEligibleForCopy(boolean eligibleForCopy) {
+        this.eligibleForCopy = eligibleForCopy;
+    }
 
     public String getName() {
         return name;

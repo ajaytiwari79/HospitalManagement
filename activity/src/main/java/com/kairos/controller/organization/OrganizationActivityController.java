@@ -85,19 +85,19 @@ public class OrganizationActivityController {
     }
 
 
-    @ApiOperation("get balanceSettings Tab of Activity")
+    /*@ApiOperation("get balanceSettings Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/balanceSettings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getBalanceSettingsTab(@PathVariable BigInteger activityId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getBalanceSettingsTabOfType(activityId, unitId));
-    }
+    }*/
 
-    @ApiOperation("Update Balance Settings Tab of Activity")
+   /* @ApiOperation("Update Balance Settings Tab of Activity")
     @PutMapping(value = "/activity/balanceSettings")
         //  @PreAuthorize("@S.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateBalanceSettingsTab(@RequestBody BalanceSettingActivityTabDTO balanceDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateBalanceTab(balanceDTO));
-    }
+    }*/
 
     @ApiOperation("get Rules Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/rules")
@@ -180,12 +180,12 @@ public class OrganizationActivityController {
     }
 
 
-    @ApiOperation("Update notes Tab of Activity")
+   /* @ApiOperation("Update notes Tab of Activity")
     @PutMapping(value = "/activity/notes")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateNotesTabOfActivity(@RequestBody NotesActivityDTO notesActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateNotesTabOfActivity(notesActivityDTO));
-    }
+    }*/
 
     @ApiOperation("get notes Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/notes")
@@ -234,12 +234,12 @@ public class OrganizationActivityController {
 
     //Permissions
 
-    @ApiOperation("Update Permissions Tab of Activity")
+   /* @ApiOperation("Update Permissions Tab of Activity")
     @PutMapping(value = "/activity/permission_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updatePermissionsTabOfActivity(@RequestBody PermissionsActivityTabDTO permissionsActivityTabDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePermissionsTabOfActivity(permissionsActivityTabDTO));
-    }
+    }*/
 
     @ApiOperation("get Permissions Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/permission_settings")

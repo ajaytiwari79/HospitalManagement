@@ -103,16 +103,16 @@ public class ActivityController {
     @ApiOperation("get General Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/general")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable BigInteger countryId, @PathVariable BigInteger activityId) {
+    ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable Long countryId, @PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getGeneralTabOfActivity(countryId, activityId));
     }
 
-    @ApiOperation("get balanceSettings Tab of Activity")
+    /*@ApiOperation("get balanceSettings Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/balanceSettings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getBalanceSettingsTab(@PathVariable Long countryId, @PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getBalanceSettingsTabOfActivity(activityId,countryId));
-    }
+    }*/
 
 
     @ApiOperation("get getTime Calculation Tab of Activity")
@@ -126,13 +126,13 @@ public class ActivityController {
     //getTimeCalculationTabOfActivity
 
 
-    @ApiOperation("Update Balance Settings Tab of Activity")
+  /*  @ApiOperation("Update Balance Settings Tab of Activity")
     @PutMapping(value = "/activity/balanceSettings")
         //  @PreAuthorize("@S.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateBalanceSettingsTab(@RequestBody BalanceSettingActivityTabDTO balanceDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateBalanceTab(balanceDTO));
     }
-
+*/
 
     @ApiOperation("Update IndividualPoints Tab of Activity")
     @PutMapping(value = "/activity/individualPoints")
@@ -211,12 +211,12 @@ public class ActivityController {
     }
 
 
-    @ApiOperation("Update notes Tab of Activity")
+   /* @ApiOperation("Update notes Tab of Activity")
     @PutMapping(value = "/activity/notes")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateNotesTabOfActivity(@RequestBody NotesActivityDTO notesActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateNotesTabOfActivity(notesActivityDTO));
-    }
+    }*/
 
     @ApiOperation("get notes Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/notes")
@@ -279,12 +279,12 @@ public class ActivityController {
 
     //Permissions
 
-    @ApiOperation("Update Permissions Tab of Activity")
+   /* @ApiOperation("Update Permissions Tab of Activity")
     @PutMapping(value = "/activity/permission_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updatePermissionsTabOfActivity(@RequestBody PermissionsActivityTabDTO permissionsActivityTabDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePermissionsTabOfActivity(permissionsActivityTabDTO));
-    }
+    }*/
 
     @ApiOperation("get Permissions Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/permission_settings")

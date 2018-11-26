@@ -22,7 +22,6 @@ public class TimeType extends MongoBaseEntity{
     private String description;
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
-    private TimeTypeEnum type;
     private TimeTypeEnum secondLevelType;
 
     public TimeType() {}
@@ -109,9 +108,7 @@ public class TimeType extends MongoBaseEntity{
         this.backgroundColor = backgroundColor;
     }
 
-    public TimeTypeEnum getType() {
-        return type;
-    }
+
 
     public TimeTypeEnum getSecondLevelType() {
         return secondLevelType;
@@ -120,7 +117,5 @@ public class TimeType extends MongoBaseEntity{
     public void setSecondLevelType(TimeTypeEnum secondLevelType) {
         this.secondLevelType = secondLevelType;
     }
-       public void setType(TimeTypeEnum type) {
-        this.type = type;
-    }
+
 }
