@@ -5,12 +5,14 @@ import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class LocationDTO {
 
     private Long id;
-    @NotEmpty
+    @NotEmpty(message="message.location.name.null")
+    @NotNull(message="message.location.name.null")
     private String name;
 
     private ContactAddressDTO address;

@@ -369,6 +369,8 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         Query query=null;
         if(kpiIds.isEmpty()){
             query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and(queryField).is(refId));
+        }else if(accessGroupIds.isEmpty()) {
+            query=new Query(Criteria.where("kpiId").in(kpiIds).and(queryField).is(refId));
         }else{
             query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and("kpiId").in(kpiIds).and(queryField).is(refId));
         }

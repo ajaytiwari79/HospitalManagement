@@ -102,6 +102,7 @@ import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResult;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -792,7 +793,6 @@ public class OrganizationService {
         return null;
     }
 
-    //todo remove if not use
     public String getWorkPlaceFromTimeCare(GetAllWorkPlacesResponse workPlaces) {
         try {
             logger.info(" workPlaces---> " + workPlaces.getWorkPlaceList().size());
@@ -1162,7 +1162,7 @@ public class OrganizationService {
         return organizationGraphRepository.getOneParentUnitByCountry(countryId);
     }
 
-    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long organizationTypeId, Long expertiseId) {
+    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long organizationTypeId, Long expertiseId, List<Long> unitIds) {
         WTABasicDetailsDTO wtaBasicDetailsDTO = new WTABasicDetailsDTO();
         if (Optional.ofNullable(expertiseId).isPresent()) {
             Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
@@ -1197,25 +1197,29 @@ public class OrganizationService {
             wtaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
         }
 
+        List<Organization> organizations;
+        if(CollectionUtils.isNotEmpty(unitIds)){
+            organizations = organizationGraphRepository.findOrganizationsByIdsIn(unitIds);
+        } else {
+            organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        }
         if (Optional.ofNullable(organizationSubTypeId).isPresent()) {
             OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
-            List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
             if (Optional.ofNullable(organizationSubType).isPresent()) {
                 OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
                 BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
                 wtaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
             }
-            if (Optional.ofNullable(organizations).isPresent()) {
-                List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
-                organizations.forEach(organization -> {
-                    OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
-                    ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
-                    organizationBasicDTOS.add(organizationBasicDTO);
-                });
-                wtaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
-            }
         }
-
+        if (CollectionUtils.isNotEmpty(organizations)){
+            List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
+            organizations.forEach(organization -> {
+                OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
+                ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
+                organizationBasicDTOS.add(organizationBasicDTO);
+            });
+            wtaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
+        }
         return wtaBasicDetailsDTO;
     }
 
@@ -1343,7 +1347,7 @@ public class OrganizationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
 
-    public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId, Long organizationSubTypeId, Long countryId) {
+    public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, List<Long> unitIds) {
         CTABasicDetailsDTO ctaBasicDetailsDTO = new CTABasicDetailsDTO();
         if (Optional.ofNullable(expertiseId).isPresent()) {
             Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
@@ -1370,13 +1374,20 @@ public class OrganizationService {
             }
         }
         OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
-        List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+
+        List<Organization> organizations;
+        if(CollectionUtils.isNotEmpty(unitIds)){
+            organizations = organizationGraphRepository.findOrganizationsByIdsIn(unitIds);
+        }else{
+            organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        }
+
         if (Optional.ofNullable(organizationSubType).isPresent()) {
             OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
             BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
             ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
         }
-        if (Optional.ofNullable(organizations).isPresent()) {
+        if (CollectionUtils.isNotEmpty(organizations)) {
             List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
             organizations.forEach(organization -> {
                 OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();

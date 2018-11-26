@@ -56,7 +56,7 @@ public interface CustomShiftMongoRepository {
      Shift findShiftByShiftActivityId(BigInteger shiftActivityId) ;
 
 
-    List<Shift> findShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
+    List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId,BigInteger phaseId);
 
 
 

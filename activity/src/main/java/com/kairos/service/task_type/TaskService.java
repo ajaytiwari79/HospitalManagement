@@ -733,8 +733,9 @@ public class TaskService extends MongoBaseService {
 
         }
         if (!shiftsToCreate.isEmpty()) {
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftsToCreate.get(0).getUnitId(), shiftsToCreate.get(0).getActivities().get(0).getStartDate());
-            shiftService.saveShiftWithActivity(phase,shiftsToCreate,staffAdditionalInfoDTO);
+            Set<LocalDateTime> dates = shiftsToCreate.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
+            Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shiftsToCreate.get(0).getUnitId(), dates);
+            shiftService.saveShiftWithActivity(phaseListByDate,shiftsToCreate,staffAdditionalInfoDTO);
             timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }

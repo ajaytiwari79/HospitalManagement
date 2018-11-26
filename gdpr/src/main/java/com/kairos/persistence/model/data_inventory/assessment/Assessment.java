@@ -38,15 +38,18 @@ public class Assessment extends MongoBaseEntity {
     private BigInteger questionnaireTemplateId;
     private UserVO assessmentLastAssistBy;
     private LocalDate assessmentScheduledDate;
+    @NotNull(message = "error.message.start.date.not.Selected")
+    private LocalDate startDate;
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
 
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment) {
+    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment,@NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate) {
         this.name = name;
         this.endDate = endDate;
         this.assigneeList = assigneeList;
         this.approver = approver;
         this.comment=comment;
+        this.startDate=startDate;
     }
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
@@ -112,4 +115,8 @@ public class Assessment extends MongoBaseEntity {
     public List<AssessmentAnswerValueObject> getAssessmentAnswers() { return assessmentAnswers; }
 
     public void setAssessmentAnswers(List<AssessmentAnswerValueObject> assessmentAnswers) { this.assessmentAnswers = assessmentAnswers; }
+
+    public LocalDate getStartDate() { return startDate; }
+
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 }

@@ -36,6 +36,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.employment.Employment;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
@@ -277,11 +278,21 @@ public class StaffService {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
         }
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
+        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
+        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
+        sectorWiseGroupedExpertise.forEach((sector,expertise)->{
+            boolean unitPositionExists=unitPositionGraphRepository.unitPositionExistsByStaffIdAndExpertiseIdsIn(staffId,expertise,sector);
+            if(unitPositionExists){
+                exceptionService.actionNotPermittedException("Unit Position is Created");
+            }
+        });
+        Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
+
         List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
         Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
         staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, expertises);
-        List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
-        Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
+
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
             Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
@@ -295,7 +306,7 @@ public class StaffService {
             boolean isSeniorityLevelMatched = false;
             for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
                 if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 &&
-                        (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() <= seniorityLevel.getTo() * 12)) {
+                        (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
                     isSeniorityLevelMatched = true;
                     break;
                 }
@@ -933,7 +944,7 @@ public class StaffService {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
 
         unitPermission = unitPermission == null ? new UnitPermission() : unitPermission;
-        AccessGroup accessGroup =accessGroupRepository.findOne(accessGroupId); //union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
+        AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organizationId, accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
             linkAccessOfModules(accessGroup, unitPermission);
@@ -973,7 +984,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);//union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
@@ -983,23 +994,15 @@ public class StaffService {
         employmentGraphRepository.save(employment);
     }
 
-    private void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
+    public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
+        employment.setStaff(staff);
         staff.setUser(user);
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-    //TODO fixed if parent org false than create employment in parent and unit permission in unit
-        //        if (!parentOrganization) {
-//            Organization
-//                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
-//            mainOrganization.getEmployments().add(employment);
-//            organizationGraphRepository.save(mainOrganization);
-//        } else {
-//            organization.getEmployments().add(employment);
-//        }
         organization.getEmployments().add(employment);
         organizationGraphRepository.save(organization);
         if (accessGroupId != null) {
@@ -1013,7 +1016,7 @@ public class StaffService {
         }
 
         employmentGraphRepository.save(employment);
-
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())), organization.getId());
 
     }
 

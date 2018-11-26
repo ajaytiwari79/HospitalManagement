@@ -2,14 +2,10 @@ package com.kairos.persistence.model.data_inventory.assessment;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.QuestionType;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentAnswerValueObject {

@@ -5,12 +5,14 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
-
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
+import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
+
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
@@ -68,7 +70,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -81,7 +82,6 @@ import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
 @Transactional
 public class CompanyCreationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CompanyCreationService.class);
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -448,8 +448,8 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createDefalutDataForSubUnit(unit, parentOrganization.getId());
-        accessGroupService.createUnitDefaultAccessGroups(unit, parentOrganization.getId());
+        reasonCodeService.createDefalutDateForSubUnit(unit, parentOrganization.getId());
+        accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
@@ -581,7 +581,6 @@ public class CompanyCreationService {
 
 
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
-        Map<Long,Long> unitAndStaffId=staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v.getStaff().getId()));
         unitIds.add(organizationId);
         if (staffPersonalDetailDTOS.size() != unitIds.size()) {
             exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
@@ -596,40 +595,31 @@ public class CompanyCreationService {
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
         List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
-        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days, LocalTime.of(23,59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING);
+        SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(days,LocalTime.of(23,59),JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING,String.valueOf(organization.getTimeZone()));
         List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
-
-        Map<Long,Map<Long, Long>> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
                 countryId);
         if (parentId == null) {
-            List<Future<Object>> hasUpdated = companyDefaultDataService
-                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId,unitAndStaffId);
-            //CompletableFuture.allOf(hasUpdated).join();
-            hasUpdated.forEach(data -> {
-                try {
-                    data.get();
-                } catch (InterruptedException | ExecutionException ex){
-                   logger.info("failed...............");
-                }
-            });
-            Map<Long,Map<Long, Long>> orgAndUnitAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganizations(unitIds);
+            CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
+                    .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
+            CompletableFuture.allOf(hasUpdated).join();
+
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,orgAndUnitAccessGroupIdsMap,unitAndStaffId);
+                    .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
             CompletableFuture.allOf(createdInUnit).join();
 
 
         } else {
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots,countryAndOrgAccessGroupIdsMap,unitAndStaffId);
+                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots);
             CompletableFuture.allOf(createdInUnit).join();
         }
 
-        //QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         List<QueryResult> childQueryResults = new ArrayList<>();
         for (Organization childUnits : organization.getChildren()) {
@@ -639,7 +629,6 @@ public class CompanyCreationService {
         organizationQueryResult.setChildren(childQueryResults);
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
-
 
     private void addStaffsInChatServer(List<Staff> staffList) {
         staffList.forEach(staff -> {

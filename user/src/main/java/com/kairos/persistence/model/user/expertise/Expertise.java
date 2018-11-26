@@ -34,7 +34,7 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     Country country;
 
-    @Relationship(type = BELONGS_TO)
+    @Relationship(type = BELONGS_TO_SECTOR)
     private Sector sector;
 
     @Relationship(type = HAS_TAG)

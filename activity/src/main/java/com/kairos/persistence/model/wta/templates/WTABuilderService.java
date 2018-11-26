@@ -57,7 +57,6 @@ public class WTABuilderService extends MongoBaseService {
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate)wtaBaseRuleTemplate;
                     activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId,seniorDaysPerYearWTATemplate.getActivityIds());
                     seniorDaysPerYearWTATemplate.setActivityIds(activityIds);
-                    activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
                     break;
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)wtaBaseRuleTemplate;

@@ -7,12 +7,14 @@ import com.kairos.config.codec.BigIntegerCodecProvider;
 import com.kairos.config.codec.BigIntegerTransformer;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.utils.user_context.UserContext;
 import com.mongodb.*;
 import org.bson.BSON;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
@@ -28,7 +30,9 @@ import org.springframework.core.annotation.Order;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -38,6 +42,7 @@ public class JaversMongoConfig {
 
     @Inject
     private EnvConfig environment;
+
 
 
 
@@ -63,7 +68,7 @@ public class JaversMongoConfig {
         MongoClientOptions.Builder builder = MongoClientOptions.builder()
                 .codecRegistry(codecRegistry);
         final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(), environment.getDataBaseName(), environment.getMongoPassword().toCharArray()));
-        return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList,builder.build());
+        return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList, builder.build());
 
     }
 
@@ -80,15 +85,14 @@ public class JaversMongoConfig {
 
     @Bean
     public AuthorProvider authorProvider() {
-        return new SpringSecurityAuthorProvider();
+        return new SpringSecurityAuthorProviderConfig();
     }
 
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return () -> ImmutableMap.of("key", "ok");
+        return () -> ImmutableMap.of("key","ok");
+
     }
-
-
 
 
 }

@@ -11,6 +11,7 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.service.clause_tag.ClauseTagService;
@@ -89,6 +90,7 @@ public class ClauseService extends MongoBaseService {
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
                 ObjectMapperUtils.copyProperties(masterClauseDTO, clause);
             }
+            clause.setTags(clauseTags);
         } else {
             clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags);
             if (isUnitId) {
@@ -139,7 +141,7 @@ public class ClauseService extends MongoBaseService {
         return clauseMongoRepository.findAllClauseByCountryId(countryId);
     }
 
-    public List<ClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
+    public List<ClauseBasicResponseDTO> getAllClauseByUnitId(Long unitId) {
         return clauseMongoRepository.findAllClauseByUnitId(unitId);
     }
 
@@ -161,7 +163,7 @@ public class ClauseService extends MongoBaseService {
      */
     public Boolean deleteClauseById(Long referenceId, boolean isUnitId, BigInteger clauseId) {
 
-        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplateListByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+        List<AgreementTemplateBasicResponseDTO> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
         if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
             exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(AgreementTemplateBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
