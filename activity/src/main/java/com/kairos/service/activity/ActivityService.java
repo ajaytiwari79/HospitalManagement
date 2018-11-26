@@ -287,7 +287,7 @@ public class ActivityService extends MongoBaseService {
         if (!generalDTO.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         }
-        updateBalanceTab(generalDTO,activity);
+        updateBalanceSettingTab(generalDTO,activity);
         updateNotesTabOfActivity(generalDTO,activity);
         updatePermissionsTabOfActivity(generalDTO,activity);
         save(activity);
@@ -353,7 +353,7 @@ public class ActivityService extends MongoBaseService {
         return activityTabsWrapper;
     }*/
 
-    public BalanceSettingsActivityTab updateBalanceTab(GeneralActivityTabDTO generalActivityTabDTO,Activity activity) {
+    public BalanceSettingsActivityTab updateBalanceSettingTab(GeneralActivityTabDTO generalActivityTabDTO, Activity activity) {
         /*BalanceSettingsActivityTab balanceSettingsTab = new BalanceSettingsActivityTab();
         ObjectMapperUtils.copyProperties(generalActivityTabDTO, balanceSettingsTab);
         *//*Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(balanceDTO.getActivityId())));

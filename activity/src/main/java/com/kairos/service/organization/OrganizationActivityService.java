@@ -16,7 +16,6 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -295,7 +294,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if(!generalDTO.getTags().isEmpty()){
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         }
-        activityService.updateBalanceTab(generalDTO,activity);
+        activityService.updateBalanceSettingTab(generalDTO,activity);
         activityService.updateNotesTabOfActivity(generalDTO,activity);
         activityService.updatePermissionsTabOfActivity(generalDTO,activity);
         save(activity);
