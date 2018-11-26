@@ -9,7 +9,6 @@ import java.io.Serializable;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
 @NodeEntity
-@QueryResult
 public class SeniorityLevelFunction extends UserBaseEntity  implements Serializable {
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;

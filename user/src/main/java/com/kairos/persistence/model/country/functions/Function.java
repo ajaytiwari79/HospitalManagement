@@ -22,7 +22,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-@QueryResult
 public class Function extends UserBaseEntity {
     private String name;
     private String description;

@@ -17,6 +17,13 @@ public class SeniorityLevelFunctionQR {
         // dc
     }
 
+    public SeniorityLevelFunctionQR(Long seniorityLevelId, Integer from, Integer to, List<FunctionQR> functions) {
+        this.seniorityLevelId = seniorityLevelId;
+        this.from = from;
+        this.to = to;
+        this.functions = functions;
+    }
+
     public Long getSeniorityLevelId() {
         return seniorityLevelId;
     }

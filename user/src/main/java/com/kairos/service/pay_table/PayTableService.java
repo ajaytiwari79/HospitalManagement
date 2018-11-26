@@ -546,7 +546,7 @@ public class PayTableService {
 
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
-        if(payTable.getPercentageValue()!=null){
+        if(payTable.getPercentageValue()!=null && parentPayTable!=null){
             functionalPaymentService.updateAmountInFunctionalTable(parentPayTable.getId(),payTable.getStartDateMillis(),payTable.getEndDateMillis(),payTable.getPercentageValue());
         }
 

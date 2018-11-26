@@ -23,7 +23,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LE
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-@QueryResult
 public class PayGroupArea extends UserBaseEntity {
     private String name;
     private String description;

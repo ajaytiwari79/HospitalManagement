@@ -4,9 +4,12 @@ package com.kairos.persistence.model.user.expertise.Response;
  *
  */
 
+import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.FunctionalPaymentMatrix;
+import com.kairos.persistence.model.user.expertise.SeniorityLevelFunctionsRelationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
@@ -15,9 +18,11 @@ import java.util.List;
 @QueryResult
 public class FunctionalPaymentQueryResult {
    private Long id;
+    @Convert(LocalDateConverter.class)
    private LocalDate startDate;
+    @Convert(LocalDateConverter.class)
    private LocalDate endDate;
-   private List<FunctionalPaymentMatrix> functionalPaymentMatrices;
+   private List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrices;
    private Expertise expertise;
    private PaidOutFrequencyEnum paymentUnit;
 
@@ -26,6 +31,13 @@ public class FunctionalPaymentQueryResult {
         //Default Constructor
     }
 
+    public FunctionalPaymentQueryResult(Long id, LocalDate startDate, LocalDate endDate, Expertise expertise, PaidOutFrequencyEnum paymentUnit) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.expertise = expertise;
+        this.paymentUnit = paymentUnit;
+    }
 
     public Long getId() {
         return id;
@@ -60,11 +72,11 @@ public class FunctionalPaymentQueryResult {
         this.expertise = expertise;
     }
 
-    public List<FunctionalPaymentMatrix> getFunctionalPaymentMatrices() {
+    public List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrices() {
         return functionalPaymentMatrices;
     }
 
-    public void setFunctionalPaymentMatrices(List<FunctionalPaymentMatrix> functionalPaymentMatrices) {
+    public void setFunctionalPaymentMatrices(List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrices) {
         this.functionalPaymentMatrices = functionalPaymentMatrices;
     }
 

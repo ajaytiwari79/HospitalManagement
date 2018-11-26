@@ -18,7 +18,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  * Created by vipul on 27/3/18.
  */
 @NodeEntity
-@QueryResult
 public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years

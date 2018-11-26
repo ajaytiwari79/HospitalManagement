@@ -16,7 +16,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_F
  */
 
 @RelationshipEntity(type = HAS_FUNCTIONAL_AMOUNT)
-@QueryResult
 public class SeniorityLevelFunctionsRelationship extends UserBaseEntity {
     @StartNode
     private SeniorityLevelFunction seniorityLevelFunction;
