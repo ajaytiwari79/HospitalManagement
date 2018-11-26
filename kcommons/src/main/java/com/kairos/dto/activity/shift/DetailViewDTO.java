@@ -14,7 +14,6 @@ public class DetailViewDTO {
     private Long staffId;
     private ShiftDetailViewDTO shifts;
     List<AttendanceTimeSlot> attendanceTimeSlot;
-
     public DetailViewDTO() {
     }
 

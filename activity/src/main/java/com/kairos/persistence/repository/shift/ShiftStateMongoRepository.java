@@ -28,8 +28,8 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
     @Query("{deleted:false,staffId:{$in:?0}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<ShiftState> getAllByStaffsByIdsBetweenDate(List<Long> staffIds, Date startDate, Date endDate);
 
-    @Query("{deleted:false,shiftId:?0}")
-    ShiftState findShiftStateByShiftIdAndActualPhase(BigInteger shiftId, String actualPhaseState);
+    @Query("{deleted:false,shiftId:?0,shiftStatePhaseId:?1}")
+    ShiftState findShiftStateByShiftIdAndActualPhase(BigInteger shiftId, BigInteger shiftStatePhaseId);
 
     @Query("{deleted:false,shiftId:{$in:?0},shiftStatePhaseId:?1}")
     List<ShiftState> findShiftStateByShiftIdsAndPhaseId(List<BigInteger> shiftId, BigInteger shiftStatePhaseId);

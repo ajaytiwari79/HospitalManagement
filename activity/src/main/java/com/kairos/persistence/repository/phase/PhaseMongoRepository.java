@@ -20,8 +20,8 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
     @Query(value = "{organizationId:?0 ,name:?1}")
     Phase findByUnitIdAndName(Long unitId, String name);
 
-    @Query(value = "{organizationId:?0 ,'$or':[{'phaseEnum':?1},{'phaseEnum':?2}]}")
-    List<Phase> findByUnitIdAndPhaseEnum(Long unitId, String realTimePhase, String tAndAphase);
+    @Query(value = "{organizationId:?0 ,'phaseEnum':?1}")
+    Phase findByUnitIdAndPhaseEnum(Long unitId, String realTimePhase);
 
 
     @Query(value = "{sequence:?0 ,countryId:?1 ,deleted:false}", count = true)
