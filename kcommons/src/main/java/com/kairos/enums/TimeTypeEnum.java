@@ -6,7 +6,8 @@ package com.kairos.enums;/*
 public enum TimeTypeEnum {
     PRESENCE,
     ABSENCE,
-    BREAK,
+    PAID_BREAK,
+    UNPAID_BREAK,
     VETO,
     STOP_BRICK,
     VOLUNTEER,
