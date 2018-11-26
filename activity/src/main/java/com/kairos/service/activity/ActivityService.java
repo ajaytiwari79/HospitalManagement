@@ -265,7 +265,7 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO, generalTab);
@@ -275,24 +275,36 @@ public class ActivityService extends MongoBaseService {
         if (Optional.ofNullable(activity.getGeneralActivityTab().getOriginalIconName()).isPresent()) {
             generalTab.setOriginalIconName(activity.getGeneralActivityTab().getOriginalIconName());
         }
-        activity.getBalanceSettingsActivityTab().setTimeTypeId(activityCategory.getTimeTypeId());
         activity.setGeneralActivityTab(generalTab);
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
-        save(activity);
-        List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
+
+        List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
         ObjectMapperUtils.copyProperties(generalTab, generalActivityTabWithTagDTO, "tags");
         if (!generalDTO.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         }
+        updateBalanceTab(generalDTO,activity);
+        updateNotesTabOfActivity(generalDTO,activity);
+        updatePermissionsTabOfActivity(generalDTO,activity);
+        save(activity);
+        generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
+        generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
+        generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
+        generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
+        generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
+        generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        generalActivityTabWithTagDTO.setEligibleForCopy(activity.getPermissionsActivityTab().isEligibleForCopy());
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
         return activityTabsWrapper;
     }
 
-    public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger countryId, BigInteger activityId) {
+    public ActivityTabsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -304,16 +316,31 @@ public class ActivityService extends MongoBaseService {
         if (!activity.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
+        generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
+        generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
+        generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
+        generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
+        generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
+        generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        if(activity.getPermissionsActivityTab()!=null) {
+            generalActivityTabWithTagDTO.setEligibleForCopy(activity.getPermissionsActivityTab().isEligibleForCopy());
+        }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
+        activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
+        activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activity.getBalanceSettingsActivityTab().getTimeTypeId(), countryId));
         return activityTabsWrapper;
     }
 
-    private List<ActivityCategory> checkCountryAndFindActivityCategory(BigInteger countryId) {
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId.longValue());
+    private List<ActivityCategory> checkCountryAndFindActivityCategory(Long countryId) {
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         return activityCategories;
     }
 
-    public ActivityTabsWrapper getBalanceSettingsTabOfActivity(BigInteger activityId, Long countryId) {
+   /* public ActivityTabsWrapper getBalanceSettingsTabOfActivity(BigInteger activityId, Long countryId) {
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -324,32 +351,39 @@ public class ActivityService extends MongoBaseService {
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsActivityTab, presenceType);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), countryId));
         return activityTabsWrapper;
-    }
+    }*/
 
-    public ActivityTabsWrapper updateBalanceTab(BalanceSettingActivityTabDTO balanceDTO) {
-        BalanceSettingsActivityTab balanceSettingsTab = new BalanceSettingsActivityTab();
-        ObjectMapperUtils.copyProperties(balanceDTO, balanceSettingsTab);
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(balanceDTO.getActivityId())));
+    public BalanceSettingsActivityTab updateBalanceTab(GeneralActivityTabDTO generalActivityTabDTO,Activity activity) {
+        /*BalanceSettingsActivityTab balanceSettingsTab = new BalanceSettingsActivityTab();
+        ObjectMapperUtils.copyProperties(generalActivityTabDTO, balanceSettingsTab);
+        *//*Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(balanceDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
-        }
-        TimeType timeType = timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
+        }*/
+        TimeType timeType = timeTypeMongoRepository.findOneById(generalActivityTabDTO.getTimeTypeId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timetype.notfound");
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
-        activity.setBalanceSettingsActivityTab(balanceSettingsTab);
+        //activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
         //updating activity category based on time type
         Long countryId = activity.getCountryId();
-        if (countryId == null)
+        if (countryId == null) {
             countryId = genericIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
+        }
+        activity.getBalanceSettingsActivityTab().setTimeTypeId(generalActivityTabDTO.getTimeTypeId());
+        activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
+        activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
+        activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
+        activity.getBalanceSettingsActivityTab().setTimeType(generalActivityTabDTO.getTimeType());
         updateActivityCategory(activity, countryId);
-        save(activity);
+        /*save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
         activityTabsWrapper.setActivityCategories(activityCategoryRepository.findByCountryId(countryId));
-        return activityTabsWrapper;
+        return activityTabsWrapper;*/
+        return activity.getBalanceSettingsActivityTab();
     }
 
     public void updateActivityCategory(Activity activity, Long countryId) {
@@ -519,23 +553,20 @@ public class ActivityService extends MongoBaseService {
         return new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
     }
 
-    public ActivityTabsWrapper updateNotesTabOfActivity(NotesActivityDTO notesActivityDTO) {
-        NotesActivityTab notesActivityTab = new NotesActivityTab();
+    public NotesActivityTab updateNotesTabOfActivity(GeneralActivityTabDTO generalActivityTabDTO,Activity activity) {
+        /*NotesActivityTab notesActivityTab = new NotesActivityTab();
         ObjectMapperUtils.copyProperties(notesActivityDTO, notesActivityTab);
 
         Activity activity = activityMongoRepository.findOne(notesActivityDTO.getActivityId());
+        */
         if (Optional.ofNullable(activity.getNotesActivityTab().getModifiedDocumentName()).isPresent()) {
-            notesActivityTab.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+            activity.getNotesActivityTab().setModifiedDocumentName(generalActivityTabDTO.getModifiedDocumentName());
         }
         if (Optional.ofNullable(activity.getNotesActivityTab().getOriginalDocumentName()).isPresent()) {
-            notesActivityTab.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
+            activity.getNotesActivityTab().setOriginalDocumentName(generalActivityTabDTO.getOriginalDocumentName());
         }
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", notesActivityDTO.getActivityId());
-        }
-        activity.setNotesActivityTab(notesActivityTab);
-        save(activity);
-        return new ActivityTabsWrapper(notesActivityTab);
+        activity.getNotesActivityTab().setContent(generalActivityTabDTO.getContent());
+        return activity.getNotesActivityTab();
     }
 
     public ActivityTabsWrapper getNotesTabOfActivity(BigInteger activityId) {
@@ -588,15 +619,10 @@ public class ActivityService extends MongoBaseService {
 
     // PERMISSIONS
 
-    public ActivityTabsWrapper updatePermissionsTabOfActivity(PermissionsActivityTabDTO permissionsActivityTabDTO) {
-        PermissionsActivityTab permissionsActivityTab = new PermissionsActivityTab(permissionsActivityTabDTO.isEligibleForCopy());
-        Activity activity = activityMongoRepository.findOne(permissionsActivityTabDTO.getActivityId());
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", permissionsActivityTabDTO.getActivityId());
-        }
+    public PermissionsActivityTab updatePermissionsTabOfActivity(GeneralActivityTabDTO generalActivityTabDTO,Activity activity) {
+        PermissionsActivityTab permissionsActivityTab = new PermissionsActivityTab(generalActivityTabDTO.isEligibleForCopy());
         activity.setPermissionsActivityTab(permissionsActivityTab);
-        save(activity);
-        return new ActivityTabsWrapper(permissionsActivityTab);
+        return activity.getPermissionsActivityTab();
     }
 
     public ActivityTabsWrapper getPermissionsTabOfActivity(BigInteger activityId) {
