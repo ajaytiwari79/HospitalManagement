@@ -8,16 +8,17 @@ import java.util.List;
 
 @QueryResult
 public class AccessGroupStaffQueryResult {
-    private Organization currentOrganization;
+    private Organization organization;
     private Long staffId;
+    private List<AccessGroupDayTypesQueryResult> dayTypesByAccessGroup;
     private List<DayType> dayTypes;
 
-    public Organization getCurrentOrganization() {
-        return currentOrganization;
+    public Organization getOrganization() {
+        return organization;
     }
 
-    public void setCurrentOrganization(Organization currentOrganization) {
-        this.currentOrganization = currentOrganization;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public Long getStaffId() {
@@ -34,6 +35,14 @@ public class AccessGroupStaffQueryResult {
 
     public void setDayTypes(List<DayType> dayTypes) {
         this.dayTypes = dayTypes;
+    }
+
+    public List<AccessGroupDayTypesQueryResult> getDayTypesByAccessGroup() {
+        return dayTypesByAccessGroup;
+    }
+
+    public void setDayTypesByAccessGroup(List<AccessGroupDayTypesQueryResult> dayTypesByAccessGroup) {
+        this.dayTypesByAccessGroup = dayTypesByAccessGroup;
     }
 }
 

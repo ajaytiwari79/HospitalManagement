@@ -349,7 +349,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) WHERE ID(pag) IN {1} return id(ag) as id,id(pag) as parentId")
     List<AccessPageQueryResult> findAllAccessGroupWithParentIds(Long organizationId,Set<Long> parentAccessGroupsIds);
 
-    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPosition:UnitPosition)-[:"+IN_UNIT+"]-(currentOrganization:Organization) WHERE id(currentOrganization)={0} AND id(user)={1}\n" +
+    /*@Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPosition:UnitPosition)-[:"+IN_UNIT+"]-(currentOrganization:Organization) WHERE id(currentOrganization)={0} AND id(user)={1}\n" +
             "OPTIONAL MATCH(currentOrganization)<-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganizationOptional:Organization)\n" +
             "WITH currentOrganization,parentOrganizationOptional,staff,\n" +
             "CASE WHEN currentOrganization.isParentOrganization=true THEN currentOrganization  ELSE parentOrganizationOptional END AS parentOrganization\n" +
@@ -359,8 +359,16 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "WITH currentOrganization,staff, accessGroup\n" +
             "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType)\n" +
             "RETURN \n" +
-            "currentOrganization,id(staff) AS staffId,COLLECT(DISTINCT dayTypes) AS dayTypes")
-    AccessGroupStaffQueryResult getManagementRoleDayTypesAndStaffId(Long unitId, Long userId);
+            "currentOrganization,id(staff) AS staffId,COLLECT(DISTINCT dayTypes) AS dayTypes")*/
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization)\n" +
+            "WHERE id(organization)={0} AND id(user)={1}\n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:\"MANAGEMENT\"})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(organization)\n" +
+            "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType{holidayType:false})\n" +
+            //"OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType{holidayType:true})-[:DAY_TYPE]-(cHC:CountryHolidayCalender)
+            "WITH organization,id(staff) AS staffId,accessGroup,COLLECT(DISTINCT {id:id(dayTypes),holidayType:dayTypes.holidayType,validDays:dayTypes.validDays,name:dayTypes.name,allowTimeSettings:dayTypes.allowTimeSettings}) AS dayTypes \n" +
+            "RETURN\n" +
+            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayTypes}) AS dayTypesByAccessGroup")
+    AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long userId);
 }
 
 
