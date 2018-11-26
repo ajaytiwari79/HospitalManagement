@@ -373,4 +373,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "END")
     String validateOrganizationStaffUnitPosition(Long unitId,Long staffId,Long unitPositionId);
 
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false})-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WHERE id(staff) ={0} AND id(expertise) IN {1} AND id(sector) ={2}" +
+            "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
+    boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
+
 }
