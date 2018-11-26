@@ -10,4 +10,6 @@ import java.util.List;
 public interface CustomTimeAndAttendanceRepository {
 
     TimeAndAttendance findMaxAttendanceCheckIn(List<Long> staffIds, Date date);
+
+    List<TimeAndAttendance> findAllAttendanceByStaffIds(List<Long> staffIds, Date date);
 }

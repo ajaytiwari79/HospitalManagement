@@ -30,6 +30,18 @@ public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceR
        return (result.getMappedResults().isEmpty())?null:result.getMappedResults().get(0);
    }
 
+    @Override
+    public List<TimeAndAttendance> findAllAttendanceByStaffIds(List<Long> staffIds, Date date) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("staffid").in(staffIds).and("updatedAt").gte(date)),
+                sort(Sort.Direction.DESC,"updatedAt"),
+                limit(1)
+        );
+
+        AggregationResults<TimeAndAttendance> result = mongoTemplate.aggregate(aggregation, TimeAndAttendance.class, TimeAndAttendance.class);
+        return (result.getMappedResults().isEmpty())?null:result.getMappedResults();
     }
+
+}
 
 

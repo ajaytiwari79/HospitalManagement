@@ -11,18 +11,16 @@ import java.util.List;
  */
 
 public class DetailViewDTO {
-
+    private Long staffId;
     private ShiftDetailViewDTO shifts;
     List<AttendanceTimeSlot> attendanceTimeSlot;
-    private List<ReasonCodeDTO> reasonCodes;
-
 
     public DetailViewDTO() {
     }
 
-    public DetailViewDTO(ShiftDetailViewDTO shifts, List<ReasonCodeDTO> reasonCodes,List<AttendanceTimeSlot> attendanceTimeSlot) {
+    public DetailViewDTO(Long staffId,ShiftDetailViewDTO shifts,List<AttendanceTimeSlot> attendanceTimeSlot) {
+        this.staffId=staffId;
         this.shifts = shifts;
-        this.reasonCodes = reasonCodes;
         this.attendanceTimeSlot=attendanceTimeSlot;
     }
 
@@ -34,19 +32,19 @@ public class DetailViewDTO {
         this.shifts = shifts;
     }
 
-    public List<ReasonCodeDTO> getReasonCodes() {
-        return reasonCodes;
-    }
-
-    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
-        this.reasonCodes = reasonCodes;
-    }
-
     public List<AttendanceTimeSlot> getAttendanceTimeSlot() {
         return attendanceTimeSlot;
     }
 
     public void setAttendanceTimeSlot(List<AttendanceTimeSlot> attendanceTimeSlot) {
         this.attendanceTimeSlot = attendanceTimeSlot;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }

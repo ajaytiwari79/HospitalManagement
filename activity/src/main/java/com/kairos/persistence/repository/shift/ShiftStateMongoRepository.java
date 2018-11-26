@@ -34,8 +34,8 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
     @Query("{deleted:false,shiftId:{$in:?0},shiftStatePhaseId:?1}")
     List<ShiftState> findShiftStateByShiftIdsAndPhaseId(List<BigInteger> shiftId, BigInteger shiftStatePhaseId);
 
-    @Query("{deleted:false,shiftId:?0}")
-    ShiftState findShiftStateByShiftIdAndActualPhaseAndRole(BigInteger shiftId, String actualPhaseState, AccessGroupRole role);
+    @Query("{deleted:false,shiftId:?0,shiftStatePhaseId:?1,accessGroupRole:?2}")
+    ShiftState findShiftStateByShiftIdAndActualPhaseAndRole(BigInteger shiftId, BigInteger shiftStatePhaseId, AccessGroupRole role);
 
     @Query("{deleted:false,staffId:{$in:?0},startDate: {$lt: ?3},endDate:{$gt:?2}}")
     List<ShiftState> findAllShiftStateByShiftIdAndActualPhase(List<Long> staffIds, String actualPhaseState,Date startDate, Date endDate);

@@ -59,7 +59,7 @@ public class ShiftDTO {
     private boolean editable;
     private boolean functionDeleted;
     private ShiftType shiftType;
-
+    private BigInteger shiftStatePhaseId;
 
    public ShiftDTO(BigInteger id, Date startDate,Date endDate,Long unitId,Long staffId) {
        this.id = id;
@@ -265,6 +265,14 @@ public class ShiftDTO {
 
     public void setAccumulatedTimeBankInMinutes(long accumulatedTimeBankInMinutes) {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+    }
+
+    public BigInteger getShiftStatePhaseId() {
+        return shiftStatePhaseId;
+    }
+
+    public void setShiftStatePhaseId(BigInteger shiftStatePhaseId) {
+        this.shiftStatePhaseId = shiftStatePhaseId;
     }
 
     @JsonIgnore
