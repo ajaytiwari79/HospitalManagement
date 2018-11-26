@@ -23,7 +23,10 @@ public class ShiftActivity {
     private String activityName;
     private long bid;
     private long pId;
+    //used in T&A view
     private Long reasonCodeId;
+    //used for adding absence type of activities.
+    private Long absenceReasonCodeId;
     private String remarks;
     private BigInteger id;
     private String timeType;
@@ -194,5 +197,13 @@ public class ShiftActivity {
 
     public void setBreakShift(boolean breakShift) {
         this.breakShift = breakShift;
+    }
+
+    public Long getAbsenceReasonCodeId() {
+        return absenceReasonCodeId;
+    }
+
+    public void setAbsenceReasonCodeId(Long absenceReasonCodeId) {
+        this.absenceReasonCodeId = absenceReasonCodeId;
     }
 }
