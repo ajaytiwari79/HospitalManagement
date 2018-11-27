@@ -25,6 +25,7 @@ public class ShiftActivity {
     private long pId;
     private Long reasonCodeId;
     private String remarks;
+    //please don't use this id for any functionality this on ly for frontend
     private BigInteger id;
     private String timeType;
     private String backgroundColor;

@@ -21,7 +21,7 @@ public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceR
 
    public TimeAndAttendance findMaxAttendanceCheckIn(List<Long> staffIds, Date date){
        Aggregation aggregation = Aggregation.newAggregation(
-               match(Criteria.where("staffid").in(staffIds).and("updatedAt").gte(date)),
+               match(Criteria.where("staffId").in(staffIds).and("updatedAt").gte(date)),
                sort(Sort.Direction.DESC,"updatedAt"),
                limit(1)
        );
@@ -33,7 +33,7 @@ public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceR
     @Override
     public List<TimeAndAttendance> findAllAttendanceByStaffIds(List<Long> staffIds, Date date) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("staffid").in(staffIds).and("updatedAt").gte(date)),
+                match(Criteria.where("staffId").in(staffIds).and("updatedAt").gte(date)),
                 sort(Sort.Direction.DESC,"updatedAt"),
                 limit(1)
         );

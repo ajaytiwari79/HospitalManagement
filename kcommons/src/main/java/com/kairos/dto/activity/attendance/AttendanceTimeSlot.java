@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.attendance;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public class AttendanceTimeSlot {
@@ -11,6 +12,8 @@ public class AttendanceTimeSlot {
     private Long clockInReasonCode;
     private Long clockOutReasonCode;
     private Long unitPositionId;
+    private BigInteger shiftId;
+    private boolean systemGeneratedClockOut;
 
     public AttendanceTimeSlot() {
     }
@@ -20,6 +23,14 @@ public class AttendanceTimeSlot {
         this.clockInReasonCode = clockInReasonCode;
         this.unitPositionId = unitPositionId;
         this.unitId=unitId;
+    }
+
+    public AttendanceTimeSlot(LocalDateTime from, Long unitId, Long clockInReasonCode, Long unitPositionId, BigInteger shiftId) {
+        this.from = from;
+        this.unitId = unitId;
+        this.clockInReasonCode = clockInReasonCode;
+        this.unitPositionId = unitPositionId;
+        this.shiftId = shiftId;
     }
 
     public LocalDateTime getFrom() {
@@ -68,5 +79,21 @@ public class AttendanceTimeSlot {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public BigInteger getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(BigInteger shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public boolean isSystemGeneratedClockOut() {
+        return systemGeneratedClockOut;
+    }
+
+    public void setSystemGeneratedClockOut(boolean systemGeneratedClockOut) {
+        this.systemGeneratedClockOut = systemGeneratedClockOut;
     }
 }
