@@ -27,7 +27,6 @@ public class ActivityTabsWrapper {
 
     private GeneralActivityTabWithTagDTO generalTab;
     private List<ActivityCategory> activityCategories;
-    private BalanceSettingsActivityTab balanceSettingsTab;
     private RulesActivityTab rulesTab;
     private IndividualPointsActivityTab individualPointsTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
@@ -99,15 +98,6 @@ public class ActivityTabsWrapper {
         this.employmentTypes=employmentTypes;
     }
 
-    public ActivityTabsWrapper(BalanceSettingsActivityTab balanceSettingsTab) {
-        this.balanceSettingsTab = balanceSettingsTab;
-    }
-
-    public ActivityTabsWrapper(BalanceSettingsActivityTab balanceSettingsTab, PresenceTypeWithTimeTypeDTO presenceTypeWithTimeType) {
-        this.balanceSettingsTab = balanceSettingsTab;
-        this.presenceTypeWithTimeType = presenceTypeWithTimeType;
-    }
-
     public ActivityTabsWrapper() {
     }
 
@@ -158,14 +148,6 @@ public class ActivityTabsWrapper {
 
     public void setActivityCategories(List<ActivityCategory> activityCategories) {
         this.activityCategories = activityCategories;
-    }
-
-    public BalanceSettingsActivityTab getBalanceSettingsTab() {
-        return balanceSettingsTab;
-    }
-
-    public void setBalanceSettingsTab(BalanceSettingsActivityTab balanceSettingsTab) {
-        this.balanceSettingsTab = balanceSettingsTab;
     }
 
 

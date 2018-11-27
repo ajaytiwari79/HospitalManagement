@@ -102,7 +102,7 @@ public class TimeBankCalculationService {
                         shiftInterval = interval.overlap(shiftInterval);
                         if (!ctaDto.getCtaRuleTemplates().isEmpty()) {
                             for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
-                                boolean ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), DateUtils.asLocalDate(shiftActivity.getStartDate())) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                                boolean ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), DateUtils.asLocalDate(shiftActivity.getStartDate()),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                                 if (ruleTemplateValid) {
                                     int ctaTimeBankMin = 0;
                                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
@@ -226,9 +226,10 @@ public class TimeBankCalculationService {
      * @param activityId
      * @param timeTypeId
      * @param shiftDate
+     * @param plannedTimeId
      * @return
      */
-    public boolean validateCTARuleTemplate(CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,java.time.LocalDate shiftDate) {
+    public boolean validateCTARuleTemplate(CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,java.time.LocalDate shiftDate,BigInteger plannedTimeId) {
         boolean valid = true;
         if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null){
             valid = false;
@@ -237,7 +238,7 @@ public class TimeBankCalculationService {
             valid = false;
         if (valid && (CollectionUtils.isEmpty(ruleTemplate.getPhaseInfo()) || !(ruleTemplate.getPhaseInfo().stream().filter(p -> p.getPhaseId().equals(shiftPhaseId)).findFirst().isPresent())))
             valid = false;
-        if(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId)))) {
+        if(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId)) {
             valid = true;
         }
         if(valid && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate)))){
