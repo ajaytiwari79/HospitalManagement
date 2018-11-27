@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.AppConstants.PAID_BREAK;
+import static com.kairos.constants.AppConstants.UNPAID_BREAK;
+import static com.kairos.enums.shift.BreakPaymentSetting.PAID;
+
 @Service
 public class BreakSettingsService extends MongoBaseService {
 
@@ -54,10 +58,9 @@ public class BreakSettingsService extends MongoBaseService {
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.duplicateDataException("error.expertise.notfound");
         }
-        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId, expertise.getBreakPaymentSetting().toString());
+        String secondLevelTimeType=expertise.getBreakPaymentSetting().toString().equals(PAID)?PAID_BREAK:UNPAID_BREAK;
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId,secondLevelTimeType );
         List<BigInteger> parentIds = timeTypes.stream().map(TimeType::getId).collect(Collectors.toList());
-        List<TimeType> childTimeType = timeTypeMongoRepository.findAllChildTimeTypeByParentId(parentIds);
-        parentIds.addAll(childTimeType.stream().map(TimeType::getId).collect(Collectors.toList()));
         List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);
 
         List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);

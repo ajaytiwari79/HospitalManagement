@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class OrderResponseDTO {
     private Long unitId;
@@ -17,7 +18,7 @@ public class OrderResponseDTO {
     private LocalDate endDate;
     private LocalTime fromTime;
     private LocalTime toTime;
-    private WeekType weekType;
+    private Set<WeekType> weekType;
     private List<DayOfWeek> dayType = new ArrayList<DayOfWeek>();
     private Long reasonCodeId;
     private String noteForPlanner;
@@ -127,14 +128,13 @@ public class OrderResponseDTO {
         this.toTime = toTime;
     }
 
-    public WeekType getWeekType() {
+    public Set<WeekType> getWeekType() {
         return weekType;
     }
 
-    public void setWeekType(WeekType weekType) {
+    public void setWeekType(Set<WeekType> weekType) {
         this.weekType = weekType;
     }
-
 
     public Long getReasonCodeId() {
         return reasonCodeId;
