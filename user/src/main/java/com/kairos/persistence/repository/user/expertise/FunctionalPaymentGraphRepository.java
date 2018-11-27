@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -79,48 +80,19 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "SET rel.amount=toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100) ")
     void updateFunctionalAmount(List<Long> functionalPaymentIds, String percentageValue);
 
-    @Query("MATCH(p:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(sl:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(f:Function) "+
-            "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(fp:FunctionalPayment) "+
-            "WHERE id(p) IN {0} " +
-            "SET rel.amount=rel.amount+(rel.amount*{1}/100) ")
-    void updateFunctionalAmountT(Long payTableId, BigDecimal percentageValue);
 
 
-//    @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} \n" +
-//            "MATCH(functionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise:Expertise) \n" +
-//            "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)\n" +
-//            "MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)\n" +
-//            "MATCH(seniorityLevel:SeniorityLevel)-[:"+FOR_SENIORITY_LEVEL+"]-(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
-//            "WITH functionalPayment,seniorityLevel,fpm,expertise,collect({function:{id:id(function),name:function.name},amount:rel.amount,amountEditableAtUnit:rel.amountEditableAtUnit}) as functions\n" +
-//            "MATCH(fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea)  \n" +
-//            "WITH functionalPayment,functions,seniorityLevel,fpm,expertise,collect(id(pga)) as payGroupAreasIds\n" +
-//            "RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate ,functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreasIds:payGroupAreasIds,seniorityLevelFunction:{seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}}) as functionalPaymentMatrices")
-//    List<FunctionalPaymentQueryResult> getFunctionalPaymentDataT(List<Long> functionalPaymentIds);
-
-
-    @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0}\n" +
-            "    MATCH(functionalPayment)-[:APPLICABLE_FOR_EXPERTISE]->(expertise:Expertise)\n" +
-            "    MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix)\n" +
-            "    MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)\n" +
-            "    MATCH(seniorityLevel:SeniorityLevel)-[:FOR_SENIORITY_LEVEL]-(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function:Function)\n" +
-            "    WITH functionalPayment,seniorityLevel,fpm,expertise,collect({function:{id:id(function),name:function.name},amount:rel.amount,amountEditableAtUnit:rel.amountEditableAtUnit}) as functions\n" +
-            "    MATCH(fpm)-[:HAS_PAY_GROUP_AREA]-(pga:PayGroupArea)\n" +
-            "    WITH functionalPayment,functions,seniorityLevel,fpm,expertise,collect(id(pga)) as abc,\n" +
-            "    collect({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction\n" +
-            "    RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate ,functionalPayment.paymentUnit as paymentUnit,expertise as expertise,\n" +
-            "    {seniorityLevelFunction:seniorityLevelFunction,payGroupAreasIds:abc} as functionalPaymentMatrices")
-    List<FunctionalPaymentQueryResult> getFunctionalPaymentDataT(List<Long> functionalPaymentIds);
-
-
-    @Query(" MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0}\n" +
-            " MATCH(functionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPaymentMatrix:FunctionalPaymentMatrix)\n" +
-            " MATCH(functionalPaymentMatrix)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n " +
-            " WITH functionalPaymentMatrix ,COLLECT (id(pga)) as payGroupAreaIds \n" +
-            " MATCH(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)" +
-            " MATCH(seniorityLevel:SeniorityLevel)<-[:" + FOR_SENIORITY_LEVEL + "]- (seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) " +
-            " WITH functionalPaymentMatrix ,seniorityLevel,payGroupAreaIds, COLLECT({functionId:id(function),amountEditableAtUnit:function_amt.amountEditableAtUnit, amount:function_amt.amount}) as functions\n" +
-            " RETURN id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,COLLECT ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction")
+    @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} \n" +
+            "MATCH(functionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise:Expertise) \n" +
+            "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)\n" +
+            "MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)\n" +
+            "MATCH(seniorityLevel:SeniorityLevel)-[:"+FOR_SENIORITY_LEVEL+"]-(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
+            "WITH functionalPayment,seniorityLevel,fpm,expertise,collect({functionId:id(function),amount:rel.amount,amountEditableAtUnit:rel.amountEditableAtUnit}) as functions\n" +
+            "MATCH(fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea)  \n" +
+            "WITH functionalPayment,functions,seniorityLevel,fpm,expertise,collect(id(pga)) as payGroupAreasIds, COLLECT({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction \n" +
+            "RETURN id(functionalPayment) as id ,functionalPayment.startDate as startDate, functionalPayment.endDate as endDate, functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreasIds:payGroupAreasIds,seniorityLevelFunction:seniorityLevelFunction}) as functionalPaymentMatrices")
     List<FunctionalPaymentQueryResult> getFunctionalPaymentData(List<Long> functionalPaymentIds);
+
 
 
 
