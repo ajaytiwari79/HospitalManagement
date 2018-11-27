@@ -15,6 +15,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
@@ -181,11 +182,25 @@ public class ShiftValidatorService {
         //TODO
         activitySpecification.validateRules(shift);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
+        activityRuleViolations.addAll(validateAbsenceReasonCodeRule(activityWrapperMap,shift));
         ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
         return shiftWithViolatedInfoDTO;
     }
 
+    private List<ActivityRuleViolation> validateAbsenceReasonCodeRule(Map<BigInteger,ActivityWrapper> activityWrapperMap,ShiftWithActivityDTO shift) {
+        List<ActivityRuleViolation> activityRuleViolations = new ArrayList<>();
+        for(ShiftActivityDTO shiftActivity:shift.getActivities()) {
+            Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            if(activity.getRulesActivityTab().isReasonCodeRequired()&&activity.getRulesActivityTab().getReasonCodeRequiredState().
+                    equals(ReasonCodeRequiredState.MANDATORY)&&!Optional.ofNullable(shiftActivity.getAbsenceReasonCodeId()).isPresent()) {
+                activityRuleViolations.add(new ActivityRuleViolation(activity.getId(),activity.getName(),0,Collections.singletonList(exceptionService.
+                        convertMessage("message.shift.reasoncode.required",activity.getId()))));
+            }
+        }
+        return activityRuleViolations;
+
+    }
     private List<ActivityRuleViolation> validateTimingOfActivity(ShiftWithActivityDTO shiftDTO, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shiftDTO.getStaffId(), activityIds);
         Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId, v -> v));
