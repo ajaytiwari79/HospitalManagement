@@ -2,7 +2,7 @@ package com.kairos.enums;
 
 public enum TimeTypes {
 
-    WORKING_TYPE("Working time"),NON_WORKING_TYPE("Non working time"), PAID("paid"), UNPAID("Un paid");
+    WORKING_TYPE("Working time"),NON_WORKING_TYPE("Non working time");
 
     private String value;
     TimeTypes(String value){
