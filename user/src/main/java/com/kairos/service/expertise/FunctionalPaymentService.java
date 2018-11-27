@@ -278,7 +278,7 @@ public class FunctionalPaymentService {
 
 
     public void updateAmountInFunctionalTable(Long payTableId, Date startDate, Date endDate, BigDecimal percentageValue) {
-        List<FunctionalPayment> functionalPaymentList = seniorityLevelFunctionRelationshipGraphRepository.findAllActiveByPayTableId(payTableId, startDate.getTime(), null);
+        List<FunctionalPayment> functionalPaymentList = functionalPaymentGraphRepository.findAllActiveByPayTableId(payTableId, startDate.getTime(), null);
         List<FunctionalPayment> toBreakInNewList = new ArrayList<>();
         List<FunctionalPayment> toUpdateInExisting = new ArrayList<>();
         for (FunctionalPayment functionalPayment : functionalPaymentList) {
@@ -413,8 +413,3 @@ public class FunctionalPaymentService {
     }
 
 }
-
-
-
-
-

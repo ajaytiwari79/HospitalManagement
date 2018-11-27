@@ -155,13 +155,6 @@ public class ExpertiseController {
 
 
     }
-    @ApiOperation(value = "publish a functional payment settings for expertise")
-    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/functional_payment/test", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateAmountInFunctionalTable() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.test(null));
-
-
-    }
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.POST)

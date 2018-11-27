@@ -200,7 +200,7 @@ public class PayTableService {
 
     // update basic detail of pay Table we are not making any copy as this time  as this does not impact any calculation
     public PayTableResponse updatePayTable(Long countryId, Long payTableId, PayTableUpdateDTO payTableDTO) {
-        PayTable payTable = payTableGraphRepository.findByIdAndDeletedFalse(payTableId);
+        PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
@@ -315,7 +315,7 @@ public class PayTableService {
     private PayGradeResponse addPayGradeInCurrentPayTable(PayTable payTable, PayGradeDTO payGradeDTO) {
         Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
 
-        List<PayGroupArea> payGroupAreas = ObjectMapperUtils.copyPropertiesOfListByMapper(payGroupAreaGraphRepository.findAllByIds(payGroupAreasId),PayGroupArea.class);
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
         if (payGroupAreas.size() != payGroupAreasId.size()) {
             exceptionService.dataNotMatchedException("message.paygrouparea.unabletoget");
 
@@ -561,7 +561,7 @@ public class PayTableService {
 
     }
 
-    public boolean updateAmountRelatedToPayTable(Long payTableId, PayTableDTO payTableDTO) {
+    public boolean updatePayTableAmountByPercentage(Long payTableId, PayTableDTO payTableDTO) {
         if (payTableDTO.getPercentageValue() == null || payTableDTO.getPercentageValue().equals(new BigDecimal(0))) {
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }

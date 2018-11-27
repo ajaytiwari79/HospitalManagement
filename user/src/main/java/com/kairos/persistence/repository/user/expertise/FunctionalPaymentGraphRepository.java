@@ -73,7 +73,14 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " CREATE UNIQUE(newSL)-[:"+HAS_FUNCTIONAL_AMOUNT+"{amount:0,amountEditableAtUnit:oldRel.amountEditableAtUnit}]->(currentFunction))")
     void linkWithFunctionPayment(Long expertiseId,Long seniorityLevelId);
 
-
+    @Query("MATCH(p:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(sl:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(f:Function)\n" +
+            "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(fp:FunctionalPayment)\n" +
+            "WHERE id(p)={0} AND  \n" +
+            "({2} IS NULL AND (fp.endDateMillis IS NULL OR fp.endDateMillis > {1}))\n" +
+            "OR \n" +
+            "({2} IS NOT NULL AND  ({1} < fp.endDateMillis OR {2}>fp.startDateMillis))\n" +
+            "return fp")
+    List<FunctionalPayment> findAllActiveByPayTableId(Long payTableId,Long startDate,Long endDate);
 
     @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} " +
             "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) "+
@@ -92,9 +99,4 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "WITH functionalPayment,functions,seniorityLevel,fpm,expertise,collect(id(pga)) as payGroupAreasIds, COLLECT({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction \n" +
             "RETURN id(functionalPayment) as id ,functionalPayment.startDate as startDate, functionalPayment.endDate as endDate, functionalPayment.paymentUnit as paymentUnit,expertise as expertise,COLLECT({payGroupAreasIds:payGroupAreasIds,seniorityLevelFunction:seniorityLevelFunction}) as functionalPaymentMatrices")
     List<FunctionalPaymentQueryResult> getFunctionalPaymentData(List<Long> functionalPaymentIds);
-
-
-
-
-
 }

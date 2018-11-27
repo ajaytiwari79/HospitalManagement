@@ -5,7 +5,6 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 
@@ -15,7 +14,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  * Created by vipul on 15/3/18.
  */
 @RelationshipEntity(type = HAS_PAY_GROUP_AREA)
-@QueryResult
 public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
     @StartNode
     private PayGrade payGrade;

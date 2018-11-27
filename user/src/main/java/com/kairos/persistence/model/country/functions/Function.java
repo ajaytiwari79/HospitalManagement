@@ -9,7 +9,6 @@ import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Date;
 import java.util.List;

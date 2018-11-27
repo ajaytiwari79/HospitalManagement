@@ -1,18 +1,14 @@
 package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
 /**
  * Created by vipul on 27/3/18.

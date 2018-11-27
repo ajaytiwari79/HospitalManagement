@@ -40,12 +40,6 @@ public class FunctionalPayment extends UserBaseEntity {
 
     }
 
-    public FunctionalPayment(Long id,LocalDate startDate, LocalDate endDate) {
-        this.id=id;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
     public Expertise getExpertise() {
         return expertise;
     }
