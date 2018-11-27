@@ -1,7 +1,6 @@
 package com.kairos.service.attendence_setting;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.dto.activity.shift.ShiftActivity;
@@ -282,7 +281,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     }
 
     public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<TimeAndAttendance> timeAndAttendance,BigInteger phaseId){
-        ShiftState timeAndAttendanceShiftState=null;
+        ShiftState timeAndAttendanceShiftState;
         timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),phaseId);
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=timeAndAttendanceShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
@@ -310,11 +309,11 @@ public class TimeAndAttendanceService extends MongoBaseService {
     public void checkOutBySchedulerJob(Long unitId){
         List<Shift> saveShifts=new ArrayList<>();
         List<TimeAndAttendance> timeAndAttendances = timeAndAttendanceRepository.findAllbyUnitIdAndDate(unitId,DateUtils.asDate(DateUtils.getEndOfDayFromLocalDateTime()));
-        List<Shift> shifts=null;//shiftMongoRepository.findAllShiftByIds(timeAndAttendances.stream().map(timeAndAttendance -> timeAndAttendance.getShiftId()).collect(Collectors.toList()));
+        List<Shift> shifts=shiftMongoRepository.findAllShiftByIds(timeAndAttendances.stream().map(timeAndAttendance -> timeAndAttendance.getShiftId()).collect(Collectors.toList()));
              Map<BigInteger, Shift> staffIdAndShifts = shifts.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
              timeAndAttendances.forEach(timeAndAttendance -> {
-                 if (staffIdAndShifts.get(0) != null) {
-                     Shift shift = null;//staffIdAndShifts.get(timeAndAttendance.getShiftId());
+                 if (staffIdAndShifts.get(timeAndAttendance.getStaffId()) != null) {
+                     Shift shift = staffIdAndShifts.get(timeAndAttendance.getStaffId());
                      if (!DateUtils.asLocalDate(shift.getEndDate()).isAfter(DateUtils.getCurrentLocalDate())) {
                          timeAndAttendance.getAttendanceTimeSlot().sort((a1, a2) -> a1.getFrom().compareTo(a2.getFrom()));
                          timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).setTo(DateUtils.asLocalDateTime(shift.getEndDate()));
