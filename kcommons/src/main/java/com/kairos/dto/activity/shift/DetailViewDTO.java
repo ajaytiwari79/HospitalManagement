@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.attendance.AttendanceTimeSlot;
+import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
 import java.util.List;
@@ -13,11 +14,11 @@ import java.util.List;
 public class DetailViewDTO {
     private Long staffId;
     private ShiftDetailViewDTO shifts;
-    List<AttendanceTimeSlot> attendanceTimeSlot;
+    List<AttendanceTimeSlotDTO> attendanceTimeSlot;
     public DetailViewDTO() {
     }
 
-    public DetailViewDTO(Long staffId,ShiftDetailViewDTO shifts,List<AttendanceTimeSlot> attendanceTimeSlot) {
+    public DetailViewDTO(Long staffId,ShiftDetailViewDTO shifts,List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
         this.staffId=staffId;
         this.shifts = shifts;
         this.attendanceTimeSlot=attendanceTimeSlot;
@@ -31,11 +32,11 @@ public class DetailViewDTO {
         this.shifts = shifts;
     }
 
-    public List<AttendanceTimeSlot> getAttendanceTimeSlot() {
+    public List<AttendanceTimeSlotDTO> getAttendanceTimeSlot() {
         return attendanceTimeSlot;
     }
 
-    public void setAttendanceTimeSlot(List<AttendanceTimeSlot> attendanceTimeSlot) {
+    public void setAttendanceTimeSlot(List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
         this.attendanceTimeSlot = attendanceTimeSlot;
     }
 

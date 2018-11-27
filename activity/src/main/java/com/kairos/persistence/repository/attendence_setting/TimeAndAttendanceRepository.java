@@ -17,7 +17,7 @@ public interface TimeAndAttendanceRepository extends MongoBaseRepository<TimeAnd
     @Query(value ="{unitId:?0,staffId:?1,currentDate:?2,deleted:false}" )
     TimeAndAttendance findbyUnitIdAndStaffIdAndDate(Long unitId, Long staffId, LocalDate date);
 
-    @Query(value ="{attendanceDuration:{$elemMatch:{to:{$exists:false}}},attendanceDuration:{$elemMatch:{unitId:?0}},createdAt:{$lte:?1},deleted:false}" )
+    @Query(value ="{attendanceTimeSlot:{$elemMatch:{to:{$exists:false}}},attendanceTimeSlot:{$elemMatch:{unitId:?0}},createdAt:{$lte:?1},deleted:false}" )
     List<TimeAndAttendance> findAllbyUnitIdAndDate(Long unitId, Date Startdate);
 
     @Query(value = "{deleted:false,shiftId:?0}")

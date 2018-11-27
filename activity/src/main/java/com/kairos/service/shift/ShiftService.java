@@ -10,6 +10,8 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSetting
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlot;
+import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
+import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
@@ -1207,7 +1209,7 @@ public class ShiftService extends MongoBaseService {
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeZone,phaseMap,timeAttendanceGracePeriod, shifts, shiftStatesList);
-        TimeAndAttendance timeAndAttendance=timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffId),shiftStartDate);
+        TimeAndAttendanceDTO timeAndAttendance=timeAndAttendanceRepository.findMaxAttendanceCheckInsada(Arrays.asList(staffId),shiftStartDate);
         return new CompactViewDTO(Arrays.asList(new DetailViewDTO(staffId,shiftDetailViewDTO,(Optional.ofNullable(timeAndAttendance).isPresent())?timeAndAttendance.getAttendanceTimeSlot():new ArrayList<>())),reasonCodeDTOS);
     }
 
@@ -1315,15 +1317,16 @@ public class ShiftService extends MongoBaseService {
         List<ShiftDTO> plannedShifts = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
         List<ShiftDTO> realTimeShift = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),ShiftDTO.class);
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList, ShiftDTO.class);
+        List<ShiftDTO> staffValidatedShifts = shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole()!=null&&s.getAccessGroupRole().equals(AccessGroupRole.STAFF)&& s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId())).collect(Collectors.toList());
+        Map<Long ,ShiftDTO> staffAndShiftMap=staffValidatedShifts.stream().collect(Collectors.toMap(k->k.getStaffId(),v->v));
         DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.getDate(), true);
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         for (ShiftDTO shiftDTO : realTimeShift) {
-            if (shiftDTO.getValidated() == null&&phaseService.isShiftIdEditInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())) {
+            if (!Optional.ofNullable(staffAndShiftMap.get(shiftDTO.getStaffId())).isPresent()&&shiftDTO.getValidated() == null&&phaseService.isShiftIdEditInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())) {
                     shiftDTO.setEditable(true);
             }
             updateRealTime.add(shiftDTO);
         }
-        List<ShiftDTO> staffValidatedShifts = shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole()!=null&&s.getAccessGroupRole().equals(AccessGroupRole.STAFF)&& s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId())).collect(Collectors.toList());
         if (!staffValidatedShifts.isEmpty()) {
             graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, staffValidatedShifts.get(0).getStartDate(), false);
             for (ShiftDTO staffValidatedShift : staffValidatedShifts) {
@@ -1352,8 +1355,8 @@ public class ShiftService extends MongoBaseService {
         Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(shiftStartDate).plusDays(1));
         List<StaffDTO> staffResponseDTOS = genericIntegrationService.getStaffListByUnit();
         List<Long> staffIds = staffResponseDTOS.stream().map(s -> s.getId()).collect(Collectors.toList());
-        List<TimeAndAttendance> timeAndAttendance=timeAndAttendanceRepository.findAllAttendanceByStaffIds(staffIds,shiftStartDate);
-        Map<Long,List<AttendanceTimeSlot>> staffsTimeAndAttendance=timeAndAttendance.stream().collect(Collectors.toMap(k->k.getStaffId(), v->v.getAttendanceTimeSlot()));
+        List<TimeAndAttendanceDTO> timeAndAttendance=timeAndAttendanceRepository.findAllAttendanceByStaffIds(staffIds,shiftStartDate);
+        Map<Long,List<AttendanceTimeSlotDTO>> staffsTimeAndAttendance=timeAndAttendance.stream().collect(Collectors.toMap(k->k.getStaffId(), v->v.getAttendanceTimeSlot()));
         List<Shift> shifts = shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds, shiftStartDate, endDate);
         List<ShiftState> shiftStates = shiftStateMongoRepository.getAllByStaffsByIdsBetweenDate(staffIds, shiftStartDate, endDate);
         List<ShiftState> realTimeShiftStatesList=checkAndCreateRealtimeState(shifts,shiftStates.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
@@ -1363,7 +1366,7 @@ public class ShiftService extends MongoBaseService {
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         Map<Long, List<Shift>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
         Map<Long, List<ShiftState>> shiftStateMap = shiftStates.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
-        List<DetailViewDTO> shiftDetailViewDTOMap = staffIds.stream().map(staffId->new DetailViewDTO(staffId,getShiftDetailsOfStaff(timeZone,phaseMap,timeAttendanceGracePeriod, shiftsMap.getOrDefault(staffId, new ArrayList<>()), shiftStateMap.getOrDefault(staffId, new ArrayList<>())),staffsTimeAndAttendance.get(staffId))).collect(Collectors.toList());
+        List<DetailViewDTO> shiftDetailViewDTOMap =staffIds.stream().map(staffId->new DetailViewDTO(staffId,getShiftDetailsOfStaff(timeZone,phaseMap,timeAttendanceGracePeriod, shiftsMap.getOrDefault(staffId, new ArrayList<>()), shiftStateMap.getOrDefault(staffId, new ArrayList<>())),staffsTimeAndAttendance.get(staffId))).collect(Collectors.toList());
         return new CompactViewDTO(shiftDetailViewDTOMap, reasonCodeDTOS);
     }
 
