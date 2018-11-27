@@ -19,22 +19,30 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @QueryResult
 public class DayTypeCountryHolidayCalenderQueryResult {
     @NotBlank(message = "error.DayType.name.notEmpty")
+    private Long id;
     private String name;
     @NotNull
     int code;
     private String description;
     private String colorCode;
-    @Relationship(type = BELONGS_TO)
     private Country country;
     private List<Day> validDays=new ArrayList<>();
     private boolean holidayType;
     private boolean isEnabled = true;
     private boolean allowTimeSettings = false;
-    List<CountryHolidayCalender> countryHolidayCalender;
+    List<CountryHolidayCalenderQueryResult> countryHolidayCalenders;
 
 
     // Constructor
     public DayTypeCountryHolidayCalenderQueryResult() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getColorCode() {
@@ -110,11 +118,19 @@ public class DayTypeCountryHolidayCalenderQueryResult {
     }
 
 
-    public List<CountryHolidayCalender> getCountryHolidayCalender() {
+    /*public List<CountryHolidayCalender> getCountryHolidayCalender() {
         return countryHolidayCalender;
     }
 
     public void setCountryHolidayCalender(List<CountryHolidayCalender> countryHolidayCalender) {
         this.countryHolidayCalender = countryHolidayCalender;
+    }*/
+
+    public List<CountryHolidayCalenderQueryResult> getCountryHolidayCalenders() {
+        return countryHolidayCalenders;
+    }
+
+    public void setCountryHolidayCalenders(List<CountryHolidayCalenderQueryResult> countryHolidayCalenders) {
+        this.countryHolidayCalenders = countryHolidayCalenders;
     }
 }

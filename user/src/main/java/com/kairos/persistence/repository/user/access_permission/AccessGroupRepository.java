@@ -364,12 +364,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long userId);*/
         @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization)\n" +
                 "WHERE id(organization)={0} AND id(user)={1}\n" +
-                "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:\"MANAGEMENT\"})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(organization)\n" +
+                "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(organization)\n" +
                 "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType)\n" +
                 "OPTIONAL MATCH(dayType)-[:"+DAY_TYPE+"]-(chc:CountryHolidayCalender)\n" +
-                "WITH organization,id(staff) AS staffId,accessGroup,\n" +
-                "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc:holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS chc,\n" +
-                "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalender:chc}) AS dayType\n" +
+                "WITH organization,id(staff) AS staffId,accessGroup,dayType,\n" +
+                "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS countryHolidayCalender\n" +
+                "WITH organization, staffId,accessGroup,countryHolidayCalender,\n" +
+                "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
                 "RETURN\n" +
                 "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
         AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long userId);

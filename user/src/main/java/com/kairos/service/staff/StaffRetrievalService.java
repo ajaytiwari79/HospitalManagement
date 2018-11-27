@@ -22,6 +22,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
+import com.kairos.persistence.model.access_permission.query_result.CountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.DayType;
@@ -335,12 +336,12 @@ public class StaffRetrievalService {
     }
 
     /**
-     * Assuming Hub member is not the part of Organization at same time
-     *
+     * Assuming Hub member/staff is not the part of Organization at same time
      * @param staff
      * @param unitId
      * @param userId
      * @return
+     * @author mohit
      */
     private List<StaffPersonalDetailDTO> filterStaffByRoles(List<StaffPersonalDetailDTO> staff, Long unitId, Long userId) {
         List<StaffPersonalDetailDTO> staffListByRole = new ArrayList<>();
@@ -349,90 +350,33 @@ public class StaffRetrievalService {
             staffListByRole = staff;
         } else {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+           String STAFF_CURRENT_ROLE;
             if (accessGroupQueryResult != null) {
-                staffListByRole = getStaffsByAccessRole(accessGroupQueryResult, staff, staffListByRole);
+                STAFF_CURRENT_ROLE=setStaffAccessRole(accessGroupQueryResult);
+                 if(AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)){
+                     staffListByRole=staff;
+                 }else if(AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)){
+                     StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId() == accessGroupQueryResult.getStaffId()).findFirst().get();
+                     staffListByRole.add(staffPersonalDetail);
+                 }
             }
         }
-
         return staffListByRole;
     }
 
-    /*private List<StaffPersonalDetailDTO> getStaffsByAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult, List<StaffPersonalDetailDTO> staff, List<StaffPersonalDetailDTO> staffListByRole) {
+    /**
+     * Method to set current staff role if present
+     * @param accessGroupQueryResult
+     * @return
+     * @author mohit
+     */
+    public String setStaffAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult) {
         ZoneId organizationTimeZoneId = accessGroupQueryResult.getOrganization().getTimeZone();
         LocalDate loginDate = ZonedDateTime.now(organizationTimeZoneId).toLocalDate();
         DayOfWeek loginDay = loginDate.getDayOfWeek();
         String STAFF_CURRENT_ROLE = null;
         AccessGroupStaffQueryResult accessGroupQueryResultCopy = ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult, AccessGroupStaffQueryResult.class);
         for (AccessGroupDayTypesQueryResult accessGroupDayTypes : accessGroupQueryResultCopy.getDayTypesByAccessGroup()) {
-            List<DayType> dayTypeList = accessGroupDayTypes.getDayTypes();
-            List<DayTypeCountryHolidayCalenderQueryResult> dayTypeWithHolidayCalender = accessGroupDayTypes.getDayTypesWithHolidayType();
-            String staffRole = null;
-            if (CollectionUtils.isNotEmpty(dayTypeList)) {
-                for (DayType dayType : dayTypeList) {
-                    List<String> validDays = dayType.getValidDays().stream().map(day -> day.name()).collect(Collectors.toList());
-                    if (validDays.contains(loginDay.toString()) || validDays.contains("EVERYDAY")) {
-                        staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
-                        if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
-                            STAFF_CURRENT_ROLE = staffRole;
-                            staffListByRole = staff;
-                            break;
-                        } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
-                            STAFF_CURRENT_ROLE = staffRole;
-                        }
-                    }
-                }
-            }
-            if (CollectionUtils.isNotEmpty(dayTypeWithHolidayCalender) && !AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
-                for (DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalender : dayTypeWithHolidayCalender) {
-                    List<CountryHolidayCalender> countryHolidayCalenders = dayTypeCountryHolidayCalender.getCountryHolidayCalender();
-                    if (CollectionUtils.isNotEmpty(countryHolidayCalenders) && !dayTypeCountryHolidayCalender.isAllowTimeSettings()) {
-                        Set<LocalDate> dates = countryHolidayCalenders.stream().map(date -> ZonedDateTime.ofInstant(new Date(date.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate()).collect(Collectors.toSet());
-                        if (dates.contains(loginDate)) {
-                            staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
-                            if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
-                                STAFF_CURRENT_ROLE = staffRole;
-                                staffListByRole = staff;
-                                break;
-                            } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
-                                STAFF_CURRENT_ROLE = staffRole;
-                            }
-                        }
-                    } else if (CollectionUtils.isNotEmpty(countryHolidayCalenders) && dayTypeCountryHolidayCalender.isAllowTimeSettings()) {
-                        Optional<CountryHolidayCalender> countryHolidayCalender = countryHolidayCalenders.stream().filter(cal -> ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
-                        Long localTime = LocalTime.now().getLong(ChronoField.MINUTE_OF_DAY);
-                        if (countryHolidayCalender.isPresent() && countryHolidayCalender.get().getStartTime() <= localTime && localTime <= countryHolidayCalender.get().getEndTime()) {
-                            staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
-                            if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
-                                STAFF_CURRENT_ROLE = staffRole;
-                                staffListByRole = staff;
-                                break;
-                            } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
-                                STAFF_CURRENT_ROLE = staffRole;
-                            }
-                        }
-                    }
-                }
-
-            }
-            if (STAFF_CURRENT_ROLE != null && AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
-                break;
-            }
-        }
-        if ("STAFF".equals(STAFF_CURRENT_ROLE)) {
-            StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId() == accessGroupQueryResultCopy.getStaffId()).findFirst().get();
-            staffListByRole.add(staffPersonalDetail);
-        }
-        return staffListByRole;
-    }
-*/
-    private List<StaffPersonalDetailDTO> getStaffsByAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult, List<StaffPersonalDetailDTO> staff, List<StaffPersonalDetailDTO> staffListByRole) {
-        ZoneId organizationTimeZoneId = accessGroupQueryResult.getOrganization().getTimeZone();
-        LocalDate loginDate = ZonedDateTime.now(organizationTimeZoneId).toLocalDate();
-        DayOfWeek loginDay = loginDate.getDayOfWeek();
-        String STAFF_CURRENT_ROLE = null;
-        AccessGroupStaffQueryResult accessGroupQueryResultCopy = ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult, AccessGroupStaffQueryResult.class);
-        for (AccessGroupDayTypesQueryResult accessGroupDayTypes : accessGroupQueryResultCopy.getDayTypesByAccessGroup()) {
-            //List<DayType> dayTypeList = accessGroupDayTypes.getDayTypes();
             List<DayTypeCountryHolidayCalenderQueryResult> dayTypeList = accessGroupDayTypes.getDayTypes();
             String staffRole = null;
             if (CollectionUtils.isNotEmpty(dayTypeList)) {
@@ -443,32 +387,32 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                staffListByRole = staff;
+                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
                             }
                         }
-                    }else if(dayType.isHolidayType() && !dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalender())){
-                        Set<LocalDate> dates = dayType.getCountryHolidayCalender().stream().map(date -> ZonedDateTime.ofInstant(new Date(date.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate()).collect(Collectors.toSet());
+                    }else if(dayType.isHolidayType() && !dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalenders())){
+                        Set<LocalDate> dates = dayType.getCountryHolidayCalenders().stream().map(date -> ZonedDateTime.ofInstant(new Date(date.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate()).collect(Collectors.toSet());
                         if (dates.contains(loginDate)) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                staffListByRole = staff;
+                               // staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
                             }
                         }
-                    }else if(dayType.isHolidayType() && dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalender())) {
-                        Optional<CountryHolidayCalender> countryHolidayCalender = dayType.getCountryHolidayCalender().stream().filter(cal -> ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
+                    }else if(dayType.isHolidayType() && dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalenders())) {
+                        Optional<CountryHolidayCalenderQueryResult> countryHolidayCalender = dayType.getCountryHolidayCalenders().stream().filter(cal -> ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
                         Long localTime = LocalTime.now().getLong(ChronoField.MINUTE_OF_DAY);
                         if (countryHolidayCalender.isPresent() && countryHolidayCalender.get().getStartTime() <= localTime && localTime <= countryHolidayCalender.get().getEndTime()) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                staffListByRole = staff;
+                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
@@ -482,11 +426,7 @@ public class StaffRetrievalService {
                 break;
             }
         }
-        if ("STAFF".equals(STAFF_CURRENT_ROLE)) {
-            StaffPersonalDetailDTO staffPersonalDetail = staff.stream().filter(s -> s.getStaff().getId() == accessGroupQueryResultCopy.getStaffId()).findFirst().get();
-            staffListByRole.add(staffPersonalDetail);
-        }
-        return staffListByRole;
+        return STAFF_CURRENT_ROLE;
     }
 
 
