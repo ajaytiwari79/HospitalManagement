@@ -26,7 +26,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date({1}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({1}))" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= {1} AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= {1})" +
             "MATCH (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "WITH expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +

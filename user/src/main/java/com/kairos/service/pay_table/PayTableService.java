@@ -511,9 +511,9 @@ public class PayTableService {
     }
 
     public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
-//        if(publishedDateMillis<DateUtils.getCurrentMillis()){
-//            exceptionService.actionNotPermittedException("message.startdate.lessthan");
-//        }
+        if(publishedDate.isBefore(LocalDate.now())){
+            exceptionService.actionNotPermittedException("message.startdate.lessthan");
+        }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");

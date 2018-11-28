@@ -93,7 +93,7 @@ public class UnitPositionCTAWTAService {
             if (selectedDate == null) {
                 selectedDate = DateUtils.getCurrentLocalDate();
             }
-            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), DateUtils.getLongFromLocalDate(selectedDate), appliedSeniorityLevel.getId(), unitId);
+            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate, appliedSeniorityLevel.getId(), unitId);
             seniorityLevel.setFunctions(functionDTOs);
         }
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);

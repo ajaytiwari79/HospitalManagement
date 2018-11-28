@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Long>{
 
-    @Query("MATCH (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR date(timeSlotSet.endDate)>=date({2})) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+    @Query("MATCH (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR date(timeSlotSet.endDate)>={2}) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
             "MATCH (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
             "RETURN id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime")
     List<TimeSlotWrapper> getTimeSlots(Long unitId, TimeSlotMode timeSlotMode, LocalDate currentDate);
@@ -35,7 +35,7 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
     void deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
-            "Match (org)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:org.timeSlotMode}) where (timeSlotSet.endDate is null OR date(timeSlotSet.endDate)>=date({2})) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            "Match (org)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:org.timeSlotMode}) where (timeSlotSet.endDate is null OR date(timeSlotSet.endDate)>={2}) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
             "Match (timeSlotSet:TimeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) where id(timeSlot)={1} return distinct {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
     Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId,LocalDate date);
 
@@ -59,7 +59,5 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
 
     @Query("Match (organization:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1},deleted:false}) where id(organization)={0} AND timeSlotSet.timeSlotType={2} return timeSlotSet order by timeSlotSet.startDate")
     List<TimeSlotSet> findTimeSlotSetsByOrganizationId(Long unitId, TimeSlotMode timeSlotMode,TimeSlotType timeSlotType);
-
-
 
 }

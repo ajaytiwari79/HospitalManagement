@@ -75,9 +75,9 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
     @Query("MATCH(payTable:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(seniorityLevel:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function)\n" +
             "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment:FunctionalPayment)\n" +
             "WHERE id(payTable)={0} AND  \n" +
-            "({2} IS NULL AND (functionalPayment.endDateMillis IS NULL OR date(functionalPayment.endDateMillis) > date({1})))\n" +
+            "({2} IS NULL AND (functionalPayment.endDateMillis IS NULL OR date(functionalPayment.endDateMillis) > {1}))\n" +
             "OR \n" +
-            "({2} IS NOT NULL AND  (date({1}) < date(functionalPayment.endDateMillis) OR date({2})>date(functionalPayment.startDateMillis)))\n" +
+            "({2} IS NOT NULL AND  ({1} < date(functionalPayment.endDateMillis) OR {2}>date(functionalPayment.startDateMillis)))\n" +
             "RETURN functionalPayment")
     List<FunctionalPayment> findAllActiveByPayTableId(Long payTableId,LocalDate startDate,LocalDate endDate);
 

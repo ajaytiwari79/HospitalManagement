@@ -19,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 public interface TimeSlotSetRepository extends Neo4jBaseRepository<TimeSlotSet,Long> {
 
 
-    @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} and date(timeSlotSet.startDate)>date({1}) " +
+    @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} and date(timeSlotSet.startDate)>{1} " +
             "return timeSlotSet order by timeSlotSet.startDate limit 1")
     TimeSlotSet findOneByStartDateAfter(Long unitId,LocalDate endDate);
 

@@ -54,7 +54,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "return payTable1")
     PayTable getPermanentPayTableByPayTableId(Long payTableId);
 
-    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,published:true}) where id(level)={0} AND date(payTable.startDateMillis) <= date({1}) AND (payTable.endDateMillis IS NULL OR date(payTable.endDateMillis) >= date({1}))" +
+    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,published:true}) where id(level)={0} AND date(payTable.startDateMillis) <= {1} AND (payTable.endDateMillis IS NULL OR date(payTable.endDateMillis) >= {1})" +
             "OPTIONAL MATCH(payTable)-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false})\n" +
             "RETURN id(payTable) as id,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis," +
             " payTable.name as name ,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
