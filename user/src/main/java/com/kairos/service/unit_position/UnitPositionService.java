@@ -1274,6 +1274,7 @@ public class UnitPositionService {
      */
     public List<UnitPositionDTO> getUnitPositionsByStaffId(Long unitId, Long staffId) {
         Object object = unitPositionGraphRepository.getUnitPositionsByUnitIdAndStaffId(unitId, staffId);
+        List<UnitPositionDTO> unitPositionDTOList =new ArrayList<>();
         if (object instanceof String) {
             if (ORGANIZATION.equals(object)) {
                 exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
@@ -1282,9 +1283,10 @@ public class UnitPositionService {
             } else if (EMPLOYMENT.equals(object)) {
                 exceptionService.dataNotFoundByIdException("error.Employement.notExist", unitId, staffId);
             }
+        }else {
+            List<Map<Object, Object>> unitPositions = (List<Map<Object, Object>>) object;
+             unitPositionDTOList = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositions, UnitPositionDTO.class);
         }
-        List<Map<Object, Object>> unitPositions = (List<Map<Object, Object>>) object;
-        List<UnitPositionDTO> unitPositionDTOList = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositions, UnitPositionDTO.class);
         return unitPositionDTOList;
     }
 

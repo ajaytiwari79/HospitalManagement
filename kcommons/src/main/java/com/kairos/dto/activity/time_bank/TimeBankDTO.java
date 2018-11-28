@@ -89,6 +89,17 @@ public class TimeBankDTO {
         this.phaseName = "Total";
     }
 
+    public TimeBankDTO(Date startDate, Date endDate, UnitPositionWithCtaDetailsDTO costTimeAgreement,Long staffId,Long unitPositionId,int totalWeeklyMin,int workingDaysInWeek) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.unitPositionId = unitPositionId;
+        this.costTimeAgreement = costTimeAgreement;
+        this.phaseName = "Total";
+        this.totalWeeklyMin = totalWeeklyMin;
+        this.workingDaysInWeek = workingDaysInWeek;
+    }
+
     public long getPaidoutChange() {
         return paidoutChange;
     }

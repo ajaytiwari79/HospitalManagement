@@ -17,7 +17,7 @@ public interface CustomProcessingActivityRepository {
 
     List<ProcessingActivityResponseDTO> getAllProcessingActivityAndMetaDataAndSubProcessingActivities(Long unitId);
 
-    ProcessingActivityResponseDTO  getProcessingActivityAndMetaDataById( Long unitId,BigInteger processingActivityId);
+    ProcessingActivityResponseDTO  getProcessingActivityAndMetaDataById( Long unitId,BigInteger processingActivityId,boolean subProcessingActivity);
 
     List<ProcessingActivityBasicResponseDTO>  getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds);
 
