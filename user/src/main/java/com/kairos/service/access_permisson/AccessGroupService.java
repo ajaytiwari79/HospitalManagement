@@ -926,11 +926,8 @@ public class AccessGroupService {
     }
 
     public void linkParentOrganizationAccessGroup(Organization unit,Long parentOrganizationId){
-        List<AccessGroup> accessGroupList=new ArrayList<>();
-        for(AccessGroupQueryResult accessGroupQueryResult:getOrganizationAccessGroups(parentOrganizationId)){
-            AccessGroup accessGroup=ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult,AccessGroup.class);
-            accessGroupList.add(accessGroup);
-        }
+        List<AccessGroupQueryResult> accessGroupQueryResults=getOrganizationAccessGroups(parentOrganizationId);
+        List<AccessGroup> accessGroupList=ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupQueryResults,AccessGroup.class);
         unit.setAccessGroups(accessGroupList);
         accessGroupRepository.saveAll(accessGroupList);
 
