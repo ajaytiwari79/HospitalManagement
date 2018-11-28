@@ -2,3 +2,16 @@
 
 db.activities.updateMany({},{$set:{"rulesActivityTab.pqlSettings":{"approvalTimeInAdvance":{},
 "approvalPercentageWithoutMovement":{},"approvalWithMovement":{},"appreciable":{},"acceptable":{},"critical":{}}}});
+
+db.activities.updateMany({"balanceSettingsActivityTab.timeTypeId":"3"},{$set:{secondLevelType:"PAID_BREAK"}})
+db.activities.updateMany({"balanceSettingsActivityTab.timeTypeId":"3"},{$set:{secondLevelType:"PAID_BREAK"}})  // unpaid
+db.time_Type.find({label:"Unpaid break"})
+
+db.time_Type.find({label:"Paid Break"})
+db.time_Type.updateMany({label:"Paid Break"},{"$set":{secondLevelType:"PAID_BREAK",timeTypes:"WORKING_TYPE"}})
+
+db.time_Type.updateMany({label:"Unpaid break"},{"$set":{secondLevelType:"UNPAID_BREAK",timeTypes:"NON_WORKING_TYPE"}})
+
+db.time_Type.updateMany({timeTypes:"UNPAID"},{$set:{timeTypes:"NON_WORKING_TYPE"}})
+db.time_Type.updateMany({timeTypes:"PAID"},{$set:{timeTypes:"WORKING_TYPE"}})
+db.time_Type.updateMany({secondLevelType:"BREAK"},{$set:{secondLevelType:"PAID_BREAK"}})

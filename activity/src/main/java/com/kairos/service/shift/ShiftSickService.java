@@ -15,11 +15,14 @@ import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
@@ -35,6 +38,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,6 +74,9 @@ public class ShiftSickService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
+    @Inject
+    private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
+    @Inject private TimeBankRepository timeBankRepository;
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -155,7 +162,25 @@ public class ShiftSickService extends MongoBaseService {
         if (!shifts.isEmpty()) {
             Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
+            //shiftMongoRepository.saveEntities(shifts);
+
+            List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
+            List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+            Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+            for (Shift shift : shifts) {
+                staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()),shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
+                WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
+                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts.get(0).getActivities().get(0).getStartDate());
+                if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
+                    exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
+                }
+                staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+                shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                shiftService.saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
+            }
+
             shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
+
         }
     }
 
@@ -173,7 +198,7 @@ public class ShiftSickService extends MongoBaseService {
             currentShift.setPhaseId(planningPeriodForSameDate.getPhaseId());
         }
     }
-
+    //TODO Refactor db queries
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
@@ -227,7 +252,7 @@ public class ShiftSickService extends MongoBaseService {
         shiftActivity.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getTo()));
         return shiftActivity;
     }
-
+//TODO Refactor db queries
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {
 
         StaffUnitPositionDetails staffUnitPositionDetails = genericIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
@@ -260,10 +285,33 @@ public class ShiftSickService extends MongoBaseService {
             logger.error("error occurred in User service while restoring functions");
         }
         if (CollectionUtils.isNotEmpty(shifts)) {
+
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
-            Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
-            Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dates);
-            shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
+            //Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
+            //Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dates);
+
+            shiftMongoRepository.saveEntities(shifts);
+            shifts.sort((shift1,shift2)->shift1.getStartDate().compareTo(shift2.getStartDate()));
+            List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
+            List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+            Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+            Date startDate = DateUtils.asDate(DateUtils.asZoneDateTime(shifts.get(0).getStartDate()).truncatedTo(ChronoUnit.DAYS));
+            Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(shifts.get(shifts.size()-1).getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+            timeBankRepository.deleteDailyTimeBank(Arrays.asList(staffAdditionalInfoDTO.getUnitPosition().getId()), startDate, endDate);
+            for (Shift shift : shifts) {
+                if(!shift.isDeleted()){
+                    staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaffWithUnitId(unitId,DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
+                    CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts.get(0).getActivities().get(0).getStartDate());
+                    if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
+                        exceptionService.invalidRequestException("error.cta.notFound", shift.getActivities().get(0).getStartDate());
+                    }
+                    staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+                    shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                    shiftService.updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+                }
+            }
+            //shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
+
         }
     }
 

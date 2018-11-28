@@ -760,7 +760,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
 
     @Query("MATCH(parentOrg:Organization{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
-            "MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
+            "OPTIONAL MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
             "OPTIONAL MATCH(parentOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizationType:OrganizationType{deleted:false})\n" +
             "OPTIONAL MATCH(childOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizationType:OrganizationType{deleted:false})\n" +
             "OPTIONAL MATCH(parentOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizationService:OrganizationService{deleted:false})\n" +

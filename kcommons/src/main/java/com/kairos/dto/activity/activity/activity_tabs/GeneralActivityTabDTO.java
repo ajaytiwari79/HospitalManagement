@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.TimeTypeEnum;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -31,32 +32,95 @@ public class GeneralActivityTabDTO {
     private String originalIconName;
     private String modifiedIconName;
     private List<BigInteger> tags = new ArrayList<>();
+    private Integer addTimeTo;
+    private BigInteger timeTypeId;
+    private boolean onCallTimePresent;
+    private Boolean negativeDayBalancePresent;
+    private TimeTypeEnum timeType;
+    private String content;
+    private String originalDocumentName;
+    private String modifiedDocumentName;
+    private boolean eligibleForCopy;
 
     public GeneralActivityTabDTO() {
         // dc
     }
 
 
-    @Override
-    public String toString() {
-        return "GeneralActivityTabDTO{" +
-                "activityId=" + activityId +
-                ", name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                ", printoutSymbol='" + printoutSymbol + '\'' +
-                ", categoryName='" + categoryName + '\'' +
-                ", categoryId=" + categoryId +
-                ", colorPresent=" + colorPresent +
-                ", backgroundColor='" + backgroundColor + '\'' +
-                ", description='" + description + '\'' +
-                ", isActive=" + isActive +
-                ", shortName='" + shortName + '\'' +
-                ", eligibleForUse=" + eligibleForUse +
-                ", originalIconName='" + originalIconName + '\'' +
-                ", modifiedIconName='" + modifiedIconName + '\'' +
-                ", tags=" + tags +
-                '}';
+    public Integer getAddTimeTo() {
+        return addTimeTo;
     }
+
+    public void setAddTimeTo(Integer addTimeTo) {
+        this.addTimeTo = addTimeTo;
+    }
+
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
+    public boolean isOnCallTimePresent() {
+        return onCallTimePresent;
+    }
+
+    public void setOnCallTimePresent(boolean onCallTimePresent) {
+        this.onCallTimePresent = onCallTimePresent;
+    }
+
+    public Boolean getNegativeDayBalancePresent() {
+        return negativeDayBalancePresent;
+    }
+
+    public void setNegativeDayBalancePresent(Boolean negativeDayBalancePresent) {
+        this.negativeDayBalancePresent = negativeDayBalancePresent;
+    }
+
+    public TimeTypeEnum getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(TimeTypeEnum timeType) {
+        this.timeType = timeType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getOriginalDocumentName() {
+        return originalDocumentName;
+    }
+
+    public void setOriginalDocumentName(String originalDocumentName) {
+        this.originalDocumentName = originalDocumentName;
+    }
+
+    public String getModifiedDocumentName() {
+        return modifiedDocumentName;
+    }
+
+    public void setModifiedDocumentName(String modifiedDocumentName) {
+        this.modifiedDocumentName = modifiedDocumentName;
+    }
+
+    public boolean isEligibleForCopy() {
+        return eligibleForCopy;
+    }
+
+    public void setEligibleForCopy(boolean eligibleForCopy) {
+        this.eligibleForCopy = eligibleForCopy;
+    }
+
+
+
 
     public String getUltraShortName() {
         return ultraShortName;
@@ -206,6 +270,26 @@ public class GeneralActivityTabDTO {
         this.endDate = endDate;
     }
 
+    @Override
+    public String toString() {
+        return "GeneralActivityTabDTO{" +
+                "activityId=" + activityId +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", printoutSymbol='" + printoutSymbol + '\'' +
+                ", categoryName='" + categoryName + '\'' +
+                ", categoryId=" + categoryId +
+                ", colorPresent=" + colorPresent +
+                ", backgroundColor='" + backgroundColor + '\'' +
+                ", description='" + description + '\'' +
+                ", isActive=" + isActive +
+                ", shortName='" + shortName + '\'' +
+                ", eligibleForUse=" + eligibleForUse +
+                ", originalIconName='" + originalIconName + '\'' +
+                ", modifiedIconName='" + modifiedIconName + '\'' +
+                ", tags=" + tags +
+                '}';
+    }
 
 
 }

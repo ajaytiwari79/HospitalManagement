@@ -143,5 +143,7 @@ public final class ApiConstants {
     public static final String COUNTRY_GLIDE_TIME_SETTINGS ="/country/{countryId}/glide_time";
     public static final String APPLIED_FUNCTIONS_BY_UNIT_POSITION_IDS="/appliedFunctionsByUnitPositionIds";
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION="/updateFunctionOnPhaseRestoration";
+    public static final String GET_FUNCTIONS_OF_UNIT_POSITION=STAFF_WITH_STAFF_ID+"/unit_position/{unitPositionId}/functions";
     public static final String UNIT_TIMEZONE="/time_zone";
+
 }

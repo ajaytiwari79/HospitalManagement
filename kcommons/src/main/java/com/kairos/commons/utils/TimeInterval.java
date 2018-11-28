@@ -1,5 +1,6 @@
 package com.kairos.commons.utils;
 
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 
 public class TimeInterval {
@@ -44,10 +45,11 @@ public class TimeInterval {
     }
 
     public boolean contains(int minutes){
-        boolean contains = startFrom<minutes?minutes<endTo:false;
+        boolean contains;
         if(endTo<startFrom){
-            minutes = minutes+1440;
-            contains = startFrom<minutes?minutes<(endTo+1440):false;
+            contains = minutes <= DateTimeConstants.MINUTES_PER_DAY ? (startFrom < minutes && minutes <= DateTimeConstants.MINUTES_PER_DAY):(0 <= minutes && minutes < 320);
+        }else {
+            contains = startFrom<minutes?minutes<endTo:false;
         }
         return contains;
     }

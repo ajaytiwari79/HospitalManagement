@@ -15,6 +15,7 @@ public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
    // @NotNull(message = "error.message.risk.due.date")
     //private LocalDate dueDate;
     //private Staff riskOwner;
+
     private boolean reminderActive;
     private int daysToReminderBefore;
 

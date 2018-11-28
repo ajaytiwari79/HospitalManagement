@@ -1,4 +1,5 @@
-package com.kairos.persistence.model.access_permission;/*
+package com.kairos.persistence.model.access_permission;
+/*
  *Created By Pavan on 30/8/18
  *
  */
