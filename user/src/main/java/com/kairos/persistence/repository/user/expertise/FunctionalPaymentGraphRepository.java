@@ -73,13 +73,13 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " CREATE UNIQUE(newSL)-[:"+HAS_FUNCTIONAL_AMOUNT+"{amount:0,amountEditableAtUnit:oldRel.amountEditableAtUnit}]->(currentFunction))")
     void linkWithFunctionPayment(Long expertiseId,Long seniorityLevelId);
 
-    @Query("MATCH(p:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(sl:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(f:Function)\n" +
-            "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(fp:FunctionalPayment)\n" +
-            "WHERE id(p)={0} AND  \n" +
-            "({2} IS NULL AND (fp.endDateMillis IS NULL OR fp.endDateMillis > {1}))\n" +
+    @Query("MATCH(payTable:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(seniorityLevel:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function)\n" +
+            "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment:FunctionalPayment)\n" +
+            "WHERE id(payTable)={0} AND  \n" +
+            "({2} IS NULL AND (functionalPayment.endDateMillis IS NULL OR functionalPayment.endDateMillis > {1}))\n" +
             "OR \n" +
-            "({2} IS NOT NULL AND  ({1} < fp.endDateMillis OR {2}>fp.startDateMillis))\n" +
-            "return fp")
+            "({2} IS NOT NULL AND  ({1} < functionalPayment.endDateMillis OR {2}>functionalPayment.startDateMillis))\n" +
+            "RETURN functionalPayment")
     List<FunctionalPayment> findAllActiveByPayTableId(Long payTableId,Long startDate,Long endDate);
 
     @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} " +
