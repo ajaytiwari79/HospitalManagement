@@ -71,7 +71,7 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
     List<TimeSlot> findBySystemGeneratedTimeSlotsIsTrue();
 
     @Query("MATCH (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} AND org.timeSlotMode=timeSlotSet.timeSlotMode" +
-            "AND timeSlotSet.timeSlotType ={1} with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            " AND timeSlotSet.timeSlotType ={1} with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
             "MATCH (timeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
             "RETURN id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime ORDER BY  r.startHour")
     List<TimeSlotWrapper> getShiftPlanningTimeSlotsByUnit(Long unitId,   TimeSlotType timeSlotType);

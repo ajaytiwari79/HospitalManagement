@@ -28,7 +28,7 @@ public class ShiftWithActivityDTO {
 
     private BigInteger id;
     private String name;
-
+    private List<ShiftActivityDTO> activities = new ArrayList<>();
     private Date startDate;
 
     private Date endDate;
@@ -48,7 +48,7 @@ public class ShiftWithActivityDTO {
     private Long unitId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private List<ShiftActivityDTO> activities = new ArrayList<>();
+
     private List<ShiftStatus> status;
     private String timeType;
     private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
@@ -205,25 +205,16 @@ public class ShiftWithActivityDTO {
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = getActivitiesStartDate();
+        this.startDate = getStartDate();
     }
 
     public Date getEndDate() {
         return endDate;
     }
 
-    public Date getActivitiesEndDate() {
-        activities.sort((a1, a2) -> a1.getStartDate().compareTo(a2.getStartDate()));
-        return activities.get(activities.size() - 1).getEndDate();
-    }
-
-    public Date getActivitiesStartDate() {
-        activities.sort((a1, a2) -> a1.getStartDate().compareTo(a2.getStartDate()));
-        return activities.get(0).getStartDate();
-    }
 
     public void setEndDate(Date endDate) {
-        this.endDate = getActivitiesEndDate();
+        this.endDate = getEndDate();
     }
 
 
