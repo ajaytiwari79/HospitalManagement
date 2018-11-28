@@ -71,7 +71,7 @@ public class PayOutCalculationService {
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
                 for (CTARuleTemplateDTO ruleTemplate : unitPositionDetails.getCtaRuleTemplates()) {
-                    boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, unitPositionDetails, shift.getPhaseId(), activity.getId(),activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftInterval.getStartLocalDate()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
+                    boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, unitPositionDetails, shift.getPhaseId(), activity.getId(),activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftInterval.getStartLocalDate(),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                     if (ruleTemplateValid) {
                         int ctaPayOutMin = 0;
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {

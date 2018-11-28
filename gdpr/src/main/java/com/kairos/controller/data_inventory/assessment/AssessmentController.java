@@ -47,8 +47,8 @@ public class AssessmentController {
 
     @ApiOperation(value = "launch assessment for processing activity")
     @PostMapping( "/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO));
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO,subProcessingActivity));
 
     }
 

@@ -58,6 +58,6 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     @Query("{upperLevelTimeTypeId:{ $in:?0},deleted : false}")
     List<TimeType> findAllChildTimeTypeByParentId(List<BigInteger> timeTypeIds);
 
-    @Query(value = "{ upperLevelTimeTypeId:{'$exists':false}, deleted:false, countryId:?0 , timeTypes:?1 }")
+    @Query(value = "{ deleted:false, countryId:?0 , secondLevelType:?1 }")
     List<TimeType> findAllByDeletedFalseAndCountryIdAndTimeType(Long countryId, String timeType);
 }
