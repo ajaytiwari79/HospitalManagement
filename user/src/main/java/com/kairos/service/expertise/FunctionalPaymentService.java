@@ -329,7 +329,7 @@ public class FunctionalPaymentService {
                 }
             }
             allFunctionalPayments.addAll(functionalPaymentListBeforeDate);
-            allFunctionalPayments.addAll(functionalPaymentListBeforeDate);
+            allFunctionalPayments.addAll(functionalPaymentListAfterDate);
             functionalPaymentGraphRepository.saveAll(allFunctionalPayments);
         }
 
@@ -398,7 +398,7 @@ public class FunctionalPaymentService {
             currentSRLevelFunction.getFunctions().forEach(currentFunction -> {
                 Function function = functions.stream().
                         filter(function1 -> function1.getId().equals(currentFunction.getFunctionId())).findAny().get();
-                BigDecimal updatedAmount = currentFunction.getAmount().multiply(percentageValue).divide(new BigDecimal(100),RoundingMode.CEILING);
+                BigDecimal updatedAmount = currentFunction.getAmount().add(currentFunction.getAmount().multiply(percentageValue).divide(new BigDecimal(100),RoundingMode.CEILING));
                 SeniorityLevelFunctionsRelationship seniorityLevelFunctionsRelationship = new SeniorityLevelFunctionsRelationship(function, seniorityLevelFunction, updatedAmount, currentFunction.isAmountEditableAtUnit());
                 seniorityLevelFunctionsRelationships.add(seniorityLevelFunctionsRelationship);
             });
