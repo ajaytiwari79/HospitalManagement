@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
+import com.kairos.service.unit_position.UnitPositionCTAWTAService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -48,6 +49,7 @@ public class ExpertiseController {
     private FunctionalPaymentService functionalPaymentService;
     @Inject
     ExpertiseUnitService expertiseUnitService;
+    @Inject private  UnitPositionCTAWTAService unitPositionCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
@@ -83,7 +85,7 @@ public class ExpertiseController {
     @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
                                                                   @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,unitPositionCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
     }
 
     @ApiOperation(value = "Get Available expertise")

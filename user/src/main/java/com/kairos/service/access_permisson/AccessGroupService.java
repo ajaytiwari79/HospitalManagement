@@ -921,5 +921,19 @@ public class AccessGroupService {
         else if((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))){
             exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
         }
+
+
+    }
+
+    public void linkParentOrganizationAccessGroup(Organization unit,Long parentOrganizationId){
+        List<AccessGroupQueryResult> accessGroupQueryResults=getOrganizationAccessGroups(parentOrganizationId);
+        List<AccessGroup> accessGroupList=ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupQueryResults,AccessGroup.class);
+        unit.setAccessGroups(accessGroupList);
+        accessGroupRepository.saveAll(accessGroupList);
+
+    }
+
+    public List<AccessGroupQueryResult> getOrganizationAccessGroups(Long parentOrganizationId){
+        return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
     }
 }

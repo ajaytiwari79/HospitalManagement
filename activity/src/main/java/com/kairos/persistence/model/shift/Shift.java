@@ -115,7 +115,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
@@ -129,6 +129,8 @@ public class Shift extends MongoBaseEntity {
         this.copiedFromShiftId = copiedFromShiftId;
         this.scheduledMinutes = scheduledMinutes;
         this.durationMinutes = durationMinutes;
+        this.phaseId=phaseId;
+        this.planningPeriodId=planningPeriodId;
     }
 
 
