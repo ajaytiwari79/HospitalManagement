@@ -561,7 +561,7 @@ public class PayTableService {
 
     }
 
-    public List<PayGradeResponse> updatePayTableAmountByPercentage(Long payTableId, PayTableDTO payTableDTO) {
+    public PayTableUpdateDTO updatePayTableAmountByPercentage(Long payTableId, PayTableDTO payTableDTO) {
         if (payTableDTO.getPercentageValue() == null || payTableDTO.getPercentageValue().equals(new BigDecimal(0))) {
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }
@@ -581,7 +581,6 @@ public class PayTableService {
 
                     }
                 }
-
                 if(payTable.isPublished()){
                     payGradeResponses = createCopyOfPayTableAndAddPayGrade(payTable, null, payGradePayGroupAreaRelationShips, true);
                 }
@@ -591,7 +590,10 @@ public class PayTableService {
 
                 }
             }
-        return payGradeResponses;
+            Long id=CollectionUtils.isEmpty(payGradeResponses)?payTable.getId():payGradeResponses.get(0).getPayTableId();
+            return new PayTableUpdateDTO(id,payTable.getName());
+
+
     }
 
 
