@@ -24,7 +24,7 @@ public interface TimeSlotSetRepository extends Neo4jBaseRepository<TimeSlotSet,L
     TimeSlotSet findOneByStartDateAfter(Long unitId,LocalDate endDate);
 
     @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} AND " +
-            "(date(timeSlotSet.startDate)>=date({1}) AND date(timeSlotSet.startDate) < date({2})) AND timeSlotSet.timeSlotType={3} " +
+            "(date(timeSlotSet.startDate)>={1} AND date(timeSlotSet.startDate) < {2}) AND timeSlotSet.timeSlotType={3} " +
             "return timeSlotSet order by timeSlotSet.startDate")
     List<TimeSlotSet> findTimeSlotSetByStartDateBetween(Long unitId, LocalDate startDate, LocalDate endDate, TimeSlotType timeSlotType);
 

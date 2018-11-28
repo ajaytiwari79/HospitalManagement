@@ -561,11 +561,12 @@ public class PayTableService {
 
     }
 
-    public boolean updatePayTableAmountByPercentage(Long payTableId, PayTableDTO payTableDTO) {
+    public List<PayGradeResponse> updatePayTableAmountByPercentage(Long payTableId, PayTableDTO payTableDTO) {
         if (payTableDTO.getPercentageValue() == null || payTableDTO.getPercentageValue().equals(new BigDecimal(0))) {
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
+        List<PayGradeResponse> payGradeResponses=null;
         payTable.setPercentageValue(payTableDTO.getPercentageValue());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
             if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
@@ -582,7 +583,7 @@ public class PayTableService {
                 }
 
                 if(payTable.isPublished()){
-                    createCopyOfPayTableAndAddPayGrade(payTable, null, payGradePayGroupAreaRelationShips, true);
+                    payGradeResponses = createCopyOfPayTableAndAddPayGrade(payTable, null, payGradePayGroupAreaRelationShips, true);
                 }
                 else {
                     payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
@@ -590,7 +591,7 @@ public class PayTableService {
 
                 }
             }
-        return true;
+        return payGradeResponses;
     }
 
 

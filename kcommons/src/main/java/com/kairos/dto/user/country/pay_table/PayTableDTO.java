@@ -123,10 +123,7 @@ public class PayTableDTO {
             return false;
         }
         if (Optional.ofNullable(this.endDateMillis).isPresent()) {
-            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
-            return dateValue;
+            return endDateMillis.isAfter(startDateMillis.minusDays(1));
         }
         return true;
     }

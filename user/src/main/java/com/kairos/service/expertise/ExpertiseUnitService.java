@@ -13,6 +13,8 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeLocationRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,23 +50,26 @@ public class ExpertiseUnitService {
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
+        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
         organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         List<ExpertiseQueryResult> expertise = new ArrayList<>();
         if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            expertise = expertiseGraphRepository.findExpertiseByOrganizationServicesAndLevelForUnit(organization.getCountry().getId(), servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
+            expertise = expertiseGraphRepository.findExpertiseByOrganizationServicesAndLevelForUnit(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
         } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            expertise = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(organization.getCountry().getId(), servicesAndLevel.getServicesId());
+            expertise = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(countryId, servicesAndLevel.getServicesId());
         }
-        List<Long> expertiseIds = expertise.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
-        List<ExpertiseLocationStaffQueryResult> locations= organizationLocationRelationShipGraphRepository.getExpertiseWiseLocationInOrganization(expertiseIds,unitId);
-        List<ExpertiseLocationStaffQueryResult> staffs=staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds,unitId);
+        if (CollectionUtils.isNotEmpty(expertise)) {
+            List<Long> expertiseIds = expertise.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
+            List<ExpertiseLocationStaffQueryResult> locations = organizationLocationRelationShipGraphRepository.getExpertiseWiseLocationInOrganization(expertiseIds, unitId);
+            List<ExpertiseLocationStaffQueryResult> staffs = staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds, unitId);
 
-        Map<Long,Map<String,Object>> staffMap= staffs.stream().collect(Collectors.toMap(current->current.getExpertiseId(),v->v.getStaff()));
-        Map<Long,Location> locationMap= locations.stream().collect(Collectors.toMap(current->current.getExpertiseId(),v->v.getLocation()));
-        expertise.forEach(current->{
-            current.setUnionRepresentative(staffMap.get(current.getId()));
-            current.setUnionLocation(locationMap.get(current.getId()));
-        });
+            Map<Long, Map<String, Object>> staffMap = staffs.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getStaff()));
+            Map<Long, Location> locationMap = locations.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getLocation()));
+            expertise.forEach(current -> {
+                current.setUnionRepresentative(staffMap.get(current.getId()));
+                current.setUnionLocation(locationMap.get(current.getId()));
+            });
+        }
         return expertise;
 
     }

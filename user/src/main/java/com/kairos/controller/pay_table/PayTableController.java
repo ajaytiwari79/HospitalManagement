@@ -6,6 +6,7 @@ import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.service.pay_table.PayTableService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -96,7 +97,7 @@ public class PayTableController {
     }
 
     @RequestMapping(value = "/pay_table/{payTableId}/publish", method = POST)
-    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam LocalDate publishedDate) {
+    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
     }
 
