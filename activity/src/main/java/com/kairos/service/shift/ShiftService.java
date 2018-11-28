@@ -1310,9 +1310,9 @@ public class ShiftService extends MongoBaseService {
         return shiftDTO;
     }
 
-    private void validateRealTimeShift(Long unitId,ShiftDTO shiftDTO,Map<String,Phase> phaseMap){
+    public void validateRealTimeShift(Long unitId,ShiftDTO shiftDTO,Map<String,Phase> phaseMap){
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
-        ShiftState shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME).getId());
+        ShiftState shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
         Map<BigInteger,ShiftActivity> activityMap=shiftState.getActivities().stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
         boolean realtime=phaseService.isShiftIdEditInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate());
         if(realtime){
