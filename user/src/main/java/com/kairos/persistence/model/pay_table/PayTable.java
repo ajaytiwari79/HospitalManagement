@@ -6,6 +6,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -35,10 +36,22 @@ public class PayTable extends UserBaseEntity {
 
     @Relationship(type = HAS_TEMP_PAY_TABLE, direction = INCOMING)
     private PayTable payTable;
+    private BigDecimal percentageValue; // this value is being used to update paygrade and functional amount
 
     //
     public PayTable() {
         //default constructor
+    }
+
+    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis, String paymentUnit, boolean editable) {
+        this.name = name;
+        this.description = description;
+        this.shortName = shortName;
+        this.level = level;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
+        this.editable=editable;
     }
 
     public Date getStartDateMillis() {
@@ -114,15 +127,12 @@ public class PayTable extends UserBaseEntity {
         this.payTable = payTable;
     }
 
-    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis, String paymentUnit, boolean editable) {
-        this.name = name;
-        this.description = description;
-        this.shortName = shortName;
-        this.level = level;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.paymentUnit = paymentUnit;
-        this.editable=editable;
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
+    }
+
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
     }
 
     public boolean isHasTempCopy() {

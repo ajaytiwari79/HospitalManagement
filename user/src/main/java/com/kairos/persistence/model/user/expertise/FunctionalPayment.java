@@ -40,7 +40,6 @@ public class FunctionalPayment extends UserBaseEntity {
 
     }
 
-
     public Expertise getExpertise() {
         return expertise;
     }
