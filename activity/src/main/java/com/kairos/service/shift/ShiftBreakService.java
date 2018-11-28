@@ -267,9 +267,7 @@ public class ShiftBreakService {
         if (numberOfBreakAllotted != numberOfBreakRequired) {
             reAdjustShiftDuration(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailability,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired));
         }
-        if (updateShift){
-            mainShift.getActivities().clear();
-        }
+
         return shifts;
     }
     private void removeAllPreviouslyAllottedBreaks(Shift shift){

@@ -381,8 +381,8 @@ public class ShiftService extends MongoBaseService {
              breakActivities = shiftBreakService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
         }
         if (!breakActivities.isEmpty()) {
-            shift.getActivities().clear();
-            shift.getActivities().addAll(breakActivities);
+
+            shift.setActivities(breakActivities);
         }
         shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
         shiftMongoRepository.save(shift);
