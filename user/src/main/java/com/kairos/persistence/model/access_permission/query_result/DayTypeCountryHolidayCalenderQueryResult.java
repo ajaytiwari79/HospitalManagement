@@ -2,19 +2,12 @@ package com.kairos.persistence.model.access_permission.query_result;
 
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.DayType;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
-import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 @QueryResult
 public class DayTypeCountryHolidayCalenderQueryResult {
@@ -30,7 +23,7 @@ public class DayTypeCountryHolidayCalenderQueryResult {
     private boolean holidayType;
     private boolean isEnabled = true;
     private boolean allowTimeSettings = false;
-    List<CountryHolidayCalenderQueryResult> countryHolidayCalenders;
+    List<CountryHolidayCalendarQueryResult> countryHolidayCalenders;
 
 
     // Constructor
@@ -126,11 +119,11 @@ public class DayTypeCountryHolidayCalenderQueryResult {
         this.countryHolidayCalender = countryHolidayCalender;
     }*/
 
-    public List<CountryHolidayCalenderQueryResult> getCountryHolidayCalenders() {
+    public List<CountryHolidayCalendarQueryResult> getCountryHolidayCalenders() {
         return countryHolidayCalenders;
     }
 
-    public void setCountryHolidayCalenders(List<CountryHolidayCalenderQueryResult> countryHolidayCalenders) {
+    public void setCountryHolidayCalenders(List<CountryHolidayCalendarQueryResult> countryHolidayCalenders) {
         this.countryHolidayCalenders = countryHolidayCalenders;
     }
 }

@@ -15,23 +15,21 @@ import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.Day;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
-import com.kairos.persistence.model.access_permission.query_result.CountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
@@ -71,8 +69,6 @@ import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -377,6 +373,12 @@ public class StaffRetrievalService {
         String STAFF_CURRENT_ROLE = null;
         AccessGroupStaffQueryResult accessGroupQueryResultCopy = ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult, AccessGroupStaffQueryResult.class);
         for (AccessGroupDayTypesQueryResult accessGroupDayTypes : accessGroupQueryResultCopy.getDayTypesByAccessGroup()) {
+            if(!accessGroupDayTypes.getAccessGroup().isAllowedDayTypes()){
+                STAFF_CURRENT_ROLE=accessGroupDayTypes.getAccessGroup().getRole().name();
+                if(AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)){
+                    break;
+                }
+            }
             List<DayTypeCountryHolidayCalenderQueryResult> dayTypeList = accessGroupDayTypes.getDayTypes();
             String staffRole = null;
             if (CollectionUtils.isNotEmpty(dayTypeList)) {
@@ -406,7 +408,7 @@ public class StaffRetrievalService {
                             }
                         }
                     }else if(dayType.isHolidayType() && dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalenders())) {
-                        Optional<CountryHolidayCalenderQueryResult> countryHolidayCalender = dayType.getCountryHolidayCalenders().stream().filter(cal -> ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
+                        Optional<CountryHolidayCalendarQueryResult> countryHolidayCalender = dayType.getCountryHolidayCalenders().stream().filter(cal -> ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
                         Long localTime = LocalTime.now().getLong(ChronoField.MINUTE_OF_DAY);
                         if (countryHolidayCalender.isPresent() && countryHolidayCalender.get().getStartTime() <= localTime && localTime <= countryHolidayCalender.get().getEndTime()) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
