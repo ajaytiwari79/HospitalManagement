@@ -882,10 +882,15 @@ public class UnitPositionService {
         List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetailsList = new ArrayList<>();
         unitPositions.forEach(unitPosition -> {
             com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            List<UnitPositionLinesQueryResult> unitPositionLinesQueryResults = unitPositionGraphRepository.findFunctionalHourlyCost(Arrays.asList(unitPosition.getId()));
+            Map<Long, Float> hourlyCostMap = unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
             convertUnitPositionObject(unitPosition, unitPositionDetail);
             unitPositionDetail.setStaffId(unitPosition.getStaffId());
             unitPositionDetail.setCountryId(countryId);
             unitPositionDetail.setUnitTimeZone(organization.getTimeZone());
+            UnitPositionLinesQueryResult unitPositionLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
+            float hourlyCost = (float) (unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()) / (366 * 7.4) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()) / (365 * 7.4));
+            unitPositionDetail.setHourlyCost(hourlyCost);
             unitPositionDetailsList.add(unitPositionDetail);
         });
 
