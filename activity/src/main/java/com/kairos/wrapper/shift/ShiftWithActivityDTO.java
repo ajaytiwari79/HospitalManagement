@@ -205,7 +205,7 @@ public class ShiftWithActivityDTO {
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = getStartDate();
+        this.startDate = startDate;
     }
 
     public Date getEndDate() {
@@ -214,7 +214,7 @@ public class ShiftWithActivityDTO {
 
 
     public void setEndDate(Date endDate) {
-        this.endDate = getEndDate();
+        this.endDate = endDate;
     }
 
 
