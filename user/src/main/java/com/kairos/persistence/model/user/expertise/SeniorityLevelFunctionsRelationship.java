@@ -13,6 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_F
 /**
  * Created by vipul on 28/3/18.
  */
+
 @RelationshipEntity(type = HAS_FUNCTIONAL_AMOUNT)
 public class SeniorityLevelFunctionsRelationship extends UserBaseEntity {
     @StartNode
