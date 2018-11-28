@@ -53,12 +53,13 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
         this.breakShift=breakShift;
+        this.absenceReasonCodeId = absenceReasonCodeId;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
