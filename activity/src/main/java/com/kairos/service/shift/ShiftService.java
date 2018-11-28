@@ -644,7 +644,7 @@ public class ShiftService extends MongoBaseService {
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
 
-//            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
+            shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
             //anil m2 notify event for updating staffing level
