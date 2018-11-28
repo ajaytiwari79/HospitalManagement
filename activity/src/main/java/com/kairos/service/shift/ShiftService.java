@@ -127,20 +127,15 @@ public class ShiftService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(ShiftService.class);
 
     @Inject
-    private
-    ShiftMongoRepository shiftMongoRepository;
+    private  ShiftMongoRepository shiftMongoRepository;
     @Inject
     private ActivityMongoRepository activityRepository;
     @Inject
     private AttendanceSettingRepository attendanceSettingRepository;
-
     @Inject
     private StaffRestClient staffRestClient;
-
     @Inject
     private ApplicationContext applicationContext;
-
-
     @Inject
     private PhaseService phaseService;
     @Inject
@@ -169,8 +164,7 @@ public class ShiftService extends MongoBaseService {
     private BreakSettingMongoRepository breakSettingMongoRepository;
     @Inject
     private WorkingTimeAgreementMongoRepository wtaMongoRepository;
-    @Inject
-    private GenericIntegrationService restClient;
+
     @Inject
     private PhaseSettingsService phaseSettingsService;
     @Inject
@@ -1039,100 +1033,6 @@ public class ShiftService extends MongoBaseService {
 
         return buttonConfig;
     }
-    public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
-        List<DateWiseShiftResponse> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
-        if (!Optional.ofNullable(shifts).isPresent() || shifts.isEmpty()) {
-            exceptionService.invalidOperationException("message.shift.notBlank");
-        }
-        Set<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getShifts().stream().flatMap(ss -> ss.getActivities().stream().map(a -> a.getActivityId()))).collect(Collectors.toSet());
-
-        List<Activity> activities = activityRepository.findAllActivitiesByIds(activityIds);
-        Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        List<StaffUnitPositionDetails> staffDataList = restClient.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
-
-        //
-        List<Long> expertiseIds=staffDataList.stream().map(staffUnitPositionDetails -> staffUnitPositionDetails.getExpertise().getId()).collect(Collectors.toList());
-
-        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(expertiseIds);
-        Map<BigInteger, ActivityWrapper> breakActivitiesMap = shiftBreakService.getBreakActivities(breakSettings,unitId);
-        Integer unCopiedShiftCount = 0;
-        CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
-
-        for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
-
-            StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
-            boolean paid = staffUnitPosition.getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID);
-            // TODO PAVAN handle error
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activityMap, copyShiftDTO);
-            StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
-            StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
-            unCopiedShiftCount += response.get("error").size();
-            copyShiftResponse.getSuccessFul().add(successfullyCopied);
-            copyShiftResponse.getFailure().add(errorInCopy);
-        }
-        copyShiftResponse.setUnCopiedShiftCount(unCopiedShiftCount);
-
-        return copyShiftResponse;
-    }
-
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<DateWiseShiftResponse> shifts, StaffUnitPositionDetails staffUnitPosition, Map<BigInteger, Activity> activityMap, CopyShiftDTO copyShiftDTO) {
-        List<Shift> newShifts = new ArrayList<>(shifts.size());
-        Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
-        List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
-        List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
-        int counter = 0;
-        LocalDate shiftCreationDate = copyShiftDTO.getStartDate();
-        LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
-        ShiftResponse shiftResponse;
-        while (shiftCreationLastDate.isAfter(shiftCreationDate) || shiftCreationLastDate.equals(shiftCreationDate)) {
-            DateWiseShiftResponse dateWiseShiftResponse = shifts.get(counter);
-            for (Shift sourceShift : dateWiseShiftResponse.getShifts()) {
-                ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
-                shiftWithActivityDTO.getActivities().forEach(s -> {
-                    ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()), ActivityDTO.class);
-                    s.setActivity(activityDTO);
-                });
-                List<String> validationMessages = shiftValidatorService.validateShiftWhileCopy(shiftWithActivityDTO, staffUnitPosition);
-                shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, shiftCreationDate, newShifts);
-                if (shiftResponse.isSuccess()) {
-                    successfullyCopiedShifts.add(shiftResponse);
-                } else {
-                    errorInCopyingShifts.add(shiftResponse);
-                }
-            }
-            shiftCreationDate = shiftCreationDate.plusDays(1L);
-            if (counter++ == shifts.size() - 1) {
-                counter = 0;
-            }
-
-        }
-        statusMap.put("success", successfullyCopiedShifts);
-        statusMap.put("error", errorInCopyingShifts);
-        if (!newShifts.isEmpty()) {
-            save(newShifts);
-        }
-        return statusMap;
-    }
-
-    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, LocalDate shiftCreationFirstDate, List<Shift> newShifts) {
-        List<BigInteger> activityIds = sourceShift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
-        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        if (responseMessages.isEmpty()) {
-            Shift copiedShift = new Shift(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getStartDate())), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getEndDate())),
-                    sourceShift.getRemarks(), sourceShift.getActivities(), staffUnitPosition.getStaff().getId(), sourceShift.getUnitId(),
-                    sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
-            List<ShiftActivity> shiftActivities = shiftBreakService.addBreakInShifts(activityWrapperMap, copiedShift, staffUnitPosition,null,null);
-            copiedShift.getActivities().addAll(shiftActivities);
-            newShifts.add(copiedShift);
-            return new ShiftResponse(sourceShift.getId(), sourceShift.getActivities().get(0).getActivityName(), Arrays.asList(NO_CONFLICTS), true, shiftCreationFirstDate);
-
-        } else {
-            List<String> errors = responseMessages.stream().map(responseMessage -> localeService.getMessage(responseMessage)).collect(Collectors.toList());
-            return new ShiftResponse(sourceShift.getId(), sourceShift.getActivities().get(0).getActivityName(), errors, false, shiftCreationFirstDate);
-        }
-    }
-
 
     public List<ShiftDTO> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, String startDateAsString, String endDateAsString, Long expertiseId) throws ParseException {
         Date startDateInISO = DateUtils.getDate();
@@ -1146,7 +1046,7 @@ public class ShiftService extends MongoBaseService {
                 endDateInISO = new DateTime(endDate).plusDays(1).toDate();
             }
         }
-        Long unitPositionId = restClient.getUnitPositionId(unitId, staffId, expertiseId, startDateInISO.getTime());
+        Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, expertiseId, startDateInISO.getTime());
 
         List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, unitId);
         return shifts;
