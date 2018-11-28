@@ -2,9 +2,10 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
@@ -14,6 +15,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by vipul on 30/8/17.
