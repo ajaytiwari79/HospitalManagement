@@ -80,8 +80,10 @@ public class RestingHoursCalculationService implements CounterService {
         //FIXME: fixed time interval TO BE REMOVED ONCE FILTERS IMPLEMENTED PROPERLY
         if(kpi && filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS)!= null){
             staffIds = filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS);
-        }else{
+        }else if(filterBasedCriteria.get(FilterType.STAFF_IDS) != null){
             staffIds = filterBasedCriteria.get(FilterType.STAFF_IDS);
+        }else {
+            staffIds = new ArrayList<>();
         }
         if(filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null){
             dates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
