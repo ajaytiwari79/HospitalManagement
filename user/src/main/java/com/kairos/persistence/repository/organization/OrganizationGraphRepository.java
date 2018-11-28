@@ -778,5 +778,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH (organizations:Organization{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
     List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
+
 }
 

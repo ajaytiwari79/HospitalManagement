@@ -98,7 +98,7 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
     public static ShiftActivityIdsDTO getActivitiesToProcess(List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
         Set<BigInteger> allExistingShiftActivities = existingShiftActivities.stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet());
         Set<BigInteger> allArrivedShiftActivities = arrivedShiftActivities.stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
-        Map<BigInteger, ShiftActivity> existingShiftActivityMap = existingShiftActivities.stream().collect(Collectors.toMap(ShiftActivity::getActivityId, Function.identity()));
+        Map<BigInteger, ShiftActivity> existingShiftActivityMap = existingShiftActivities.stream().collect(Collectors.toMap(ShiftActivity::getActivityId, Function.identity(), (currentActivity, nextActivity) -> currentActivity));
         Set<BigInteger> activitiesToEdit = new HashSet<>();
         Set<BigInteger> activitiesToAdd = new HashSet<>();
         Set<BigInteger> activitiesToDelete = new HashSet<>();

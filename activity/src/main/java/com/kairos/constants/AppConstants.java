@@ -160,8 +160,8 @@ public class AppConstants {
     public static final int YOUNGER_AGE = 18;
     public static final int OLDER_AGE = 62;
 
-    public static final String PAID_BREAK = "PAID BREAK";
-    public static final String UNPAID_BREAK = "UNPAID BREAK";
+    public static final String PAID_BREAK = "PAID_BREAK";
+    public static final String UNPAID_BREAK = "UNPAID_BREAK";
     public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
     public static final String SHIFT = "SHIFT";

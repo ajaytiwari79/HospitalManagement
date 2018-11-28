@@ -139,7 +139,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId,Date startDate,Date endDate) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lt(endDate).gte(startDate));
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(startDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")

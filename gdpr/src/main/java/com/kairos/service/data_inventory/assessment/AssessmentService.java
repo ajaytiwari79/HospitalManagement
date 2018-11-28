@@ -155,14 +155,14 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentDTO        Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
-    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, BigInteger processingActivityId, AssessmentDTO assessmentDTO) {
+    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, BigInteger processingActivityId, AssessmentDTO assessmentDTO,boolean subProcessingActivity) {
 
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentMongoRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId) : assessmentMongoRepository.findPreviousLaunchedAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.PROCESSING_ACTIVITY);
-        ProcessingActivityResponseDTO processingActivityDTO = processingActivityMongoRepository.getProcessingActivityAndMetaDataById(unitId, processingActivityId);
+        ProcessingActivityResponseDTO processingActivityDTO = processingActivityMongoRepository.getProcessingActivityAndMetaDataById(unitId, processingActivityId,subProcessingActivity);
         if (!Optional.ofNullable(processingActivityDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
         }

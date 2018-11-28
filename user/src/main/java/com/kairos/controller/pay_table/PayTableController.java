@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
@@ -96,6 +97,11 @@ public class PayTableController {
     @RequestMapping(value = "/pay_table/{payTableId}/publish", method = POST)
     public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
+    }
+
+    @PutMapping(value = "/pay_table/{payTableId}/amount")
+    public ResponseEntity<Map<String,Object>> updatePayTableAmount(@PathVariable @NotNull Long payTableId,@RequestBody PayTableDTO payTableDTO){
+       return ResponseHandler.generateResponse(HttpStatus.OK,true,payTableService.updatePayTableAmountByPercentage(payTableId,payTableDTO));
     }
 
 }
