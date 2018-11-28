@@ -195,6 +195,8 @@ public class FunctionService {
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
-        return functionGraphRepository.findFunctionsByCountry(organization.getCountry().getId());
+        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+
+        return functionGraphRepository.findFunctionsByCountry(countryId);
     }
 }
