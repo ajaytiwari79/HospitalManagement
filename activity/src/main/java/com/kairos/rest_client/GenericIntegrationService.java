@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.RestClientUrlUtil;
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
@@ -374,10 +375,11 @@ public class GenericIntegrationService {
         }, staffId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId,Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
         queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
     }

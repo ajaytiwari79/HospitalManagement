@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
@@ -34,6 +35,9 @@ public class ShiftActivity {
     private boolean haltBreak;
     private BigInteger plannedTimeId;
     private boolean breakShift;
+
+    //Yatharth adding embedded object for frontend
+    private ReasonCodeDTO reasonCode;
 
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
@@ -205,5 +209,13 @@ public class ShiftActivity {
 
     public void setAbsenceReasonCodeId(Long absenceReasonCodeId) {
         this.absenceReasonCodeId = absenceReasonCodeId;
+    }
+
+    public ReasonCodeDTO getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(ReasonCodeDTO reasonCode) {
+        this.reasonCode = reasonCode;
     }
 }

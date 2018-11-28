@@ -714,7 +714,7 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(null,staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId(),Collections.emptySet());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(),new Date());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
