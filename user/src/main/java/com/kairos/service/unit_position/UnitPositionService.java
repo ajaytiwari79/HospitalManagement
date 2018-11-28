@@ -117,15 +117,15 @@ public class UnitPositionService {
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
-    protected UnitPositionGraphRepository unitPositionGraphRepository;
+    private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private PositionCodeGraphRepository positionCodeGraphRepository;
     @Inject
-    protected ExpertiseGraphRepository expertiseGraphRepository;
+    private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
-    protected OrganizationGraphRepository organizationGraphRepository;
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private StaffService staffService;
     @Inject
@@ -133,7 +133,7 @@ public class UnitPositionService {
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    protected OrganizationService organizationService;
+    private OrganizationService organizationService;
     @Inject
     private PositionCodeService positionCodeService;
     @Inject
@@ -141,17 +141,17 @@ public class UnitPositionService {
     @Inject
     private TimeBankRestClient timeBankRestClient;
     @Inject
-    protected UserGraphRepository userGraphRepository;
+    private UserGraphRepository userGraphRepository;
     @Inject
     private UnitPositionEmploymentTypeRelationShipGraphRepository unitPositionEmploymentTypeRelationShipGraphRepository;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
-    protected SeniorityLevelGraphRepository seniorityLevelGraphRepository;
+    private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
     @Inject
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
-    protected FunctionGraphRepository functionGraphRepository;
+    private FunctionGraphRepository functionGraphRepository;
     @Inject
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
@@ -161,11 +161,11 @@ public class UnitPositionService {
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
-    protected WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
+    private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
     private PlannerSyncService plannerSyncService;
     @Inject
-    protected ExceptionService exceptionService;
+    private ExceptionService exceptionService;
     @Inject
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
@@ -175,7 +175,7 @@ public class UnitPositionService {
     @Inject
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
-    protected GenericRestClient genericRestClient;
+    private GenericRestClient genericRestClient;
 
     @Inject
     private AsynchronousService asynchronousService;

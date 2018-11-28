@@ -18,12 +18,23 @@ import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.query_result.PositionCtaWtaQueryResult;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.rest_client.WorkingTimeAgreementRestClient;
+import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -42,13 +53,35 @@ import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPo
  **/
 @Service
 @Transactional
-public class UnitPositionCTAWTAService extends UnitPositionService{
+public class UnitPositionCTAWTAService {
+    @Inject
+    private UnitPositionService unitPositionService;
+    @Inject
+    private UnitPositionGraphRepository unitPositionGraphRepository;
+    @Inject
+    private ExpertiseGraphRepository expertiseGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject
+    private UserGraphRepository userGraphRepository;
+    @Inject
+    private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
+    @Inject
+    private FunctionGraphRepository functionGraphRepository;
+    @Inject
+    private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private GenericRestClient genericRestClient;
 
     public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId, LocalDate selectedDate) throws Exception {
         PositionCtaWtaQueryResult positionCtaWtaQueryResult = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_CTA_WTA_BY_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCtaWtaQueryResult>>() {
         }, expertiseId);
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
-        SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
+        SeniorityLevel appliedSeniorityLevel = unitPositionService.getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
         //SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
         //positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
@@ -83,7 +116,7 @@ public class UnitPositionCTAWTAService extends UnitPositionService{
         updateDTO.setId(wtaId);
         updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
+        UnitPositionQueryResult unitPositionQueryResult = unitPositionService.getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
         return unitPositionQueryResult;
     }
     //  TODO Pradeep INCORRECT function NAME and working
