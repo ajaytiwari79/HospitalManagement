@@ -3,15 +3,19 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.enums.UnitPosition;
+import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.wrapper.staff.StaffEmploymentWrapper;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -63,6 +67,10 @@ public class StaffFilterService {
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private AccessGroupRepository accessGroupRepository;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
@@ -254,9 +262,31 @@ public class StaffFilterService {
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
+        staffEmploymentWrapper.setStaffList(filterStaffByRoles(staffEmploymentWrapper.getStaffList(),unitId));
         return staffEmploymentWrapper;
 
     }
 
+    private List<Map> filterStaffByRoles(List<Map> staffList, Long unitId) {
+        Long userId=UserContext.getUserDetails().getId();
+        List<Map> staffListByRole = new ArrayList<>();
+        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
+        if (staffAtHub != null) {
+            staffListByRole = staffList;
+        } else {
+            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+            String STAFF_CURRENT_ROLE;
+            if (accessGroupQueryResult != null) {
+                STAFF_CURRENT_ROLE=staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+                if(AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)){
+                    staffListByRole=staffList;
+                }else if(AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)){
+                    Map staff = staffList.stream().filter(s -> s.get("id") == accessGroupQueryResult.getStaffId()).findFirst().get();
+                    staffListByRole.add(staff);
+                }
+            }
+        }
+        return staffListByRole;
+    }
 
 }
