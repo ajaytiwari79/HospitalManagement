@@ -136,10 +136,10 @@ public class TimeBankIntervalDTO {
         this.phaseName = "T & A Phase";
     }
 
-    public TimeBankIntervalDTO(Date startDate, Date endDate) {
+    public TimeBankIntervalDTO(Date startDate, Date endDate,String phaseName) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.phaseName = "T & A Phase";
+        this.phaseName = phaseName;
     }
 
     public Date getStartDate() {

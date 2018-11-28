@@ -100,13 +100,13 @@ public class RuleTemplateCategoryRequestDTO {
     @JsonSetter("categoryName")
     public void setCategoryategoryName(String name) {
         if (this.name == null) {
-            this.name = name;
+            this.name = name.trim();
         }
     }
 
     @JsonSetter("name")
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getDescription() {

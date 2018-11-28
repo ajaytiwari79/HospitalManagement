@@ -143,6 +143,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_REGIONS = "HAS_REGIONS";
     public final static String CONTROL_PANEL_SETTINGS = "CONTROL_PANEL_SETTINGS";
     public final static String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
+    public final static String DAY_TYPE = "DAY_TYPE";
 
 
     //TimeCare

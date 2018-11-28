@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.user.access_permission;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
@@ -351,12 +352,33 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH(organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup)-[:"+HAS_PARENT_ACCESS_GROUP+"]-(pag:AccessGroup) WHERE ID(pag) IN {1} return id(ag) as id,id(pag) as parentId")
     List<AccessPageQueryResult> findAllAccessGroupWithParentIds(Long organizationId,Set<Long> parentAccessGroupsIds);
 
-    @Query("MATCH (organization:Organization)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup{deleted:false}) WHERE id(organization)={0}  " +
-            "OPTIONAL MATCH (ag)-[:"+DAY_TYPES+"]-(dayType:DayType) \n" +
-            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.role as role, ag.enabled as enabled , ag.startDate as startDate, ag.endDate as endDate, collect(id(dayType)) as dayTypeIds,ag.allowedDayTypes as allowedDayTypes")
-    List<AccessGroupQueryResult> getOrganizationAccessGroup( Long organizationId);
 
+        /*@Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization)\n" +
+            "WHERE id(organization)={0} AND id(user)={1}\n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:\"MANAGEMENT\"})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(organization)\n" +
+            "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypes:DayType{holidayType:false})\n" +
+            "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayTypeWithHoliday:DayType{holidayType:true})\n" +
+            "OPTIONAL MATCH(dayTypeWithHoliday)-[:"+DAY_TYPE+"]-(chc:CountryHolidayCalender)\n" +
+            "WITH organization,id(staff) AS staffId,accessGroup,\n" +
+            "COLLECT(DISTINCT {id:id(dayTypes),holidayType:dayTypes.holidayType,validDays:dayTypes.validDays,name:dayTypes.name,allowTimeSettings:dayTypes.allowTimeSettings}) AS dayTypes, \n" +
+            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc:holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS chc,\n" +
+            "COLLECT(DISTINCT {id:id(dayTypeWithHoliday),holidayType:dayTypeWithHoliday.holidayType,validDays:dayTypeWithHoliday.validDays,name:dayTypeWithHoliday.name,allowTimeSettings:dayTypeWithHoliday.allowTimeSettings,countryHolidayCalender:chc}) AS dayTypeWithHoliday\n" +
+            "RETURN\n" +
+            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayTypes,dayTypesWithHolidayType:dayTypeWithHoliday}) AS dayTypesByAccessGroup")
+    AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long userId);*/
 
+        @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization)\n" +
+                "WHERE id(organization)={0} AND id(user)={1}\n" +
+                "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(organization)\n" +
+                "OPTIONAL MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType)\n" +
+                "OPTIONAL MATCH(dayType)-[:"+DAY_TYPE+"]-(chc:CountryHolidayCalender)\n" +
+                "WITH organization,id(staff) AS staffId,accessGroup,dayType,\n" +
+                "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS countryHolidayCalender\n" +
+                "WITH organization, staffId,accessGroup,countryHolidayCalender,\n" +
+                "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
+                "RETURN\n" +
+                "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
+        AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long userId);
 
 }
 
