@@ -5,6 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -53,9 +54,8 @@ public class ShiftCopyService extends MongoBaseService {
 
         List<Activity> activities = activityRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        List<StaffUnitPositionDetails> staffDataList = genericIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
-
-        //
+        StaffUnitPositionTimeSlotWrapper unitPositionTimeSlotWrapper = genericIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
+        List<StaffUnitPositionDetails> staffDataList = unitPositionTimeSlotWrapper.getStaffUnitPositionDetails();
         List<Long> expertiseIds=staffDataList.stream().map(staffUnitPositionDetails -> staffUnitPositionDetails.getExpertise().getId()).collect(Collectors.toList());
 
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(expertiseIds);

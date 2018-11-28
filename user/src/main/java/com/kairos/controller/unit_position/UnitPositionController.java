@@ -2,6 +2,8 @@ package com.kairos.controller.unit_position;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.service.unit_position.UnitPositionCTAWTAService;
+import com.kairos.service.unit_position.UnitPositionFunctionService;
 import com.kairos.service.unit_position.UnitPositionJobService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
@@ -40,7 +42,8 @@ public class UnitPositionController {
     private UnitPositionService unitPositionService;
     @Inject
     private UnitPositionJobService unitPositionJobService;
-
+    @Inject private UnitPositionFunctionService unitPositionFunctionService;
+    @Inject private UnitPositionCTAWTAService unitPositionCTAWTAService;
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
     public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
@@ -79,25 +82,25 @@ public class UnitPositionController {
     @ApiOperation(value = "Update unit_position's WTA")
     @PutMapping(value = "/unit_position/{unitPositionId}/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> updateUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateUnitPositionWTA(unitId, unitPositionId, wtaId, wtadto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionCTAWTAService.updateUnitPositionWTA(unitId, unitPositionId, wtaId, wtadto));
     }
 
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
     public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId,@PathVariable Long unitId, @RequestBody Map<String, Object> payload) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.applyFunction(unitPositionId, payload,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.applyFunction(unitPositionId, payload,unitId));
     }
 
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/restore_functions")
     public ResponseEntity<Map<String, Object>> restoreFunctions(@PathVariable Long unitPositionId, @RequestBody Map<Long,Set<LocalDate>> payload)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.restoreFunctions(unitPositionId, payload));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.restoreFunctions(unitPositionId, payload));
     }
 
     @ApiOperation(value = "remove function to unit position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}/applyFunction")
     public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitId,unitPositionId, appliedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.removeFunction(unitId,unitPositionId, appliedDate));
     }
 
     /**
@@ -111,7 +114,7 @@ public class UnitPositionController {
     @ApiOperation(value = "remove function to unit position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}/remove_functions")
     public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId, @RequestBody Set<LocalDate> appliedDates)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunctions(unitPositionId, appliedDates));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.removeFunctions(unitPositionId, appliedDates));
     }
 
     @ApiOperation(value = "get unit_position's Id By Staff and expertise")
@@ -135,13 +138,13 @@ public class UnitPositionController {
     @ApiOperation(value = "get all wta version for a staff")
     @RequestMapping(value = "/staff/{staffId}/wta", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllWTAOfStaff(unitId,staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionCTAWTAService.getAllWTAOfStaff(unitId,staffId));
     }
 
     @ApiOperation(value = "get all cta version for a staff")
     @RequestMapping(value = "/staff/{staffId}/cta", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllCTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllCTAOfStaff(unitId, staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionCTAWTAService.getAllCTAOfStaff(unitId, staffId));
     }
 
     //Do not remove, required for local testing.
@@ -155,7 +158,7 @@ public class UnitPositionController {
     @ApiOperation(value = "get unit_position's CTA")
     @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
     public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionCTAWTAService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
 
@@ -168,6 +171,6 @@ public class UnitPositionController {
     @ApiOperation(value = "get HourlyCost By unitPositionLine Wise")
     @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
     public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
     }
 }

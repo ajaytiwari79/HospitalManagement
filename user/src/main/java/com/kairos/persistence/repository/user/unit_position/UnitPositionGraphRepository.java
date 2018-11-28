@@ -364,7 +364,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(staff)-[unitPositionStaffRel: BELONGS_TO_STAFF ]->(unitPosition) " +
             "RETURN  \n" +
             " CASE  \n" +
-            " WHEN organization IS NULL THEN \"orgganization\"    \n" +
+            " WHEN organization IS NULL THEN \"organization\"    \n" +
             " WHEN staff IS NULL THEN \"staff\"     \n" +
             " WHEN unitPosition IS NULL THEN \"unitPosition\"    \n" +
             " WHEN unitPositionOrgRel IS NULL THEN  \"unitPositionOrgRel\"    \n" +
