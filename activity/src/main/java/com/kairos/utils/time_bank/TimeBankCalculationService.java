@@ -1,20 +1,22 @@
 package com.kairos.utils.time_bank;
 
 import com.google.common.collect.Lists;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
-import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-
 import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
@@ -29,10 +31,6 @@ import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
-import com.kairos.dto.user.country.agreement.cta.CalculationFor;
-import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,16 +46,13 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.Month;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.BONUS_HOURS;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
+import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 
@@ -76,9 +71,7 @@ public class TimeBankCalculationService {
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
-
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
-
 
     /**
      * @param staffAdditionalInfoDTO
@@ -274,22 +267,6 @@ public class TimeBankCalculationService {
         }
         return timeBankCTADistributions;
     }
-
-    /**
-     * @param shifts
-     * @param intervalValue
-     * @return Map<String, List<ShiftWithActivityDTO>>
-     */
-    private Map<String, List<ShiftWithActivityDTO>> getMapOfShiftByInterval(List<ShiftWithActivityDTO> shifts, int intervalValue) {
-        Map<String, List<ShiftWithActivityDTO>> shiftQueryResultMap = new HashMap<>();
-        for (int i = 0; i < shifts.size() - 1; i++) {
-            DateTime startDateTime = new DateTime().plusDays(i).withTimeAtStartOfDay();
-            Interval interval = new Interval(startDateTime, startDateTime.plusDays(intervalValue));
-            shiftQueryResultMap.put(interval.toString(), getShiftsByDate(interval, shifts));
-        }
-        return shiftQueryResultMap;
-    }
-
 
     /**
      * @param interval
