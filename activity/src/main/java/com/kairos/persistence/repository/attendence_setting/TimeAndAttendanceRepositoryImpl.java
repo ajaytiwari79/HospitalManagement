@@ -9,20 +9,19 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-   public TimeAndAttendance findMaxAttendanceCheckIn(List<Long> staffIds, Date date){
+   public TimeAndAttendance findMaxAttendanceCheckIn(List<Long> staffIds, LocalDate date){
        Aggregation aggregation = Aggregation.newAggregation(
-               match(Criteria.where("staffId").in(staffIds).and("updatedAt").gte(date)),
+               match(Criteria.where("staffId").in(staffIds).and("date").gte(date)),
                sort(Sort.Direction.DESC,"updatedAt"),
                limit(1)
        );
@@ -31,25 +30,26 @@ public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceR
        return (result.getMappedResults().isEmpty())?null:result.getMappedResults().get(0);
    }
 
-    public TimeAndAttendanceDTO findMaxAttendanceCheckInsada(List<Long> staffIds, Date date){
+    public TimeAndAttendance findMaxAttendanceCheckOut(List<Long> staffIds, LocalDate date){
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("staffId").in(staffIds).and("updatedAt").gte(date)),
+                match(Criteria.where("staffId").in(staffIds).and("date").gte(date).and("attendanceTimeSlot").elemMatch(Criteria.where("to").exists(false))),
                 sort(Sort.Direction.DESC,"updatedAt"),
                 limit(1)
         );
 
-        AggregationResults<TimeAndAttendanceDTO> result = mongoTemplate.aggregate(aggregation, TimeAndAttendance.class, TimeAndAttendanceDTO.class);
+        AggregationResults<TimeAndAttendance> result = mongoTemplate.aggregate(aggregation, TimeAndAttendance.class, TimeAndAttendance.class);
         return (result.getMappedResults().isEmpty())?null:result.getMappedResults().get(0);
     }
 
     @Override
-    public List<TimeAndAttendanceDTO> findAllAttendanceByStaffIds(List<Long> staffIds, Date date) {
+    public List<TimeAndAttendanceDTO> findAllAttendanceByStaffIds(List<Long> staffIds,Long unitId, Date lastDate,Date currentDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("staffId").in(staffIds).and("updatedAt").gte(date)),
-                sort(Sort.Direction.DESC,"updatedAt"),
-                limit(1)
+                match(Criteria.where("staffId").in(staffIds).and("date").gte(lastDate)),
+                unwind("attendanceTimeSlot"),
+                match(Criteria.where("attendanceTimeSlot.unitId").is(unitId).and("attendanceTimeSlot.to").gte(currentDate).orOperator(Criteria.where("attendanceTimeSlot.to").gte(currentDate))),
+                group("staffId").push("$attendanceTimeSlot").as("attendanceTimeSlot"),
+                Aggregation.project().and("$_id").as("staffId").and("attendanceTimeSlot").as("attendanceTimeSlot")
         );
-
         AggregationResults<TimeAndAttendanceDTO> result = mongoTemplate.aggregate(aggregation, TimeAndAttendance.class, TimeAndAttendanceDTO.class);
         return (result.getMappedResults().isEmpty())?null:result.getMappedResults();
     }

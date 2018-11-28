@@ -17,10 +17,11 @@ public class TimeAndAttendance extends MongoBaseEntity {
     public TimeAndAttendance() {
     }
 
-    public TimeAndAttendance(Long staffId, Long userId, List<AttendanceTimeSlot> attendanceTimeSlot) {
+    public TimeAndAttendance(Long staffId, Long userId, List<AttendanceTimeSlot> attendanceTimeSlot,LocalDate date) {
         this.staffId =staffId;
         this.userId=userId;
         this.attendanceTimeSlot = attendanceTimeSlot;
+        this.date=date;
     }
 
     public TimeAndAttendance(Long userId, List<AttendanceTimeSlot> attendanceTimeSlot) {

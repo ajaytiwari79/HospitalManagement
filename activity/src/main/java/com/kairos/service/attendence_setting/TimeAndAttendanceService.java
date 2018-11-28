@@ -67,7 +67,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
     public TimeAndAttendanceDTO getAttendanceSetting() {
         List<StaffResultDTO> staffAndUnitId = genericIntegrationService.getStaffIdsByUserId(UserContext.getUserDetails().getId());
-        TimeAndAttendance timeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(staffAndUnitId.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+        TimeAndAttendance timeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(staffAndUnitId.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()),LocalDate.now().minusDays(1));
         SickSettingsDTO sickSettings = sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
         return (Optional.ofNullable(timeAndAttendance).isPresent()) ? new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), sickSettings) : new TimeAndAttendanceDTO(null, sickSettings);
     }
@@ -129,7 +129,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         }
 
         else if(!checkIn){
-            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(staffAndOrganizationIds.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckOut(staffAndOrganizationIds.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()), LocalDate.now().minusDays(1));
             if(!(Optional.ofNullable(shift).isPresent()&&validateGlideTimeWhileCheckOut(shift,reasonCodeId, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap))&&!Optional.ofNullable(reasonCodeId).isPresent()){
                  timeAndAttendanceDTO= new TimeAndAttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId()));
              }else{
@@ -159,13 +159,13 @@ public class TimeAndAttendanceService extends MongoBaseService {
             if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
                 exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
             }
-            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+            TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()),LocalDate.now());
             AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),reasonCodeId,unitPositionId,unitId);
             if(oldTimeAndAttendance !=null){
                 oldTimeAndAttendance.getAttendanceTimeSlot().add(attendanceTimeSlot);
                 timeAndAttendance = oldTimeAndAttendance;
             }else{
-                timeAndAttendance = new TimeAndAttendance(staffAndOrganizationId.getStaffId(),UserContext.getUserDetails().getId(), Arrays.asList(attendanceTimeSlot));
+                timeAndAttendance = new TimeAndAttendance(staffAndOrganizationId.getStaffId(),UserContext.getUserDetails().getId(), Arrays.asList(attendanceTimeSlot),LocalDate.now());
             }
         }
         return timeAndAttendance;
@@ -175,7 +175,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     private TimeAndAttendance checkOut(List<StaffResultDTO> staffAndOrganizationIds, Shift shift, TimeAndAttendance oldTimeAndAttendance, Long reasonCodeId,Map<BigInteger,LocationActivityTab> activityIdAndLocationActivityTabMap) {
         AttendanceTimeSlot duration ;
         TimeAndAttendance timeAndAttendance = oldTimeAndAttendance;
-        final Long unitId= timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId();
+        Long unitId= timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId();
         if (Optional.ofNullable(timeAndAttendance).isPresent()) {
             timeAndAttendance.getAttendanceTimeSlot().sort((s1, s2)->s1.getFrom().compareTo(s2.getFrom()));
             duration = timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size()-1);
@@ -207,13 +207,13 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
         private TimeAndAttendance checkInWithShift(Shift shift, Long reasonCodeId, StaffResultDTO staffAndOrganizationId) {
             TimeAndAttendance timeAndAttendance =null;
-                TimeAndAttendance oldTimeAndAttendance =timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
+                TimeAndAttendance oldTimeAndAttendance =timeAndAttendanceRepository.findMaxAttendanceCheckIn(Arrays.asList(staffAndOrganizationId.getStaffId()),LocalDate.now());
                 AttendanceTimeSlot attendanceTimeSlot = new AttendanceTimeSlot(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(staffAndOrganizationId.getTimeZone())),shift.getUnitId(),reasonCodeId,shift.getUnitPositionId(),shift.getId());
                 if(oldTimeAndAttendance !=null){
                     oldTimeAndAttendance.getAttendanceTimeSlot().add(attendanceTimeSlot);
                     timeAndAttendance = oldTimeAndAttendance;
                 }else{
-                    timeAndAttendance = new TimeAndAttendance(shift.getStaffId(), UserContext.getUserDetails().getId(),Arrays.asList(attendanceTimeSlot));
+                    timeAndAttendance = new TimeAndAttendance(shift.getStaffId(), UserContext.getUserDetails().getId(),Arrays.asList(attendanceTimeSlot),LocalDate.now());
                 }
         return timeAndAttendance;
 
