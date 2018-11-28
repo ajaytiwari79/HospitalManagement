@@ -507,7 +507,7 @@ public class ActivityService extends MongoBaseService {
         }
 
         if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
-            if (rulesActivityDTO.getCutOffIntervalUnit().equals(DAYS) && rulesActivityDTO.getCutOffdayValue() == 0) {
+            if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException("error.DayValue.zero");
             }
             List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
@@ -524,12 +524,14 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        if (!Optional.ofNullable(activity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
+        }
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
-        Activity activity = activityMongoRepository.findOne(activityId);
-
         PhaseSettingsActivityTab phaseSettingsActivityTab = activity.getPhaseSettingsActivityTab();
         return new ActivityTabsWrapper(roles, phaseSettingsActivityTab, dayTypes, employmentTypeDTOS);
     }

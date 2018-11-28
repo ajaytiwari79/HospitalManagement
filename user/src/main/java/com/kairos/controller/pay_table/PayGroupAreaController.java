@@ -27,7 +27,7 @@ public class PayGroupAreaController {
     @Inject
     private PayGroupAreaService payGroupAreaService;
 
-    @PostMapping(API_ORGANIZATION_COUNTRY_URL+"pay_group_area")
+    @PostMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area")
     public ResponseEntity<Map<String, Object>> savePayGroupArea(@PathVariable Long countryId,
                                                                 @Validated @RequestBody PayGroupAreaDTO payGroupAreaDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payGroupAreaService.savePayGroupArea(countryId, payGroupAreaDTO));
