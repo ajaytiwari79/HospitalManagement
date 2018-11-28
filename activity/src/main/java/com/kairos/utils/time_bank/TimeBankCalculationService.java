@@ -287,7 +287,7 @@ public class TimeBankCalculationService {
     private List<ShiftWithActivityDTO> getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts) {
         List<ShiftWithActivityDTO> shifts1 = new ArrayList<>();
         shifts.forEach(s -> {
-            if (interval.contains(s.getActivitiesStartDate().getTime()) || interval.contains(s.getActivitiesEndDate().getTime())) {
+            if (interval.contains(s.getStartDate().getTime()) || interval.contains(s.getEndDate().getTime())) {
                 shifts1.add(s);
             }
         });
