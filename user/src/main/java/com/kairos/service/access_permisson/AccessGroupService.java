@@ -937,6 +937,6 @@ public class AccessGroupService {
     }
 
     public List<AccessGroupQueryResult> getOrganizationAccessGroups(Long parentOrganizationId){
-        return accessGroupRepository.getOrganizationAccessGroup(parentOrganizationId);
+        return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
     }
 }

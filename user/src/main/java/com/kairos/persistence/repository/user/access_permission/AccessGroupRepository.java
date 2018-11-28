@@ -353,14 +353,6 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<AccessPageQueryResult> findAllAccessGroupWithParentIds(Long organizationId,Set<Long> parentAccessGroupsIds);
 
 
-    @Query("MATCH (organization:Organization)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup{deleted:false}) WHERE id(organization)={0}  " +
-            "OPTIONAL MATCH (ag)-[:"+DAY_TYPES+"]-(dayType:DayType) \n" +
-            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.role as role, ag.enabled as enabled , ag.startDate as startDate, ag.endDate as endDate, collect(id(dayType)) as dayTypeIds,ag.allowedDayTypes as allowedDayTypes")
-    List<AccessGroupQueryResult> getOrganizationAccessGroup( Long organizationId);
-
-
-
-
         /*@Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization)\n" +
             "WHERE id(organization)={0} AND id(user)={1}\n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{role:\"MANAGEMENT\"})-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(organization)\n" +
