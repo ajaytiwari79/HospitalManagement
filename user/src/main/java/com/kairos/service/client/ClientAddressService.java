@@ -162,6 +162,8 @@ public class ClientAddressService{
         address.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
         address.put("addressProtected", contactAddress.isAddressProtected());
         address.put("description", contactAddress.getDescription());
+        address.put("startDate", DateConverter.getDate(contactAddress.getStartDate()));
+        address.put("endDate", DateConverter.getDate(contactAddress.getEndDate()));
         address.put("street1", contactAddress.getStreet());
         address.put("locationName",contactAddress.getLocationName());
         return address;

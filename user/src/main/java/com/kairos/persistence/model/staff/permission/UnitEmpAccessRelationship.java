@@ -10,6 +10,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 /**
  * Created by prabjot on 30/1/17.
  */
+//TODO remove
 @RelationshipEntity(type = HAS_ACCESS_PERMISSION)
 public class UnitEmpAccessRelationship extends UserBaseEntity {
 

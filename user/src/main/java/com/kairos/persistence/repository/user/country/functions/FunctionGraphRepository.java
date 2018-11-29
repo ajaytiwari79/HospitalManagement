@@ -53,7 +53,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "MATCH(unit)-[:"+CONTACT_ADDRESS+"]-(:ContactAddress)-[:"+MUNICIPALITY+"]-(municipality:Municipality)<-[rel:"+HAS_MUNICIPALITY+"]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
             "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) \n" +
-            "WHERE  date(functionalPayment.startDate)<=date{1} AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>={1})\n" +
+            "WHERE  date(functionalPayment.startDate)<={1} AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>={1})\n" +
             "MATCH(sl)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment) \n" +
             "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
             " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +

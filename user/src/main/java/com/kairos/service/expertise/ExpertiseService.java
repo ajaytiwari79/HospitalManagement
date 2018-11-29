@@ -175,7 +175,7 @@ public class ExpertiseService {
     }
 
 
-    private void validateSeniorityLevel(List<SeniorityLevel> seniorityLevels, SeniorityLevelDTO seniorityLevelDTO, Long currentSeniorityLevelId) {
+    private boolean validateSeniorityLevel(List<SeniorityLevel> seniorityLevels, SeniorityLevelDTO seniorityLevelDTO, Long currentSeniorityLevelId) {
         Collections.sort(seniorityLevels);
         for (SeniorityLevel seniorityLevel : seniorityLevels) {
             if (!seniorityLevel.getId().equals(currentSeniorityLevelId)) { // we are skipping the current
@@ -202,6 +202,7 @@ public class ExpertiseService {
                 }
             }
         }
+        return true;
 
     }
 
@@ -238,10 +239,7 @@ public class ExpertiseService {
 
         expertiseGraphRepository.save(expertise);
         // NOW linking this with functional table
-
         functionalPaymentGraphRepository.linkFunctionalPaymentExpertise(expertise.getParentExpertise().getId(), expertise.getId());
-
-
         return seniorityLevelResponse;
 
     }
