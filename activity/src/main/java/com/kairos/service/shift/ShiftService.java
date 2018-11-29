@@ -343,6 +343,24 @@ public class ShiftService extends MongoBaseService {
                                       StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift,List<TimeSlotWrapper> timeSlot) {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
+
+        shift.setStartDate(shift.getActivities().get(0).getStartDate());
+        shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
+        shift.setScheduledMinutes(scheduledMinutes);
+        shift.setDurationMinutes(durationMinutes);
+        List<ShiftActivity> breakActivities= new ArrayList<>();
+        if(updateShift) {
+             breakActivities = shiftBreakService.updateBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
+
+        }else {
+             breakActivities = shiftBreakService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
+        }
+        if (!breakActivities.isEmpty()) {
+
+            shift.setActivities(breakActivities);
+        }
+        shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
+
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             if (shiftActivity.getId() == null) {
                 shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
@@ -362,22 +380,6 @@ public class ShiftService extends MongoBaseService {
             shiftActivity.setTimeType(activityWrapper.getTimeType());
         }
 
-        shift.setStartDate(shift.getActivities().get(0).getStartDate());
-        shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-        shift.setScheduledMinutes(scheduledMinutes);
-        shift.setDurationMinutes(durationMinutes);
-        List<ShiftActivity> breakActivities= new ArrayList<>();
-        if(updateShift) {
-             breakActivities = shiftBreakService.updateBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
-
-        }else {
-             breakActivities = shiftBreakService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
-        }
-        if (!breakActivities.isEmpty()) {
-
-            shift.setActivities(breakActivities);
-        }
-        shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
         shiftMongoRepository.save(shift);
         if(!updateShift) {
             updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
