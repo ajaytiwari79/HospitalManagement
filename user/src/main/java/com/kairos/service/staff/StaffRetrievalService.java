@@ -323,8 +323,8 @@ public class StaffRetrievalService {
         if (Optional.ofNullable(staff).isPresent()) {
             map.put("staffList", staff);
         }
-        staff = filterStaffByRoles((List<StaffPersonalDetailDTO>) map.get("staffList"), unitId, UserContext.getUserDetails().getId());
-        map.put("staffList", staff);
+        /*staff = filterStaffByRoles((List<StaffPersonalDetailDTO>) map.get("staffList"), unitId, UserContext.getUserDetails().getId());
+        map.put("staffList", staff);*/
         map.put("engineerTypes", engineerTypes);
         map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
         map.put("roles", roles);
