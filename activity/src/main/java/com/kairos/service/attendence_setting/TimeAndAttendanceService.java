@@ -130,7 +130,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
         else if(!checkIn){
             TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckOut(staffAndOrganizationIds.stream().map(staffResultDTO -> staffResultDTO.getStaffId()).collect(Collectors.toList()), LocalDate.now().minusDays(1));
-            if(!(Optional.ofNullable(shift).isPresent()&&validateGlideTimeWhileCheckOut(shift,reasonCodeId, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap))&&!Optional.ofNullable(reasonCodeId).isPresent()){
+            if(!(Optional.ofNullable(shift).isPresent()&&Optional.ofNullable(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size()-1).getShiftId()).isPresent()&&validateGlideTimeWhileCheckOut(shift,reasonCodeId, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap))&&!Optional.ofNullable(reasonCodeId).isPresent()){
                  timeAndAttendanceDTO= new TimeAndAttendanceDTO(new ArrayList<>(),unitAndReasonCode.get(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size()-1).getUnitId()));
              }else{
                  timeAndAttendance = checkOut(staffAndOrganizationIds, shift, oldTimeAndAttendance, reasonCodeId, activityIdAndLocationActivityTabMap);

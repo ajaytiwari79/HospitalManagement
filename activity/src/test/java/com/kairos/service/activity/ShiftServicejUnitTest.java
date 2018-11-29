@@ -126,8 +126,8 @@ public class ShiftServicejUnitTest {
         phaseMap.put(phase.getPhaseEnum().toString(),phase);
         activity=new ShiftActivity();
         activity.setActivityId(BigInteger.valueOf(47));
-        activity.setStartDate(new Date(18,10,28,12,30,00));
-        activity.setEndDate(new Date(18,10,28,18,00,00));
+        activity.setStartDate(new Date(2018,10,28,12,30));
+        activity.setEndDate(new Date(2018,10,28,18,00));
         activity.setScheduledMinutes(360);
         activity.setScheduledMinutes(360);
         activity.setActivityName("12 Bronze");
@@ -144,8 +144,8 @@ public class ShiftServicejUnitTest {
         activity.setStatus(new HashSet<>());
         activity1=new ShiftActivity();
         activity1.setActivityId(BigInteger.valueOf(47));
-        activity1.setStartDate(new Date(18,10,28,12,30,00));
-        activity1.setEndDate(new Date(18,10,28,18,00,00));
+        activity1.setStartDate(new Date(2018,10,28,12,30));
+        activity1.setEndDate(new Date(2018,10,28,18,10));
         activity1.setScheduledMinutes(360);
         activity1.setScheduledMinutes(360);
         activity1.setActivityName("12 Bronze");

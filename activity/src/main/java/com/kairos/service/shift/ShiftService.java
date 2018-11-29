@@ -1218,7 +1218,9 @@ public class ShiftService extends MongoBaseService {
         if(realtime){
             shiftDTO.getActivities().forEach(shiftActivity -> {
                 ShiftActivity shiftActivity1=activityMap.get(shiftActivity.getActivityId());
-                if(shiftActivity1!=null&&!shiftActivity.getStartDate().equals(shiftActivity1.getStartDate())&&shiftActivity.getStartDate().before(DateUtils.asDate(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone))))){
+                if(shiftActivity1!=null&&
+                   ((!shiftActivity.getStartDate().equals(shiftActivity1.getStartDate())&&shiftActivity.getStartDate().before(DateUtils.asDate(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)))))
+                        ||(!shiftActivity.getEndDate().equals(shiftActivity1.getEndDate())&&shiftActivity.getEndDate().before(DateUtils.asDate(DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone))))))){
                     exceptionService.actionNotPermittedException("error.activity.startdate",shiftActivity.getActivityName());
                 }
             });
