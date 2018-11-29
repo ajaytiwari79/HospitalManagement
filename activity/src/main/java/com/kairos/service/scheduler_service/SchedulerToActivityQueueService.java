@@ -2,7 +2,7 @@ package com.kairos.service.scheduler_service;
 
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
-import com.kairos.service.attendence_setting.AttendanceSettingService;
+import com.kairos.service.attendence_setting.TimeAndAttendanceService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.dashboard.SickService;
 import com.kairos.service.shift.ShiftReminderService;
@@ -23,7 +23,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     @Inject
     ShiftReminderService shiftReminderService;
     @Inject
-    private AttendanceSettingService attendanceSettingService;
+    private TimeAndAttendanceService timeAndAttendanceService;
 
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
@@ -43,7 +43,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case ATTENDANCE_SETTING:
                 logger.info("Job to update clock out time");
-                attendanceSettingService.checkOutBySchedulerJob(job.getUnitId());
+                timeAndAttendanceService.checkOutBySchedulerJob(job.getUnitId());
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");

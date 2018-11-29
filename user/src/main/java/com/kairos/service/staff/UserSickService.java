@@ -1,6 +1,6 @@
 package com.kairos.service.staff;
 
-import com.kairos.persistence.model.staff.StaffTimezoneQueryResult;
+import com.kairos.persistence.model.staff.StaffInformationQueryResult;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.service.organization_meta_data.SickConfigurationService;
@@ -29,7 +29,7 @@ public class UserSickService {
     private SickConfigurationService sickConfigurationService;
 
     public List<StaffResultDTO> getStaffAndUnitSickSettings(Long UserId, String sickSettingsRequired) {
-        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getAllStaffsAndUnitDetailsByUserId(UserId);
+        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getAllStaffsAndUnitDetailsByUserId(UserId);
         List<StaffResultDTO> staffResults = new ArrayList<>();
         if (Optional.ofNullable(staffUnitWrappers).isPresent()) {
             staffResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);

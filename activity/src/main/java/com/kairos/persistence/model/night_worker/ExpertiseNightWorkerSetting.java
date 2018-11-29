@@ -33,6 +33,17 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
         this.expertiseId = expertiseId;
     }
 
+    public ExpertiseNightWorkerSetting(Long unitId, Long expertiseId,TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker, Integer minShiftsValueToCheckNightWorker, CalculationUnit minShiftsUnitToCheckNightWorker) {
+        this.timeSlot = timeSlot;
+        this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
+        this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;
+        this.intervalValueToCheckNightWorker = intervalValueToCheckNightWorker;
+        this.minShiftsValueToCheckNightWorker = minShiftsValueToCheckNightWorker;
+        this.minShiftsUnitToCheckNightWorker = minShiftsUnitToCheckNightWorker;
+        this.unitId = unitId;
+        this.expertiseId = expertiseId;
+    }
+
     public TimeSlot getTimeSlot() {
         return timeSlot;
     }

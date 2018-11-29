@@ -37,7 +37,8 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
         save(expertiseNightWorkerSetting);
-        return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
+        nightWorkerSettingDTO.setId(expertiseNightWorkerSetting.getId());
+        return nightWorkerSettingDTO;
     }
 
     public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long countryId, Long expertiseId) {
@@ -59,7 +60,6 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
         expertiseNightWorkerSetting.setIntervalValueToCheckNightWorker(nightWorkerSettingDTO.getIntervalValueToCheckNightWorker());
         expertiseNightWorkerSetting.setMinShiftsValueToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsValueToCheckNightWorker());
         expertiseNightWorkerSetting.setMinShiftsUnitToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsUnitToCheckNightWorker());
-
         save(expertiseNightWorkerSetting);
         return nightWorkerSettingDTO;
     }
@@ -70,11 +70,9 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", nightWorkerSettingDTO.getId());
         }
         if (expertiseNightWorkerSetting.getCountryId() != null) {  // this is country's night worker settings so we are personalizing and creating for unit
-            expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
-            expertiseNightWorkerSetting.setUnitId(unitId);
-            expertiseNightWorkerSetting.setCountryId(null);
-            expertiseNightWorkerSetting.setExpertiseId(expertiseId);
-            expertiseNightWorkerSetting.setId(null); // making null so that a new Object is constructed and saved
+            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(unitId,expertiseId,nightWorkerSettingDTO.getTimeSlot(), nightWorkerSettingDTO.getMinMinutesToCheckNightShift(),
+                    nightWorkerSettingDTO.getIntervalUnitToCheckNightWorker(),nightWorkerSettingDTO.getIntervalValueToCheckNightWorker(), nightWorkerSettingDTO.getMinShiftsValueToCheckNightWorker(),
+                    nightWorkerSettingDTO.getMinShiftsUnitToCheckNightWorker());
         } else {
             expertiseNightWorkerSetting.setExpertiseId(expertiseId);
             expertiseNightWorkerSetting.setTimeSlot(nightWorkerSettingDTO.getTimeSlot());

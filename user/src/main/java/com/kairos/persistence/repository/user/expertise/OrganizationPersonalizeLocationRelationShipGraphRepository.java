@@ -24,5 +24,5 @@ public interface OrganizationPersonalizeLocationRelationShipGraphRepository exte
             "MATCH (org)-[rel:" + HAS_PERSONALIZED_LOCATION + "]-(expertise) " +
             "MATCH (location:Location) WHERE id(location)= rel.locationId " +
             "RETURN location as location,id(expertise) as expertiseId ")
-    List<ExpertiseLocationStaffQueryResult> getExpertiseWiseLocationInOrganization(List<Long> expertiseId, Long organizationId);
+    List<ExpertiseLocationStaffQueryResult> getExpertisesLocationInOrganization(List<Long> expertiseId, Long organizationId);
 }

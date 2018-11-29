@@ -26,6 +26,11 @@ public class PayTableUpdateDTO {
         //Default cons
     }
 
+    public PayTableUpdateDTO(Long id, @NotNull(message = "name can't be null") String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
