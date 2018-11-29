@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.activity.attendance.AttendanceTimeSlot;
+import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
 import java.util.List;
@@ -10,17 +12,16 @@ import java.util.List;
  */
 
 public class DetailViewDTO {
-
+    private Long staffId;
     private ShiftDetailViewDTO shifts;
-    private List<ReasonCodeDTO> reasonCodes;
-
-
+    List<AttendanceTimeSlotDTO> attendanceTimeSlot;
     public DetailViewDTO() {
     }
 
-    public DetailViewDTO(ShiftDetailViewDTO shifts, List<ReasonCodeDTO> reasonCodes) {
+    public DetailViewDTO(Long staffId,ShiftDetailViewDTO shifts,List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
+        this.staffId=staffId;
         this.shifts = shifts;
-        this.reasonCodes = reasonCodes;
+        this.attendanceTimeSlot=attendanceTimeSlot;
     }
 
     public ShiftDetailViewDTO getShifts() {
@@ -31,11 +32,19 @@ public class DetailViewDTO {
         this.shifts = shifts;
     }
 
-    public List<ReasonCodeDTO> getReasonCodes() {
-        return reasonCodes;
+    public List<AttendanceTimeSlotDTO> getAttendanceTimeSlot() {
+        return attendanceTimeSlot;
     }
 
-    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
-        this.reasonCodes = reasonCodes;
+    public void setAttendanceTimeSlot(List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
+        this.attendanceTimeSlot = attendanceTimeSlot;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }

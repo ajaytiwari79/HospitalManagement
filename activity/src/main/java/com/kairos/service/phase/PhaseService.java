@@ -306,6 +306,8 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
+
+
     /**
      * @Auther Pavan
      * @param unitId
@@ -369,6 +371,14 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
+    public boolean shiftEdititableInRealtime(String timeZone, Map<String,Phase> phaseMap, Date startDate, Date endDate){
+        int minutesToCalculate=phaseMap.get(REALTIME).getRealtimeDuration();
+        LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
+        LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
+        DateTimeInterval shiftInterval=new DateTimeInterval(startDate,endDate);
+        DateTimeInterval realtimeInterval=new DateTimeInterval(DateUtils.asDate(localDateTimeAfterMinus),DateUtils.asDate(localDateTimeAfterPlus));
+        return shiftInterval.overlaps(realtimeInterval);
+    }
     /**
      * @author mohit
      * @date 8-10-2018
