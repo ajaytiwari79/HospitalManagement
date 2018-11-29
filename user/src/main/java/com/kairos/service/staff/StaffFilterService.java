@@ -281,7 +281,7 @@ public class StaffFilterService {
                 if(AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)){
                     staffListByRole=staffList;
                 }else if(AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)){
-                    Map staff = staffList.stream().filter(s -> s.get("id") == accessGroupQueryResult.getStaffId()).findFirst().get();
+                    Map staff = staffList.stream().filter(s -> ((Long)s.get("id")).equals(accessGroupQueryResult.getStaffId())).findFirst().get();
                     staffListByRole.add(staff);
                 }
             }
