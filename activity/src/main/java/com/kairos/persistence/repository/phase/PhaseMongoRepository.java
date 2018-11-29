@@ -21,7 +21,7 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
     Phase findByUnitIdAndName(Long unitId, String name);
 
     @Query(value = "{organizationId:?0 ,'phaseEnum':?1}")
-    Phase findByUnitIdAndPhaseEnum(Long unitId, String realTimePhase);
+    Phase findByUnitIdAndPhaseEnum(Long unitId, String phaseEnum);
 
 
     @Query(value = "{sequence:?0 ,countryId:?1 ,deleted:false}", count = true)

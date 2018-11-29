@@ -46,7 +46,7 @@ public class TimeAndAttendanceRepositoryImpl implements CustomTimeAndAttendanceR
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("staffId").in(staffIds).and("date").gte(lastDate)),
                 unwind("attendanceTimeSlot"),
-                match(Criteria.where("attendanceTimeSlot.unitId").is(unitId).and("attendanceTimeSlot.to").gte(currentDate).orOperator(Criteria.where("attendanceTimeSlot.to").gte(currentDate))),
+                match(Criteria.where("attendanceTimeSlot.unitId").is(unitId).orOperator(Criteria.where("attendanceTimeSlot.to").gte(currentDate),Criteria.where("attendanceTimeSlot.from").gte(currentDate))),
                 group("staffId").push("$attendanceTimeSlot").as("attendanceTimeSlot"),
                 Aggregation.project().and("$_id").as("staffId").and("attendanceTimeSlot").as("attendanceTimeSlot")
         );

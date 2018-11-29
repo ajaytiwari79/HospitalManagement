@@ -1,6 +1,5 @@
 package com.kairos.service.activity;
 
-import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -12,10 +11,8 @@ import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
-import org.bouncycastle.util.test.FixedSecureRandom;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -183,7 +180,7 @@ public class ShiftServicejUnitTest {
         when(phaseMongoRepository.findByUnitIdAndName(958l,PhaseDefaultName.REALTIME.toString())).thenReturn(phase);
         when(genericIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
-        when(phaseService.isShiftIdEditInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
+        when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
         try {
             shiftService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
         }catch (Exception e){

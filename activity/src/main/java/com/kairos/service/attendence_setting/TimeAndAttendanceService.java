@@ -71,7 +71,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         SickSettingsDTO sickSettings = sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
         return (Optional.ofNullable(timeAndAttendance).isPresent()) ? new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), sickSettings) : new TimeAndAttendanceDTO(null, sickSettings);
     }
-
+        // peer review
     public TimeAndAttendanceDTO updateTimeAndAttendance(Long unitId, Long reasonCodeId, Long unitPositionId, boolean checkIn) {
         TimeAndAttendanceDTO timeAndAttendanceDTO = null;
         TimeAndAttendance timeAndAttendance = null;
@@ -142,7 +142,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
             if(Optional.ofNullable(shift).isPresent()) {
                 unitId=shift.getUnitId();
                 checkIn=(!checkIn)?!validateGlideTimeWhileCheckOut(shift,reasonCodeId, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap):true;
-                createShiftState(Arrays.asList(shift), checkIn, Arrays.asList(timeAndAttendance), unitId);
+                createShiftState(Arrays.asList(shift), checkIn,unitId);
             }
             timeAndAttendanceDTO = new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), null);
         }
@@ -242,7 +242,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     }
 
 
-    public void createShiftState(List<Shift> shifts,boolean checkIn,List<TimeAndAttendance> timeAndAttendances,Long unitId){
+    public void createShiftState(List<Shift> shifts,boolean checkIn,Long unitId){
         List<Phase> phases=phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
         List<ShiftState> realtimeShiftStates=new ArrayList<>();
         List<ShiftState> timeAndAttendanceShiftStates=null;
@@ -250,7 +250,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         realtimeShiftStates=createRealTimeShiftState(realtimeShiftStates,oldRealtimeShiftStates,shifts,phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.REALTIME)).findFirst().get().getId());
         if( !realtimeShiftStates.isEmpty()) shiftMongoRepository.saveEntities(realtimeShiftStates);
         if(!checkIn) {
-               timeAndAttendanceShiftStates = createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates, oldRealtimeShiftStates, shifts, timeAndAttendances, phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.TIME_ATTENDANCE)).findFirst().get().getId());
+               timeAndAttendanceShiftStates = createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates, oldRealtimeShiftStates, shifts, phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.TIME_ATTENDANCE)).findFirst().get().getId());
                if (!timeAndAttendanceShiftStates.isEmpty())
                    shiftStateMongoRepository.saveEntities(timeAndAttendanceShiftStates);
            }
@@ -272,7 +272,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         return realtimeShiftStates;
     }
 
-    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,List<TimeAndAttendance> timeAndAttendance,BigInteger phaseId){
+    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<ShiftState> realtimeShiftStates,List<Shift> shifts,BigInteger phaseId){
         ShiftState timeAndAttendanceShiftState;
         timeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(shift -> shift.getId()).collect(Collectors.toList()),phaseId);
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
@@ -316,6 +316,6 @@ public class TimeAndAttendanceService extends MongoBaseService {
                  timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).setSystemGeneratedClockOut(true);
              });
              if (!timeAndAttendances.isEmpty()) timeAndAttendanceRepository.saveEntities(timeAndAttendances);
-             createShiftState(shifts, false, timeAndAttendances,unitId);
+             createShiftState(shifts, false,unitId);
          }
 }

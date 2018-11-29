@@ -371,7 +371,7 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
-    public boolean isShiftIdEditInRealtime(String timeZone,Map<String,Phase> phaseMap,Date startDate,Date endDate){
+    public boolean shiftEdititableInRealtime(String timeZone, Map<String,Phase> phaseMap, Date startDate, Date endDate){
         int minutesToCalculate=phaseMap.get(REALTIME).getRealtimeDuration();
         LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
         LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
