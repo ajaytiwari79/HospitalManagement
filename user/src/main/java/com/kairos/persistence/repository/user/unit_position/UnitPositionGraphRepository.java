@@ -26,7 +26,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date({1}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({1}))" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= {1} AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= {1})" +
             "MATCH (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "WITH expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
@@ -74,7 +74,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "WITH staff,expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "OPTIONAL MATCH (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "return expertise as expertise,id(staff) as staffId,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),startDate:positionLine.startDate, hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines, "+
             " case appliedFunction when NULL then [] else  Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions")
     List<UnitPositionQueryResult> getUnitPositionByIds(List<Long> unitPositionIds);
@@ -364,7 +364,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(staff)-[unitPositionStaffRel: BELONGS_TO_STAFF ]->(unitPosition) " +
             "RETURN  \n" +
             " CASE  \n" +
-            " WHEN organization IS NULL THEN \"orgganization\"    \n" +
+            " WHEN organization IS NULL THEN \"organization\"    \n" +
             " WHEN staff IS NULL THEN \"staff\"     \n" +
             " WHEN unitPosition IS NULL THEN \"unitPosition\"    \n" +
             " WHEN unitPositionOrgRel IS NULL THEN  \"unitPositionOrgRel\"    \n" +
@@ -372,5 +372,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "ELSE \"valid\" \n" +
             "END")
     String validateOrganizationStaffUnitPosition(Long unitId,Long staffId,Long unitPositionId);
+
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false})-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WHERE id(staff) ={0} AND id(expertise) IN {1} AND id(sector) ={2}" +
+            "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
+    boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
 
 }

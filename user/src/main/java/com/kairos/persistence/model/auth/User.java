@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -14,7 +15,9 @@ import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedS
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

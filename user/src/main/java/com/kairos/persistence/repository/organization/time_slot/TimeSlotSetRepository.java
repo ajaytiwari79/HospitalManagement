@@ -19,16 +19,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 public interface TimeSlotSetRepository extends Neo4jBaseRepository<TimeSlotSet,Long> {
 
 
-    @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} and timeSlotSet.startDate>{1} " +
+    @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} and date(timeSlotSet.startDate)>{1} " +
             "return timeSlotSet order by timeSlotSet.startDate limit 1")
     TimeSlotSet findOneByStartDateAfter(Long unitId,LocalDate endDate);
 
-    @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} and timeSlotSet.endDate>{1} " +
-            "return timeSlotSet order by timeSlotSet.startDate limit 1")
-    TimeSlotSet findOneByEndDateAfter(Long unitId,Date endDate);
-
     @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} AND " +
-            "(timeSlotSet.startDate>={1} AND timeSlotSet.startDate < {2}) AND timeSlotSet.timeSlotType={3} " +
+            "(date(timeSlotSet.startDate)>={1} AND date(timeSlotSet.startDate) < {2}) AND timeSlotSet.timeSlotType={3} " +
             "return timeSlotSet order by timeSlotSet.startDate")
     List<TimeSlotSet> findTimeSlotSetByStartDateBetween(Long unitId, LocalDate startDate, LocalDate endDate, TimeSlotType timeSlotType);
 

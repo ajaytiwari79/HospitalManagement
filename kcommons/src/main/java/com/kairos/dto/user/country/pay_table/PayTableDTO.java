@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
@@ -31,6 +32,8 @@ public class PayTableDTO {
 
     @NotNull(message = "Please provide payment unit type")
     private String paymentUnit;
+
+    private BigDecimal percentageValue; // this value is being used to update paygrade and functional amount
 
     public PayTableDTO() {
     }
@@ -91,15 +94,14 @@ public class PayTableDTO {
         this.description = description;
     }
 
-    public PayTableDTO(String name, String shortName, String description, LocalDate startDateMillis, LocalDate endDateMillis, String paymentUnit, Long levelId) {
-        this.name = name;
-        this.shortName = shortName;
-        this.description = description;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.paymentUnit = paymentUnit;
-        this.levelId = levelId;
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
     }
+
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
+    }
+
 
     @Override
     public String toString() {
@@ -121,10 +123,7 @@ public class PayTableDTO {
             return false;
         }
         if (Optional.ofNullable(this.endDateMillis).isPresent()) {
-            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
-            return dateValue;
+            return endDateMillis.isAfter(startDateMillis.minusDays(1));
         }
         return true;
     }

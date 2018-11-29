@@ -605,10 +605,10 @@ public class PlanningPeriodService extends MongoBaseService {
         List<Shift> shiftList = shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(), unitId);
         List<StaffingLevelState> staffingLevelStates = staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId, planningPeriod.getCurrentPhaseId(), unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
-        restoreShifts(shiftStates, shiftList, unitId);
-        restoreAvailabilityCount(staffingLevels, staffingLevelStates);
         List<Shift> currentPhaseShifts=shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
         restoreFunctions(shiftStates,  unitId,currentPhaseShifts);
+        restoreShifts(shiftStates, shiftList, unitId);
+        restoreAvailabilityCount(staffingLevels, staffingLevelStates);
         shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
         return true;
     }

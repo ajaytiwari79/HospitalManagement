@@ -22,11 +22,6 @@ public class BreakSettingAndActivitiesWrapper {
         this.activities=activities;
 
     }
-    public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> activities, FlexibleTimeSettingDTO flexibleTimeSettings) {
-        this.breakSettings = breakSettings;
-        this.activities=activities;
-        this.flexibleTimeSettings = flexibleTimeSettings;
-    }
 
     public List<BreakSettingsDTO> getBreakSettings() {
         return breakSettings;

@@ -1,7 +1,17 @@
+
+//for adding pql settings in previous activities
+
+db.activities.updateMany({},{$set:{"rulesActivityTab.pqlSettings":{}}});
+
 db.activities.updateMany({"balanceSettingsActivityTab.timeTypeId":"3"},{$set:{secondLevelType:"PAID_BREAK"}})
 db.activities.updateMany({"balanceSettingsActivityTab.timeTypeId":"3"},{$set:{secondLevelType:"PAID_BREAK"}})  // unpaid
-db.time_Type.find({label:"Unpaid Break"})
-db.time_Type.find({label:"Paid Break"})
-db.time_Type.updateMany({label:"Paid Break"},{"$set":{timeType:"PAID_BREAK"}})
-db.time_Type.updateMany({label:"Unpaid Break"},{"$set":{timeType:"UNPAID_BREAK"}})
+db.time_Type.find({label:"Unpaid break"})
 
+db.time_Type.find({label:"Paid Break"})
+db.time_Type.updateMany({label:"Paid Break"},{"$set":{secondLevelType:"PAID_BREAK",timeTypes:"WORKING_TYPE"}})
+
+db.time_Type.updateMany({label:"Unpaid break"},{"$set":{secondLevelType:"UNPAID_BREAK",timeTypes:"NON_WORKING_TYPE"}})
+
+db.time_Type.updateMany({timeTypes:"UNPAID"},{$set:{timeTypes:"NON_WORKING_TYPE"}})
+db.time_Type.updateMany({timeTypes:"PAID"},{$set:{timeTypes:"WORKING_TYPE"}})
+db.time_Type.updateMany({secondLevelType:"BREAK"},{$set:{secondLevelType:"PAID_BREAK"}})

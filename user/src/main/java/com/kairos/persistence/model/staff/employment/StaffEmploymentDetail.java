@@ -20,8 +20,7 @@ public class StaffEmploymentDetail {
     private long visitourId;
     private long engineerTypeId;
     private Long timeCareExternalId;
-    @DateLong
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     public String getCardNumber() {
         return cardNumber;
@@ -87,11 +86,11 @@ public class StaffEmploymentDetail {
         this.timeCareExternalId = timeCareExternalId;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 }

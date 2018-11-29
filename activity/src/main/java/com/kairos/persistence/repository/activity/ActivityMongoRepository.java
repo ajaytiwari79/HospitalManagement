@@ -35,6 +35,9 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     List<Activity> findByExternalIdIn(List<String> activityExternalIds);
 
+    @Query(value = "{'deleted' : false, 'unitId' :{$in:?0},'parentId':{$in:?1}}", fields = "{'parentId':1,'_id':1,'unitId':1}")
+    List<Activity> findAllActivitiesByUnitIds(List<Long> unitIds,Set<BigInteger> activityIds);
+
     List<Activity> findByUnitIdAndExternalIdInAndDeletedFalse(Long unitId, List<String> activityExternalIds);
 
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
@@ -43,7 +46,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
 
-    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "'_id':1, 'phaseSettingsActivityTab':1")
+    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
