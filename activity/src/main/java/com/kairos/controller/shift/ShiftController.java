@@ -4,7 +4,9 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.shift.ShiftCopyService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.dto.activity.shift.CopyShiftDTO;
 import com.kairos.dto.activity.shift.ShiftPublishDTO;
@@ -47,7 +49,7 @@ public class ShiftController {
 
     @Inject
     private ActivityService activityService;
-
+    @Inject private ShiftCopyService shiftCopyService;
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -134,14 +136,14 @@ public class ShiftController {
     @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
     @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, startDate,endDate));
+    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,@RequestParam(required=false)ViewType viewType) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, startDate,endDate,viewType));
     }
 
     @ApiOperation("copy shifts from 1 employee to others")
     @PutMapping(value = "/copy_shifts")
     public ResponseEntity<Map<String, Object>> copyShifts(@PathVariable long unitId,@RequestBody @Valid CopyShiftDTO copyShiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.copyShifts(unitId, copyShiftDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftCopyService.copyShifts(unitId, copyShiftDTO));
     }
 
     @ApiOperation("Get Shift of a staff based upon expertise")
@@ -205,7 +207,7 @@ public class ShiftController {
 
     @ApiOperation("shifts details by date")
     @GetMapping("/shift/compact_view_details_by_date")
-    public ResponseEntity<Map<String,Object>> getShiftsDetailsForComapactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
+    public ResponseEntity<Map<String,Object>> getShiftsDetailsForCompactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
 }

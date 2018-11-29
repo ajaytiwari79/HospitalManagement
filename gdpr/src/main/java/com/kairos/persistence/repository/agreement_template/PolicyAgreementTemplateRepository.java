@@ -13,7 +13,11 @@ import java.math.BigInteger;
 public interface PolicyAgreementTemplateRepository extends MongoBaseRepository<PolicyAgreementTemplate,BigInteger>,CustomPolicyAgreementTemplateRepository {
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
-    PolicyAgreementTemplate findByIdAndCountryId(Long countryId, BigInteger id);
+    PolicyAgreementTemplate findByCountryIdAndId(Long countryId, BigInteger id);
+
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    PolicyAgreementTemplate findByUnitIdAndId(Long unitId, BigInteger id);
+
 
     PolicyAgreementTemplate findByid(BigInteger id);
 

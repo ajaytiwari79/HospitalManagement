@@ -190,4 +190,13 @@ public class FunctionService {
         }
         return result;
     }
+    public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+        }
+        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+
+        return functionGraphRepository.findFunctionsByCountry(countryId);
+    }
 }

@@ -1,5 +1,7 @@
 package com.kairos.dto.user.staff.unit_position;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
@@ -13,6 +15,8 @@ import java.util.Set;
 /**
  * Created by pawanmandhan on 27/7/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UnitPositionDTO {
 
     @NotNull(message = "Position code  is required for position")
@@ -66,6 +70,7 @@ public class UnitPositionDTO {
     private Long timeCareExternalId;
     private boolean published;
     private Long accessGroupId;
+    private String positionCodeName;
 
 
 
@@ -218,13 +223,14 @@ public class UnitPositionDTO {
     }
 
 
-    public long getEmploymentTypeId() {
+    public Long getEmploymentTypeId() {
         return employmentTypeId;
     }
 
-    public void setEmploymentTypeId(long employmentTypeId) {
+
+    /*public void setEmploymentTypeId(long employmentTypeId) {
         this.employmentTypeId = employmentTypeId;
-    }
+    }*/
 
     public Long getStaffId() {
         return staffId;
@@ -329,5 +335,13 @@ public class UnitPositionDTO {
 
     public void setPositionLineId(Long positionLineId) {
         this.positionLineId = positionLineId;
+    }
+
+    public String getPositionCodeName() {
+        return positionCodeName;
+    }
+
+    public void setPositionCodeName(String positionCodeName) {
+        this.positionCodeName = positionCodeName;
     }
 }

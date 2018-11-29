@@ -148,9 +148,9 @@ public class SchedulerPanelService extends MongoBaseService {
         save(schedulerPanels);
         if(!Optional.ofNullable(timezone).isPresent())
         timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
-
         String defaultTimezone=timezone;
         schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,defaultTimezone));
+
         for(SchedulerPanel schedulerPanel:schedulerPanels) {
             dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
         }

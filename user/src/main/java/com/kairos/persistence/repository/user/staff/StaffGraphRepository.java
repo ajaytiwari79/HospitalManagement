@@ -16,6 +16,7 @@ import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrap
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
@@ -299,7 +300,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "collect(CASE WHEN r IS NULL AND  et.allowedForContactPerson =true THEN  {id:id(et),allowedForContactPerson:et.allowedForContactPerson} \n" +
             "ELSE {id:id(et),allowedForContactPerson:r.allowedForContactPerson} END) as employmentTypeSettings with filter\n" +
             "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) as filteredEmploymentType with extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n" +
-
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission)\n" +
             "match (unitPermission)-[:HAS_UNIT_EMPLOYMENT_POSITION]->(p:Position)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +
             "return distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
@@ -322,7 +322,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
             "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where user.cprNumber={0} return count(staff)>0")
     Boolean isStaffExistsByCPRNumber(String cprNumber, Long parentOrganizationId);
-
+// TODO CRITICAL ISSUE we are fetching all staff across all organisation i think it should be refactored
     @Query("MATCH (staff:Staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(expertise) IN {1} return staff")
     List<Staff> getStaffByExperties(Long unitId, List<Long> expertiesIds);
 
@@ -405,14 +405,37 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName")
     List<StaffTimezoneQueryResult> getAllStaffsAndUnitDetailsByUserId(Long userId);
 
-    @Query("Optional MATCH (o:Organization)-[:"+HAS_EMPLOYMENTS+"]-(e:Employment)-[:"+BELONGS_TO+"]-(s:Staff) WHERE s.email=~{0} AND id(o)={1} RETURN s")
+    @Query("Optional MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(e:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE staff.email=~{0} AND id(organization)={1} RETURN staff")
     Staff findStaffByEmailInOrganization(String email,Long unitId);
 
-/*
- @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
-            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
-            "match (org)-[:" + BELONGS_TO + "]-(country:Country)<-[: " + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCodes")
- */
+    @Query("MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE id(organization)={0} \n" +
+            "MATCH (staff)-[:BELONGS_TO]->(user:User) " +
+            "Match (staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(expertise) ={2} \n" +
+            "return  distinct id(staff) as id,staff.firstName as firstName,staff.lastName as lastName,staff.userName as userName,user.cprNumber as cprNumber,user.gender as gender, {1} + staff.profilePic as profilePic")
+    List<StaffPersonalDetailDTO> getAllStaffByUnitIdAndExpertiseId(Long unitId, String imageUrl,Long expertiseId);
 
+    @Query("MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE id(organization)={0} \n" +
+            "Match (staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(expertise) ={1} AND rel.unionRepresentative\n" +
+            "SET rel.unionRepresentative=false " +
+            "return count(rel)")
+    int removePreviousUnionRepresentativeOfExpertiseInUnit(Long unitId, Long expertiseId);
+
+    @Query("MATCH (staff:Staff),(expertise:Expertise) WHERE id(staff)={0} AND id(expertise) ={1} \n" +
+            "Match (staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)\n" +
+            "SET rel.unionRepresentative=true " +
+            "return count(rel) ")
+    int assignStaffAsUnionRepresentativeOfExpertise(Long staffId, Long expertiseId);
+
+    @Query("MATCH (organization:Organization),(expertise:Expertise) WHERE id(organization)={1} AND id(expertise) IN {0} " +
+            "MATCH (organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "{unionRepresentative:true}]->(expertise) \n" +
+            " MATCH(staff)-[:"+BELONGS_TO+"]-(user:User)\n" +
+            "return {id:id(staff),name:user.firstName} as staff,id(expertise) as expertiseId")
+    List<ExpertiseLocationStaffQueryResult> findAllUnionRepresentativeOfExpertiseInUnit(List<Long> expertiseIds, Long unitId);
+
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})<-[:"+HAS_SUB_ORGANIZATION+"*]-(organizationHub:Organization{deleted:false,isEnable:true}) \n" +
+            "-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)\n " +
+            "WHERE id(organization)={0} AND organizationHub.isKairosHub=true AND id(user)={1} \n " +
+            "RETURN staff")
+    Staff getStaffByOrganizationHub(Long currentUnitId,Long userId);
 }
 

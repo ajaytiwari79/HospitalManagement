@@ -129,7 +129,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
 
         } else {
             previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(referenceId)
-                    : questionnaireTemplateMongoRepository.findRiskTemplateByAsssociatedProcessingActivityAndCountryId(referenceId);
+                    : questionnaireTemplateMongoRepository.findRiskTemplateByAssociatedProcessingActivityAndCountryId(referenceId);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
             }
@@ -289,7 +289,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      * @param questionnaireTemplateId
      * @param questionnaireTemplateDTO
      * @return
-     * @description method update exisiting questionnaire template at organization level( check if template with same name exist, then throw exception )
+     * @description method update existing questionnaire template at organization level( check if template with same name exist, then throw exception )
      */
     public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 

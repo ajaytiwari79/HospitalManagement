@@ -25,7 +25,7 @@ import static java.time.temporal.TemporalAdjusters.previousOrSame;
 /**
  * Created by oodles on 1/2/17.
  */
-public class DateUtils {
+public  class DateUtils {
     //TODO gotta add logger
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -760,5 +760,9 @@ public class DateUtils {
 
     public static LocalDateTime getEndOfDayFromLocalDateTime(){
         return LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
+    }
+
+    public static LocalDate getLocalDateFromTimezone(String timeZone){
+        return LocalDate.now(ZoneId.of(timeZone));
     }
 }
