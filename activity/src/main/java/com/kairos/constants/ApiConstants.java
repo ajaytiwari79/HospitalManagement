@@ -55,7 +55,6 @@ public final class ApiConstants {
     public static final String KPI_DETAILS = "/kpi_details";
     public static final String UNIT_PARENT_ORGANIZATION_AND_COUNTRY = "/unit/parent_org_and_country";
     public static final String USER_USERID_STAFFS = "/user/{userId}/staffs";
-    public static final String STAFFID_UNITID_MAPPING="staff_unit_mapping";
     public static final String DAY_TYPES_AND_EMPLOYEMENT_TYPES = "/day_types_and_employment_types";
     public static final String STAFF_ACCESS_ROLES = "/staff/access_roles";
     public static final String STAFF_AND_UNIT_POSITIONS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/staff_and_unit_positions";
