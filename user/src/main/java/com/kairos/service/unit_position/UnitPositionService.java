@@ -741,48 +741,6 @@ public class UnitPositionService {
         return employmentUnitPositionDTO;
     }
 
-    public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId, LocalDate selectedDate) throws Exception {
-        PositionCtaWtaQueryResult positionCtaWtaQueryResult = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_CTA_WTA_BY_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCtaWtaQueryResult>>() {
-        }, expertiseId);
-        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
-        SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
-        positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
-        //SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
-        //positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
-        positionCtaWtaQueryResult.setUnion(currentExpertise.get().getUnion());
-
-        SeniorityLevelQueryResult seniorityLevel = null;
-        if (appliedSeniorityLevel != null) {
-            seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
-            if (selectedDate == null) {
-                selectedDate = DateUtils.getCurrentLocalDate();
-            }
-            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate, appliedSeniorityLevel.getId(), unitId);
-            seniorityLevel.setFunctions(functionDTOs);
-        }
-        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
-        return positionCtaWtaQueryResult;
-    }
-
-    //TODO this must be moved to activity
-    public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, BigInteger wtaId, WTADTO updateDTO) {
-        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
-        if (!Optional.ofNullable(unitPosition).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
-
-        }
-        if (unitPosition.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(unitPosition.getEndDate())) {
-            exceptionService.actionNotPermittedException("end_date.from.end_date");
-        }
-        if (unitPosition.getEndDate() != null && updateDTO.getStartDate().isAfter(unitPosition.getEndDate())) {
-            exceptionService.actionNotPermittedException("start_date.from.end_date");
-        }
-        updateDTO.setId(wtaId);
-        updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
-        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
-        return unitPositionQueryResult;
-    }
 
     private UnitPositionQueryResult getBasicDetails(UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, UnitPositionLineEmploymentTypeRelationShip relationShip,
                                                     Long parentOrganizationId, String parentOrganizationName, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {

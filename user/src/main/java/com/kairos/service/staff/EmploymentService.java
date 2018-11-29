@@ -235,7 +235,7 @@ public class EmploymentService {
             } else if(!Optional.ofNullable(unitPermission).isPresent()){
                 unitPermission = new UnitPermission();
                 unitPermission.setOrganization(unit);
-                unitPermission.setStartDate(LocalDate.now());
+                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
@@ -611,7 +611,7 @@ public class EmploymentService {
                 if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
                     unitPermission.setOrganization(organizations.get(currentElement));
-                    unitPermission.setStartDate(LocalDate.now());
+                    unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
                 }
                 unitPermission.setAccessGroup(accessGroupDB);
                 employment.getUnitPermissions().add(unitPermission);

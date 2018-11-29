@@ -21,8 +21,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 public class UnitPermission extends UserBaseEntity {
 
     private String place;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private long startDate;
+    private long endDate;
     private int weeklyHours;
 
     @Relationship(type = APPLICABLE_IN_UNIT)
@@ -39,11 +39,11 @@ public class UnitPermission extends UserBaseEntity {
         return place;
     }
 
-    public LocalDate getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public LocalDate getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
@@ -53,12 +53,12 @@ public class UnitPermission extends UserBaseEntity {
     }
 
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
