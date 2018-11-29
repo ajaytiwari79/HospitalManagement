@@ -121,23 +121,23 @@ public class ShiftBreakService {
         List<ShiftActivity> shifts = new ArrayList<>();
         Activity breakActivity = null;
         short numberOfBreakRequired = findNumberOfRequiredBreaks(breakSettings,shiftDurationInMinute);
-        BreakAvailabilitySettings breakAvailability=null;
+        BreakAvailabilitySettings breakAvailabilitySettings=null;
         if (numberOfBreakRequired > 0) {
 
-             breakAvailability =findCurrentBreakAvailability(mainShift.getActivities().get(0).getStartDate(), timeSlot, breakWTATemplate);
+             breakAvailabilitySettings =findCurrentBreakAvailability(mainShift.getActivities().get(0).getStartDate(), timeSlot, breakWTATemplate);
                     // this must be break restriction settings
             // with initial block and end block  we need to check start restriction and and end as well
 
-            if (breakAvailability == null) { // if availability is null then we are resetting it to zero means no restriction at all
-                breakAvailability = new BreakAvailabilitySettings((short) 0, (short) 0);
+            if (breakAvailabilitySettings == null) { // if availability is null then we are resetting it to zero means no restriction at all
+                breakAvailabilitySettings = new BreakAvailabilitySettings((short) 0, (short) 0);
                 breakWTATemplate= new BreakWTATemplate();
                 breakWTATemplate.setBreakGapMinutes((short) 0);
             }
-            if (breakAvailability.getStartAfterMinutes() == 0) { // this means no start restriction is set, so we are adding the break at start
+            if (breakAvailabilitySettings.getStartAfterMinutes() == 0) { // this means no start restriction is set, so we are adding the break at start
                 workedShiftDuration = workedShiftDuration + (breakSettings.get(0).getShiftDurationInMinute() / 2);
                 currentlyAllottedDurationInMinute=workedShiftDuration;
             } else {
-                workedShiftDuration = workedShiftDuration + breakAvailability.getStartAfterMinutes();
+                workedShiftDuration = workedShiftDuration + breakAvailabilitySettings.getStartAfterMinutes();
                 currentlyAllottedDurationInMinute=workedShiftDuration;
             }
             currentlyAllottedDurationInMinute=workedShiftDuration;
@@ -146,10 +146,10 @@ public class ShiftBreakService {
             shiftDurationInMinute -= workedShiftDuration;
             startDateMillis=endDateMillis; // reassigning next start as end of this
 
-            if (breakAvailability.getEndBeforeMinutes() > 0 && shiftDurationInMinute >= breakAvailability.getEndBeforeMinutes()) {    // add a shift at last of array we need to shift this to last
-                workedShiftDuration += breakAvailability.getEndBeforeMinutes();
-                shiftDurationInMinute -= breakAvailability.getEndBeforeMinutes();
-                restrictedEndDateMillis = mainShift.getEndDate().getTime() - breakAvailability.getEndBeforeMinutes() * ONE_MINUTE;// reducing the end date for the rest calculation
+            if (breakAvailabilitySettings.getEndBeforeMinutes() > 0 && shiftDurationInMinute >= breakAvailabilitySettings.getEndBeforeMinutes()) {    // add a shift at last of array we need to shift this to last
+                workedShiftDuration += breakAvailabilitySettings.getEndBeforeMinutes();
+                shiftDurationInMinute -= breakAvailabilitySettings.getEndBeforeMinutes();
+                restrictedEndDateMillis = mainShift.getEndDate().getTime() - breakAvailabilitySettings.getEndBeforeMinutes() * ONE_MINUTE;// reducing the end date for the rest calculation
                 shifts.add(++itemsAddedFromBeginning,getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(restrictedEndDateMillis), mainShift.getEndDate(), false));
                 lastBlockingShiftAdded=true;
             }
@@ -236,22 +236,26 @@ public class ShiftBreakService {
             endDateMillis = mainShift.getEndDate().getTime();
             shifts.add(++itemsAddedFromBeginning,updateShift?getShiftByStartDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis)):getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis), false));
         }
-        // if we have 2 consecutive shift then we will merge them.
-        for (int i=0;i< shifts.size();i++) {
+        mergeShifts(shifts);// if we have 2 consecutive shift then we will merge them.
+
+        if (numberOfBreakAllotted != numberOfBreakRequired) {
+            reAdjustShiftDuration(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailabilitySettings,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired));
+        }
+        return shifts;
+    }
+    private void mergeShifts(List<ShiftActivity> shiftActivities){
+
+        for (int i=0;i< shiftActivities.size();i++) {
             if (i > 0){
-                if (!shifts.get(i-1).isBreakShift() && !shifts.get(i).isBreakShift()){
+                if (!shiftActivities.get(i-1).isBreakShift() && !shiftActivities.get(i).isBreakShift()){
                     // merge and remove
-                    shifts.get(i).setStartDate(shifts.get(i-1).getStartDate());
-                    shifts.remove(i-1);
+                    shiftActivities.get(i).setStartDate(shiftActivities.get(i-1).getStartDate());
+                    shiftActivities.remove(i-1);
                     i--;
                 }
             }
         }
-        if (numberOfBreakAllotted != numberOfBreakRequired) {
-            reAdjustShiftDuration(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailability,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired));
-        }
 
-        return shifts;
     }
     private void removeAllPreviouslyAllottedBreaks(Shift shift){
         for (int i = 0; i < shift.getActivities().size(); i++) {
