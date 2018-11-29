@@ -631,10 +631,12 @@ public class UnitPositionService {
         return CompletableFuture.completedFuture(true);
     }
 
+
     private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) throws Exception {
         CompletableFuture<Boolean> done = setDefaultData(unitPositionDTO, unitPosition);
         CompletableFuture.allOf(done).join();
         // UEP can be created for past dates from time care
+
         unitPosition.setStartDate(unitPositionDTO.getStartDate());
         if (Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) {
             if (unitPositionDTO.getStartDate().isAfter(unitPositionDTO.getEndDate())) {
@@ -650,16 +652,21 @@ public class UnitPositionService {
             unitPosition.setReasonCode(reasonCode.get());
             unitPosition.setEndDate(unitPositionDTO.getEndDate());
         }
+
         if (Optional.ofNullable(unitPositionDTO.getLastWorkingDate()).isPresent()) {
             if (unitPositionDTO.getStartDate().isAfter(unitPositionDTO.getLastWorkingDate())) {
                 exceptionService.actionNotPermittedException("message.lastdate.notlessthan.startdate");
             }
             unitPosition.setLastWorkingDate(unitPositionDTO.getLastWorkingDate());
         }
+
+
         SeniorityLevel seniorityLevel = getSeniorityLevelByStaffAndExpertise(unitPosition.getStaff().getId(), unitPosition.getExpertise());
+
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.seniorityLevel.id.notfound", unitPositionDTO.getReasonCodeId());
         }
+
         UnitPositionLine unitPositionLine = new UnitPositionLine.UnitPositionLineBuilder()
                 .setSeniorityLevel(seniorityLevel)
                 .setStartDate(unitPositionDTO.getStartDate())

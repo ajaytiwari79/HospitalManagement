@@ -2,6 +2,7 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.open_shift.DurationField;
+import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -44,6 +45,8 @@ public class RulesActivityTabDTO {
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.
     private PQLSettings pqlSettings;
+    private boolean reasonCodeRequired;
+    private ReasonCodeRequiredState reasonCodeRequiredState;
 
 
 
@@ -249,6 +252,19 @@ public class RulesActivityTabDTO {
     }
 
 
+    public ReasonCodeRequiredState getReasonCodeRequiredState() {
+        return reasonCodeRequiredState;
+    }
 
+    public void setReasonCodeRequiredState(ReasonCodeRequiredState reasonCodeRequiredState) {
+        this.reasonCodeRequiredState = reasonCodeRequiredState;
+    }
 
+    public boolean isReasonCodeRequired() {
+        return reasonCodeRequired;
+    }
+
+    public void setReasonCodeRequired(boolean reasonCodeRequired) {
+        this.reasonCodeRequired = reasonCodeRequired;
+    }
 }
