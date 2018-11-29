@@ -220,7 +220,7 @@ public class AccessGroupController {
     @ApiOperation("To fetch Access Role (Staff/Management) of current logged in user")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> checkIfUserHasAccessByRoleInUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.findUserAccessRole(unitId));
 
     }
 

@@ -36,6 +36,7 @@ import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.MicroService;
@@ -94,10 +95,9 @@ public class GenericIntegrationService {
         });
     }
 
-    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+    public StaffUnitPositionTimeSlotWrapper getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionTimeSlotWrapper>>() {
         }, expertiseId);
-
     }
 
     public List<String> getEmailsOfStaffByStaffIds(Long unitId, List<Long> staffIds) {

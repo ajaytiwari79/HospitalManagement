@@ -16,6 +16,7 @@ import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.DayType;
@@ -881,8 +882,20 @@ public class AccessGroupService {
         return new UserAccessRoleDTO(userId, unitId,isStaff,isManagementStaff);
     }
 
+    public UserAccessRoleDTO findUserAccessRole(Long unitId) {
+        Long userId = UserContext.getUserDetails().getId();
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+
+        String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+        boolean staff = AccessGroupRole.STAFF.name().equals(staffRole)?true:false;
+        boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole)?true:false;
+
+        return new UserAccessRoleDTO(userId,unitId,staff,management);
+    }
+
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
-        UserAccessRoleDTO userAccessRoleDTO = checkIfUserHasAccessByRoleInUnit(unitId);
+        UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId,ReasonCodeType.ABSENCE),ReasonCodeDTO.class);
 
         return new ReasonCodeWrapper(reasonCodes,userAccessRoleDTO);
@@ -936,5 +949,19 @@ public class AccessGroupService {
         else if((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))){
             exceptionService.actionNotPermittedException("error.allowed.day_type.absent");
         }
+
+
+    }
+
+    public void linkParentOrganizationAccessGroup(Organization unit,Long parentOrganizationId){
+        List<AccessGroupQueryResult> accessGroupQueryResults=getOrganizationAccessGroups(parentOrganizationId);
+        List<AccessGroup> accessGroupList=ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupQueryResults,AccessGroup.class);
+        unit.setAccessGroups(accessGroupList);
+        accessGroupRepository.saveAll(accessGroupList);
+
+    }
+
+    public List<AccessGroupQueryResult> getOrganizationAccessGroups(Long parentOrganizationId){
+        return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
     }
 }

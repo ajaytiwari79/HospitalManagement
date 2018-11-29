@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.counter;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ public class DefaultKPISettingDTO {
     private Long parentUnitId;
     private Map<Long, Long> countryAndOrgAccessGroupIdsMap;
     private List<Long> staffIds;
+
     public DefaultKPISettingDTO() {
     }
 

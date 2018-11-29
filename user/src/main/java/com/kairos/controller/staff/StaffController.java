@@ -15,6 +15,8 @@ import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
+import com.kairos.service.unit_position.UnitPositionCTAWTAService;
+import com.kairos.service.unit_position.UnitPositionJobService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -71,7 +73,8 @@ public class StaffController {
     private UnitPositionService unitPositionService;
     @Inject private VRPClientService vrpClientService;
     @Inject private StaffRetrievalService staffRetrievalService;
-
+    @Inject
+    private UnitPositionJobService unitPositionJobService;
 
 
     @RequestMapping(value = "/{staffId}/employment_details", method = RequestMethod.PUT)
@@ -609,7 +612,7 @@ public class StaffController {
         String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
         Long reasonCodeId = employmentDTO.getReasonCodeId();
         Long accessGroupId = employmentDTO.getAccessGroupIdOnEmploymentEnd();
-        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId,reasonCodeId,accessGroupId);
+        EmploymentUnitPositionDTO response = unitPositionJobService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId,reasonCodeId,accessGroupId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

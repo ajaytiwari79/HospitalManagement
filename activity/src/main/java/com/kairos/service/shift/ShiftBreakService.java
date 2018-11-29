@@ -42,20 +42,6 @@ public class ShiftBreakService {
     private ExceptionService exceptionService;
 
 
-   /* public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffUnitPositionDetails unitPositionDetails) {
-        Long shiftDurationInMinute = new DateTimeInterval(shift.getStartDate(), shift.getEndDate()).getMinutes();
-        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(shift.getUnitId(), shiftDurationInMinute);
-        List<ShiftActivity> breakActivities = new ArrayList<>();
-        if (!breakSettings.isEmpty()) {
-            Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings);
-            boolean paid = Optional.ofNullable(unitPositionDetails.getExpertise().getBreakPaymentSetting()).isPresent() &&
-                    BreakPaymentSetting.PAID.equals(unitPositionDetails.getExpertise().getBreakPaymentSetting());
-            activityWrapperMap.putAll(breakActivitiesMap);
-            breakActivities = getBreaks(activityWrapperMap, shift, breakSettings, breakActivitiesMap, paid);
-        }
-        return breakActivities;
-    }*/
-
     public Map<BigInteger, ActivityWrapper> getBreakActivities(List<BreakSettings> breakSettings, Long unitId) {
         List<BigInteger> breakActivityIds = breakSettings.stream().map(BreakSettings::getActivityId).collect(Collectors.toList());// These are country activity ids
         List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByParentIdsAndUnitId(breakActivityIds, unitId);
@@ -75,10 +61,7 @@ public class ShiftBreakService {
             List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(unitPositionDetails.getExpertise().getId(), shiftDurationInMinute);
             Map<BigInteger, ActivityWrapper> breakActivitiesMap = getBreakActivities(breakSettings, mainShift.getUnitId());
             activityWrapperMap.putAll(breakActivitiesMap);
-            if (Optional.ofNullable(breakSettings).isPresent() && breakSettings.size() > 0) {
-                activityWrapperMap.putAll(breakActivitiesMap);
-                return addBreakInShifts(mainShift, breakSettings, shiftDurationInMinute, breakActivitiesMap, breakWTATemplate, timeSlot,updateShift);
-            }
+            return addBreakInShifts(mainShift, breakSettings, shiftDurationInMinute, breakActivitiesMap, breakWTATemplate, timeSlot,updateShift);
         }
         return Collections.emptyList();
     }
@@ -333,4 +316,9 @@ public class ShiftBreakService {
 
     }
 
+    public List<ShiftActivity> addBreakInShiftsWhileCopy(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot,List<BreakSettings> breakSettings) {
+        Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
+        return  addBreakInShifts(mainShift, breakSettings, shiftDurationInMinute, activityWrapperMap, breakWTATemplate, timeSlot,false);
+
+    }
 }

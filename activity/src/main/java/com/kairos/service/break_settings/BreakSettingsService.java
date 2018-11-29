@@ -64,14 +64,7 @@ public class BreakSettingsService extends MongoBaseService {
         List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);
 
         List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
-        // TODO VIPUL FIX
-        /*UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
-        FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
-        if (unitSettingDTO != null) {
-            flexibleTimeSettingDTO = unitSettingDTO.getGlideTimeSettings();
-        }
-        */
-        return new BreakSettingAndActivitiesWrapper(breakSettings, activities, null);
+        return new BreakSettingAndActivitiesWrapper(breakSettings, activities);
     }
 
     public Boolean removeBreakSettings(BigInteger breakSettingsId) {

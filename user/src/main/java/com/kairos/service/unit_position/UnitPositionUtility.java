@@ -31,7 +31,6 @@ public class UnitPositionUtility {
         UnitPositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
-
         unitPositionDetails.setStartDate(unitPosition.getStartDate());
         unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
