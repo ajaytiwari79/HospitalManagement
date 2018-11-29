@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 public class UnitPositionDTO {
     private Long id;
+    private String expertiseName;
     private Long startDateMillis;
     private Long endDateMillis;
     private Long lastWorkingDateMillis;
@@ -112,5 +113,13 @@ public class UnitPositionDTO {
 
     public void setTimeCareExternalId(Long timeCareExternalId) {
         this.timeCareExternalId = timeCareExternalId;
+    }
+
+    public String getExpertiseName() {
+        return expertiseName;
+    }
+
+    public void setExpertiseName(String expertiseName) {
+        this.expertiseName = expertiseName;
     }
 }

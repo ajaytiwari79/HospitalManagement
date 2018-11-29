@@ -8,7 +8,7 @@ import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.staff.PartialLeave;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffQueryResult;
-import com.kairos.persistence.model.staff.StaffTimezoneQueryResult;
+import com.kairos.persistence.model.staff.StaffInformationQueryResult;
 import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
@@ -393,9 +393,17 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Long findHubStaffIdByUserId(Long userId, Long unitId);
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
-            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
-            "match (org)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCodes")
-    List<StaffTimezoneQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id,ReasonCodeType reasonCodeType);
+            "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false,published:true}) with staff,up \n" +
+            "MATCH(up)-[: " + IN_UNIT + " ]-(org:Organization{deleted:false}) with staff,up,org\n" +
+            "MATCH (up)-[: " + HAS_EXPERTISE_IN + "]-(exp:Expertise) with staff,up,org,exp \n"+
+            "Optional match (org)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} with staff,up,org,exp,reasonCode \n " +
+            "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(DISTINCT reasonCode) as reasonCodes,COLLECT({id:id(up),expertiseName:exp.name}) as unitPosition")
+    List<StaffInformationQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id, ReasonCodeType reasonCodeType);
+
+    @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
+            "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false,published:true}) with staff,up \n" +
+            "MATCH(up)-[: " + IN_UNIT + " ]-(org:Organization{deleted:false}) RETURN id(staff) as staffId,id(org) as unitId ")
+    List<StaffInformationQueryResult> getStaffIdsAndUnitByUserId(Long userId);
 
     @Query("Match(staff:Staff)-[rel:"+STAFF_HAS_EXPERTISE+"]-(exp:Expertise) where id(staff)={0} and id(exp)={1} set rel.expertiseStartDate = {2}  return staff,exp")
     void updateStaffExpertiseRelation(Long staffId,Long expertiseId,Long millis);
@@ -403,7 +411,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
             "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
             "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName")
-    List<StaffTimezoneQueryResult> getAllStaffsAndUnitDetailsByUserId(Long userId);
+    List<StaffInformationQueryResult> getAllStaffsAndUnitDetailsByUserId(Long userId);
 
     @Query("Optional MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(e:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE staff.email=~{0} AND id(organization)={1} RETURN staff")
     Staff findStaffByEmailInOrganization(String email,Long unitId);

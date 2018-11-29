@@ -12,22 +12,22 @@ import java.util.Map;
 
 public class CompactViewDTO {
 
-    private Map<Long,ShiftDetailViewDTO> staffShifts;
+    private List<DetailViewDTO> staffShifts;
     private List<ReasonCodeDTO> reasonCodes;
 
     public CompactViewDTO() {
     }
 
-    public CompactViewDTO(Map<Long, ShiftDetailViewDTO> staffShifts, List<ReasonCodeDTO> reasonCodes) {
+    public CompactViewDTO( List<DetailViewDTO> staffShifts, List<ReasonCodeDTO> reasonCodes) {
         this.staffShifts = staffShifts;
         this.reasonCodes = reasonCodes;
     }
 
-    public Map<Long, ShiftDetailViewDTO> getStaffShifts() {
+    public  List<DetailViewDTO> getStaffShifts() {
         return staffShifts;
     }
 
-    public void setStaffShifts(Map<Long, ShiftDetailViewDTO> staffShifts) {
+    public void setStaffShifts( List<DetailViewDTO> staffShifts) {
         this.staffShifts = staffShifts;
     }
 
