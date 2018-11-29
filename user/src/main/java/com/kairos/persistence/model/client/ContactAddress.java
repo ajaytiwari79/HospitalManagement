@@ -48,9 +48,9 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     @NotNull(message = "error.ContactAddress.latitude.notnull")
     private float latitude;
 
-    private LocalDate startDate;
+    private long startDate;
 
-    private LocalDate endDate;
+    private long endDate;
 
     private String country;
 
@@ -189,20 +189,20 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         this.country = country;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
-    public LocalDate getStartDate() {
+    public long getStartDate() {
 
         return startDate;
     }
 
-    public LocalDate getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 

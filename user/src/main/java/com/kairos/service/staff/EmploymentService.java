@@ -146,12 +146,12 @@ public class EmploymentService {
         }
 
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
-        LocalDate employmentStartDate = staffEmploymentDetail.getEmployedSince();
+        Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
-            if(Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent()&&employmentStartDate.isAfter(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()))
+            if(Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent()&& employmentStartDate>employmentUnitPosition.getEarliestUnitPositionStartDateMillis())
                 exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.unitpositionstartdate");
 
-            if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate.isAfter(employmentUnitPosition.getEmploymentEndDateMillis()))
+            if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDateMillis())
                 exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.enddate");
 
         }

@@ -12,13 +12,13 @@ import java.time.LocalDate;
 public class StaffEmploymentDTO {
 
    private Staff staff;
-   private LocalDate employmentStartDate;
+   private Long employmentStartDate;
 
     public StaffEmploymentDTO() {
 
     }
 
-    public StaffEmploymentDTO(Staff staff, LocalDate startDateMillis ) {
+    public StaffEmploymentDTO(Staff staff, Long startDateMillis ) {
         this.staff = staff;
         this.employmentStartDate = startDateMillis;
     }
@@ -30,11 +30,11 @@ public class StaffEmploymentDTO {
         this.staff = staff;
     }
 
-    public LocalDate getEmploymentStartDate() {
+    public Long getEmploymentStartDate() {
         return employmentStartDate;
     }
 
-    public void setEmploymentStartDate(LocalDate employmentStartDate) {
+    public void setEmploymentStartDate(Long employmentStartDate) {
         this.employmentStartDate = employmentStartDate;
     }
 

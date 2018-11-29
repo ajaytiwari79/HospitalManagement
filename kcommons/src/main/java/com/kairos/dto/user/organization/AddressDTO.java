@@ -33,8 +33,8 @@ public class AddressDTO {
     private boolean isVerifiedByGoogleMap;
     private boolean addressProtected;
     private boolean verifiedByVisitour;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private long startDate;
+    private long endDate;
 
     private String description;
     private Long municipalityId;
@@ -58,19 +58,19 @@ public class AddressDTO {
         this.description = description;
     }
 
-    public LocalDate getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 

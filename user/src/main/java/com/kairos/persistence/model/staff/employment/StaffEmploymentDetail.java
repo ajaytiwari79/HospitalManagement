@@ -16,7 +16,7 @@ public class StaffEmploymentDetail {
     private String email;
     private boolean copyKariosMailToLogin;
     @NotNull(message = "error.Staff.employedsince.notnull")
-    private LocalDate employedSince;
+    private String employedSince;
     private long visitourId;
     private long engineerTypeId;
     private Long timeCareExternalId;
@@ -55,11 +55,11 @@ public class StaffEmploymentDetail {
         this.copyKariosMailToLogin = copyKariosMailToLogin;
     }
 
-    public LocalDate getEmployedSince() {
+    public String getEmployedSince() {
         return employedSince;
     }
 
-    public void setEmployedSince(LocalDate employedSince) {
+    public void setEmployedSince(String employedSince) {
         this.employedSince = employedSince;
     }
 

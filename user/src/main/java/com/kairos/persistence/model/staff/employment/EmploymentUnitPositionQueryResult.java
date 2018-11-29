@@ -12,22 +12,22 @@ import java.time.LocalDate;
 @QueryResult
 public class EmploymentUnitPositionQueryResult {
 
-private LocalDate earliestUnitPositionStartDateMillis;
-private LocalDate employmentEndDateMillis;
+private Long earliestUnitPositionStartDateMillis;
+private Long employmentEndDateMillis;
 
-    public LocalDate getEarliestUnitPositionStartDateMillis() {
+    public Long getEarliestUnitPositionStartDateMillis() {
         return earliestUnitPositionStartDateMillis;
     }
 
-    public void setEarliestUnitPositionStartDateMillis(LocalDate earliestUnitPositionStartDateMillis) {
+    public void setEarliestUnitPositionStartDateMillis(Long earliestUnitPositionStartDateMillis) {
         this.earliestUnitPositionStartDateMillis = earliestUnitPositionStartDateMillis;
     }
 
-    public LocalDate getEmploymentEndDateMillis() {
+    public Long getEmploymentEndDateMillis() {
         return employmentEndDateMillis;
     }
 
-    public void setEmploymentEndDateMillis(LocalDate employmentEndDateMillis) {
+    public void setEmploymentEndDateMillis(Long employmentEndDateMillis) {
         this.employmentEndDateMillis = employmentEndDateMillis;
     }
 }

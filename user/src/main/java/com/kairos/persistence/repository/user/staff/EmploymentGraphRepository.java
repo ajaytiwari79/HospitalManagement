@@ -62,7 +62,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
 
     @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} set emp.startDateMillis = {1}")
-    void updateEmploymentStartDate(Long staffId, LocalDate endDateMillis);
+    void updateEmploymentStartDate(Long staffId, Long endDateMillis);
 
     @Query("Match(staff:Staff)-[:" + BELONGS_TO + "]-(emp:Employment) Match(emp)-[r:"+ HAS_REASON_CODE +"]-(reasonCode:ReasonCode) where id(staff)={0} delete r")
     void deleteEmploymentReasonCodeRelation(Long staffId);

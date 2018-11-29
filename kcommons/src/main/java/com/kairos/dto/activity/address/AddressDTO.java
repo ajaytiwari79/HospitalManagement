@@ -35,8 +35,6 @@ public class AddressDTO {
     private boolean isVerifiedByGoogleMap;
     private boolean addressProtected;
     private boolean verifiedByVisitour;
-    private long startDate;
-    private long endDate;
 
     private String description;
     private Long municipalityId;
@@ -50,22 +48,6 @@ public class AddressDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public long getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(long startDate) {
-        this.startDate = startDate;
-    }
-
-    public long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(long endDate) {
-        this.endDate = endDate;
     }
 
     public Long getTypeOfHouseId() {
