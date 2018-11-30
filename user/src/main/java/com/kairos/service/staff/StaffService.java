@@ -984,7 +984,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = (union|| parentOrganization) ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);

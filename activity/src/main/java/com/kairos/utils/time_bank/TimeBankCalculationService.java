@@ -243,11 +243,11 @@ public class TimeBankCalculationService {
             valid = false;
         if (valid && (CollectionUtils.isEmpty(ruleTemplate.getPhaseInfo()) || !(ruleTemplate.getPhaseInfo().stream().filter(p -> p.getPhaseId().equals(shiftPhaseId)).findFirst().isPresent())))
             valid = false;
-        if(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId)) {
-            valid = true;
+        if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
+            valid = false;
         }
-        if(valid && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate)))){
-            valid = true;
+        if(!(valid && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate))))){
+            valid = false;
         }
         return valid;
     }

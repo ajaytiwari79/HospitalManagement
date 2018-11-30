@@ -298,7 +298,7 @@ public class ShiftService extends MongoBaseService {
     private ShiftWithViolatedInfoDTO saveShift(ActivityWrapper activityWrapper, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO,Phase phase, boolean byTandAPhase) {
         ShiftState shiftState=null;
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-        ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityWrapper.getActivity(), ActivityDTO.class);
+
 
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()));
@@ -322,7 +322,7 @@ public class ShiftService extends MongoBaseService {
 
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityWrapperMap);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null,activityWrapperMap,false,byTandAPhase);
-        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> shiftActivityDTO.setPlannedTimeId(addPlannedTimeInShift(mainShift.getUnitId(), phase.getId(), activityWrapper.getActivity(), staffAdditionalInfoDTO)));
+
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
         validateStaffingLevel(phase, mainShift, activityWrapper.getActivity(), true, staffAdditionalInfoDTO);
@@ -360,6 +360,22 @@ public class ShiftService extends MongoBaseService {
                                       StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift,List<TimeSlotWrapper> timeSlot) {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
+
+        shift.setStartDate(shift.getActivities().get(0).getStartDate());
+        shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
+        shift.setScheduledMinutes(scheduledMinutes);
+        shift.setDurationMinutes(durationMinutes);
+        List<ShiftActivity> breakActivities= new ArrayList<>();
+        if(updateShift) {
+             breakActivities = shiftBreakService.updateBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
+        }else {
+             breakActivities = shiftBreakService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
+        }
+        if (!breakActivities.isEmpty()) {
+            shift.setActivities(breakActivities);
+        }
+        shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
+
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             if (shiftActivity.getId() == null) {
                 shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
@@ -377,24 +393,9 @@ public class ShiftService extends MongoBaseService {
             shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
             shiftActivity.setActivityName(activityWrapper.getActivity().getName());
             shiftActivity.setTimeType(activityWrapper.getTimeType());
+            shiftActivity.setPlannedTimeId(addPlannedTimeInShift(shift.getUnitId(), shift.getPhaseId(), activityWrapper.getActivity(), staffAdditionalInfoDTO));
         }
 
-        shift.setStartDate(shift.getActivities().get(0).getStartDate());
-        shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-        shift.setScheduledMinutes(scheduledMinutes);
-        shift.setDurationMinutes(durationMinutes);
-        List<ShiftActivity> breakActivities= new ArrayList<>();
-        if(updateShift) {
-             breakActivities = shiftBreakService.updateBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
-
-        }else {
-             breakActivities = shiftBreakService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition(), breakWTATemplate, timeSlot);
-        }
-        if (!breakActivities.isEmpty()) {
-
-            shift.setActivities(breakActivities);
-        }
-        shift.getActivities().sort(Comparator.comparing(ShiftActivity::getStartDate));
         shiftMongoRepository.save(shift);
         if(!updateShift) {
             updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
@@ -423,6 +424,7 @@ public class ShiftService extends MongoBaseService {
                 shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
                 shiftActivity.setTimeType(activityWrapper.getTimeType());
                 shiftActivity.setActivityName(activityWrapper.getActivity().getName());
+                shiftActivity.setPlannedTimeId(addPlannedTimeInShift(staffAdditionalInfoDTO.getUnitId(), phaseListByDate.get(shiftActivity.getStartDate()).getId(), activityWrapperMap.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO));
             }
             shift.setCreatedBy(UserContext.getUserDetails().getId());
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());
@@ -551,7 +553,6 @@ public class ShiftService extends MongoBaseService {
         for (ShiftDTO shiftDTO : shiftDTOS) {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityWrapperMap);
-            shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> shiftActivityDTO.setPlannedTimeId(addPlannedTimeInShift(staffAdditionalInfoDTO.getUnitId(), phaseListByDate.get(shiftDTO.getActivities().get(0).getStartDate()).getId(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO)));
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseListByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null,activityWrapperMap,false,false);
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO, Shift.class);
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
@@ -628,7 +629,6 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
 
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityWrapperMap);
-        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> shiftActivityDTO.setPlannedTimeId(addPlannedTimeInShift(staffAdditionalInfoDTO.getUnitId(), phase.getId(), activityWrapper.getActivity(), staffAdditionalInfoDTO)));
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO,shift,activityWrapperMap, true,false);
         shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
