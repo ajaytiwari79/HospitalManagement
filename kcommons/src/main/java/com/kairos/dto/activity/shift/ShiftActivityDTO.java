@@ -30,6 +30,7 @@ public class ShiftActivityDTO {
     private Set<ShiftStatus> status;
     private String message;
     private boolean success;
+    private Long absenceReasonCodeId;
 
     //This field is only for validation
     //@JsonIgnore
@@ -193,5 +194,13 @@ public class ShiftActivityDTO {
 
     public void setActivityName(String activityName) {
         this.activityName = activityName;
+    }
+
+    public Long getAbsenceReasonCodeId() {
+        return absenceReasonCodeId;
+    }
+
+    public void setAbsenceReasonCodeId(Long absenceReasonCodeId) {
+        this.absenceReasonCodeId = absenceReasonCodeId;
     }
 }
