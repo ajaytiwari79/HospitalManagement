@@ -1,5 +1,6 @@
 package com.planner.repository.shift_planning;
 
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
@@ -7,7 +8,6 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
-import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
