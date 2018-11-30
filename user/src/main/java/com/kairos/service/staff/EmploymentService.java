@@ -241,8 +241,8 @@ public class EmploymentService {
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
             logger.info(unitPermission.getId() + " Currently created Unit Permission ");
-            response.put("startDate", unitPermission.getStartDate());
-            response.put("endDate", unitPermission.getEndDate());
+            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
+            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
 
 
