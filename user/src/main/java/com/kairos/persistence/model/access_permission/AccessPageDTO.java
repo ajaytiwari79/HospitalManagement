@@ -24,6 +24,8 @@ public class AccessPageDTO {
     private boolean accessibleForUnion;
     private boolean accessibleForOrganization;
     private List<OrganizationCategory> accessibleFor = new ArrayList<>();
+    //this value is true only in case of "moduleId" : "module_1"
+    private boolean editable;
 
 
     public Long getParentTabId() {
@@ -105,5 +107,13 @@ public class AccessPageDTO {
 
     public void setAccessibleFor(List<OrganizationCategory> accessibleFor) {
         this.accessibleFor = accessibleFor;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 }
