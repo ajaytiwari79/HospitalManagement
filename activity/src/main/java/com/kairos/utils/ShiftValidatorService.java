@@ -349,8 +349,9 @@ public class ShiftValidatorService {
         return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue : limitValue >= calculatedValue;
     }
 
-    public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift) {
-        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).sorted().collect(Collectors.toSet()));
+    public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
+        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
+        dates.sort((date1,date2)->date1.compareTo(date2));
         return dates;
     }
 
@@ -623,6 +624,10 @@ public class ShiftValidatorService {
                 case WTA_FOR_CARE_DAYS:
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     interval = interval.addInterval(getIntervalByWTACareDaysRuleTemplate(shift,wtaForCareDays));
+                case CONSECUTIVE_WORKING_PARTOFDAY:
+                    ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate = (ConsecutiveWorkWTATemplate) ruleTemplate;
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift, consecutiveWorkWTATemplate.getIntervalUnit(), consecutiveWorkWTATemplate.getIntervalLength()));
+                    break;
 
             }
         }
