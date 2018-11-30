@@ -884,14 +884,20 @@ public class AccessGroupService {
 
     public UserAccessRoleDTO findUserAccessRole(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
-
-        String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
-        boolean staff = AccessGroupRole.STAFF.name().equals(staffRole)?true:false;
-        boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole)?true:false;
-
-        return new UserAccessRoleDTO(userId,unitId,staff,management);
+        //Todo Yatharth please check and verify our code
+        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
+        UserAccessRoleDTO userAccessRoleDTO;
+        if (staffAtHub != null) {
+           userAccessRoleDTO = new UserAccessRoleDTO(userId,unitId,false,true);
+        }else {
+            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+            String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+            boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
+            boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
+            userAccessRoleDTO = new UserAccessRoleDTO(userId,unitId,staff,management);
+        }
+        //Todo till here
+        return userAccessRoleDTO;
     }
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
