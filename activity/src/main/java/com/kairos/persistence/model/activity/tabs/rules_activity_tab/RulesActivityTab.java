@@ -4,6 +4,7 @@ import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -44,6 +45,9 @@ public class RulesActivityTab implements Serializable{
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --   -128 to 127
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
     private PQLSettings pqlSettings;
+    private boolean reasonCodeRequired;
+    private ReasonCodeRequiredState reasonCodeRequiredState;
+
 
     public RulesActivityTab() {
         //Default Constructor
@@ -271,5 +275,21 @@ public class RulesActivityTab implements Serializable{
 
     public void setPqlSettings(PQLSettings pqlSettings) {
         this.pqlSettings = pqlSettings;
+    }
+
+    public ReasonCodeRequiredState getReasonCodeRequiredState() {
+        return reasonCodeRequiredState;
+    }
+
+    public void setReasonCodeRequiredState(ReasonCodeRequiredState reasonCodeRequiredState) {
+        this.reasonCodeRequiredState = reasonCodeRequiredState;
+    }
+
+    public boolean isReasonCodeRequired() {
+        return reasonCodeRequired;
+    }
+
+    public void setReasonCodeRequired(boolean reasonCodeRequired) {
+        this.reasonCodeRequired = reasonCodeRequired;
     }
 }

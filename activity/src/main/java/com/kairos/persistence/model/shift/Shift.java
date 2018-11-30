@@ -3,16 +3,18 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.commons.utils.DateTimeInterval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.Date;
 import java.util.List;
 
@@ -58,7 +60,6 @@ public class Shift extends MongoBaseEntity {
 
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
-    private AttendanceDuration attendanceDuration;
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
@@ -140,15 +141,6 @@ public class Shift extends MongoBaseEntity {
     public void setShiftType(ShiftType shiftType) {
         this.shiftType = shiftType;
     }
-
-    public AttendanceDuration getAttendanceDuration() {
-        return attendanceDuration;
-    }
-
-    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
-        this.attendanceDuration = attendanceDuration;
-    }
-
 
     public Long getUpdatedBy() {
         return updatedBy;
