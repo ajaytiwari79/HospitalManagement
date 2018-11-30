@@ -195,6 +195,7 @@ public class EmploymentService {
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+
         if( accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created){
             exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
@@ -206,6 +207,9 @@ public class EmploymentService {
         }
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
@@ -254,8 +258,6 @@ public class EmploymentService {
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
         }
 
-        StaffAccessGroupQueryResult staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
         accessGroupPermissionCounterDTO.setStaffId(staffId);
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created",created+""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {},accessGroupId);
