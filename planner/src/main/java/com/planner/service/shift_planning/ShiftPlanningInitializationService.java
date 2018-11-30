@@ -9,6 +9,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.Employee;
@@ -56,7 +57,12 @@ public class ShiftPlanningInitializationService {
     /**
      * ShiftRequestPhasePlanningSolution(Opta-planner planning Solution)
      */
-    public ShiftRequestPhasePlanningSolution initializeShiftPlanning(Long unitId, Date fromPlanningDate, Date toPlanningDate, Long[] staffIds) {
+    public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+        Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
+        Date fromPlanningDate = DateUtils.asDate(shiftPlanningProblemSubmitDTO.getStartDate());
+        Date toPlanningDate = DateUtils.asDate(shiftPlanningProblemSubmitDTO.getEndDate());
+        Long[] staffIds=null;
+
         List<StaffQueryResult> staffWithSkillsAndUnitPostionIds = userNeo4jService.getStaffWithSkillsAndUnitPostionIds(unitId, staffIds);
         List<Long> unitPositionIds = staffWithSkillsAndUnitPostionIds.stream().map(s -> s.getStaffUnitPosition()).collect(Collectors.toList());
         List<Employee> employeeList = getAllEmployee(fromPlanningDate, toPlanningDate, staffWithSkillsAndUnitPostionIds, unitPositionIds);
@@ -209,8 +215,9 @@ public class ShiftPlanningInitializationService {
         return shiftRequestPhaseList;
     }
 
-    private List<ActivityLineInterval> getShiftActivityLineInterval(){
+    private List<ActivityLineInterval> getShiftActivityLineInterval() {
         List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
+        return activityLineIntervals;
     }
 
 

@@ -1,5 +1,6 @@
 package com.planner.controller;
 
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.service.shift_planning.CTAService;
@@ -50,7 +51,7 @@ private CTAService ctaService;
     @GetMapping(value = "/ShiftPlanning")
     ResponseEntity<Map<String, Object>> initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         Long[] staffIds = {34246L,27075L,27079L,34251L,34246L,34272L};
-        shiftPlanningInitializationService.initializeShiftPlanning(25120L, new Date(1530383400000l), new Date(1532975400000l), staffIds);
+        shiftPlanningInitializationService.initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
 
         return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.FOUND);
     }
