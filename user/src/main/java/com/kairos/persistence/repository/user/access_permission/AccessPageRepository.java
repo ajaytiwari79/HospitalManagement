@@ -211,7 +211,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
             "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage\n" +
             "RETURN \n" +
-            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active, \n" +
+            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable, \n" +
             " CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             " CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
