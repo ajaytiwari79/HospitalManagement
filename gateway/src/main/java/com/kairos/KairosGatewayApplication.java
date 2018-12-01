@@ -1,9 +1,12 @@
 package com.kairos;
 
+import com.kairos.filter.AddRequestHeaderGatewayFilterFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitionLocator;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -48,9 +51,22 @@ public class KairosGatewayApplication {
             return chain.filter(ctx);
         };
     }
+    @Bean
+    public AddRequestHeaderGatewayFilterFactory elapsedFilter(){
+        return new AddRequestHeaderGatewayFilterFactory();
+    }
 
-
-
+    @Bean
+    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
+        // @formatter:off
+        return builder.routes()
+                .route(r -> r.path("/kairos/**")
+                        .filters(f -> f.filter(new AddRequestHeaderGatewayFilterFactory()))
+                        .uri("lb://user-service")
+                )
+                .build();
+        // @formatter:on
+    }
 
 }
 
