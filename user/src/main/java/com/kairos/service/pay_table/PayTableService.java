@@ -281,7 +281,7 @@ public class PayTableService {
         payTableGraphRepository.save(copiedPayTable);
         // copying all previous and then adding in pay Table as well.
         List<PayGrade> payGradesObjects = new ArrayList<>();
-        if(payGradesPayGroupAreaRelationShips==null) {
+        if(CollectionUtils.isEmpty(payGradesPayGroupAreaRelationShips)) {
             for (PayGrade currentPayGrade : payTable.getPayGrades()) {
                 PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
                 List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
