@@ -362,7 +362,7 @@ public class EmploymentService {
         units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
         List<Map<String, Object>> employments;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
-        // This is for parent organization i.e if unit is its left parent organization
+        // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit.isParentOrganization()) {
             employments = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {
