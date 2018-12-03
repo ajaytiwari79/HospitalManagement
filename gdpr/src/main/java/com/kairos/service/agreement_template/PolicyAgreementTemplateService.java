@@ -210,10 +210,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 }
         );
         List<ClauseBasicResponseDTO> clauseBasicResponseDTOS=policyAgreementTemplateRepository.getAllClausesByAgreementTemplateId(referenceId,isUnitId,agreementTemplateId);
-       Map<BigInteger,ClauseBasicResponseDTO> clauseBasicResponseDTOMap=new HashMap<>();
-       clauseBasicResponseDTOS.forEach(clauseBasicResponseDTO -> {
-           clauseBasicResponseDTOMap.put(clauseBasicResponseDTO.getId(),clauseBasicResponseDTO);
-       });
+       Map<BigInteger,ClauseBasicResponseDTO> clauseBasicResponseDTOMap=clauseBasicResponseDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v ,(p1, p2) -> p1));
         clauseListForTemplate.stream().forEach(clauseBasicResponseDTO -> {
             if(clauseBasicResponseDTOMap.get(clauseBasicResponseDTO.getId())!=null){
                 clauseBasicResponseDTO.setLinkedWithOtherTemplate(true);
