@@ -29,6 +29,6 @@ public interface CustomPolicyAgreementTemplateRepository {
 
     Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds);
 
-    List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
+    List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateIdNotEquals(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
 
 }

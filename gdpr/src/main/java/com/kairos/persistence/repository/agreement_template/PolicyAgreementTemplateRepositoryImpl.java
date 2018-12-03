@@ -203,7 +203,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     }
 
     @Override
-    public List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
+    public List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateIdNotEquals(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
         Criteria criteria= isUnitId ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
