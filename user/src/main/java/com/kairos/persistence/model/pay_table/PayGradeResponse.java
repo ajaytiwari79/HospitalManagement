@@ -24,6 +24,10 @@ public class PayGradeResponse {
         //default
     }
 
+    public PayGradeResponse(Long payTableId) {
+        this.payTableId = payTableId;
+    }
+
     public Long getPayTableId() {
         return payTableId;
     }

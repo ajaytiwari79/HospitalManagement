@@ -696,6 +696,9 @@ public class StaffRetrievalService {
                 expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
                 expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
                 expertiseQueryResult.setSeniorityLevel(calculateApplicableSeniorityLevel(expertiseQueryResult.getSeniorityLevels(), maxExperience));
+                if(expertiseQueryResult.isUnitPositionExists()){
+                    staffExpertiseQueryResult.setUnitPositionExists(true);
+                }
             });
         });
         return staffExpertiseQueryResults;
