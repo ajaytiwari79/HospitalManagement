@@ -154,10 +154,12 @@ public class CountryCTAService extends MongoBaseService {
         List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(organizationIds.size());
         costTimeAgreement.setCountryId(null);
         List<CostTimeAgreement> costTimeAgreementList=costTimeAgreementRepository.findCTAByUnitIdAndOrgTypeAndName(organizationIds,collectiveTimeAgreementDTO.getName());
+        Set<BigInteger> phaseIds = collectiveTimeAgreementDTO.getRuleTemplates().stream().flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getPhaseInfo().stream().map(ctaRuleTemplatePhaseInfo -> ctaRuleTemplatePhaseInfo.getPhaseId())).collect(Collectors.toSet());
+        Map<Long,Map<BigInteger,BigInteger>> unitPhasesMap = costTimeAgreementService.getMapOfPhaseIdsAndUnitByParentIds(phaseIds,organizationIds);
         Map<String,CostTimeAgreement> costTimeAgreementMap = costTimeAgreementList.stream().collect(Collectors.toMap(k->k.getName()+"_"+k.getOrganization().getId()+"_"+k.getOrganizationType().getId(),v->v, (previous, current) -> previous));
         ctaBasicDetailsDTO.getOrganizations().forEach(organization ->{
                     if(costTimeAgreementMap.get(collectiveTimeAgreementDTO.getName()+"_"+organization.getId()+"_"+costTimeAgreement.getOrganizationType().getId())==null){
-                        CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(costTimeAgreement,collectiveTimeAgreementDTO, unitActivities.get(organization.getId()),ctaBasicDetailsDTO,organization);
+                        CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(unitPhasesMap.get(organization.getId()),costTimeAgreement,collectiveTimeAgreementDTO, unitActivities.get(organization.getId()),ctaBasicDetailsDTO,organization);
                         costTimeAgreements.add(newCostTimeAgreement);
                     }
         });
@@ -176,11 +178,12 @@ public class CountryCTAService extends MongoBaseService {
      * @param ctaBasicDetailsDTO
      * @return
      */
-    public CostTimeAgreement createCostTimeAgreementForOrganization(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Map<Long, BigInteger> parentUnitActivityMap, CTABasicDetailsDTO ctaBasicDetailsDTO, OrganizationBasicDTO organization) {
+    public CostTimeAgreement createCostTimeAgreementForOrganization(Map<BigInteger,BigInteger> unitPhaseIdsMap,CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Map<Long, BigInteger> parentUnitActivityMap, CTABasicDetailsDTO ctaBasicDetailsDTO, OrganizationBasicDTO organization) {
         CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CostTimeAgreement.class);
         // Set activity Ids according to unit activity Ids
         organisationCTA.setId(null);
-        costTimeAgreementService.assignOrganisationActivitiesToRuleTemplate(collectiveTimeAgreementDTO.getRuleTemplates(),parentUnitActivityMap);
+
+        costTimeAgreementService.assignOrganisationActivitiesToRuleTemplate(unitPhaseIdsMap,collectiveTimeAgreementDTO.getRuleTemplates(),parentUnitActivityMap);
        /* for (CTARuleTemplateDTO ruleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
             List<BigInteger> parentActivityIds = ruleTemplateDTO.getActivityIds();
             if(parentActivityIds!=null){
