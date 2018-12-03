@@ -987,11 +987,11 @@ public class ShiftService extends MongoBaseService {
             StaffAccessGroupDTO staffAccessGroupDTO = genericIntegrationService.getStaffAccessGroupDTO(unitId);
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    if (shiftActivitiyIds.contains(shiftActivity.getId())) {
-                        Phase phase = phaseListByDate.get(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()));
+                    if (shiftActivitiyIds.contains(shiftActivity.getActivityId())) {
+                        Phase phase = phaseListByDate.get(shift.getActivities().get(0).getStartDate());
                         PhaseSettingsActivityTab phaseSettingsActivityTab = activityPhaseSettingMap.get(shiftActivity.getActivityId());
                         PhaseTemplateValue phaseTemplateValue = phaseSettingsActivityTab.getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
-                        ActivityShiftStatusSettings activityShiftStatusSettings = phaseTemplateValue.getActivityShiftStatusSettings().stream().filter(a -> a.getShiftStatus().equals(shiftPublishDTO.getStatus())).findAny().get();
+                        ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue,shiftPublishDTO.getStatus());
                         boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
@@ -1118,7 +1118,7 @@ public class ShiftService extends MongoBaseService {
 
 
     private boolean validateAccessGroup(ActivityShiftStatusSettings activityShiftStatusSettings, StaffAccessGroupDTO staffAccessGroupDTO) {
-        return activityShiftStatusSettings != null && CollectionUtils.containsAny(activityShiftStatusSettings.getAccessGroupIds(), staffAccessGroupDTO.getAccessGroupIds());
+        return activityShiftStatusSettings != null && staffAccessGroupDTO !=null && CollectionUtils.containsAny(activityShiftStatusSettings.getAccessGroupIds(), staffAccessGroupDTO.getAccessGroupIds());
     }
 
 
@@ -1367,6 +1367,16 @@ public class ShiftService extends MongoBaseService {
             //Intentionally left blank to avoid ArrayIndexOutOfBoundsException
         }
         return shiftActivities;
+    }
+    private ActivityShiftStatusSettings getActivityShiftStatusSettingByStatus(PhaseTemplateValue phaseTemplateValue,ShiftStatus status){
+        ActivityShiftStatusSettings activityShiftStatusSettings=null;
+        for (ActivityShiftStatusSettings statusSettings:phaseTemplateValue.getActivityShiftStatusSettings()){
+            if(status.equals(statusSettings.getShiftStatus())){
+                activityShiftStatusSettings=statusSettings;
+                break;
+            }
+        }
+        return activityShiftStatusSettings;
     }
 
 }
