@@ -12,6 +12,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.dto.user.employment.employment_dto.MainEmploymentResultDTO;
+import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
@@ -868,5 +869,15 @@ public class EmploymentService {
         employment.setMainEmployment(false);
         employmentGraphRepository.save(employment);
         return true;
+    }
+
+    public void verifyMainUnitPositionAndEmployment(UnitPositionDTO unitPositionDTO){
+        User user=userGraphRepository.getUserByStaffId(unitPositionDTO.getStaffId());
+        List<Employment>  mainEmployments=employmentGraphRepository.findAllMainEmploymentsByUserId(user.getId(),unitPositionDTO.getStartDate(),unitPositionDTO.getEndDate());
+        Employment currentEmployment=mainEmployments.stream().filter(emp->emp.getStaff().getId().equals(unitPositionDTO.getStaffId())).findFirst().orElse(null);
+        mainEmployments.forEach(employment -> {
+
+        });
+
     }
 }

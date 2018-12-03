@@ -2,26 +2,18 @@ package com.kairos.service.unit_position;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.utils.ArrayUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-
-import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
@@ -35,11 +27,12 @@ import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.unit_position.*;
-import com.kairos.persistence.model.user.unit_position.query_result.*;
+import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -90,7 +83,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -224,6 +216,9 @@ public class UnitPositionService {
                 new UnitPosition(positionCode, organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft);
 
         preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
+        if(employment.isMainEmployment()){
+            unitPosition.setMainUnitPosition(true);
+        }
 
         unitPositionGraphRepository.save(unitPosition);
         CTAWTAWrapper ctawtaWrapper = assignCTAAndWTAToUnitPosition(unitPosition, unitPositionDTO);
@@ -575,7 +570,6 @@ public class UnitPositionService {
         positionLine.setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60) + unitPositionDTO.getTotalWeeklyMinutes());
         positionLine.setHourlyCost(unitPositionDTO.getHourlyCost());
         positionLine.setStartDate(unitPositionDTO.getStartDate());
-        //positionLine.setFunctions(functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctions()));
         positionLine.setEndDate(unitPositionDTO.getEndDate());
     }
 
@@ -825,14 +819,6 @@ public class UnitPositionService {
             unitPositionDetailsList.add(unitPositionDetail);
         });
 
-        // convertUnitPositionObject(unitPosition, unitPositionDetails);
-//  com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-//        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());
-//        if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
-//            unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
-//            unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-//
-//        }
         return unitPositionDetailsList;
     }
 
@@ -906,8 +892,6 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.unitposition.expertise.notfound", expertiseId);
 
         }
-
-
         CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
         if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getCta())) {
             exceptionService.dataNotFoundByIdException("message.organization.cta.notfound", organization.getId());
@@ -1049,6 +1033,4 @@ public class UnitPositionService {
         }
         return unitPositionDTOList;
     }
-
-
 }
