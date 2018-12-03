@@ -316,7 +316,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Map<String, Object>> getParentOrganization(long parentId);
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org " +
-            "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->() WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
+            "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->(child:Organization:{isEnable:true,boardingCompleted: true,union:false}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
     @Query("MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]-(o:Organization) WHERE id(o)= {0}  WITH c,r\n" +
