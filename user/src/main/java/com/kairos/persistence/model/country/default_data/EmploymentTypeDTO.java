@@ -24,6 +24,10 @@ public class EmploymentTypeDTO {
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
     private PaidOutFrequencyEnum paymentFrequency;
+    //Added By Pavan
+    private boolean editableAtUnitPosition;
+    private Short weeklyMinutes;
+    private boolean mainEmployment;
 
     public EmploymentTypeDTO() {
         //Default Constructor
@@ -91,6 +95,30 @@ public class EmploymentTypeDTO {
 
     public void setPaymentFrequency(PaidOutFrequencyEnum paymentFrequency) {
         this.paymentFrequency = paymentFrequency;
+    }
+
+    public boolean isEditableAtUnitPosition() {
+        return editableAtUnitPosition;
+    }
+
+    public void setEditableAtUnitPosition(boolean editableAtUnitPosition) {
+        this.editableAtUnitPosition = editableAtUnitPosition;
+    }
+
+    public Short getWeeklyMinutes() {
+        return weeklyMinutes;
+    }
+
+    public void setWeeklyMinutes(Short weeklyMinutes) {
+        this.weeklyMinutes = weeklyMinutes;
+    }
+
+    public boolean isMainEmployment() {
+        return mainEmployment;
+    }
+
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
     }
 
     @AssertTrue(message = "At least one role should be selected")

@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
+
 /**
  * Created by prerna on 2/11/17.
  */
@@ -27,13 +28,17 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
     private PaidOutFrequencyEnum paymentFrequency;
+    //Added By Pavan
+    private boolean editableAtUnitPosition;
+    private Short weeklyMinutes;
+    private boolean mainEmployment;
 
     public EmploymentType() {
         //Default Constructor
     }
 
-    public EmploymentType(@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson,
-                          boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency) {
+    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtUnitPosition, boolean mainEmployment) {
+        this.id=id;
         this.name = name;
         this.description = description;
         this.allowedForContactPerson = allowedForContactPerson;
@@ -41,6 +46,8 @@ public class EmploymentType extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
         this.employmentCategories = employmentCategories;
         this.paymentFrequency = paymentFrequency;
+        this.editableAtUnitPosition = editableAtUnitPosition;
+        this.mainEmployment = mainEmployment;
     }
 
     public String getName() {
@@ -99,4 +106,27 @@ public class EmploymentType extends UserBaseEntity {
         this.paymentFrequency = paymentFrequency;
     }
 
+    public boolean isEditableAtUnitPosition() {
+        return editableAtUnitPosition;
+    }
+
+    public void setEditableAtUnitPosition(boolean editableAtUnitPosition) {
+        this.editableAtUnitPosition = editableAtUnitPosition;
+    }
+
+    public Short getWeeklyMinutes() {
+        return weeklyMinutes;
+    }
+
+    public void setWeeklyMinutes(Short weeklyMinutes) {
+        this.weeklyMinutes = weeklyMinutes;
+    }
+
+    public boolean isMainEmployment() {
+        return mainEmployment;
+    }
+
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
+    }
 }
