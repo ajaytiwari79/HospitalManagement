@@ -443,6 +443,7 @@ public class UserService {
                         .filter(unitModuleAccess -> unitModuleAccess.getUnitId().equals(userPermissionQueryResult.getUnitId()))
                         .findAny().map(u -> u.getAccessibleModules())
                         .orElse(new ArrayList<>());
+                logger.info("Adding data for unit {} ",userPermissionQueryResult.getUnitId());
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
