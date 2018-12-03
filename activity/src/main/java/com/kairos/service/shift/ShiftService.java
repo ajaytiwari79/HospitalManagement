@@ -1373,6 +1373,7 @@ public class ShiftService extends MongoBaseService {
         for (ActivityShiftStatusSettings statusSettings:phaseTemplateValue.getActivityShiftStatusSettings()){
             if(status.equals(statusSettings.getShiftStatus())){
                 activityShiftStatusSettings=statusSettings;
+                break;
             }
         }
         return activityShiftStatusSettings;
