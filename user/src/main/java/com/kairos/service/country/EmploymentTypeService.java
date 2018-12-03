@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.ONE_WEEK_MINUTES;
+
 
 /**
  * Created by prerna on 2/11/17.
@@ -109,7 +111,7 @@ public class EmploymentTypeService {
         EmploymentType employmentType=new EmploymentType(employmentTypeToUpdate.getId(),employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
                 employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
                 employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMainEmployment());
-        employmentTypeToUpdate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
+        employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         return employmentTypeGraphRepository.save(employmentType);
     }
 
@@ -251,6 +253,9 @@ public class EmploymentTypeService {
         }
         if(employmentTypeDTO.getWeeklyMinutes()==null){
             exceptionService.actionNotPermittedException("error.weekly_minutes.absent");
+        }
+        if(employmentTypeDTO.getWeeklyMinutes()>ONE_WEEK_MINUTES){
+            exceptionService.actionNotPermittedException("error.weekly_minutes.exceeds");
         }
     }
 
