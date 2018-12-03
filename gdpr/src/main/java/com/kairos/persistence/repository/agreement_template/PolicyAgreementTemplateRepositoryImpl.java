@@ -5,6 +5,7 @@ import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -41,6 +43,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     private ObjectMapper objectMapper;
 
     private String replaceRoot = "{'$replaceRoot': { 'newRoot': '$agreementSections' } }";
+    private String replaceClauseRoot="{'$replaceRoot': { 'newRoot': '$clause' } }";
 
 
     @Override
@@ -197,6 +200,27 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
             return clauseIds.stream().filter(clauseId -> clauseIdList.contains(clauseId.toString())).collect(Collectors.toSet());
         }
         return clauseIdList;
+    }
+
+    @Override
+    public List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
+        Criteria criteria= isUnitId ?Criteria.where(ORGANIZATION_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false) : Criteria.where(COUNTRY_ID).is(referenceId).and("_id").ne(agreementTemplateId).and(DELETED).is(false);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
+                unwind("agreementSections"),
+                new CustomAggregationOperation(Document.parse(replaceRoot)),
+                lookup("clause", "clauseIdOrderedIndex", "_id", "clause"),
+                lookup("agreementSection", "subSections", "_id", "subSections"),
+                unwind("subSections", true),
+                lookup("clause", "subSections.clauseIdOrderedIndex", "_id", "clausesSubSection"),
+                project().and("clause").concatArrays("clausesSubSection","clause"),
+                unwind("clause", true),
+                new CustomAggregationOperation(Document.parse(replaceClauseRoot)),
+                project("id","description")
+        );
+        AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, ClauseBasicResponseDTO.class);
+        return result.getMappedResults();
     }
 
 
