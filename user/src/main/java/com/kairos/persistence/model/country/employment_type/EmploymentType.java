@@ -2,14 +2,12 @@ package com.kairos.persistence.model.country.employment_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.EmploymentCategory;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
