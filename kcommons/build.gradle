@@ -1,8 +1,9 @@
-version '0.0.1-SNAPSHOT'
+version '0.0.1'
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+
 sourceCompatibility = 1.8
 
 repositories {
@@ -32,4 +33,3 @@ dependencies {
     //compile 'org.neo4j:neo4j:3.3.4'
 
 }
-

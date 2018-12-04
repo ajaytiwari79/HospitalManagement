@@ -184,7 +184,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
     public AgreementTemplateSectionResponseDTO getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId) {
-
         PolicyAgreementTemplate template = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndId(referenceId, agreementTemplateId) : policyAgreementTemplateRepository.findByCountryIdAndId(referenceId, agreementTemplateId);
         if (!Optional.ofNullable(template).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
@@ -210,6 +209,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     }
                 }
         );
+        List<ClauseBasicResponseDTO> clauseBasicResponseDTOS=policyAgreementTemplateRepository.getAllClausesByAgreementTemplateIdNotEquals(referenceId,isUnitId,agreementTemplateId);
+       Map<BigInteger,ClauseBasicResponseDTO> clauseBasicResponseDTOMap=clauseBasicResponseDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v ,(p1, p2) -> p1));
+        clauseListForTemplate.stream().forEach(clauseBasicResponseDTO -> {
+            if(clauseBasicResponseDTOMap.get(clauseBasicResponseDTO.getId())!=null){
+                clauseBasicResponseDTO.setLinkedWithOtherTemplate(true);
+            }
+        });
         agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
         agreementTemplateResponse.setSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
@@ -235,7 +241,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 clause.setTitleHtml(clauseCkEditorVO.getTitleHtml());
                 clause.setDescriptionHtml(clauseCkEditorVO.getDescriptionHtml());
             }
-
             clauses.add(clause);
         }
         agreementSectionResponseDTO.setClauses(clauses);
