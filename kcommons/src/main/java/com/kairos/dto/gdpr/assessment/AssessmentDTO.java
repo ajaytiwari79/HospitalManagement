@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
@@ -35,6 +36,8 @@ public class AssessmentDTO {
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
+    private int relativeDeadlineDuration;
+    private DurationType relativeDeadType;
 
     public BigInteger getId() { return id; }
 
@@ -79,4 +82,21 @@ public class AssessmentDTO {
     public LocalDate getStartDate() { return startDate; }
 
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public int getRelativeDeadlineDuration() {
+        return relativeDeadlineDuration;
+    }
+
+    public void setRelativeDeadlineDuration(int relativeDeadlineDuration) {
+        this.relativeDeadlineDuration = relativeDeadlineDuration;
+    }
+
+    public DurationType getRelativeDeadType() {
+        return relativeDeadType;
+    }
+
+    public void setRelativeDeadType(DurationType relativeDeadType) {
+        this.relativeDeadType = relativeDeadType;
+    }
+
 }

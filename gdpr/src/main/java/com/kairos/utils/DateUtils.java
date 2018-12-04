@@ -1,5 +1,6 @@
 package com.kairos.utils;
 
+import com.kairos.enums.DurationType;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -386,6 +387,24 @@ public class DateUtils {
         }
 
         return timeZone.getRawOffset() + timeZoneDSTOffset;
+    }
+
+    public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber) {
+        switch (durationType) {
+            case DAYS: {
+                return localDate.plusDays(duration * recurringNumber);
+            }
+            case WEEKS: {
+                return localDate.plusDays(duration * recurringNumber * 7);
+            }
+            case MONTHS: {
+                return localDate.plusMonths(duration * recurringNumber);
+            }
+            case YEAR: {
+                return localDate.plusYears(duration * recurringNumber);
+            }
+        }
+        return localDate;
     }
 
 }

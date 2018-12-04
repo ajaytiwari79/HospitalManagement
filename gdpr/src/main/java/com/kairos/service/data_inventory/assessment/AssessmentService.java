@@ -6,6 +6,7 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
@@ -43,6 +44,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireT
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
@@ -126,7 +128,6 @@ public class AssessmentService extends MongoBaseService {
      * @return
      */
     public AssessmentDTO launchAssessmentForAsset(Long unitId, BigInteger assetId, AssessmentDTO assessmentDTO) {
-
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentMongoRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndAssetId(unitId, assetId) : assessmentMongoRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
@@ -135,6 +136,7 @@ public class AssessmentService extends MongoBaseService {
         if (!Optional.ofNullable(assetResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
+        validateLaunchAssessmentDate(assessmentDTO);
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
         Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, assetResponseDTO) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, assetResponseDTO);
         assessment.setAssetId(assetId);
@@ -148,6 +150,20 @@ public class AssessmentService extends MongoBaseService {
         return assessmentDTO;
     }
 
+    private void validateLaunchAssessmentDate(AssessmentDTO assessmentDTO){
+            if(assessmentDTO.getRelativeDeadType().equals(DurationType.DAYS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=30)){
+              exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+            }else if(assessmentDTO.getRelativeDeadType().equals(DurationType.HOURS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=24)){
+                exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+            }else if(assessmentDTO.getRelativeDeadType().equals(DurationType.MONTHS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=12)){
+                exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+            }else {
+                LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadType(), 1);
+                if(endDate.isAfter(assessmentDTO.getEndDate())){
+                    exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+                }
+            }
+    }
 
     /**
      * @param unitId
