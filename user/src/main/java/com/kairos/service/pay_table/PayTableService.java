@@ -566,9 +566,14 @@ public class PayTableService {
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
+        PayTable parentPayTable=null;
+        if(!payTable.isPublished()){
+             parentPayTable=payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
+        }
+
         List<PayGradeResponse> payGradeResponses=null;
         payTable.setPercentageValue(payTableDTO.getPercentageValue());
-        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
+        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(parentPayTable==null?payTableRelationShipGraphRepository.findAllByPayTableId(payTableId):payTableRelationShipGraphRepository.findAllByPayTableId(parentPayTable.getId()), PayGradePayGroupAreaRelationShip.class);
             if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
                 for (PayGradePayGroupAreaRelationShip current : payGradePayGroupAreaRelationShips) {
                     if (current.getPayGroupAreaAmount() != null) {
