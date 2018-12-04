@@ -631,6 +631,7 @@ public class ShiftService extends MongoBaseService {
             saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,true,staffAdditionalInfoDTO.getTimeSlotSets());
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
+            shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
             //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
