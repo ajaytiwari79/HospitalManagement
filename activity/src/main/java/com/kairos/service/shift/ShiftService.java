@@ -634,6 +634,7 @@ public class ShiftService extends MongoBaseService {
             saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,true,staffAdditionalInfoDTO.getTimeSlotSets());
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
+            shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
             //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
             Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
@@ -1149,6 +1150,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public ShiftWithViolatedInfoDTO updateShift(Long unitId, ShiftDTO shiftDTO,
+
                                                 String type, Boolean validatedByStaff) {
         UserAccessRoleDTO userAccessRoleDTO=genericIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
@@ -1156,7 +1158,7 @@ public class ShiftService extends MongoBaseService {
         } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.validation.access");
         }
-        Phase phase=phaseMongoRepository.findByUnitIdAndName(unitId,PhaseDefaultName.REALTIME.toString());
+        Phase phase=phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.REALTIME.toString());
         Map<String,Phase> phaseMap=new HashMap<>();
         phaseMap.put(phase.getPhaseEnum().toString(),phase);
         if(shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
