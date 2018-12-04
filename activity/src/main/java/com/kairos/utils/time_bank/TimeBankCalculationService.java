@@ -94,7 +94,7 @@ public class TimeBankCalculationService {
                 functionId= appliedFunctionDTO.get().getId();
             }
             Long requiredFunctionId=ctaDto.getFunctionId()!=null?ctaDto.getFunctionId():functionId;
-            int totalWeeklyMinutes = ctaDto.getTotalWeeklyMinutes() + (ctaDto.getTotalWeeklyHours() * 60);
+            int totalWeeklyMinutes = ctaDto.getTotalWeeklyMinutes();
             dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(ctaDto.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate())));
             int totalDailyTimebank = 0;
             int dailyScheduledMin = 0;

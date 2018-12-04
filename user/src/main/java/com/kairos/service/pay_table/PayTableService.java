@@ -1,9 +1,9 @@
 package com.kairos.service.pay_table;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.country.pay_table.PayTableDTO;
+import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
@@ -22,8 +22,6 @@ import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.country.pay_table.PayTableDTO;
-import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.utils.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -38,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static javax.management.timer.Timer.ONE_DAY;
@@ -261,13 +260,13 @@ public class PayTableService {
         if (!payTable.isPublished()) {
             payGradesData.add(addPayGradeInCurrentPayTable(payTable, payGradeDTO));
         } else {
-            payGradesData = createCopyOfPayTableAndAddPayGrade(payTable, payGradeDTO, null, false);
+            payGradesData = createCopyOfPayTableAndAddPayGrade(payTable, payGradeDTO, null);
         }
         return payGradesData;
 
     }
 
-    private List<PayGradeResponse> createCopyOfPayTableAndAddPayGrade(PayTable payTable, PayGradeDTO payGradeDTO, List<PayGradePayGroupAreaRelationShip> payGradesPayGroupAreaRelationShips, boolean updateValues) {
+    private List<PayGradeResponse> createCopyOfPayTableAndAddPayGrade(PayTable payTable, PayGradeDTO payGradeDTO, List<PayGradePayGroupAreaRelationShip> payGradesPayGroupAreaRelationShips) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         PayTable copiedPayTable = new PayTable();
         BeanUtils.copyProperties(payTable, copiedPayTable);
@@ -282,10 +281,10 @@ public class PayTableService {
         payTableGraphRepository.save(copiedPayTable);
         // copying all previous and then adding in pay Table as well.
         List<PayGrade> payGradesObjects = new ArrayList<>();
-        for (PayGrade currentPayGrade : payTable.getPayGrades()) {
-            PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
-            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = payGradesPayGroupAreaRelationShips == null ? new ArrayList<>() : payGradesPayGroupAreaRelationShips;
-            if (!updateValues) {
+        if(CollectionUtils.isEmpty(payGradesPayGroupAreaRelationShips)) {
+            for (PayGrade currentPayGrade : payTable.getPayGrades()) {
+                PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
+                List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
                 HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
 
                 payTableMatrix.forEach(currentObj -> {
@@ -293,21 +292,28 @@ public class PayTableService {
                             = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
                     payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
                 });
+                payGradesObjects.add(newPayGrade);
+                PayGradeResponse payGradeResponse =
+                        new PayGradeResponse(copiedPayTable.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
+                payGradeResponses.add(payGradeResponse);
             }
-            if (payGradesPayGroupAreaRelationShips != null) {
-                payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
-                Map<Long, Long> payGradeMap = payGradePayGroupAreaRelationShips.stream().collect(Collectors.toMap(k -> k.getPayGrade().getPayGradeLevel(), k -> k.getPayGrade().getId()));
-                newPayGrade.setId(payGradeMap.get(newPayGrade.getPayGradeLevel()));
-            }
-            payGradesObjects.add(newPayGrade);
-            PayGradeResponse payGradeResponse =
-                    new PayGradeResponse(copiedPayTable.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
-            payGradeResponses.add(payGradeResponse);
+        }
+        else {
+            Set<PayGrade> payGrades=payGradesPayGroupAreaRelationShips.stream().map(PayGradePayGroupAreaRelationShip::getPayGrade).collect(Collectors.toSet());
+            payGradeGraphRepository.saveAll(payGrades);
+            Map<Long,PayGrade> longPayGradeMap=payGrades.stream().collect(Collectors.toMap(PayGrade::getPayGradeLevel,Function.identity(),(previous,current)->current));
+            payGradesPayGroupAreaRelationShips.forEach(payGradesRelationShips->{
+                payGradesRelationShips.setPayGrade(longPayGradeMap.get(payGradesRelationShips.getPayGrade().getPayGradeLevel()));
+            });
+            payTableRelationShipGraphRepository.saveAll(payGradesPayGroupAreaRelationShips);
+            payGradesObjects.addAll(payGrades);
         }
         // Adding new Grade in PayTable
         copiedPayTable.setPayGrades(payGradesObjects);
         payTableGraphRepository.save(copiedPayTable);
-
+        if(payGradeResponses.isEmpty()){
+            payGradeResponses.add(new PayGradeResponse(copiedPayTable.getId()));
+        }
         return payGradeResponses;
     }
 
@@ -587,7 +593,7 @@ public class PayTableService {
                     }
                 }
                 if(payTable.isPublished()){
-                    payGradeResponses = createCopyOfPayTableAndAddPayGrade(payTable, null, payGradePayGroupAreaRelationShips, true);
+                    payGradeResponses = createCopyOfPayTableAndAddPayGrade(payTable, null, payGradePayGroupAreaRelationShips);
                 }
                 else {
                     payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);

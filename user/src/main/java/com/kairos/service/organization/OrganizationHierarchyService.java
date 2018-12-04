@@ -38,7 +38,7 @@ public class OrganizationHierarchyService {
     private TreeStructureService treeStructureService;
 
     public QueryResult generateHierarchyMinimum(long parentOrganizationId) {
-        List<Map<String, Object>> units = organizationGraphRepository.getParentOrganization(parentOrganizationId);
+        List<Map<String, Object>> units = organizationGraphRepository.getSubOrgHierarchy(parentOrganizationId);
         ObjectMapper objectMapper = new ObjectMapper();
         List<QueryResult> list = new ArrayList<>();
         List<Long> ids = new ArrayList<>();
@@ -135,7 +135,7 @@ public class OrganizationHierarchyService {
      */
     public QueryResult getChildUnits(long parentOrganizationId, long userId, String accessPageId) {
 
-        List<Map<String, Object>> units = organizationGraphRepository.getParentOrganization(parentOrganizationId);
+        List<Map<String, Object>> units = organizationGraphRepository.getSubOrgHierarchy(parentOrganizationId);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
