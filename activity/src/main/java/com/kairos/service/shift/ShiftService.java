@@ -978,7 +978,7 @@ public class ShiftService extends MongoBaseService {
         Set<BigInteger> shiftActivitiyIds = ((Set<BigInteger>) objects[1]);
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
-        Set<BigInteger> allActivities = shiftPublishDTO.getShifts().stream().flatMap(s -> s.getActivityIds().stream().map(a -> a)).collect(Collectors.toSet());
+        Set<BigInteger> allActivities = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
         List<Activity> activities = activityRepository.findAllPhaseSettingsByActivityIds(allActivities);
         Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getPhaseSettingsActivityTab));
         if (!shifts.isEmpty() && objects[1] != null) {
@@ -987,7 +987,7 @@ public class ShiftService extends MongoBaseService {
             StaffAccessGroupDTO staffAccessGroupDTO = genericIntegrationService.getStaffAccessGroupDTO(unitId);
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    if (shiftActivitiyIds.contains(shiftActivity.getActivityId())) {
+                    if (shiftActivitiyIds.contains(shiftActivity.getId())) {
                         Phase phase = phaseListByDate.get(shift.getActivities().get(0).getStartDate());
                         PhaseSettingsActivityTab phaseSettingsActivityTab = activityPhaseSettingMap.get(shiftActivity.getActivityId());
                         PhaseTemplateValue phaseTemplateValue = phaseSettingsActivityTab.getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
