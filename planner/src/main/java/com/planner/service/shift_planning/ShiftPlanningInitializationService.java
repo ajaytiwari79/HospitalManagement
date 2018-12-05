@@ -70,8 +70,8 @@ public class ShiftPlanningInitializationService {
      */
     public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
-        Date fromPlanningDate = null;
-        Date toPlanningDate = null;
+        Date fromPlanningDate;
+        Date toPlanningDate;
         List staffIds = shiftPlanningProblemSubmitDTO.getStaffIds();
         BigInteger planningPeriodId = shiftPlanningProblemSubmitDTO.getPlanningPeriodId();
         if (planningPeriodId != null) {
@@ -114,15 +114,11 @@ public class ShiftPlanningInitializationService {
 
         List<LocalDate> weekDates=new ArrayList<>();
         weekDates.addAll(activitiesPerDayList.keySet());
-        /*LocalDate jodaLocalStartDate=DateUtils.asJodaLocalDate(fromPlanningDate);
-        LocalDate jodaLocalEndDate=DateUtils.asJodaLocalDate(toPlanningDate);
-        while(!jodaLocalStartDate.equals(jodaLocalEndDate) && activitiesPerDay.containsKey(jodaLocalEndDate)){
-            weekDates.add(jodaLocalStartDate);
-            jodaLocalStartDate=jodaLocalStartDate.plusDays(1);
-        }*/
+
         List<ShiftRequestPhase> shiftRequestPhase = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList, dateWiseALIsList);
         Map<LocalDate,Object[]> staffingLevelMatrix=createStaffingLevelMatrix(activityLineIntervalList,15,activitiesPerDayList);
         int[] activitiesRank=activityList.stream().mapToInt(a->a.getRank()).toArray();
+        //
         ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution = new ShiftRequestPhasePlanningSolution();//new ShiftPlanningSolver(getSolverConfigDTO()).solveProblem(problem);
         shiftRequestPhasePlanningSolution.setEmployees(employeeList);
         shiftRequestPhasePlanningSolution.setShifts(shiftRequestPhase);
