@@ -224,6 +224,12 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND LOWER(a.name) = LOWER({1}) AND r.organizationCategory={2} return COUNT(a)>0 ")
     Boolean isCountryAccessGroupExistWithName(Long countryId, String name, String orgCategory);
 
+    @Query("MATCH(accountType:AccountType)-[:"+IN_COUNTRY+"]-(country:Country)-[r:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup{deleted:false}) WHERE id(country)={0} AND LOWER(accessGroup.name) = LOWER({1}) AND r.organizationCategory={2} \n" +
+           "MATCH(accountType)-[:"+HAS_ACCOUNT_TYPE+"]-(accessGroup)\n" +
+            "WHERE id(accountType) IN {3} \n"  +
+            "RETURN COUNT(accessGroup)>0 ")
+    Boolean isCountryAccessGroupExistWithName(Long countryId, String name, String orgCategory,Set<Long> accountTypeId);
+
     @Query("MATCH (o:Organization)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(a:AccessGroup{deleted:false}) WHERE id(o)={0} AND LOWER(a.name) = LOWER({1}) return COUNT(a)>0 ")
     Boolean isOrganizationAccessGroupExistWithName(Long orgId, String name);
 
