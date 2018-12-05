@@ -616,9 +616,8 @@ public class StaffRetrievalService {
             Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
             staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
             List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+            staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
             UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(organization.getId());
-            List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType -> new DayTypeDTO(dayType.getId(),dayType.getName(),dayType.getValidDays(),publicHolidayMap.get(dayType.getId()),dayType.isHolidayType())).collect(Collectors.toList());
-            staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
             staffAdditionalInfoDTO.setUser(userAccessRole);
             if (Optional.ofNullable(unitPosition).isPresent()) {
                 staffAdditionalInfoDTO.setUnitPosition(unitPosition);
