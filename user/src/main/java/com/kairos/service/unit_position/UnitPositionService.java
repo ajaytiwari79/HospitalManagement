@@ -186,7 +186,7 @@ public class UnitPositionService {
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException, Exception {
-        Organization organization = organizationService.getOrganizationDetail(id, type);
+        Organization organization = organizationService.getOrganizationDetail(unitPositionDTO.getUnitId(), type);
         Organization parentOrganization;
 
         PositionCode positionCode;
