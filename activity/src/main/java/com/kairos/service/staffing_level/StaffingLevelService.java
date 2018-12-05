@@ -478,7 +478,7 @@ public class StaffingLevelService extends MongoBaseService {
         LocalTime fromTime;
         LocalTime toTime;
         Set<StaffingLevelActivity> activitySet;
-        Map<BigInteger,Integer> activityRankMap;
+        Map<BigInteger,Integer> activityRankMap = new HashMap<>();
 
 
         Date date = null;
@@ -507,6 +507,7 @@ public class StaffingLevelService extends MongoBaseService {
 
                 staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
                 staffingDtoList.add(staffingDTO);
+                activityRankMap = new HashMap<>();
 
                 seq = 0;
                 staffingDTO = new PresenceStaffingLevelDto();
@@ -558,6 +559,7 @@ public class StaffingLevelService extends MongoBaseService {
             activitySet = new HashSet<StaffingLevelActivity>();
             Iterator<String> keyFirstItr = singleData.keySet().iterator();
 
+            int rank = 0;
 
             while (keyFirstItr.hasNext()) {
                 String keyTemp = keyFirstItr.next();
@@ -567,7 +569,7 @@ public class StaffingLevelService extends MongoBaseService {
                     if (activityDB != null) {
                         StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId(), keyTemp, Integer.parseInt(singleData.get(keyTemp)), Integer.parseInt(singleData.get(keyTemp)));
                         activitySet.add(staffingLevelActivity);
-                      //  activityRankMap.put(activityDB.getId(),)
+                        activityRankMap.put(activityDB.getId(),++rank);
                     }
                 }
             }
@@ -575,7 +577,7 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevelTimeSlList.add(staffingLevelTimeSlot);
         }
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
-       // staffingDTO.getStaffingLevelSetting().setActivitiesRank(activityRankMap);
+        staffingDTO.getStaffingLevelSetting().setActivitiesRank(activityRankMap);
         staffingDtoList.add(staffingDTO);
 
         staffingDtoList.forEach(staffingLevelDto -> {
@@ -618,7 +620,7 @@ public class StaffingLevelService extends MongoBaseService {
         processRecords:
         for (Map<String, String> dayRecord : recordIndexes) {
 
-            fromToTimeRecord = new HashMap<>();
+            fromToTimeRecord = new LinkedHashMap<>();
             fromToTimeRecord.put("forDay", dayRecord.get("selectedDay"));
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>(timeRecords.size());
             for (CSVRecord csvRecord : timeRecords) {

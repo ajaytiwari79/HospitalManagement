@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class StaffingLevelUtil {
 
     public static StaffingLevel buildPresenceStaffingLevels(PresenceStaffingLevelDto presenceStaffingLevelDTO, Long orgId){
-        presenceStaffingLevelDTO.getStaffingLevelSetting().setActivitiesRank(null);
+       // presenceStaffingLevelDTO.getStaffingLevelSetting().setActivitiesRank(null);
         StaffingLevel staffingLevel=new StaffingLevel(presenceStaffingLevelDTO.getCurrentDate(), presenceStaffingLevelDTO.getWeekCount()
                 ,orgId, presenceStaffingLevelDTO.getPhaseId(), presenceStaffingLevelDTO.getStaffingLevelSetting());
 
