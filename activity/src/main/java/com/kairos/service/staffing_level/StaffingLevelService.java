@@ -49,6 +49,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -541,6 +542,7 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevelTimeSlot = new StaffingLevelTimeSlotDTO(seq++, Integer.parseInt(singleData.get("min")), Integer.parseInt(singleData.get("max")), duration);
 
             activitySet = new HashSet<StaffingLevelActivity>();
+            Map<BigInteger,Integer>
             Iterator<String> keyFirstItr = singleData.keySet().iterator();
 
             while (keyFirstItr.hasNext()) {
