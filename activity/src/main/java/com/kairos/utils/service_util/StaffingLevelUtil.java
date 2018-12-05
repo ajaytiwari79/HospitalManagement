@@ -107,8 +107,8 @@ public class StaffingLevelUtil {
                 activitiesRankMap.forEach((activityId, rank) -> {
                     staffingLevelActivities[rank - 1] = staffingLevelActivityMap.get(activityId);
                 });
+                staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
             }
-            staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
 
         }
 
