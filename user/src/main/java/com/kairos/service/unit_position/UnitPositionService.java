@@ -1040,8 +1040,6 @@ public class UnitPositionService {
                 exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
             } else if (STAFF.equals(object)) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
-            } else if (EMPLOYMENT.equals(object)) {
-                exceptionService.dataNotFoundByIdException("error.Employement.notExist", unitId, staffId);
             }
         }else {
             List<Map<Object, Object>> unitPositions = (List<Map<Object, Object>>) object;
