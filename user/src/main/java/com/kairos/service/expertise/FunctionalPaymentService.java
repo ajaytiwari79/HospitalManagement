@@ -341,14 +341,15 @@ public class FunctionalPaymentService {
         List<FunctionalPaymentMatrix> list = new ArrayList<>();
         List<Function> functions = getFunctionList(functionalPaymentMatrixQueryResults);
         List<SeniorityLevel> seniorityLevels = getSeniorityLevelList(functionalPaymentMatrixQueryResults);
-
-        functionalPaymentMatrixQueryResults.forEach(functionalPaymentMatrixQueryResult -> {
-            FunctionalPaymentMatrix functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrixQueryResult, seniorityLevels, functions,percentageValue);
-            functionalPaymentMatrixQueryResult.setId(functionalPaymentMatrix.getId());
-            list.add(functionalPaymentMatrix);
-        });
+       FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
+       for (FunctionalPaymentMatrixQueryResult functionalPaymentMatrixQueryResult:functionalPaymentMatrixQueryResults){
+           functionalPaymentMatrix = addMatrixInFunctionalPayment(functionalPaymentMatrix,functionalPaymentMatrixQueryResult, seniorityLevels, functions,percentageValue);
+           functionalPaymentMatrixQueryResult.setId(functionalPaymentMatrix.getId());
+           list.add(functionalPaymentMatrix);
+       }
+       functionalPaymentMatrixRepository.save(functionalPaymentMatrix);
        functionalPayment.setFunctionalPaymentMatrices(list);
-        functionalPaymentGraphRepository.save(functionalPayment);
+       functionalPaymentGraphRepository.save(functionalPayment);
     }
 
     private List<Function> getFunctionList(List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrixQueryResults) {
@@ -374,16 +375,14 @@ public class FunctionalPaymentService {
         return seniorityLevelGraphRepository.findAll(seniorityLevelIds);
     }
 
-    private FunctionalPaymentMatrix addMatrixInFunctionalPayment(FunctionalPaymentMatrixQueryResult functionalPaymentMatrixQueryResult, List<SeniorityLevel> seniorityLevels, List<Function> functions,BigDecimal percentageValue) {
-        FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
+    private FunctionalPaymentMatrix addMatrixInFunctionalPayment( FunctionalPaymentMatrix functionalPaymentMatrix,FunctionalPaymentMatrixQueryResult functionalPaymentMatrixQueryResult, List<SeniorityLevel> seniorityLevels, List<Function> functions,BigDecimal percentageValue) {
         if (Optional.ofNullable(functionalPaymentMatrixQueryResult.getPayGroupAreasIds()).isPresent() && !functionalPaymentMatrixQueryResult.getPayGroupAreasIds().isEmpty()) {
             List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixQueryResult.getPayGroupAreasIds());
             if (payGroupAreas.size() != functionalPaymentMatrixQueryResult.getPayGroupAreasIds().size())
                 exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
         }
-        functionalPaymentMatrix.setSeniorityLevelFunction(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue));
-        functionalPaymentMatrixRepository.save(functionalPaymentMatrix);
+        functionalPaymentMatrix.getSeniorityLevelFunction().addAll(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue));
         return functionalPaymentMatrix;
     }
 
