@@ -136,7 +136,7 @@ public class AssessmentService extends MongoBaseService {
         if (!Optional.ofNullable(assetResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
-        validateLaunchAssessmentDate(assessmentDTO);
+        validateLaunchAssessmentValue(assessmentDTO);
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
         Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, assetResponseDTO) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, assetResponseDTO);
         assessment.setAssetId(assetId);
@@ -150,17 +150,17 @@ public class AssessmentService extends MongoBaseService {
         return assessmentDTO;
     }
 
-    private void validateLaunchAssessmentDate(AssessmentDTO assessmentDTO){
+    private void validateLaunchAssessmentValue(AssessmentDTO assessmentDTO){
             if(assessmentDTO.getRelativeDeadType().equals(DurationType.DAYS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=30)){
-              exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+              exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
             }else if(assessmentDTO.getRelativeDeadType().equals(DurationType.HOURS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=24)){
-                exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
             }else if(assessmentDTO.getRelativeDeadType().equals(DurationType.MONTHS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=12)){
-                exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
             }else {
                 LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadType(), 1);
                 if(endDate.isAfter(assessmentDTO.getEndDate())){
-                    exceptionService.illegalArgumentException("message.assessment.relativedeadline.vaule");
+                    exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
                 }
             }
     }
