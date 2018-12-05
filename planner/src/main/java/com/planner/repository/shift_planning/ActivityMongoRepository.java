@@ -7,6 +7,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
+import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.domain.shift_planning.Shift;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,14 +18,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import static com.planner.constants.AppConstants.*;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * Here data comes from Activity Micro-service
@@ -142,4 +142,11 @@ public class ActivityMongoRepository {
         return aggregationResults.getMappedResults();
     }
 
+    //
+    public com.kairos.dto.planner.planninginfo.PlanningProblemDTO getPlanningPeriod(BigInteger planningPeriodId,Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("_id").is(planningPeriodId).and("unitId").is(unitId)));
+        AggregationResults<com.kairos.dto.planner.planninginfo.PlanningProblemDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "planningPeriod", com.kairos.dto.planner.planninginfo.PlanningProblemDTO.class);
+        return aggregationResults.getMappedResults().get(0);
+    }
 }

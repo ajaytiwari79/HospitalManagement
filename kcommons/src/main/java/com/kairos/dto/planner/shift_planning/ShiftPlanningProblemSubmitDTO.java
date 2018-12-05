@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ShiftPlanningProblemSubmitDTO {
 
-    private Long planningProblemId;
+    private BigInteger planningProblemId;
     private List<Long> staffIds=new ArrayList<>();
     private Long unitId;
     private BigInteger planningPeriodId;
@@ -34,11 +34,11 @@ public class ShiftPlanningProblemSubmitDTO {
         this.endDate = LocalDate.parse(endDate,formatter);
     }
 
-    public Long getPlanningProblemId() {
+    public BigInteger getPlanningProblemId() {
         return planningProblemId;
     }
 
-    public void setPlanningProblemId(Long planningProblemId) {
+    public void setPlanningProblemId(BigInteger planningProblemId) {
         this.planningProblemId = planningProblemId;
     }
 

@@ -21,6 +21,7 @@ import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.planner.domain.query_results.staff.StaffQueryResult;
 import com.planner.domain.shift_planning.Shift;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
@@ -74,8 +75,7 @@ public class ShiftPlanningInitializationService {
         List staffIds = shiftPlanningProblemSubmitDTO.getStaffIds();
         BigInteger planningPeriodId = shiftPlanningProblemSubmitDTO.getPlanningPeriodId();
         if (planningPeriodId != null) {
-            //TODO fetch
-            PlanningPeriodDTO planningPeriodDTO = new PlanningPeriodDTO();
+            com.kairos.dto.planner.planninginfo.PlanningProblemDTO planningPeriodDTO = activityMongoService.getPlanningPeriod(planningPeriodId,unitId);
             fromPlanningDate = DateUtils.asDate(planningPeriodDTO.getStartDate());
             toPlanningDate = DateUtils.asDate(planningPeriodDTO.getEndDate());
         } else {
@@ -113,15 +113,16 @@ public class ShiftPlanningInitializationService {
         //
 
         List<LocalDate> weekDates=new ArrayList<>();
-        LocalDate jodaLocalStartDate=DateUtils.asJodaLocalDate(fromPlanningDate);
+        weekDates.addAll(activitiesPerDayList.keySet());
+        /*LocalDate jodaLocalStartDate=DateUtils.asJodaLocalDate(fromPlanningDate);
         LocalDate jodaLocalEndDate=DateUtils.asJodaLocalDate(toPlanningDate);
-        while(!jodaLocalStartDate.equals(jodaLocalEndDate)){
+        while(!jodaLocalStartDate.equals(jodaLocalEndDate) && activitiesPerDay.containsKey(jodaLocalEndDate)){
             weekDates.add(jodaLocalStartDate);
             jodaLocalStartDate=jodaLocalStartDate.plusDays(1);
-        }
-        Map<LocalDate,Object[]> staffingLevelMatrix=createStaffingLevelMatrix(weekDates,activityLineIntervalList,15,activityList);
-        int[] activitiesRank=activityList.stream().mapToInt(a->a.getRank()).toArray();
+        }*/
         List<ShiftRequestPhase> shiftRequestPhase = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList, dateWiseALIsList);
+        Map<LocalDate,Object[]> staffingLevelMatrix=createStaffingLevelMatrix(activityLineIntervalList,15,activitiesPerDayList);
+        int[] activitiesRank=activityList.stream().mapToInt(a->a.getRank()).toArray();
         ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution = new ShiftRequestPhasePlanningSolution();//new ShiftPlanningSolver(getSolverConfigDTO()).solveProblem(problem);
         shiftRequestPhasePlanningSolution.setEmployees(employeeList);
         shiftRequestPhasePlanningSolution.setShifts(shiftRequestPhase);
@@ -132,9 +133,10 @@ public class ShiftPlanningInitializationService {
         shiftRequestPhasePlanningSolution.setUnitId(unitId);
         shiftRequestPhasePlanningSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(staffingLevelMatrix,activitiesRank));
         shiftRequestPhasePlanningSolution.setWeekDates(weekDates);
+        shiftRequestPhasePlanningSolution.setSkillLineIntervals(new ArrayList<>());//Temporary
         ShiftRequestPhasePlanningSolution planningSolution=new ShiftPlanningSolver(getSolverConfigDTO()).solveProblem(shiftRequestPhasePlanningSolution);
 
-        return null;
+        return planningSolution;
     }
 
 
@@ -272,6 +274,8 @@ public class ShiftPlanningInitializationService {
                     ShiftRequestPhase shiftRequestPhase = new ShiftRequestPhase();
                     shiftRequestPhase.setStartDate(DateUtils.asLocalDate(shift.getStartDate()));
                     shiftRequestPhase.setEndDate(DateUtils.asLocalDate(shift.getEndDate()));
+                    shiftRequestPhase.setId(UUID.randomUUID());//Temporary
+                    shiftRequestPhase.setDate(DateUtils.asJodaLocalDate(shift.getStartDate()));//TODO check
                     //Set Appropriate Staff/Employee
                     shiftRequestPhase.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
                     //Set Matched ALI/s on the basis of its [Interval/Duration]
@@ -327,22 +331,26 @@ public class ShiftPlanningInitializationService {
         return applicableCurrentShiftALIs;
     }*/
 
-    public static Map<LocalDate, Object[]> createStaffingLevelMatrix(List<LocalDate> dates, List<ActivityLineInterval> alis,int  granularity,List<Activity> activities){
+    public static Map<LocalDate, Object[]> createStaffingLevelMatrix( List<ActivityLineInterval> alis, int granularity, Map<LocalDate, List<Activity>> activitiesPerDayList){
         Map<LocalDate, Object[]> slMatrix=new HashMap<>();
-        for(LocalDate localDate:dates){
-            slMatrix.put(localDate,new int[1440/granularity][activities.size()*2]);
-        }
-        for(ActivityLineInterval ali:alis){
-            if(ali.getActivity().isBlankActivity())continue;
-            if(ali.getActivity().isTypeAbsence()){
-                IntStream.rangeClosed(0,1440/granularity-1).forEach(i->{
-                    ((int[][])slMatrix.get(ali.getStart().toLocalDate()))[i][getActivityIndex(ali)]++;
-                });
-            }else{
-                ((int[][])slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(),granularity)][getActivityIndex(ali)]++;
+        Set<LocalDate> localDates=activitiesPerDayList.keySet();
+            for (LocalDate localDate : localDates) {
+                List<Activity> activities=activitiesPerDayList.get(localDate);
+                if(CollectionUtils.isNotEmpty(activities)) {
+                    slMatrix.put(localDate, new int[1440 / granularity][activities.size() * 2]);
+                }
             }
-        }
-        printStaffingLevelMatrix(slMatrix,null);
+            for (ActivityLineInterval ali : alis) {
+                if (ali.getActivity().isBlankActivity()) continue;
+                if (ali.getActivity().isTypeAbsence()) {
+                    IntStream.rangeClosed(0, 1440 / granularity - 1).forEach(i -> {
+                        ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[i][getActivityIndex(ali)]++;
+                    });
+                } else {
+                    ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(), granularity)][getActivityIndex(ali)]++;
+                }
+            }
+            printStaffingLevelMatrix(slMatrix, null);
         return slMatrix;
     }
 }
