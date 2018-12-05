@@ -321,9 +321,10 @@ public class FunctionalPaymentService {
 
                     //Creating new and updating values
 
-                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), functionalPaymentQueryResult.getStartDate(),
+                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), DateUtils.asLocalDate(startDate),
                             functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
                     functionalPayment.setParentFunctionalPayment(existing);
+                    functionalPayment.setPublished(functionalPaymentQueryResult.isPublished());
                     updateMatrixInFunctionalPayment(functionalPaymentQueryResult.getFunctionalPaymentMatrices(), functionalPayment, percentageValue);
                     functionalPaymentListAfterDate.add(functionalPayment);
                 }
