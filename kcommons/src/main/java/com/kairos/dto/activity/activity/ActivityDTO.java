@@ -31,13 +31,13 @@ public class ActivityDTO {
     private List<Long> employmentTypes;
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
+    private TimeTypeDTO timeType;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
     private RulesActivityTabDTO rulesActivityTab;
     private List<ActivityDTO> compositeActivities;
 
     private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
     private Long countryActivityId;
-    private TimeTypeDTO timeType;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger parentId;
@@ -259,6 +259,7 @@ public class ActivityDTO {
     public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
     }
+
 
 
 }

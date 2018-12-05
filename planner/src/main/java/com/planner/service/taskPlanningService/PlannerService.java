@@ -112,7 +112,7 @@ public class PlannerService {
 
 
     public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
-        ShiftRequestPhasePlanningSolution problem=shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
+        ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
         SolverConfigDTO solverConfig=unitSolverConfigService.getSolverConfigWithConstraints(planningSubmissionDTO.getSolverConfigId());
         //FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());

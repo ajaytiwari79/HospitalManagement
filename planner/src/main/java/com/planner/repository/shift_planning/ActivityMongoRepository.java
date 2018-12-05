@@ -60,9 +60,14 @@ public class ActivityMongoRepository {
      * @return
      */
     public List<ActivityDTO> getActivitiesById(Set<String> activitiesIds) {
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("_id").in(activitiesIds)));
+
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("_id").in(activitiesIds)),
+                lookup(TIME_TYPE,"balanceSettingsActivityTab.timeTypeId","_id","timeTypes"),
+                project("id","name","expertises","countryId","parentId","employmentTypes")
+                        .and("timeTypes").arrayElementAt(0).as("timeType"));
         AggregationResults<ActivityDTO> aggregationResults = mongoTemplate.aggregate(aggregation, ACTIVITYIES, ActivityDTO.class);
-        return aggregationResults.getMappedResults();
+        List<ActivityDTO> activityDTOS=aggregationResults.getMappedResults();
+        return activityDTOS;
     }
 /*******************************************CTA********************************************/
     /**
@@ -106,7 +111,9 @@ public class ActivityMongoRepository {
                 match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(fromDate).and("endDate").lte(toDate))
         );
         AggregationResults<Shift> aggregationResults = mongoTemplate.aggregate(aggregation, SHIFTS, Shift.class);
-        return aggregationResults.getMappedResults();
+        //return aggregationResults.getMappedResults();
+        List<Shift> shifts=aggregationResults.getMappedResults();
+        return shifts;
     }
 
 

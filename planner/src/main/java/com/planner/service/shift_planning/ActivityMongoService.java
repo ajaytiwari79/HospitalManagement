@@ -1,5 +1,6 @@
 package com.planner.service.shift_planning;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 
@@ -7,6 +8,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.Activity;
+import com.kairos.shiftplanning.domain.TimeType;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
@@ -120,11 +122,16 @@ public class ActivityMongoService {
     //TODO temporary use ObjectMapperUtils(currently not working)
     public List<Activity> getConvertedActivityList(List<ActivityDTO> activities){
         List<Activity> activityList=new ArrayList<>();
+        int order=0;
         for(ActivityDTO activityDTO:activities)
         {
             Activity activity=new Activity();
             activity.setId(activityDTO.getId().toString());
             activity.setName(activityDTO.getName());
+            activity.setOrder(++order);
+            TimeType timeType=ObjectMapperUtils.copyPropertiesByMapper(activityDTO.getTimeType(), TimeType.class);
+            timeType.setName(activityDTO.getTimeType().getTimeTypes());
+            activity.setTimeType(timeType);
             //activity.setActivityConstraints(activityDTO.);
             //activity.setSkills(activityDTO.get);
             activityList.add(activity);

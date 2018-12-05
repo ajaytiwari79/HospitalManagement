@@ -2,6 +2,8 @@ package com.kairos.dto.planner.shift_planning;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,12 +15,24 @@ import java.util.List;
 public class ShiftPlanningProblemSubmitDTO {
 
     private Long planningProblemId;
-    private List<Long> staffIds;
+    private List<Long> staffIds=new ArrayList<>();
     private Long unitId;
     private BigInteger planningPeriodId;
     private LocalDate startDate;
     private LocalDate endDate;
 
+    public ShiftPlanningProblemSubmitDTO() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        String endDate="2018/12/05";
+        String startDate="2018/12/03";
+        this.planningProblemId = null;
+        this.staffIds.add(541l);
+        //this.staffIds = staffIds;
+        this.unitId = 958l;
+        this.planningPeriodId = planningPeriodId;
+        this.startDate =LocalDate.parse(startDate,formatter);
+        this.endDate = LocalDate.parse(endDate,formatter);
+    }
 
     public Long getPlanningProblemId() {
         return planningProblemId;
