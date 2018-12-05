@@ -788,8 +788,8 @@ public class UnitPositionService {
         unitPositionLinesQueryResult.setUnitPositionId(unitPosition.getId());
         // TODO Setting for compatibility
         Map<String, Object> unitInfo = new HashMap<>();
-        unitInfo.put("id", parentOrganizationId);
-        unitInfo.put("name", parentOrganizationName);
+        unitInfo.put("id", unitPosition.getUnit().getId());
+        unitInfo.put("name", unitPosition.getUnit().getName());
         result.setUnitInfo(unitInfo);
 
         result.setPositionLines(Collections.singletonList(unitPositionLinesQueryResult));
