@@ -75,12 +75,8 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 "        'hostingProvider':{'$first':{'$arrayElemAt':['$hostingProvider',0]}}" +
                 "   }}";
 
-        Criteria criteria;
-        if(Optional.ofNullable(id).isPresent()){
-            criteria= Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id);
-        }else{
-            criteria= Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false);
-        }
+        Criteria criteria=(Optional.ofNullable(id).isPresent())?Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id):
+                Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
