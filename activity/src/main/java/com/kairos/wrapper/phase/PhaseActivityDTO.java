@@ -4,6 +4,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 
@@ -21,13 +22,14 @@ public class PhaseActivityDTO {
     private List<ShiftTemplateDTO> shiftTemplates;
     private List<PhaseDTO> applicablePhases;
     private List<PhaseDTO> actualPhases;
+    private List<ReasonCodeDTO> reasonCodes;
 
     public PhaseActivityDTO() {
         //Default Constructor
     }
 
     public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
-                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases) {
+                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes) {
         this.activities = activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
@@ -35,6 +37,7 @@ public class PhaseActivityDTO {
         this.shiftTemplates = shiftTemplates;
         this.applicablePhases = applicablePhases;
         this.actualPhases = actualPhases;
+        this.reasonCodes = reasonCodes;
     }
     
     public List<ActivityWithCompositeDTO> getActivities() {
@@ -91,5 +94,13 @@ public class PhaseActivityDTO {
 
     public void setShiftTemplates(List<ShiftTemplateDTO> shiftTemplates) {
         this.shiftTemplates = shiftTemplates;
+    }
+
+    public List<ReasonCodeDTO> getReasonCodes() {
+        return reasonCodes;
+    }
+
+    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
+        this.reasonCodes = reasonCodes;
     }
 }

@@ -180,7 +180,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public QuestionnaireTemplate findRiskTemplateByAsssociatedProcessingActivityAndCountryId(Long countryId) {
+    public QuestionnaireTemplate findRiskTemplateByAssociatedProcessingActivityAndCountryId(Long countryId) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and("templateType").is(QuestionnaireTemplateType.RISK)
                 .and("riskAssociatedEntity").is(QuestionnaireTemplateType.PROCESSING_ACTIVITY)

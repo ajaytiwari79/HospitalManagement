@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
@@ -23,14 +24,21 @@ public class ShiftActivity {
     private String activityName;
     private long bid;
     private long pId;
+    //used in T&A view
     private Long reasonCodeId;
+    //used for adding absence type of activities.
+    private Long absenceReasonCodeId;
     private String remarks;
+    //please don't use this id for any functionality this on ly for frontend
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
     private boolean breakShift;
+
+    //Yatharth adding embedded object for frontend
+    private ReasonCodeDTO reasonCode;
 
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
@@ -46,12 +54,13 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
         this.breakShift=breakShift;
+        this.absenceReasonCodeId = absenceReasonCodeId;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
@@ -194,5 +203,21 @@ public class ShiftActivity {
 
     public void setBreakShift(boolean breakShift) {
         this.breakShift = breakShift;
+    }
+
+    public Long getAbsenceReasonCodeId() {
+        return absenceReasonCodeId;
+    }
+
+    public void setAbsenceReasonCodeId(Long absenceReasonCodeId) {
+        this.absenceReasonCodeId = absenceReasonCodeId;
+    }
+
+    public ReasonCodeDTO getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(ReasonCodeDTO reasonCode) {
+        this.reasonCode = reasonCode;
     }
 }

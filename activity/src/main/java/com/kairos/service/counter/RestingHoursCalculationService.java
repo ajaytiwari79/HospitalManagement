@@ -71,7 +71,7 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     private List<DataUnit> getDataList(Map<FilterType, List> filterBasedCriteria, Long countryId, boolean averageDay, boolean kpi) {
-        List staffIds = null;
+        List staffIds = new ArrayList<>();
         List dates = new ArrayList();
 
         // TO BE USED FOR AVERAGE CALCULATION.
@@ -80,7 +80,7 @@ public class RestingHoursCalculationService implements CounterService {
         //FIXME: fixed time interval TO BE REMOVED ONCE FILTERS IMPLEMENTED PROPERLY
         if(kpi && filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS)!= null){
             staffIds = filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS);
-        }else{
+        }else if(filterBasedCriteria.get(FilterType.STAFF_IDS) != null){
             staffIds = filterBasedCriteria.get(FilterType.STAFF_IDS);
         }
         if(filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null){

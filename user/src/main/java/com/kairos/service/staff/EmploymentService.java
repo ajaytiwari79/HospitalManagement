@@ -357,25 +357,12 @@ public class EmploymentService {
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
-        Organization parentOrganization;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parentOrganization = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else {
-            parentOrganization = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        }
-
-        if (parentOrganization != null) {
-            accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
-            units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
-        } else {
-
-            accessGroups = accessGroupRepository.getAccessGroups(unit.getId());
-            units = organizationGraphRepository.getSubOrgHierarchy(unit.getId());
-        }
-
+        Organization parentOrganization= unit.isParentOrganization()?unit: organizationGraphRepository.getParentOfOrganization(unit.getId());
+        accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
+        units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
         List<Map<String, Object>> employments;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
+        // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit.isParentOrganization()) {
             employments = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {
@@ -672,7 +659,7 @@ public class EmploymentService {
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);
-       userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate,employment.getEndDateMillis(),parentOrganization.getId(),employment.getId(),
+        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate,employment.getEndDateMillis(),parentOrganization.getId(),employment.getId(),
                parentOrganization.getTimeZone());
         employment.setEndDateMillis(employmentEndDate);
         if(!Optional.ofNullable(employmentEndDate).isPresent()) {

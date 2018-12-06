@@ -3,7 +3,6 @@ package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties

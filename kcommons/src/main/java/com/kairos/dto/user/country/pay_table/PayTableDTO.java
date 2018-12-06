@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
@@ -30,6 +31,8 @@ public class PayTableDTO {
 
     @NotNull(message = "Please provide payment unit type")
     private String paymentUnit;
+
+    private BigDecimal percentageValue; // this value is being used to update paygrade and functional amount
 
     public PayTableDTO() {
     }
@@ -88,6 +91,14 @@ public class PayTableDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public BigDecimal getPercentageValue() {
+        return percentageValue;
+    }
+
+    public void setPercentageValue(BigDecimal percentageValue) {
+        this.percentageValue = percentageValue;
     }
 
     public PayTableDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, String paymentUnit, Long levelId) {

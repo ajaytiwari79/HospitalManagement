@@ -5,6 +5,8 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -35,7 +37,16 @@ public class StaffAdditionalInfoDTO {
     private List<TimeSlotWrapper> timeSlotSets;
     private Long staffUserId;
     private String cprNumber;
+    private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
+    private List<ReasonCodeDTO> reasonCodes;
 
+    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays() {
+        return seniorAndChildCareDays;
+    }
+
+    public void setSeniorAndChildCareDays(SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
+        this.seniorAndChildCareDays = seniorAndChildCareDays;
+    }
 
     public int getStaffAge() {
         return staffAge;
@@ -198,5 +209,14 @@ public class StaffAdditionalInfoDTO {
                 }
             }
         return roles;
+    }
+
+
+    public List<ReasonCodeDTO> getReasonCodes() {
+        return reasonCodes;
+    }
+
+    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
+        this.reasonCodes = reasonCodes;
     }
 }

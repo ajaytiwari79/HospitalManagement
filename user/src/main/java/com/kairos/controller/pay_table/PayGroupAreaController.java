@@ -13,50 +13,58 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by prabjot on 20/12/17.
  */
-@Api(API_ORGANIZATION_COUNTRY_URL)
+@Api
 @RestController
-@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@RequestMapping
 public class PayGroupAreaController {
 
     @Inject
     private PayGroupAreaService payGroupAreaService;
 
-    @PostMapping("pay_group_area")
+    @PostMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area")
     public ResponseEntity<Map<String, Object>> savePayGroupArea(@PathVariable Long countryId,
                                                                 @Validated @RequestBody PayGroupAreaDTO payGroupAreaDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payGroupAreaService.savePayGroupArea(countryId, payGroupAreaDTO));
     }
 
-    @PutMapping("/pay_group_area/{payGroupAreaId}")
+    @PutMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area/{payGroupAreaId}")
     public ResponseEntity<Map<String, Object>> updatePayGroupArea(@PathVariable Long payGroupAreaId, @RequestBody PayGroupAreaDTO payGroupAreaDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.updatePayGroupArea(payGroupAreaId, payGroupAreaDTO));
     }
 
-    @DeleteMapping("/pay_group_area/{payGroupAreaId}")
+    @DeleteMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area/{payGroupAreaId}")
     public ResponseEntity<Map<String, Object>> deletePayGroup(@PathVariable Long payGroupAreaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.deletePayGroupArea(payGroupAreaId));
     }
 
-    @GetMapping("/pay_group_area")
+    @GetMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area")
     public ResponseEntity<Map<String, Object>> getPayGroup(@PathVariable Long countryId, @RequestParam Long organizationLevel)
      {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getPayGroupArea(countryId, organizationLevel));
     }
 
-    @DeleteMapping("/remove_pay_group_area/{payGroupAreaId}")
+    @DeleteMapping(API_ORGANIZATION_COUNTRY_URL+"/remove_pay_group_area/{payGroupAreaId}")
     public ResponseEntity<Map<String, Object>> deletePayGroupFromMunicipality(@PathVariable Long payGroupAreaId,
                                                                               @RequestParam Long municipalityId,
                                                                               @RequestParam Long relationshipId)
     {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.deletePayGroupFromMunicipality(payGroupAreaId, municipalityId,relationshipId));
     }
-    @GetMapping("/municipality_organization_level")
+    @GetMapping(API_ORGANIZATION_COUNTRY_URL+"/municipality_organization_level")
     public ResponseEntity<Map<String, Object>> getMunicipalityAndOrganizationLevel(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getMunicipalityAndOrganizationLevel(countryId));
+    }
+
+    @GetMapping(API_V1+UNIT_URL+"/pay_group_area")
+    public ResponseEntity<Map<String, Object>> getPayGroupAreaByLevel(@RequestParam Long organizationLevel)
+    {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getPayGroupAreaByLevel( organizationLevel));
     }
 
 

@@ -113,23 +113,9 @@ public abstract class RelationshipConstants {
     public final static String LINK_WITH_EXTERNAL_SERVICE = "LINK_WITH_EXTERNAL_SERVICE";
 
 
-    public static final String RESOURCE_NOT_AVAILABLE_ON = "RESOURCE_NOT_AVAILABLE_ON";
+
     public static final String BELONGS_TO = "BELONGS_TO";
     public static final String IS_A = "IS_A";
-    public static final String HAS_EXPERTISE = "HAS_EXPERTISE";
-    public static final String BELONGS_TO_ORG_SUB_TYPE = "BELONGS_TO_ORG_SUB_TYPE";
-    public static final String BELONGS_TO_ORG_TYPE = "BELONGS_TO_ORG_TYPE";
-
-    public static final String HAS_CTA = "HAS_CTA";
-    public static final String HAS_COMPENSATION_TABLE = "HAS_COMPENSATION_TABLE";
-    public static final String HAS_COMPENSATION_TABLE_INTERVAL = "HAS_COMPENSATION_TABLE_INTERVAL";
-    public static final String HAS_PARENT_CTA = "HAS_PARENT_CTA";
-    public static final String HAS_ORGANIZATION_PARENT_WTA = "HAS_ORGANIZATION_PARENT_WTA";
-    public static final String HAS_PARENT_WTA = "HAS_PARENT_WTA";
-    public static final String HAS_COUNTRY_PARENT_WTA = "HAS_COUNTRY_PARENT_WTA";
-    public static final String HAS_PARENT_COUNTRY_CTA = "HAS_PARENT_COUNTRY_CTA";
-    public static final String HAS_WTA = "HAS_WTA";
-    public static final String BELONGS_TO_ORGANIZATION = "BELONGS_TO_ORGANIZATION";
 
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";
@@ -157,6 +143,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_REGIONS = "HAS_REGIONS";
     public final static String CONTROL_PANEL_SETTINGS = "CONTROL_PANEL_SETTINGS";
     public final static String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
+    public final static String DAY_TYPE = "DAY_TYPE";
 
 
     //TimeCare
@@ -269,10 +256,11 @@ public abstract class RelationshipConstants {
     public static final String DAY_TYPES="DAY_TYPES";
     public static final String HAS_PARENT_ACCESS_GROUP="HAS_PARENT_ACCESS_GROUP";
 
-    public static final String COUNTRY_HAS_SECTOR = "COUNTRY_HAS_SECTOR";
+    public static final String HAS_PERSONALIZED_LOCATION = "HAS_PERSONALIZED_LOCATION";
     public static final String HAS_LOCATION = "HAS_LOCATION";
     public static final String LOCATION_HAS_ADDRESS = "LOCATION_HAS_ADDRESS";
     public static final String HAS_SECTOR = "HAS_SECTOR";
+
 
 
 

@@ -3,31 +3,66 @@ package com.kairos.dto.activity.attendance;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 
-public class AttendanceDTO {
-
-
+public class TimeAndAttendanceDTO {
+    private Long userId;
+    private Long staffId;
+    private LocalDate date;
+    private List<AttendanceTimeSlotDTO> attendanceTimeSlot;
     private AttendanceDurationDTO duration;
     private List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes;
     private OrganizationCommonDTO organizationCommonDTO;
     private List<ReasonCodeDTO> reasonCode;
     private SickSettingsDTO sickSettings;
 
-    public AttendanceDTO() {
+    public TimeAndAttendanceDTO() {
     }
 
-    public AttendanceDTO(AttendanceDurationDTO duration, SickSettingsDTO sickSettings) {
+    public TimeAndAttendanceDTO(AttendanceDurationDTO duration, SickSettingsDTO sickSettings) {
         this.duration = duration;
         this.sickSettings = sickSettings;
     }
 
 
-    public AttendanceDTO(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes, List<ReasonCodeDTO> reasonCode) {
+    public TimeAndAttendanceDTO(List<OrganizationAndReasonCodeDTO> organizationAndReasonCodes, List<ReasonCodeDTO> reasonCode) {
         this.organizationAndReasonCodes = organizationAndReasonCodes;
         this.reasonCode = reasonCode;
     }
 
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public List<AttendanceTimeSlotDTO> getAttendanceTimeSlot() {
+        return attendanceTimeSlot;
+    }
+
+    public void setAttendanceTimeSlot(List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
+        this.attendanceTimeSlot = attendanceTimeSlot;
+    }
 
     public OrganizationCommonDTO getOrganizationCommonDTO() {
         return organizationCommonDTO;

@@ -2,23 +2,21 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import com.kairos.dto.activity.attendance.AttendanceDuration;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by vipul on 30/8/17.
@@ -62,7 +60,6 @@ public class Shift extends MongoBaseEntity {
 
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
-    private AttendanceDuration attendanceDuration;
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
@@ -118,7 +115,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
@@ -132,6 +129,8 @@ public class Shift extends MongoBaseEntity {
         this.copiedFromShiftId = copiedFromShiftId;
         this.scheduledMinutes = scheduledMinutes;
         this.durationMinutes = durationMinutes;
+        this.phaseId=phaseId;
+        this.planningPeriodId=planningPeriodId;
     }
 
 
@@ -142,15 +141,6 @@ public class Shift extends MongoBaseEntity {
     public void setShiftType(ShiftType shiftType) {
         this.shiftType = shiftType;
     }
-
-    public AttendanceDuration getAttendanceDuration() {
-        return attendanceDuration;
-    }
-
-    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
-        this.attendanceDuration = attendanceDuration;
-    }
-
 
     public Long getUpdatedBy() {
         return updatedBy;

@@ -1,6 +1,7 @@
 package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MasterAssetResponseDTO {
 
     @NotNull
@@ -28,7 +30,7 @@ public class MasterAssetResponseDTO {
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
     private AssetTypeBasicResponseDTO assetType;
-    public List<AssetTypeBasicResponseDTO> assetSubTypes;
+    private   AssetTypeBasicResponseDTO assetSubType;
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
@@ -45,9 +47,9 @@ public class MasterAssetResponseDTO {
 
     public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType; }
 
-    public List<AssetTypeBasicResponseDTO> getAssetSubTypes() { return assetSubTypes; }
+    public AssetTypeBasicResponseDTO getAssetSubType() { return assetSubType; }
 
-    public void setAssetSubTypes(List<AssetTypeBasicResponseDTO> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
+    public void setAssetSubType(AssetTypeBasicResponseDTO assetSubType) { this.assetSubType = assetSubType; }
 
     public String getName() {
         return name;

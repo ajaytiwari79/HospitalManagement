@@ -3,6 +3,8 @@ package com.kairos.persistence.model.pay_table;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import java.util.Objects;
+
 /**
  * Created by prabjot on 21/12/17.
  */
@@ -38,5 +40,19 @@ public class PayGrade extends UserBaseEntity {
     public PayGrade(Long payGradeLevel, boolean published) {
         this.payGradeLevel = payGradeLevel;
         this.published = published;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PayGrade payGrade = (PayGrade) o;
+        return Objects.equals(payGradeLevel, payGrade.payGradeLevel);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(payGradeLevel);
     }
 }

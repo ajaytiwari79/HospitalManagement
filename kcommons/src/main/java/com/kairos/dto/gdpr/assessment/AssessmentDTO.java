@@ -33,6 +33,8 @@ public class AssessmentDTO {
     private QuestionnaireTemplateType riskAssociatedEntity;
     @NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
+    @NotNull(message = "error.message.start.date.not.Selected")
+    private LocalDate startDate;
 
     public BigInteger getId() { return id; }
 
@@ -73,4 +75,8 @@ public class AssessmentDTO {
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 
     public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
+
+    public LocalDate getStartDate() { return startDate; }
+
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 }

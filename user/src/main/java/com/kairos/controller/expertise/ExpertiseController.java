@@ -1,18 +1,21 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.dto.user.country.pay_table.PayTableDTO;
+import com.kairos.persistence.model.pay_table.PayTable;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
+import com.kairos.service.unit_position.UnitPositionCTAWTAService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.text.ParseException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -40,10 +43,13 @@ public class ExpertiseController {
     private ExpertiseService expertiseService;
     @Inject
     private UnitPositionService unitPositionService;
-    @Autowired
+    @Inject
     private LocaleService localeService;
-    @Autowired
+    @Inject
     private FunctionalPaymentService functionalPaymentService;
+    @Inject
+    ExpertiseUnitService expertiseUnitService;
+    @Inject private  UnitPositionCTAWTAService unitPositionCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
@@ -78,8 +84,8 @@ public class ExpertiseController {
     @ApiOperation(value = "Get cta and wta by expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
-                                                                  @RequestParam(value = "selectedDate",required = false)  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate ) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId,selectedDate));
+                                                                  @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,unitPositionCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
     }
 
     @ApiOperation(value = "Get Available expertise")
@@ -89,7 +95,7 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnpublishedExpertise(countryId));
     }
 
-    @RequestMapping(value = PARENT_ORGANIZATION_URL+"/unit/{unitId}/cta/expertise", method = RequestMethod.GET)
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + "/unit/{unitId}/cta/expertise", method = RequestMethod.GET)
     @ApiOperation("get expertise for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseForOrgCTA(unitId));
@@ -114,7 +120,7 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.saveFunctionalPayment(expertiseId, functionalPaymentDTO));
     }
 
-    @ApiOperation(value = "save a functional payment settings for expertise")
+    @ApiOperation(value = "get  functional payment settings of expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getFunctionalPayment(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
@@ -148,6 +154,8 @@ public class ExpertiseController {
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/functional_payment/{functionalPaymentId}/publish", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> publishFunctionalPayment(@PathVariable Long functionalPaymentId, @RequestBody FunctionalPaymentDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.publishFunctionalPayment(functionalPaymentId, functionalPaymentDTO));
+
+
     }
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
@@ -177,14 +185,59 @@ public class ExpertiseController {
 
     @ApiOperation(value = "copy Expertise")
     @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/copy")
-    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO,@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO,countryId));
+    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO, @PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO, countryId));
     }
 
     @ApiOperation(value = "Get senior Days and child Care days at country")
     @GetMapping(value = "/expertise/{expertiseId}/senior_and_child_care_days")
     public ResponseEntity<Map<String, Object>> getSeniorAndChildCareDaysAtCountry(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId));
+    }
+    //-------------------UNIT LEVEL ----------------------\\
+
+
+    @ApiOperation(value = "get all expertise at unit level to show")
+    @GetMapping(value = UNIT_URL + "/expertise")
+    public ResponseEntity<Map<String, Object>> findAllExpertise(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertise(unitId));
+    }
+
+    @ApiOperation(value = "get functional payment  for expertise")
+    @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/functional_payment")
+    public ResponseEntity<Map<String, Object>> getFunctionalPaymentForUnit(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
+    }
+
+
+    @ApiOperation(value = "get functional payment matrix for functional payment at unit level")
+    @GetMapping(value = UNIT_URL + "/functional_payment/{functionalPaymentId}")
+    public ResponseEntity<Map<String, Object>> getMatrixOfFunctionalPaymentForUnit(@PathVariable Long functionalPaymentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getMatrixOfFunctionalPayment(functionalPaymentId));
+    }
+
+    @ApiOperation(value = "get planned time for employment type and expertise ")
+    @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/planned_time")
+    public ResponseEntity<Map<String, Object>> getPlannedTimeOfExpertise(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeInExpertise(expertiseId));
+    }
+
+    @ApiOperation(value = "get all staff who has this expertise assigned ")
+    @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/staff_location")
+    public ResponseEntity<Map<String, Object>> getStaffListOfExpertise(@PathVariable Long expertiseId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.getStaffListOfExpertise(expertiseId, unitId));
+    }
+
+    @ApiOperation(value = "All planned time and employment type for unit level")
+    @GetMapping(value = UNIT_URL + "/expertise/planned_time/default_data")
+    public ResponseEntity<Map<String, Object>> getPlannedTimeAndEmploymentTypeForUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeAndEmploymentTypeForUnit(unitId));
+    }
+
+    @ApiOperation(value = "update location and staff representative in expertise")
+    @PutMapping(value = UNIT_URL + "/expertise/{expertiseId}")
+    public ResponseEntity<Map<String, Object>> updateExpertiseAtUnit(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("unionLocationId") Long locationId, @RequestParam("unionRepresentativeId") Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.updateExpertiseAtUnit(unitId, staffId, expertiseId, locationId));
     }
 /*
     @ApiOperation(value = "Get senior Days and child Care days at unit")

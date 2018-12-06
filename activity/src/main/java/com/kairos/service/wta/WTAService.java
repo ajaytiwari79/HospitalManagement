@@ -11,13 +11,19 @@ import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.enums.MasterDataTypeEnum;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.persistence.model.wta.templates.template_types.ChildCareDaysCheckWTATemplate;
+import com.kairos.persistence.model.wta.templates.template_types.SeniorDaysPerYearWTATemplate;
+import com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate;
+import com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
@@ -118,6 +124,7 @@ public class WTAService extends MongoBaseService {
             if (alreadyExists) {
                 exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
             }
+
         } else if(wtaRepository.isWTAExistByOrganizationIdAndName(referenceId, wtaDTO.getName())){
             exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
         }
@@ -149,7 +156,7 @@ public class WTAService extends MongoBaseService {
 
         prepareWtaWhileCreate(wta, wtaDTO, wtaBasicDetailsDTO);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (wtaDTO.getRuleTemplates().size() > 0) {
+        if (CollectionUtils.isNotEmpty(wtaDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaDTO.getRuleTemplates(), true);
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
@@ -182,6 +189,7 @@ public class WTAService extends MongoBaseService {
         List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(o -> o.getId()).collect(Collectors.toList());
         List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdsAndName(organizationIds, wtadto.getName());
         Map<String, WorkingTimeAgreement> workingTimeAgreementMap = workingTimeAgreementList.stream().collect(Collectors.toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v));
+        Map<String,BigInteger> activitiesIdsAndUnitIdsMap = getActivityMapWithUnitId(wtadto.getRuleTemplates(),wtaBasicDetailsDTO.getOrganizations());
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
             if (workingTimeAgreementMap.get(wtadto.getName() + "_" + organization.getId() + "_" + wta.getOrganizationType().getId()) == null) {
@@ -192,7 +200,8 @@ public class WTAService extends MongoBaseService {
                 }
                 workingTimeAgreement.setDisabled(false);
                 if (CollectionUtils.isNotEmpty(wtadto.getRuleTemplates())) {
-                    List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
+
+                    List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplatesWithUpdateActivity(activitiesIdsAndUnitIdsMap,organization.getId(),wtadto.getRuleTemplates(), true);
                     ruleTemplates.forEach(wtaBaseRuleTemplate -> {
                         wtaBaseRuleTemplate.setCountryId(null);
                     });
@@ -211,6 +220,8 @@ public class WTAService extends MongoBaseService {
             save(workingTimeAgreements);
         }
     }
+
+
 
 
     private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta, WTADTO wtaDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
@@ -267,6 +278,7 @@ public class WTAService extends MongoBaseService {
 
         return wtaResponseDTO;
     }
+
 
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
@@ -441,9 +453,9 @@ public class WTAService extends MongoBaseService {
         return new CTAWTAWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
 
-    public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId) {
-        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
-        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
+    public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId,LocalDate startDate) {
+        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, DateUtils.asDate(startDate));
+        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, DateUtils.asDate(startDate));
         CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
         if (Optional.ofNullable(wta).isPresent()) {
             WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());
@@ -723,6 +735,35 @@ public class WTAService extends MongoBaseService {
         wtaRepository.setEndDateToWTAOfUnitPosition(unitPositionId, endDate);
         costTimeAgreementRepository.setEndDateToCTAOfUnitPosition(unitPositionId, endDate);
         return true;
-
     }
+
+    private Map<String,BigInteger> getActivityMapWithUnitId(List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS, List<OrganizationBasicDTO> organizations){
+        Set<BigInteger> activityIds = new HashSet<>();
+        for (WTABaseRuleTemplateDTO ruleTemplate : wtaBaseRuleTemplateDTOS) {
+            switch (ruleTemplate.getWtaTemplateType()) {
+                case VETO_AND_STOP_BRICKS:
+                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
+                    CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getStopBrickActivityId());
+                    CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getVetoActivityId());
+                    break;
+                case SENIOR_DAYS_PER_YEAR:
+                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
+                    activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
+                    break;
+                case CHILD_CARE_DAYS_CHECK:
+                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
+                    activityIds.addAll(childCareDaysCheckWTATemplate.getActivityIds());
+                    break;
+                case WTA_FOR_CARE_DAYS:
+                    WTAForCareDays wtaForCareDays = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
+                    activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
+                    break;
+            }
+        }
+        List<Long> organisationIds = organizations.stream().map(organizationBasicDTO -> organizationBasicDTO.getId()).collect(Collectors.toList());
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitIds(organisationIds,activityIds);
+        Map<String,BigInteger> activitiesIdsAndUnitIdsMap = activities.stream().collect(Collectors.toMap(k->k.getParentId()+"-"+k.getUnitId(),v->v.getId()));
+        return activitiesIdsAndUnitIdsMap;
+    }
+
 }
