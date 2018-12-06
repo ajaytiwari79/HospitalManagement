@@ -169,7 +169,7 @@ public class ShiftBreakService {
                     // we have already added shift now we need to add break for remaining period
                     if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                         endDateMillis = startDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                        shifts.add(++itemsAddedFromBeginning, getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true,null));
+                        shifts.add(++itemsAddedFromBeginning,updateShift?getBreakAtCurrentDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis),breakActivity): getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true,null));
                         shiftDurationInMinute -=  allowedBreakDurationInMinute;
                         startDateMillis=endDateMillis;
                         lastBreakEndedOnInMillis=endDateMillis;
@@ -204,9 +204,10 @@ public class ShiftBreakService {
                         if (gapBetweenBothBreaks<breakWTATemplate.getBreakGapMinutes()){
                             // function reduce shift
                             logger.info("GAP is not sufficient as required ");
-                        }
+                        }// we have already added shift now we need to add break for remaining period
                         endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
-                        shifts.add(++itemsAddedFromBeginning,getShiftObject(breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true,null));
+                        shifts.add(++itemsAddedFromBeginning,updateShift?getBreakAtCurrentDuration(mainShift,new Date(startDateMillis),new Date(endDateMillis),breakActivity):getShiftObject(
+                                breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), true,null));
                         shiftDurationInMinute -= allowedBreakDurationInMinute;
                         workedShiftDuration += allowedBreakDurationInMinute;
                         currentlyAllottedDurationInMinute += allowedBreakDurationInMinute;
@@ -259,7 +260,7 @@ public class ShiftBreakService {
     }
     private void removeAllPreviouslyAllottedBreaks(Shift shift){
         for (int i = 0; i < shift.getActivities().size(); i++) {
-            if (shift.getActivities().get(i).isBreakShift()) {
+            if (shift.getActivities().get(i).isBreakShift() && !shift.getActivities().get(i).isBreakReplaced()) { // if this is break and break is not replaced by another
                 shift.getActivities().remove(i);
             }
         }
@@ -302,19 +303,27 @@ public class ShiftBreakService {
     private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate, boolean breakShift,Long absenceReasonCodeId) {
         ShiftActivity childShift = new ShiftActivity(name, startDate, endDate, activityId, breakShift,absenceReasonCodeId);
         childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
-        childShift.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
         return childShift;
-
     }
     private ShiftActivity getShiftByStartDuration(Shift shift,Date startDate, Date endDate) {
         ShiftActivity childShift;
         Optional<ShiftActivity> currentShiftActivity=shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime()<=startDate.getTime() && shiftActivity.getEndDate().getTime()>startDate.getTime())).findFirst();
         if (currentShiftActivity.isPresent()){
             childShift= new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), false,currentShiftActivity.get().getAbsenceReasonCodeId());
-
-
         }else {
             childShift= new ShiftActivity(shift.getActivities().get(0).getActivityName(), startDate, endDate, shift.getActivities().get(0).getActivityId(), false,shift.getActivities().get(0).getAbsenceReasonCodeId());
+        }
+        return childShift;
+
+    }
+    private ShiftActivity getBreakAtCurrentDuration(Shift shift,Date startDate, Date endDate,Activity breakActivity) {
+        ShiftActivity childShift;
+        Optional<ShiftActivity> currentShiftActivity=shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime()<=startDate.getTime() && shiftActivity.getEndDate().getTime()>startDate.getTime())).findFirst();
+        if (currentShiftActivity.isPresent()){
+            childShift= new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), true,currentShiftActivity.get().getAbsenceReasonCodeId());
+
+        }else {
+            childShift= new ShiftActivity(breakActivity.getName(), startDate, endDate, shift.getId(), true,shift.getActivities().get(0).getAbsenceReasonCodeId());
         }
         return childShift;
 
