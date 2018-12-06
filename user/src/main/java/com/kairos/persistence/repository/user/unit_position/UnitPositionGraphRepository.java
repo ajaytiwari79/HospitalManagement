@@ -36,7 +36,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) end as positionLines, "+
             " appliedFunctions as appliedFunctions")
-    UnitPositionQueryResult getUnitPositionById(Long unitPositionId,String shiftDate);
+    UnitPositionQueryResult getUnitPositionByIdAndDate(Long unitPositionId,String shiftDate);
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +

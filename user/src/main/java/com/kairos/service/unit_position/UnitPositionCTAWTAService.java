@@ -122,9 +122,9 @@ public class UnitPositionCTAWTAService {
     }
     //  TODO Pradeep INCORRECT function NAME and working
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
-        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId, DateUtils.getCurrentLocalDate().toString());
-        //For handling unitPosition applicable in future
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionByIdAndDate(unitPositionId, DateUtils.getCurrentLocalDate().toString());
         if(unitPosition==null ){
+            //For handling unitPosition applicable in future with nearest unitPositionLine from current date
             unitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         }
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
