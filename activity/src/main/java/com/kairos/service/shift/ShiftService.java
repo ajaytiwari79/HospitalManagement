@@ -1155,9 +1155,9 @@ public class ShiftService extends MongoBaseService {
                                                 String type, Boolean validatedByStaff) {
         UserAccessRoleDTO userAccessRoleDTO=genericIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException("message.shift.save.access");
         } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException("message.shift.save.access");
         }
         Phase phase=phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.REALTIME.toString());
         Map<String,Phase> phaseMap=new HashMap<>();
