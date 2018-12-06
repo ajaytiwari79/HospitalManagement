@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.RestClientUrlUtil;
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
@@ -28,12 +29,14 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.OrganizationStaffWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.rest_client.MicroService;
@@ -92,10 +95,9 @@ public class GenericIntegrationService {
         });
     }
 
-    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffUnitPositionDetails>>>() {
+    public StaffUnitPositionTimeSlotWrapper getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, UNIT_POSITIONS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionTimeSlotWrapper>>() {
         }, expertiseId);
-
     }
 
     public List<String> getEmailsOfStaffByStaffIds(Long unitId, List<Long> staffIds) {
@@ -129,6 +131,7 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, USER_USERID_STAFFS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffResultDTO>>>() {
         }, userId);
     }
+
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryOfUnits() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, UNIT_PARENT_ORGANIZATION_AND_COUNTRY, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitAndParentOrganizationAndCountryDTO>>>() {
@@ -373,10 +376,13 @@ public class GenericIntegrationService {
         }, staffId);
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId,Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
         queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
+            queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
+        }
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
     }
@@ -409,6 +415,12 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_USER_ACCESS_ROLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
         });
     }
+    public ReasonCodeWrapper getAccessRoleAndReasoncodes() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, ACCESS_ROLE_AND_REASON_CODE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
+        });
+    }
+
+
     //shift service
     public List<StaffAdditionalInfoDTO> getStaffAditionalDTOS(Long unitId,List<NameValuePair> requestParam) {
        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/verifyUnitEmployments", requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {
@@ -693,6 +705,11 @@ public class GenericIntegrationService {
     }
     public List<SchedulerPanelDTO> registerNextTrigger(Long unitId,List<SchedulerPanelDTO> schedulerPanelDTOS) {
         return userRestClientForScheduler.publishRequest(schedulerPanelDTOS, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.POST,MicroService.SCHEDULER, "/scheduler_panel", null, new ParameterizedTypeReference<com.kairos.commons.client.RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+    }
+
+    public String getTimeZoneByUnitId(Long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT_WITHOUT_PARENT_ORG,HttpMethod.GET,UNIT_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        });
     }
 }
 

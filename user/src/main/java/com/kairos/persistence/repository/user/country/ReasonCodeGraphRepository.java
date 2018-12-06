@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY;
@@ -48,6 +49,9 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND id(reasonCode)= {1} return reasonCode")
     ReasonCode findByUnitidAndReasonCode(long unitId, long reasonCodeId);
+
+    @Query("MATCH(reasonCode:ReasonCode{deleted:false}) WHERE id(reasonCode) IN {0} RETURN reasonCode")
+    List<ReasonCode> findByIds(Set<Long> reasonCodeIds);
 
 
 }

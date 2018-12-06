@@ -161,8 +161,8 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         for (ProcessingLegalBasisDTO ProcessingLegalBasis : processingLegalBasisDTOS) {
             processingLegalBasisNameList.add(ProcessingLegalBasis.getName());
         }
-        List<ProcessingLegalBasis> existingProcessingLegalBasiss = findMetaDataByNamesAndCountryId(countryId, processingLegalBasisNameList, ProcessingLegalBasis.class);
-        processingLegalBasisNameList = ComparisonUtils.getNameListForMetadata(existingProcessingLegalBasiss, processingLegalBasisNameList);
+        List<ProcessingLegalBasis> existingProcessingLegalBasis = findMetaDataByNamesAndCountryId(countryId, processingLegalBasisNameList, ProcessingLegalBasis.class);
+        processingLegalBasisNameList = ComparisonUtils.getNameListForMetadata(existingProcessingLegalBasis, processingLegalBasisNameList);
         List<ProcessingLegalBasis> processingLegalBasisList = new ArrayList<>();
         if (!processingLegalBasisNameList.isEmpty()) {
             for (String name : processingLegalBasisNameList) {

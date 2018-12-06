@@ -32,8 +32,8 @@ public class Asset extends MongoBaseEntity {
     private BigInteger dataDisposalId;
     private BigInteger assetTypeId;
     private BigInteger assetSubTypeId;
-    private Set<BigInteger> processingActivities;
-    private Set<BigInteger> subProcessingActivities;
+    private Set<BigInteger> processingActivityIds;
+    private Set<BigInteger> subProcessingActivityIds;
     private Integer dataRetentionPeriod;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
@@ -44,12 +44,10 @@ public class Asset extends MongoBaseEntity {
     public Asset() {
     }
 
-    public Asset(String name, String description, String hostingLocation, BigInteger assetTypeId, BigInteger assetSubTypeId, ManagingOrganization managingDepartment, Staff assetOwner) {
+    public Asset(String name, String description, String hostingLocation, ManagingOrganization managingDepartment, Staff assetOwner) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
-        this.assetTypeId = assetTypeId;
-        this.assetSubTypeId=assetSubTypeId;
         this.assetOwner=assetOwner;
         this.managingDepartment=managingDepartment;
     }
@@ -72,15 +70,6 @@ public class Asset extends MongoBaseEntity {
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
-
-
-    public Set<BigInteger> getProcessingActivities() { return processingActivities; }
-
-    public void setProcessingActivities(Set<BigInteger> processingActivities) { this.processingActivities = processingActivities; }
-
-    public Set<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
-
-    public void setSubProcessingActivities(Set<BigInteger> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
     public String getName() { return name; }
 
@@ -147,6 +136,14 @@ public class Asset extends MongoBaseEntity {
     public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
 
     public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
+
+    public Set<BigInteger> getProcessingActivityIds() { return processingActivityIds; }
+
+    public void setProcessingActivityIds(Set<BigInteger> processingActivityIds) { this.processingActivityIds = processingActivityIds; }
+
+    public Set<BigInteger> getSubProcessingActivityIds() { return subProcessingActivityIds; }
+
+    public void setSubProcessingActivityIds(Set<BigInteger> subProcessingActivityIds) { this.subProcessingActivityIds = subProcessingActivityIds; }
 }
 
 

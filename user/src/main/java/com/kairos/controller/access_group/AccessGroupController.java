@@ -220,7 +220,15 @@ public class AccessGroupController {
     @ApiOperation("To fetch Access Role (Staff/Management) of current logged in user")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> checkIfUserHasAccessByRoleInUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.findUserAccessRole(unitId));
+
+    }
+
+    @RequestMapping(value = UNIT_URL+"/current_user/access_role_and_reason_codes", method = RequestMethod.GET)
+    @ApiOperation("To fetch Access Role (Staff/Management) of current logged in user and fetch reasoncodes for absence")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessRoleAndReasonCodes(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAbsenceReasonCodesAndAccessRole(unitId));
 
     }
 

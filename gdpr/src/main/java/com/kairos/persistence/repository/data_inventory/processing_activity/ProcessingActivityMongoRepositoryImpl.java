@@ -149,9 +149,10 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public ProcessingActivityResponseDTO getProcessingActivityAndMetaDataById(Long unitId, BigInteger processingActivityId) {
+    public ProcessingActivityResponseDTO getProcessingActivityAndMetaDataById(Long unitId, BigInteger processingActivityId,boolean subProcessingActivity) {
+        Criteria criteria =  Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("_id").is(processingActivityId).and("subProcess").is(subProcessingActivity);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
+                match(criteria),
                 lookup("processingPurpose", "processingPurposes", "_id", "processingPurposes"),
                 lookup("transferMethod", "transferMethods", "_id", "transferMethods"),
                 lookup("accessorParty", "accessorParties", "_id", "accessorParties"),
@@ -159,7 +160,8 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("responsibilityType", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
                 lookup("asset", "assetId", "_id", "asset"),
-                lookup("risk","risks","_id","risks")
+                lookup("risk","risks","_id","risks"),
+                lookup("subProcessingActivities","processingActivity","_id","subProcessingActivities")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);

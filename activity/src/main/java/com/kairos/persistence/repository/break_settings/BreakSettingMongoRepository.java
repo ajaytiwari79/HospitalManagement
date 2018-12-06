@@ -10,9 +10,9 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSettings, BigInteger> {
+public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSettings, BigInteger> , CustomBreakSettingsMongoRepository{
 
-    List<BreakSettingsDTO> findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(Long unitId);
+    List<BreakSettingsDTO> findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(Long expertiseId);
 
     BreakSettings findByIdAndDeletedFalse(BigInteger id);
 
@@ -20,7 +20,6 @@ public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSe
 
     List<BreakSettings> findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(Long expertiseId, Long shiftDurationInMinute);
 
-
-    List<BreakSettings> findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(List<Long> unitId);
+    List<BreakSettings> findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(List<Long> expertiseIds);
 
 }

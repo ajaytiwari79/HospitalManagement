@@ -12,6 +12,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
@@ -127,7 +128,7 @@ public class ActivityUtil {
     }
 
     public static Activity initializeTimeCareActivities(TimeCareActivity timeCareActivity,Long orgType,List<Long> orgSubTypes,Long countryId,GlideTimeSettingsDTO glideTimeSettingsDTO,List<PhaseDTO> phases,List<Activity> activitiesByExternalIds
-    ,ActivityCategory activityCategory,List<Skill> skills, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId){
+            ,ActivityCategory activityCategory,List<Skill> skills, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId){
         Optional<Activity> result = activitiesByExternalIds.stream().filter(activityByExternalId -> timeCareActivity.getId().equals(activityByExternalId.getExternalId())).findFirst();
         Activity activity = result.orElseGet(Activity::new);
         activity.setCountryId(countryId);
@@ -197,6 +198,8 @@ public class ActivityUtil {
     public  static void initializeActivityTabs(Activity activity,List<PhaseTemplateValue> phaseTemplateValues,GlideTimeSettingsDTO glideTimeSettingsDTO){
 
         RulesActivityTab rulesActivityTab = new RulesActivityTab();
+        PQLSettings pqlSettings=new PQLSettings();
+        rulesActivityTab.setPqlSettings(pqlSettings);
         activity.setRulesActivityTab(rulesActivityTab);
 
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0L, true, LocalTime.of(7, 0), 1d);
@@ -235,9 +238,11 @@ public class ActivityUtil {
     public static List<String> verifyCompositeActivities(boolean breakAllowed, List<Activity> activities){
         List<String> invalidActivities=new ArrayList<>();
         activities.forEach(activity -> {
-            if(activity.getRulesActivityTab().isBreakAllowed()!=breakAllowed){
+            if(activity.getRulesActivityTab().isBreakAllowed()!=breakAllowed
+                    && activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.PAID_BREAK)
+                    && activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.UNPAID_BREAK)){
                 invalidActivities.add(activity.getName());
-        }
+            }
         });
         return invalidActivities;
     }

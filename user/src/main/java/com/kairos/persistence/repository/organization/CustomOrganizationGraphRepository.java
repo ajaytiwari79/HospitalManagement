@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 
@@ -15,4 +16,6 @@ public interface CustomOrganizationGraphRepository {
 
     List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
                                   Map<FilterType, List<String>> filters, String searchText, String imagePath);
+
+    List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId,OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
 }

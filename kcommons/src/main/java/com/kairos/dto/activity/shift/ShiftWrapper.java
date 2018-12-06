@@ -12,6 +12,7 @@ public class ShiftWrapper {
     private List<ShiftDTO> assignedShifts;
     private List<OpenShiftResponseDTO> openShifts;
     private StaffAccessRoleDTO staffDetails;
+    private ButtonConfig buttonConfig;
 
     public ShiftWrapper() {
         //default case
@@ -22,10 +23,11 @@ public class ShiftWrapper {
         this.openShifts = openShifts;
     }
 
-    public ShiftWrapper(List<ShiftDTO> assignedShifts, List<OpenShiftResponseDTO> openShifts, StaffAccessRoleDTO staffDetails) {
+    public ShiftWrapper(List<ShiftDTO> assignedShifts, List<OpenShiftResponseDTO> openShifts, StaffAccessRoleDTO staffDetails,ButtonConfig buttonConfig) {
         this.assignedShifts = assignedShifts;
         this.openShifts = openShifts;
         this.staffDetails = staffDetails;
+        this.buttonConfig = buttonConfig;
     }
 
     public List<ShiftDTO> getAssignedShifts() {
@@ -50,5 +52,13 @@ public class ShiftWrapper {
 
     public void setStaffDetails(StaffAccessRoleDTO staffDetails) {
         this.staffDetails = staffDetails;
+    }
+
+    public ButtonConfig getButtonConfig() {
+        return buttonConfig;
+    }
+
+    public void setButtonConfig(ButtonConfig buttonConfig) {
+        this.buttonConfig = buttonConfig;
     }
 }

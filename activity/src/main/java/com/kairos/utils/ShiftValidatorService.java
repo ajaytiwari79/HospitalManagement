@@ -15,6 +15,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
@@ -142,7 +143,7 @@ public class ShiftValidatorService {
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.actionNotPermittedException("message.wta.notFound");
         }
-        if (wtaQueryResultDTO.getEndDate() != null && new DateTime(wtaQueryResultDTO.getEndDate()).isBefore(shift.getActivitiesEndDate().getTime())) {
+        if (wtaQueryResultDTO.getEndDate() != null && new DateTime(wtaQueryResultDTO.getEndDate()).isBefore(shift.getEndDate().getTime())) {
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getStartDate()));
@@ -155,34 +156,51 @@ public class ShiftValidatorService {
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
-        Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
-                .and(wtaRulesSpecification)
-                .and(staffEmploymentSpecification);
+                .and(wtaRulesSpecification);
+
         if (byUpdate) {
             Specification<ShiftWithActivityDTO> activityPhaseSettingSpecification = new ActivityPhaseSettingSpecification(staffAdditionalInfoDTO, phase, activityWrapperMap.values(), oldShift);
-            activitySpecification.and(activityPhaseSettingSpecification);
+            activitySpecification = activitySpecification.and(activityPhaseSettingSpecification);
+        }else{
+            Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
+            activitySpecification = activitySpecification.and(staffEmploymentSpecification);
         }
         if (!byTandAPhase) {
             Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan();
-            activitySpecification.and(shiftTimeLessThan);
+            activitySpecification = activitySpecification.and(shiftTimeLessThan);
         }
         List<Long> dayTypeIds = shift.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getActivity().getRulesActivityTab().getDayTypes().stream()).collect(Collectors.toList());
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(dayTypeIds)) {
             Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
             Set<DayOfWeek> validDays = getValidDays(dayTypeDTOMap, dayTypeIds);
-            Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getActivitiesStartDate());
-            activitySpecification.and(activityDayTypeSpec);
+            Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getStartDate());
+            activitySpecification= activitySpecification.and(activityDayTypeSpec);
         }
+        //TODO
         activitySpecification.validateRules(shift);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
+        activityRuleViolations.addAll(validateAbsenceReasonCodeRule(activityWrapperMap,shift));
         ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
         return shiftWithViolatedInfoDTO;
     }
 
+    private List<ActivityRuleViolation> validateAbsenceReasonCodeRule(Map<BigInteger,ActivityWrapper> activityWrapperMap,ShiftWithActivityDTO shift) {
+        List<ActivityRuleViolation> activityRuleViolations = new ArrayList<>();
+        for(ShiftActivityDTO shiftActivity:shift.getActivities()) {
+            Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            if(activity.getRulesActivityTab().isReasonCodeRequired()&&activity.getRulesActivityTab().getReasonCodeRequiredState().
+                    equals(ReasonCodeRequiredState.MANDATORY)&&!Optional.ofNullable(shiftActivity.getAbsenceReasonCodeId()).isPresent()) {
+                activityRuleViolations.add(new ActivityRuleViolation(activity.getId(),activity.getName(),0,Collections.singletonList(exceptionService.
+                        convertMessage("message.shift.reasoncode.required",activity.getId()))));
+            }
+        }
+        return activityRuleViolations;
+
+    }
     private List<ActivityRuleViolation> validateTimingOfActivity(ShiftWithActivityDTO shiftDTO, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shiftDTO.getStaffId(), activityIds);
         Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId, v -> v));
@@ -243,7 +261,7 @@ public class ShiftValidatorService {
         int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUser(), totalTimeBank, activityWrapperMap,staffAdditionalInfoDTO.getStaffAge());
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUser(), totalTimeBank, activityWrapperMap,staffAdditionalInfoDTO.getStaffAge(),staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(),staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays());
     }
 
     public List<String> validateShiftWhileCopy(ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails) {
@@ -324,15 +342,16 @@ public class ShiftValidatorService {
     }
 
     public static Comparator getShiftStartTimeComparator() {
-        return (Comparator<ShiftWithActivityDTO>) (ShiftWithActivityDTO s1, ShiftWithActivityDTO s2) -> s1.getActivitiesStartDate().compareTo(s2.getActivitiesStartDate());
+        return (Comparator<ShiftWithActivityDTO>) (ShiftWithActivityDTO s1, ShiftWithActivityDTO s2) -> s1.getStartDate().compareTo(s2.getStartDate());
     }
 
     public static boolean isValid(MinMaxSetting minMaxSetting, int limitValue, int calculatedValue) {
         return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue : limitValue >= calculatedValue;
     }
 
-    public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift) {
-        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getActivitiesStartDate())).sorted().collect(Collectors.toSet()));
+    public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
+        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
+        dates.sort((date1,date2)->date1.compareTo(date2));
         return dates;
     }
 
@@ -605,6 +624,11 @@ public class ShiftValidatorService {
                 case WTA_FOR_CARE_DAYS:
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     interval = interval.addInterval(getIntervalByWTACareDaysRuleTemplate(shift,wtaForCareDays));
+                    break;
+                case CONSECUTIVE_WORKING_PARTOFDAY:
+                    ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate = (ConsecutiveWorkWTATemplate) ruleTemplate;
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift, consecutiveWorkWTATemplate.getIntervalUnit(), consecutiveWorkWTATemplate.getIntervalLength()));
+                    break;
 
             }
         }
@@ -629,14 +653,14 @@ public class ShiftValidatorService {
 
     public static  DateTimeInterval getIntervalByActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap,Date shiftStartDate,List<BigInteger> activityIds){
         LocalDate shiftDate = DateUtils.asLocalDate(shiftStartDate);
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftStartDate,DateUtils.asDate(DateUtils.asZoneDateTime(shiftStartDate).plusDays(1)));
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftStartDate,DateUtils.asDate(shiftDate.plusDays(1)));
         for (BigInteger activityId : activityIds) {
             if(activityWrapperMap.containsKey(activityId)){
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(cutOffInterval -> (cutOffInterval.getStartDate().isBefore(shiftDate) && cutOffInterval.getEndDate().isAfter(shiftDate) || cutOffInterval.getStartDate().isEqual(shiftDate))).findFirst();
+                Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate))&& (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
                 if(cutOffIntervalOptional.isPresent()){
                     CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate())));
+                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
                 }
             }
         }

@@ -6,10 +6,7 @@ import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQuery
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionLineEmploymentTypeRelationShip;
-import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
-import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -77,7 +74,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "WITH staff,expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "OPTIONAL MATCH (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "return expertise as expertise,id(staff) as staffId,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),startDate:positionLine.startDate, hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines, "+
             " case appliedFunction when NULL then [] else  Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions")
     List<UnitPositionQueryResult> getUnitPositionByIds(List<Long> unitPositionIds);
@@ -324,5 +321,57 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<UnitPositionLinesQueryResult> findFunctionalHourlyCost(List<Long> unitPositionIds);
 
 
+@Query("OPTIONAL MATCH (organization:Organization)  WHERE id(organization)={0}\n" +
+        "OPTIONAL MATCH (staff:Staff)  WHERE id(staff)={1}\n" +
+        "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true}) \n" +
+        "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode) " +
+        "RETURN \n" +
+        "CASE \n" +
+        "WHEN organization IS NULL THEN \"organization\" \n" +
+        "WHEN staff IS NULL THEN \"staff\"\n" +
+        "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
+        "ELSE COLLECT({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
+        Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
+
+    @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
+            "WHERE id(organization)={0}  AND id(unitPosition)={1} \n" +
+            "MATCH(positionLine:UnitPositionLine)-[:"+ HAS_POSITION_LINES+" ]-(unitPosition)   \n" +
+            "MATCH(positionLine)-[: "+HAS_SENIORITY_LEVEL +"]->(seniorityLevel:SeniorityLevel)-[: HAS_BASE_PAY_GRADE ]-(payGrade:PayGrade)   \n" +
+            "MATCH(unitPosition)-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})   \n" +
+            "OPTIONAL MATCH(organization)-[: "+CONTACT_ADDRESS +"]->(contactAddress:ContactAddress)-[:"+ MUNICIPALITY +"]->(municipality:Municipality)-[:"+ HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+ HAS_PAY_GROUP_AREA+" ]-(payGrade)   \n" +
+            "WITH  positionLine,payGrade,expertise,seniorityLevel,  \n" +
+            "CASE WHEN pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END AS basePayGradeAmount   \n" +
+            "OPTIONAL MATCH (positionLine)-[: "+APPLICABLE_FUNCTION+" ]-(function:Function)   \n" +
+            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[: "+APPLICABLE_FOR_EXPERTISE+" ]->(expertise) where date(datetime({epochmillis:functionalPayment.startDate})) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(datetime({epochmillis:functionalPayment.startDate})))   \n" +
+            "WITH  positionLine,functionalPayment,seniorityLevel,function,basePayGradeAmount   \n" +
+            "OPTIONAL MATCH(functionalPayment)-[: "+FUNCTIONAL_PAYMENT_MATRIX+" ]->(fpm:FunctionalPaymentMatrix)    \n" +
+            "WITH  positionLine,fpm,seniorityLevel,function,functionalPayment,basePayGradeAmount   \n" +
+            "OPTIONAL MATCH(fpm)-[: "+SENIORITY_LEVEL_FUNCTIONS+" ]->(slf:SeniorityLevelFunction)-[: "+FOR_SENIORITY_LEVEL+" ]->(seniorityLevel)   \n" +
+            " WITH  positionLine,fpm,slf,function,functionalPayment,basePayGradeAmount   \n" +
+            "OPTIONAL MATCH(slf)-[rel: "+HAS_FUNCTIONAL_AMOUNT +"]-(function)   \n" +
+            "WITH  positionLine,COLLECT(DISTINCT {id:id(function),amount:rel.amount,name:function.name}) AS functions,basePayGradeAmount, sum(toInteger(rel.amount)) as totalCostOfFunctions\n" +
+            "RETURN  \n" +
+            "positionLine.startDate AS startDate,basePayGradeAmount AS basePayGradeAmount,functions,basePayGradeAmount+totalCostOfFunctions AS hourlyCost ")
+    List<UnitPositionLineFunctionQueryResult> getFunctionalHourlyCostByUnitPositionId(Long unitId, Long unitPositionId);
+
+    @Query("OPTIONAL MATCH(organization:Organization) WHERE id(organization)={0}\n" +
+            "OPTIONAL MATCH(staff:Staff) WHERE id(staff)={1}\n" +
+            "OPTIONAL MATCH(unitPosition:UnitPosition) WHERE id(unitPosition)={2}\n" +
+            "OPTIONAL MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel: IN_UNIT ]-(organization) \n" +
+            "OPTIONAL MATCH(staff)-[unitPositionStaffRel: BELONGS_TO_STAFF ]->(unitPosition) " +
+            "RETURN  \n" +
+            " CASE  \n" +
+            " WHEN organization IS NULL THEN \"organization\"    \n" +
+            " WHEN staff IS NULL THEN \"staff\"     \n" +
+            " WHEN unitPosition IS NULL THEN \"unitPosition\"    \n" +
+            " WHEN unitPositionOrgRel IS NULL THEN  \"unitPositionOrgRel\"    \n" +
+            " WHEN unitPositionStaffRel IS NULL THEN  \"unitPositionStaffRel\" \n" +
+            "ELSE \"valid\" \n" +
+            "END")
+    String validateOrganizationStaffUnitPosition(Long unitId,Long staffId,Long unitPositionId);
+
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false})-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WHERE id(staff) ={0} AND id(expertise) IN {1} AND id(sector) ={2}" +
+            "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
+    boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
 
 }
