@@ -10,3 +10,17 @@ MATCH(n:Organization{isParentOrganization:false,boardingCompleted:true}) where N
  match(unitType:UnitType) where id(unitType)=1175
  MERGE(n)-[rel:HAS_UNIT_TYPE]->(unitType)
 return count(rel)
+
+
+//gdpr
+for add default tag
+db.getCollection('clause').updateMany({"tags.0":{"$exists":false}},{"$addToSet":{"tags" : {
+            "_id" : "19",
+            "name" : "None",
+            "defaultTag" : true,
+            "countryId" : NumberLong(18712),
+            "createdAt" : ISODate("2018-11-02T10:05:04.898Z"),
+            "updatedAt" : ISODate("2018-12-03T10:22:43.931Z"),
+            "deleted" : false
+        }
+    }})
