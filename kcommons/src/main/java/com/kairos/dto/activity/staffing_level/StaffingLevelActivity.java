@@ -13,6 +13,7 @@ public class StaffingLevelActivity {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
+    private int availableNoOfStaff;
 
     public int getMinNoOfStaff() {
         return minNoOfStaff;
@@ -105,5 +106,11 @@ public class StaffingLevelActivity {
     }
 
 
+    public int getAvailableNoOfStaff() {
+        return availableNoOfStaff;
+    }
 
+    public void setAvailableNoOfStaff(int availableNoOfStaff) {
+        this.availableNoOfStaff = availableNoOfStaff;
+    }
 }
