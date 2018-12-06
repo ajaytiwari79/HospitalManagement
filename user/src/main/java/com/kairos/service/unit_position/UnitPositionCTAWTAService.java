@@ -28,6 +28,7 @@ import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
@@ -122,6 +123,12 @@ public class UnitPositionCTAWTAService {
     //  TODO Pradeep INCORRECT function NAME and working
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId, DateUtils.getCurrentLocalDate().toString());
+        //For handling unitPosition applicable in future
+        UnitPositionQueryResult existingUnitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        if(unitPosition==null && Optional.ofNullable(existingUnitPosition).isPresent() && CollectionUtils.isNotEmpty(existingUnitPosition.getPositionLines())){
+            UnitPositionQueryResult exUnitPositionQueryResult=ObjectMapperUtils.copyPropertiesByMapper(existingUnitPosition,UnitPositionQueryResult.class);
+            unitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId, exUnitPositionQueryResult.getPositionLines().get(0).getStartDate().toString());
+        }
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
