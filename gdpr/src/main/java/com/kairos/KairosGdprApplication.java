@@ -99,7 +99,6 @@ public class KairosGdprApplication {
 
 
     @Profile("local")
-    @LoadBalanced
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {

@@ -1,4 +1,4 @@
-package com.kairos.enums;
+package com.kairos.enums.employment_type;
 
 /**
  * Created by vipul on 6/4/18.
