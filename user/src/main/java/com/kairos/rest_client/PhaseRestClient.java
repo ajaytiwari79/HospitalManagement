@@ -30,75 +30,7 @@ public class PhaseRestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    @Inject
-    private OrganizationService organizationService;
 
-    /**
-     * @auther Vipul Pandey
-     * used to create the phases in default
-     * @param unitId
-     * @return
-     */
-    public void createDefaultPhases (Long unitId){
-
-        final String baseUrl= RestClientURLUtil.getBaseUrl(false);
-
-        try {
-            Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/phase/default?countryId="+countryId,
-                            HttpMethod.POST,
-                            null, typeReference, unitId);
-
-            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                logger.info("RestExchange",restExchange);
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e) {
-
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-        }
-
-    }
-
-    /**
-     * @Auther anil maurya
-     * @param unitId
-     * @return
-     */
-    public PhaseAndActivityTypeWrapper getPhaseAndActivityType (Long unitId){
-
-        final String baseUrl= RestClientURLUtil.getBaseUrl(false);
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/phase/default",
-                            HttpMethod.POST,
-                            null, typeReference, unitId);
-
-            RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-               return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e) {
-
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-        }
-
-    }
 
     public List<PhaseResponseDTO> getPhases (Long countryId){
 

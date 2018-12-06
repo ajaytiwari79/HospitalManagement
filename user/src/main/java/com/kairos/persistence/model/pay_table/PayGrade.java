@@ -47,12 +47,12 @@ public class PayGrade extends UserBaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PayGrade payGrade = (PayGrade) o;
-        return Objects.equals(id, payGrade.id);
+        return Objects.equals(payGradeLevel, payGrade.payGradeLevel);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id);
+        return Objects.hash(payGradeLevel);
     }
 }

@@ -25,6 +25,7 @@ public class FunctionalPaymentQueryResult {
    private List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrices;
    private Expertise expertise;
    private PaidOutFrequencyEnum paymentUnit;
+   private boolean published;
 
 
     public FunctionalPaymentQueryResult() {
@@ -86,5 +87,13 @@ public class FunctionalPaymentQueryResult {
 
     public void setPaymentUnit(PaidOutFrequencyEnum paymentUnit) {
         this.paymentUnit = paymentUnit;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 }

@@ -186,7 +186,7 @@ public class UnitPositionService {
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException, Exception {
-        Organization organization = organizationService.getOrganizationDetail(id, type);
+        Organization organization = organizationService.getOrganizationDetail(unitPositionDTO.getUnitId(), type);
         Organization parentOrganization;
 
         PositionCode positionCode;
@@ -456,7 +456,8 @@ public class UnitPositionService {
         if (currentUnitPositionLine == null) {
             exceptionService.dataNotFoundByIdException("message.position_line.notfound", unitPositionId);
         }
-        List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("unitPositionId", unitPositionId + ""));
+
+        List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("unitPositionId", unitPositionId + ""),new BasicNameValuePair("startDate",currentUnitPositionLine.getStartDate().toString()));
         CTAWTAWrapper existingCtaWtaWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, APPLICABLE_CTA_WTA, param,
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
                 });
@@ -788,8 +789,8 @@ public class UnitPositionService {
         unitPositionLinesQueryResult.setUnitPositionId(unitPosition.getId());
         // TODO Setting for compatibility
         Map<String, Object> unitInfo = new HashMap<>();
-        unitInfo.put("id", parentOrganizationId);
-        unitInfo.put("name", parentOrganizationName);
+        unitInfo.put("id", unitPosition.getUnit().getId());
+        unitInfo.put("name", unitPosition.getUnit().getName());
         result.setUnitInfo(unitInfo);
 
         result.setPositionLines(Collections.singletonList(unitPositionLinesQueryResult));
@@ -1040,8 +1041,6 @@ public class UnitPositionService {
                 exceptionService.unitNotFoundException("message.organization.id.notFound", unitId);
             } else if (STAFF.equals(object)) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Staff", staffId);
-            } else if (EMPLOYMENT.equals(object)) {
-                exceptionService.dataNotFoundByIdException("error.Employement.notExist", unitId, staffId);
             }
         }else {
             List<Map<Object, Object>> unitPositions = (List<Map<Object, Object>>) object;
