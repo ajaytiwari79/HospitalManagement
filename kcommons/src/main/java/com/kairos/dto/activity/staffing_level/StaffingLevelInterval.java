@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.staffing_level;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -168,4 +169,6 @@ public class StaffingLevelInterval {
                 .append("staffingLevelSkills", staffingLevelSkills)
                 .toString();
     }
+
+
 }
