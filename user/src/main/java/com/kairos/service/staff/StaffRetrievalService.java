@@ -595,14 +595,12 @@ public class StaffRetrievalService {
 
     public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, long staffId, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds) {
         Organization organization = organizationService.getOrganizationDetail(organizationId, type);
-        Long countryId = organization.getCountry().getId();
-        Long unitId = organization.getId();
-
+        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(organizationId).getId();
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId, shiftDate);
-        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organization.getId(), staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         if (unitPosition != null) {
-            List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+            List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
             List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
             staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeFromCPRNumber(staffAdditionalInfoDTO.getCprNumber()));
             Long functionId = null;
@@ -619,20 +617,20 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
             List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
             staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
-            UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
+            UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(organization.getId());
             staffAdditionalInfoDTO.setUser(userAccessRole);
             if (Optional.ofNullable(unitPosition).isPresent()) {
                 staffAdditionalInfoDTO.setUnitPosition(unitPosition);
             }
             staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
-            Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+            Organization parentOrganization = organization.isParentOrganization()?organization:organizationGraphRepository.getParentOfOrganization(organization.getId());
             UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
             Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
             if (!Optional.ofNullable(staff).isPresent()) {
                 userAccessRoleDTO.setManagement(true);
                 userAccessRoleDTO.setStaff(false);
             } else {
-                userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
+                userAccessRoleDTO = accessGroupService.getStaffAccessRoles(organization.getId(), staff.getId());
             }
             SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(unitPosition.getExpertise().getId());
             staffAdditionalInfoDTO.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
@@ -696,6 +694,9 @@ public class StaffRetrievalService {
                 expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
                 expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
                 expertiseQueryResult.setSeniorityLevel(calculateApplicableSeniorityLevel(expertiseQueryResult.getSeniorityLevels(), maxExperience));
+                if(expertiseQueryResult.isUnitPositionExists()){
+                    staffExpertiseQueryResult.setUnitPositionExists(true);
+                }
             });
         });
         return staffExpertiseQueryResults;

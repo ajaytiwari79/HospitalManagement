@@ -486,6 +486,7 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
+        unit.setUnitType(getUnitType(organizationBasicDTO.getUnitTypeId()));
         updateOrganizationDetails(unit, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO, null);
