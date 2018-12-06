@@ -124,10 +124,8 @@ public class UnitPositionCTAWTAService {
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId, DateUtils.getCurrentLocalDate().toString());
         //For handling unitPosition applicable in future
-        UnitPositionQueryResult existingUnitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        if(unitPosition==null && Optional.ofNullable(existingUnitPosition).isPresent() && CollectionUtils.isNotEmpty(existingUnitPosition.getPositionLines())){
-            UnitPositionQueryResult unitPositionQueryResult=ObjectMapperUtils.copyPropertiesByMapper(existingUnitPosition,UnitPositionQueryResult.class);
-            unitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate().toString());
+        if(unitPosition==null ){
+            unitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         }
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
