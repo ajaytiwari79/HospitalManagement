@@ -323,7 +323,7 @@ public class ShiftBreakService {
             childShift= new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), true,currentShiftActivity.get().getAbsenceReasonCodeId());
 
         }else {
-            childShift= new ShiftActivity(breakActivity.getName(), startDate, endDate, shift.getId(), true,shift.getActivities().get(0).getAbsenceReasonCodeId());
+            childShift= new ShiftActivity(breakActivity.getName(), startDate, endDate, breakActivity.getId(), true,shift.getActivities().get(0).getAbsenceReasonCodeId());
         }
         return childShift;
 
