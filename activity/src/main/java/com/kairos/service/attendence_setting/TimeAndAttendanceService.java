@@ -260,7 +260,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
          Map<BigInteger,ShiftState> realtimeShiftStateMap=oldRealtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         ShiftState realtimeShiftState;
         for (Shift shift:shifts) {
-            if (realtimeShiftStateMap.get(shift.getId()) == null&&DateUtils.asLocalDate(shift.getStartDate()).isAfter(DateUtils.getCurrentLocalDate())) {
+            if (realtimeShiftStateMap.get(shift.getId()) == null&&!DateUtils.asLocalDate(shift.getStartDate()).isAfter(DateUtils.getCurrentLocalDate())) {
                 realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
                 realtimeShiftState.setId(null);
                 realtimeShiftState.setShiftId(shift.getId());
