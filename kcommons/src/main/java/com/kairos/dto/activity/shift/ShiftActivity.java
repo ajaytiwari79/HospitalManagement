@@ -36,7 +36,7 @@ public class ShiftActivity {
     private boolean haltBreak;
     private BigInteger plannedTimeId;
     private boolean breakShift;
-
+    private boolean breakReplaced;
     //Yatharth adding embedded object for frontend
     private ReasonCodeDTO reasonCode;
 
@@ -219,5 +219,13 @@ public class ShiftActivity {
 
     public void setReasonCode(ReasonCodeDTO reasonCode) {
         this.reasonCode = reasonCode;
+    }
+
+    public boolean isBreakReplaced() {
+        return breakReplaced;
+    }
+
+    public void setBreakReplaced(boolean breakReplaced) {
+        this.breakReplaced = breakReplaced;
     }
 }
