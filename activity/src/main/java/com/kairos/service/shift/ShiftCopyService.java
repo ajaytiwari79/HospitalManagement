@@ -4,16 +4,17 @@ import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
-import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.persistence.model.activity.Activity;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -30,6 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.NO_CONFLICTS;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * CreatedBy vipulpandey on 28/11/18
@@ -45,6 +47,8 @@ public class ShiftCopyService extends MongoBaseService {
     @Inject private ShiftBreakService shiftBreakService;
     @Inject private ShiftValidatorService shiftValidatorService;
     @Inject private LocaleService localeService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ShiftService shiftService;
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<DateWiseShiftResponse> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
@@ -54,8 +58,9 @@ public class ShiftCopyService extends MongoBaseService {
         Set<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getShifts().stream().flatMap(ss -> ss.getActivities().stream().map(a -> a.getActivityId()))).collect(Collectors.toSet());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
         Map<BigInteger, ActivityWrapper> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        StaffUnitPositionTimeSlotWrapper unitPositionTimeSlotWrapper = genericIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
-        List<StaffUnitPositionDetails> staffDataList = unitPositionTimeSlotWrapper.getStaffUnitPositionDetails();
+        StaffUnitPositionUnitDataWrapper dataWrapper = genericIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
+        List<StaffUnitPositionDetails> staffDataList = dataWrapper.getStaffUnitPositionDetails();
+        findAndAddCTAInUnitPositions(staffDataList,copyShiftDTO,dataWrapper);
         List<Long> expertiseIds=staffDataList.stream().map(staffUnitPositionDetails -> staffUnitPositionDetails.getExpertise().getId()).collect(Collectors.toList());
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(expertiseIds);
         Map<BigInteger, ActivityWrapper> breakActivitiesMap = shiftBreakService.getBreakActivities(breakSettings,unitId);
@@ -64,10 +69,9 @@ public class ShiftCopyService extends MongoBaseService {
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
 
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
-
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
             // TODO PAVAN handle error
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activityMap, copyShiftDTO,breakActivitiesMap,unitPositionTimeSlotWrapper.getTimeSlotWrappers(),breakSettings);
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activityMap, copyShiftDTO,breakActivitiesMap,dataWrapper.getTimeSlotWrappers(),breakSettings);
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
             unCopiedShiftCount += response.get("error").size();
@@ -75,8 +79,20 @@ public class ShiftCopyService extends MongoBaseService {
             copyShiftResponse.getFailure().add(errorInCopy);
         }
         copyShiftResponse.setUnCopiedShiftCount(unCopiedShiftCount);
-
         return copyShiftResponse;
+    }
+    private void findAndAddCTAInUnitPositions(List<StaffUnitPositionDetails> staffDataList, CopyShiftDTO copyShiftDTO,StaffUnitPositionUnitDataWrapper dataWrapper){
+        List<Long> unitPositionIds=staffDataList.stream().map(staffUnitPositionDetails -> staffUnitPositionDetails.getId()).collect(Collectors.toList());
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, DateUtils.asDate( copyShiftDTO.getStartDate()),DateUtils.asDate(copyShiftDTO.getEndDate()));
+        Map<Long,List<CTAResponseDTO>> CTAResponseMapByUnitPositionIds=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
+        staffDataList.stream().forEach(staffAdditionalInfoDTO -> {
+            if(CTAResponseMapByUnitPositionIds.get(staffAdditionalInfoDTO.getId())!=null){
+                List<CTAResponseDTO> ctaResponseDTOSList=CTAResponseMapByUnitPositionIds.get(staffAdditionalInfoDTO.getId());
+                List<CTARuleTemplateDTO> ctaRuleTemplateDTOS=ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+                staffAdditionalInfoDTO.setCtaRuleTemplates(ctaRuleTemplateDTOS);
+                ShiftUtils.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO,dataWrapper.getDayTypes(),dataWrapper.getPublicHoliday());
+            }
+        });
     }
     private Map<String, List<ShiftResponse>> copyForThisStaff(List<DateWiseShiftResponse> shifts, StaffUnitPositionDetails staffUnitPosition, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO,Map<BigInteger, ActivityWrapper> breakActivitiesMap,List<TimeSlotWrapper> timeSlots,List<BreakSettings> breakSettings ) {
         List<Shift> newShifts = new ArrayList<>(shifts.size());
