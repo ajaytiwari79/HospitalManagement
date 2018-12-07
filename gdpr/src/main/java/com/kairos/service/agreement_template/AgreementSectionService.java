@@ -285,7 +285,7 @@ public class AgreementSectionService extends MongoBaseService {
         Map<AgreementSection, List<Clause>> clauseListCorrespondingToAgreementSection = new HashMap<>();
         Map<AgreementSection, List<ClauseBasicDTO>> exisitingClauseListCorrespondingToAgreementSections = new HashMap<>();
         Set<BigInteger> alteredClauseIdList = new HashSet<>();
-        ClauseTag defaultTag = isUnitId ? clauseTagMongoRepository.findDefaultTagByUnitId(referenceId) : clauseTagMongoRepository.findDefaultTagByCountryId(referenceId);
+        ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTag();
         agreementTemplate.setDefaultClauseTag(defaultTag);
         globalAgreementSectionAndClauseDTOListHashMap.forEach((agreementSection, clauseBasicDTOList) -> {
             List<ClauseBasicDTO> existingClauseList = new ArrayList<>();

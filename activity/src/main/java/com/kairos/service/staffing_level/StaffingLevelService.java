@@ -41,6 +41,8 @@ import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang.CharSet;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -73,6 +75,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -573,7 +576,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public void processStaffingLevel(MultipartFile file, long unitId) throws IOException {
 
-        CSVParser csvRecords = CSVFormat.DEFAULT.parse(new InputStreamReader(file.getInputStream()));
+        CSVParser csvRecords = CSVParser.parse(file.getInputStream(),StandardCharsets.UTF_8,CSVFormat.DEFAULT);
         List<Map<Date, Long>> recordSizeByDate = new ArrayList<>();
         List<CSVRecord> timeRecords = csvRecords.getRecords();
         CSVRecord headerRecord = timeRecords.get(1);

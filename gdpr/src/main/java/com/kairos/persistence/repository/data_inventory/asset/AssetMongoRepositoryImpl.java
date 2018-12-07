@@ -5,7 +5,6 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import org.bson.Document;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -16,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;
@@ -43,7 +43,20 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
     @Override
     public AssetResponseDTO getAssetWithRiskAndRelatedProcessingActivitiesById(Long organizationId, BigInteger id) {
+        Aggregation aggregation= getAggregationOfAsset(organizationId,id);
+        AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
+        return results.getUniqueMappedResult();
 
+    }
+
+    @Override
+    public List<AssetResponseDTO> findAllByUnitId(Long organizationId) {
+        Aggregation aggregation= getAggregationOfAsset(organizationId,null);
+        AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
+        return results.getMappedResults();
+    }
+
+    private Aggregation getAggregationOfAsset(Long organizationId, BigInteger id){
         String addSelectedSubProcessingActivity = "{'$addFields':{" +
                 "    'processingActivities.subProcessingActivities':{   " +
                 "     '$filter': {" +
@@ -62,9 +75,10 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 "        'hostingProvider':{'$first':{'$arrayElemAt':['$hostingProvider',0]}}" +
                 "   }}";
 
-
+        Criteria criteria=(Optional.ofNullable(id).isPresent())?Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id):
+                Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
+                match(criteria),
                 lookup("storageFormat", "storageFormats", "_id", "storageFormats"),
                 lookup("organizationalSecurityMeasure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technicalSecurityMeasure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
@@ -83,27 +97,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 new CustomAggregationOperation(Document.parse(addSelectedSubProcessingActivity)),
                 new CustomAggregationOperation(Document.parse(groupOperation))
         );
-
-        AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
-        return results.getUniqueMappedResult();
-
-    }
-
-    @Override
-    public List<AssetResponseDTO> findAllByUnitId(Long organizationId) {
-
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
-                lookup("assetType", "assetSubTypeId", "_id", "assetSubType"),
-                lookup("assetType", "assetTypeId", "_id", "assetType"),
-                sort(Sort.Direction.DESC, "createdAt"),
-                new CustomAggregationOperation(projectionOperation)
-
-
-        );
-        AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
-        return results.getMappedResults();
+        return  aggregation;
     }
 
 }
