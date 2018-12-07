@@ -41,6 +41,8 @@ import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang.CharSet;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -74,6 +76,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -465,6 +468,7 @@ public class StaffingLevelService extends MongoBaseService {
         LocalTime fromTime;
         LocalTime toTime;
         Set<StaffingLevelActivity> activitySet;
+        Map<BigInteger,Integer> activityRankMap = new HashMap<>();
 
 
         Date date = null;
@@ -493,6 +497,7 @@ public class StaffingLevelService extends MongoBaseService {
 
                 staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
                 staffingDtoList.add(staffingDTO);
+                activityRankMap = new HashMap<>();
 
                 seq = 0;
                 staffingDTO = new PresenceStaffingLevelDto();
@@ -545,6 +550,8 @@ public class StaffingLevelService extends MongoBaseService {
             Map<BigInteger,Integer>
             Iterator<String> keyFirstItr = singleData.keySet().iterator();
 
+            int rank = 0;
+
             while (keyFirstItr.hasNext()) {
                 String keyTemp = keyFirstItr.next();
                 if (!keyTemp.equals("to") && !keyTemp.equals("from") && !keyTemp.equals("min")
@@ -553,6 +560,7 @@ public class StaffingLevelService extends MongoBaseService {
                     if (activityDB != null) {
                         StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId(), keyTemp, Integer.parseInt(singleData.get(keyTemp)), Integer.parseInt(singleData.get(keyTemp)));
                         activitySet.add(staffingLevelActivity);
+                        activityRankMap.put(activityDB.getId(),++rank);
                     }
                 }
             }
@@ -560,6 +568,7 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevelTimeSlList.add(staffingLevelTimeSlot);
         }
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
+        staffingDTO.getStaffingLevelSetting().setActivitiesRank(activityRankMap);
         staffingDtoList.add(staffingDTO);
 
         staffingDtoList.forEach(staffingLevelDto -> {
@@ -569,7 +578,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public void processStaffingLevel(MultipartFile file, long unitId) throws IOException {
 
-        CSVParser csvRecords = CSVFormat.DEFAULT.parse(new InputStreamReader(file.getInputStream()));
+        CSVParser csvRecords = CSVParser.parse(file.getInputStream(),StandardCharsets.UTF_8,CSVFormat.DEFAULT);
         List<Map<Date, Long>> recordSizeByDate = new ArrayList<>();
         List<CSVRecord> timeRecords = csvRecords.getRecords();
         CSVRecord headerRecord = timeRecords.get(1);
@@ -602,7 +611,7 @@ public class StaffingLevelService extends MongoBaseService {
         processRecords:
         for (Map<String, String> dayRecord : recordIndexes) {
 
-            fromToTimeRecord = new HashMap<>();
+            fromToTimeRecord = new LinkedHashMap<>();
             fromToTimeRecord.put("forDay", dayRecord.get("selectedDay"));
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>(timeRecords.size());
             for (CSVRecord csvRecord : timeRecords) {
