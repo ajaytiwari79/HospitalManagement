@@ -125,7 +125,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "UNWIND listOfPage as page\n" +
             "UNWIND allOrg as org \n" +
             "Match (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(page)")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:false, write:false}]->(page)")
     void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
