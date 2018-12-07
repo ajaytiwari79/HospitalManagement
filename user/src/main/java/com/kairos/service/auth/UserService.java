@@ -1,10 +1,13 @@
 package com.kairos.service.auth;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
+import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UnitModuleAccess;
@@ -86,7 +89,12 @@ public class UserService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private DayTypeService dayTypeService;
-
+    @Inject
+    private MailService mailService;
+    @Inject
+    private TokenService tokenService;
+    @Inject
+    EnvConfig config;
     /**
      * Calls UserGraphRepository,
      * creates a new user as provided in method argument
@@ -188,8 +196,16 @@ public class UserService {
         return userGraphRepository.findByAccessToken(token);
     }
 
+    public User findByForgotPasswordToken(String token) {
+        return userGraphRepository.findByForgotPasswordToken(token);
+    }
+
     public User findAndRemoveAccessToken(String accessToken) {
         return userGraphRepository.findAndRemoveAccessToken(accessToken);
+    }
+
+    public User findAndRemoveForgotPasswordToken(String accessToken) {
+        return userGraphRepository.findAndRemoveForgotPasswordToken(accessToken);
     }
 
     public User generateTokenToUser(User currentUser) {
@@ -686,4 +702,43 @@ public class UserService {
     public Long getUserSelectedLanguageId(Long userId) {
         return userGraphRepository.getUserSelectedLanguageId(userId);
     }
+
+    public boolean forgotPassword(String email){
+        if(email.endsWith("kairos.com")||email.endsWith("kairosplanning.com")){
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", email);
+        }
+        User currentUser = userGraphRepository.findByEmail(email);
+        if (Optional.ofNullable(currentUser).isPresent()) {
+            String token=tokenService.createForgotPasswordToken(currentUser);
+            mailService.sendPlainMailWithMailGrid(email,AppConstants.MAILBODY+config.getForgotPasswordApiLink()+token,AppConstants.MAILSUBJECT);
+            return true;
+        }else{
+            logger.error("User not found belongs to this email " + email);
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", email);
+        }
+        return false;
+    }
+
+    public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO){
+        User user=tokenService.getUserByForgotPasswordToken(token);
+        if(!Optional.ofNullable(user).isPresent()){
+            logger.error("User not found belongs to this token " + token);
+            exceptionService.dataNotFoundByIdException("message.user.token.notFound", token);
+        }
+        if(!user.getForgotTokenRequestTime().plusHours(2).isAfter(DateUtils.getCurrentLocalDateTime())){
+            logger.error("User not found belongs to this token " + token);
+            exceptionService.dataNotFoundByIdException("message.user.token.invalid", token);
+        }
+        CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
+        if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
+            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
+            user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            userGraphRepository.save(user);
+        } else {
+            logger.error("Password not matched ");
+            exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
+        }
+        return true;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.kairos.controller.auth;
 
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.OrganizationSelectionDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
@@ -67,6 +69,22 @@ public class AuthController {
             return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, response);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+
+    }
+
+    @RequestMapping(value = "/forgot", method = RequestMethod.POST)
+    @ApiOperation(value = "Authenticate User")
+    ResponseEntity<Map<String, Object>> forgotPassword(@RequestParam("email") String email) {
+        logger.info("user info is {}",email);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.forgotPassword(email));
+
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
+    @ApiOperation(value = "Authenticate User")
+    ResponseEntity<Map<String, Object>> resetPassword(@RequestParam("token") String token,@RequestBody PasswordUpdateDTO passwordUpdateDTO ) {
+        logger.info("user info is {}",token);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.resetPassword(token,passwordUpdateDTO));
 
     }
 
