@@ -33,7 +33,6 @@ ext {
 }
 
 dependencies {
-	compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 	compile('org.springframework.cloud:spring-cloud-starter-gateway')

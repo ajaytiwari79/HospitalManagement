@@ -55,6 +55,7 @@ public class ShiftBreakService {
         return calculateBreakAndShiftDuration(activityWrapperMap,  mainShift, unitPositionDetails,  breakWTATemplate, timeSlot,false);
 
     }
+  
     private List<ShiftActivity> calculateBreakAndShiftDuration(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffUnitPositionDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot,boolean updateShift) {
         if (activityWrapperMap.get(mainShift.getActivities().get(0).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
             Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
@@ -65,11 +66,13 @@ public class ShiftBreakService {
         }
         return Collections.emptyList();
     }
+  
     public List<ShiftActivity> updateBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift mainShift, StaffUnitPositionDetails unitPositionDetails, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         removeAllPreviouslyAllottedBreaks(mainShift);
         return calculateBreakAndShiftDuration(activityWrapperMap,  mainShift, unitPositionDetails,  breakWTATemplate, timeSlot,true);
 
     }
+  
     private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotWrapper> timeSlots, BreakWTATemplate breakWTATemplate) {
         BreakAvailabilitySettings breakAvailabilitySettings = null;
         TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> (current.getStartHour() < startDate.getHours() && current.getEndHour() > startDate.getHours())).findFirst().orElse(null);
@@ -92,7 +95,6 @@ public class ShiftBreakService {
         }
         return numberOfBreakRequired;
         // This means that at least we have to add n break.
-
     }
 
     /**
@@ -189,9 +191,7 @@ public class ShiftBreakService {
                         shiftDurationInMinute -= (breakAllowedWithShiftMinute-currentlyAllottedDurationInMinute);
                         currentlyAllottedDurationInMinute=0L;
                         startDateMillis = endDateMillis;
-
                     }
-
                 } else if (shiftDurationInMinute >= breakAllowedWithShiftMinute) {
                     endDateMillis=startDateMillis+((breakAllowedWithShiftMinute/2) *ONE_MINUTE); // adding shift for next half
                     shifts.add(++itemsAddedFromBeginning,getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(),
@@ -225,7 +225,6 @@ public class ShiftBreakService {
 
                 }
             }
-
         } else {
             endDateMillis = mainShift.getEndDate().getTime();
             shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(startDateMillis), new Date(endDateMillis), false,mainShift.getActivities().get(0).getAbsenceReasonCodeId()));
@@ -244,6 +243,7 @@ public class ShiftBreakService {
         }
         return shifts;
     }
+  
     private void mergeShifts(List<ShiftActivity> shiftActivities){
 
         for (int i=0;i< shiftActivities.size();i++) {
@@ -258,6 +258,7 @@ public class ShiftBreakService {
         }
 
     }
+  
     private void removeAllPreviouslyAllottedBreaks(Shift shift){
         for (int i = 0; i < shift.getActivities().size(); i++) {
             if (shift.getActivities().get(i).isBreakShift() && !shift.getActivities().get(i).isBreakReplaced()) { // if this is break and break is not replaced by another
@@ -265,6 +266,7 @@ public class ShiftBreakService {
             }
         }
     }
+  
     private  void reAdjustShiftDuration(Activity breakActivity,Shift mainShift,List<ShiftActivity> shifts, boolean lastBlockingShiftAdded, BreakAvailabilitySettings breakAvailability, List<BreakSettings> breakSettings) {
         for (BreakSettings breakSetting : breakSettings) {
             long requiredReduceShiftByMinutes = breakSetting.getShiftDurationInMinute() + breakSetting.getBreakDurationInMinute();
@@ -292,12 +294,10 @@ public class ShiftBreakService {
                         shifts.add(i+3,getShiftObject(breakActivity.getName(),breakActivity.getId(),shifts.get(i+2).getEndDate() ,
                                 new Date(shifts.get(i+3).getStartDate().getTime()), true,null));
                         break;
-
                     }
                 }
             }
         }
-
     }
 
     private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate, boolean breakShift,Long absenceReasonCodeId) {
@@ -305,6 +305,7 @@ public class ShiftBreakService {
         childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
         return childShift;
     }
+  
     private ShiftActivity getShiftByStartDuration(Shift shift,Date startDate, Date endDate) {
         ShiftActivity childShift;
         Optional<ShiftActivity> currentShiftActivity=shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime()<=startDate.getTime() && shiftActivity.getEndDate().getTime()>startDate.getTime())).findFirst();
@@ -316,12 +317,12 @@ public class ShiftBreakService {
         return childShift;
 
     }
+  
     private ShiftActivity getBreakAtCurrentDuration(Shift shift,Date startDate, Date endDate,Activity breakActivity) {
         ShiftActivity childShift;
         Optional<ShiftActivity> currentShiftActivity=shift.getActivities().stream().filter(shiftActivity -> (shiftActivity.getStartDate().getTime()<=startDate.getTime() && shiftActivity.getEndDate().getTime()>startDate.getTime())).findFirst();
         if (currentShiftActivity.isPresent()){
             childShift= new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), true,currentShiftActivity.get().getAbsenceReasonCodeId());
-
         }else {
             childShift= new ShiftActivity(breakActivity.getName(), startDate, endDate, breakActivity.getId(), true,shift.getActivities().get(0).getAbsenceReasonCodeId());
         }
