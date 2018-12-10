@@ -262,7 +262,6 @@ public class EmploymentService {
             }, accessGroupId);
 
         response.put("organizationId", unitId);
-        response.put("synInFls", flsSyncStatus);
         return response;
     }
 
