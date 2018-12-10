@@ -90,11 +90,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+import static com.kairos.service.unit_position.UnitPositionUtility.convertStaffUnitPositionObject;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 
 /**
@@ -1010,7 +1012,10 @@ public class UnitPositionService {
 
         Map<Long, StaffUnitPositionDetails> unitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));
 
-        staffAdditionalInfoDTOS.forEach(currentData -> convertUnitPositionObject(unitPositionDetailsMap.get(currentData.getId()),currentData));
+        List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
+
+
+        staffAdditionalInfoDTOS.forEach(currentData -> convertStaffUnitPositionObject(unitPositionDetailsMap.get(currentData.getId()),currentData,expertisePlannedTimes));
 
         StaffUnitPositionUnitDataWrapper staffUnitPositionUnitDataWrapper = new StaffUnitPositionUnitDataWrapper(staffAdditionalInfoDTOS);
 

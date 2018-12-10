@@ -9,6 +9,7 @@ import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -277,5 +278,16 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Query query=new Query(criteria);
         List<PlanningPeriod> results = mongoTemplate.find(query, PlanningPeriod.class);
         return results;
+    }
+    @Override
+    public List<PlanningPeriod> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate){
+         Aggregation aggregation = newAggregation(
+        match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
+                .orOperator(
+                        Criteria.where("startDate").lte(requestedStartDate).where("endDate").gte(requestedStartDate),
+                        Criteria.where("startDate").lte(requestedEndDate).where("endDate").gte(requestedEndDate)
+                )));
+        AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriod.class);
+        return results.getMappedResults();
     }
 }

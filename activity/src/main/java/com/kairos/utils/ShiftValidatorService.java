@@ -12,6 +12,7 @@ import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
@@ -264,11 +265,38 @@ public class ShiftValidatorService {
         return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUser(), totalTimeBank, activityWrapperMap,staffAdditionalInfoDTO.getStaffAge(),staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(),staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays());
     }
 
-    public List<String> validateShiftWhileCopy(ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails) {
+    private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(PlanningPeriod planningPeriod, Phase phase, ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffUnitPositionDetails staffUnitPositionDetails, Map<BigInteger, ActivityWrapper> activityWrapperMap,StaffUnitPositionUnitDataWrapper dataWrapper) {
+        logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getStartDate()));
+        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffUnitPositionDetails.getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), dataWrapper.getUser().getStaff());
+        DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates(),activityWrapperMap);
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUnitPosition(shift.getUnitPositionId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeDate(staffUnitPositionDetails.getId(), shift.getStartDate());
+        Map<String, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateName, sc -> sc.getCount()));
+        Date endTimeOfInterval = DateUtils.getStartOfTheDay(DateUtils.asDate(DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1)));
+        Interval interval = new Interval(DateUtils.getLongFromLocalDate(staffUnitPositionDetails.getStartDate()),
+                staffUnitPositionDetails.getEndDate() == null ? endTimeOfInterval.getTime() : DateUtils.getLongFromLocalDate(staffUnitPositionDetails.getEndDate()));
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionDetails.getId(), staffUnitPositionDetails.getTotalWeeklyMinutes(), staffUnitPositionDetails.getWorkingDaysInWeek(),
+                staffUnitPositionDetails.getStartDate(), staffUnitPositionDetails.getEndDate() != null ? staffUnitPositionDetails.getEndDate() : null, staffUnitPositionDetails.getTotalWeeklyHours());
+        List<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shift.getUnitId(), interval.getStart().toDate(), interval.getEnd().toDate());
+        int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
+        Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
+        Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, dataWrapper.getUser(), totalTimeBank, activityWrapperMap,dataWrapper.getStaffAge(),dataWrapper.getSeniorAndChildCareDays().getChildCareDays(),dataWrapper.getSeniorAndChildCareDays().getSeniorDays());
+    }
+
+
+    public List<String> validateShiftWhileCopy(StaffUnitPositionUnitDataWrapper dataWrapper, ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails, List<WTAQueryResultDTO> wtaQueryResultDTOS, PlanningPeriod planningPeriod, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo =  getRuleTemplateSpecificInfo(planningPeriod,null,shiftWithActivityDTO,wtaQueryResultDTOS.get(0),staffUnitPositionDetails,activityWrapperMap,dataWrapper);
+        Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffUnitPositionDetails.getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffUnitPositionDetails.getExpertise());
 
-        Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification);
+        Specification<ShiftWithActivityDTO> activitySpecification =
+                 activityEmploymentTypeSpecification
+                .and(activityExpertiseSpecification)
+                .and(wtaRulesSpecification);
+
         return activitySpecification.isSatisfiedString(shiftWithActivityDTO);
     }
 

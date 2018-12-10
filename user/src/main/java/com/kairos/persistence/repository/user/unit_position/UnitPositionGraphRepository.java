@@ -52,8 +52,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "WITH expertise,staff,unit,user,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
             "return id(staff) as staffId,id(user) as userId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
-            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,employmentType:employmentType}) end as positionLines , " +
             "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
