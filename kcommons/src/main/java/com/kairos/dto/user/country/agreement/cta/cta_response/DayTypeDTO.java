@@ -9,7 +9,7 @@ public class DayTypeDTO {
    private Long id;
    private String name;
    private List<Day> validDays=new ArrayList<>();
-    private List<CountryHolidayCalenderDTO> countryHolidayCalenderData;
+    private List<CountryHolidayCalenderDTO> countryHolidayCalenderData = new ArrayList<>();
     private boolean holidayType;
     private boolean allowTimeSettings = false;
     public DayTypeDTO() {
