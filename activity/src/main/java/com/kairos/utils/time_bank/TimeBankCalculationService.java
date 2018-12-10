@@ -281,7 +281,7 @@ public class TimeBankCalculationService {
                         DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.asDate(DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asLocalTime(countryHolidayCalenderDTO.getStartTime())), DateUtils.asDate(DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asLocalTime(countryHolidayCalenderDTO.getEndTime())));
                         valid = dateTimeInterval.contains(shiftDateTime);
                     }else {
-                        valid = countryHolidayCalenderDTO.getHolidayDate().equals(shiftDateTime.toLocalDate());
+                        valid = DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()).equals(shiftDateTime.toLocalDate());
                     }
                     if (valid) {
                         break;
