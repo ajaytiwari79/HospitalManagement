@@ -323,17 +323,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
 @Query("OPTIONAL MATCH (organization:Organization)  WHERE id(organization)={0}\n" +
         "OPTIONAL MATCH (staff:Staff)  WHERE id(staff)={1}\n" +
-        "OPTIONAL MATCH(organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff)\n" +
         "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true}) \n" +
         "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode) " +
         "RETURN \n" +
         "CASE \n" +
         "WHEN organization IS NULL THEN \"organization\" \n" +
         "WHEN staff IS NULL THEN \"staff\"\n" +
-        "WHEN employment IS NULL THEN  \"emp\" \n" +
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
         "ELSE COLLECT({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
-        Object getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
+        Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
             "WHERE id(organization)={0}  AND id(unitPosition)={1} \n" +

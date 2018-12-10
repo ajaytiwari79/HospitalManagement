@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class StaffingLevelUtil {
 
     public static StaffingLevel buildPresenceStaffingLevels(PresenceStaffingLevelDto presenceStaffingLevelDTO, Long orgId){
-        presenceStaffingLevelDTO.getStaffingLevelSetting().setActivitiesRank(null);
+       // presenceStaffingLevelDTO.getStaffingLevelSetting().setActivitiesRank(null);
         StaffingLevel staffingLevel=new StaffingLevel(presenceStaffingLevelDTO.getCurrentDate(), presenceStaffingLevelDTO.getWeekCount()
                 ,orgId, presenceStaffingLevelDTO.getPhaseId(), presenceStaffingLevelDTO.getStaffingLevelSetting());
 
@@ -107,8 +107,8 @@ public class StaffingLevelUtil {
                 activitiesRankMap.forEach((activityId, rank) -> {
                     staffingLevelActivities[rank - 1] = staffingLevelActivityMap.get(activityId);
                 });
+                staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
             }
-            staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
 
         }
 

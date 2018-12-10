@@ -202,10 +202,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
-        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
-                template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
-                template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
-                template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
+        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO=null;
+        if(!isUnitId) {
+            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
+                    template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
+                    template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
+                    template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
+        }
         List<ClauseBasicResponseDTO> clauseListForTemplate = isUnitId ? clauseMongoRepository.findAllClauseByUnitId(referenceId) : clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO);
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId, isUnitId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
