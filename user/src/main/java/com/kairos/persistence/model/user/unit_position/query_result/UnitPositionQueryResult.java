@@ -39,6 +39,25 @@ public class UnitPositionQueryResult {
     private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
+    private boolean mainEmployment;
+    private boolean mainUnitPosition;
+    private String unitName;
+
+    public UnitPositionQueryResult() {
+        //Default Constructor
+    }
+
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta) {
+        this.expertise = expertise;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastWorkingDate = lastWorkingDate;
+        this.id = id;
+        this.positionCode = positionCode;
+        this.union = union;
+        this.workingTimeAgreement=wta;
+
+    }
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -190,11 +209,6 @@ public class UnitPositionQueryResult {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
-
-    public UnitPositionQueryResult() {
-        //default cons
-    }
-
     public Long getStaffId() {
         return staffId;
     }
@@ -203,16 +217,27 @@ public class UnitPositionQueryResult {
         this.staffId = staffId;
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta) {
-        this.expertise = expertise;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.lastWorkingDate = lastWorkingDate;
-        this.id = id;
-        this.positionCode = positionCode;
-        this.union = union;
-        this.workingTimeAgreement=wta;
-
+    public boolean isMainEmployment() {
+        return mainEmployment;
     }
 
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
+    }
+
+    public boolean isMainUnitPosition() {
+        return mainUnitPosition;
+    }
+
+    public void setMainUnitPosition(boolean mainUnitPosition) {
+        this.mainUnitPosition = mainUnitPosition;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
 }

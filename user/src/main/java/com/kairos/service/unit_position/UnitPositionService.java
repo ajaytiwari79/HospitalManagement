@@ -216,7 +216,9 @@ public class UnitPositionService {
                 new UnitPosition(positionCode, organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft);
 
         preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
-        if(employment.isMainEmployment()){
+        String [] str=new String[2];
+        if(employmentType.isMainEmployment() || unitPositionDTO.isMainUnitPosition()){
+            str=employmentService.createUnitPositionTest(unitPositionDTO,str);
             unitPosition.setMainUnitPosition(true);
         }
 
@@ -230,6 +232,7 @@ public class UnitPositionService {
         linkFunctions(functions, unitPosition.getUnitPositionLines().get(0), false, unitPositionDTO.getFunctions());
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
+        unitPositionQueryResult.setUnitName(str[1]);
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaWrapper.getCta().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaWrapper.getWta().get(0));
         return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
@@ -310,18 +313,18 @@ public class UnitPositionService {
                 (unitPositionDTO.getUnitId(), unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(), DateUtils.getLongFromLocalDate(unitPositionDTO.getStartDate()),
                         funIds);
 
-        if (functions.size() != unitPositionDTO.getFunctions().size()) {
-            exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
-        }
-        functions.forEach(currentFunction -> {
-            unitPositionDTO.getFunctions().forEach(functionsToSave -> {
-                if (currentFunction.getFunction().getId().equals(functionsToSave.getId())) {
-                    if (!currentFunction.isAmountEditableAtUnit() && !currentFunction.getAmount().equals(functionsToSave.getAmount())) {
-                        exceptionService.actionNotPermittedException("error_function_amount_unmodifiable", currentFunction.getFunction().getName());
-                    }
-                }
-            });
-        });
+//        if (functions.size() != unitPositionDTO.getFunctions().size()) {
+//            exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
+//        }
+//        functions.forEach(currentFunction -> {
+//            unitPositionDTO.getFunctions().forEach(functionsToSave -> {
+//                if (currentFunction.getFunction().getId().equals(functionsToSave.getId())) {
+//                    if (!currentFunction.isAmountEditableAtUnit() && !currentFunction.getAmount().equals(functionsToSave.getAmount())) {
+//                        exceptionService.actionNotPermittedException("error_function_amount_unmodifiable", currentFunction.getFunction().getName());
+//                    }
+//                }
+//            });
+//        });
         return functions;
     }
 

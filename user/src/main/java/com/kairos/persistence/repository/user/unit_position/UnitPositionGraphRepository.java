@@ -376,4 +376,16 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
     boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
 
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0} \n" +
+            "MATCH(staff)<-[:"+BELONGS_TO+"]-(emp:Employment) WHERE (emp.mainEmploymentEndDate IS NULL OR emp.mainEmploymentEndDate>={1}) AND ((emp.mainEmploymentStartDate IS NOT NULL) AND({2} IS NULL OR emp.mainEmploymentStartDate<={2})) \n" +
+            "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(et:EmploymentType) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) AND " +
+            "({2} IS NULL AND (up.endDate IS NULL OR up.endDate > {1})) \n" +
+            "OR " +
+            "({2} IS NOT NULL AND  ({1} < up.endDate OR {2}>up.startDate)) \n" +
+            "WITH staff,emp,up,et \n" +
+            "OPTIONAL MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
+            "WITH staff,emp,up,et,org " +
+            "RETURN staff,emp as employment,CASE WHEN up IS NULL then [] ELSE collect({id:id(up),startDate:up.startDate,endDate:up.endDate,mainEmployment:et.mainEmployment,id(org) as unitId,org.name as unitName}) END as unitPositionList \n ")
+    List<StaffEmploymentQueryResult> findAllByUserId(Long userId,String startDate,String endDate);
+
 }

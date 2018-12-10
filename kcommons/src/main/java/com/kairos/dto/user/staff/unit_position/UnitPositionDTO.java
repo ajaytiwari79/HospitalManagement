@@ -72,6 +72,7 @@ public class UnitPositionDTO {
     private Long accessGroupId;
     private String positionCodeName;
     private boolean mainUnitPosition;
+    private boolean checkMainUnitPosition;
 
 
 
@@ -352,5 +353,13 @@ public class UnitPositionDTO {
 
     public void setMainUnitPosition(boolean mainUnitPosition) {
         this.mainUnitPosition = mainUnitPosition;
+    }
+
+    public boolean isCheckMainUnitPosition() {
+        return checkMainUnitPosition;
+    }
+
+    public void setCheckMainUnitPosition(boolean checkMainUnitPosition) {
+        this.checkMainUnitPosition = checkMainUnitPosition;
     }
 }

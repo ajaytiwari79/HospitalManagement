@@ -15,6 +15,7 @@ public class PositionWrapper {
     private List<ClientMinimumDTO> relatedCitizens;
     private UnitPositionQueryResult unitPosition;
     private EmploymentQueryResult employment;
+    private boolean alreadyMainUnitPositionExists;
 
     public EmploymentQueryResult getEmployment() {
         return employment;
@@ -52,5 +53,13 @@ public class PositionWrapper {
 
     public void setUnitPosition(UnitPositionQueryResult unitPosition) {
         this.unitPosition = unitPosition;
+    }
+
+    public boolean isAlreadyMainUnitPositionExists() {
+        return alreadyMainUnitPositionExists;
+    }
+
+    public void setAlreadyMainUnitPositionExists(boolean alreadyMainUnitPositionExists) {
+        this.alreadyMainUnitPositionExists = alreadyMainUnitPositionExists;
     }
 }

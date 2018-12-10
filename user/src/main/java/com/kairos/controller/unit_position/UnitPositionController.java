@@ -2,6 +2,7 @@ package com.kairos.controller.unit_position;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.unit_position.UnitPositionCTAWTAService;
 import com.kairos.service.unit_position.UnitPositionFunctionService;
 import com.kairos.service.unit_position.UnitPositionJobService;
@@ -44,6 +45,8 @@ public class UnitPositionController {
     private UnitPositionJobService unitPositionJobService;
     @Inject private UnitPositionFunctionService unitPositionFunctionService;
     @Inject private UnitPositionCTAWTAService unitPositionCTAWTAService;
+    @Inject private EmploymentService employmentService;
+
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
     public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
@@ -172,5 +175,11 @@ public class UnitPositionController {
     @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
     public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
+    }
+
+    @ApiOperation(value = "Create a New Position")
+    @PostMapping(value = "/unit_position/test")
+    public ResponseEntity<Map<String, Object>> verify(@PathVariable Long unitId,  @RequestBody @Valid UnitPositionDTO unitPositionDTO) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createUnitPositionTest(unitPositionDTO,new String[2]));
     }
 }

@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
+import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.*;
@@ -142,7 +143,7 @@ public class CounterConfService extends MongoBaseService {
         if(availableCounters.size() == CounterType.values().length) exceptionService.duplicateDataException("error.counterType.duplicate", "Duplicate Available");
         List<CounterType> availableTypes = availableCounters.stream().map(Counter::getType).collect(Collectors.toList());
         List<CounterType> addableCounters = Arrays.stream(CounterType.values()).filter(counterType -> !availableTypes.contains(counterType)).collect(Collectors.toList());
-        addableCounters.forEach(counterType -> kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null)));
+        addableCounters.forEach(counterType -> kpis.add(new KPI(counterType.getName(), ChartType.PIE, null, counterType, false, null)));
         List<KPI> savedKPIs = save(kpis);
         List<ApplicableKPI> applicableKPIS = savedKPIs.parallelStream().map(kpi -> new ApplicableKPI(kpi.getId(),kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
         save(applicableKPIS);

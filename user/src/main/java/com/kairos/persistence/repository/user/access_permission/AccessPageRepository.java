@@ -106,10 +106,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
 
-    @Query("MATCH (n:Organization)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(n)={0} AND  id(staff)={2}\n" +
-            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
-            "Match (unitPermission)-[:HAS_ACCESS_GROUP]->(g:AccessGroup) where id(g)={3} with g,unitPermission\n" +
-            "Match (g)-[:HAS_ACCESS_OF_TABS]->(accessPage:AccessPage{isModule:true}) with accessPage,g,unitPermission\n" +
+    @Query("MATCH (n:Organization)-[:"+HAS_EMPLOYMENTS+"]->(emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(n)={0} AND  id(staff)={2}\n" +
+            "Match (emp)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit:Organization) WHERE id(unit)={1}\n" +
+            "Match (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(g:AccessGroup) where id(g)={3} with g,unitPermission\n" +
+            "Match (g)-[:"+HAS_ACCESS_OF_TABS+"]->(accessPage:AccessPage{isModule:true}) with accessPage,g,unitPermission\n" +
             "MATCH path=(accessPage)-[:SUB_PAGE*]->(accessPage1:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) \n" +
             "WITH NODES(path) AS np,g as g,unitPermission as unitPermission with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1],g:g,unitPermission:unitPermission}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.unitPermission as unitPermission\n" +
             "optional match (parent:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(parent)=id(ps.p) \n" +
