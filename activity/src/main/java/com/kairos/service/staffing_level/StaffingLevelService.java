@@ -547,7 +547,6 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevelTimeSlot = new StaffingLevelTimeSlotDTO(seq++, Integer.parseInt(singleData.get("min")), Integer.parseInt(singleData.get("max")), duration);
 
             activitySet = new HashSet<StaffingLevelActivity>();
-            Map<BigInteger,Integer>
             Iterator<String> keyFirstItr = singleData.keySet().iterator();
 
             int rank = 0;
