@@ -285,7 +285,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
                 .orOperator(
                         Criteria.where("startDate").lte(requestedStartDate).where("endDate").gte(requestedStartDate),
-                        Criteria.where("startDate").lte(requestedEndDate).where("endDate").gte(requestedEndDate)
+                        Criteria.where("startDate").gte(requestedStartDate).where("endDate").gte(requestedEndDate)
                 )));
         AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriod.class);
         return results.getMappedResults();
