@@ -1,6 +1,7 @@
 package com.kairos.service.auth;
 
 import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -710,7 +711,7 @@ public class UserService {
         User currentUser = userGraphRepository.findByEmail(email);
         if (Optional.ofNullable(currentUser).isPresent()) {
             String token=tokenService.createForgotPasswordToken(currentUser);
-            mailService.sendPlainMailWithMailGrid(email,AppConstants.MAILBODY+config.getForgotPasswordApiLink()+token,AppConstants.MAILSUBJECT);
+            mailService.sendPlainMailWithMailGrid(email,AppConstants.HI+"  "+currentUser.getFirstName()+AppConstants.MAILBODY+config.getForgotPasswordApiLink()+token,AppConstants.MAILSUBJECT);
             return true;
         }else{
             logger.error("User not found belongs to this email " + email);
@@ -720,24 +721,20 @@ public class UserService {
     }
 
     public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO){
-        User user=tokenService.getUserByForgotPasswordToken(token);
+        User user=findByForgotPasswordToken(token);
         if(!Optional.ofNullable(user).isPresent()){
             logger.error("User not found belongs to this token " + token);
             exceptionService.dataNotFoundByIdException("message.user.token.notFound", token);
         }
-        if(!user.getForgotTokenRequestTime().plusHours(2).isAfter(DateUtils.getCurrentLocalDateTime())){
+        DateTimeInterval interval=new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()),DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
+        if(!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))){
             logger.error("User not found belongs to this token " + token);
             exceptionService.dataNotFoundByIdException("message.user.token.invalid", token);
         }
-        CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
-        if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
-            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
-            user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
-            userGraphRepository.save(user);
-        } else {
-            logger.error("Password not matched ");
-            exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
-        }
+        CharSequence password = CharBuffer.wrap(passwordUpdateDTO.getConfirmPassword());
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.setForgotPasswordToken(null);
+        userGraphRepository.save(user);
         return true;
     }
 

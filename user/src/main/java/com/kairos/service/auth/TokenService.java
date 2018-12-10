@@ -61,9 +61,6 @@ public class TokenService {
         return userService.findByAccessToken(token) != null;
     }
 
-    public boolean validateForgotPasswordToken(String token) {
-        return userService.findByForgotPasswordToken(token) != null;
-    }
 
 
     /**
@@ -79,13 +76,6 @@ public class TokenService {
         return currentUser.getAccessToken() == null;
     }
 
-    public boolean removeForgotPasswordToken(String ForgotToken) {
-        User currentUser = userService.findAndRemoveForgotPasswordToken(ForgotToken);
-        currentUser.setForgotPasswordToken(null);
-        userGraphRepository.save(currentUser);
-        return currentUser.getAccessToken() == null;
-    }
-
 
     /**
      * Find the user by token and returns user
@@ -96,8 +86,5 @@ public class TokenService {
         return userService.findByAccessToken(token);
     }
 
-    public User getUserByForgotPasswordToken(String token){
-        return userService.findByForgotPasswordToken(token);
-    }
 
 }

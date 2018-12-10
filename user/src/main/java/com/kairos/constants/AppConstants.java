@@ -20,8 +20,9 @@ public class AppConstants {
     }
 
     //forgot password mail
-    public static final String MAILSUBJECT="Password Reset Request";
-    public static final String MAILBODY="To reset your password, click the link :\n";
+    public static final String MAILSUBJECT="Kairos Planning password reset link";
+    public static final String HI="Hi";
+    public static final String MAILBODY="\n\nWe received a request to reset your Kairos Planning password. Click the link below to choose a new one :\n";
     public static final String TIMEZONE_UTC = "UTC";
     public static final String HYPHEN = "-";
     public static final String KAI = "KAI-";
