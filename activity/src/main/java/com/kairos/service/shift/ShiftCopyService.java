@@ -129,7 +129,7 @@ public class ShiftCopyService extends MongoBaseService {
         Map<Long, List<Shift>> unitPositionWiseShifts = previousShiftBetweenDatesByUnitPosition.stream().collect(Collectors.toMap(key -> key.getUnitPositionId(), value -> value.getShifts()));
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
-            // TODO PAVAN handle error
+
             List<WTAQueryResultDTO> wtaQueryResultDTOS = WTAMapByUnitPositionId.get(staffUnitPosition.getId());
             List<Shift> currentStaffPreviousShifts = unitPositionWiseShifts.get(staffUnitPosition.getId());
 
@@ -164,11 +164,7 @@ public class ShiftCopyService extends MongoBaseService {
                     s.setActivity(activityDTO);
                 });
 
-                PlanningPeriodDTO planningPeriod = planningPeriodMap.get(planningPeriodMap.keySet().iterator().next());
-                if (planningPeriod == null) {
-                    logger.info("I havent found pp");
-                    continue;// TODO vipul We need to restrict this and return
-                }
+                PlanningPeriodDTO planningPeriod = getCurrentPlanningPeriod(planningPeriodMap, shiftCreationStartDate);
 
                 String shiftExistsMessage = validateShiftExistanceBetweenDuration(shiftCreationStartDate, sourceShift, currentStaffPreviousShifts);
                 if (shiftExistsMessage != null) {
@@ -319,6 +315,17 @@ public class ShiftCopyService extends MongoBaseService {
             return ("message.shift.date.startandend");
         }
         return null;
+    }
+
+    private PlanningPeriodDTO getCurrentPlanningPeriod(Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, LocalDate shiftCreationStartDate) {
+        PlanningPeriodDTO planningPeriod = null;
+        for (DateTimeInterval currentInterval : planningPeriodMap.keySet()) {
+            if (currentInterval.contains(DateUtils.getLongFromLocalDate(shiftCreationStartDate))) {
+                planningPeriod = planningPeriodMap.get(currentInterval);
+                break;
+            }
+        }
+        return planningPeriod;
     }
 
 }

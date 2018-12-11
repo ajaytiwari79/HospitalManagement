@@ -288,15 +288,9 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("endDate").
                 and("current_phase_data.name").as("currentPhase").
                 and("current_phase_data._id").as("currentPhaseId");
-
         Aggregation aggregation = newAggregation(
-        match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
-                .orOperator(
-                        Criteria.where("startDate").lte(requestedStartDate).where("endDate").gte(requestedStartDate),
-                        Criteria.where("startDate").gte(requestedStartDate).where("endDate").gte(requestedEndDate)
-                )),
+        match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").lte(requestedEndDate).and("endDate").gte(requestedStartDate)),
                  lookup("phases", "currentPhaseId", "_id", "current_phase_data"),projectionOperation
-
          );
         AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
         return results.getMappedResults();
