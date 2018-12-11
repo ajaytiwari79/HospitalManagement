@@ -35,6 +35,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -704,32 +705,38 @@ public class UserService {
         return userGraphRepository.getUserSelectedLanguageId(userId);
     }
 
-    public boolean forgotPassword(String email){
-        if(email.endsWith("kairos.com")||email.endsWith("kairosplanning.com")){
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", email);
+    public boolean forgotPassword(String userEmail){
+        boolean result = false;
+        if(userEmail.endsWith("kairos.com")||userEmail.endsWith("kairosplanning.com")){
+            logger.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
         }
-        User currentUser = userGraphRepository.findByEmail(email);
+        User currentUser = userGraphRepository.findByEmail(userEmail);
         if (Optional.ofNullable(currentUser).isPresent()) {
-            String token=tokenService.createForgotPasswordToken(currentUser);
-            mailService.sendPlainMailWithMailGrid(email,AppConstants.HI+"  "+currentUser.getFirstName()+AppConstants.MAILBODY+config.getForgotPasswordApiLink()+token,AppConstants.MAILSUBJECT);
-            return true;
+            String token = tokenService.createForgotPasswordToken(currentUser);
+            mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT);
+            result = true;
         }else{
-            logger.error("User not found belongs to this email " + email);
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", email);
+            logger.error("No User found by email " + userEmail);
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
         }
-        return false;
+        return result;
     }
 
-    public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO){
-        User user=findByForgotPasswordToken(token);
-        if(!Optional.ofNullable(user).isPresent()){
-            logger.error("User not found belongs to this token " + token);
-            exceptionService.dataNotFoundByIdException("message.user.token.notFound", token);
+    public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
+        if(!passwordUpdateDTO.isValid()){
+            exceptionService.actionNotPermittedException("message.staff.user.password.notmatch");
         }
-        DateTimeInterval interval=new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()),DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
-        if(!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))){
-            logger.error("User not found belongs to this token " + token);
-            exceptionService.dataNotFoundByIdException("message.user.token.invalid", token);
+        User user = findByForgotPasswordToken(token);
+        if (!Optional.ofNullable(user).isPresent()) {
+            logger.error("No User found by token");
+            exceptionService.dataNotFoundByIdException("message.user.token.notFound");
+        }
+        //We are validating password reset token for 2 hours.
+        DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()), DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
+        if (!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))) {
+            logger.error("Password reset token expired");
+            exceptionService.dataNotFoundByIdException("message.user.token.invalid");
         }
         CharSequence password = CharBuffer.wrap(passwordUpdateDTO.getConfirmPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
@@ -737,5 +744,6 @@ public class UserService {
         userGraphRepository.save(user);
         return true;
     }
+
 
 }

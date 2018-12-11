@@ -73,7 +73,7 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/forgot", method = RequestMethod.POST)
-    @ApiOperation(value = "Authenticate User")
+    @ApiOperation(value = "forgot password")
     ResponseEntity<Map<String, Object>> forgotPassword(@RequestParam("email") String email) {
         logger.info("user info is {}",email);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.forgotPassword(email));
@@ -81,7 +81,7 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
-    @ApiOperation(value = "Authenticate User")
+    @ApiOperation(value = "reset password")
     ResponseEntity<Map<String, Object>> resetPassword(@RequestParam("token") String token,@RequestBody PasswordUpdateDTO passwordUpdateDTO ) {
         logger.info("user info is {}",token);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.resetPassword(token,passwordUpdateDTO));

@@ -60,12 +60,12 @@ public class MailService {
         return false;
     }
 
-    public void sendPlainMailWithMailGrid(String receiver,String body, String subject) {
-       Email from=new Email("harishmodi38@gmail.com");
+    public void sendPlainMailWithSendGrid(String receiver, String body, String subject) {
+       Email from=new Email("no-reply@kairosplanning.com");
        Email to=new Email(receiver);
        Content content=new Content("text/plain",body);
        Mail mail=new Mail(from,subject,to,content);
-       SendGrid sg = new SendGrid(AppConstants.API_KEY);
+       SendGrid sg = new SendGrid(AppConstants.SEND_GRID_API_KEY);
         Request request = new Request();
         try {
             request.setMethod(Method.POST);
@@ -74,7 +74,7 @@ public class MailService {
             sg.api(request);
             logger.info("Email sent");
         } catch (IOException ex) {
-            logger.info("exception occured {}",ex);
+            logger.error("exception occured {}",ex);
         }
 
 
