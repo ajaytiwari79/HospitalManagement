@@ -1,7 +1,7 @@
 package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.activity.tabs.ActivitySkill;
+import com.kairos.dto.activity.activity.activity_tabs.ActivitySkill;
 
 import java.math.BigInteger;
 import java.util.List;
