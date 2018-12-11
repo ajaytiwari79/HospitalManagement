@@ -2,10 +2,8 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by oodles on 28/11/17.
@@ -49,14 +46,20 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+            ActivityRuleViolation activityRuleViolation=null;
             if (!CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills)) {
                 errorMessages.add(exceptionService.convertMessage("message.activity.skill.match", shiftActivityDTO.getActivity().getName()));
+                 activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
+                if(activityRuleViolation==null){
+                    activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,errorMessages);
+                }
+                else {
+                    activityRuleViolation.getErrorMessages().addAll(errorMessages);
+                }
             }
+            ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
         }
-        ActivityRuleViolation activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
-        if(activityRuleViolation==null){
-            activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,errorMessages);
-        }
+
     }
 
 
