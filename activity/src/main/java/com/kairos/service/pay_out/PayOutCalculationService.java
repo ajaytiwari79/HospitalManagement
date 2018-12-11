@@ -24,6 +24,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
@@ -83,19 +84,21 @@ public class PayOutCalculationService {
                         }
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)) {
                             for (CompensationTableInterval ctaIntervalDTO : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
-                                DateTimeInterval ctaInterval = getCTAInterval(ctaIntervalDTO, interval.getStart());
-                                if (ctaInterval.overlaps(shiftInterval)) {
-                                    int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).getMinutes();
-                                    if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
-                                        ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
-                                        totalPayOut += ctaPayOutMin;
-                                        break;
-                                    } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
-                                        ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
-                                        totalPayOut += ctaPayOutMin;
-                                        break;
-                                    }
+                                List<DateTimeInterval> ctaIntervals = getCTAInterval(ctaIntervalDTO, interval.getStart());
+                                for (DateTimeInterval ctaInterval : ctaIntervals) {
+                                    if (ctaInterval.overlaps(shiftInterval)) {
+                                        int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).getMinutes();
+                                        if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
+                                            ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
+                                            totalPayOut += ctaPayOutMin;
+                                            break;
+                                        } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
+                                            ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
+                                            totalPayOut += ctaPayOutMin;
+                                            break;
+                                        }
 
+                                    }
                                 }
                             }
                         }
@@ -120,11 +123,19 @@ public class PayOutCalculationService {
      * @param startDate
      * @return DateTimeInterval
      */
-    private DateTimeInterval getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
-        int ctaStart = (interval.getFrom().getHour() * 60) + interval.getFrom().getMinute();
-        int intervalEnd = (interval.getTo().getHour() * 60) + interval.getTo().getMinute();
-        int ctaEnd = ctaStart >= intervalEnd ? 1440 + intervalEnd : intervalEnd;
-        return new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
+    private List<DateTimeInterval> getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
+        List<DateTimeInterval> ctaIntervals = new ArrayList<>(2);
+        if(interval.getFrom().isAfter(interval.getTo())){
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS),startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
+        }
+        else if(interval.getFrom().equals(interval.getTo())){
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
+        }
+        else{
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
+        }
+        return ctaIntervals;
     }
 
     /**
