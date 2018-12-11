@@ -1,7 +1,9 @@
 package com.kairos.service.country;
 
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
+import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
@@ -15,6 +17,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
@@ -64,6 +67,8 @@ public class EmploymentTypeService {
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
@@ -258,6 +263,8 @@ public class EmploymentTypeService {
             exceptionService.actionNotPermittedException("error.weekly_minutes.exceeds");
         }
     }
-
+    public List<StaffDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByEmploymentType(staffEmploymentTypeDTO.getUnitIds(),staffEmploymentTypeDTO.getEmploymentTypeIds(),staffEmploymentTypeDTO.getDate()),StaffDTO.class);
+    }
 
 }

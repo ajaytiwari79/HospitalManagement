@@ -12,10 +12,7 @@ import com.kairos.persistence.model.staff.StaffInformationQueryResult;
 import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
-import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.*;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -445,5 +442,12 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "WHERE id(organization)={0} AND organizationHub.isKairosHub=true AND id(user)={1} \n " +
             "RETURN staff")
     Staff getStaffByOrganizationHub(Long currentUnitId,Long userId);
+
+    @Query("MATCH (org:Organization),(emptype:EmploymentType) WHERE id(emptype) IN {1} AND id(org) IN {0}"+
+    "MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)"+
+    "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]-(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
+    "WHERE  date(positionLine.startDate) <= date({2}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({2}))"+
+    "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(emptype) RETURN DISTINCT staff")
+    List<StaffPersonalDetailDTO> getStaffsByEmploymentType(List<Long> unitId,List<Long> employmentType,String shiftDate);
 }
 

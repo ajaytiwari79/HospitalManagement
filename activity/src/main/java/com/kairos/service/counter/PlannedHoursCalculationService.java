@@ -5,11 +5,18 @@ import com.kairos.dto.activity.counter.chart.DataUnit;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -24,6 +31,8 @@ import java.util.stream.Collectors;
 public class PlannedHoursCalculationService implements CounterService {
     @Inject
     private TimeBankRepository timeBankRepository;
+    @Inject
+    private GenericRestClient genericRestClient;
 
     private Map<Long,Long> calculatePlannedHour(List<Long> staffIds, LocalDate startDate, LocalDate endDate ){
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
@@ -32,6 +41,7 @@ public class PlannedHoursCalculationService implements CounterService {
     }
 
     private List<DataUnit> getPlannedHours(Map<FilterType, List> filterBasedCriteria, boolean kpi){
+        List<StaffDTO> staffDTOS=new ArrayList<>();
         List<Long> staffIds=new ArrayList<>();
         List<Date> dates=new ArrayList<>();
         List<Long> unit;
@@ -57,6 +67,8 @@ public class PlannedHoursCalculationService implements CounterService {
         }
         if(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) {
             employmentType = filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE);
+            StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(filterBasedCriteria.get(FilterType.UNIT_IDS),filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE),filterBasedCriteria.get(FilterType.TIME_INTERVAL).get(0).toString());
+            staffDTOS=genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.GET, "/staff_by_employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>(){});
         }
         return new ArrayList<>();
     }
