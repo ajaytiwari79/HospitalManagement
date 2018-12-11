@@ -43,6 +43,8 @@ public class ActivityDTO {
     private BigInteger parentId;
     private PermissionsActivityTabDTO permissionsActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private List<Long> skills;
+    private SkillActivityDTO skillActivityTab;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -260,7 +262,21 @@ public class ActivityDTO {
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
     }
 
+    public List<Long> getSkills() {
+        return skills;
+    }
 
+    public void setSkills(List<Long> skills) {
+        this.skills = skills;
+    }
+
+    public SkillActivityDTO getSkillActivityTab() {
+        return skillActivityTab;
+    }
+
+    public void setSkillActivityTab(SkillActivityDTO skillActivityTab) {
+        this.skillActivityTab = skillActivityTab;
+    }
 }
 
 
