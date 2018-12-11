@@ -217,8 +217,8 @@ public class UnitPositionService {
 
         preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
         String [] str=new String[2];
-        if(employmentType.isMainEmployment() || unitPositionDTO.isMainUnitPosition()){
-            str=employmentService.createUnitPositionTest(unitPositionDTO,str);
+        if(employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()){
+            str=employmentService.validateUnitPositionAndEmployment(unitPositionDTO,str);
             unitPosition.setMainUnitPosition(true);
         }
 
@@ -462,10 +462,15 @@ public class UnitPositionService {
         if (existingCtaWtaWrapper.getCta().isEmpty() || existingCtaWtaWrapper.getWta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.unitPosition.ctawtamissing", existingCtaWtaWrapper.getCta().isEmpty(), existingCtaWtaWrapper.getWta().isEmpty(), unitPositionId);
         }
+        EmploymentType employmentType=employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(),0).orElse(null);
+        String[] str=new String[2];
+        if(employmentType!=null && employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()){
+            str=employmentService.validateUnitPositionAndEmployment(unitPositionDTO,str);
+        }
 
         UnitPositionLineEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentUnitPositionLine.getId());
         EmploymentQueryResult employmentQueryResult;
-        UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
+        UnitPositionQueryResult unitPositionQueryResult;
         List<NameValuePair> changedParams = new ArrayList<>();
         oldUnitPosition.setPublished(!saveAsDraft);
         PositionLineChangeResultDTO changeResultDTO = calculativeValueChanged(unitPositionDTO, positionLineEmploymentTypeRelationShip, currentUnitPositionLine, existingCtaWtaWrapper, changedParams);
@@ -543,6 +548,7 @@ public class UnitPositionService {
         if (unitPositionDTO.getEndDate() != null) {
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, unitPositionDTO.getEndDate(), unitPositionDTO.getStaffId());
         }
+        unitPositionQueryResult.setUnitName(str[1]);
         //plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
         return new PositionWrapper(unitPositionQueryResult, employmentQueryResult);
 

@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import java.util.concurrent.ExecutionException;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -180,6 +179,6 @@ public class UnitPositionController {
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position/test")
     public ResponseEntity<Map<String, Object>> verify(@PathVariable Long unitId,  @RequestBody @Valid UnitPositionDTO unitPositionDTO) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createUnitPositionTest(unitPositionDTO,new String[2]));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.validateUnitPositionAndEmployment(unitPositionDTO,new String[2]));
     }
 }

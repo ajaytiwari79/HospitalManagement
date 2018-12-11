@@ -215,8 +215,7 @@ public class EmploymentService {
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
-        StaffAccessGroupQueryResult staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
+
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
@@ -232,6 +231,7 @@ public class EmploymentService {
             exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", staffId);
 
         }
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO;
 
         boolean flsSyncStatus = false;
         List<AccessPageQueryResult> accessPageQueryResults;
@@ -251,6 +251,8 @@ public class EmploymentService {
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
+            StaffAccessGroupQueryResult staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+            accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
             logger.info(unitPermission.getId() + " Currently created Unit Permission ");
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
@@ -262,6 +264,8 @@ public class EmploymentService {
             if (unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId) <= 1) {
                 exceptionService.actionNotPermittedException("error.permission.remove");
             }
+            StaffAccessGroupQueryResult staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+            accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
         }
 
@@ -863,7 +867,7 @@ public class EmploymentService {
         return true;
     }
 
-    public String[] createUnitPositionTest(UnitPositionDTO unitPositionDTO, String[] obj) {
+    public String[] validateUnitPositionAndEmployment(UnitPositionDTO unitPositionDTO, String[] obj) {
         User user = userGraphRepository.getUserByStaffId(unitPositionDTO.getStaffId());
 
         List<StaffEmploymentQueryResult> staffEmploymentQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByUserId(user.getId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString()), StaffEmploymentQueryResult.class);
@@ -919,7 +923,7 @@ public class EmploymentService {
         if (CollectionUtils.isNotEmpty(employmentQueryResult.getUnitPositionList())) {
 
             for (UnitPositionQueryResult unitPositionQueryResult : employmentQueryResult.getUnitPositionList()) {
-                if (unitPositionQueryResult.isMainEmployment() && (unitPositionQueryResult.getEndDate() == null || unitPositionQueryResult.getEndDate().isAfter(unitPositionDTO.getStartDate()))) {
+                if (unitPositionQueryResult.isMarkMainEmployment() && (unitPositionQueryResult.getEndDate() == null || unitPositionQueryResult.getEndDate().isAfter(unitPositionDTO.getStartDate()))) {
                     exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName());
                 }
 

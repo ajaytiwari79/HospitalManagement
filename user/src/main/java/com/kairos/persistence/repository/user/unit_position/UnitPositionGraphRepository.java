@@ -383,7 +383,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "WITH staff,emp,up,et \n" +
             "OPTIONAL MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
             "WITH staff,emp,up,et,org " +
-            "RETURN staff,emp as employment,CASE WHEN up IS NULL then [] ELSE collect({id:id(up),startDate:up.startDate,endDate:up.endDate,mainEmployment:et.mainEmployment,id(org) as unitId,org.name as unitName}) END as unitPositionList \n ")
+            "RETURN staff,emp as employment,CASE WHEN up IS NULL then [] ELSE collect({id:id(up),startDate:up.startDate,endDate:up.endDate,markMainEmployment:et.markMainEmployment,id(org) as unitId,org.name as unitName}) END as unitPositionList \n ")
     List<StaffEmploymentQueryResult> findAllByUserId(Long userId,String startDate,String endDate);
 
 }

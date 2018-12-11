@@ -39,7 +39,7 @@ public class UnitPositionQueryResult {
     private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private boolean mainEmployment;
+    private boolean markMainEmployment;
     private boolean mainUnitPosition;
     private String unitName;
 
@@ -217,12 +217,12 @@ public class UnitPositionQueryResult {
         this.staffId = staffId;
     }
 
-    public boolean isMainEmployment() {
-        return mainEmployment;
+    public boolean isMarkMainEmployment() {
+        return markMainEmployment;
     }
 
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
+    public void setMarkMainEmployment(boolean markMainEmployment) {
+        this.markMainEmployment = markMainEmployment;
     }
 
     public boolean isMainUnitPosition() {

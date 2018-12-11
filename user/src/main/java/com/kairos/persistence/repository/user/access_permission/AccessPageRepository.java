@@ -230,11 +230,13 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<AccessPageDTO> getMainTabsForUnit(Long unitId);
 
 
-    @Query("Match (accessPage:AccessPage)-[:" + SUB_PAGE + "]->(subPage:AccessPage) where id(accessPage)={0} WITH subPage,accessPage\n" +
-            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(subPage) WHERE id(country)={1} WITH r,subPage,id(accessPage) as parentTabId,\n" +
+    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} WITH subPage,accessPage \n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage) WHERE id(country)={1}\n" +
+            "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
+            "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
             "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
-            "return id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active, parentTabId, " +
-            "CASE WHEN count(subPage)>0 THEN true ELSE false END as hasSubTabs,\n" +
+            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active, parentTabId, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization "
