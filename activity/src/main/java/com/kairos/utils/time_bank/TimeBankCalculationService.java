@@ -52,6 +52,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.Month;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -117,19 +118,21 @@ public class TimeBankCalculationService {
                                         totalDailyTimebank += dailyScheduledMin;
                                     } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                         for (CompensationTableInterval ctaInterval : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
-                                            Interval intervalOfCTA = getCTAInterval(ctaInterval, interval.getStart());
-                                            if (intervalOfCTA.overlaps(shiftInterval)) {
-                                                int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
-                                                if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
-                                                    ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
-                                                    totalDailyTimebank += ctaTimeBankMin;
-                                                    break;
-                                                } else if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
-                                                    ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
-                                                    totalDailyTimebank += ctaTimeBankMin;
-                                                    break;
-                                                }
+                                            List<Interval> intervalOfCTAs = getCTAInterval(ctaInterval, interval.getStart());
+                                            for (Interval intervalOfCTA : intervalOfCTAs) {
+                                                if (intervalOfCTA.overlaps(shiftInterval)) {
+                                                    int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
+                                                    if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
+                                                        ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
+                                                        totalDailyTimebank += ctaTimeBankMin;
+                                                        break;
+                                                    } else if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
+                                                        ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
+                                                        totalDailyTimebank += ctaTimeBankMin;
+                                                        break;
+                                                    }
 
+                                                }
                                             }
                                         }
 
@@ -307,11 +310,19 @@ public class TimeBankCalculationService {
      * @param startDate
      * @return Interval
      */
-    private Interval getCTAInterval(CompensationTableInterval interval, DateTime startDate) {
-        int ctaStart = (interval.getFrom().getHour() * 60) + interval.getFrom().getMinute();
-        int intervalEnd = (interval.getTo().getHour() * 60) + interval.getTo().getMinute();
-        int ctaEnd = ctaStart >= intervalEnd ? 1440 + intervalEnd : intervalEnd;
-        return new Interval(startDate.withTimeAtStartOfDay().plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
+    private List<Interval> getCTAInterval(CompensationTableInterval interval, DateTime startDate) {
+        List<Interval> ctaIntervals = new ArrayList<>(2);
+        if(interval.getFrom().isAfter(interval.getTo())){
+            ctaIntervals.add(new Interval(startDate.withTimeAtStartOfDay(),startDate.withTimeAtStartOfDay().plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
+            ctaIntervals.add(new Interval(startDate.withTimeAtStartOfDay().plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.withTimeAtStartOfDay().plusDays(1)));
+        }
+        else if(interval.getFrom().equals(interval.getTo())){
+            ctaIntervals.add(new Interval(startDate.withTimeAtStartOfDay(), startDate.withTimeAtStartOfDay().plusDays(1)));
+        }
+        else{
+            ctaIntervals.add(new Interval(startDate.withTimeAtStartOfDay().plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.withTimeAtStartOfDay().plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
+        }
+        return ctaIntervals;
     }
 
     /**
@@ -1063,21 +1074,23 @@ public class TimeBankCalculationService {
                         }
                         if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                             for (CompensationTableInterval ctaIntervalDTO : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
-                                Interval ctaInterval = getCTAInterval(ctaIntervalDTO, startDate);
-                                if (ctaInterval.overlaps(shiftInterval)) {
-                                    int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
-                                    if (ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.MINUTES)) {
-                                        ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
-                                        totalTimebank += ctaTimeBankMin;
-                                        plannedTimeMin += ctaTimeBankMin;
-                                        break;
-                                    } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.PERCENT)) {
-                                        ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
-                                        totalTimebank += ctaTimeBankMin;
-                                        plannedTimeMin += ctaTimeBankMin;
-                                        break;
-                                    }
+                                List<Interval> ctaIntervals = getCTAInterval(ctaIntervalDTO, startDate);
+                                for (Interval ctaInterval : ctaIntervals) {
+                                    if (ctaInterval.overlaps(shiftInterval)) {
+                                        int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
+                                        if (ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.MINUTES)) {
+                                            ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
+                                            totalTimebank += ctaTimeBankMin;
+                                            plannedTimeMin += ctaTimeBankMin;
+                                            break;
+                                        } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.PERCENT)) {
+                                            ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
+                                            totalTimebank += ctaTimeBankMin;
+                                            plannedTimeMin += ctaTimeBankMin;
+                                            break;
+                                        }
 
+                                    }
                                 }
                             }
                         }

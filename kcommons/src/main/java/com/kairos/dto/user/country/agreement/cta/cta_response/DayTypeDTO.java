@@ -23,12 +23,13 @@ public class DayTypeDTO {
         this.validDays = validDays;
     }
 
-    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType) {
+    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType,boolean allowTimeSettings) {
         this.id = id;
         this.name = name;
         this.validDays = validDays;
         this.countryHolidayCalenderData = countryHolidayCalenderData;
         this.holidayType = holidayType;
+        this.allowTimeSettings = allowTimeSettings;
     }
 
     public boolean isAllowTimeSettings() {
