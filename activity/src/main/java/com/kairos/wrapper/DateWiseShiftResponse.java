@@ -10,6 +10,8 @@ public class DateWiseShiftResponse {
 
 
     private LocalDate currentDate;
+    private Long unitPositionId;
+
 
     private List<Shift> shifts;
     public DateWiseShiftResponse() {
@@ -32,5 +34,11 @@ public class DateWiseShiftResponse {
         this.shifts = shifts;
     }
 
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
 
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
 }

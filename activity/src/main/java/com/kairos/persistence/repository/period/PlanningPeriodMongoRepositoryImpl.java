@@ -280,14 +280,25 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return results;
     }
     @Override
-    public List<PlanningPeriod> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate){
-         Aggregation aggregation = newAggregation(
+    public List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate){
+        ProjectionOperation projectionOperation = Aggregation.project().
+                and("id").as("id").
+                andInclude("name").
+                andInclude("startDate").
+                andInclude("endDate").
+                and("current_phase_data.name").as("currentPhase").
+                and("current_phase_data._id").as("currentPhaseId");
+
+        Aggregation aggregation = newAggregation(
         match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
                 .orOperator(
                         Criteria.where("startDate").lte(requestedStartDate).where("endDate").gte(requestedStartDate),
                         Criteria.where("startDate").gte(requestedStartDate).where("endDate").gte(requestedEndDate)
-                )));
-        AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriod.class);
+                )),
+                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),projectionOperation
+
+         );
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
         return results.getMappedResults();
     }
 }
