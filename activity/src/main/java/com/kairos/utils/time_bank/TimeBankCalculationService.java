@@ -87,8 +87,8 @@ public class TimeBankCalculationService {
      */
     public DailyTimeBankEntry getTimeBankByInterval(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Interval interval, List<ShiftWithActivityDTO> shifts, Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap,List<DateTimeInterval> planningPeriodIntervals) {
         DailyTimeBankEntry dailyTimeBank = null;
+        StaffUnitPositionDetails ctaDto = staffAdditionalInfoDTO.getUnitPosition();
         if (CollectionUtils.isNotEmpty(shifts)) {
-            StaffUnitPositionDetails ctaDto = staffAdditionalInfoDTO.getUnitPosition();
             Optional<AppliedFunctionDTO> appliedFunctionDTO=ctaDto.getAppliedFunctions().stream().filter(function->function.getAppliedDates().contains(DateUtils.asLocalDate(shifts.get(0).getStartDate()))).findFirst();
             Long functionId=null;
             if(appliedFunctionDTO.isPresent()){
@@ -161,6 +161,11 @@ public class TimeBankCalculationService {
             dailyTimeBank.setScheduledMin(dailyScheduledMin);
             dailyTimeBank.setTotalTimeBankMin(totalDailyTimebank);
             dailyTimeBank.setTimeBankCTADistributionList(getBlankTimeBankDistribution(ctaDto.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        }else {
+            if(dailyTimeBankEntryMap.containsKey(ctaDto.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()))){
+                dailyTimeBank = dailyTimeBankEntryMap.get(ctaDto.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()));
+                dailyTimeBank.setDeleted(true);
+            }
         }
         return dailyTimeBank;
     }
