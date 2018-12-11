@@ -42,8 +42,6 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH(u:User { accessToken: {0} })SET u.accessToken = NULL RETURN u")
     User findAndRemoveAccessToken(String accessToken);
 
-    @Query("MATCH(u:User { forgotPasswordToken: {0} })SET u.forgotPasswordToken = NULL RETURN u")
-    User findAndRemoveForgotPasswordToken(String forgotPasswordToken);
 
     User findByAccessToken(String accessToken);
 

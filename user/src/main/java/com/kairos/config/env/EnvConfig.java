@@ -50,6 +50,9 @@ public class EnvConfig {
     @Value("${forgot.password.link}")
     private String forgotPasswordApiLink;
 
+    @Value("${sendgrid.api.key}")
+    private String sendGridApiKey;
+
     public String getGoogleCalendarAPIV3Url(String vCardId){
 
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);
@@ -108,6 +111,10 @@ public class EnvConfig {
 
     public String getTomtomKey() {
         return tomtomKey;
+    }
+
+    public String getSendGridApiKey() {
+        return sendGridApiKey;
     }
 
 

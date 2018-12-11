@@ -60,12 +60,12 @@ public class MailService {
         return false;
     }
 
-    public void sendPlainMailWithSendGrid(String receiver, String body, String subject) {
+    public void sendPlainMailWithSendGrid(String receiver, String body, String subject,String sendGridApiKey) {
        Email from=new Email("no-reply@kairosplanning.com");
        Email to=new Email(receiver);
        Content content=new Content("text/plain",body);
        Mail mail=new Mail(from,subject,to,content);
-       SendGrid sg = new SendGrid(AppConstants.SEND_GRID_API_KEY);
+       SendGrid sg = new SendGrid(sendGridApiKey);
         Request request = new Request();
         try {
             request.setMethod(Method.POST);

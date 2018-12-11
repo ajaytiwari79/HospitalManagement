@@ -206,9 +206,6 @@ public class UserService {
         return userGraphRepository.findAndRemoveAccessToken(accessToken);
     }
 
-    public User findAndRemoveForgotPasswordToken(String accessToken) {
-        return userGraphRepository.findAndRemoveForgotPasswordToken(accessToken);
-    }
 
     public User generateTokenToUser(User currentUser) {
         currentUser.setAccessToken(UUID.randomUUID().toString().toUpperCase());
@@ -706,21 +703,18 @@ public class UserService {
     }
 
     public boolean forgotPassword(String userEmail){
-        boolean result = false;
         if(userEmail.endsWith("kairos.com")||userEmail.endsWith("kairosplanning.com")){
             logger.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
-            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
+            exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
         }
         User currentUser = userGraphRepository.findByEmail(userEmail);
-        if (Optional.ofNullable(currentUser).isPresent()) {
-            String token = tokenService.createForgotPasswordToken(currentUser);
-            mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT);
-            result = true;
-        }else{
+        if (!Optional.ofNullable(currentUser).isPresent()) {
             logger.error("No User found by email " + userEmail);
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
         }
-        return result;
+        String token = tokenService.createForgotPasswordToken(currentUser);
+        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT,config.getSendGridApiKey());
+        return true;
     }
 
     public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
@@ -736,7 +730,7 @@ public class UserService {
         DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()), DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
         if (!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))) {
             logger.error("Password reset token expired");
-            exceptionService.dataNotFoundByIdException("message.user.token.invalid");
+            exceptionService.dataNotFoundByIdException("message.user.token.expired");
         }
         CharSequence password = CharBuffer.wrap(passwordUpdateDTO.getConfirmPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
