@@ -6,7 +6,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.wrapper.DateWiseShiftResponse;
+import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
@@ -37,7 +37,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
 
-    List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds);
+    List<ShiftResponseDTO> findAllByIdGroupByDate(List<BigInteger> shiftIds);
 
     void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate);
 
@@ -53,7 +53,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId);
 
-    List<DateWiseShiftResponse> findShiftsBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<ShiftResponseDTO> findShiftsBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
 
 }

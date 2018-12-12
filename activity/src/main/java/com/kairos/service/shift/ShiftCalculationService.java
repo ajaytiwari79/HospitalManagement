@@ -17,7 +17,7 @@ import static com.kairos.constants.AppConstants.EVERYDAY;
 /**
  * CreatedBy vipulpandey on 7/12/18
  **/
-public class ShiftUtils {
+public class ShiftCalculationService {
     public static void setDayTypeToCTARuleTemplate(StaffUnitPositionDetails staffAdditionalInfoDTO, List<DayTypeDTO> dayTypeDTOS, Map<Long, List<LocalDate>> publicHolidays) {
         Map<Long, List<Day>> daytypesMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {

@@ -6,15 +6,13 @@ import com.kairos.persistence.model.shift.Shift;
 import java.time.LocalDate;
 import java.util.List;
 
-public class DateWiseShiftResponse {
+public class ShiftResponseDTO {
 
 
     private LocalDate currentDate;
     private Long unitPositionId;
-
-
     private List<Shift> shifts;
-    public DateWiseShiftResponse() {
+    public ShiftResponseDTO() {
         //DC
     }
 
