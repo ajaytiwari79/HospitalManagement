@@ -55,6 +55,7 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.protocol.types.Field;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
@@ -289,8 +290,6 @@ public class ShiftValidatorService {
 
 
     public List<String> validateShiftWhileCopy(StaffUnitPositionUnitDataWrapper dataWrapper, ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails, List<WTAQueryResultDTO> wtaQueryResultDTOS, PlanningPeriodDTO planningPeriod, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        Phase phase = new Phase();
-        phase.setName("test");
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo =  getRuleTemplateSpecificInfo(planningPeriod,shiftWithActivityDTO,wtaQueryResultDTOS.get(0),staffUnitPositionDetails,activityWrapperMap,dataWrapper);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffUnitPositionDetails.getEmploymentType());
@@ -300,8 +299,12 @@ public class ShiftValidatorService {
                  activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(wtaRulesSpecification);
+        List<String> voilatedRules;
+        activitySpecification.validateRules(shiftWithActivityDTO);
 
-        return activitySpecification.isSatisfiedString(shiftWithActivityDTO);
+        voilatedRules =filterVoilatedRules(ruleTemplateSpecificInfo.getViolatedRules());
+        voilatedRules.addAll(activitySpecification.isSatisfiedString(shiftWithActivityDTO));
+        return voilatedRules;
     }
 
 
@@ -817,6 +820,17 @@ public class ShiftValidatorService {
 
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints,int totalVeto,int totalStopBricks){
         return totalBlockingPoints>=totalVeto*VETO_BLOCKING_POINT+totalStopBricks*STOP_BRICK_BLOCKING_POINT;
-
+    }
+    private List<String> filterVoilatedRules(ViolatedRulesDTO violatedRulesDTO){
+        List<String> messages= new ArrayList<>();
+        if (violatedRulesDTO!=null){
+            violatedRulesDTO.getActivities().forEach(activityRuleViolation -> {
+                messages.addAll(activityRuleViolation.getErrorMessages());
+            });
+            violatedRulesDTO.getWorkTimeAgreements().forEach(workTimeAgreementRuleViolation -> {
+                messages.add(workTimeAgreementRuleViolation.getName()+IS_BROKEN);
+            });
+        }
+        return messages;
     }
 }
