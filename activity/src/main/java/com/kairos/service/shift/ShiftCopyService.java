@@ -145,6 +145,7 @@ public class ShiftCopyService extends MongoBaseService {
     private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffUnitPositionDetails staffUnitPosition, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO, Map<BigInteger, ActivityWrapper> breakActivitiesMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts) {
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
+        List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs= new ArrayList<>();
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
         int counter = 0;
@@ -156,11 +157,7 @@ public class ShiftCopyService extends MongoBaseService {
             ShiftResponseDTO shiftResponseDTO = shifts.get(counter);
             List<String> validationMessages = new ArrayList<>();
             for (Shift sourceShift : shiftResponseDTO.getShifts()) {
-                ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
-                shiftWithActivityDTO.getActivities().forEach(s -> {
-                    ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
-                    s.setActivity(activityDTO);
-                });
+                ShiftWithActivityDTO shiftWithActivityDTO = convertIntoShiftWithActivity(sourceShift,activityMap);
 
                 PlanningPeriodDTO planningPeriod = getCurrentPlanningPeriod(planningPeriodMap, shiftCreationStartDate);
                 Date startDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getStartDate()));
@@ -171,10 +168,12 @@ public class ShiftCopyService extends MongoBaseService {
                 if (shiftExistsMessage != null) {
                     validationMessages.add(shiftExistsMessage);
                 }
-                validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffUnitPosition, wtaQueryResultDTOS, planningPeriod, activityMap));
+
+                validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffUnitPosition, wtaQueryResultDTOS, planningPeriod, activityMap,newCreatedShiftWithActivityDTOs));
                 shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
+                    newCreatedShiftWithActivityDTOs.add(convertIntoShiftWithActivity(newShifts.get(counter),activityMap));
                 } else {
                     errorInCopyingShifts.add(shiftResponse);
                 }
@@ -192,10 +191,18 @@ public class ShiftCopyService extends MongoBaseService {
         }
         return statusMap;
     }
+    private ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap){
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
+        shiftWithActivityDTO.getActivities().forEach(s -> {
+            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
+            s.setActivity(activityDTO);
+        });
+        return shiftWithActivityDTO;
+    }
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
-            Shift copiedShift = new Shift(startDate, endDate,
+         Shift    copiedShift = new Shift(startDate, endDate,
                     sourceShift.getRemarks(), sourceShift.getActivities(), staffUnitPosition.getStaff().getId(), sourceShift.getUnitId(),
                     sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId()
                     , planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
@@ -204,6 +211,7 @@ public class ShiftCopyService extends MongoBaseService {
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffUnitPosition, planningPeriod, activityConfigurations);
             newShifts.add(copiedShift);
+
             return new ShiftResponse(sourceShift.getId(), sourceShift.getActivities().get(0).getActivityName(), Collections.singletonList(NO_CONFLICTS), true, DateUtils.asLocalDate(startDate));
 
         } else {
