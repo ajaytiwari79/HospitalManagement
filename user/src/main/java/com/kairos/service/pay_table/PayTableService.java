@@ -572,14 +572,23 @@ public class PayTableService {
             exceptionService.actionNotPermittedException("exception.null.percentageValue");
         }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
+        PayTable parentPayTable=null;
+        Map<String,PayGradePayGroupAreaRelationShip> publishedPayGroupAreaRelationShipMap=null;
+        if(!payTable.isPublished() && payTable.getPayTable()!=null){
+             parentPayTable=payTable.getPayTable();
+             List<PayGradePayGroupAreaRelationShip> publishedPayGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(parentPayTable.getId()), PayGradePayGroupAreaRelationShip.class);
+             publishedPayGroupAreaRelationShipMap=publishedPayGradePayGroupAreaRelationShips.stream().collect(Collectors.toMap(k->k.getPayGrade().getPayGradeLevel().toString()+k.getPayGroupArea().getId(),v->v));
+        }
+
         List<PayGradeResponse> payGradeResponses=null;
         payTable.setPercentageValue(payTableDTO.getPercentageValue());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
             if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
                 for (PayGradePayGroupAreaRelationShip current : payGradePayGroupAreaRelationShips) {
                     if (current.getPayGroupAreaAmount() != null) {
-                        BigDecimal valueToAdd = current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100));
-                        current.setPayGroupAreaAmount(current.getPayGroupAreaAmount().add(valueToAdd));
+                        BigDecimal valueToAdd =(parentPayTable==null)? current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100)):publishedPayGroupAreaRelationShipMap.get(current.getPayGrade().getPayGradeLevel().toString()+current.getPayGroupArea().getId()).getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100));
+                        BigDecimal updatedValue=(parentPayTable==null)?current.getPayGroupAreaAmount().add(valueToAdd):publishedPayGroupAreaRelationShipMap.get(current.getPayGrade().getPayGradeLevel().toString()+current.getPayGroupArea().getId()).getPayGroupAreaAmount().add(valueToAdd);
+                        current.setPayGroupAreaAmount(updatedValue);
                         if(payTable.isPublished()){
                             current.setId(null);
                             current.getPayGrade().setId(null);

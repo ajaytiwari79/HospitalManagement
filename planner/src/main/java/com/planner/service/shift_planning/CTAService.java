@@ -76,11 +76,14 @@ public class CTAService {
             DateTimeInterval dateTimeIntervalPerCTA = createCTADateTimeInterval(ctaResponseDTO, toPlanningDate);
            LocalDate startLocalDate=ctaResponseDTO.getStartDate();
             LocalDate endLocalDate=dateTimeIntervalPerCTA.getEndLocalDate();
-            while(!startLocalDate.equals(endLocalDate) && localDateApplicableIntervals.contains(startLocalDate))
+            while(!startLocalDate.equals(endLocalDate) )
             {
-                localDateCTAMap.put(startLocalDate,ctaResponseDTO);
+                if(localDateApplicableIntervals.contains(startLocalDate)) {
+                    localDateCTAMap.put(startLocalDate, ctaResponseDTO);
+                }
                 startLocalDate=startLocalDate.plusDays(1l);//TODO optimization reuse {localDateApplicableIntervals}
             }
+
         }
         return localDateCTAMap;
     }

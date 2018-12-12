@@ -21,7 +21,7 @@ public class UserNeo4jService {
      * @param staffIds
      * @return
      */
-    public List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId, Long[] staffIds) {
+    public List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId, List<Long> staffIds) {
         List<StaffQueryResult> staffQueryResults = new ArrayList<>();
         for (StaffQueryResult staffQueryResult : userNeo4jRepo.getStaffWithSkillsAndUnitPostionIds(unitId, staffIds)) {
             if (staffQueryResult.getStaffUnitPosition() != null) staffQueryResults.add(staffQueryResult);

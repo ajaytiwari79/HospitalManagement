@@ -58,6 +58,8 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 "'processingLegalBasis':{'$first':'$processingLegalBasis'}," +
                 "'createdAt':{'$first':'$createdAt'}," +
                 "'name':{'$first':'$name'}," +
+                "'minDataSubjectVolume':{'$first':'$minDataSubjectVolume'}," +
+                "'maxDataSubjectVolume':{'$first':'$maxDataSubjectVolume'}," +
                 "'active':{'$first':'$active'}," +
                 "'suggested':{'$first':'$suggested'}," +
                 "'description':{'$first':'$description'}," +

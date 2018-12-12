@@ -572,4 +572,8 @@ public class CountryService {
         }
         return true;
     }
+
+    public Long getCountryIdByUnitId(long unitId){
+        return countryGraphRepository.getCountryIdByUnitId(unitId);
+    }
 }

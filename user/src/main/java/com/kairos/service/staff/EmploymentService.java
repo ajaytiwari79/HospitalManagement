@@ -12,7 +12,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.dto.user.employment.employment_dto.MainEmploymentResultDTO;
-import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;

@@ -765,4 +765,21 @@ public  class DateUtils {
     public static LocalDate getLocalDateFromTimezone(String timeZone){
         return LocalDate.now(ZoneId.of(timeZone));
     }
+
+    public static Long getMillisFromDateAndTime(Date date,LocalTime localTime ) {
+
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault()).withHour(localTime.getHour()).
+                withMinute(localTime.getMinute()).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+    }
+
+    public static int getHourFromDate(Date date) {
+
+        return asZoneDateTime(date).getHour();
+    }
+
+    public static int getMinutesFromDate(Date date) {
+
+        return asZoneDateTime(date).getMinute();
+    }
 }
