@@ -963,6 +963,7 @@ public class StaffService {
     }
 
     public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
+
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
@@ -984,7 +985,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = (union|| parentOrganization) ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = (union|| parentOrganization) ? accessGroupRepository.getAccessGroupByParentAccessGroupId(organization.getId(),accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
