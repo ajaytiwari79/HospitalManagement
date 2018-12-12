@@ -150,7 +150,7 @@ public class ShiftBreakService {
                 workedShiftDuration += breakAvailabilitySettings.getEndBeforeMinutes();
                 shiftDurationInMinute -= breakAvailabilitySettings.getEndBeforeMinutes();
                 restrictedEndDateMillis = mainShift.getEndDate().getTime() - breakAvailabilitySettings.getEndBeforeMinutes() * ONE_MINUTE;// reducing the end date for the rest calculation
-                shifts.add(++itemsAddedFromBeginning,getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(restrictedEndDateMillis), mainShift.getEndDate(), false,mainShift.getActivities().get(0).getAbsenceReasonCodeId()));
+                shifts.add(getShiftObject(mainShift.getActivities().get(0).getActivityName(), mainShift.getActivities().get(0).getActivityId(), new Date(restrictedEndDateMillis), mainShift.getEndDate(), false,mainShift.getActivities().get(0).getAbsenceReasonCodeId()));
                 lastBlockingShiftAdded=true;
             }
             for (int i = 0; i < numberOfBreakRequired; i++) {
@@ -270,10 +270,10 @@ public class ShiftBreakService {
             long requiredReduceShiftByMinutes = breakSetting.getShiftDurationInMinute() + breakSetting.getBreakDurationInMinute();
             logger.info(" add shift/break for the following duration"+requiredReduceShiftByMinutes);
             long currentReduceShiftByMinutes = 0l;
-            for (int i = shifts.size() - 1; i > 0; i--) {
+            for (int i = shifts.size() - 1; i >= 0; i--) {
                 if (!shifts.get(i).isBreakShift()) {
                     Long currentShiftDuration = (shifts.get(i).getEndDate().getTime() - shifts.get(i).getStartDate().getTime()) / ONE_MINUTE;
-                    if ((lastBlockingShiftAdded && i == shifts.size() - 1)) { // we need to increase the start date of it
+                    if (lastBlockingShiftAdded && i == shifts.size() - 1) { // we need to increase the start date of it
                         if (currentShiftDuration > breakAvailability.getEndBeforeMinutes()) {//  shift duration 60 min and blocking 30 min so we can move this start with 30 min
                             currentReduceShiftByMinutes = currentShiftDuration - breakAvailability.getEndBeforeMinutes();
                             shifts.get(i).setStartDate(new Date(shifts.get(i).getStartDate().getTime() + ((currentShiftDuration - breakAvailability.getEndBeforeMinutes()) * ONE_MINUTE)));
