@@ -2,9 +2,12 @@ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.staff.StaffUnitPositionQueryResult;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import org.neo4j.ogm.session.Session;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
@@ -56,6 +59,43 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
         return staffUnitPositionList;
 
+    }
+
+    @Override
+    public List<StaffPersonalDetailDTO> getStaffsByUnitIdsEmploymentType(Long organizationId,List<Long> unitIds, List<Long> employmentType, String startDate, String endDate,List<Long> staffIds) {
+        String staffFilterQuery="";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("MATCH (org:Organization)");
+        if(!unitIds.isEmpty()){
+            stringBuilder.append("Where id(org) IN {unitIds}");
+        }else{
+            stringBuilder.append("Where id(org) = {organizationId}");
+        }
+        if(!employmentType.isEmpty()) {
+            stringBuilder.append("MATCH(emptype:EmploymentType) WHERE id(emptype) IN {employmentType}");
+        }
+        if(unitIds.isEmpty()){
+            stringBuilder.append("MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) ");
+        }else {
+            stringBuilder.append("MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition)-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
+        }
+        if(!staffIds.isEmpty()) {
+            stringBuilder.append(" WHERE id(staff) IN {staffIds}");
+        }
+        stringBuilder.append(" MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
+                "WHERE  date(positionLine.startDate) <= date({endDate}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({startDate}))"+
+                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(emptype) RETURN DISTINCT  {id:id(staff),firstName:staff.firstName ,lastName:staff.lastName} as data");
+        Map<String, Object> queryParameters = new HashMap();
+        queryParameters.put("employmentType", employmentType);
+        queryParameters.put("organizationId", organizationId);
+        queryParameters.put("unitIds", unitIds);
+        queryParameters.put("staffIds",staffIds);
+        queryParameters.put("endDate", endDate);
+        queryParameters.put("startDate", startDate);
+        staffFilterQuery += stringBuilder.toString();
+        List<Map> my=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(my,Staff.class);
+        return staffPersonalDetailDTOS;
     }
 
 

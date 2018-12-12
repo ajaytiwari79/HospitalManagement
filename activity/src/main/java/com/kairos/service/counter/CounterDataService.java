@@ -337,7 +337,7 @@ public class CounterDataService {
 //
 //    }
 
-    public Map generateKPIData(FilterCriteriaDTO filters){
+    public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId){
         //get unitPositionIds and get staffIds.
         List<BigInteger> kpiIds = filters.getKpiIds();
         Long countryId = genericIntegrationService.getCountryIdOfOrganization(filters.getUnitId());
@@ -351,7 +351,7 @@ public class CounterDataService {
         });
         for(BigInteger kpiId : filters.getKpiIds()){
             Callable<RawRepresentationData> data = () ->{
-                return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, countryId, kpiMap.get(kpiId));
+                return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, organizationId, kpiMap.get(kpiId));
             };
             Future<RawRepresentationData> responseData = executorService.submit(data);
             kpiResults.add(responseData);
