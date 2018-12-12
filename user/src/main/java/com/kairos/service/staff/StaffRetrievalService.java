@@ -11,6 +11,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
@@ -25,6 +26,8 @@ import com.kairos.persistence.model.access_permission.query_result.DayTypeCountr
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -52,6 +55,7 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
@@ -69,6 +73,8 @@ import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,6 +139,8 @@ public class StaffRetrievalService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private ExpertiseService expertiseService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId, String type) {
@@ -402,7 +410,7 @@ public class StaffRetrievalService {
                             }
                         }
                     }else if(dayType.isHolidayType() && !dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalenders())){
-                        Set<LocalDate> dates = dayType.getCountryHolidayCalenders().stream().map(date -> ZonedDateTime.ofInstant(new Date(date.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate()).collect(Collectors.toSet());
+                        Set<LocalDate> dates = dayType.getCountryHolidayCalenders().stream().filter(cal -> cal.getHolidayDate()!=null).map(date -> ZonedDateTime.ofInstant(new Date(date.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate()).collect(Collectors.toSet());
                         if (dates.contains(loginDate)) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
@@ -414,7 +422,7 @@ public class StaffRetrievalService {
                             }
                         }
                     }else if(dayType.isHolidayType() && dayType.isAllowTimeSettings() && CollectionUtils.isNotEmpty(dayType.getCountryHolidayCalenders())) {
-                        Optional<CountryHolidayCalendarQueryResult> countryHolidayCalender = dayType.getCountryHolidayCalenders().stream().filter(cal -> ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
+                        Optional<CountryHolidayCalendarQueryResult> countryHolidayCalender = dayType.getCountryHolidayCalenders().stream().filter(cal -> cal.getHolidayDate()!=null && ZonedDateTime.ofInstant(new Date(cal.getHolidayDate()).toInstant(), organizationTimeZoneId).toLocalDate().equals(loginDate)).findFirst();
                         Long localTime = LocalTime.now().getLong(ChronoField.MINUTE_OF_DAY);
                         if (countryHolidayCalender.isPresent() && countryHolidayCalender.get().getStartTime() <= localTime && localTime <= countryHolidayCalender.get().getEndTime()) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
@@ -469,8 +477,6 @@ public class StaffRetrievalService {
         map.put("roles", roles);
         return map;
     }
-
-
 
     /* @Modified by VIPUL
      * */
@@ -587,16 +593,14 @@ public class StaffRetrievalService {
         return staffGraphRepository.getStaffByPriorityGroupStaffIncludeFilter(staffIncludeFilterDTO, unitId);
     }
 
-    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, long staffId, Long unitPositionId, long organizationId, String type) {
+    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, long staffId, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds) {
         Organization organization = organizationService.getOrganizationDetail(organizationId, type);
-        Long countryId = organization.getCountry().getId();
-        Long unitId = organization.getId();
-
+        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(organizationId).getId();
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId, shiftDate);
-        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organization.getId(), staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         if (unitPosition != null) {
-            List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+            List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
             List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
             staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeFromCPRNumber(staffAdditionalInfoDTO.getCprNumber()));
             Long functionId = null;
@@ -613,36 +617,46 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
             List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
             staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
-            UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
+            UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(organization.getId());
             staffAdditionalInfoDTO.setUser(userAccessRole);
             if (Optional.ofNullable(unitPosition).isPresent()) {
                 staffAdditionalInfoDTO.setUnitPosition(unitPosition);
             }
             staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
-            Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+            Organization parentOrganization = organization.isParentOrganization()?organization:organizationGraphRepository.getParentOfOrganization(organization.getId());
             UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
             Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
             if (!Optional.ofNullable(staff).isPresent()) {
                 userAccessRoleDTO.setManagement(true);
                 userAccessRoleDTO.setStaff(false);
             } else {
-                userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
+                userAccessRoleDTO = accessGroupService.getStaffAccessRoles(organization.getId(), staff.getId());
             }
             SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(unitPosition.getExpertise().getId());
             staffAdditionalInfoDTO.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
+            List<ReasonCode> reasonCodes= new ArrayList<>();
+            if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
+                 reasonCodes = reasonCodeGraphRepository.findByIds(reasonCodeIds);
+            }
+            staffAdditionalInfoDTO.setReasonCodes(ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes,ReasonCodeDTO.class));
+
         }
         return staffAdditionalInfoDTO;
 
     }
-
-    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, Long unitPositionId) {
-        StaffUnitPositionDetails unitPosition = unitPositionService.findAppliedFunctionsAtUnitPosition(unitPositionId, shiftDate);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
+    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, Long unitPositionId, Long unitId) {
+        StaffUnitPositionDetails unitPosition = null;
+        if(Optional.ofNullable(unitPositionId).isPresent()) {
+            unitPosition = unitPositionService.findAppliedFunctionsAtUnitPosition(unitPositionId, shiftDate);
+        }
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO =null;
+        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId,ReasonCodeType.ABSENCE);
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            staffAdditionalInfoDTO = new StaffAdditionalInfoDTO();
+            staffAdditionalInfoDTO= new StaffAdditionalInfoDTO();
             staffAdditionalInfoDTO.setUnitPosition(unitPosition);
         }
+        staffAdditionalInfoDTO.setReasonCodes(ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes,ReasonCodeDTO.class));
         return staffAdditionalInfoDTO;
     }
 
@@ -680,6 +694,9 @@ public class StaffRetrievalService {
                 expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
                 expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
                 expertiseQueryResult.setSeniorityLevel(calculateApplicableSeniorityLevel(expertiseQueryResult.getSeniorityLevels(), maxExperience));
+                if(expertiseQueryResult.isUnitPositionExists()){
+                    staffExpertiseQueryResult.setUnitPositionExists(true);
+                }
             });
         });
         return staffExpertiseQueryResults;

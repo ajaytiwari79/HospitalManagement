@@ -397,7 +397,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH(up)-[: " + IN_UNIT + " ]-(org:Organization{deleted:false}) with staff,up,org\n" +
             "MATCH (up)-[: " + HAS_EXPERTISE_IN + "]-(exp:Expertise) with staff,up,org,exp \n"+
             "Optional match (org)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} with staff,up,org,exp,reasonCode \n " +
-            "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(DISTINCT reasonCode) as reasonCodes,COLLECT({id:id(up),expertiseName:exp.name}) as unitPosition")
+            "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(DISTINCT reasonCode) as reasonCodes,COLLECT(DISTINCT {id:id(up),expertiseName:exp.name}) as unitPosition")
     List<StaffInformationQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +

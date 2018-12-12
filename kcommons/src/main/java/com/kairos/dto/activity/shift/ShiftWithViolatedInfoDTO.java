@@ -14,7 +14,6 @@ import java.util.Map;
 public class ShiftWithViolatedInfoDTO {
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
-    private List<String> errorMessages = new ArrayList<>();
 
     public ShiftWithViolatedInfoDTO() {
     }
@@ -30,14 +29,6 @@ public class ShiftWithViolatedInfoDTO {
 
     }
 
-
-    public List<String> getErrorMessages() {
-        return errorMessages;
-    }
-
-    public void setErrorMessages(List<String> errorMessages) {
-        this.errorMessages = errorMessages;
-    }
 
     public List<ShiftDTO> getShifts() {
         return shifts;

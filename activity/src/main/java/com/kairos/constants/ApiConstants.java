@@ -94,6 +94,7 @@ public final class ApiConstants {
     public static final String STAFF_CURRENT_USER_ID="/staff/current_user/{userId}";
     public static final String STAFF_GET_STAFF_BY_EXPERTISES="/staff/getStaffByExperties";
     public static final String CURRENT_USER_ACCESS_ROLE="/current_user/access_role";
+    public static final String ACCESS_ROLE_AND_REASON_CODE = "/current_user/access_role_and_reason_codes";
     public static final String TIME_SLOT_URL="/time_slot/{timeSlotId}";
     public static final String CURRENT_TIME_SLOTS="/current/time_slots";
     public static final String GET_CTA_BY_UNIT_POSITION_ID="/getCTAbyUnitPosition/{unitPositionId}";

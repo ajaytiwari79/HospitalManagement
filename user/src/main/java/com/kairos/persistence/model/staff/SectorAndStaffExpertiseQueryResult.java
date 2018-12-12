@@ -14,6 +14,7 @@ public class SectorAndStaffExpertiseQueryResult {
     private Long id;
     private String name;
     private List<StaffExpertiseQueryResult> expertiseWithExperience;
+    private boolean unitPositionExists;
 
     public SectorAndStaffExpertiseQueryResult() {
         //Default Constructor
@@ -41,5 +42,13 @@ public class SectorAndStaffExpertiseQueryResult {
 
     public void setExpertiseWithExperience(List<StaffExpertiseQueryResult> expertiseWithExperience) {
         this.expertiseWithExperience = expertiseWithExperience;
+    }
+
+    public boolean isUnitPositionExists() {
+        return unitPositionExists;
+    }
+
+    public void setUnitPositionExists(boolean unitPositionExists) {
+        this.unitPositionExists = unitPositionExists;
     }
 }

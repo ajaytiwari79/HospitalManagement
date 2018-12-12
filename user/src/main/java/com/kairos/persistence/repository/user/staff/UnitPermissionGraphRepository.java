@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.staff;
 
 
-import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;

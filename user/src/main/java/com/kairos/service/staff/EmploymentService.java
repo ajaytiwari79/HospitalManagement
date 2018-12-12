@@ -12,7 +12,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.dto.user.employment.employment_dto.MainEmploymentResultDTO;
-import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
@@ -195,6 +195,7 @@ public class EmploymentService {
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+
         if( accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created){
             exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
@@ -206,6 +207,9 @@ public class EmploymentService {
         }
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
@@ -254,8 +258,6 @@ public class EmploymentService {
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
         }
 
-        StaffAccessGroupQueryResult staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
         accessGroupPermissionCounterDTO.setStaffId(staffId);
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created",created+""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {},accessGroupId);
@@ -357,25 +359,12 @@ public class EmploymentService {
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
-        Organization parentOrganization;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parentOrganization = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else {
-            parentOrganization = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        }
-
-        if (parentOrganization != null) {
-            accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
-            units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
-        } else {
-
-            accessGroups = accessGroupRepository.getAccessGroups(unit.getId());
-            units = organizationGraphRepository.getSubOrgHierarchy(unit.getId());
-        }
-
+        Organization parentOrganization= unit.isParentOrganization()?unit: organizationGraphRepository.getParentOfOrganization(unit.getId());
+        accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
+        units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
         List<Map<String, Object>> employments;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
+        // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit.isParentOrganization()) {
             employments = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {

@@ -279,14 +279,14 @@ public class StaffService {
         }
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
-        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
-        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
-        sectorWiseGroupedExpertise.forEach((sector,expertise)->{
-            boolean unitPositionExists=unitPositionGraphRepository.unitPositionExistsByStaffIdAndExpertiseIdsIn(staffId,expertise,sector);
-            if(unitPositionExists){
-                exceptionService.actionNotPermittedException("Unit Position is Created");
-            }
-        });
+//        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
+//        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
+//        sectorWiseGroupedExpertise.forEach((sector,expertise)->{
+//            boolean unitPositionExists=unitPositionGraphRepository.unitPositionExistsByStaffIdAndExpertiseIdsIn(staffId,expertise,sector);
+//            if(unitPositionExists){
+//                exceptionService.actionNotPermittedException("Unit Position is Created");
+//            }
+//        });
         Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
 
         List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
@@ -984,7 +984,7 @@ public class StaffService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
-            AccessGroup accessGroup = union ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
+            AccessGroup accessGroup = (union|| parentOrganization) ? accessGroupRepository.findOne(accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
