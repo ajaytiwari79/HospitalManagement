@@ -18,16 +18,15 @@ import java.util.List;
  */
 public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
-    @Autowired
-    ExceptionService exceptionService;
-
     private List<Long> staffSkills;
     private List<String> errorMessages = new ArrayList<>();
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
+    private ExceptionService exceptionService;
 
-    public StaffAndSkillSpecification(List<Long> staffSkills, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+    public StaffAndSkillSpecification(List<Long> staffSkills, RuleTemplateSpecificInfo ruleTemplateSpecificInfo,ExceptionService exceptionService) {
         this.staffSkills = staffSkills;
         this.ruleTemplateSpecificInfo = ruleTemplateSpecificInfo;
+        this.exceptionService=exceptionService;
     }
 
     @Override

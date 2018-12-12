@@ -23,14 +23,15 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     private Expertise expertise;
     private List<String> errorMessages = new ArrayList<>();
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
+    private ExceptionService exceptionService;
 
-    public ExpertiseSpecification(Expertise expertise, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+    public ExpertiseSpecification(Expertise expertise, RuleTemplateSpecificInfo ruleTemplateSpecificInfo,ExceptionService exceptionService) {
         this.expertise = expertise;
         this.ruleTemplateSpecificInfo = ruleTemplateSpecificInfo;
+        this.exceptionService=exceptionService;
     }
 
-    @Autowired
-    ExceptionService exceptionService;
+
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {

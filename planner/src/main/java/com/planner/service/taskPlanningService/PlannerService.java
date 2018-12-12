@@ -1,6 +1,7 @@
 package com.planner.service.taskPlanningService;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.planner.planninginfo.PlanningSubmissionDTO;
 import com.kairos.dto.planner.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
@@ -16,7 +17,6 @@ import com.planner.repository.solver_config.SolverConfigRepository;
 import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
-import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
 import com.planner.service.config.DroolsConfigService;
 import com.planner.service.config.PathProvider;
 import com.planner.service.rest_client.PlannerRestClient;
@@ -61,27 +61,27 @@ public class PlannerService {
     @Inject private UnitSolverConfigService unitSolverConfigService;
 
 
-    public TaskPlanningDTO getPlanningProblemByid(String id){
+    public TaskDTO getPlanningProblemByid(String id){
         PlanningProblem planningProblem = (PlanningProblem) planningRepository.findById(id,PlanningProblem.class);
-        TaskPlanningDTO taskPlanningDTO = new TaskPlanningDTO();
-        taskPlanningDTO.setUnitId(planningProblem.getUnitId());
+        TaskDTO taskPlanningDTO = new TaskDTO();
+        /*taskPlanningDTO.setUnitId(planningProblem.getUnitId());
         taskPlanningDTO.setOptaPlannerId(planningProblem.getId());
-        taskPlanningDTO.setPlanningProblemStatus(planningProblem.getStatus().toValue());
+        taskPlanningDTO.setPlanningProblemStatus(planningProblem.getStatus().toValue());*/
         return taskPlanningDTO;
     }
 
 
-    public TaskPlanningDTO submitTaskPlanningProblem(TaskPlanningDTO taskPlanningDTO){
+    public TaskDTO submitTaskPlanningProblem(TaskDTO taskPlanningDTO){
         SolverConfigDTO solverConfigDTO =null;// solverConfigService.getOneForPlanning(taskPlanningDTO.getSolverConfigId());
         boolean initializedTaskPlanner = initializeTaskPlanner(solverConfigDTO);
         if(initializedTaskPlanner){
             PlanningProblem planningProblem = new PlanningProblem();
-            planningProblem.setUnitId(taskPlanningDTO.getUnitId());
+            //planningProblem.setUnitId(taskPlanningDTO.getUnitId());
             planningProblem.setStatus(PlanningStatus.UNSOLVED);
             //planningProblem.setProblemXml(getStringBySolutionObject(taskPlanningSolution));
             planningProblem = (PlanningProblem) planningRepository.save(planningProblem);
-            taskPlanningDTO.setOptaPlannerId(planningProblem.getId());
-            taskPlanningDTO.setPlanningProblemStatus(planningProblem.getStatus().toValue());
+            //taskPlanningDTO.setOptaPlannerId(planningProblem.getId());
+            //taskPlanningDTO.setPlanningProblemStatus(planningProblem.getStatus().toValue());
         }
         return taskPlanningDTO;
     }
@@ -112,7 +112,7 @@ public class PlannerService {
 
 
     public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
-        ShiftRequestPhasePlanningSolution problem=shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
+        ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
         SolverConfigDTO solverConfig=unitSolverConfigService.getSolverConfigWithConstraints(planningSubmissionDTO.getSolverConfigId());
         //FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());
