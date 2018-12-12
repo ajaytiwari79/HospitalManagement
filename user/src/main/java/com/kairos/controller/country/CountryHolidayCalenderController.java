@@ -1,4 +1,5 @@
 package com.kairos.controller.country;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.google_calender.GoogleCalenderService;
@@ -71,12 +72,12 @@ public class CountryHolidayCalenderController {
 
     @RequestMapping(value = "/holiday",method = RequestMethod.POST)
     @ApiOperation("save a new CountryHolidayCalenderController holiday by id")
-    ResponseEntity<Map<String, Object>> addCountryCalenderToCountry(@PathVariable Long countryId ,@RequestBody Map<String,Object> countryHolidayCalender) throws Exception{
+    ResponseEntity<Map<String, Object>> addCountryCalenderToCountry(@PathVariable Long countryId ,@RequestBody CountryHolidayCalenderDTO countryHolidayCalender) throws Exception{
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.createHolidayCalenderByCountryId(countryId,countryHolidayCalender));
     }
     @RequestMapping(value = "/holiday",method = RequestMethod.PUT)
     @ApiOperation("Update a new CountryHolidayCalenderController holiday by id")
-    ResponseEntity<Map<String, Object>> updateCountryCalender(@RequestBody Map<String,Object> countryHolidayCalender) throws Exception{
+    ResponseEntity<Map<String, Object>> updateCountryCalender(@RequestBody CountryHolidayCalenderDTO countryHolidayCalender) throws Exception{
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.updateCountryCalender(countryHolidayCalender));
     }
     @RequestMapping(value = "holiday/{holidayId}",method = RequestMethod.DELETE)

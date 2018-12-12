@@ -51,8 +51,10 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,7 +112,7 @@ public class TimeBankCalculationService {
                         shiftInterval = interval.overlap(shiftInterval);
                         if (!ctaDto.getCtaRuleTemplates().isEmpty()) {
                             for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
-                                boolean ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), DateUtils.asZoneDateTime(shiftActivity.getStartDate()),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                                boolean ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), new DateTimeInterval(shiftActivity.getStartDate(),shiftActivity.getEndDate()),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                                 if (ruleTemplateValid) {
                                     int ctaTimeBankMin = 0;
                                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
@@ -178,7 +180,7 @@ public class TimeBankCalculationService {
         Date date = DateUtils.asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
         for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
-            if(planningPeriodInterval.contains(date)){
+            if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
                 contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= workingDaysInWeek ? totalWeeklyMinutes / workingDaysInWeek : 0;
                 contractualOrTimeBankMinutes = calculateForConstractual ? contractualOrTimeBankMinutes : -contractualOrTimeBankMinutes;
                 break;
@@ -240,11 +242,11 @@ public class TimeBankCalculationService {
      * @param shiftPhaseId
      * @param activityId
      * @param timeTypeId
-     * @param shiftDateTime
+     * @param shiftInterval
      * @param plannedTimeId
      * @return
      */
-    public boolean validateCTARuleTemplate(Map<Long,DayTypeDTO> dayTypeDTOMap ,CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,java.time.ZonedDateTime shiftDateTime,BigInteger plannedTimeId) {
+    public boolean validateCTARuleTemplate(Map<Long,DayTypeDTO> dayTypeDTOMap ,CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,DateTimeInterval shiftInterval,BigInteger plannedTimeId) {
         boolean valid = true;
 
         if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null){
@@ -257,46 +259,32 @@ public class TimeBankCalculationService {
         if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
             valid = false;
         }
-        if(!(valid && validateDayType(shiftDateTime,ruleTemplate,dayTypeDTOMap))){
+        if(!(valid && validateDayType(shiftInterval,ruleTemplate,dayTypeDTOMap))){
             valid=false;
         }
         return valid;
     }
-    /*private boolean validateDayType(java.time.LocalDate shiftDate,CTARuleTemplateDTO ruleTemplateDTO, Map<Long,DayTypeDTO> dayTypeDTOMap) {
-        List<DayTypeDTO> dayTypeDTOS = ruleTemplateDTO.getDayTypeIds().stream().map(daytypeId -> dayTypeDTOMap.get(daytypeId)).collect(Collectors.toList());
-        boolean valid = false;
-        for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
-            if(dayTypeDTO.isHolidayType()) {
-                if (ruleTemplateDTO.getPublicHolidays() != null && ruleTemplateDTO.getPublicHolidays().contains(shiftDate)) {
-                    valid = true;
-                }
 
-            }
-            else if (ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(shiftDate.getDayOfWeek())) {
-                valid = true;
-            }
-        }
-        return valid;
-    }*/
-
-    private boolean validateDayType(java.time.ZonedDateTime shiftDateTime, CTARuleTemplateDTO ruleTemplateDTO, Map<Long, DayTypeDTO> dayTypeDTOMap) {
+    private boolean validateDayType(DateTimeInterval shiftInterval, CTARuleTemplateDTO ruleTemplateDTO, Map<Long, DayTypeDTO> dayTypeDTOMap) {
         List<DayTypeDTO> dayTypeDTOS = ruleTemplateDTO.getDayTypeIds().stream().map(daytypeId -> dayTypeDTOMap.get(daytypeId)).collect(Collectors.toList());
         boolean valid = false;
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
             if (dayTypeDTO.isHolidayType()) {
                 for (CountryHolidayCalenderDTO countryHolidayCalenderDTO : dayTypeDTO.getCountryHolidayCalenderData()) {
+                    DateTimeInterval dateTimeInterval;
                     if (dayTypeDTO.isAllowTimeSettings()) {
-                        DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.asDate(DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asLocalTime(countryHolidayCalenderDTO.getStartTime())), DateUtils.asDate(DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asLocalTime(countryHolidayCalenderDTO.getEndTime())));
-                        valid = dateTimeInterval.contains(shiftDateTime);
+                        LocalTime holidayEndTime = countryHolidayCalenderDTO.getEndTime().get(ChronoField.MINUTE_OF_DAY)==0 ? LocalTime.MAX: countryHolidayCalenderDTO.getEndTime();
+                        dateTimeInterval = new DateTimeInterval(DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate(), countryHolidayCalenderDTO.getStartTime()), DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate(), holidayEndTime));
                     }else {
-                        valid = DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()).equals(shiftDateTime.toLocalDate());
+                        dateTimeInterval = new DateTimeInterval(DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate().plusDays(1)));
                     }
+                    valid = dateTimeInterval.overlaps(shiftInterval);
                     if (valid) {
                         break;
                     }
                 }
             } else {
-                valid = ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(shiftDateTime.getDayOfWeek());
+                valid = ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(shiftInterval.getStartLocalDate().getDayOfWeek());
             }
             if (valid) {
                 break;

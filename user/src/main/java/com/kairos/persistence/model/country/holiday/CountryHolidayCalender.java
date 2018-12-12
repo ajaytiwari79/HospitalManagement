@@ -1,8 +1,13 @@
 package com.kairos.persistence.model.country.holiday;
+import com.kairos.config.neo4j.converter.LocalTimeConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.DayType;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,10 +18,12 @@ import java.util.Map;
 @NodeEntity
 public class CountryHolidayCalender extends UserBaseEntity {
     private String holidayTitle;
-    private Long holidayDate;
+    private LocalDate holidayDate;
     private DayType dayType;
-    private Long startTime;
-    private Long endTime;
+    @Convert(LocalTimeConverter.class)
+    private LocalTime startTime;
+    @Convert(LocalTimeConverter.class)
+    private LocalTime endTime;
     private boolean reOccuring;
     private String description;
     private String holidayType;
@@ -34,13 +41,13 @@ public class CountryHolidayCalender extends UserBaseEntity {
     public CountryHolidayCalender() {
     }
 
-    public CountryHolidayCalender(String holidayTitle, Long holidayDate) {
+    public CountryHolidayCalender(String holidayTitle, LocalDate holidayDate) {
         this.holidayDate = holidayDate;
         this.holidayTitle = holidayTitle;
 
     }
 
-    public CountryHolidayCalender(String holidayTitle, Long holidayDate,Long startTime,Long endTime) {
+    public CountryHolidayCalender(String holidayTitle, LocalDate holidayDate,LocalTime startTime,LocalTime endTime) {
         this.holidayDate = holidayDate;
         this.holidayTitle = holidayTitle;
         this.startTime  = startTime;
@@ -73,19 +80,19 @@ public class CountryHolidayCalender extends UserBaseEntity {
         this.dayType = dayType;
     }
 
-    public Long getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Long startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Long getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Long endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
@@ -113,18 +120,18 @@ public class CountryHolidayCalender extends UserBaseEntity {
         this.reOccuring = reOccuring;
     }
 
-    public Long getHolidayDate() {
+    public LocalDate getHolidayDate() {
         return holidayDate;
     }
 
-    public void setHolidayDate(Long holidayDate) {
+    public void setHolidayDate(LocalDate holidayDate) {
         this.holidayDate = holidayDate;
     }
 
 
     public Map<String, Object> retrieveDetails() {
         Map<String,Object> map = new HashMap<>();
-        map.put("text", this.holidayTitle);
+        map.put("holidayTitle", this.holidayTitle);
         map.put("holidayDate", this.holidayDate);
         map.put("description", this.description);
         map.put("isEnabled", this.isEnabled());
