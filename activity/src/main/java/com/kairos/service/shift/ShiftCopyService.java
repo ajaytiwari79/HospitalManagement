@@ -43,6 +43,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,7 +124,7 @@ public class ShiftCopyService extends MongoBaseService {
 
         Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap = planningPeriods.stream().collect(Collectors.toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), v -> v));
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
-        List<ShiftResponseDTO> previousShiftBetweenDatesByUnitPosition = shiftMongoRepository.findShiftsBetweenDurationByUnitPositions(unitPositionIds, DateUtils.asDate(copyShiftDTO.getStartDate()), DateUtils.asDate(copyShiftDTO.getEndDate()));
+        List<ShiftResponseDTO> previousShiftBetweenDatesByUnitPosition = shiftMongoRepository.findShiftsBetweenDurationByUnitPositions(unitPositionIds, DateUtils.asDate(copyShiftDTO.getStartDate().atTime(LocalTime.MIN)), DateUtils.asDate(copyShiftDTO.getEndDate().atTime(LocalTime.MAX)));
         Map<Long, List<Shift>> unitPositionWiseShifts = previousShiftBetweenDatesByUnitPosition.stream().collect(Collectors.toMap(key -> key.getUnitPositionId(), value -> value.getShifts()));
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
@@ -202,7 +203,7 @@ public class ShiftCopyService extends MongoBaseService {
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
-         Shift    copiedShift = new Shift(startDate, endDate,
+         Shift  copiedShift = new Shift(startDate, endDate,
                     sourceShift.getRemarks(), sourceShift.getActivities(), staffUnitPosition.getStaff().getId(), sourceShift.getUnitId(),
                     sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId()
                     , planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
@@ -305,7 +306,7 @@ public class ShiftCopyService extends MongoBaseService {
     private BigInteger getPresencePlannedTime(BigInteger phaseId, Boolean managementPerson, StaffUnitPositionDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
         ActivityConfiguration appliedActivityConfiguration = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (activityConfiguration.getPresencePlannedTime() != null && activityConfiguration.getAbsencePlannedTime().getPhaseId().equals(phaseId)) {
+            if (activityConfiguration.getPresencePlannedTime() != null && activityConfiguration.getPresencePlannedTime().getPhaseId().equals(phaseId)) {
                 appliedActivityConfiguration = activityConfiguration;
             }
 
