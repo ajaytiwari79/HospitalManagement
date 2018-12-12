@@ -1,6 +1,8 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
@@ -48,35 +50,31 @@ public class CountryHolidayCalenderService {
 
     /**
      *
-     * @param countryHolidayCalender
+     * @param countryHolidayCalenderDTO
      * @return
      */
-    public Map<String, Object> updateCountryCalender(Map<String,Object> countryHolidayCalender){
-        logger.info("Data Received: "+countryHolidayCalender);
-        Long id = Long.valueOf(String.valueOf(countryHolidayCalender.get("id")));
-        CountryHolidayCalender calender = countryHolidayCalenderGraphRepository.findOne(id);
-        DayType dayType = dayTypeGraphRepository.findOne(Long.valueOf(String.valueOf(countryHolidayCalender.get("dayTypeId"))));
-
+    public CountryHolidayCalenderDTO updateCountryCalender(CountryHolidayCalenderDTO countryHolidayCalenderDTO){
+        logger.info("Data Received: "+countryHolidayCalenderDTO);
+        CountryHolidayCalender calender = countryHolidayCalenderGraphRepository.findOne(countryHolidayCalenderDTO.getId());
+        DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
         if (calender!=null){
-
             if (dayType!=null){
-                dayType.setColorCode(String.valueOf(countryHolidayCalender.get("colorCode")));
-                String holidayDate = (String)(countryHolidayCalender.get("holidayDate"));
-                calender.setHolidayDate(DateUtil.getIsoDateInLong(holidayDate));
-                //calender.setHolidayDate(Long.valueOf(String.valueOf(countryHolidayCalender.get("holidayDate"))));
-                calender.setHolidayTitle((String) countryHolidayCalender.get("text"));
-                calender.setDescription((String) countryHolidayCalender.get("description"));
+                dayType.setColorCode(countryHolidayCalenderDTO.getColorCode());
+                calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
+                calender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());
+                calender.setDescription(countryHolidayCalenderDTO.getDescription());
                 calender.setDayType(dayType);
-                calender.setStartTime(Long.valueOf(String.valueOf(countryHolidayCalender.get("startTime"))));
-                calender.setEndTime(Long.valueOf(String.valueOf(countryHolidayCalender.get("endTime"))));
+                calender.setStartTime(countryHolidayCalenderDTO.getStartTime());
+                calender.setEndTime(countryHolidayCalenderDTO.getEndTime());
                 CountryHolidayCalender calender1  =countryHolidayCalenderGraphRepository.save(calender);
                 logger.info("Updated title: "+calender1.getHolidayTitle()+"\n Desc: "+calender1.getDescription());
-                return calender1.retrieveDetails();
             }
             logger.info("dayType not found");
 
+        }else {
+            countryHolidayCalenderDTO = null;
         }
-        return null;
+        return countryHolidayCalenderDTO;
     }
 
 
@@ -117,24 +115,23 @@ public class CountryHolidayCalenderService {
     }
 
 
-    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) {
+    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
             CountryHolidayCalender countryHolidayCalender = new CountryHolidayCalender();
-            if (data != null) {
+            if (countryHolidayCalenderDTO != null) {
                 logger.info("Data Received: "+countryHolidayCalender);
-                DayType dayType = dayTypeGraphRepository.findOne(Long.valueOf(String.valueOf(data.get("dayTypeId"))));
+                DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
 
                 if(dayType!=null){
 
-                    String holidayDate = (String)(data.get("holidayDate"));
-                    countryHolidayCalender.setHolidayDate(DateUtil.getIsoDateInLong(holidayDate));
+                    countryHolidayCalender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
                     //countryHolidayCalender.setHolidayDate(Long.valueOf(String.valueOf(data.get("holidayDate"))));
-                    countryHolidayCalender.setDescription(String.valueOf(data.get("description")));
-                    countryHolidayCalender.setHolidayTitle((String) data.get("text"));
+                    countryHolidayCalender.setDescription(countryHolidayCalenderDTO.getDescription());
+                    countryHolidayCalender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());
                     countryHolidayCalender.setDayType(dayType);
-                    countryHolidayCalender.setStartTime(Long.valueOf(String.valueOf(data.get("startTime"))));
-                    countryHolidayCalender.setEndTime(Long.valueOf(String.valueOf(data.get("endTime"))));
+                    countryHolidayCalender.setStartTime(countryHolidayCalenderDTO.getStartTime());
+                    countryHolidayCalender.setEndTime(countryHolidayCalenderDTO.getEndTime());
 
                     List<CountryHolidayCalender> calenderList = country.getCountryHolidayCalenderList() != null?
                             country.getCountryHolidayCalenderList() : new ArrayList<>();
@@ -170,23 +167,20 @@ public class CountryHolidayCalenderService {
                 dateItem = datesArray.getJSONObject(i);
                 countryHolidayCalender = countryHolidayCalenderGraphRepository.getExistingHoliday(dateItem.getString("id"),country.getId());
                 logger.info("country holiday calendar is "+countryHolidayCalender);
-                if(countryHolidayCalender == null && DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")) > DateUtil.getCurrentDate().getTime()) {
+                countryHolidayCalender = countryHolidayCalender!=null ? countryHolidayCalender: new CountryHolidayCalender();
+                countryHolidayCalender.setHolidayDate(DateUtil.getDateFromEpoch(Long.valueOf(dateItem.getJSONObject("start").getString("date"))));
+                countryHolidayCalender.setHolidayTitle(dateItem.getString("summary"));
+                countryHolidayCalender.setGoogleCalId(dateItem.getString("id"));
+                countryHolidayCalender.setLastModificationDate(DateUtil.getIsoDateWithTimezoneInLong(dateItem.getString("updated")));
+                countryHolidayCalender.setStartTime(DateUtils.asLocalTime(Long.valueOf(dateItem.getJSONObject("start").getString("date"))));
+                countryHolidayCalender.setEndTime(DateUtils.asLocalTime(Long.valueOf(dateItem.getJSONObject("end").getString("date"))));
+
+                if(countryHolidayCalender == null && DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")) > DateUtils.getCurrentDate().getTime()) {
                     countryHolidayCalender = new CountryHolidayCalender();
-                    countryHolidayCalender.setHolidayDate(DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")));
-                    countryHolidayCalender.setHolidayTitle(dateItem.getString("summary"));
-                    countryHolidayCalender.setGoogleCalId(dateItem.getString("id"));
-                    countryHolidayCalender.setLastModificationDate(DateUtil.getIsoDateWithTimezoneInLong(dateItem.getString("updated")));
-                    countryHolidayCalender.setStartTime(DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")));
-                    countryHolidayCalender.setEndTime(DateUtil.getIsoDateInLong(dateItem.getJSONObject("end").getString("date")));
                     countryHolidayCalenderList.add(countryHolidayCalender);
                 }else if(countryHolidayCalender!=null && DateUtil.getIsoDateWithTimezoneInLong(dateItem.getString("updated")) > countryHolidayCalender.getLastModificationDate()){
-                    countryHolidayCalender.setHolidayTitle(dateItem.getString("summary"));
-                    countryHolidayCalender.setHolidayDate(DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")));
-                    countryHolidayCalender.setGoogleCalId(dateItem.getString("id"));
-                    countryHolidayCalender.setLastModificationDate(DateUtil.getIsoDateWithTimezoneInLong(dateItem.getString("updated")));
-                    countryHolidayCalender.setStartTime(DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")));
-                    countryHolidayCalender.setEndTime(DateUtil.getIsoDateInLong(dateItem.getJSONObject("end").getString("date")));
                 }
+
             }
             country.setCountryHolidayCalenderList(countryHolidayCalenderList);
             countryGraphRepository.save(country);
