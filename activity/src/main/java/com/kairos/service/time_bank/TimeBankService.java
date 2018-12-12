@@ -399,6 +399,7 @@ public class TimeBankService extends MongoBaseService {
     private List<DailyTimeBankEntry> renewDailyTimeBankOnUnitPositionModification(StaffAdditionalInfoDTO staffAdditionalInfoDTO,Date firstShiftStartDate,Date lastShiftStartDate, List<ShiftWithActivityDTO> shiftsWithActivities) {
         DateTime startDate = new DateTime(firstShiftStartDate).withTimeAtStartOfDay();
         DateTime endDate = new DateTime(lastShiftStartDate).plusDays(1).withTimeAtStartOfDay();
+        timeBankRepository.deleteDailyTimeBank(Arrays.asList(staffAdditionalInfoDTO.getUnitPosition().getId()), firstShiftStartDate, endDate.toDate());
         List<DailyTimeBankEntry> dailyTimeBankEntries=new ArrayList<>();
         List<DateTimeInterval> dateTimeIntervals = timeBankCalculationService.getPlanningPeriodIntervals(staffAdditionalInfoDTO.getUnitId(),startDate.toDate(),endDate.toDate());
         while (startDate.isBefore(endDate)) {
