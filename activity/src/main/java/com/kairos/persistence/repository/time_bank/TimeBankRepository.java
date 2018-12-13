@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /*
 * Created By Pradeep singh rajawat
@@ -39,5 +40,5 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     void deleteDailyTimeBank(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{staffId:{$in:?0},date:{$gte:?1 , $lt:?2}}")
-    List<DailyTimeBankEntry> findAllByStaffIdsAndDate(List<Long> staffIds, Date startDate, Date endDate);
+    List<DailyTimeBankEntry> findAllByStaffIdsAndDate(Set<Long> staffIds, Date startDate, Date endDate);
 }

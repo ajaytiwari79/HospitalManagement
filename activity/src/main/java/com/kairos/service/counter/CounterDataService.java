@@ -382,9 +382,9 @@ public class CounterDataService {
         return kpisData.stream().collect(Collectors.toMap(kpiData -> kpiData.getCounterId(), kpiData -> kpiData));
     }
 
-    public Map<Long,Long> calculatePlannedHour(List<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
-        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
-        return staffPlannedHours;
-    }
+//    public Map<Long,Long> calculatePlannedHour(Set<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
+//        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
+//        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
+//        return staffPlannedHours;
+//    }
 }

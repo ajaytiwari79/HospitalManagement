@@ -7,15 +7,14 @@ import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -23,19 +22,20 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.constants.ApiConstants.STAFF_BY_EMPLOYMENT_TYPE;
 
 @Service
 public class PlannedHoursCalculationService implements CounterService {
     @Inject
     private TimeBankRepository timeBankRepository;
     @Inject
-    private GenericRestClient genericRestClient;
+    private GenericIntegrationService genericIntegrationService;
 
-    private Map<Long,Long> calculatePlannedHour(List<Long> staffIds, LocalDate startDate, LocalDate endDate ){
+    private Map<Long,Long> calculatePlannedHour(Set<Long> staffIds, LocalDate startDate, LocalDate endDate ){
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
         Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
         return staffPlannedHours;
@@ -44,46 +44,35 @@ public class PlannedHoursCalculationService implements CounterService {
     private List<DataUnit> getPlannedHours(Long organizationId,Map<FilterType, List> filterBasedCriteria, boolean kpi){
         List<StaffDTO> staffDTOS;
         List<Long> staffIds=new ArrayList<>();
-        List dates = new ArrayList();
-        List<Long> unitIds=new ArrayList();
-        List<DataUnit> dataList = new ArrayList<>();
-
 //        List<String> timeType=new ArrayList();
 //        List<String> approvalStatus=new ArrayList();
-        List<Long> employmentType=new ArrayList();
         if(kpi && filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS)!= null){
-            staffIds = (List<Long>)filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS).stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
+            staffIds = getLongValue(filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS));
         }else if(filterBasedCriteria.get(FilterType.STAFF_IDS) != null){
-            staffIds = (List<Long>)filterBasedCriteria.get(FilterType.STAFF_IDS).stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
+            staffIds = getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS));
         }
-        if(filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) {
-            dates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
-        }else{
-        dates.add(LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-        dates.add(LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)));
-        }
-        if(filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) {
-            unitIds = (List<Long>)filterBasedCriteria.get(FilterType.UNIT_IDS).stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
-        }
-//        if(filterBasedCriteria.get(FilterType.TIME_TYPE)!=null) {
+        List<LocalDate> dates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)));
+        List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
+         // if(filterBasedCriteria.get(FilterType.TIME_TYPE)!=null) {
 //            timeType = filterBasedCriteria.get(FilterType.TIME_TYPE);
 //        }
 //        if(filterBasedCriteria.get(FilterType.APPROVAL_STATUS)!=null) {
 //            approvalStatus = filterBasedCriteria.get(FilterType.APPROVAL_STATUS);
 //        }
-        if(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) {
-            employmentType = (List<Long>)filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE).stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
-        }
+        List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentType,organizationId,dates.get(0).toString(),dates.get(1).toString());
-        staffDTOS=genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, "/staff_by_employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>(){});
+        staffDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        List<DataUnit> dataList = new ArrayList<>();
         if(Optional.ofNullable(staffDTOS).isPresent()) {
-            Map<Long, String> staffIdAndNameMap = staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getFirstName() + " " + v.getLastName()));
-            Map<Long, Long> plannedHoursMap = calculatePlannedHour(staffDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), (LocalDate) dates.get(0), (LocalDate) dates.get(1));
-            for (Map.Entry<Long, Long> entry : plannedHoursMap.entrySet()) {
-                dataList.add(new DataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getKey(), entry.getValue()));
-            }
+            Map<Long, String> staffIdAndNameMap = staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getFullName()));
+            Map<Long, Long> plannedHoursMap = calculatePlannedHour(staffIdAndNameMap.keySet(), dates.get(0), dates.get(1));
+            dataList = plannedHoursMap.entrySet().stream().map(entry->new DataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getKey(), entry.getValue())).collect(Collectors.toList());
         }
         return dataList;
+    }
+
+    private List<Long> getLongValue(List<Object> objects){
+        return objects.stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
     }
 
     @Override

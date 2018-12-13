@@ -4,7 +4,7 @@ import java.util.List;
 
 public class StaffEmploymentTypeDTO {
     private List<Long> staffIds;
- private List<Long> unitIds;
+    private List<Long> unitIds;
     private List<Long> employmentTypeIds;
     private Long organizationId;
     private String startDate;

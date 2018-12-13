@@ -136,6 +136,9 @@ public class StaffDTO {
     }
 
 
+    public String getFullName(){
+        return this.firstName+" "+this.getLastName();
+    }
 
     public String getWorkEmail() {
         return workEmail;
