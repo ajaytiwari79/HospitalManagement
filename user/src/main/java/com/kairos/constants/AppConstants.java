@@ -5,6 +5,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -17,6 +18,10 @@ import java.util.List;
 public class AppConstants {
     private AppConstants() {
     }
+
+    //forgot password mail
+    public static final String MAIL_SUBJECT ="Kairos Planning password reset link";
+    public static final String MAIL_BODY="Hi  {0}\n\nWe received a request to reset your Kairos Planning password. Click the link to choose a new one :\n";
     public static final String TIMEZONE_UTC = "UTC";
     public static final String HYPHEN = "-";
     public static final String KAI = "KAI-";

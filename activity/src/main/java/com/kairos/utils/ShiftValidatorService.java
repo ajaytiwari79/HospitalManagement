@@ -765,7 +765,7 @@ public class ShiftValidatorService {
         boolean management = roles.contains(AccessGroupRole.MANAGEMENT);
         phaseTemplateValue.forEach((k, v) -> {
             if (shiftActivityIdsDTO.getActivitiesToAdd().contains(k)) {
-                if ((!v.getEligibleEmploymentTypes().contains(employmentTypeId)) || management && !v.isEligibleForManagement()) {
+                if ((staff && !v.getEligibleEmploymentTypes().contains(employmentTypeId)) || (management && !v.isEligibleForManagement())) {
                     exceptionService.actionNotPermittedException("error.shift.not.authorised.phase");
                 }
             }
