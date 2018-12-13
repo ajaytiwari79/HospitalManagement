@@ -324,16 +324,17 @@ public class ShiftCopyService extends MongoBaseService {
     }
 
     private String validateShiftExistanceBetweenDuration(LocalDate shiftCreationStartDate, Shift sourceShift, List<Shift> currentStaffPreviousShifts) {
+        String response=null;
         if (currentStaffPreviousShifts != null) {
-            DateTime startDateTime = DateUtils.getDateTimeByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getStartDate()));
-            DateTime endDateTime = DateUtils.getDateTimeByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
-            Interval shiftInterval = new Interval(startDateTime, endDateTime);
-            Optional<Shift> shift = currentStaffPreviousShifts.stream().filter(s -> shiftInterval.overlaps(new Interval(s.getStartDate().getTime(), s.getEndDate().getTime()))).findFirst();
+            Date startDateTime = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getStartDate()));
+            Date endDateTime = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
+            DateTimeInterval shiftInterval = new DateTimeInterval(startDateTime, endDateTime);
+            Optional<Shift> shift = currentStaffPreviousShifts.stream().filter(s -> shiftInterval.overlaps(new DateTimeInterval(s.getStartDate().getTime(), s.getEndDate().getTime()))).findFirst();
             if (shift.isPresent()) {
-                return ("message.shift.date.startandend");
+                response= ("message.shift.date.startandend");
             }
         }
-        return null;
+        return response;
     }
 
     private PlanningPeriodDTO getCurrentPlanningPeriod(Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, LocalDate shiftCreationStartDate) {
