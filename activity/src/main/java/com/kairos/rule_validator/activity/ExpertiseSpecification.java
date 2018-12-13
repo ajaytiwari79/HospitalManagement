@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.utils.ShiftValidatorService.convertMessage;
+import static com.kairos.utils.ShiftValidatorService.throwException;
+
 /**
  * Created by vipul on 31/1/18.
  */
@@ -23,12 +26,12 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     private Expertise expertise;
     private List<String> errorMessages = new ArrayList<>();
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
-    private ExceptionService exceptionService;
 
-    public ExpertiseSpecification(Expertise expertise, RuleTemplateSpecificInfo ruleTemplateSpecificInfo,ExceptionService exceptionService) {
+
+    public ExpertiseSpecification(Expertise expertise, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
         this.expertise = expertise;
         this.ruleTemplateSpecificInfo = ruleTemplateSpecificInfo;
-        this.exceptionService=exceptionService;
+
     }
 
 
@@ -39,7 +42,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         if (!expertiseIds.contains(expertise.getId())) {
             return false;
         }
-        exceptionService.invalidRequestException("message.activity.expertise.match");
+        throwException("message.activity.expertise.match");
         return true;
     }
 
@@ -49,15 +52,16 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ActivityRuleViolation activityRuleViolation = null;
             if (!shiftActivityDTO.getActivity().getExpertises().contains(expertise.getId())) {
-                errorMessages.add(exceptionService.convertMessage("message.activity.expertise.match", shiftActivityDTO.getActivity().getName(), expertise.getName()));
+                errorMessages.add(convertMessage("message.activity.expertise.match", shiftActivityDTO.getActivity().getName(), expertise.getName()));
                 activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
                 if (activityRuleViolation == null) {
                     activityRuleViolation = new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(), shiftActivityDTO.getActivity().getName(), 0, errorMessages);
+                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
                 } else {
-                    activityRuleViolation.getErrorMessages().addAll(errorMessages);
+                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().get().getErrorMessages().addAll(errorMessages);
                 }
             }
-            ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+
         }
     }
 
