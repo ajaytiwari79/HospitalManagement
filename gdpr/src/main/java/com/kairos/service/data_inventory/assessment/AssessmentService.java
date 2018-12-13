@@ -128,6 +128,9 @@ public class AssessmentService extends MongoBaseService {
      * @return
      */
     public AssessmentDTO launchAssessmentForAsset(Long unitId, BigInteger assetId, AssessmentDTO assessmentDTO) {
+        if(!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent()||!Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()){
+            exceptionService.illegalArgumentException("message.assessment.relativedeadline.value.invalid");
+        }
         Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentMongoRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndAssetId(unitId, assetId) : assessmentMongoRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
@@ -165,7 +168,7 @@ public class AssessmentService extends MongoBaseService {
                 }
             }
             if(!result){
-                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
+                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value.invalid");
             }
             return result;
     }
