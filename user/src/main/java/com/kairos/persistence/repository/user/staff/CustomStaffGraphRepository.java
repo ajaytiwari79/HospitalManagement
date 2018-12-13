@@ -10,5 +10,5 @@ import java.util.List;
 public interface CustomStaffGraphRepository {
 
     public List<StaffUnitPositionQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId);
-    List<StaffPersonalDetailDTO> getStaffsByUnitIdsEmploymentType(Long organizationId,List<Long> unitId, List<Long> employmentType, String startDate, String endDate,List<Long> staffIds);
+    List<StaffPersonalDetailDTO> getStaffsByFilter(Long organizationId, List<Long> unitId, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds);
 }

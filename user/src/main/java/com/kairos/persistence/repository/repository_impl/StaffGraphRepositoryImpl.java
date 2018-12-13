@@ -62,7 +62,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     @Override
-    public List<StaffPersonalDetailDTO> getStaffsByUnitIdsEmploymentType(Long organizationId,List<Long> unitIds, List<Long> employmentType, String startDate, String endDate,List<Long> staffIds) {
+    public List<StaffPersonalDetailDTO> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
         String staffFilterQuery="";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
