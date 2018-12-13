@@ -46,18 +46,11 @@ public class Shift extends MongoBaseEntity {
     private List<ShiftActivity> activities;
     //time care id
     private String externalId;
-
     private Long unitPositionId;
-
-
     private BigInteger parentOpenShiftId;
-
-
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
-
     private boolean sickShift;
-
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private Long functionId;
@@ -115,7 +108,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId,Long staffUserId) {
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId,Long staffUserId,ShiftType shiftType) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
@@ -131,6 +124,7 @@ public class Shift extends MongoBaseEntity {
         this.phaseId=phaseId;
         this.planningPeriodId=planningPeriodId;
         this.staffUserId=staffUserId;
+        this.shiftType=shiftType;
     }
 
 
