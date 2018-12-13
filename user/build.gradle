@@ -67,6 +67,8 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     compile('org.springframework.cloud:spring-cloud-starter-security')
     compile('org.springframework.boot:spring-boot-starter-data-neo4j')
+    //send grid
+    compile ('com.sendgrid:sendgrid-java:4.0.1')
     //
     //compile('org.springframework.boot:spring-boot-starter-data-redis')
     compile('org.springframework.boot:spring-boot-starter-security')

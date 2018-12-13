@@ -1,5 +1,6 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
@@ -106,7 +107,7 @@ public class DayTypeService {
         calendar.set(Calendar.SECOND, 59);
         Date endDate = calendar.getTime();
         CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(countryId, startDate.getTime(), endDate.getTime());
+                findByIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate.getTime()), DateUtils.asLocalDate(endDate.getTime()));
 
         if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
             List<DayType> dayTypes = new ArrayList<>();

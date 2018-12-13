@@ -1,18 +1,21 @@
-version '0.0.1'
+version '0.0.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
     jcenter()
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://repo.spring.io/release/" }
 }
+
 dependencies {
+    //send grid
+    compile ('com.sendgrid:sendgrid-java:4.0.1')
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
     compile 'javax.validation:validation-api:2.0.0.Final'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.5.Final'
@@ -33,3 +36,4 @@ dependencies {
     //compile 'org.neo4j:neo4j:3.3.4'
 
 }
+
