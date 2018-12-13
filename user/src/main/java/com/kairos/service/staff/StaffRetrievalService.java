@@ -550,15 +550,7 @@ public class StaffRetrievalService {
     }
 
     public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId) {
-        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
-        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-        if (!Optional.ofNullable(staff).isPresent()) {
-            userAccessRoleDTO.setManagement(true);
-            userAccessRoleDTO.setStaff(false);
-            return userAccessRoleDTO;
-        }
-        return accessGroupService.getStaffAccessRoles(unitId, staff.getId());
+        return  accessGroupService.findUserAccessRole(unitId);
     }
 
     public List<StaffWithSkillDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
@@ -628,15 +620,7 @@ public class StaffRetrievalService {
             UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(organization.getId());
             staffAdditionalInfoDTO.setUser(userAccessRole);
             staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
-            Organization parentOrganization = organization.isParentOrganization()?organization:organizationGraphRepository.getParentOfOrganization(organization.getId());
-            UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
-            Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-            if (!Optional.ofNullable(staff).isPresent()) {
-                userAccessRoleDTO.setManagement(true);
-                userAccessRoleDTO.setStaff(false);
-            } else {
-                userAccessRoleDTO = accessGroupService.getStaffAccessRoles(organization.getId(), staff.getId());
-            }
+            UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organization.getId());
             SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(unitPosition.getExpertise().getId());
             staffAdditionalInfoDTO.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
@@ -660,15 +644,7 @@ public class StaffRetrievalService {
         UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(organization.getId());
         staffUnitPositionUnitDataWrapper.setUser(userAccessRole);
         staffUnitPositionUnitDataWrapper.setUnitTimeZone(organization.getTimeZone());
-        Organization parentOrganization = organization.isParentOrganization()?organization:organizationGraphRepository.getParentOfOrganization(organization.getId());
-        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
-        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-        if (!Optional.ofNullable(staff).isPresent()) {
-            userAccessRoleDTO.setManagement(true);
-            userAccessRoleDTO.setStaff(false);
-        } else {
-            userAccessRoleDTO = accessGroupService.getStaffAccessRoles(organization.getId(), staff.getId());
-        }
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organization.getId());
         SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(expertiseId);
         staffUnitPositionUnitDataWrapper.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
         staffUnitPositionUnitDataWrapper.setUser(userAccessRoleDTO);
