@@ -600,6 +600,9 @@ public  class DateUtils {
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
             }
+            case YEAR: {
+                return localDate.plusYears(duration * recurringNumber);
+            }
         }
         return localDate;
     }

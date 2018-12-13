@@ -37,7 +37,7 @@ public class AssessmentDTO {
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
     private int relativeDeadlineDuration;
-    private DurationType relativeDeadType;
+    private DurationType relativeDeadlineType;
 
     public BigInteger getId() { return id; }
 
@@ -91,12 +91,12 @@ public class AssessmentDTO {
         this.relativeDeadlineDuration = relativeDeadlineDuration;
     }
 
-    public DurationType getRelativeDeadType() {
-        return relativeDeadType;
+    public DurationType getRelativeDeadlineType() {
+        return relativeDeadlineType;
     }
 
-    public void setRelativeDeadType(DurationType relativeDeadType) {
-        this.relativeDeadType = relativeDeadType;
+    public void setRelativeDeadlineType(DurationType relativeDeadlineType) {
+        this.relativeDeadlineType = relativeDeadlineType;
     }
 
 }

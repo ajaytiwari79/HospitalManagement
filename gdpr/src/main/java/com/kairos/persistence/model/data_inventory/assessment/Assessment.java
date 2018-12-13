@@ -44,7 +44,7 @@ public class Assessment extends MongoBaseEntity {
 
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     private int relativeDeadlineDuration;
-    private DurationType relativeDeadType;
+    private DurationType relativeDeadlineType;
 
 
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment,@NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate) {
@@ -132,12 +132,12 @@ public class Assessment extends MongoBaseEntity {
         this.relativeDeadlineDuration = relativeDeadlineDuration;
     }
 
-    public DurationType getRelativeDeadType() {
-        return relativeDeadType;
+    public DurationType getRelativeDeadlineType() {
+        return relativeDeadlineType;
     }
 
-    public void setRelativeDeadType(DurationType relativeDeadType) {
-        this.relativeDeadType = relativeDeadType;
+    public void setRelativeDeadlineType(DurationType relativeDeadlineType) {
+        this.relativeDeadlineType = relativeDeadlineType;
     }
 
 

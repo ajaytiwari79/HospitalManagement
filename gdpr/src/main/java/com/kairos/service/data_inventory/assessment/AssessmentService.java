@@ -3,6 +3,7 @@ package com.kairos.service.data_inventory.assessment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
@@ -44,7 +45,6 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireT
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
@@ -150,19 +150,24 @@ public class AssessmentService extends MongoBaseService {
         return assessmentDTO;
     }
 
-    private void validateLaunchAssessmentValue(AssessmentDTO assessmentDTO){
-            if(assessmentDTO.getRelativeDeadType().equals(DurationType.DAYS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=30)){
-              exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
-            }else if(assessmentDTO.getRelativeDeadType().equals(DurationType.HOURS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=24)){
-                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
-            }else if(assessmentDTO.getRelativeDeadType().equals(DurationType.MONTHS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=12)){
-                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
+    private boolean validateLaunchAssessmentValue(AssessmentDTO assessmentDTO){
+            boolean result=true;
+            if(assessmentDTO.getRelativeDeadlineType().equals(DurationType.DAYS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=30)){
+             result=false;
+            }else if(assessmentDTO.getRelativeDeadlineType().equals(DurationType.HOURS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=24)){
+                result=false;
+            }else if(assessmentDTO.getRelativeDeadlineType().equals(DurationType.MONTHS)&&!(assessmentDTO.getRelativeDeadlineDuration()<=12)){
+                result=false;
             }else {
-                LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadType(), 1);
+                LocalDate endDate = DateUtils.addDurationInLocalDate(assessmentDTO.getStartDate(), assessmentDTO.getRelativeDeadlineDuration(), assessmentDTO.getRelativeDeadlineType(), 1);
                 if(endDate.isAfter(assessmentDTO.getEndDate())){
-                    exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
+                    result=false;
                 }
             }
+            if(!result){
+                exceptionService.illegalArgumentException("message.assessment.relativedeadline.value");
+            }
+            return result;
     }
 
     /**
