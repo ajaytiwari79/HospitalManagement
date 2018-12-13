@@ -1,6 +1,7 @@
 package com.planner.domain.shift_planning;
 
-import com.kairos.dto.activity.shift.ShiftActivity;
+
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.shiftplanning.domain.Employee;
 
 import java.math.BigInteger;
@@ -15,7 +16,7 @@ public class Shift {
     private Date startDate;
     private Date endDate;
     private Long unitPositionId;
-    private List<ShiftActivity> activities;
+    private List<ShiftActivityDTO> activities;
 
     public BigInteger getId() {
         return id;
@@ -57,11 +58,11 @@ public class Shift {
         this.unitPositionId = unitPositionId;
     }
 
-    public List<ShiftActivity> getActivities() {
+    public List<ShiftActivityDTO> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ShiftActivity> activities) {
+    public void setActivities(List<ShiftActivityDTO> activities) {
         this.activities = activities;
     }
 }

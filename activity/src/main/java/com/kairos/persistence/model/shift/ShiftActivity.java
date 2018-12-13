@@ -1,13 +1,11 @@
-package com.kairos.dto.activity.shift;
+package com.kairos.persistence.model.shift;
 
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -29,7 +27,7 @@ public class ShiftActivity {
     //used for adding absence type of activities.
     private Long absenceReasonCodeId;
     private String remarks;
-    //please don't use this id for any functionality this on ly for frontend
+    //please don't use this id for any functionality this only for frontend
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
@@ -37,9 +35,8 @@ public class ShiftActivity {
     private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
+    private List<TimeBankCTADistribution> timeBankCTADistributions;
     //Yatharth adding embedded object for frontend
-    private ReasonCodeDTO reasonCode;
-
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
     public ShiftActivity() {
@@ -213,12 +210,12 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
     }
 
-    public ReasonCodeDTO getReasonCode() {
-        return reasonCode;
+    public List<TimeBankCTADistribution> getTimeBankCTADistributions() {
+        return timeBankCTADistributions;
     }
 
-    public void setReasonCode(ReasonCodeDTO reasonCode) {
-        this.reasonCode = reasonCode;
+    public void setTimeBankCTADistributions(List<TimeBankCTADistribution> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
     }
 
     public boolean isBreakReplaced() {
@@ -228,4 +225,5 @@ public class ShiftActivity {
     public void setBreakReplaced(boolean breakReplaced) {
         this.breakReplaced = breakReplaced;
     }
+
 }

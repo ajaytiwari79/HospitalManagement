@@ -3,12 +3,11 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -378,21 +377,6 @@ public class Shift extends MongoBaseEntity {
         return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
 
-    public ShiftQueryResult getShiftQueryResult() {
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        return shiftQueryResult;
-    }
 
     public ShiftDTO getShiftDTO() {
         ShiftDTO shiftDTO = new ShiftDTO(this.id,
@@ -405,7 +389,7 @@ public class Shift extends MongoBaseEntity {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
+                ObjectMapperUtils.copyPropertiesOfListByMapper(this.activities, ShiftActivityDTO.class), this.staffId, this.unitId, this.unitPositionId);
         shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         return shiftDTO;
     }
