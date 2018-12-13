@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (c:Country)-[:"+HAS_HOLIDAY+"]-(ch:CountryHolidayCalender{isEnabled :true}) " +
             "where id(c) = {0}  " +
             " MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
-            "RETURN {text: ch.holidayTitle,isEnabled :ch.isEnabled  ,holidayDate: ch.holidayDate, description:ch.description,startTime:ch.startTime,id:id(ch),endTime:ch.endTime, " +
+            "RETURN {holidayTitle: ch.holidayTitle,isEnabled :ch.isEnabled  ,holidayDate: ch.holidayDate, description:ch.description,startTime:ch.startTime,id:id(ch),endTime:ch.endTime, " +
             "dayType:dt.name, allowTimeSettings:dt.allowTimeSettings, colorCode:dt.colorCode," +
             "dayTypeId:id(dt)} as result order by  ch.holidayDate asc ")
     List<Map<String,Object>> getCountryAllHolidays(Long countryId);
@@ -108,25 +109,19 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     Long getCountryOfTeam(long teamId);
 
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
-            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
+            "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
             "AND ch.isEnabled = true WITH  ch as ch  " +
             "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "RETURN ch.holidayDate as result")
-    List<Long> getAllCountryHolidaysBetweenDates(Long countryId, Long start, Long end);
+    List<LocalDate> getAllCountryHolidaysBetweenDates(Long countryId, LocalDate start, LocalDate end);
+
 
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
-            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
-            "AND ch.isEnabled = true WITH  ch as ch  " +
-            "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
-            "RETURN ch.holidayDate as result")
-    List<Long> getAllCountryHolidaysCalendarsByIds(Long countryId, Long start, Long end);
-
-    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
-            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
+            "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
             "AND ch.isEnabled = true WITH  ch as ch  " +
             "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "RETURN ch.holidayDate as holidayDate, dt as dayType ")
-    List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, Long start, Long end);
+    List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, LocalDate start, LocalDate end);
 
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} RETURN level")

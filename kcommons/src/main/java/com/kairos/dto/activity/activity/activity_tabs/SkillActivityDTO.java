@@ -1,14 +1,14 @@
 package com.kairos.dto.activity.activity.activity_tabs;
+/*
+ *Created By Pavan on 11/12/18
+ *
+ */
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by vipul on 25/8/17.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class SkillActivityDTO {

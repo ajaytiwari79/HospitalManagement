@@ -1,5 +1,6 @@
 package com.kairos.service.open_shift;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
 import com.kairos.dto.activity.shift.ShiftActivity;
@@ -19,7 +20,6 @@ import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRe
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.mail.MailService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;

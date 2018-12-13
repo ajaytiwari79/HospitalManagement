@@ -69,7 +69,8 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         String groupOperation = "{'$group':{" +
                 "       '_id':'$_id','processingActivities':{'$addToSet':'$processingActivities'},'assetType':{'$first':'$assetType'},'technicalSecurityMeasures':{'$first':'$technicalSecurityMeasures'},\n" +
                 "       'assetSubType':{'$first':'$assetSubType'},'description':{'$first':'$description'},'hostingLocation':{'$first':'$hostingLocation'},'assetAssessor':{'$first':'$assetAssessor'},\n" +
-                "        'name':{'$first':'$name'},'storageFormats':{'$first':'$storageFormats'},'orgSecurityMeasures':{'$first':'$orgSecurityMeasures'},'active':{'$first':'$active'},\n" +
+                "        'name':{'$first':'$name'},'managingDepartment':{'$first':'$managingDepartment'},'assetOwner':{'$first':'$assetOwner'},'dataRetentionPeriod':{'$first':'$dataRetentionPeriod'},\n" +
+                "         'storageFormats':{'$first':'$storageFormats'},'orgSecurityMeasures':{'$first':'$orgSecurityMeasures'},'active':{'$first':'$active'},\n" +
                 "        'hostingType':{'$first':{'$arrayElemAt':['$hostingType',0]}}," +
                 "        'dataDisposal':{'$first':{'$arrayElemAt':['$dataDisposal',0]}}," +
                 "        'hostingProvider':{'$first':{'$arrayElemAt':['$hostingProvider',0]}}" +

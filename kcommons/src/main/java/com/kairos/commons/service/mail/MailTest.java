@@ -1,8 +1,9 @@
-package com.kairos.service.mail;
+package com.kairos.commons.service.mail;
 
-import java.io.File;
+
 
 import javax.inject.Inject;
+import java.io.File;
 
 /**
  * Created by oodles on 3/2/17.

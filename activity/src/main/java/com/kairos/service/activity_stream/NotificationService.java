@@ -1,5 +1,6 @@
 package com.kairos.service.activity_stream;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.response.RequestComponent;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
@@ -7,7 +8,6 @@ import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.activity_stream.NotificationMongoRepository;
-import com.kairos.service.mail.MailService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 

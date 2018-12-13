@@ -33,6 +33,7 @@ public class AppConstants {
     public static final String Working_Time_AGREEMENT="workingTimeAgreement";
     public static final String WTABASE_TEMPLATE="wtaBaseRuleTemplate";
     public static final String SHIFTS="shifts";
+    public static final String TIME_TYPE="time_Type";
 
     /**
      * Neo4j RelationShip constants
