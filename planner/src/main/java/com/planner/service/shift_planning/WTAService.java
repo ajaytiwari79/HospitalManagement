@@ -78,9 +78,11 @@ public class WTAService {
             DateTimeInterval dateTimeIntervalPerWTA = createWTADateTimeInterval(wtaResponseDTO, toPlanningDate);
             LocalDate startLocalDate=wtaResponseDTO.getStartDate();
             LocalDate endLocalDate=dateTimeIntervalPerWTA.getEndLocalDate();
-            while(!startLocalDate.equals(endLocalDate) && localDateApplicableIntervals.contains(startLocalDate))
+            while(!startLocalDate.equals(endLocalDate) )
             {
-                localDateWTAMap.put(startLocalDate,wtaResponseDTO);
+                if(localDateApplicableIntervals.contains(startLocalDate)) {
+                    localDateWTAMap.put(startLocalDate, wtaResponseDTO);
+                }
                 startLocalDate=startLocalDate.plusDays(1l);//TODO optimization reuse {localDateApplicableIntervals}
             }
         }

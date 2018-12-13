@@ -2,6 +2,7 @@ package com.planner.service.shift_planning;
 
 
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class StaffingLevelService {
      * @param shiftPlanningStaffingLevelDTOList
      * @return
      */
-    Map<LocalDate, List<StaffingLevelTimeSlotDTO>> getStaffingLevelTimeSlotByDate(List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList) {
+    Map<LocalDate, List<StaffingLevelInterval>> getStaffingLevelTimeSlotByDate(List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList) {
         return shiftPlanningStaffingLevelDTOList.stream().collect(Collectors.toMap(k -> k.getCurrentDate(), v -> v.getPresenceStaffingLevelInterval()));
     }
 
@@ -42,15 +43,15 @@ public class StaffingLevelService {
      * @param map
      * @return
      */
-    Map<LocalDate,Set<StaffingLevelActivity>> getStaffingLevelActivityByDay(Map<LocalDate,List<StaffingLevelTimeSlotDTO>> map)
+    Map<LocalDate,Set<StaffingLevelActivity>> getStaffingLevelActivityByDay(Map<LocalDate,List<StaffingLevelInterval>> map)
     {
 
         Map<LocalDate,Set<StaffingLevelActivity>> map1=new HashMap<>();
         for(LocalDate localDate:map.keySet()){
-            for(StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO:map.get(localDate))
+            for(StaffingLevelInterval staffingLevelInterval:map.get(localDate))
             {
-                if(staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()>0)
-                map1.put(localDate,staffingLevelTimeSlotDTO.getStaffingLevelActivities());
+                if(staffingLevelInterval.getStaffingLevelActivities().size()>0)
+                map1.put(localDate,staffingLevelInterval.getStaffingLevelActivities());
             }
 
         }

@@ -3,6 +3,7 @@ package com.kairos.dto.planner.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 
@@ -19,7 +20,7 @@ public class ShiftPlanningStaffingLevelDTO {
     private LocalDate currentDate;
     private Integer weekCount;
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval=new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval=new ArrayList<>();
 
     public ShiftPlanningStaffingLevelDTO() {
         //default constructor
@@ -73,11 +74,11 @@ public class ShiftPlanningStaffingLevelDTO {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public List<StaffingLevelTimeSlotDTO> getPresenceStaffingLevelInterval() {
+    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
         return presenceStaffingLevelInterval;
     }
 
-    public void setPresenceStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval) {
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 }
