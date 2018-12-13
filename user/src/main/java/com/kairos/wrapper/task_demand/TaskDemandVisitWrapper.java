@@ -4,6 +4,7 @@ import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.dto.planner.vrp.TaskAddress;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class TaskDemandVisitWrapper {
     private  Long countryId;
     private Long staffId;
     private Map<String, Object> timeSlotMap;
-    private  List<Long> publicHolidayList;
+    private  List<LocalDate> publicHolidayList;
     private Map<String, String> flsCredentials;
     private List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList;
 
@@ -46,7 +47,7 @@ public class TaskDemandVisitWrapper {
         private  Long countryId;
         private Long staffId;
         private Map<String, Object> timeSlotMap;
-        private  List<Long> publicHolidayList;
+        private  List<LocalDate> publicHolidayList;
         private Map<String, String> flsCredentials;
         private List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList;
 
@@ -74,7 +75,7 @@ public class TaskDemandVisitWrapper {
             this.timeSlotMap = timeSlotMap;
             return this;
         }
-        public TaskDemandVisitWrapperBuilder publicHolidayList(List<Long> publicHolidayList) {
+        public TaskDemandVisitWrapperBuilder publicHolidayList(List<LocalDate> publicHolidayList) {
             this.publicHolidayList =publicHolidayList;
             return this;
         }
@@ -135,11 +136,11 @@ public class TaskDemandVisitWrapper {
         this.countryId = countryId;
     }
 
-    public List<Long> getPublicHolidayList() {
+    public List<LocalDate> getPublicHolidayList() {
         return publicHolidayList;
     }
 
-    public void setPublicHolidayList(List<Long> publicHolidayList) {
+    public void setPublicHolidayList(List<LocalDate> publicHolidayList) {
         this.publicHolidayList = publicHolidayList;
     }
 

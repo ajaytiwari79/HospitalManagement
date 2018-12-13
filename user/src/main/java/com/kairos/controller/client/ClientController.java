@@ -1,5 +1,6 @@
 package com.kairos.controller.client;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.user.client.ClientExceptionDTO;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.persistence.model.client.*;
@@ -11,7 +12,6 @@ import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;
 import com.kairos.service.client.ClientService;
-import com.kairos.service.mail.MailService;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.utils.response.ResponseHandler;

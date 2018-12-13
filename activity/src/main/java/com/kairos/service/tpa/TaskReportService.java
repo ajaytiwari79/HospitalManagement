@@ -1,9 +1,9 @@
 package com.kairos.service.tpa;
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.persistence.model.task.TaskReport;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.mail.MailService;
 import com.kairos.utils.external_plateform_shift.TaskReportWrapper;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
