@@ -24,7 +24,6 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
 
     private Set<Long> expertiseIds = new HashSet<>();
     private Expertise expertise;
-    private List<String> errorMessages = new ArrayList<>();
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
 
 
@@ -48,7 +47,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-
+        List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ActivityRuleViolation activityRuleViolation = null;
             if (!shiftActivityDTO.getActivity().getExpertises().contains(expertise.getId())) {
@@ -58,7 +57,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
                     activityRuleViolation = new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(), shiftActivityDTO.getActivity().getName(), 0, errorMessages);
                     ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
                 } else {
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().get().getErrorMessages().addAll(errorMessages);
+                    activityRuleViolation.getErrorMessages().addAll(errorMessages);
                 }
             }
 

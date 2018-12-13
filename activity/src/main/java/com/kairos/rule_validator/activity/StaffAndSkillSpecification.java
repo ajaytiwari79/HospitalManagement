@@ -20,7 +20,6 @@ import java.util.Objects;
 public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
     private List<Long> staffSkills;
-    private List<String> errorMessages = new ArrayList<>();
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
     private ExceptionService exceptionService;
 
@@ -45,8 +44,9 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
+        List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            ActivityRuleViolation activityRuleViolation=null;
+            ActivityRuleViolation activityRuleViolation;
             if (!CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills)) {
                 errorMessages.add(exceptionService.convertMessage("message.activity.skill.match", shiftActivityDTO.getActivity().getName()));
                  activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
@@ -55,7 +55,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
                     ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
                 }
                 else {
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().get().getErrorMessages().addAll(errorMessages);
+                    activityRuleViolation.getErrorMessages().addAll(errorMessages);
                 }
             }
 
