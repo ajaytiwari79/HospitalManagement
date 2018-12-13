@@ -208,9 +208,6 @@ public class EmploymentService {
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
-        StaffAccessGroupQueryResult staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
-
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
 
@@ -230,6 +227,7 @@ public class EmploymentService {
         List<AccessPageQueryResult> accessPageQueryResults;
         Map<String, Object> response = new HashMap<>();
         UnitPermission unitPermission = null;
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
@@ -248,22 +246,23 @@ public class EmploymentService {
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
+            staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
 
 
         } else {
+            staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
             // need to remove unit permission
             if(unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId)<=1){
                 exceptionService.actionNotPermittedException("error.permission.remove");
             }
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
         }
-
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
         accessGroupPermissionCounterDTO.setStaffId(staffId);
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created",created+""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {},accessGroupId);
 
         response.put("organizationId", unitId);
-        response.put("synInFls", flsSyncStatus);
         return response;
     }
 

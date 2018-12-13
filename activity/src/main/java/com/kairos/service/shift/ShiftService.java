@@ -519,10 +519,10 @@ public class ShiftService extends MongoBaseService {
                         dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
                     }
                 });
-                List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
+                /*List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
                 if (CollectionUtils.isNotEmpty(publicHoliday)) {
                     publicHolidays.addAll(publicHoliday);
-                }
+                }*/
             }
             ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
             ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
@@ -622,7 +622,7 @@ public class ShiftService extends MongoBaseService {
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityWrapperMap);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO,shift,activityWrapperMap, true,false);
         shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
-        shift.setPhaseId(oldStateOfShift.getPhaseId());
+        shift.setPhaseId(phase.getId());
         shift.setPlanningPeriodId(oldStateOfShift.getPlanningPeriodId());
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -1155,9 +1155,9 @@ public class ShiftService extends MongoBaseService {
                                                 String type, Boolean validatedByStaff) {
         UserAccessRoleDTO userAccessRoleDTO=genericIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException("message.shift.save.access");
         } else if (!userAccessRoleDTO.getManagement() && !validatedByStaff) {
-            exceptionService.actionNotPermittedException("message.shift.validation.access");
+            exceptionService.actionNotPermittedException("message.shift.save.access");
         }
         Phase phase=phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.REALTIME.toString());
         Map<String,Phase> phaseMap=new HashMap<>();
