@@ -1,18 +1,26 @@
 package com.planner.service.shift_planning;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
+
+import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.shiftplanning.domain.Activity;
+import com.kairos.shiftplanning.domain.TimeType;
+import com.kairos.shiftplanning.domain.activityConstraint.*;
+import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
+import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.domain.shift_planning.Shift;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
-import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -120,15 +128,40 @@ public class ActivityMongoService {
     //TODO temporary use ObjectMapperUtils(currently not working)
     public List<Activity> getConvertedActivityList(List<ActivityDTO> activities){
         List<Activity> activityList=new ArrayList<>();
+        int order=0;
+        int rank=0;
         for(ActivityDTO activityDTO:activities)
         {
             Activity activity=new Activity();
             activity.setId(activityDTO.getId().toString());
             activity.setName(activityDTO.getName());
+            activity.setOrder(++order);
+            activity.setActivityConstraints(getActivityContraints());
+            TimeType timeType=ObjectMapperUtils.copyPropertiesByMapper(activityDTO.getTimeType(), TimeType.class);
+            timeType.setName(activityDTO.getTimeType().getSecondLevelType().name().toLowerCase());
+            activity.setTimeType(timeType);
+            activity.setRank(++rank);
             //activity.setActivityConstraints(activityDTO.);
             //activity.setSkills(activityDTO.get);
             activityList.add(activity);
         }
         return activityList;
+    }
+
+    public ActivityConstraints getActivityContraints(){
+        LongestDuration longestDuration = new LongestDuration(80, ScoreLevel.SOFT,-5);
+        ShortestDuration shortestDuration = new ShortestDuration(60,ScoreLevel.HARD,-2);
+        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3,ScoreLevel.MEDIUM,-1);//3
+        //ContinousActivityPerShift continousActivityPerShift = new ContinousActivityPerShift(3,ScoreLevel.SOFT,-4);
+        MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.MEDIUM,-1);//4
+        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.MEDIUM,-1);//5
+        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity);
+        return activityConstraints;
+    }
+
+    //
+
+    public PlanningProblemDTO getPlanningPeriod(BigInteger planningPeriodId,Long unitId){
+        return activityMongoRepository.getPlanningPeriod(planningPeriodId,unitId);
     }
 }

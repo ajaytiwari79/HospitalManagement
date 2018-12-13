@@ -253,6 +253,7 @@ public class AppConstants {
     public static final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = 7.4f;
     public static final int LEAP_YEAR = 366;
     public static final int NON_LEAP_YEAR = 365;
+    public static final short ONE_WEEK_MINUTES=10080;
 
     //Query result Keys
     public static final String STAFF="staff";

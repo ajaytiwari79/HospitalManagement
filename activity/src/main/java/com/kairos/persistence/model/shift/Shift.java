@@ -46,18 +46,11 @@ public class Shift extends MongoBaseEntity {
     private List<ShiftActivity> activities;
     //time care id
     private String externalId;
-
     private Long unitPositionId;
-
-
     private BigInteger parentOpenShiftId;
-    private Long allowedBreakDurationInMinute;
-
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
-
     private boolean sickShift;
-
     private Long createdBy ;//= UserContext.getUserDetails().getId();
     private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private Long functionId;
@@ -115,7 +108,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId) {
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId,Long staffUserId,ShiftType shiftType) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
@@ -125,12 +118,13 @@ public class Shift extends MongoBaseEntity {
         this.externalId = externalId;
         this.unitPositionId = unitPositionId;
         this.parentOpenShiftId = parentOpenShiftId;
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
         this.scheduledMinutes = scheduledMinutes;
         this.durationMinutes = durationMinutes;
         this.phaseId=phaseId;
         this.planningPeriodId=planningPeriodId;
+        this.staffUserId=staffUserId;
+        this.shiftType=shiftType;
     }
 
 
@@ -174,9 +168,6 @@ public class Shift extends MongoBaseEntity {
         this.scheduledMinutes = scheduledMinutes;
     }
 
-
-
-
     public List<ShiftActivity> getActivities() {
         return activities;
     }
@@ -185,8 +176,6 @@ public class Shift extends MongoBaseEntity {
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
-
-
     public Date getStartDate() {
         return startDate;
     }
@@ -304,7 +293,6 @@ public class Shift extends MongoBaseEntity {
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
-
     }
 
     public Long getUnitPositionId() {
@@ -315,22 +303,12 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-
-
     public BigInteger getParentOpenShiftId() {
         return parentOpenShiftId;
     }
 
     public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
         this.parentOpenShiftId = parentOpenShiftId;
-    }
-
-    public Long getAllowedBreakDurationInMinute() {
-        return allowedBreakDurationInMinute;
-    }
-
-    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
 
     public BigInteger getCopiedFromShiftId() {
@@ -340,7 +318,6 @@ public class Shift extends MongoBaseEntity {
     public void setCopiedFromShiftId(BigInteger copiedFromShiftId) {
         this.copiedFromShiftId = copiedFromShiftId;
     }
-
 
     public boolean isSickShift() {
         return sickShift;
@@ -378,37 +355,6 @@ public class Shift extends MongoBaseEntity {
         return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
 
-    public ShiftQueryResult getShiftQueryResult() {
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        return shiftQueryResult;
-    }
-
-    public ShiftDTO getShiftDTO() {
-        ShiftDTO shiftDTO = new ShiftDTO(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        return shiftDTO;
-    }
 
     @Override
     public String toString() {

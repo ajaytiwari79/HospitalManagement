@@ -12,7 +12,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.dto.user.employment.employment_dto.MainEmploymentResultDTO;
-import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
@@ -195,6 +195,7 @@ public class EmploymentService {
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+
         if( accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created){
             exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
@@ -262,6 +263,7 @@ public class EmploymentService {
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {},accessGroupId);
 
         response.put("organizationId", unitId);
+        response.put("synInFls", flsSyncStatus);
         return response;
     }
 
