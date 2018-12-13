@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.activity.tabs;
+package com.kairos.dto.activity.activity.activity_tabs;
 
 import java.io.Serializable;
 

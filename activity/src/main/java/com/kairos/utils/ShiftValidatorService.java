@@ -74,6 +74,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static java.util.Collections.singletonList;
 
 /**
  * @author pradeep
@@ -154,10 +155,12 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shift.getStartDate());
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap);
-
-        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
+        List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
+        ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
+        validateAbsenceReasonCodeRule(activityWrapperMap,shift,ruleTemplateSpecificInfo);
+        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills(),ruleTemplateSpecificInfo,exceptionService);
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
-        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
+        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise(),ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
@@ -184,24 +187,32 @@ public class ShiftValidatorService {
         }
         //TODO
         activitySpecification.validateRules(shift);
-        List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
-        activityRuleViolations.addAll(validateAbsenceReasonCodeRule(activityWrapperMap,shift));
-        ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
+
+
+        //ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
         return shiftWithViolatedInfoDTO;
     }
 
-    private List<ActivityRuleViolation> validateAbsenceReasonCodeRule(Map<BigInteger,ActivityWrapper> activityWrapperMap,ShiftWithActivityDTO shift) {
-        List<ActivityRuleViolation> activityRuleViolations = new ArrayList<>();
+    private void validateAbsenceReasonCodeRule(Map<BigInteger,ActivityWrapper> activityWrapperMap,ShiftWithActivityDTO shift,RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
         for(ShiftActivityDTO shiftActivity:shift.getActivities()) {
             Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            ActivityRuleViolation activityRuleViolation = null;
             if(activity.getRulesActivityTab().isReasonCodeRequired()&&activity.getRulesActivityTab().getReasonCodeRequiredState().
                     equals(ReasonCodeRequiredState.MANDATORY)&&!Optional.ofNullable(shiftActivity.getAbsenceReasonCodeId()).isPresent()) {
-                activityRuleViolations.add(new ActivityRuleViolation(activity.getId(),activity.getName(),0,Collections.singletonList(exceptionService.
-                        convertMessage("message.shift.reasoncode.required",activity.getId()))));
+
+                activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
+                if (activityRuleViolation == null) {
+                    activityRuleViolation = new ActivityRuleViolation(activity.getId(),activity.getName(),0,singletonList(exceptionService.
+                            convertMessage("message.shift.reasoncode.required",activity.getId())));
+                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+                } else {
+                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(activity.getId())).findAny().get().getErrorMessages().add(exceptionService.
+                            convertMessage("message.shift.reasoncode.required",activity.getId()));
+                }
+
             }
         }
-        return activityRuleViolations;
 
     }
     private List<ActivityRuleViolation> validateTimingOfActivity(ShiftWithActivityDTO shiftDTO, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
@@ -299,7 +310,7 @@ public class ShiftValidatorService {
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo =  getRuleTemplateSpecificInfo(planningPeriod,shiftWithActivityDTO,wtaQueryResultDTOS.get(0),staffUnitPositionDetails,activityWrapperMap,dataWrapper, newCreatedShiftWithActivityDTOs);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffUnitPositionDetails.getEmploymentType());
-        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffUnitPositionDetails.getExpertise());
+        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffUnitPositionDetails.getExpertise(),null);
 
         Specification<ShiftWithActivityDTO> activitySpecification =
                  activityEmploymentTypeSpecification
@@ -367,6 +378,10 @@ public class ShiftValidatorService {
 
     public static void throwException(String exception, Object... param) {
         exceptionService.invalidRequestException(exception, param);
+    }
+
+    public static String convertMessage(String exception, Object... param) {
+        return exceptionService.convertMessage(exception, param);
     }
 
     public static List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts) {
