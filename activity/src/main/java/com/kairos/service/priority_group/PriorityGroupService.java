@@ -1,5 +1,6 @@
 package com.kairos.service.priority_group;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.constants.AppConstants;
@@ -13,7 +14,6 @@ import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.mail.MailService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.PriorityGroupWrapper;

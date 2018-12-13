@@ -6,6 +6,8 @@ import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,9 +30,9 @@ public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseReposito
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]->(ch:CountryHolidayCalender)  WHERE ch.googleCalId={0} AND  id(c)={1} return ch ")
     CountryHolidayCalender getExistingHoliday(String id, Long countryId);
 
-    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " + "where id(c) = {0} AND ch.holidayDate >={1} AND ch.holidayDate <={2} " + "AND ch.isEnabled = true WITH ch as ch " +
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " + "where id(c) = {0} AND date(ch.holidayDate) >={1} AND date(ch.holidayDate) <={2} " + "AND ch.isEnabled = true WITH ch as ch " +
             "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " + "return ch.holidayDate as holidayDate, dt as dayType ")
-    CountryHolidayCalendarQueryResult findByIdAndHolidayDateBetween(Long countryId, Long start, Long end);
+    CountryHolidayCalendarQueryResult findByIdAndHolidayDateBetween(Long countryId, LocalDate start, LocalDate end);
 
 
 }

@@ -3,6 +3,7 @@ package com.kairos.service.country;
 
 import com.google.api.services.calendar.model.Event;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
@@ -230,7 +231,7 @@ public class CountryService {
 
                 holidayCalender = new CountryHolidayCalender();
                 holidayCalender.setHolidayTitle(event.getSummary() != null ? event.getSummary() : "");
-                holidayCalender.setHolidayDate(DateTime.parse(event.getStart().get("date").toString()).getMillis());
+                holidayCalender.setHolidayDate(DateUtils.asLocalDate(DateTime.parse(event.getStart().get("date").toString()).getMillis()));
                 holidayCalender.setHolidayType(event.getVisibility() != null ? event.getSummary() : "");
                 holidayCalender.setGoogleCalId(event.getId());
 
