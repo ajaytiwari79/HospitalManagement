@@ -64,10 +64,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("Match(staff:Staff)-[:"+BELONGS_TO+"]-(emp:Employment) where id(emp)={0} return id(staff)")
     Long findStaffByEmployment(Long employmentId);
 
-    @Query("MATCH(user:User)-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+ BELONGS_TO +"]-(employment:Employment) WHERE id(user)={0} AND " +
-            "WHERE (employment.mainEmploymentEndDate IS NULL OR employment.mainEmploymentEndDate>={1}) AND ((employment.mainEmploymentStartDate IS NOT NULL) AND({2} IS NULL OR employment.mainEmploymentStartDate<={2})) WITH employment ORDER BY employment.mainEmploymentStartDate" +
-            " RETURN employment \n")
-    List<Employment> findAllMainEmploymentsByUserId(Long userId, LocalDate startDate,LocalDate endDate);
 
 }
 

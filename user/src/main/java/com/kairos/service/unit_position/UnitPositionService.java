@@ -314,18 +314,18 @@ public class UnitPositionService {
                 (unitPositionDTO.getUnitId(), unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(), DateUtils.getLongFromLocalDate(unitPositionDTO.getStartDate()),
                         funIds);
 
-//        if (functions.size() != unitPositionDTO.getFunctions().size()) {
-//            exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
-//        }
-//        functions.forEach(currentFunction -> {
-//            unitPositionDTO.getFunctions().forEach(functionsToSave -> {
-//                if (currentFunction.getFunction().getId().equals(functionsToSave.getId())) {
-//                    if (!currentFunction.isAmountEditableAtUnit() && !currentFunction.getAmount().equals(functionsToSave.getAmount())) {
-//                        exceptionService.actionNotPermittedException("error_function_amount_unmodifiable", currentFunction.getFunction().getName());
-//                    }
-//                }
-//            });
-//        });
+        if (functions.size() != unitPositionDTO.getFunctions().size()) {
+            exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
+        }
+        functions.forEach(currentFunction -> {
+            unitPositionDTO.getFunctions().forEach(functionsToSave -> {
+                if (currentFunction.getFunction().getId().equals(functionsToSave.getId())) {
+                    if (!currentFunction.isAmountEditableAtUnit() && !currentFunction.getAmount().equals(functionsToSave.getAmount())) {
+                        exceptionService.actionNotPermittedException("error_function_amount_unmodifiable", currentFunction.getFunction().getName());
+                    }
+                }
+            });
+        });
         return functions;
     }
 
