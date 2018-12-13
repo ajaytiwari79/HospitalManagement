@@ -9,6 +9,7 @@ import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -277,5 +278,21 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Query query=new Query(criteria);
         List<PlanningPeriod> results = mongoTemplate.find(query, PlanningPeriod.class);
         return results;
+    }
+    @Override
+    public List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate,Date requestedEndDate){
+        ProjectionOperation projectionOperation = Aggregation.project().
+                and("id").as("id").
+                andInclude("name").
+                andInclude("startDate").
+                andInclude("endDate").
+                and("current_phase_data.name").as("currentPhase").
+                and("current_phase_data._id").as("currentPhaseId");
+        Aggregation aggregation = newAggregation(
+        match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").lte(requestedEndDate).and("endDate").gte(requestedStartDate)),
+                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),projectionOperation
+         );
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation,PlanningPeriod.class,PlanningPeriodDTO.class);
+        return results.getMappedResults();
     }
 }

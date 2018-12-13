@@ -43,9 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
-import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
-import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
+import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 
 /**
