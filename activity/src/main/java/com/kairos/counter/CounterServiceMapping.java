@@ -30,7 +30,7 @@ public class CounterServiceMapping {
     }
 
     @Inject
-    public void clculatePlannedHours(PlannedHoursCalculationService plannedHoursCalculationService) {
+    public void calculatePlannedHours(PlannedHoursCalculationService plannedHoursCalculationService) {
         this.counters.put(CounterType.PLANNED_HOURS, plannedHoursCalculationService);
         logger.info("Enum mapping: "+this.counters);
     }

@@ -37,8 +37,7 @@ public class PlannedHoursCalculationService implements CounterService {
 
     private Map<Long,Long> calculatePlannedHour(Set<Long> staffIds, LocalDate startDate, LocalDate endDate ){
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
-        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
-        return staffPlannedHours;
+        return dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
     }
 
     private List<DataUnit> getPlannedHours(Long organizationId,Map<FilterType, List> filterBasedCriteria, boolean kpi){

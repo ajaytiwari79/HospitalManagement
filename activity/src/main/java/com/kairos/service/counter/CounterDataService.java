@@ -340,7 +340,7 @@ public class CounterDataService {
     public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId){
         //get unitPositionIds and get staffIds.
         List<BigInteger> kpiIds = filters.getKpiIds();
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(filters.getUnitId());
+        //Long countryId = genericIntegrationService.getCountryIdOfOrganization(filters.getUnitId());
         List<KPI> kpis = counterRepository.getKPIsByIds(kpiIds);
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
         List<Future<RawRepresentationData>> kpiResults = new ArrayList<>();

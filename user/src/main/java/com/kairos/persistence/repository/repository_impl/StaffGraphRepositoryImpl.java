@@ -64,39 +64,39 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     @Override
     public List<StaffDTO> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
+        Map<String, Object> queryParameters = new HashMap();
         String staffFilterQuery="";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
         if(!unitIds.isEmpty()){
-            stringBuilder.append("Where id(org) IN {unitIds}");
+            stringBuilder.append(" WHERE id(org) IN {unitIds}");
+            queryParameters.put("unitIds", unitIds);
         }else{
-            stringBuilder.append("Where id(org) = {organizationId}");
+            stringBuilder.append(" WHERE id(org) = {organizationId}");
+            queryParameters.put("organizationId", organizationId);
         }
         if(!employmentType.isEmpty()) {
-            stringBuilder.append("MATCH(emptype:EmploymentType) WHERE id(emptype) IN {employmentType}");
+            stringBuilder.append(" MATCH(empType:EmploymentType) WHERE id(empType) IN {employmentType}");
+            queryParameters.put("employmentType", employmentType);
         }
         if(unitIds.isEmpty()){
-            stringBuilder.append("MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) ");
+            stringBuilder.append(" MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) ");
         }else {
-            stringBuilder.append("MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition)-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
+            stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition)-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
         }
         if(!staffIds.isEmpty()) {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
+            queryParameters.put("staffIds",staffIds);
         }
         stringBuilder.append(" MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
                 "WHERE  date(positionLine.startDate) <= date({endDate}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({startDate}))"+
-                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(emptype) RETURN DISTINCT  {id:id(staff),firstName:staff.firstName ,lastName:staff.lastName} as data");
-        Map<String, Object> queryParameters = new HashMap();
-        queryParameters.put("employmentType", employmentType);
-        queryParameters.put("organizationId", organizationId);
-        queryParameters.put("unitIds", unitIds);
-        queryParameters.put("staffIds",staffIds);
+                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) RETURN DISTINCT  {id:id(staff),firstName:staff.firstName ,lastName:staff.lastName} as data");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
         staffFilterQuery += stringBuilder.toString();
-        List<Map> my=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
-        List<StaffDTO> staffDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(my,Staff.class);
-        return staffDTOS;
+        List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(result,Staff.class);
+
     }
 
 
