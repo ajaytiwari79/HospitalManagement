@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by oodles on 28/11/17.
@@ -48,6 +49,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
             ActivityRuleViolation activityRuleViolation=null;
             if (!CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills)) {
                 errorMessages.add(exceptionService.convertMessage("message.activity.skill.match", shiftActivityDTO.getActivity().getName()));
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().removeIf(Objects::isNull);
                  activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
                 if(activityRuleViolation==null){
                     activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,errorMessages);

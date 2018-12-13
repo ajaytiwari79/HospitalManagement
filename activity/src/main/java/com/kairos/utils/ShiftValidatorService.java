@@ -183,7 +183,8 @@ public class ShiftValidatorService {
         activitySpecification.validateRules(shift);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         activityRuleViolations.addAll(validateAbsenceReasonCodeRule(activityWrapperMap,shift));
-        ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
+        ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
+        //ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
         return shiftWithViolatedInfoDTO;
     }
