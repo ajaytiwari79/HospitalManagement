@@ -25,10 +25,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +46,8 @@ public class PlannedHoursCalculationService implements CounterService {
         List<Long> staffIds=new ArrayList<>();
         List dates = new ArrayList();
         List<Long> unitIds=new ArrayList();
+        List<DataUnit> dataList = new ArrayList<>();
+
 //        List<String> timeType=new ArrayList();
 //        List<String> approvalStatus=new ArrayList();
         List<Long> employmentType=new ArrayList();
@@ -77,11 +76,12 @@ public class PlannedHoursCalculationService implements CounterService {
         }
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentType,organizationId,dates.get(0).toString(),dates.get(1).toString());
         staffDTOS=genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, "/staff_by_employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>(){});
-        Map<Long,String> staffIdAndNameMap=staffDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v.getFirstName()+" "+v.getLastName()));
-        Map<Long,Long> plannedHoursMap=calculatePlannedHour(staffDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()),(LocalDate) dates.get(0), (LocalDate) dates.get(1));
-        List<DataUnit> dataList = new ArrayList<>();
-        for (Map.Entry<Long, Long> entry : plannedHoursMap.entrySet()) {
-            dataList.add(new DataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getKey(), entry.getValue()));
+        if(Optional.ofNullable(staffDTOS).isPresent()) {
+            Map<Long, String> staffIdAndNameMap = staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getFirstName() + " " + v.getLastName()));
+            Map<Long, Long> plannedHoursMap = calculatePlannedHour(staffDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), (LocalDate) dates.get(0), (LocalDate) dates.get(1));
+            for (Map.Entry<Long, Long> entry : plannedHoursMap.entrySet()) {
+                dataList.add(new DataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getKey(), entry.getValue()));
+            }
         }
         return dataList;
     }

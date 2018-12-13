@@ -264,7 +264,7 @@ public class EmploymentTypeService {
         }
     }
     public List<StaffDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(),staffEmploymentTypeDTO.getUnitIds(),staffEmploymentTypeDTO.getEmploymentTypeIds(),staffEmploymentTypeDTO.getStartDate(),staffEmploymentTypeDTO.getEndDate(),staffEmploymentTypeDTO.getStaffIds()),StaffDTO.class);
+        return staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(),staffEmploymentTypeDTO.getUnitIds(),staffEmploymentTypeDTO.getEmploymentTypeIds(),staffEmploymentTypeDTO.getStartDate(),staffEmploymentTypeDTO.getEndDate(),staffEmploymentTypeDTO.getStaffIds());
     }
 
 }

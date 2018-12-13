@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.staff.StaffUnitPositionQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -62,7 +63,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     @Override
-    public List<StaffPersonalDetailDTO> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
+    public List<StaffDTO> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
         String staffFilterQuery="";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
@@ -94,8 +95,8 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         queryParameters.put("startDate", startDate);
         staffFilterQuery += stringBuilder.toString();
         List<Map> my=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(my,Staff.class);
-        return staffPersonalDetailDTOS;
+        List<StaffDTO> staffDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(my,Staff.class);
+        return staffDTOS;
     }
 
 
