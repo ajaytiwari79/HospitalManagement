@@ -6,46 +6,32 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.skill.SkillDTO;
-import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
-import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.employment.Employment;
-import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
-import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
@@ -89,7 +75,10 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.utils.*;
+import com.kairos.utils.CPRUtil;
+import com.kairos.utils.DateConverter;
+import com.kairos.utils.DateUtil;
+import com.kairos.utils.FileUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -111,7 +100,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -279,14 +267,14 @@ public class StaffService {
         }
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
-        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
-        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
-        sectorWiseGroupedExpertise.forEach((sector,expertise)->{
-            boolean unitPositionExists=unitPositionGraphRepository.unitPositionExistsByStaffIdAndExpertiseIdsIn(staffId,expertise,sector);
-            if(unitPositionExists){
-                exceptionService.actionNotPermittedException("Unit Position is Created");
-            }
-        });
+//        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
+//        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
+//        sectorWiseGroupedExpertise.forEach((sector,expertise)->{
+//            boolean unitPositionExists=unitPositionGraphRepository.unitPositionExistsByStaffIdAndExpertiseIdsIn(staffId,expertise,sector);
+//            if(unitPositionExists){
+//                exceptionService.actionNotPermittedException("Unit Position is Created");
+//            }
+//        });
         Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
 
         List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);

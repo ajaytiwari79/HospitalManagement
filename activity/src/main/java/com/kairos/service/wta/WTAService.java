@@ -248,7 +248,7 @@ public class WTAService extends MongoBaseService {
     public WTAResponseDTO updateWtaOfCountry(Long countryId, BigInteger wtaId, WTADTO updateDTO) {
 
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            exceptionService.actionNotPermittedException("message.wta.start-current-date", wtaId);
+            exceptionService.actionNotPermittedException("message.wta.start-current-date");
         }
         WorkingTimeAgreement workingTimeAgreement = wtaRepository.getWtaByNameExcludingCurrent(updateDTO.getName(), countryId, wtaId, updateDTO.getOrganizationType(), updateDTO.getOrganizationSubType());
         if (Optional.ofNullable(workingTimeAgreement).isPresent()) {
@@ -453,9 +453,9 @@ public class WTAService extends MongoBaseService {
         return new CTAWTAWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
 
-    public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId) {
-        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
-        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, DateUtils.getCurrentDayStart());
+    public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId,LocalDate startDate) {
+        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId, DateUtils.asDate(startDate));
+        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId, DateUtils.asDate(startDate));
         CTAWTAWrapper ctawtaWrapper = new CTAWTAWrapper();
         if (Optional.ofNullable(wta).isPresent()) {
             WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());

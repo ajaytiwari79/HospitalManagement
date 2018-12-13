@@ -44,16 +44,16 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " RETURN  id(unitPosition) as id , appliedFunctions as appliedFunctions")
     UnitPositionQueryResult findAppliedFunctionsAtUnitPosition(Long unitPositionId,String shiftDate);
 
-    @Query("MATCH(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
+    @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(user:User) where id(staff) IN {2}\n" +
             "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
             "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
-            " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
+            "MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
             "MATCH (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "WITH expertise,staff,unit,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
-            "return id(staff) as staffId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
-            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
+            "WITH expertise,staff,unit,user,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
+            "return id(staff) as staffId,id(user) as userId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,employmentType:employmentType}) end as positionLines , " +
             "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
@@ -323,17 +323,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
 @Query("OPTIONAL MATCH (organization:Organization)  WHERE id(organization)={0}\n" +
         "OPTIONAL MATCH (staff:Staff)  WHERE id(staff)={1}\n" +
-        "OPTIONAL MATCH(organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff)\n" +
         "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true}) \n" +
         "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode) " +
         "RETURN \n" +
         "CASE \n" +
         "WHEN organization IS NULL THEN \"organization\" \n" +
         "WHEN staff IS NULL THEN \"staff\"\n" +
-        "WHEN employment IS NULL THEN  \"emp\" \n" +
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
         "ELSE COLLECT({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
-        Object getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
+        Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
             "WHERE id(organization)={0}  AND id(unitPosition)={1} \n" +

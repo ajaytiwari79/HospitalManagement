@@ -30,6 +30,10 @@ public class DateTimeInterval {
         this.start = start.getTime();
         this.end = end.getTime();
     }
+    public DateTimeInterval(LocalDate start, LocalDate end) {
+        this.start = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        this.end = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
 
     public DateTimeInterval(Long start, Long end) {
         this.start = start;
