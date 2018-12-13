@@ -416,6 +416,10 @@ public  class DateUtils {
         return new Date();
     }
 
+    public static LocalDate getLocalDate(){
+        return LocalDate.now();
+    }
+
     public static Date parseStringDate(String dateString, SimpleDateFormat dateFormat) throws ParseException {
         return dateFormat.parse(dateString);
     }
