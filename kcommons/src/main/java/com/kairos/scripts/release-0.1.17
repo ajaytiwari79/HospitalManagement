@@ -31,3 +31,5 @@ MATCH(et:EmploymentType{deleted:false})
 SET
 et.weeklyMinutes= CASE WHEN et.mainEmployment=true THEN 2220 ELSE 420 END,
 et.mainEmployment=CASE WHEN et.mainEmployment=true THEN true ELSE false END
+
+MATCH(up:UnitPosition) set up.mainUnitPosition=false

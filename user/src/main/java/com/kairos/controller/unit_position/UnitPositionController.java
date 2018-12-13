@@ -175,10 +175,4 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
     }
-
-    @ApiOperation(value = "Create a New Position")
-    @PostMapping(value = "/unit_position/test")
-    public ResponseEntity<Map<String, Object>> verify(@PathVariable Long unitId,  @RequestBody @Valid UnitPositionDTO unitPositionDTO) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.validateUnitPositionAndEmployment(unitPositionDTO,new String[2]));
-    }
 }

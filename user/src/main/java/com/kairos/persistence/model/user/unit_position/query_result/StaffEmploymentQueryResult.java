@@ -13,7 +13,6 @@ import java.util.List;
 @QueryResult
 public class StaffEmploymentQueryResult {
     private Staff staff;
-    private Employment employment;
     private List<UnitPositionQueryResult> unitPositionList;
 
     public StaffEmploymentQueryResult() {
@@ -26,14 +25,6 @@ public class StaffEmploymentQueryResult {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
-    }
-
-    public Employment getEmployment() {
-        return employment;
-    }
-
-    public void setEmployment(Employment employment) {
-        this.employment = employment;
     }
 
     public List<UnitPositionQueryResult> getUnitPositionList() {

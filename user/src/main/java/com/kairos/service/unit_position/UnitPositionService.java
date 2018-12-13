@@ -216,10 +216,12 @@ public class UnitPositionService {
                 new UnitPosition(positionCode, organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft);
 
         preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
-        String [] str=new String[2];
         if(employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()){
-            str=employmentService.validateUnitPositionAndEmployment(unitPositionDTO,str);
-            unitPosition.setMainUnitPosition(true);
+            boolean valid=employmentService.eligibleForMainUnitPosition(unitPositionDTO);
+            if(valid){
+                unitPosition.setMainUnitPosition(true);
+            }
+
         }
 
         unitPositionGraphRepository.save(unitPosition);
@@ -232,7 +234,6 @@ public class UnitPositionService {
         linkFunctions(functions, unitPosition.getUnitPositionLines().get(0), false, unitPositionDTO.getFunctions());
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(employmentType,unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
-        unitPositionQueryResult.setUnitName(str[1]);
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaWrapper.getCta().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaWrapper.getWta().get(0));
         return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
@@ -463,9 +464,11 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.unitPosition.ctawtamissing", existingCtaWtaWrapper.getCta().isEmpty(), existingCtaWtaWrapper.getWta().isEmpty(), unitPositionId);
         }
         EmploymentType employmentType=employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(),0).orElse(null);
-        String[] str=new String[2];
         if(employmentType!=null && employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()){
-            str=employmentService.validateUnitPositionAndEmployment(unitPositionDTO,str);
+            boolean valid=employmentService.eligibleForMainUnitPosition(unitPositionDTO);
+            if(valid){
+                oldUnitPosition.setMainUnitPosition(true);
+            }
         }
 
         UnitPositionLineEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentUnitPositionLine.getId());
@@ -549,7 +552,6 @@ public class UnitPositionService {
         if (unitPositionDTO.getEndDate() != null) {
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, unitPositionDTO.getEndDate(), unitPositionDTO.getStaffId());
         }
-        unitPositionQueryResult.setUnitName(str[1]);
         //plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
         return new PositionWrapper(unitPositionQueryResult, employmentQueryResult);
 

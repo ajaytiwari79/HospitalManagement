@@ -216,7 +216,6 @@ public class EmploymentService {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
 
-
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
@@ -370,7 +369,7 @@ public class EmploymentService {
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
-        Organization parentOrganization= unit.isParentOrganization()?unit: organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Organization parentOrganization = unit.isParentOrganization() ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
         units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
         List<Map<String, Object>> employments;
@@ -673,8 +672,8 @@ public class EmploymentService {
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
-       // userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, employment.getEndDateMillis(), parentOrganization.getId(), employment.getId(),
-           //     parentOrganization.getTimeZone());
+        // userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, employment.getEndDateMillis(), parentOrganization.getId(), employment.getId(),
+        //     parentOrganization.getTimeZone());
         employment.setEndDateMillis(employmentEndDate);
         if (!Optional.ofNullable(employmentEndDate).isPresent()) {
             employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
@@ -867,79 +866,28 @@ public class EmploymentService {
         return true;
     }
 
-    public String[] validateUnitPositionAndEmployment(UnitPositionDTO unitPositionDTO, String[] obj) {
-        User user = userGraphRepository.getUserByStaffId(unitPositionDTO.getStaffId());
-
-        List<StaffEmploymentQueryResult> staffEmploymentQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByUserId(user.getId(), DateUtils.getLongFromLocalDate(unitPositionDTO.getStartDate()), unitPositionDTO.getEndDate() == null ? null : DateUtils.getLongFromLocalDate(unitPositionDTO.getEndDate())), StaffEmploymentQueryResult.class);
-        Map<Long, Employment> employmentMap = staffEmploymentQueryResults.stream().collect(Collectors.toMap(k -> k.getEmployment().getId(), StaffEmploymentQueryResult::getEmployment));
-        Set<Long> unitPositionIds = staffEmploymentQueryResults.stream().flatMap(s -> s.getUnitPositionList().stream().map(UnitPositionQueryResult::getId)).collect(Collectors.toSet());
-        List<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(new ArrayList<>(unitPositionIds));
-        Map<Long, UnitPosition> unitPositionMap = unitPositions.stream().collect(Collectors.toMap(UnitPosition::getId, Function.identity()));
-        // List<Employment>  mainEmployments=employmentGraphRepository.findAllMainEmploymentsByUserId(user.getId(),unitPositionDTO.getStartDate(),unitPositionDTO.getEndDate());
-        verifyMainEmploymentsAndUnitPositions(staffEmploymentQueryResults, unitPositionDTO, employmentMap, unitPositionMap, obj);
-        return obj;
-    }
-
-
-    private void verifyMainEmploymentsAndUnitPositions(List<StaffEmploymentQueryResult> staffEmploymentQueryResults, UnitPositionDTO unitPositionDTO, Map<Long, Employment> employmentMap, Map<Long, UnitPosition> unitPositionMap, String[] obj) {
-        List<Employment> employmentList = new ArrayList<>();
-        List<UnitPosition> unitPositionList = new ArrayList<>();
-        StaffEmploymentQueryResult currentOrgStaffEmploymentQueryResult = staffEmploymentQueryResults.stream().filter(emp -> emp.getStaff().getId().equals(unitPositionDTO.getStaffId())).findFirst().orElse(null);
-        Employment currentEmployment = currentOrgStaffEmploymentQueryResult == null ? employmentGraphRepository.findEmploymentByStaff(unitPositionDTO.getStaffId()) : currentOrgStaffEmploymentQueryResult.getEmployment();
-
-        staffEmploymentQueryResults.forEach(employmentQueryResult -> {
-
-            if (CollectionUtils.isNotEmpty(employmentQueryResult.getUnitPositionList())) {
-                List<UnitPosition> unitPositions = alreadyMainUnitPositionExistsWithFullTime(employmentQueryResult, unitPositionDTO, unitPositionMap, obj);
-                unitPositionList.addAll(unitPositions);
-            }
-            //For Employments
-            if (employmentQueryResult.getEmployment().getMainEmploymentStartDate().isAfter(unitPositionDTO.getStartDate())) {
-                if (unitPositionDTO.getEndDate() == null) {
-                    employmentQueryResult.getEmployment().setMainEmploymentStartDate(null);
-                    employmentQueryResult.getEmployment().setMainEmploymentEndDate(null);
-                    employmentQueryResult.getEmployment().setMainEmployment(false);
-                } else {
-                    employmentQueryResult.getEmployment().setMainEmploymentStartDate(unitPositionDTO.getEndDate().plusDays(1));
-                }
-            } else if (employmentQueryResult.getEmployment().getMainEmploymentStartDate().isBefore(unitPositionDTO.getStartDate())) {
-                employmentQueryResult.getEmployment().setMainEmploymentEndDate(unitPositionDTO.getStartDate().minusDays(1));
-            } else if (employmentQueryResult.getEmployment().getMainEmploymentEndDate() != null && unitPositionDTO.getEndDate() != null && employmentQueryResult.getEmployment().getMainEmploymentStartDate().isBefore(unitPositionDTO.getStartDate()) && employmentQueryResult.getEmployment().getMainEmploymentStartDate().isAfter(unitPositionDTO.getEndDate())) {
-                employmentQueryResult.getEmployment().setMainEmploymentStartDate(null);
-                employmentQueryResult.getEmployment().setMainEmploymentEndDate(null);
-                employmentQueryResult.getEmployment().setMainEmployment(false);
-            }
-            employmentList.add(employmentQueryResult.getEmployment());
-        });
-        currentEmployment.setMainEmploymentStartDate(currentEmployment.getMainEmploymentStartDate()==null?unitPositionDTO.getStartDate():unitPositionDTO.getStartDate().isBefore(currentEmployment.getMainEmploymentStartDate())?unitPositionDTO.getStartDate():currentEmployment.getMainEmploymentStartDate());
-        currentEmployment.setMainEmploymentEndDate(currentEmployment.getMainEmploymentEndDate()==null?unitPositionDTO.getEndDate():unitPositionDTO.getEndDate().isAfter(currentEmployment.getMainEmploymentEndDate())?unitPositionDTO.getEndDate():currentEmployment.getMainEmploymentEndDate());
-        employmentList.add(currentEmployment);
-        unitPositionGraphRepository.saveAll(unitPositionList);
-        employmentGraphRepository.saveAll(employmentList);
-    }
-
-    private List<UnitPosition> alreadyMainUnitPositionExistsWithFullTime(StaffEmploymentQueryResult employmentQueryResult, UnitPositionDTO unitPositionDTO, Map<Long, UnitPosition> unitPositionMap, String[] obj) {
-        List<UnitPosition> unitPositions = new ArrayList<>();
-        LocalDate mainEmploymentStartDate=null;
-        LocalDate mainEmploymentEndDate=null;
-        if (CollectionUtils.isNotEmpty(employmentQueryResult.getUnitPositionList())) {
-            employmentQueryResult.getUnitPositionList().sort(Comparator.comparing(UnitPositionQueryResult::getStartDate));
-            mainEmploymentStartDate=employmentQueryResult.getUnitPositionList().get(0).getStartDate();
-            mainEmploymentEndDate=employmentQueryResult.getUnitPositionList().get(employmentQueryResult.getUnitPositionList().size()-1).getEndDate();
-            for (UnitPositionQueryResult unitPositionQueryResult : employmentQueryResult.getUnitPositionList()) {
-                if (unitPositionQueryResult.isMarkMainEmployment()) {
-                    exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName());
-                }
-                if(!unitPositionQueryResult.isMarkMainEmployment()){
-
-                }
-                UnitPosition unitPosition = unitPositionMap.get(unitPositionQueryResult.getId());
-                unitPosition.setMainUnitPosition(false);
-                unitPositions.add(unitPosition);
-            }
-
+    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO) {
+        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByUserIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString()), UnitPositionQueryResult.class);
+        Set<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toSet());
+        if (CollectionUtils.isNotEmpty(unitPositionIds)) {
+            List<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(new ArrayList<>(unitPositionIds));
+            Map<Long, UnitPosition> unitPositionMap = unitPositions.stream().collect(Collectors.toMap(UnitPosition::getId, Function.identity()));
+            List<UnitPosition> unitPositionList = new ArrayList<>();
+            verifyMainUnitPositions(unitPositionQueryResults, unitPositionMap, unitPositionList);
+            unitPositionGraphRepository.saveAll(unitPositionList);
         }
-        return unitPositions;
+        return true;
     }
 
+
+    private void verifyMainUnitPositions(List<UnitPositionQueryResult> unitPositionQueryResults, Map<Long, UnitPosition> unitPositionMap, List<UnitPosition> unitPositionList) {
+        for (UnitPositionQueryResult unitPositionQueryResult : unitPositionQueryResults) {
+            if (unitPositionQueryResult.isMarkMainEmployment()) {
+                exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate() == null ? TILL_NOW : unitPositionQueryResult.getStartDate());
+            }
+            UnitPosition unitPosition = unitPositionMap.get(unitPositionQueryResult.getId());
+            unitPosition.setMainUnitPosition(false);
+            unitPositionList.add(unitPosition);
+        }
+    }
 }

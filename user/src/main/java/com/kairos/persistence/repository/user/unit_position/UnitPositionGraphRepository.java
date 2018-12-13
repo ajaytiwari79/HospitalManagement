@@ -374,16 +374,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
     boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
 
-    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0} \n" +
-            "MATCH(staff)<-[:"+BELONGS_TO+"]-(emp:Employment) WHERE (emp.mainEmploymentEndDate IS NULL OR emp.mainEmploymentEndDate>={1}) AND ((emp.mainEmploymentStartDate IS NOT NULL) AND({2} IS NULL OR emp.mainEmploymentStartDate<={2})) \n" +
+    @Query("MATCH(s:Staff)-[:BELONGS_TO]->(user:User)  where id(s)={0}\n" +
+            "MATCH(user)<-[:BELONGS_TO]-(staff:Staff)\n" +
             "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(et:EmploymentType) WHERE up.mainUnitPosition=true AND " +
-            "({2} IS NULL AND (up.endDate IS NULL OR up.endDate > (date(datetime({epochmillis:{1}})))) \n" +
-            "OR " +
-            "({2} IS NOT NULL AND  (date(datetime({epochmillis:{1}})) < up.endDate OR date(datetime({epochmillis:{2}}))>up.startDate))) \n" +
-            "WITH staff,emp,up,collect(et) as et  \n" +
-            "OPTIONAL MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
-            "WITH staff,emp,up,org, CASE WHEN ANY(x in et WHERE x.markMainEmployment=true) then true ELSE false END as markMainEmployment " +
-            "RETURN staff,emp as employment,CASE WHEN up IS NULL then [] ELSE collect({id:id(up),startDate:up.startDate,endDate:up.endDate,markMainEmployment:markMainEmployment,unitId:id(org) ,unitName:org.name }) END as unitPositionList \n ")
-    List<StaffEmploymentQueryResult> findAllByUserId(Long userId,Long startDate,Long endDate);
+            "(({2} IS NULL AND (up.endDate IS NULL OR DATE(up.endDate) >= DATE({1}))) \n" +
+            "OR ({2} IS NOT NULL AND DATE(up.startDate) <= DATE({2}) AND (up.endDate IS NULL OR DATE(up.endDate)>DATE({1}))) ) \n" +
+            "WITH up,collect(et) as et  \n" +
+            "MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
+            "WITH up,org, CASE WHEN ANY(x in et WHERE x.markMainEmployment=true) then true ELSE false END as markMainEmployment " +
+            "RETURN id(up) as id,up.startDate as startDate,up.endDate as endDate,markMainEmployment as markMainEmployment,id(org) as unitId,org.name as unitName \n ")
+    List<UnitPositionQueryResult> findAllByUserIdAndBetweenDates(Long userId, String startDate, String endDate);
 
 }
