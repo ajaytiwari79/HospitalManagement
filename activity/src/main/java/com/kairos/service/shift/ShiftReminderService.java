@@ -87,8 +87,9 @@ public class ShiftReminderService extends MongoBaseService {
     }
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
-        schedulerServiceRestClient.publishRequest(jobIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+        // TODO VIPUL please verify when needed
+        /*schedulerServiceRestClient.publishRequest(jobIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        }, null, null);*/
 
 
     }
