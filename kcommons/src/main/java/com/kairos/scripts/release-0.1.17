@@ -29,7 +29,7 @@ db.getCollection('clause').updateMany({"tags.0":{"$exists":false}},{"$addToSet":
 // For setting weekly minutes and full time employment in previously created Employment Type
 MATCH(et:EmploymentType{deleted:false})
 SET
-et.weeklyMinutes= CASE WHEN et.mainEmployment=true THEN 2220 ELSE 420 END,
-et.mainEmployment=CASE WHEN et.mainEmployment=true THEN true ELSE false END
+et.weeklyMinutes= CASE WHEN et.markMainEmployment=true THEN 2220 ELSE 420 END,
+et.mainEmployment=CASE WHEN et.markMainEmployment=true THEN true ELSE false END
 
 MATCH(up:UnitPosition) set up.mainUnitPosition=false

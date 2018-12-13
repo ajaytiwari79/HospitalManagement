@@ -208,27 +208,17 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     AccessPage findByModuleId(String moduleId);
 
-<<<<<<< HEAD
-    @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
-=======
+
     @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
->>>>>>> 4de6c915660c0b6eda1f6fe5a36963645413876d
             "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} " +
             "OPTIONAL MATCH(accessPage)-[subTabs:SUB_PAGE]-(sub:AccessPage) " +
             "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs \n" +
             "RETURN \n" +
             "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable, " +
-<<<<<<< HEAD
-            " CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
-            " CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
-            " CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
-            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
-=======
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
->>>>>>> 4de6c915660c0b6eda1f6fe5a36963645413876d
     List<AccessPageDTO> getMainTabs(Long countryId);
 
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +

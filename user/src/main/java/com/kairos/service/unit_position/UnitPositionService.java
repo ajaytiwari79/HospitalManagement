@@ -7,11 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
-<<<<<<< HEAD
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
-=======
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
->>>>>>> 4de6c915660c0b6eda1f6fe5a36963645413876d
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
