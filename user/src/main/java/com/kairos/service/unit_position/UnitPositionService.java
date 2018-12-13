@@ -2,30 +2,20 @@ package com.kairos.service.unit_position;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.utils.ArrayUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionTimeSlotWrapper;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-
-import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.employment.Employment;
@@ -33,13 +23,15 @@ import com.kairos.persistence.model.staff.employment.EmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentReasonCodeQueryResult;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.unit_position.*;
-import com.kairos.persistence.model.user.unit_position.query_result.*;
+import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -90,7 +82,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -99,10 +90,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.STAFF;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+import static com.kairos.service.unit_position.UnitPositionUtility.convertStaffUnitPositionObject;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 
 /**
@@ -1007,19 +1001,27 @@ public class UnitPositionService {
     }
 
 
-    public StaffUnitPositionTimeSlotWrapper getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
-        List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
-        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetails = new ArrayList<>();
-        staffData.forEach(currentData -> {
-            com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-            convertUnitPositionObject(currentData, unitPositionDetail);
-            unitPositionDetails.add(unitPositionDetail);
-        });
-        StaffUnitPositionTimeSlotWrapper staffUnitPositionTimeSlotWrapper = new StaffUnitPositionTimeSlotWrapper(unitPositionDetails);
-        List<TimeSlotWrapper> timeSlotWrappers=timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnit(unitId, TimeSlotType.SHIFT_PLANNING);
-        staffUnitPositionTimeSlotWrapper.setTimeSlotWrappers( ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
+    public StaffUnitPositionUnitDataWrapper getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffIds) {
+        Organization organization = organizationService.getOrganizationDetail(unitId,ORGANIZATION);
+        Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
+        // TODO MIght We dont need these details I(vipul) will verify and remove
+        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds);
 
-        return staffUnitPositionTimeSlotWrapper;
+        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffUnitPositionDetails.class);
+        List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
+
+        Map<Long, StaffUnitPositionDetails> unitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));
+
+        List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
+
+
+        staffAdditionalInfoDTOS.forEach(currentData -> convertStaffUnitPositionObject(unitPositionDetailsMap.get(currentData.getId()),currentData,expertisePlannedTimes));
+
+        StaffUnitPositionUnitDataWrapper staffUnitPositionUnitDataWrapper = new StaffUnitPositionUnitDataWrapper(staffAdditionalInfoDTOS);
+
+        staffRetrievalService.setRequiredDataForShiftCreationInWrapper(staffUnitPositionUnitDataWrapper,organization,countryId,expertiseId);
+
+        return staffUnitPositionUnitDataWrapper;
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {

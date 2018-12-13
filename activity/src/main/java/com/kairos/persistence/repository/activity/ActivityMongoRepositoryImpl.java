@@ -257,6 +257,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     //Ignorecase
+
     public Activity getActivityByNameAndUnitId(Long unitId, String name) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
         return  mongoTemplate.findOne(query, Activity.class);
