@@ -1,5 +1,6 @@
 package com.kairos.service.skill;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationLevel;
@@ -30,7 +31,6 @@ import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
-import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;

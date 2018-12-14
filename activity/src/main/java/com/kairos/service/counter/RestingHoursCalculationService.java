@@ -53,8 +53,8 @@ public class RestingHoursCalculationService implements CounterService {
 
     public Map<Long, Double> calculateRestingHours(List<Long> staffIds, Long countryId, LocalDateTime startDate, LocalDateTime endDate) {
         Map<Long, Double> staffRestingHours = new HashMap<>();
-        List<BigInteger> activityIds = getPresenceTimeTypeActivitiesIds(countryId);
-        List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, activityIds, startDate, endDate);
+//        List<BigInteger> activityIds = getPresenceTimeTypeActivitiesIds(countryId);
+        List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, startDate, endDate);
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
         staffIds.forEach(staffId -> {
             if(staffId != null) {
@@ -79,9 +79,9 @@ public class RestingHoursCalculationService implements CounterService {
 
         //FIXME: fixed time interval TO BE REMOVED ONCE FILTERS IMPLEMENTED PROPERLY
         if(kpi && filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS)!= null){
-            staffIds = filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS);
+            staffIds = getLongValue(filterBasedCriteria.get(FilterType.SELECTED_STAFF_IDS));
         }else if(filterBasedCriteria.get(FilterType.STAFF_IDS) != null){
-            staffIds = filterBasedCriteria.get(FilterType.STAFF_IDS);
+            staffIds = getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS));
         }
         if(filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null){
             dates = filterBasedCriteria.get(FilterType.TIME_INTERVAL);
@@ -107,5 +107,9 @@ public class RestingHoursCalculationService implements CounterService {
     public RawRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
         List<KpiDataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
+    }
+
+    private List<Long> getLongValue(List<Object> objects){
+        return objects.stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
     }
 }

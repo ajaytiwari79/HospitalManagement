@@ -203,10 +203,10 @@ public class ShiftCopyService extends MongoBaseService {
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
-         Shift  copiedShift = new Shift(startDate, endDate,
+         Shift copiedShift = new Shift(startDate, endDate,
                     sourceShift.getRemarks(), sourceShift.getActivities(), staffUnitPosition.getStaff().getId(), sourceShift.getUnitId(),
                     sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getParentOpenShiftId(),  sourceShift.getId()
-                    , planningPeriod.getCurrentPhaseId(), planningPeriod.getId(),staffUnitPosition.getUserId());
+                    , planningPeriod.getCurrentPhaseId(), planningPeriod.getId(),staffUnitPosition.getUserId(),sourceShift.getShiftType());
 
             List<ShiftActivity> shiftActivities = shiftBreakService.addBreakInShiftsWhileCopy(activityMap, copiedShift, null, dataWrapper.getTimeSlotWrappers(), breakSettings);
             copiedShift.setActivities(shiftActivities);

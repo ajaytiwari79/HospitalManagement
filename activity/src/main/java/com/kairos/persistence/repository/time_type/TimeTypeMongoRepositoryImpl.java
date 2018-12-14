@@ -39,8 +39,8 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
     public Set<BigInteger> findActivityIdssByTimeTypeEnum(List<String> timeTypeEnums) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("timeTypes").in(timeTypeEnums)),
-                Aggregation.project("_id"),
-                Aggregation.unwind("_id"));
+                Aggregation.project("id"),
+                Aggregation.unwind("id"));
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,TimeType.class,Map.class);
         return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toSet());
     }
