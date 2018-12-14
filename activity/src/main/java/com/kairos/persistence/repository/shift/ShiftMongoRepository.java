@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 
 
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
@@ -80,5 +81,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<Shift> findAllShiftByIds(List<BigInteger> shiftIds);
+
+    @Query("{deleted:false,unitPositionId:{$in:?0},disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
+    List<Shift> findAllShiftsBetweenDatesByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
 }

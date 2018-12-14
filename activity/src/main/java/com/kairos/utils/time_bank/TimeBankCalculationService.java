@@ -112,6 +112,8 @@ public class TimeBankCalculationService {
                     if (interval.overlaps(shiftInterval)) {
                         shiftInterval = interval.overlap(shiftInterval);
                         if (!ctaDto.getCtaRuleTemplates().isEmpty()) {
+                            int shiftActivityTimeBank = 0;
+                            List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>(ctaDto.getCtaRuleTemplates().size());
                             for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
                                 boolean ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), new DateTimeInterval(shiftInterval.getStart().getMillis(),shiftInterval.getEnd().getMillis()),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                                 if (ruleTemplateValid) {
@@ -150,12 +152,15 @@ public class TimeBankCalculationService {
                                         ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId() , 0)+ctaTimeBankMin);
                                     }
 
+                                    shiftActivityTimeBank+=ctaTimeBankMin;
                                 }
-
-
+                                timeBankCTADistributions.add(new TimeBankCTADistributionDTO(ruleTemplate.getName(),ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId() , 0),ruleTemplate.getId()));
                             }
+                            shiftActivity.setTimeBankCtaBonusHour(shiftActivityTimeBank);
+                            shiftActivity.setTimeBankCTADistributions(timeBankCTADistributions);
                         }
                     }
+
                 }
             }
             totalDailyTimebank = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? totalDailyTimebank - contractualMin : totalDailyTimebank;
