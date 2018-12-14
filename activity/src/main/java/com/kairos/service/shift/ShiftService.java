@@ -831,7 +831,7 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.actionNotPermittedException("message.staffingLevel.absent");
             }
             List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
-            List<ShiftActivity> shiftActivities = shifts.stream().flatMap(shift1 -> shift.getActivities().stream()).collect(Collectors.toList());
+            List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             StaffingLevel staffingLevel = staffingLevels.get(0);
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
