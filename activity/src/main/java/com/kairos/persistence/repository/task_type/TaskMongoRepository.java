@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.task_type;
 
-import com.google.inject.Inject;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.joda.time.DateTime;
