@@ -825,7 +825,7 @@ public class ShiftService extends MongoBaseService {
                 phaseSettings)) {
             Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
             Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
-            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(), startDate1, endDate1);
+            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate1, endDate1);
             if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
                 exceptionService.actionNotPermittedException("message.staffingLevel.absent");
             }
@@ -839,33 +839,22 @@ public class ShiftService extends MongoBaseService {
                     int upperLimit = 0;
                     List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
                     if (shift.getShiftType().equals(ShiftType.PRESENCE)) {
-                        lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
-                        upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
                         applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
-                    }
-                    for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
-                        int shiftsCount = 0;
-                        Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
-                        if (staffingLevelActivity.isPresent()) {
-                            ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getFrom());
-                            ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getTo());
-                            DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-                            for (ShiftActivity shiftActivityDB : shiftActivities) {
-                                if (shiftActivityDB.getActivityId().equals(shiftActivity.getActivityId()) && interval.overlaps(shiftActivityDB.getInterval())) {
-                                    shiftsCount++;
-                                }
-                            }
-                            int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
-                            if ((checkOverStaffing && totalCount >= 0)) {
-                                exceptionService.actionNotPermittedException("message.shift.overStaffing");
+                        if(!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
+                            lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
+                            upperLimit = 95;
+                            checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
+                            lowerLimit = 0;
+                            upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
+                            staffingLevel = staffingLevels.get(1);
+                            applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
 
-                            }
-                            if (!checkOverStaffing && totalCount <= 0) {
-                                exceptionService.actionNotPermittedException("message.shift.underStaffing");
+                            checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
 
-                            }
-                        } else {
-                            exceptionService.actionNotPermittedException("message.staffingLevel.activity");
+                        }else {
+                            lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
+                            upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
+                            checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
                         }
                     }
                 }
@@ -873,6 +862,34 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
+    private void checkStaffingLevelInterval(int lowerLimit,int upperLimit,List<StaffingLevelInterval> applicableIntervals,StaffingLevel staffingLevel,
+                                            List<ShiftActivity> shiftActivities,boolean checkOverStaffing,ShiftActivity shiftActivity) {
+        for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
+            int shiftsCount = 0;
+            Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
+            if (staffingLevelActivity.isPresent()) {
+                ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getFrom());
+                ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getTo());
+                DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+                for (ShiftActivity shiftActivityDB : shiftActivities) {
+                    if (shiftActivityDB.getActivityId().equals(shiftActivity.getActivityId()) && interval.overlaps(shiftActivityDB.getInterval())) {
+                        shiftsCount++;
+                    }
+                }
+                int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
+                if ((checkOverStaffing && totalCount >= 0)) {
+                    exceptionService.actionNotPermittedException("message.shift.overStaffing");
+
+                }
+                if (!checkOverStaffing && totalCount <= 0) {
+                    exceptionService.actionNotPermittedException("message.shift.underStaffing");
+
+                }
+            } else {
+                exceptionService.actionNotPermittedException("message.staffingLevel.activity");
+            }
+        }
+    }
     private boolean isVerificationRequired(boolean checkOverStaffing,boolean staff,boolean management,PhaseSettings phaseSettings) {
         boolean result = false;
         if(staff||management) {
