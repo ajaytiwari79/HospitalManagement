@@ -1,8 +1,7 @@
 
 buildscript {
     ext {
-    //    springBootVersion = '2.0.0.M7'
-	springBootVersion='2.0.0.RELEASE'
+	    springBootVersion='2.0.0.RELEASE'
         swaggerVersion = '2.5.0'
         jacksonVersion = '2.9.2'
         projectVersion = "0.0.1"
@@ -11,11 +10,8 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://repo.spring.io/milestone" }
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        maven { url "http://repo.spring.io/release/"}
+        maven { url "https://plugins.gradle.org/m2/"}
 
     }
     dependencies {
@@ -26,10 +22,8 @@ buildscript {
 }
 apply plugin: 'java'
 apply plugin: 'groovy'
-//apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
-//apply plugin: 'idea'
 apply plugin: 'application'
 
 
@@ -44,8 +38,6 @@ applicationDefaultJvmArgs = ["-Xdiag"]
 repositories {
     mavenCentral()
     jcenter()
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "https://repo.spring.io/milestone" }
     maven { url "http://repo.spring.io/release/" }
     maven { url "https://plugins.gradle.org/m2/" }
 }
@@ -53,48 +45,54 @@ task wrapper(type: Wrapper) { gradleVersion = '4.4' }
 
 ext {
     springCloudVersion = 'Finchley.RELEASE'
-
 }
 
 dependencies {
     compile project(':kcommons')
-    //compile('org.kairos:dto:0.0.1-SNAPSHOT')
+
+    compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
+    compile('org.springframework.boot:spring-boot-starter-security')
+
+
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     compile('org.springframework.cloud:spring-cloud-starter-security')
+    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
+
     compile('org.springframework.boot:spring-boot-starter-data-neo4j')
+
     //send grid
     compile ('com.sendgrid:sendgrid-java:4.0.1')
-    //
-    //compile('org.springframework.boot:spring-boot-starter-data-redis')
-    compile('org.springframework.boot:spring-boot-starter-security')
-    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-mail')
+
+
+
+
     compile('org.springframework.boot:spring-boot-starter-websocket')
-    compile group: 'com.sun.mail', name: 'javax.mail', version:'1.5.6'
+
     compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'
+
     compile 'com.google.api-client:google-api-client:1.22.0'
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
     compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'
+
     compile group: 'com.twilio.sdk', name: 'twilio-java-sdk', version: '6.3.0'
-    //compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
-    compile group: 'javax.mail', name: 'mail', version: '1.4'
+
+
     compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
-    //compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
+
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
     compile group: 'org.json', name: 'json', version: '20160810'
+
     compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
 
-    //compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
+
 
     compile group: 'log4j', name: 'log4j', version: '1.2.17'
     compile (('org.springframework.kafka:spring-kafka:2.1.7.RELEASE'))
