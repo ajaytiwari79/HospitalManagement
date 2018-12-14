@@ -231,11 +231,9 @@ public class StaffingLevelService extends MongoBaseService {
 
     public void updateStaffingLevelAvailableStaffCount(ShiftNotificationEvent shiftNotificationEvent) {
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(shiftNotificationEvent.getUnitId(), DateUtils.onlyDate(shiftNotificationEvent.getShift().getStartDate()),shiftNotificationEvent.getShift().getEndDate());
-
+        staffingLevels = verifyAndCreateStaffingLevel(staffingLevels,shiftNotificationEvent);
         for (StaffingLevel staffingLevel : staffingLevels) {
-            if (!Optional.ofNullable(staffingLevel).isPresent()) {
-                staffingLevel = createDefaultStaffingLevel(shiftNotificationEvent);
-            }
+
             if (shiftNotificationEvent.isDeletedShift()) {
 
                 staffingLevel = shiftNotificationEvent.isShiftForPresence() ? updateStaffingLevelAvailableStaffCountForDeletedShift(staffingLevel, shiftNotificationEvent.getShift()) :
@@ -273,6 +271,22 @@ public class StaffingLevelService extends MongoBaseService {
         if(!staffingLevels.isEmpty()){
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
+    }
+
+    private List<StaffingLevel> verifyAndCreateStaffingLevel(List<StaffingLevel> staffingLevels,ShiftNotificationEvent shiftNotificationEvent){
+        if(staffingLevels.isEmpty() && DateUtils.asLocalDate(shiftNotificationEvent.getShift().getStartDate()).equals(DateUtils.asLocalDate(shiftNotificationEvent.getShift().getEndDate()))){
+            staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent.getUnitId(),shiftNotificationEvent.getShift().getStartDate()));
+        }else if((staffingLevels.isEmpty() || staffingLevels.size()==1) && !DateUtils.asLocalDate(shiftNotificationEvent.getShift().getStartDate()).equals(DateUtils.asLocalDate(shiftNotificationEvent.getShift().getEndDate()))){
+            if(staffingLevels.isEmpty()){
+                staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent.getUnitId(),shiftNotificationEvent.getShift().getStartDate()));
+                staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent.getUnitId(),shiftNotificationEvent.getShift().getEndDate()));
+            }else {
+                StaffingLevel staffingLevel = staffingLevels.get(0);
+                Date startDate = staffingLevel.getCurrentDate().equals(DateUtils.onlyDate(shiftNotificationEvent.getShift().getStartDate())) ?  shiftNotificationEvent.getShift().getStartDate() : shiftNotificationEvent.getShift().getEndDate();
+                staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent.getUnitId(),startDate));
+            }
+        }
+        return staffingLevels;
     }
 
     private boolean isShiftPeriodModified(ShiftNotificationEvent shiftNotificationEvent) {
@@ -354,22 +368,16 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
 
-    /**
-     * create default staffing level when not present for selected date
-     *
-     * @param shiftNotificationEvent
-     * @return
-     */
-    public StaffingLevel createDefaultStaffingLevel(ShiftNotificationEvent shiftNotificationEvent) {
+    public StaffingLevel createDefaultStaffingLevel(Long unitId,Date currentDate) {
 
         Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         StaffingLevelSetting staffingLevelSetting = new StaffingLevelSetting(15, duration);
 
-        PhaseDTO phase = phaseService.getUnitPhaseByDate(shiftNotificationEvent.getUnitId(), shiftNotificationEvent.getCurrentDate());
+        PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, currentDate);
         LocalDate date = LocalDate.now();
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = date.get(woy);
-        StaffingLevel staffingLevel = new StaffingLevel(DateUtils.onlyDate(shiftNotificationEvent.getCurrentDate()), currentWeekCount, shiftNotificationEvent.getUnitId(), phase.getId(), staffingLevelSetting);
+        StaffingLevel staffingLevel = new StaffingLevel(DateUtils.onlyDate(currentDate), currentWeekCount, unitId, phase.getId(), staffingLevelSetting);
         List<StaffingLevelInterval> StaffingLevelIntervals = new ArrayList<>();
         int startTimeCounter = 0;
         LocalTime startTime = LocalTime.MIN;
