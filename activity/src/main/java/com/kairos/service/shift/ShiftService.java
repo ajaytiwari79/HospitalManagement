@@ -827,7 +827,7 @@ public class ShiftService extends MongoBaseService {
            /* Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
             Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));*/
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), shiftStartDate, shiftEndDate);
-            if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(staffingLevels)) {
                 exceptionService.actionNotPermittedException("message.staffingLevel.absent");
             }
             List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
@@ -896,7 +896,7 @@ public class ShiftService extends MongoBaseService {
     }
     private boolean isVerificationRequired(boolean checkOverStaffing,boolean staff,boolean management,PhaseSettings phaseSettings) {
         boolean result = false;
-        if(staff||management) {
+        if(staff&&management) {
             result = checkOverStaffing?!(phaseSettings.isManagementEligibleForOverStaffing()||phaseSettings.isStaffEligibleForOverStaffing()):!(phaseSettings.
                     isManagementEligibleForUnderStaffing()||phaseSettings.isManagementEligibleForUnderStaffing());
         } else if(staff) {
