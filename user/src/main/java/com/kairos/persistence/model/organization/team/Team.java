@@ -40,7 +40,7 @@ public class Team extends UserBaseEntity {
     @Relationship(type = TEAM_HAS_LOCATION)
     private ContactAddress contactAddress;
 
-    @Relationship(type = PROVIDE_TASK_TYPE)
+    //@Relationship(type = PROVIDE_TASK_TYPE)
     private List<String> taskTypeList;
 
     private boolean isEnabled = true;

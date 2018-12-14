@@ -106,7 +106,7 @@ public class TeamService {
         Team team = new Team(teamDTO.getName(),teamDTO.isHasAddressOfUnit());
         team.setVisitourId(teamDTO.getVisitourId());
         team.setDescription(teamDTO.getDescription());
-        ContactAddress contactAddress;
+        ContactAddress contactAddress=null;
 
 
 
@@ -213,8 +213,6 @@ public class TeamService {
                 }
                 return null;
             }
-            team.setContactAddress(contactAddress);
-            teamGraphRepository.save(team);
 
 
         }else{
@@ -255,10 +253,10 @@ public class TeamService {
                 contactAddress.setStreetUrl(organizationContactAddress.getContactAddress().getStreetUrl());
                 contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
                 contactAddress.setFloorNumber(organizationContactAddress.getContactAddress().getFloorNumber());
-                team.setContactAddress(contactAddress);
-                teamGraphRepository.save(team);
             }
         }
+        team.setContactAddress(contactAddress);
+        //teamGraphRepository.save(team);
 
         logger.info("Preparing response");
         group.getTeamList().add(team);
