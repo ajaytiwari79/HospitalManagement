@@ -47,7 +47,7 @@ public class UnitPositionQueryResult {
         //Default Constructor
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Boolean published,Long parentUnitId) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -56,6 +56,9 @@ public class UnitPositionQueryResult {
         this.positionCode = positionCode;
         this.union = union;
         this.workingTimeAgreement=wta;
+        this.unitId=unitId;
+        this.published=published;
+        this.parentUnitId=parentUnitId;
 
     }
 

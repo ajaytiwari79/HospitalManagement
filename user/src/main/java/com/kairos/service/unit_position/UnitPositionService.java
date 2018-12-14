@@ -790,14 +790,9 @@ public class UnitPositionService {
 
     protected UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
         UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
-        UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
-                unitPosition.getEndDate(),
-                unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDate(), wtaResponseDTO);
-        result.setUnitId(unitPositionQueryResult.getUnitId());
-        result.setPublished(unitPosition.isPublished());
-        result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
-        return result;
+        return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(), unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
+                unitPosition.getLastWorkingDate(), wtaResponseDTO,unitPositionQueryResult.getUnitId(),unitPosition.isPublished(),unitPositionQueryResult.getParentUnitId()));
+
     }
 
     public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionIds, Organization organization, Long countryId) {
