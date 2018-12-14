@@ -863,7 +863,7 @@ public class EmploymentService {
     }
 
     public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO) {
-        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByUserIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString()), UnitPositionQueryResult.class);
+        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString()), UnitPositionQueryResult.class);
         Set<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toSet());
         if (CollectionUtils.isNotEmpty(unitPositionIds)) {
             List<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(new ArrayList<>(unitPositionIds));
@@ -881,8 +881,7 @@ public class EmploymentService {
             if (unitPositionQueryResult.isMarkMainEmployment()) {
                 if(unitPositionQueryResult.getEndDate()==null){
                     exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate());
-                }
-                else {
+                } else {
                     exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate());
                 }
 
