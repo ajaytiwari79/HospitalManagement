@@ -1,4 +1,4 @@
-package com.kairos.config.asw;
+package com.kairos.config.aws;
 
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
