@@ -36,8 +36,6 @@ public class ShiftActivity {
     private boolean breakShift;
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
-    //Yatharth adding embedded object for frontend
-    private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));

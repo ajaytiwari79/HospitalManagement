@@ -45,6 +45,7 @@ public class ShiftActivityDTO {
     private boolean breakShift;
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
+    private Long allowedBreakDurationInMinute;
 
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
@@ -67,6 +68,14 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
+    }
+
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
 
     public BigInteger getPlannedTimeId() {

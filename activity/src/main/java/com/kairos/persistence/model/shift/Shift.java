@@ -356,21 +356,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public ShiftDTO getShiftDTO() {
-        ShiftDTO shiftDTO = new ShiftDTO(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                ObjectMapperUtils.copyPropertiesOfListByMapper(this.activities, ShiftActivityDTO.class), this.staffId, this.unitId, this.unitPositionId);
-        shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        return shiftDTO;
-    }
 
     @Override
     public String toString() {
