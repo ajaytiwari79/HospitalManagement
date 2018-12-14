@@ -18,7 +18,6 @@ buildscript {
 
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
@@ -47,43 +46,42 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter-web")
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-aop') //c
-    compile('org.springframework.boot:spring-boot-starter-cache') //c
+    compile('org.springframework.boot:spring-boot-starter-aop') 
+    compile('org.springframework.boot:spring-boot-starter-cache') 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
 
-    compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
-    compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')//c
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+    compile('org.springframework.cloud:spring-cloud-starter-oauth2')
+    compile('org.springframework.cloud:spring-cloud-starter-security')
+
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-mongodb
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
-    //compile('org.springframework.boot:spring-boot-starter-data-redis')//c
-    compile('org.springframework.boot:spring-boot-starter-thymeleaf')//c
-    compile('org.springframework.boot:spring-boot-starter-web')//c
-    compile('org.springframework.boot:spring-boot-starter-websocket')//c
-    compile('org.springframework.cloud:spring-cloud-starter-oauth2')//c
-    compile('org.springframework.cloud:spring-cloud-starter-security')//c
-    compile('org.springframework.boot:spring-boot-starter-mail')//c
-    compile group: 'com.sun.mail', name: 'javax.mail', version: '1.5.6'//c
-    compile group: 'javax.mail', name: 'mail', version: '1.4'//c
-    compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'//c
-    //compile group: 'redis.clients', name: 'jedis', version: '2.9.0'//c
-    compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'//c
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'//c
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion//c
-    compile group: 'org.json', name: 'json', version: '20160810'//c
-    compile "io.springfox:springfox-swagger2:${swaggerVersion}"//c
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swaggerVersion}"//c
-    compile 'com.google.api-client:google-api-client:1.22.0'//c
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'//c
+    compile('org.springframework.boot:spring-boot-starter-websocket')
+
+    compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'
+
+    // use in import sheet
+    compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
+
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
+    compile group: 'org.json', name: 'json', version: '20160810'
+    compile "io.springfox:springfox-swagger2:${swaggerVersion}"
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swaggerVersion}"
+
+    compile 'com.google.api-client:google-api-client:1.22.0'
+    compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
     compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'//c0
     //javers
     compile ('org.javers:javers-spring-boot-starter-mongo:3.10.0')
-    //compile group: 'joda-time', name: 'joda-time', version: '2.9.4'//c
-    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'//c
+    //compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
+    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
-    compile group: 'com.twilio.sdk', name: 'twilio-java-sdk', version: '6.3.0'//c
-    testCompile('org.springframework.boot:spring-boot-starter-test')//c
+    compile group: 'com.twilio.sdk', name: 'twilio-java-sdk', version: '6.3.0'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
     compile (('org.springframework.kafka:spring-kafka:2.1.7.RELEASE'))
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
