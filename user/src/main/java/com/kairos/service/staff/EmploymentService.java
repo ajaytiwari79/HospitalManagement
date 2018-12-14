@@ -879,7 +879,13 @@ public class EmploymentService {
     private void verifyMainUnitPositions(List<UnitPositionQueryResult> unitPositionQueryResults, Map<Long, UnitPosition> unitPositionMap, List<UnitPosition> unitPositionList) {
         for (UnitPositionQueryResult unitPositionQueryResult : unitPositionQueryResults) {
             if (unitPositionQueryResult.isMarkMainEmployment()) {
-                exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate() == null ? TILL_NOW : unitPositionQueryResult.getStartDate());
+                if(unitPositionQueryResult.getEndDate()==null){
+                    exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate());
+                }
+                else {
+                    exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate());
+                }
+
             }
             UnitPosition unitPosition = unitPositionMap.get(unitPositionQueryResult.getId());
             unitPosition.setMainUnitPosition(false);

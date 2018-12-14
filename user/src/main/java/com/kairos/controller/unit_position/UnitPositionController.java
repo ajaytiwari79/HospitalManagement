@@ -44,7 +44,6 @@ public class UnitPositionController {
     private UnitPositionJobService unitPositionJobService;
     @Inject private UnitPositionFunctionService unitPositionFunctionService;
     @Inject private UnitPositionCTAWTAService unitPositionCTAWTAService;
-    @Inject private EmploymentService employmentService;
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")

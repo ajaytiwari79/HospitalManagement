@@ -218,12 +218,8 @@ public class UnitPositionService {
                 new UnitPosition(positionCode, organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft);
 
         preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
-        if(employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()){
-            boolean valid=employmentService.eligibleForMainUnitPosition(unitPositionDTO);
-            if(valid){
+        if((employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO)){
                 unitPosition.setMainUnitPosition(true);
-            }
-
         }
 
         unitPositionGraphRepository.save(unitPosition);
@@ -466,11 +462,8 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.unitPosition.ctawtamissing", existingCtaWtaWrapper.getCta().isEmpty(), existingCtaWtaWrapper.getWta().isEmpty(), unitPositionId);
         }
         EmploymentType employmentType=employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(),0).orElse(null);
-        if(employmentType!=null && employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()){
-            boolean valid=employmentService.eligibleForMainUnitPosition(unitPositionDTO);
-            if(valid){
+        if(employmentType!=null && (employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO)){
                 oldUnitPosition.setMainUnitPosition(true);
-            }
         }
 
         UnitPositionLineEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentUnitPositionLine.getId());
