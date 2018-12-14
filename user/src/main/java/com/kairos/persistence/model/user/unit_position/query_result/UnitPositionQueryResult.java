@@ -59,6 +59,26 @@ public class UnitPositionQueryResult {
 
     }
 
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
+                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines) {
+        this.expertise = expertise;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastWorkingDate = lastWorkingDate;
+        this.id = id;
+        this.positionCode = positionCode;
+        this.union = union;
+        this.workingTimeAgreement=wta;
+        this.unitId=unitId;
+        this.parentUnitId=parentUnitId;
+        this.published=published;
+        this.reasonCode=reasonCode;
+        this.unitInfo=unitInfo;
+        this.mainUnitPosition=mainUnitPosition;
+        this.positionLines=positionLines;
+
+    }
+
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
     }

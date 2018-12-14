@@ -754,22 +754,12 @@ public class UnitPositionService {
     private UnitPositionQueryResult getBasicDetails(EmploymentType employmentType,UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, UnitPositionLineEmploymentTypeRelationShip relationShip,
                                                     Long parentOrganizationId, String parentOrganizationName, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
 
-        UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
-                unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
-                , wtaResponseDTO);
-
-        result.setUnitId(unitPosition.getUnit().getId());
-
-        result.setParentUnitId(parentOrganizationId);
-        result.setPublished(unitPosition.isPublished());
         Map<String, Object> reasonCode = null;
         if (Optional.ofNullable(unitPosition.getReasonCode()).isPresent()) {
             reasonCode = new HashMap();
             reasonCode.put("name", unitPosition.getReasonCode().getName());
             reasonCode.put("id", unitPosition.getReasonCode().getId());
         }
-        result.setReasonCode(reasonCode);
-
         Map<String, Object> employmentTypes = new HashMap();
         employmentTypes.put("name", relationShip.getEmploymentType().getName());
         employmentTypes.put("id", unitPositionDTO.getEmploymentTypeId());
@@ -777,29 +767,25 @@ public class UnitPositionService {
         employmentTypes.put("editableAtUnitPosition",employmentType.isEditableAtUnitPosition());
         employmentTypes.put("weeklyMinutes",employmentType.getWeeklyMinutes());
         employmentTypes.put("markMainEmployment",employmentType.isMarkMainEmployment());
-
-        Map<String, Object> seniorityLevel;
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        seniorityLevel = objectMapper.convertValue(unitPositionLine.getSeniorityLevel(), Map.class);
-        seniorityLevel.put("functions", unitPositionDTO.getFunctions());
-        seniorityLevel.put("payGrade", Optional.ofNullable(unitPositionLine.getSeniorityLevel().getPayGrade()).isPresent() ? unitPositionLine.getSeniorityLevel().getPayGrade() : payGradeGraphRepository.getPayGradeBySeniorityLevelId(unitPositionLine.getSeniorityLevel().getId()));
-
-        UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
-                , unitPositionLine.getWorkingDaysInWeek(), unitPositionLine.getTotalWeeklyMinutes() / 60, unitPositionLine.getAvgDailyWorkingHours(), unitPositionLine.getFullTimeWeeklyMinutes(), 0D,
-                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel);
-
-        unitPositionLinesQueryResult.setUnitPositionId(unitPosition.getId());
-        // TODO Setting for compatibility
         Map<String, Object> unitInfo = new HashMap<>();
         unitInfo.put("id", unitPosition.getUnit().getId());
         unitInfo.put("name", unitPosition.getUnit().getName());
-        result.setUnitInfo(unitInfo);
-        result.setMainUnitPosition(unitPosition.isMainUnitPosition());
 
-        result.setPositionLines(Collections.singletonList(unitPositionLinesQueryResult));
-        return result;
+        Map<String, Object> seniorityLevel;
+        ObjectMapper objectMapper = new ObjectMapper();
+        seniorityLevel = objectMapper.convertValue(unitPositionLine.getSeniorityLevel(), Map.class);
+
+        seniorityLevel.put("functions", unitPositionDTO.getFunctions());
+        seniorityLevel.put("payGrade", Optional.ofNullable(unitPositionLine.getSeniorityLevel().getPayGrade()).isPresent() ? unitPositionLine.getSeniorityLevel().getPayGrade() : payGradeGraphRepository.getPayGradeBySeniorityLevelId(unitPositionLine.getSeniorityLevel().getId()));
+        UnitPositionLinesQueryResult unitPositionLinesQueryResult = new UnitPositionLinesQueryResult(unitPositionLine.getId(), unitPositionLine.getStartDate(), unitPositionLine.getEndDate()
+                , unitPositionLine.getWorkingDaysInWeek(), unitPositionLine.getTotalWeeklyMinutes() / 60, unitPositionLine.getAvgDailyWorkingHours(), unitPositionLine.getFullTimeWeeklyMinutes(), 0D,
+                unitPositionLine.getTotalWeeklyMinutes() % 60, unitPositionLine.getHourlyCost(), employmentTypes, seniorityLevel,unitPosition.getId());
+
+        return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
+                unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
+                , wtaResponseDTO,unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(),reasonCode,unitInfo,unitPosition.isMainUnitPosition(),
+                Collections.singletonList(unitPositionLinesQueryResult));
+
     }
 
     protected UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
