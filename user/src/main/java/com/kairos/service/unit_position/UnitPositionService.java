@@ -791,7 +791,7 @@ public class UnitPositionService {
     protected UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
         UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(), unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDate(), wtaResponseDTO,unitPositionQueryResult.getUnitId(),unitPosition.isPublished(),unitPositionQueryResult.getParentUnitId()));
+                unitPosition.getLastWorkingDate(), wtaResponseDTO,unitPositionQueryResult.getUnitId(),unitPosition.isPublished(),unitPositionQueryResult.getParentUnitId());
 
     }
 
