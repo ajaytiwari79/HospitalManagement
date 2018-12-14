@@ -2,15 +2,14 @@ package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.skill.Skill;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.PROVIDE_TASK_TYPE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_LOCATION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
 
@@ -40,7 +39,7 @@ public class Team extends UserBaseEntity {
     @Relationship(type = TEAM_HAS_LOCATION)
     private ContactAddress contactAddress;
 
-    @Relationship(type = PROVIDE_TASK_TYPE)
+    //@Relationship(type = PROVIDE_TASK_TYPE)
     private List<String> taskTypeList;
 
     private boolean isEnabled = true;
@@ -109,9 +108,12 @@ public class Team extends UserBaseEntity {
     public Team() {
     }
 
-    public Team(String name,boolean hasAddressOfUnit) {
+    public Team(String name, boolean hasAddressOfUnit, String description, String visitourId, ContactAddress contactAddress) {
         this.name = name;
         this.hasAddressOfUnit = hasAddressOfUnit;
+        this.description = description;
+        this.visitourId = visitourId;
+        this.contactAddress = contactAddress;
     }
 
     public String getDescription() {

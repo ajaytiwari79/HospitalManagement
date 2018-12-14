@@ -41,6 +41,7 @@ import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -269,7 +270,7 @@ public class ShiftService extends MongoBaseService {
 
         Map<Long,ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(reasoncodeDTO->reasoncodeDTO.getId(),v->v));
         for(ShiftDTO shift:shiftWithViolatedInfoDTO.getShifts()) {
-            for(ShiftActivity activity:shiftWithViolatedInfoDTO.getShifts().get(0).getActivities()) {
+            for(ShiftActivityDTO activity:shiftWithViolatedInfoDTO.getShifts().get(0).getActivities()) {
                 activity.setReasonCode(reasonCodeDTOMap.get(activity.getAbsenceReasonCodeId()));
             }
         }
@@ -582,7 +583,7 @@ public class ShiftService extends MongoBaseService {
         if (phase == null) {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shiftDTO.getActivities().get(0).getStartDate());
         }
-        Set<BigInteger> activityIdsSet=ArrayUtil.getUnionOfList(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()),shiftDTO.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        Set<BigInteger> activityIdsSet=ArrayUtil.getUnionOfList(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()),shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         List<BigInteger> activityIds = new ArrayList<>(activityIdsSet);
         shiftValidatorService.validateStatusOfShiftOnUpdate(shift, shiftDTO);
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
@@ -601,7 +602,7 @@ public class ShiftService extends MongoBaseService {
         // Validating Shift to eligibility
         Map<BigInteger, PhaseTemplateValue> activityPerPhaseMap = constructMapOfActivityAndPhaseTemplateValue(phase, activities);
 
-        List<ShiftActivity> shiftActivities = findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
+        List<ShiftActivityDTO> shiftActivities = findShiftActivityToValidateStaffingLevel(shift.getActivities(), shiftDTO.getActivities());
         shiftValidatorService.verifyShiftActivities(staffAdditionalInfoDTO.getRoles(), staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId(), activityPerPhaseMap, shiftActivityIdsDTO);
         shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities, shiftDTO.getUnitId(), activities,phase,staffAdditionalInfoDTO.getUserAccessRoleDTO());
 
@@ -697,7 +698,7 @@ public class ShiftService extends MongoBaseService {
                 shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId);
 
         for(ShiftDTO shift:shifts) {
-            for(ShiftActivity activity: shift.getActivities()) {
+            for(ShiftActivityDTO activity: shift.getActivities()) {
                 activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
             }
         }
@@ -935,7 +936,7 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftDTO calculateAverageShiftByActivity(List<ShiftDTO> shifts, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Date fromDate) {
         int contractualMinutesInADay = staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() / staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek();
-        ShiftActivity shiftActivity = new ShiftActivity(activity.getId(), activity.getName());
+        ShiftActivityDTO shiftActivity = new ShiftActivityDTO(activity.getId(), activity.getName());
         Integer startAverageMin = null;
         if (shifts != null && !shifts.isEmpty() && activity.getTimeCalculationActivityTab().getHistoryDuration() != 0) {
             startAverageMin = getStartAverage(new DateTime(fromDate).getDayOfWeek(), shifts);
@@ -1352,14 +1353,14 @@ public class ShiftService extends MongoBaseService {
      * @LastModifiedBy Pavan
      * @Desc used to filter the ShiftActivities for Add , Edit and Delete
      */
-    private ShiftActivityIdsDTO getActivitiesToProcess(List<ShiftActivity> existingShiftActivities, List<ShiftActivity> arrivedShiftActivities) {
+    private ShiftActivityIdsDTO getActivitiesToProcess(List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
         Set<BigInteger> allExistingShiftActivities = existingShiftActivities.stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet());
-        Set<BigInteger> allArrivedShiftActivities = arrivedShiftActivities.stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet());
+        Set<BigInteger> allArrivedShiftActivities = arrivedShiftActivities.stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
         Map<BigInteger, ShiftActivity> existingShiftActivityMap = existingShiftActivities.stream().collect(Collectors.toMap(ShiftActivity::getActivityId, Function.identity(), (previous, current) -> previous));
         Set<BigInteger> activitiesToEdit = new HashSet<>();
         Set<BigInteger> activitiesToAdd = new HashSet<>();
         Set<BigInteger> activitiesToDelete = new HashSet<>();
-        for (ShiftActivity shiftActivity : arrivedShiftActivities) {
+        for (ShiftActivityDTO shiftActivity : arrivedShiftActivities) {
             if (allExistingShiftActivities.contains(shiftActivity.getActivityId())) {
                 ShiftActivity existingActivity = existingShiftActivityMap.get(shiftActivity.getActivityId());
                 if (!shiftActivity.getStartDate().equals(existingActivity.getStartDate()) || !shiftActivity.getEndDate().equals(existingActivity.getEndDate())) {
@@ -1390,12 +1391,12 @@ public class ShiftService extends MongoBaseService {
         return phaseTemplateValueMap;
     }
 
-    private List<ShiftActivity> findShiftActivityToValidateStaffingLevel(List<ShiftActivity> existingShiftActivities, List<ShiftActivity> arrivedShiftActivities) {
-        List<ShiftActivity> shiftActivities = new ArrayList<>();
+    private List<ShiftActivityDTO> findShiftActivityToValidateStaffingLevel(List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
+        List<ShiftActivityDTO> shiftActivities = new ArrayList<>();
         try {
             for (int i = 0; i < arrivedShiftActivities.size(); i++) {
-                ShiftActivity currentShiftActivity = arrivedShiftActivities.get(i);
-                ShiftActivity existingShiftActivity = existingShiftActivities.get(i);
+                ShiftActivityDTO currentShiftActivity = arrivedShiftActivities.get(i);
+                ShiftActivityDTO existingShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(existingShiftActivities.get(i),ShiftActivityDTO.class);
                 if (!currentShiftActivity.getActivityId().equals(existingShiftActivity.getActivityId())) {
                     currentShiftActivity.setStartDate(existingShiftActivity.getStartDate());
                     shiftActivities.add(existingShiftActivity);

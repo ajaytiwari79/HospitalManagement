@@ -3,12 +3,11 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -293,6 +292,7 @@ public class Shift extends MongoBaseEntity {
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
+
     }
 
     public Long getUnitPositionId() {
@@ -354,6 +354,7 @@ public class Shift extends MongoBaseEntity {
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
+
 
 
     @Override

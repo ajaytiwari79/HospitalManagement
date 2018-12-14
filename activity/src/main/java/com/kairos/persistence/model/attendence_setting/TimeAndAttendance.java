@@ -14,8 +14,11 @@ public class TimeAndAttendance extends MongoBaseEntity {
     private Long staffId;
     private LocalDate date;
     private List<AttendanceTimeSlot> attendanceTimeSlot;
+
     public TimeAndAttendance() {
+        //Default Constructor
     }
+
 
     public TimeAndAttendance(Long staffId, Long userId, List<AttendanceTimeSlot> attendanceTimeSlot,LocalDate date) {
         this.staffId =staffId;
@@ -24,10 +27,6 @@ public class TimeAndAttendance extends MongoBaseEntity {
         this.date=date;
     }
 
-    public TimeAndAttendance(Long userId, List<AttendanceTimeSlot> attendanceTimeSlot) {
-        this.userId = userId;
-        this.attendanceTimeSlot = attendanceTimeSlot;
-    }
 
     public Long getUserId() {
         return userId;

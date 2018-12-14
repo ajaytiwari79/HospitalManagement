@@ -15,6 +15,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
