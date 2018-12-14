@@ -1299,9 +1299,9 @@ public class OrganizationService {
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
-        Country country = organizationGraphRepository.getCountry(organization.getId());
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(country.getId());
-        List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(country.getId());
+        Long countryId = organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
+        List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);
         List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
@@ -1316,7 +1316,7 @@ public class OrganizationService {
                 e.printStackTrace();
             }
         });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS1, timeSlotDTOS, country.getId());
+        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS1, timeSlotDTOS,countryId);
     }
 
     public RuleTemplateDefaultData getDefaultDataForRuleTemplateByUnit(Long unitId) {
