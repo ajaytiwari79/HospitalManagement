@@ -37,6 +37,9 @@ public class ShiftActivity {
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     //Yatharth adding embedded object for frontend
+    private ReasonCodeDTO reasonCode;
+    private Long allowedBreakDurationInMinute;
+
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
     public ShiftActivity() {
@@ -51,13 +54,14 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
         this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
@@ -226,4 +230,11 @@ public class ShiftActivity {
         this.breakReplaced = breakReplaced;
     }
 
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+    }
 }

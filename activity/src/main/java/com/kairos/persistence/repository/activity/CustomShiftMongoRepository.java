@@ -6,7 +6,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.wrapper.DateWiseShiftResponse;
+import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
@@ -23,9 +23,9 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftDTO> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPosition(Long unitEmploymentPositionId, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositions(List<Long> unitEmploymentPositionIds, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
@@ -37,26 +37,23 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
 
-    List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds);
+    List<ShiftResponseDTO> findAllByIdGroupByDate(List<BigInteger> shiftIds);
 
     void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate);
-    List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap);
 
+    List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap);
 
     Long countByActivityId(BigInteger activityId);
 
-    Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis);
-
     List<Shift> findShiftsForCheckIn(List<Long> staffIds, Date startDateMillis, Date endDateMillis);
 
-    void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId);
+    void deleteShiftAfterRestorePhase(BigInteger planningPeriodId, BigInteger phaseId);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByStaffUserId(Long staffUserId, Date startDate, Date endDate);
-     Shift findShiftByShiftActivityId(BigInteger shiftActivityId) ;
+    Shift findShiftByShiftActivityId(BigInteger shiftActivityId);
 
+    List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId);
 
-    List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId,BigInteger phaseId);
-
+    List<ShiftResponseDTO> findShiftsBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
 
 }

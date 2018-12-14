@@ -77,7 +77,7 @@ public class WTAOrganizationService extends MongoBaseService {
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
         if (DateUtils.getLocalDate(updateDTO.getStartDateMillis()).isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.wta.start-end-date",wtaId);
+            exceptionService.actionNotPermittedException("message.wta.start-end-date");
         }
         boolean isWTAAlreadyExists = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
         if (isWTAAlreadyExists) {

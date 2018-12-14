@@ -61,8 +61,7 @@ public class PayOutService extends MongoBaseService {
     @Inject
     private OrganizationRestClient organizationRestClient;
     @Inject private TimeBankService timeBankService;
-    @Inject
-    private TimeTypeService timeTypeService;
+    @Inject private TimeTypeService timeTypeService;
     @Inject private TimeBankRepository timeBankRepository;
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;

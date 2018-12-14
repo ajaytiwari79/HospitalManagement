@@ -416,6 +416,10 @@ public  class DateUtils {
         return new Date();
     }
 
+    public static LocalDate getLocalDate(){
+        return LocalDate.now();
+    }
+
     public static Date parseStringDate(String dateString, SimpleDateFormat dateFormat) throws ParseException {
         return dateFormat.parse(dateString);
     }
@@ -492,6 +496,9 @@ public  class DateUtils {
 
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
+    }
+    public static DateTime getDateTimeByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
+        return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute());
     }
 
     public static Date getDateByLocalDate(LocalDate localDate) {
@@ -604,6 +611,9 @@ public  class DateUtils {
             }
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
+            }
+            case YEAR: {
+                return localDate.plusYears(duration * recurringNumber);
             }
         }
         return localDate;

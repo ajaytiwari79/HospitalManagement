@@ -2,9 +2,8 @@ package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.user.organization.AddressDTO;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 /**
  * Created by prabjot on 20/1/17.
@@ -12,13 +11,11 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeamDTO {
 
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
+    @NotBlank(message = "error.name.notnull")
     private String name;
 
-    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
 
-    @NotEmpty(message = "error.visitour.teamid.notnull") @NotNull(message = "error.visitour.teamid.notnull")
     private String visitourId;
 
     private AddressDTO contactAddress;

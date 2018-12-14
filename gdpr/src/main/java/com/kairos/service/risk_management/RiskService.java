@@ -153,5 +153,13 @@ public class RiskService extends MongoBaseService {
         return riskMongoRepository.getAllRiskByUnitId(unitId);
     }
 
-
+    /**
+     *
+     * @param riskId
+     * @return
+     */
+    public boolean deleteRiskById(BigInteger riskId) {
+        riskMongoRepository.safeDeleteById(riskId);
+        return true;
+    }
 }

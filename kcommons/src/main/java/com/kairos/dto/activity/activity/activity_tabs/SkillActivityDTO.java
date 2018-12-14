@@ -1,14 +1,14 @@
-package com.kairos.wrapper.activity;
+package com.kairos.dto.activity.activity.activity_tabs;
+/*
+ *Created By Pavan on 11/12/18
+ *
+ */
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.activity.tabs.ActivitySkill;
-
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by vipul on 25/8/17.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class SkillActivityDTO {
@@ -37,5 +37,13 @@ public class SkillActivityDTO {
 
     public SkillActivityDTO(List<ActivitySkill> activitySkills) {
         this.activitySkills = activitySkills;
+    }
+
+    public List<Long> getActivitySkillIds() {
+        List<Long> skillIds=new ArrayList<>();
+        for (ActivitySkill activitySkill:activitySkills){
+            skillIds.add(activitySkill.getSkillId());
+        }
+        return skillIds;
     }
 }
