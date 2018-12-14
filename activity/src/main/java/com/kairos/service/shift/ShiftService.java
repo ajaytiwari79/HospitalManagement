@@ -839,7 +839,7 @@ public class ShiftService extends MongoBaseService {
                     int lowerLimit = 0;
                     int upperLimit = 0;
                     List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
-                    if (shift.getShiftType().equals(ShiftType.PRESENCE)) {
+                    if (ShiftType.PRESENCE.equals(shift.getShiftType())) {
                         applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
                         if(!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                             lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
@@ -847,6 +847,9 @@ public class ShiftService extends MongoBaseService {
                             checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
                             lowerLimit = 0;
                             upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
+                            if(staffingLevels.size()<2) {
+                                exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+                            }
                             staffingLevel = staffingLevels.get(1);
                             applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
 
