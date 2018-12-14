@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
@@ -9,6 +8,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
