@@ -26,13 +26,13 @@ public class CounterServiceMapping {
     @Inject
     public void setCounterService(RestingHoursCalculationService restingHoursCalculationService) {
         this.counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, restingHoursCalculationService);
-        logger.info("Enum mapping: "+this.counters);
+        logger.info("Enum mapping for resting hours: "+this.counters);
     }
 
     @Inject
     public void calculatePlannedHours(PlannedHoursCalculationService plannedHoursCalculationService) {
         this.counters.put(CounterType.PLANNED_HOURS, plannedHoursCalculationService);
-        logger.info("Enum mapping: "+this.counters);
+        logger.info("Enum mapping for planned hours: "+this.counters);
     }
 
 

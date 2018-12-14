@@ -2,7 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.chart.DataUnit;
+import com.kairos.dto.activity.counter.chart.KpiDataUnit;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
@@ -70,7 +70,7 @@ public class RestingHoursCalculationService implements CounterService {
         return activityService.getActivitiesIdByTimeTypes(supportedTimeTypeIdList);
     }
 
-    private List<DataUnit> getDataList(Map<FilterType, List> filterBasedCriteria, Long countryId, boolean averageDay, boolean kpi) {
+    private List<KpiDataUnit> getDataList(Map<FilterType, List> filterBasedCriteria, Long countryId, boolean averageDay, boolean kpi) {
         List staffIds = new ArrayList<>();
         List dates = new ArrayList();
 
@@ -90,22 +90,22 @@ public class RestingHoursCalculationService implements CounterService {
             dates.add(LocalDateTime.now());
         }
         Map<Long, Double> staffRestingHours = calculateRestingHours(staffIds, countryId, (LocalDateTime) dates.get(0), (LocalDateTime) dates.get(1));
-        List<DataUnit> dataList = new ArrayList<>();
+        List<KpiDataUnit> dataList = new ArrayList<>();
         for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {
-            dataList.add(new DataUnit(""+entry.getKey(), entry.getKey(), entry.getValue()*multiplicationFactor));
+            dataList.add(new KpiDataUnit(""+entry.getKey(), entry.getKey(), entry.getValue()*multiplicationFactor));
         }
         return dataList;
     }
 
     @Override
     public RawRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
-        List<DataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), false);
+        List<KpiDataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), false);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 
     @Override
     public RawRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long countryId, KPI kpi) {
-        List<DataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true);
+        List<KpiDataUnit> dataList = getDataList(filterBasedCriteria, countryId, kpi.getType().equals(CounterType.AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY), true);
         return new RawRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList);
     }
 }
