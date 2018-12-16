@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
-import static com.kairos.constants.AppConstants.SHIFT_LEAST_GRANUALARITY;
+import static com.kairos.constants.AppConstants.SHIFT_LEAST_GRANULARITY;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -356,7 +356,7 @@ public class ShiftBreakService {
     }
     private short reduceMinimumGapValue(short gapBetweenBreaks) {
         short modFactorOfShiftGap=gapBetweenBreaks>ONE_HOUR_MINUTES?(short) (gapBetweenBreaks%ONE_HOUR_MINUTES):gapBetweenBreaks; // 1 hour equals to 60 min
-        return modFactorOfShiftGap>SHIFT_LEAST_GRANUALARITY?((short)(gapBetweenBreaks-SHIFT_LEAST_GRANUALARITY)):gapBetweenBreaks;
+        return modFactorOfShiftGap> SHIFT_LEAST_GRANULARITY ?((short)(gapBetweenBreaks- SHIFT_LEAST_GRANULARITY)):gapBetweenBreaks;
 
     }
 
