@@ -806,7 +806,7 @@ public  class DateUtils {
     }
 
     public static LocalDate getEndDateOfWeek(){
-        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
 }

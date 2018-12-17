@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.counter.chart.KpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -378,7 +379,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<ShiftDTO> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
+    public List<KpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
         Criteria criteria=Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").lte(endDate).and("endDate").gte(startDate);
         List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
@@ -392,9 +393,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(new UnwindOperation(Fields.field("activity")));
             aggregationOperation.add(new MatchOperation(Criteria.where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
-        //aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByForPlannedHours())));
+        aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByForPlannedHours())));
+        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
+       // aggregationOperation.add(new ProjectionOperation().and("id").as("refId").and("plannedHours").as("value"));
         Aggregation aggregation=Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<ShiftDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class);
+        AggregationResults<KpiDataUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, KpiDataUnit.class);
         return result.getMappedResults();
     }
 
@@ -402,6 +405,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return "{'$group':{'_id':'$staffId' \n" +
                 "'plannedHours':{ '$sum': {'$add':['$activities.timeBankCtaBonusHour','$activities.scheduledMinutes']}}}}";
     }
-
+    private String projectionOfShift(){
+        return  "{'$project' : { 'refId' : '$_id' ,'value':'$plannedHours'} }";
+    }
 
 }
