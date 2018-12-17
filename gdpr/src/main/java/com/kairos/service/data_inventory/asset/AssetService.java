@@ -2,6 +2,7 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
+import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.risk_management.Risk;
@@ -16,7 +17,7 @@ import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
-import com.kairos.service.master_data.asset_management.MasterAssetService;
+import com.kairos.service.master_data.asset_management.*;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.javers.core.Javers;
@@ -64,6 +65,20 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private RiskService riskService;
+    @Inject
+    private OrganizationHostingTypeService organizationHostingTypeService;
+    @Inject
+    private OrganizationHostingProviderService organizationHostingProviderService;
+    @Inject
+    private OrganizationStorageFormatService organizationStorageFormatService;
+    @Inject
+    private OrganizationDataDisposalService organizationDataDisposalService;
+    @Inject
+    private OrganizationTechnicalSecurityMeasureService organizationTechnicalSecurityMeasureService;
+    @Inject
+    private OrganizationOrganizationalSecurityMeasureService organizationalSecurityMeasureService;
+    @Inject
+    private OrganizationAssetTypeService organizationAssetTypeService;
 
 
     public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
@@ -312,6 +327,24 @@ public class AssetService extends MongoBaseService {
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
         return result;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Map<String, Object> getAssetMetaData(Long unitId){
+        Map<String, Object> assetMetaDataMap=new HashMap<>();
+        assetMetaDataMap.put("hostingTypeList",organizationHostingTypeService.getAllHostingType(unitId));
+        assetMetaDataMap.put("hostingProviderList",organizationHostingProviderService.getAllHostingProvider(unitId));
+        assetMetaDataMap.put("storageFormatList",organizationStorageFormatService.getAllStorageFormat(unitId));
+        assetMetaDataMap.put("dataDisposalList",organizationDataDisposalService.getAllDataDisposal(unitId));
+        assetMetaDataMap.put("technicalSecurityMeasureList",organizationTechnicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
+        assetMetaDataMap.put("organizationalSecurityMeasureList",organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
+        assetMetaDataMap.put("organizationAssetTypeList",organizationAssetTypeService.getAllAssetType(unitId));
+        assetMetaDataMap.put("riskLevelList", RiskSeverity.values());
+        return assetMetaDataMap;
+
     }
 
 

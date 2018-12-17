@@ -47,7 +47,7 @@ public class TimeInterval {
     public boolean contains(int minutes){
         boolean contains;
         if(endTo<startFrom){
-            contains = minutes <= DateTimeConstants.MINUTES_PER_DAY ? (startFrom < minutes && minutes <= DateTimeConstants.MINUTES_PER_DAY):(0 <= minutes && minutes < 320);
+            contains =  endTo > minutes || startFrom<=minutes;
         }else {
             contains = startFrom<minutes?minutes<endTo:false;
         }

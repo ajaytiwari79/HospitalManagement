@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.unit_position;
 
-import com.kairos.enums.EmploymentCategory;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import org.neo4j.ogm.annotation.EndNode;

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.staff.employment;
 
 import com.kairos.config.neo4j.converter.LocalDateConverter;
-import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.staff.personal_details.Staff;

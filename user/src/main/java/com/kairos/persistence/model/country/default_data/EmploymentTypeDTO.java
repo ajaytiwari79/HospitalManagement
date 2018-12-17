@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.EmploymentCategory;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -24,6 +24,10 @@ public class EmploymentTypeDTO {
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
     private PaidOutFrequencyEnum paymentFrequency;
+    //Added By Pavan
+    private boolean editableAtUnitPosition;
+    private Short weeklyMinutes;
+    private boolean markMainEmployment;
 
     public EmploymentTypeDTO() {
         //Default Constructor
@@ -91,6 +95,30 @@ public class EmploymentTypeDTO {
 
     public void setPaymentFrequency(PaidOutFrequencyEnum paymentFrequency) {
         this.paymentFrequency = paymentFrequency;
+    }
+
+    public boolean isEditableAtUnitPosition() {
+        return editableAtUnitPosition;
+    }
+
+    public void setEditableAtUnitPosition(boolean editableAtUnitPosition) {
+        this.editableAtUnitPosition = editableAtUnitPosition;
+    }
+
+    public Short getWeeklyMinutes() {
+        return weeklyMinutes;
+    }
+
+    public void setWeeklyMinutes(Short weeklyMinutes) {
+        this.weeklyMinutes = weeklyMinutes;
+    }
+
+    public boolean isMarkMainEmployment() {
+        return markMainEmployment;
+    }
+
+    public void setMarkMainEmployment(boolean markMainEmployment) {
+        this.markMainEmployment = markMainEmployment;
     }
 
     @AssertTrue(message = "At least one role should be selected")

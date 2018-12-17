@@ -111,10 +111,10 @@ public class AppConstants {
 
 
 
-    public static final String REQUEST_PHASE_NAME = "REQUEST";
-    public static final String PUZZLE_PHASE_NAME = "PUZZLE";
-    public static final String CONSTRUCTION_PHASE_NAME = "CONSTRUCTION";
-    public static final String DRAFT_PHASE_NAME = "DRAFT";
+    public static final String REQUEST_PHASE_NAME = "Request";
+    public static final String PUZZLE_PHASE_NAME = "Puzzle";
+    public static final String CONSTRUCTION_PHASE_NAME = "Construction";
+    public static final String DRAFT_PHASE_NAME = "Draft";
     public static final String COPY_OF = "copy of";
 
     public static final int REQUEST_PHASE_SEQUENCE = 1;
@@ -176,10 +176,10 @@ public class AppConstants {
     //for Planning period name
     public static final String DATE_FORMET_STRING="dd.MMM.yyyy";
     //Phases
-    public static final String REALTIME="REALTIME";
-    public static final String TIME_AND_ATTENDANCE="TIME & ATTENDANCE";
-    public static final String TENTATIVE="TENTATIVE";
-    public static final String PAYROLL="PAYROLL";
+    public static final String REALTIME="Realtime";
+    public static final String TIME_AND_ATTENDANCE="Time & Attendance";
+    public static final String TENTATIVE="Tentative";
+    public static final String PAYROLL="Payroll";
     public static final String PRIORITY_GROUP1_NAME = "PRIORITY_GROUP1";
     public static final int STAFF_GRACE_PERIOD_DAYS=2;
     public static final int MANAGEMENT_GRACE_PERIOD_DAYS=2;
@@ -197,6 +197,10 @@ public class AppConstants {
     //Time Type Default Colors - Green for Working and Pink for Non-Working
     public static final String WORKING_TYPE_COLOR = "#c5f7c7";
     public static final String NON_WORKING_TYPE_COLOR = "#f7c5e7";
+    public static final String IS_BROKEN = " is broken";
+    public static final long ONE_HOUR_MINUTES=60;
+    public static final long SHIFT_LEAST_GRANULARITY =15;
+
 
 
 }

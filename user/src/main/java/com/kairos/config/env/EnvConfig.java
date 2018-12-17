@@ -1,7 +1,6 @@
 package com.kairos.config.env;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -48,6 +47,11 @@ public class EnvConfig {
     @Value("${tomtom.key}")
     private String tomtomKey;
 
+    @Value("${forgot.password.link}")
+    private String forgotPasswordApiLink;
+
+    @Value("${sendgrid.api.key}")
+    private String sendGridApiKey;
 
     public String getGoogleCalendarAPIV3Url(String vCardId){
 
@@ -107,6 +111,15 @@ public class EnvConfig {
 
     public String getTomtomKey() {
         return tomtomKey;
+    }
+
+    public String getSendGridApiKey() {
+        return sendGridApiKey;
+    }
+
+
+    public String getForgotPasswordApiLink() {
+        return forgotPasswordApiLink;
     }
 
 }

@@ -5,6 +5,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -17,6 +18,10 @@ import java.util.List;
 public class AppConstants {
     private AppConstants() {
     }
+
+    //forgot password mail
+    public static final String MAIL_SUBJECT ="Kairos Planning password reset link";
+    public static final String MAIL_BODY="Hi  {0}\n\nWe received a request to reset your Kairos Planning password. Click the link to choose a new one :\n";
     public static final String TIMEZONE_UTC = "UTC";
     public static final String HYPHEN = "-";
     public static final String KAI = "KAI-";
@@ -248,6 +253,7 @@ public class AppConstants {
     public static final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = 7.4f;
     public static final int LEAP_YEAR = 366;
     public static final int NON_LEAP_YEAR = 365;
+    public static final short ONE_WEEK_MINUTES=10080;
 
     //Query result Keys
     public static final String STAFF="staff";
@@ -262,5 +268,4 @@ public class AppConstants {
     public static final String ORGANIZATION_SERVICES = "organizationService";
     public static final String ORGANIZATION_SUB_SERVICES = "organizationSubService";
     public static final String ACCOUNT_TYPES = "accountType";
-
 }

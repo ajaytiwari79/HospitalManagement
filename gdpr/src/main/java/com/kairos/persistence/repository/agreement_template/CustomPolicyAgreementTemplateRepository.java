@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.agreement_template;
 
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
@@ -27,5 +28,7 @@ public interface CustomPolicyAgreementTemplateRepository {
     List<AgreementSection> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long countryId, boolean isUnitId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
 
     Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds);
+
+    List<ClauseBasicResponseDTO> getAllClausesByAgreementTemplateIdNotEquals(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
 
 }

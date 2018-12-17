@@ -6,6 +6,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class FunctionalPaymentMatrix extends UserBaseEntity implements Serializa
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private Set<PayGroupArea> payGroupAreas;
     @Relationship(type = SENIORITY_LEVEL_FUNCTIONS)
-    private List<SeniorityLevelFunction> seniorityLevelFunction;
+    private List<SeniorityLevelFunction> seniorityLevelFunction=new ArrayList<>();
 
     public FunctionalPaymentMatrix() {
         // dc

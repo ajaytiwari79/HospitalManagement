@@ -1,11 +1,12 @@
 package com.planner.service.locationService;
 
+import com.kairos.dto.user.organization.union.LocationDTO;
 import com.kairos.planner.vrp.taskplanning.model.LocationInfo;
 import com.planner.domain.location.LocationDistance;
 import com.planner.domain.location.PlanningLocation;
 import com.planner.repository.locationRepository.LocationRepository;
 import com.planner.repository.locationRepository.PlanningLocationRepository;
-import com.planner.responseDto.locationDto.OptaLocationDTO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,34 +50,34 @@ public class LocationService {
         return planningLocationRepository.getLocationByLatLong(latitude, logitude);
     }
 
-    public PlanningLocation saveLocation(OptaLocationDTO optaLocationDTO) {
+    public PlanningLocation saveLocation(LocationDTO locationDTO) {
         PlanningLocation planningLocation = new PlanningLocation();
-        planningLocation.setCity(optaLocationDTO.getCity());
-        planningLocation.setCountry(optaLocationDTO.getCountry());
-        planningLocation.setDistrict(optaLocationDTO.getDistrict());
-        planningLocation.setHouseNumber(optaLocationDTO.getHouseNumber());
-        planningLocation.setLatitude(optaLocationDTO.getLatitude());
-        planningLocation.setLongitude(optaLocationDTO.getLongitude());
-        planningLocation.setStreet(optaLocationDTO.getStreet());
-        if(optaLocationDTO.getZip()!=null){
-            planningLocation.setZip(optaLocationDTO.getZip());
-        }
+        planningLocation.setCity(locationDTO.getAddress().getCity());
+        planningLocation.setCountry(locationDTO.getAddress().getCountry());
+        //planningLocation.setDistrict(locationDTO.getAddress().getDistrict());
+        planningLocation.setHouseNumber(locationDTO.getAddress().getHouseNumber());
+        planningLocation.setLatitude(locationDTO.getAddress().getLatitude());
+        planningLocation.setLongitude(locationDTO.getAddress().getLongitude());
+        planningLocation.setStreet(locationDTO.getAddress().getStreet());
+        /*if(locationDTO.getAddress().getZip()!=null){
+            planningLocation.setZip(locationDTO.getAddress().getZip());
+        }*/
         planningLocation = (PlanningLocation) planningLocationRepository.save(planningLocation);
         return planningLocation;
     }
 
-    public void saveLocations(List<OptaLocationDTO> locationDTOS){
+    public void saveLocations(List<LocationDTO> locationDTOS){
         List<PlanningLocation> planningLocations = new ArrayList<>();
-        for (OptaLocationDTO locationDTO:locationDTOS) {
+        for (LocationDTO locationDTO:locationDTOS) {
             PlanningLocation planningLocation = new PlanningLocation();
-            planningLocation.setCity(locationDTO.getCity());
-            planningLocation.setCountry(locationDTO.getCountry());
-            planningLocation.setDistrict(locationDTO.getDistrict());
-            planningLocation.setHouseNumber(locationDTO.getHouseNumber());
-            planningLocation.setLatitude(locationDTO.getLatitude());
-            planningLocation.setLongitude(locationDTO.getLongitude());
-            planningLocation.setStreet(locationDTO.getStreet());
-            planningLocation.setZip(locationDTO.getZip());
+            planningLocation.setCity(locationDTO.getAddress().getCity());
+            planningLocation.setCountry(locationDTO.getAddress().getCountry());
+           // planningLocation.setDistrict(locationDTO.getAddress().getDistrict());
+            planningLocation.setHouseNumber(locationDTO.getAddress().getHouseNumber());
+            planningLocation.setLatitude(locationDTO.getAddress().getLatitude());
+            planningLocation.setLongitude(locationDTO.getAddress().getLongitude());
+            planningLocation.setStreet(locationDTO.getAddress().getStreet());
+            //planningLocation.setZip(locationDTO.getAddress().getZip());
             planningLocations.add(planningLocation);
         }
         saveList(planningLocations);

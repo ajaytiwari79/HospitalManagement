@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.country.DayType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 /**
  * Created by oodles on 16/11/17.
  */
@@ -13,12 +16,12 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class CountryHolidayCalendarQueryResult {
 
-    private Long holidayDate;
+    private LocalDate holidayDate;
     private DayType dayType;
     private Long id;
     private String holidayTitle;
-    private Long startTime;
-    private Long endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private boolean reOccuring;
     private String description;
     private String holidayType;
@@ -28,11 +31,11 @@ public class CountryHolidayCalendarQueryResult {
 
     public CountryHolidayCalendarQueryResult(){}
 
-    public Long getHolidayDate() {
+    public LocalDate getHolidayDate() {
         return holidayDate;
     }
 
-    public void setHolidayDate(Long holidayDate) {
+    public void setHolidayDate(LocalDate holidayDate) {
         this.holidayDate = holidayDate;
     }
 
@@ -60,19 +63,19 @@ public class CountryHolidayCalendarQueryResult {
         this.holidayTitle = holidayTitle;
     }
 
-    public Long getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Long startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Long getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Long endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 

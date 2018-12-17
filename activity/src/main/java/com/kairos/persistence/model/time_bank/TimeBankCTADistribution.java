@@ -20,10 +20,6 @@ public class TimeBankCTADistribution {
     public TimeBankCTADistribution() {
     }
 
-    public TimeBankCTADistribution(BigInteger ctaRuleTemplateId, int minutes) {
-        this.minutes = minutes;
-        this.ctaRuleTemplateId = ctaRuleTemplateId;
-    }
 
     public String getCtaName() {
         return ctaName;

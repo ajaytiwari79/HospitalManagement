@@ -321,22 +321,26 @@ public class UnionService {
         if(!publish&&union.isBoardingCompleted()) {
             exceptionService.invalidRequestException("message.publish.union.unpublish");
         }
+
+        Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
+        List<Long> sectorIDsCreated = new ArrayList<>(unionData.getSectorIds());
+        List<Long> sectorIdsToBeDeleted = new ArrayList<Long>(sectorIdsDb);
+
+        sectorIDsCreated.removeAll(sectorIdsDb);
+        sectorIdsToBeDeleted.removeAll(unionData.getSectorIds());
+        if(!sectorIdsToBeDeleted.isEmpty()&&!union.isBoardingCompleted()) {
+            organizationGraphRepository.deleteUnionSectorRelationShip(sectorIdsToBeDeleted,unionId);
+        }
+
+        if(! sectorIDsCreated.isEmpty()) {
+            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsCreated,unionId);
+        }
         if(publish) {
             validateAddress(unionData.getMainAddress());
             union.setBoardingCompleted(true);
             unionData.setState(UnionState.PUBLISHED);
         }
-        Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
-        List<Long> sectorIDsCreated = new ArrayList<>(unionData.getSectorIds());
-        List<Long> sectorIdsToBeDeleted = new ArrayList<Long>(sectorIdsDb);
-        sectorIDsCreated.removeAll(sectorIdsDb);
-        sectorIdsToBeDeleted.removeAll(unionData.getSectorIds());
-        if(!sectorIdsToBeDeleted.isEmpty()) {
-            organizationGraphRepository.deleteUnionSectorRelationShip(sectorIdsToBeDeleted,unionId);
-        }
-        if(! sectorIDsCreated.isEmpty()) {
-            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsCreated,unionId);
-        }
+
 
         ContactAddress address = null;
         ZipCode zipCode;
