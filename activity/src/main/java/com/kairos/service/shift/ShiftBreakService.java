@@ -23,6 +23,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
+import static com.kairos.constants.AppConstants.SHIFT_LEAST_GRANULARITY;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -239,7 +241,7 @@ public class ShiftBreakService {
         mergeShifts(shifts);// if we have 2 consecutive shift then we will merge them.
 
         if (numberOfBreakAllotted != numberOfBreakRequired) {
-            reAdjustShiftDuration(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailabilitySettings,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired));
+            reAdjustShiftDuration(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailabilitySettings,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired),breakWTATemplate.getBreakGapMinutes());
         }
         return shifts;
     }
@@ -267,32 +269,48 @@ public class ShiftBreakService {
         }
     }
 
-    private  void reAdjustShiftDuration(Activity breakActivity,Shift mainShift,List<ShiftActivity> shifts, boolean lastBlockingShiftAdded, BreakAvailabilitySettings breakAvailability, List<BreakSettings> breakSettings) {
+    private  void reAdjustShiftDuration(Activity breakActivity,Shift mainShift,List<ShiftActivity> shifts, boolean lastBlockingShiftAdded, BreakAvailabilitySettings breakAvailability, List<BreakSettings> breakSettings,short gapBetweenBreaks) {
+        gapBetweenBreaks=reduceMinimumGapValue(gapBetweenBreaks);
         for (BreakSettings breakSetting : breakSettings) {
-            long requiredReduceShiftByMinutes = breakSetting.getShiftDurationInMinute() + breakSetting.getBreakDurationInMinute();
+            long requiredReduceShiftByMinutes;
+            if (gapBetweenBreaks>0){
+                requiredReduceShiftByMinutes=gapBetweenBreaks + breakSetting.getBreakDurationInMinute();
+            }else {
+                requiredReduceShiftByMinutes=breakSetting.getShiftDurationInMinute()+ breakSetting.getBreakDurationInMinute();
+                gapBetweenBreaks=breakSetting.getShiftDurationInMinute().shortValue();
+
+            }
             logger.info(" add shift/break for the following duration"+requiredReduceShiftByMinutes);
             long currentReduceShiftByMinutes = 0l;
             for (int i = shifts.size() - 1; i >= 0; i--) {
+                Date previousShiftEndDate=null;
                 if (!shifts.get(i).isBreakShift()) {
                     Long currentShiftDuration = (shifts.get(i).getEndDate().getTime() - shifts.get(i).getStartDate().getTime()) / ONE_MINUTE;
                     if (lastBlockingShiftAdded && i == shifts.size() - 1) { // we need to increase the start date of it
                         if (currentShiftDuration > breakAvailability.getEndBeforeMinutes()) {//  shift duration 60 min and blocking 30 min so we can move this start with 30 min
                             currentReduceShiftByMinutes = currentShiftDuration - breakAvailability.getEndBeforeMinutes();
                             shifts.get(i).setStartDate(new Date(shifts.get(i).getStartDate().getTime() + ((currentShiftDuration - breakAvailability.getEndBeforeMinutes()) * ONE_MINUTE)));
+                            previousShiftEndDate=shifts.get(i).getStartDate();
                         }
                     } else  if (currentShiftDuration > (requiredReduceShiftByMinutes - currentReduceShiftByMinutes)) {
                         shifts.get(i).setEndDate(new Date(shifts.get(i).getEndDate().getTime() - ((requiredReduceShiftByMinutes - currentReduceShiftByMinutes) * ONE_MINUTE)));
                         shifts.get(i+1).setStartDate(shifts.get(i).getEndDate());// changing next break time as well
                         shifts.get(i+1).setEndDate(new Date(shifts.get(i+1).getEndDate().getTime() - ((requiredReduceShiftByMinutes - currentReduceShiftByMinutes) * ONE_MINUTE)));
+                        previousShiftEndDate=shifts.get(i + 1).getEndDate();
                         currentReduceShiftByMinutes+=(requiredReduceShiftByMinutes - currentReduceShiftByMinutes);
                     }
                     // now we need to check
                     if (currentReduceShiftByMinutes == requiredReduceShiftByMinutes) {
+                        Date shiftStartDate=previousShiftEndDate;
+                        Date shiftEndDate=new Date(previousShiftEndDate.getTime() + gapBetweenBreaks * ONE_MINUTE);
                         shifts.add(i+2,getShiftObject(mainShift.getActivities().get(0).getActivityName(),
-                                mainShift.getActivities().get(0).getActivityId(),shifts.get(i+1).getEndDate() ,
-                                new Date(shifts.get(i+1).getStartDate().getTime() + breakSetting.getShiftDurationInMinute()*ONE_MINUTE), false,mainShift.getActivities().get(0).getAbsenceReasonCodeId(),null));
-                        shifts.add(i+3,getShiftObject(breakActivity.getName(),breakActivity.getId(),shifts.get(i+2).getEndDate() ,
-                                new Date(shifts.get(i+3).getStartDate().getTime()), true,null,breakSetting.getShiftDurationInMinute()));
+                                mainShift.getActivities().get(0).getActivityId(),shiftStartDate ,
+                                shiftEndDate, false,mainShift.getActivities().get(0).getAbsenceReasonCodeId(),null));
+
+                        shiftStartDate=shiftEndDate; // setting the previous end as next start
+                        shiftEndDate=new Date(shiftStartDate.getTime() + breakSetting.getBreakDurationInMinute()*ONE_MINUTE);
+                        shifts.add(i+3,getShiftObject(breakActivity.getName(),breakActivity.getId(),shiftStartDate ,
+                                shiftEndDate, true,null,breakSetting.getShiftDurationInMinute()));
                         break;
                     }
                 }
@@ -336,4 +354,10 @@ public class ShiftBreakService {
         return  addBreakInShifts(mainShift, breakSettings, shiftDurationInMinute, activityWrapperMap, breakWTATemplate, timeSlot,false);
 
     }
+    private short reduceMinimumGapValue(short gapBetweenBreaks) {
+        short modFactorOfShiftGap=gapBetweenBreaks>ONE_HOUR_MINUTES?(short) (gapBetweenBreaks%ONE_HOUR_MINUTES):gapBetweenBreaks; // 1 hour equals to 60 min
+        return modFactorOfShiftGap> SHIFT_LEAST_GRANULARITY ?((short)(gapBetweenBreaks- SHIFT_LEAST_GRANULARITY)):gapBetweenBreaks;
+
+    }
+
 }
