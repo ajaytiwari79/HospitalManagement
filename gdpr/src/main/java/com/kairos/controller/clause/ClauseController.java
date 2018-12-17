@@ -102,7 +102,7 @@ public class ClauseController {
     }
 
     @ApiOperation("Get Clause MetaData")
-    @PostMapping(COUNTRY_URL + "/clause/meta_data")
+    @GetMapping(COUNTRY_URL + "/clause/meta_data")
     public ResponseEntity<Object> getClauseMetaDataByCountryId(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseMetaDataByCountryId(countryId));
 
