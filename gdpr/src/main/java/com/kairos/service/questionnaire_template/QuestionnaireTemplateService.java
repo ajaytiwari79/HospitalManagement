@@ -348,18 +348,18 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 if (!templateDto.isDefaultAssetTemplate()) {
                     previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(unitId, templateDto);
                 } else {
-                    previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndOrganizationId(unitId, questionnaireTemplateType, true);
+                    previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndOrganizationId(unitId, questionnaireTemplateType, true);
                 }
                 break;
             case RISK:
                 if (QuestionnaireTemplateType.ASSET_TYPE.equals(templateDto.getRiskAssociatedEntity())) {
                     previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(unitId, templateDto);
                 } else {
-                    previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndOrganizationId(unitId, questionnaireTemplateType, templateDto.getRiskAssociatedEntity());
+                    previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndOrganizationId(unitId, questionnaireTemplateType, templateDto.getRiskAssociatedEntity());
                 }
                 break;
             default:
-                previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(unitId,questionnaireTemplateType);
+                previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(unitId,questionnaireTemplateType);
                 break;
         }
         if (previousMasterTemplate != null) {
@@ -376,9 +376,9 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     private QuestionnaireTemplate getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(Long unitId, QuestionnaireTemplateDTO templateDto) {
         QuestionnaireTemplate previousMasterTemplate = null;
         if (templateDto.getAssetSubType() != null) {
-            previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByOrganizationId(unitId, templateDto.getAssetType(), Arrays.asList(templateDto.getAssetSubType()),templateDto.getTemplateType());
+            previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByOrganizationId(unitId, templateDto.getAssetType(), Arrays.asList(templateDto.getAssetSubType()),templateDto.getTemplateType());
         } else {
-            previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByOrganizationId(unitId, templateDto.getAssetType(),templateDto.getTemplateType());
+            previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByOrganizationId(unitId, templateDto.getAssetType(),templateDto.getTemplateType());
         }
         return previousMasterTemplate;
     }
