@@ -6,15 +6,15 @@
   <entityClass>com.kairos.shiftplanning.domain.SkillLineInterval</entityClass>
   <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
     <!--<entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>-->
-  <!--
-  Intervals on assigned back to null will not reduce shift length if they are in mid of shift and hence causing score corruption, which is fine
-  <environmentMode>FULL_ASSERT</environmentMode>-->
+
+    <!--Intervals on assigned back to null will not reduce shift length if they are in mid of shift and hence causing score corruption, which is fine
+    <environmentMode>FULL_ASSERT</environmentMode>-->
     <!--<environmentMode>FAST_ASSERT</environmentMode>-->
     <!--<environmentMode>FULL_ASSERT</environmentMode>-->
   <scoreDirectorFactory>
-      <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning_activityLine.drl</scoreDrl>
+     <!-- <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning_activityLine.drl</scoreDrl>
       <scoreDrl>com/kairos/shiftplanning/rules/wtaConstraintsRule.drl</scoreDrl>
-      <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>
+      <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>-->
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
     <constructionHeuristic>

@@ -497,6 +497,9 @@ public  class DateUtils {
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
     }
+    public static DateTime getDateTimeByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
+        return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute());
+    }
 
     public static Date getDateByLocalDate(LocalDate localDate) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), 0, 0).toDate();
@@ -608,6 +611,9 @@ public  class DateUtils {
             }
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
+            }
+            case YEAR: {
+                return localDate.plusYears(duration * recurringNumber);
             }
         }
         return localDate;
@@ -776,5 +782,22 @@ public  class DateUtils {
 
     public static LocalDate getLocalDateFromTimezone(String timeZone){
         return LocalDate.now(ZoneId.of(timeZone));
+    }
+
+    public static Long getMillisFromDateAndTime(Date date,LocalTime localTime ) {
+
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault()).withHour(localTime.getHour()).
+                withMinute(localTime.getMinute()).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+    }
+
+    public static int getHourFromDate(Date date) {
+
+        return asZoneDateTime(date).getHour();
+    }
+
+    public static int getMinutesFromDate(Date date) {
+
+        return asZoneDateTime(date).getMinute();
     }
 }

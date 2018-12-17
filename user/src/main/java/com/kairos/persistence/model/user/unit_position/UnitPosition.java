@@ -51,9 +51,15 @@ public class UnitPosition extends UserBaseEntity {
     private boolean published;
     @Relationship(type = HAS_POSITION_LINES)
     private List<UnitPositionLine> unitPositionLines;
+    private boolean mainUnitPosition;
 
     public UnitPosition() {
 
+    }
+
+    public UnitPosition(LocalDate startDate, LocalDate endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public UnitPosition(PositionCode positionCode, Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published) {
@@ -162,9 +168,14 @@ public class UnitPosition extends UserBaseEntity {
         this.unitPositionLines = unitPositionLines;
     }
 
-    public UnitPosition(LocalDate startDate, LocalDate endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+
+
+    public boolean isMainUnitPosition() {
+        return mainUnitPosition;
+    }
+
+    public void setMainUnitPosition(boolean mainUnitPosition) {
+        this.mainUnitPosition = mainUnitPosition;
     }
 
     @Override

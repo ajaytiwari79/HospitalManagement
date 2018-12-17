@@ -3,9 +3,9 @@ package com.planner.service.config;
 
 //import org.junit.Test;
 
+import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.planner.commonUtil.StaticField;
-import com.planner.responseDto.config.ConstraintDTO;
-import com.planner.responseDto.config.SolverConfigDTO;
 import org.drools.compiler.lang.api.PackageDescrBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,8 @@ public class DroolsConfigService {
 
 
     private static Logger logger = LoggerFactory.getLogger(DroolsConfigService.class);
-
+//TODO pradeep need Refactor
+/*
 
     public String getDroolFilePath(SolverConfigDTO solverConfigDTO) {
         int totalLevel = solverConfigDTO.getHardLevel()+solverConfigDTO.getMediumLevel()+solverConfigDTO.getSoftLevel();
@@ -103,9 +104,11 @@ public class DroolsConfigService {
         return condition;
     }
 
-    /*because of we use hard and soft constraint so thats why
+    */
+/*because of we use hard and soft constraint so thats why
     we add use upper level of soft constraint as a medium
-    constraint because of this we use medium level for it*/
+    constraint because of this we use medium level for it*//*
+
     private String getContraintWithLevel(ConstraintDTO constraintDTO, int mediumLevel, int totalLevel) {
         if (totalLevel == 3) {
             if(constraintDTO.getLevel().equals(StaticField.HARD)){
@@ -136,6 +139,7 @@ public class DroolsConfigService {
             return Integer.toString(constraintDTO.getRuleDTO().getNoOfruleValues());
         }
     }
+*/
 
 
 /*

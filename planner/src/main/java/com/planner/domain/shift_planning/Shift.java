@@ -1,20 +1,22 @@
 package com.planner.domain.shift_planning;
 
-import com.kairos.dto.activity.shift.ShiftActivity;
+
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.shiftplanning.domain.Employee;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public class Shift {
 
     private BigInteger id;
     private Employee employee;
-    private LocalDate startLocalDate;
-    private LocalDate endLocalDate;
+    private Date startDate;
+    private Date endDate;
     private Long unitPositionId;
-    private List<ShiftActivity> activities;
+    private List<ShiftActivityDTO> activities;
 
     public BigInteger getId() {
         return id;
@@ -32,20 +34,20 @@ public class Shift {
         this.employee = employee;
     }
 
-    public LocalDate getStartLocalDate() {
-        return startLocalDate;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStartLocalDate(LocalDate startLocalDate) {
-        this.startLocalDate = startLocalDate;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDate getEndLocalDate() {
-        return endLocalDate;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setEndLocalDate(LocalDate endLocalDate) {
-        this.endLocalDate = endLocalDate;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public Long getUnitPositionId() {
@@ -56,11 +58,11 @@ public class Shift {
         this.unitPositionId = unitPositionId;
     }
 
-    public List<ShiftActivity> getActivities() {
+    public List<ShiftActivityDTO> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ShiftActivity> activities) {
+    public void setActivities(List<ShiftActivityDTO> activities) {
         this.activities = activities;
     }
 }

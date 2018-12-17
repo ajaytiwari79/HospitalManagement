@@ -3,7 +3,7 @@ package com.kairos.rule_validator.night_shift;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
+
 import com.kairos.enums.DurationType;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
