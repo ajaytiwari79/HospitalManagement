@@ -1,11 +1,12 @@
 package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -37,19 +38,19 @@ public class ShiftDetailsService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private GenericIntegrationService genericIntegrationService;
+    @Inject
+    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
-        setReasonCodeInShifts(shiftWithActivityDTOS, unitId);
+        setReasonCodeAndRuleVoilationsInShifts(shiftWithActivityDTOS, unitId, shiftIds);
         return shiftWithActivityDTOS;
     }
 
-    private void setReasonCodeInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
-        Set<Long> reasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
-        reasonCodeIds.addAll(shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getReasonCodeId())).collect(Collectors.toSet()));
-        List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("reasonCodeIds", reasonCodeIds.toString()));
-        ReasonCodeWrapper reasonCodeWrapper = genericIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
+    private void setReasonCodeAndRuleVoilationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds) {
+
+        ReasonCodeWrapper reasonCodeWrapper = findReasonCodes(shiftWithActivityDTOS, unitId);
+        Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = findAllWTAViolatedRules(shiftIds);
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeWrapper.getReasonCodes().stream().collect(Collectors.toMap(ReasonCodeDTO::getId, Function.identity()));
 
         for (ShiftWithActivityDTO shift : shiftWithActivityDTOS) {
@@ -58,8 +59,24 @@ public class ShiftDetailsService extends MongoBaseService {
                     shiftActivityDTO.setReasonCode(shiftActivityDTO.getReasonCodeId() != null ? reasonCodeDTOMap.get(shiftActivityDTO.getReasonCodeId()) : reasonCodeDTOMap.get(shiftActivityDTO.getAbsenceReasonCodeId()));
                 }
                 shiftActivityDTO.setLocation(reasonCodeWrapper.getContactAddressData());
-
+                shiftActivityDTO.setWtaRuleViolations(wtaRuleViolationMap.get(shift.getId()));
             }
         }
+    }
+
+    private Map<BigInteger, List<WorkTimeAgreementRuleViolation>> findAllWTAViolatedRules(List<BigInteger> shiftIds) {
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
+        Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = shiftViolatedRules.stream().collect(Collectors.toMap(shiftViolatedRule -> shiftViolatedRule.getShift().getId(), v -> v.getWorkTimeAgreements(), (previous, current) -> current));
+        return wtaRuleViolationMap;
+    }
+
+    private ReasonCodeWrapper findReasonCodes(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
+        Set<Long> reasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
+        reasonCodeIds.addAll(shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getReasonCodeId())).collect(Collectors.toSet()));
+        List<NameValuePair> requestParam = new ArrayList<>();
+        requestParam.add(new BasicNameValuePair("reasonCodeIds", reasonCodeIds.toString()));
+        ReasonCodeWrapper reasonCodeWrapper = genericIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
+        return reasonCodeWrapper;
+
     }
 }

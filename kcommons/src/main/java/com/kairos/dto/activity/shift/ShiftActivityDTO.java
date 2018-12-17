@@ -6,6 +6,7 @@ import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +50,7 @@ public class ShiftActivityDTO {
     private Long allowedBreakDurationInMinute;
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
+    private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
@@ -277,5 +279,13 @@ public class ShiftActivityDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<WorkTimeAgreementRuleViolation> getWtaRuleViolations() {
+        return wtaRuleViolations;
+    }
+
+    public void setWtaRuleViolations(List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
+        this.wtaRuleViolations = wtaRuleViolations;
     }
 }
