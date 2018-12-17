@@ -216,7 +216,7 @@ public class ShiftController {
 
 
 
-    @ApiOperation("get a Shift detail by id")
+    @ApiOperation("update remarks in shift activity")
     @PutMapping(value = "/shiftActivity/{shiftActivityId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger shiftActivityId,@RequestBody ShiftActivityDTO shiftActivityDTO) {
