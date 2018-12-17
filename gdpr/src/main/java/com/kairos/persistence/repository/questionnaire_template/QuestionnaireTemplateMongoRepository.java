@@ -34,7 +34,7 @@ public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepositor
     @Query("{deleted:false,organizationId:?0,templateType:?1}")
     QuestionnaireTemplate findQuestionnaireTemplateByCountryIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
 
-    @Query("{deleted:false,organizationId:?0,templateType:?1,,templateStatus:\"PUBLISHED\"}")
+    @Query("{deleted:false,organizationId:?0,templateType:?1,templateStatus:\"PUBLISHED\"}")
     QuestionnaireTemplate findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
 
     @Query("{countryId:?0,templateType:?1,riskAssociatedEntity:?2,deleted:false}")
