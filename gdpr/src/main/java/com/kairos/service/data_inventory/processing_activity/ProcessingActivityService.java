@@ -94,6 +94,9 @@ public class ProcessingActivityService extends MongoBaseService {
 
     @Inject
     private MasterProcessingActivityService masterProcessingActivityService;
+    @Inject
+    private ResponsibilityTypeService responsibilityTypeService;
+
 
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
@@ -570,6 +573,23 @@ public class ProcessingActivityService extends MongoBaseService {
         result.put("new", processingActivityDTO);
         result.put("SuggestedData", masterProcessingActivity);
         return result;
+
+    }
+
+    /**
+     *
+     * @param unitId
+     * @return
+     */
+    public Map<String,Object> getProcessingActivityMetaData(Long unitId){
+        Map<String,Object> processingActivityMetaDataMap=new HashMap<>();
+        processingActivityMetaDataMap.put("responsibilityTypeList", responsibilityTypeService.getAllResponsibilityType(unitId));
+        processingActivityMetaDataMap.put("processingPurposeList",processingPurposeService.getAllProcessingPurpose(unitId));
+        processingActivityMetaDataMap.put("dataSourceList",dataSourceService.getAllDataSource(unitId));
+        processingActivityMetaDataMap.put("transferMethodList",transferMethodService.getAllTransferMethod(unitId));
+        processingActivityMetaDataMap.put("accessorPartyList", accessorPartyService.getAllAccessorParty(unitId));
+        processingActivityMetaDataMap.put("processingLegalBasisList",processingLegalBasisService.getAllProcessingLegalBasis(unitId));
+        return processingActivityMetaDataMap;
 
     }
 

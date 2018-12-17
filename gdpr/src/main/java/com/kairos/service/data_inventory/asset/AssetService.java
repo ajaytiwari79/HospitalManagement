@@ -16,7 +16,7 @@ import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
-import com.kairos.service.master_data.asset_management.MasterAssetService;
+import com.kairos.service.master_data.asset_management.*;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.javers.core.Javers;
@@ -64,6 +64,20 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private RiskService riskService;
+    @Inject
+    private HostingTypeService hostingTypeService;
+    @Inject
+    private HostingProviderService hostingProviderService;
+    @Inject
+    private StorageFormatService storageFormatService;
+    @Inject
+    private DataDisposalService dataDisposalService;
+    @Inject
+    private TechnicalSecurityMeasureService technicalSecurityMeasureService;
+    @Inject
+    private OrganizationalSecurityMeasureService organizationalSecurityMeasureService;
+    @Inject
+    private OrganizationAssetTypeService organizationAssetTypeService;
 
 
     public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
@@ -312,6 +326,24 @@ public class AssetService extends MongoBaseService {
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
         return result;
+    }
+
+    /**
+     *
+     * @return
+     */
+    //TODO risk level fetch
+    public Map<String, Object> getAssetMetaData(Long unitId){
+        Map<String, Object> assetMetaDataMap=new HashMap<>();
+        assetMetaDataMap.put("hostingTypeList",hostingTypeService.getAllHostingType(unitId));
+        assetMetaDataMap.put("hostingProviderList",hostingProviderService.getAllHostingProvider(unitId));
+        assetMetaDataMap.put("storageFormatList",storageFormatService.getAllStorageFormat(unitId));
+        assetMetaDataMap.put("dataDisposalList",dataDisposalService.getAllDataDisposal(unitId));
+        assetMetaDataMap.put("technicalSecurityMeasureList",technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
+        assetMetaDataMap.put("organizationalSecurityMeasureList",organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
+        assetMetaDataMap.put("organizationAssetTypeList",organizationAssetTypeService.getAllAssetType(unitId));
+        return assetMetaDataMap;
+
     }
 
 
