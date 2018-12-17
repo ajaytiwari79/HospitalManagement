@@ -1,7 +1,8 @@
 package com.kairos.service.activity;
 
 import com.kairos.dto.activity.shift.ButtonConfig;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -49,7 +50,8 @@ public class ShiftServicejUnitTest {
     @Mock private PhaseService phaseService;
     public Phase phase;
     public ShiftDTO shiftDTO;
-    public ShiftActivity activity,activity1;
+    public ShiftActivity activity;
+    public ShiftActivityDTO activity1;
     public String timeZone;
     public ShiftState shiftState;
     public boolean realtime=true;
@@ -139,7 +141,7 @@ public class ShiftServicejUnitTest {
         status.add(ShiftStatus.UNPUBLISHED);
         activity.setStatus(status);
         activity.setStatus(new HashSet<>());
-        activity1=new ShiftActivity();
+        activity1=new ShiftActivityDTO();
         activity1.setActivityId(BigInteger.valueOf(47));
         activity1.setStartDate(new Date(2018,10,28,12,30));
         activity1.setEndDate(new Date(2018,10,28,18,10));

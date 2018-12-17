@@ -5,7 +5,6 @@ package com.kairos.dto.activity.activity.activity_tabs;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

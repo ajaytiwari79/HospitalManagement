@@ -2,6 +2,7 @@ package com.kairos.controller.unit_position;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.unit_position.UnitPositionCTAWTAService;
 import com.kairos.service.unit_position.UnitPositionFunctionService;
 import com.kairos.service.unit_position.UnitPositionJobService;
@@ -24,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import java.util.concurrent.ExecutionException;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -44,6 +44,7 @@ public class UnitPositionController {
     private UnitPositionJobService unitPositionJobService;
     @Inject private UnitPositionFunctionService unitPositionFunctionService;
     @Inject private UnitPositionCTAWTAService unitPositionCTAWTAService;
+
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
     public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {

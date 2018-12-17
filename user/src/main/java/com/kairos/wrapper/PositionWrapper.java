@@ -16,6 +16,7 @@ public class PositionWrapper {
     private UnitPositionQueryResult unitPosition;
     private EmploymentQueryResult employment;
 
+
     public EmploymentQueryResult getEmployment() {
         return employment;
     }
@@ -53,4 +54,5 @@ public class PositionWrapper {
     public void setUnitPosition(UnitPositionQueryResult unitPosition) {
         this.unitPosition = unitPosition;
     }
+
 }
