@@ -55,19 +55,30 @@ public class ProcessingActivityService extends MongoBaseService {
     private AccessorPartyService accessorPartyService;
 
     @Inject
+    private OrganizationAccessorPartyService organizationAccessorPartyService;
+
+    @Inject
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
     @Inject
     private DataSourceService dataSourceService;
 
     @Inject
+    private OrganizationDataSourceService organizationDataSourceService;
+
+    @Inject
     private TransferMethodService transferMethodService;
+    @Inject
+    private OrganizationTransferMethodService organizationTransferMethodService;
 
     @Inject
     private ProcessingLegalBasisService processingLegalBasisService;
 
     @Inject
     private ProcessingPurposeService processingPurposeService;
+
+    @Inject
+    private OrganizationProcessingPurposeService organizationProcessingPurposeService;
 
     @Inject
     private Javers javers;
@@ -96,7 +107,9 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private MasterProcessingActivityService masterProcessingActivityService;
     @Inject
-    private ResponsibilityTypeService responsibilityTypeService;
+    private OrganizationResponsibilityTypeService organizationResponsibilityTypeService;
+    @Inject
+    private OrganizationProcessingLegalBasisService organizationProcessingLegalBasisService;
 
 
 
@@ -584,12 +597,12 @@ public class ProcessingActivityService extends MongoBaseService {
      */
     public Map<String,Object> getProcessingActivityMetaData(Long unitId){
         Map<String,Object> processingActivityMetaDataMap=new HashMap<>();
-        processingActivityMetaDataMap.put("responsibilityTypeList", responsibilityTypeService.getAllResponsibilityType(unitId));
-        processingActivityMetaDataMap.put("processingPurposeList",processingPurposeService.getAllProcessingPurpose(unitId));
-        processingActivityMetaDataMap.put("dataSourceList",dataSourceService.getAllDataSource(unitId));
-        processingActivityMetaDataMap.put("transferMethodList",transferMethodService.getAllTransferMethod(unitId));
-        processingActivityMetaDataMap.put("accessorPartyList", accessorPartyService.getAllAccessorParty(unitId));
-        processingActivityMetaDataMap.put("processingLegalBasisList",processingLegalBasisService.getAllProcessingLegalBasis(unitId));
+        processingActivityMetaDataMap.put("responsibilityTypeList", organizationResponsibilityTypeService.getAllResponsibilityType(unitId));
+        processingActivityMetaDataMap.put("processingPurposeList",organizationProcessingPurposeService.getAllProcessingPurpose(unitId));
+        processingActivityMetaDataMap.put("dataSourceList",organizationDataSourceService.getAllDataSource(unitId));
+        processingActivityMetaDataMap.put("transferMethodList",organizationTransferMethodService.getAllTransferMethod(unitId));
+        processingActivityMetaDataMap.put("accessorPartyList", organizationAccessorPartyService.getAllAccessorParty(unitId));
+        processingActivityMetaDataMap.put("processingLegalBasisList",organizationProcessingLegalBasisService.getAllProcessingLegalBasis(unitId));
         processingActivityMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return processingActivityMetaDataMap;
 
