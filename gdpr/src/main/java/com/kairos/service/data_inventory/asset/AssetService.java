@@ -66,17 +66,17 @@ public class AssetService extends MongoBaseService {
     @Inject
     private RiskService riskService;
     @Inject
-    private HostingTypeService hostingTypeService;
+    private OrganizationHostingTypeService organizationHostingTypeService;
     @Inject
-    private HostingProviderService hostingProviderService;
+    private OrganizationHostingProviderService organizationHostingProviderService;
     @Inject
-    private StorageFormatService storageFormatService;
+    private OrganizationStorageFormatService organizationStorageFormatService;
     @Inject
-    private DataDisposalService dataDisposalService;
+    private OrganizationDataDisposalService organizationDataDisposalService;
     @Inject
-    private TechnicalSecurityMeasureService technicalSecurityMeasureService;
+    private OrganizationTechnicalSecurityMeasureService organizationTechnicalSecurityMeasureService;
     @Inject
-    private OrganizationalSecurityMeasureService organizationalSecurityMeasureService;
+    private OrganizationOrganizationalSecurityMeasureService organizationalSecurityMeasureService;
     @Inject
     private OrganizationAssetTypeService organizationAssetTypeService;
 
@@ -335,11 +335,11 @@ public class AssetService extends MongoBaseService {
      */
     public Map<String, Object> getAssetMetaData(Long unitId){
         Map<String, Object> assetMetaDataMap=new HashMap<>();
-        assetMetaDataMap.put("hostingTypeList",hostingTypeService.getAllHostingType(unitId));
-        assetMetaDataMap.put("hostingProviderList",hostingProviderService.getAllHostingProvider(unitId));
-        assetMetaDataMap.put("storageFormatList",storageFormatService.getAllStorageFormat(unitId));
-        assetMetaDataMap.put("dataDisposalList",dataDisposalService.getAllDataDisposal(unitId));
-        assetMetaDataMap.put("technicalSecurityMeasureList",technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
+        assetMetaDataMap.put("hostingTypeList",organizationHostingTypeService.getAllHostingType(unitId));
+        assetMetaDataMap.put("hostingProviderList",organizationHostingProviderService.getAllHostingProvider(unitId));
+        assetMetaDataMap.put("storageFormatList",organizationStorageFormatService.getAllStorageFormat(unitId));
+        assetMetaDataMap.put("dataDisposalList",organizationDataDisposalService.getAllDataDisposal(unitId));
+        assetMetaDataMap.put("technicalSecurityMeasureList",organizationTechnicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
         assetMetaDataMap.put("organizationalSecurityMeasureList",organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
         assetMetaDataMap.put("organizationAssetTypeList",organizationAssetTypeService.getAllAssetType(unitId));
         assetMetaDataMap.put("riskLevelList", RiskSeverity.values());
