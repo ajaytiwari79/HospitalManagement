@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.user.unit_position;
 
-import com.kairos.enums.EmploymentCategory;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.Property;
@@ -12,7 +10,6 @@ import org.neo4j.ogm.annotation.StartNode;
 import java.math.BigDecimal;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_FUNCTION;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
 
 
 /**

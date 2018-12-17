@@ -3,7 +3,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;

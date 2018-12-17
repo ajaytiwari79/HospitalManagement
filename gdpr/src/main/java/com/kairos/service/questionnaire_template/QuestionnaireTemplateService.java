@@ -62,11 +62,61 @@ public class QuestionnaireTemplateService extends MongoBaseService {
         if (Optional.ofNullable(previousMasterTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Master Questionnaire template", templateDto.getName());
         }
+        validateQuestionnaireTemplateDTOByTemplateTypeCriteria(countryId, templateDto);
         QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
         addTemplateTypeToQuestionnaireTemplate(countryId, false, questionnaireTemplate, templateDto);
         questionnaireTemplateMongoRepository.save(questionnaireTemplate);
         templateDto.setId(questionnaireTemplate.getId());
         return templateDto.setId(questionnaireTemplate.getId());
+    }
+
+    /**
+     *
+     * @param countryId
+     * @param templateDto
+     * @return
+     */
+    private void validateQuestionnaireTemplateDTOByTemplateTypeCriteria(Long countryId, QuestionnaireTemplateDTO templateDto) {
+        QuestionnaireTemplateType questionnaireTemplateType = templateDto.getTemplateType();
+        QuestionnaireTemplate previousMasterTemplate;
+        switch (questionnaireTemplateType) {
+            case ASSET_TYPE:
+                if (!templateDto.isDefaultAssetTemplate()) {
+                    previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubType(countryId, templateDto);
+                } else {
+                    previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndCountryId(countryId, questionnaireTemplateType, true);
+                }
+                break;
+            case RISK:
+                if (QuestionnaireTemplateType.ASSET_TYPE.equals(templateDto.getRiskAssociatedEntity())) {
+                    previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubType(countryId, templateDto);
+                } else {
+                    previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndCountryId(countryId, questionnaireTemplateType, templateDto.getRiskAssociatedEntity());
+                }
+                break;
+            default:
+                previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(questionnaireTemplateType,countryId);
+                break;
+        }
+        if (previousMasterTemplate != null) {
+            exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.templateType.config", "Master Questionnaire template");
+        }
+    }
+
+    /**
+     *
+     * @param countryId
+     * @param templateDto
+     * @return
+     */
+    private QuestionnaireTemplate getQuestionnaireTemplateByAssetTypeOrSubType(Long countryId, QuestionnaireTemplateDTO templateDto) {
+        QuestionnaireTemplate previousMasterTemplate = null;
+        if (templateDto.getAssetSubType() != null) {
+            previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByCountryId(countryId, templateDto.getAssetType(), Arrays.asList(templateDto.getAssetSubType()),templateDto.getTemplateType());
+        } else {
+            previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByCountryId(countryId, templateDto.getAssetType(),templateDto.getTemplateType());
+        }
+        return previousMasterTemplate;
     }
 
     /**

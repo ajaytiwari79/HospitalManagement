@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.ONE_WEEK_MINUTES;
+
 
 /**
  * Created by prerna on 2/11/17.
@@ -67,23 +69,20 @@ public class EmploymentTypeService {
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
-        if (employmentTypeDTO.getName().trim().isEmpty()) {
-            exceptionService.dataNotMatchedException("error.employmentType.name.notEmpty");
-
-        }
+        validateEmploymentType(employmentTypeDTO);
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
-
         boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), -1L);
         if (isAlreadyExists) {
             exceptionService.duplicateDataException("message.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
 
         }
-        EmploymentType employmentTypeToCreate = new EmploymentType(employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
-                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency());
+        EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
+                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
+        employmentTypeToCreate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
 
@@ -91,10 +90,7 @@ public class EmploymentTypeService {
     }
 
     public EmploymentType updateEmploymentType(long countryId, long employmentTypeId, EmploymentTypeDTO employmentTypeDTO) {
-        if (employmentTypeDTO.getName().trim().isEmpty()) {
-            exceptionService.dataNotMatchedException("error.employmentType.name.notEmpty");
-
-        }
+        validateEmploymentType(employmentTypeDTO);
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
@@ -112,14 +108,11 @@ public class EmploymentTypeService {
 
             }
         }
-        employmentTypeToUpdate.setName(employmentTypeDTO.getName());
-        employmentTypeToUpdate.setDescription(employmentTypeDTO.getDescription());
-        employmentTypeToUpdate.setAllowedForContactPerson(employmentTypeDTO.isAllowedForContactPerson());
-        employmentTypeToUpdate.setAllowedForShiftPlan(employmentTypeDTO.isAllowedForShiftPlan());
-        employmentTypeToUpdate.setAllowedForFlexPool(employmentTypeDTO.isAllowedForFlexPool());
-        employmentTypeToUpdate.setEmploymentCategories(employmentTypeDTO.getEmploymentCategories());
-        employmentTypeToUpdate.setPaymentFrequency(employmentTypeDTO.getPaymentFrequency());
-        return employmentTypeGraphRepository.save(employmentTypeToUpdate);
+        EmploymentType employmentType=new EmploymentType(employmentTypeToUpdate.getId(),employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
+                employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
+                employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
+        employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
+        return employmentTypeGraphRepository.save(employmentType);
     }
 
     public boolean deleteEmploymentType(long countryId, long employmentTypeId) {
@@ -251,6 +244,19 @@ public class EmploymentTypeService {
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypesAtUnit(Long unitId, boolean isDeleted) {
         Long countryId=countryGraphRepository.getCountryIdByUnitId(unitId);
         return getDayTypesAndEmploymentTypes(countryId,isDeleted);
+    }
+
+    private void validateEmploymentType(EmploymentTypeDTO employmentTypeDTO){
+        if (employmentTypeDTO.getName().trim().isEmpty()) {
+            exceptionService.dataNotMatchedException("error.employmentType.name.notEmpty");
+
+        }
+        if(employmentTypeDTO.getWeeklyMinutes()==null){
+            exceptionService.actionNotPermittedException("error.weekly_minutes.absent");
+        }
+        if(employmentTypeDTO.getWeeklyMinutes()>ONE_WEEK_MINUTES){
+            exceptionService.actionNotPermittedException("error.weekly_minutes.exceeds");
+        }
     }
 
 

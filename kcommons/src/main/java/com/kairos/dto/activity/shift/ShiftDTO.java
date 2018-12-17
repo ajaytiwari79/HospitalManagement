@@ -47,7 +47,7 @@ public class ShiftDTO {
     private Long allowedBreakDurationInMinute;
     private ShiftTemplateDTO template;
     @NotEmpty(message = "message.shift.activity.empty")
-    private List<ShiftActivity> activities = new ArrayList<>();
+    private List<ShiftActivityDTO> activities = new ArrayList<>();
     private int scheduledMinutes;
     private int durationMinutes;
     private BigInteger plannedTimeId;
@@ -70,7 +70,7 @@ public class ShiftDTO {
        this.staffId = staffId;
    }
 
-    public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
+    public ShiftDTO(List<ShiftActivityDTO> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
@@ -79,7 +79,7 @@ public class ShiftDTO {
 
 
 
-    public ShiftDTO(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+    public ShiftDTO(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivityDTO> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -176,11 +176,11 @@ public class ShiftDTO {
     }
 
 
-    public List<ShiftActivity> getActivities() {
+    public List<ShiftActivityDTO> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ShiftActivity> activities) {
+    public void setActivities(List<ShiftActivityDTO> activities) {
         if (Optional.ofNullable(activities).isPresent()) {
             activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
         }

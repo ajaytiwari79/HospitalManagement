@@ -81,6 +81,7 @@ public class AgreementSectionService extends MongoBaseService {
         policyAgreementTemplate.setSignatureHtml(agreementTemplateSectionDTO.getSignatureHtml());
         policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
         policyAgreementTemplate.setCoverPageData(agreementTemplateSectionDTO.getCoverPageData());
+        policyAgreementTemplate.setIncludeContentPage(agreementTemplateSectionDTO.isIncludeContentPage());
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return policyAgreementTemplateService.getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(referenceId, isUnitId, templateId);
     }
@@ -285,7 +286,7 @@ public class AgreementSectionService extends MongoBaseService {
         Map<AgreementSection, List<Clause>> clauseListCorrespondingToAgreementSection = new HashMap<>();
         Map<AgreementSection, List<ClauseBasicDTO>> exisitingClauseListCorrespondingToAgreementSections = new HashMap<>();
         Set<BigInteger> alteredClauseIdList = new HashSet<>();
-        ClauseTag defaultTag = isUnitId ? clauseTagMongoRepository.findDefaultTagByUnitId(referenceId) : clauseTagMongoRepository.findDefaultTagByCountryId(referenceId);
+        ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTag();
         agreementTemplate.setDefaultClauseTag(defaultTag);
         globalAgreementSectionAndClauseDTOListHashMap.forEach((agreementSection, clauseBasicDTOList) -> {
             List<ClauseBasicDTO> existingClauseList = new ArrayList<>();

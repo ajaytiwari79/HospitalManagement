@@ -8,7 +8,6 @@ import com.graphhopper.directions.api.client.model.*;
 import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.commonUtil.StaticField;
 import com.planner.domain.location.PlanningLocation;
-import com.planner.responseDto.locationDto.OptaLocationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

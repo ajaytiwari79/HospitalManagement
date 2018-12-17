@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.dto.activity.activity.activity_tabs.ActivitySkill;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

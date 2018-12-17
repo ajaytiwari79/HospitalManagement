@@ -239,8 +239,8 @@ public class ActivityUtil {
         List<String> invalidActivities=new ArrayList<>();
         activities.forEach(activity -> {
             if(activity.getRulesActivityTab().isBreakAllowed()!=breakAllowed
-                    && activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.PAID_BREAK)
-                    && activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.UNPAID_BREAK)){
+                    && TimeTypeEnum.PAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())
+                    && TimeTypeEnum.UNPAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())){
                 invalidActivities.add(activity.getName());
             }
         });
