@@ -649,6 +649,10 @@ public  class DateUtils {
         return (date == null) ? null : date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    public static Long getLongFromLocalDateimeTime(LocalDateTime date) {
+        return (date == null) ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
     public static LocalDate getDateFromEpoch(Long dateLong) {
         LocalDate date = null;
         if (Optional.ofNullable(dateLong).isPresent()) {
@@ -799,5 +803,17 @@ public  class DateUtils {
     public static int getMinutesFromDate(Date date) {
 
         return asZoneDateTime(date).getMinute();
+    }
+
+    public static LocalDate getStartDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    public static LocalDate getEndDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+    }
+
+    public static Long getHoursFromTotalMilliSeconds(long TotalMilliSeconds){
+        return TotalMilliSeconds/(60*60*1000);
     }
 }
