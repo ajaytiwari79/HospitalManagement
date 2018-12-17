@@ -6,6 +6,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +50,7 @@ public class ShiftActivityDTO {
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
     private int timeBankCtaBonusHour;
-    private List<TimeBankCTADistributionDTO> timeBankCTADistributions;
+    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
 
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
