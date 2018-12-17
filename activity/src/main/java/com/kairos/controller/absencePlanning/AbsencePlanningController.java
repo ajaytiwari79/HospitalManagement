@@ -1,8 +1,8 @@
 package com.kairos.controller.absencePlanning;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.service.absencePlanning.AbsencePlanningService;
-import com.kairos.service.mail.MailService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

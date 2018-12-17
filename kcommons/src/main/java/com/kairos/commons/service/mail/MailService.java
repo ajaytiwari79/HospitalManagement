@@ -1,22 +1,28 @@
-package com.kairos.service.mail;
+package com.kairos.commons.service.mail;
+
+import com.kairos.constants.AppConstants;
+import com.sendgrid.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.inject.Inject;
-import javax.mail.*;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
+
+//import javax.validation.constraints.Email;
 
 
 /**
@@ -31,8 +37,6 @@ public class MailService {
     @Inject
     JavaMailSender javaMailSender;
 
-    @Inject
-    private TemplateEngine templateEngine;
 
 
 
@@ -49,16 +53,33 @@ public class MailService {
             helper.setText(body);
             javaMailSender.send(mimeMessage);
             logger.info("Email sent");
-        } catch (MessagingException e) {
-            logger.info("exception occured {}",e);
-            return false;
-        }
-        catch (Exception e){
+        } catch (Exception e){
             logger.info("exception occured {}",e);
             return false;
         }
         return false;
     }
+
+    public void sendPlainMailWithSendGrid(String receiver, String body, String subject,String sendGridApiKey) {
+       Email from=new Email("no-reply@kairosplanning.com");
+       Email to=new Email(receiver);
+       Content content=new Content("text/plain",body);
+       Mail mail=new Mail(from,subject,to,content);
+       SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            sg.api(request);
+            logger.info("Email sent");
+        } catch (IOException ex) {
+            logger.error("exception occured {}",ex);
+        }
+
+
+    }
+
 
     public boolean sendMailWithAttachment(String[] recipients, String message, String subject, File filePath) {
         DataSource source = new FileDataSource(filePath);
@@ -89,12 +110,7 @@ public class MailService {
             return true;
 
 
-            } catch (MessagingException e) {
-            logger.info("exception occured {}",e);
-            return false;
-            }
-
-            catch (Exception e) {
+            } catch (Exception e) {
              logger.info("exception occured {}",e);
              return false;
             }
@@ -123,7 +139,7 @@ public class MailService {
                 part.setDataHandler(new DataHandler(fileDataSource));
                 part.setFileName(fileDataSource.getName());
                 multipart.addBodyPart(part);
-            } catch (MessagingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -141,34 +157,36 @@ public class MailService {
             return true;
 
 
-        } catch (MessagingException e) {
-            logger.info("exception occured {}",e);
-            return false;
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.info("exception occured {}",e);
             return false;
         }
 
     }
 
-    /**
-     * send email using template {thymleaf}
-     * @param ctx
-     * @param templateName
-     * @param emailTo
-     * @param subj
-     * @throws MessagingException
-     */
-    public void sendEmail(final Context ctx, final String templateName, final String emailTo,
-                          final String subj) throws MessagingException{
-        final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-        message.setTo(emailTo);
-        message.setSubject(subj);
-        final String htmlContent = templateEngine.process(templateName, ctx);
-        message.setText(htmlContent, true);
-        javaMailSender.send(mimeMessage);
-    }
+//    /**
+//     * send email using template {thymleaf}
+//     * @param ctx
+//     * @param templateName
+//     * @param emailTo
+//     * @param subj
+//     * @throws MessagingException
+//     */
+//    public void sendEmail(final Context ctx, final String templateName, final String emailTo,
+//                          final String subj) throws MessagingException{
+//        final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+//        try {
+//            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+//            message.setTo(emailTo);
+//            message.setSubject(subj);
+//            final String htmlContent = templateEngine.process(templateName, ctx);
+//            message.setText(htmlContent, true);
+//            javaMailSender.send(mimeMessage);
+//        }catch (Exception e)
+//        {
+//            logger.info("exception occured {}",e);
+//        }
+//    }
+
+
 }

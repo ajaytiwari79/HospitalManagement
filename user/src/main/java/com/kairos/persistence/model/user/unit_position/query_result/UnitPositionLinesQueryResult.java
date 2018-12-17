@@ -33,7 +33,7 @@ public class UnitPositionLinesQueryResult {
         //DC
     }
 
-    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel) {
+    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel,Long unitPositionId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -46,6 +46,7 @@ public class UnitPositionLinesQueryResult {
         this.hourlyCost = hourlyCost;
         this.employmentType = employmentType;
         this.seniorityLevel = seniorityLevel;
+        this.unitPositionId=unitPositionId;
     }
 
     public Long getId() {

@@ -1,8 +1,10 @@
 package com.kairos.service.open_shift;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
@@ -19,7 +21,6 @@ import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRe
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.mail.MailService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;
@@ -263,7 +264,7 @@ public class OpenShiftService extends MongoBaseService {
                     openShift.getAssignedStaff().contains(unitPositionDetail.getStaffId()) ) {
                 return;
             }
-            ShiftActivity shiftActivity = new ShiftActivity("",openShift.getStartDate(),openShift.getEndDate(),openShift.getActivityId());
+            ShiftActivityDTO shiftActivity = new ShiftActivityDTO("",openShift.getStartDate(),openShift.getEndDate(),openShift.getActivityId());
             ShiftDTO shiftDTO = new ShiftDTO(Arrays.asList(shiftActivity), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId());
             shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
             shiftDTO.setParentOpenShiftId(openShift.getId());

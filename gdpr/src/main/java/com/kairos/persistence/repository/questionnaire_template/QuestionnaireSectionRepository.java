@@ -19,8 +19,8 @@ public interface QuestionnaireSectionRepository extends MongoBaseRepository<Ques
     @Query("{countryId:?0,_id:?1,deleted:false}")
     QuestionnaireSection findByCountryIdAndId(Long countryId, BigInteger id);
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
-    QuestionnaireSection findByUnitIdAndId(Long unitId, BigInteger id);
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    QuestionnaireSection findQuestionnaireSectionByUnitIdAndId(Long unitId, BigInteger questionnaireSectionId);
 
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
     List<QuestionnaireSection> findSectionByCountryIdAndIds(Long countryId, Set<BigInteger> ids);

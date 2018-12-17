@@ -36,6 +36,7 @@ public class StaffUnitPositionDetails {
     private CTAResponseDTO costTimeAgreement;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private Long staffId;
+    private Long userId;
     private Long countryId;
     // TODO MOVING THIS INSIDE SO THAT WE CAN REMOVE THE UPPER LEVEL WRAPPER
     private List<DayOfWeek> activityDayTypes;
@@ -183,5 +184,13 @@ public class StaffUnitPositionDetails {
 
     public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
         this.positionLines = positionLines;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

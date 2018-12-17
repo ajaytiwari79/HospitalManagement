@@ -74,7 +74,7 @@ public class CounterDataService {
     @Inject
     private TimeBankRepository timeBankRepository;
 
-    //FIXME: will be uncommented once representation model confirmed.
+    //FIXME: DO NOT REMOVE will be uncommented once representation model confirmed.
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
 //        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
 //        List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);

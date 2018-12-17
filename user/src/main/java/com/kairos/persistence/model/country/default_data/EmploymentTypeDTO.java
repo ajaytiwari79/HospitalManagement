@@ -27,7 +27,7 @@ public class EmploymentTypeDTO {
     //Added By Pavan
     private boolean editableAtUnitPosition;
     private Short weeklyMinutes;
-    private boolean mainEmployment;
+    private boolean markMainEmployment;
 
     public EmploymentTypeDTO() {
         //Default Constructor
@@ -113,12 +113,12 @@ public class EmploymentTypeDTO {
         this.weeklyMinutes = weeklyMinutes;
     }
 
-    public boolean isMainEmployment() {
-        return mainEmployment;
+    public boolean isMarkMainEmployment() {
+        return markMainEmployment;
     }
 
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
+    public void setMarkMainEmployment(boolean markMainEmployment) {
+        this.markMainEmployment = markMainEmployment;
     }
 
     @AssertTrue(message = "At least one role should be selected")

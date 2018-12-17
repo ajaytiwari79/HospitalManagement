@@ -112,5 +112,6 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
         AggregationResults<ActivityConfigurationDTO> result = mongoTemplate.aggregate(aggregation, ActivityConfiguration.class, ActivityConfigurationDTO.class);
         return result.getMappedResults();
     }
+
 }
 
