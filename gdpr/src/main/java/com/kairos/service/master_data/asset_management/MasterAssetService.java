@@ -82,7 +82,7 @@ public class MasterAssetService extends MongoBaseService {
         if (Optional.ofNullable(masterAssetDTO.getAssetType().getId()).isPresent()) {
 
             AssetType assetType = assetTypeMongoRepository.findOne(masterAssetDTO.getAssetType().getId());
-            masterAsset.setAssetSubTypeId(assetType.getId());
+            masterAsset.setAssetTypeId(assetType.getId());
             Optional.ofNullable(masterAssetDTO.getAssetSubType()).ifPresent(assetSubTypeBasicDTO -> {
                 if (assetSubTypeBasicDTO.getId() != null) {
                     masterAsset.setAssetSubTypeId(assetSubTypeBasicDTO.getId());
