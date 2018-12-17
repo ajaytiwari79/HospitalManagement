@@ -35,6 +35,7 @@ public class ShiftActivity {
     private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
+    private int timeBankCtaBonusHour;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private Long allowedBreakDurationInMinute;
 
@@ -66,6 +67,14 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
+
+    public int getTimeBankCtaBonusHour() {
+        return timeBankCtaBonusHour;
+    }
+
+    public void setTimeBankCtaBonusHour(int timeBankCtaBonusHour) {
+        this.timeBankCtaBonusHour = timeBankCtaBonusHour;
+    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
