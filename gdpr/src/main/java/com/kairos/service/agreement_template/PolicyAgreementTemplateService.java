@@ -233,6 +233,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             }
         });
         agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
+        agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
         agreementTemplateResponse.setSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
         agreementTemplateResponse.setCoverPageData(template.getCoverPageData());
