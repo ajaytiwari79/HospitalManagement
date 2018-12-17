@@ -38,6 +38,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -58,6 +59,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.ONE_DAY_MINUTES;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 
 /*
 * Created By Pradeep singh rajawat
@@ -386,6 +388,33 @@ public class TimeBankService extends MongoBaseService {
         shiftMongoRepository.save(shift);
     }
 
+    public boolean renewTimebankOfShifts() {
+        List<Shift> shifts = shiftMongoRepository.findAllByDeletedFalse();
+        Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = new HashMap<>();
+        List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());
+        for (Shift shift : shifts) {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
+            if(!staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId())){
+               try {
+                   staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId(), new HashSet<>());
+                   CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
+                   staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+                   shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+                   staffAdditionalInfoDTOMap.put(staffAdditionalInfoDTO.getUnitPosition().getId(),staffAdditionalInfoDTO);
+               }catch (Exception e){
+                   logger.info("staff is not the part of this Unit");
+               }
+            }
+            if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId()) && CollectionUtils.isNotEmpty(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()).getUnitPosition().getCtaRuleTemplates())) {
+                dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()), shift));
+
+            }
+        }
+        if (!dailyTimeBanks.isEmpty()) {
+            save(dailyTimeBanks);
+        }
+        return true;
+    }
 
 
 }
