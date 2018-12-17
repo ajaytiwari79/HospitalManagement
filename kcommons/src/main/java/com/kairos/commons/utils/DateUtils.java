@@ -800,4 +800,13 @@ public  class DateUtils {
 
         return asZoneDateTime(date).getMinute();
     }
+
+    public static LocalDate getStartDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    public static LocalDate getEndDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+    }
+
 }
