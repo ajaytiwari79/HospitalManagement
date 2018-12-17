@@ -16,7 +16,6 @@ public class UserContextFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        logger.info("I am entering the gdpr service id with auth token: {}", httpServletRequest.getHeader("Authorization"));
         UserContext.setCorrelationId(  httpServletRequest.getHeader(UserContext.CORRELATION_ID) );
         UserContext.setUserId( httpServletRequest.getHeader(UserContext.USER_ID) );
         UserContext.setAuthToken( httpServletRequest.getHeader(UserContext.AUTH_TOKEN) );
