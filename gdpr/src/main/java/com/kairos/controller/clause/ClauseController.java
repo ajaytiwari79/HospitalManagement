@@ -109,7 +109,7 @@ public class ClauseController {
     }
 
     @ApiOperation("get  clause metadata of unit")
-    @GetMapping(UNIT_URL + "/clause")
+    @GetMapping(UNIT_URL + "/clause/meta_data")
     public ResponseEntity<Object> getClauseMetadataByOrganizationId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseMetadataByOrganizationId(unitId));
     }
