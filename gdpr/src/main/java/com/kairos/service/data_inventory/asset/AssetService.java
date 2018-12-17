@@ -2,6 +2,7 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
+import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.risk_management.Risk;
@@ -332,7 +333,6 @@ public class AssetService extends MongoBaseService {
      *
      * @return
      */
-    //TODO risk level fetch
     public Map<String, Object> getAssetMetaData(Long unitId){
         Map<String, Object> assetMetaDataMap=new HashMap<>();
         assetMetaDataMap.put("hostingTypeList",hostingTypeService.getAllHostingType(unitId));
@@ -342,6 +342,7 @@ public class AssetService extends MongoBaseService {
         assetMetaDataMap.put("technicalSecurityMeasureList",technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
         assetMetaDataMap.put("organizationalSecurityMeasureList",organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
         assetMetaDataMap.put("organizationAssetTypeList",organizationAssetTypeService.getAllAssetType(unitId));
+        assetMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return assetMetaDataMap;
 
     }

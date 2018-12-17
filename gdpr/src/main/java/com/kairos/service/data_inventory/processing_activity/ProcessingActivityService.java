@@ -4,6 +4,7 @@ package com.kairos.service.data_inventory.processing_activity;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
+import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
@@ -589,6 +590,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMetaDataMap.put("transferMethodList",transferMethodService.getAllTransferMethod(unitId));
         processingActivityMetaDataMap.put("accessorPartyList", accessorPartyService.getAllAccessorParty(unitId));
         processingActivityMetaDataMap.put("processingLegalBasisList",processingLegalBasisService.getAllProcessingLegalBasis(unitId));
+        processingActivityMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return processingActivityMetaDataMap;
 
     }
