@@ -113,5 +113,11 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAssetAndSuggestToCountryAdmin(unitId, countryId, assetDTO));
     }
 
+    @ApiOperation(value = "Get Asset Metadata")
+    @GetMapping("/asset/meta_data")
+    public ResponseEntity<Object> getAssetMetaData(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetMetaData(unitId));
+    }
+
 
 }

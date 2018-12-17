@@ -184,5 +184,11 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.saveProcessingActivityAndSuggestToCountryAdmin(unitId, countryId, processingActivityDTO));
     }
 
+    @ApiOperation(value = "Get  Processing activity Metadata")
+    @GetMapping("/processing_activity/meta_data")
+    public ResponseEntity<Object> getProcessingActivityMetaData(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityMetaData(unitId));
+    }
+
 
 }
