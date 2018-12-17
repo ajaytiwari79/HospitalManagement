@@ -43,12 +43,14 @@ public class ShiftDetailsService extends MongoBaseService {
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
-        setReasonCodeAndRuleVoilationsInShifts(shiftWithActivityDTOS, unitId, shiftIds);
+        setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds);
         return shiftWithActivityDTOS;
     }
-
-    private void setReasonCodeAndRuleVoilationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds) {
-
+    public boolean updateRemarkInShiftActivity(BigInteger shiftActivityId,ShiftActivityDTO shiftActivityDTO){
+        shiftMongoRepository.updateRemarkInShiftActivity(shiftActivityId,shiftActivityDTO.getRemarks());
+        return true;
+    }
+    private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds) {
         ReasonCodeWrapper reasonCodeWrapper = findReasonCodes(shiftWithActivityDTOS, unitId);
         Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = findAllWTAViolatedRules(shiftIds);
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeWrapper.getReasonCodes().stream().collect(Collectors.toMap(ReasonCodeDTO::getId, Function.identity()));

@@ -272,6 +272,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'unitPositionId' : 1,\n" +
                 "\t'status':1,\n" +
                 "\t'activities.bid' : 1,\n" +
+                "\t'activities._id' : 1,\n" +
                 "        'activities.pId' : 1,\n" +
                 "        'activities.activityId' : 1,\n" +
                 "        'activities.startDate' : 1,\n" +
@@ -369,6 +370,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
+    @Override
+    public void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark){
+        Update update = new Update().set("activities.$.remarks", remark);
+        update.set("updatedAt", DateUtils.getDate());
+        mongoTemplate.findAndModify(new Query(new Criteria("activities.id").is(shiftActivityId)),update,Shift.class);
+    }
 
 
 }

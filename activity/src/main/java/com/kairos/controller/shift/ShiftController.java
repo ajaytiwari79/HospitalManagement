@@ -1,14 +1,11 @@
 package com.kairos.controller.shift;
 
-import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
-import com.kairos.dto.activity.shift.CopyShiftDTO;
-import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -215,5 +212,14 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> shiftDetailsById(@PathVariable Long unitId,@RequestBody List<BigInteger> shiftIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.shiftDetailsById(unitId,shiftIds));
+    }
+
+
+
+    @ApiOperation("get a Shift detail by id")
+    @PutMapping(value = "/shiftActivity/{shiftActivityId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger shiftActivityId,@RequestBody ShiftActivityDTO shiftActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.updateRemarkInShiftActivity(shiftActivityId,shiftActivityDTO));
     }
 }
