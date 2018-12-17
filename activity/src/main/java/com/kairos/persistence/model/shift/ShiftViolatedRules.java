@@ -1,4 +1,4 @@
-package com.kairos.service.shift;
+package com.kairos.persistence.model.shift;
 
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
