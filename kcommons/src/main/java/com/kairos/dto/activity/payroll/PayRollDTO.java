@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Set;
 
 public class PayRollDTO {
@@ -15,7 +16,7 @@ public class PayRollDTO {
     private String name;
     private int code;
     private boolean active;
-    private Set<Long> countryIds;
+    private Set<Long> countryIds=new HashSet<>();
     private boolean applicableForCountry;
 
     public PayRollDTO() {

@@ -7,13 +7,14 @@ package com.kairos.persistence.model.payroll;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Set;
 
 public class PayRoll extends MongoBaseEntity {
     private String name;
     private int code;
     private boolean active;
-    private Set<Long> countryIds;
+    private Set<Long> countryIds=new HashSet<>();
 
     public PayRoll() {
         //Default Constructor

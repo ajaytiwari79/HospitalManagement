@@ -20,7 +20,7 @@ public interface PayRollRepository extends MongoBaseRepository<PayRoll,BigIntege
 
     List<PayRollDTO> findAllByDeletedFalse();
 
-    List<PayRoll> findAllByIdsInAndDeletedFalse(Set<BigInteger> payRollIds);
+    List<PayRoll> findAllByDeletedFalseAndIdIn(Set<BigInteger> payRollIds);
 
     List<PayRollDTO> findByCountryIdsInAndDeletedFalse(Long countryId);
 

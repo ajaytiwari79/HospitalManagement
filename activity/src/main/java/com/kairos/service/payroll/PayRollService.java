@@ -66,7 +66,7 @@ public class PayRollService extends MongoBaseService {
     }
 
     public List<PayRollDTO> linkPayRollWithCountry(Long countryId, Set<BigInteger> payRollIds,String action){
-        List<PayRoll> payRolls=payRollRepository.findAllByIdsInAndDeletedFalse(payRollIds);
+        List<PayRoll> payRolls=payRollRepository.findAllByDeletedFalseAndIdIn(payRollIds);
         if(CollectionUtils.isNotEmpty(payRolls)){
             payRolls.forEach(payRoll -> {
                 if(LINK.equals(action))payRoll.getCountryIds().add(countryId);
