@@ -126,9 +126,9 @@ public class TimeBankService extends MongoBaseService {
     }
 
     public void saveTimeBanksAndPayOut(List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, List<Shift> shifts, Map<BigInteger, ActivityWrapper> activityWrapperMap,Date startDate,Date endDate) {
-        Date startDateTime = DateUtils.onlyDate(startDate);
-        Date endDateTime = DateUtils.onlyDate(endDate);
-        Date shiftEndTime=DateUtils.onlyDate(shifts.get(shifts.size()-1).getEndDate());
+        Date startDateTime = new DateTime(startDate).withTimeAtStartOfDay().toDate();
+        Date endDateTime = new DateTime(endDate).plusDays(1).withTimeAtStartOfDay().toDate();
+        Date shiftEndTime=new DateTime(shifts.get(shifts.size()-1).getEndDate()).plusDays(1).withTimeAtStartOfDay().toDate();
         List<Long> unitPositionIds = new ArrayList<>(staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO  -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toSet()));
       //  List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByIdsAndBetweenDates(unitPositionIds, startDate.toDate(), endDate.toDate());
        // Map<String,DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getUnitPositionId()+""+k.getDate(),v->v));
