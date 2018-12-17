@@ -809,4 +809,11 @@ public  class DateUtils {
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
+    public static Long getHoursFromTotalMilliSeconds(long totalMinutes){
+        return totalMinutes/(60*60*1000);
+    }
+
+    public static Double getHoursFromTotalMinutes(double totalMinutes){
+        return totalMinutes/(60);
+    }
 }
