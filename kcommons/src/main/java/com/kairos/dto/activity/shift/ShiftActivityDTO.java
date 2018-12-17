@@ -6,6 +6,7 @@ import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,8 +47,8 @@ public class ShiftActivityDTO {
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
-
-
+    private Map<String, Object> location;// location where this activity needs to perform
+    private String description;// this is from activity description and used in shift detail popup
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
@@ -260,5 +261,21 @@ public class ShiftActivityDTO {
 
     public void setBreakReplaced(boolean breakReplaced) {
         this.breakReplaced = breakReplaced;
+    }
+
+    public Map<String, Object> getLocation() {
+        return location;
+    }
+
+    public void setLocation(Map<String, Object> location) {
+        this.location = location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

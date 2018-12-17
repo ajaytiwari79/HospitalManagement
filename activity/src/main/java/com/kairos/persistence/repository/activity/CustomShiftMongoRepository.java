@@ -54,6 +54,7 @@ public interface CustomShiftMongoRepository {
     List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId);
 
     List<ShiftResponseDTO> findShiftsBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds);
 
 
 }

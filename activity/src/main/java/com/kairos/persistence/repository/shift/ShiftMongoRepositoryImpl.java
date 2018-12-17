@@ -237,18 +237,17 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.remove(query,Shift.class);
     }
 
-    //@Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByStaffUserId(Long staffUserId, Date startDate, Date endDate) {
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("staffUserId").is(staffUserId).and("disabled").is(false)
-                        .and("startDate").lte(endDate).and("endDate").gte(startDate)),
+                match(Criteria.where("deleted").is(false).and("id").in(shiftIds)),
                 unwind("activities", true),
-                lookup("activities", "activities.activityId", "_id", "activities.activity"),
-                lookup("activities", "activityId", "_id", "activity"),
+                lookup("activities", "activities.activityId", "_id", "activityObject"),
                 new CustomAggregationOperation(shiftWithActivityProjection()),
-                new CustomAggregationOperation(shiftWithActivityGroup()),
-                new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift()));
+               new CustomAggregationOperation(shiftWithActivityGroup())
+                //new CustomAggregationOperation(anotherShiftWithActivityProjection()),
+                //new CustomAggregationOperation(replaceRootForShift())
+                );
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
@@ -260,17 +259,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public static Document shiftWithActivityProjection(){
         String project = "{  \n" +
                 "      '$project':{  \n" +
-                "         '_id' : 1,\n" +
+                "     '_id' : 1,\n" +
                 "    'name' : 1,\n" +
                 "    'startDate' : 1,\n" +
                 "    'endDate' : 1,\n" +
-                "    'disabled' : 1,\n" +
-                "    'bid' :1,\n" +
-                "    'pId' : 1,\n" +
-                "    'bonusTimeBank' : 1,\n" +
-                "    'amount' : 1,\n" +
-                "    'probability' : 1,\n" +
-                "    'accumulatedTimeBankInMinutes' : 1,\n" +
                 "    'remarks' : 1,\n" +
                 "    'staffId' : 1,\n" +
                 "    'unitId' : 1,\n" +
@@ -287,11 +279,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.scheduledMinutes' : 1,\n" +
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.plannedTimeId' : 1,\n" +
+                "        'activities.absenceReasonCodeId' : 1,\n" +
+                "        'activities.reasonCodeId' : 1,\n" +
                 "        'activities.remarks' : 1,\n" +
                 "        'activities.activityName':1,\n" +
-                "'activities.activity':{  \n" +
+                "        'activities.description':{  \n" +
                 "            '$arrayElemAt':[  \n" +
-                "               '$activities.activity',\n" +
+                "               '$activityObject.description',\n" +
                 "               0\n" +
                 "            ]\n" +
                 "         }\n" +

@@ -2,11 +2,13 @@ package com.kairos.dto.user.reason_code;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public class ReasonCodeWrapper {
 
     private List<ReasonCodeDTO> reasonCodes;
     private UserAccessRoleDTO userAccessRoleDTO;
+    private Map<String, Object> contactAddressData;
 
     public ReasonCodeWrapper() {
 
@@ -15,6 +17,12 @@ public class ReasonCodeWrapper {
         this.reasonCodes = reasonCodes;
         this.userAccessRoleDTO = userAccessRoleDTO;
     }
+
+    public ReasonCodeWrapper(List<ReasonCodeDTO> reasonCodes, Map<String, Object> contactAddressData) {
+        this.reasonCodes = reasonCodes;
+        this.contactAddressData = contactAddressData;
+    }
+
     public List<ReasonCodeDTO> getReasonCodes() {
         return reasonCodes;
     }
@@ -31,5 +39,11 @@ public class ReasonCodeWrapper {
         this.userAccessRoleDTO = userAccessRoleDTO;
     }
 
+    public Map<String, Object> getContactAddressData() {
+        return contactAddressData;
+    }
 
+    public void setContactAddressData(Map<String, Object> contactAddressData) {
+        this.contactAddressData = contactAddressData;
+    }
 }

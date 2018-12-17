@@ -56,9 +56,7 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.common.protocol.types.Field;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -522,7 +520,7 @@ public class ShiftValidatorService {
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
                 DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1)));
-                if (CollectionUtils.containsAny(shift.getActivitIds(), activitieIds) && interval.contains(shift.getStartDate())) {
+                if (CollectionUtils.containsAny(shift.getActivitiesIds(), activitieIds) && interval.contains(shift.getStartDate())) {
                     updatedShifts.add(shift);
                 }
             }
@@ -592,7 +590,7 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> filterShiftsByActivityIds(List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(activitieIds) && CollectionUtils.containsAny(activitieIds, shift.getActivitIds()));
+            boolean isValidShift = (CollectionUtils.isNotEmpty(activitieIds) && CollectionUtils.containsAny(activitieIds, shift.getActivitiesIds()));
             if (isValidShift) {
                 shiftQueryResultWithActivities.add(shift);
             }
