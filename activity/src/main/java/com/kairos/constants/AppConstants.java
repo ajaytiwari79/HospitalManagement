@@ -198,6 +198,8 @@ public class AppConstants {
     public static final String WORKING_TYPE_COLOR = "#c5f7c7";
     public static final String NON_WORKING_TYPE_COLOR = "#f7c5e7";
     public static final String IS_BROKEN = " is broken";
+    public static final String LINK="LINK";
+    public static final String UNLINK="UNLINK";
 
 
 }
