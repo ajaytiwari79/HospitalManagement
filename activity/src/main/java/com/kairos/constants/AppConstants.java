@@ -201,6 +201,10 @@ public class AppConstants {
     public static final long ONE_HOUR_MINUTES=60;
     public static final long SHIFT_LEAST_GRANULARITY =15;
 
+    //KPI
+    public static final String XAXIS="label";
+    public static final String YAXIS="value";
+
 
 
 }
