@@ -71,7 +71,4 @@ public class PayRollController {
     public ResponseEntity<Map<String,Object>> getAllPayRollOfCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getAllPayRollOfCountry(countryId));
     }
-
-
-
 }

@@ -27,7 +27,5 @@ public interface PayRollRepository extends MongoBaseRepository<PayRoll,BigIntege
     @Query("{deleted:false,_id:{$ne:?0},$or:[{name:{$regex:?1,$options:'i'},code:?2}]}")
     PayRoll getByDeletedFalseAndIdNotOrNameIgnoreCaseAndCode(BigInteger id, String name, int code);
 
-
     PayRoll getByIdAndDeletedFalse(BigInteger id);
-
 }
