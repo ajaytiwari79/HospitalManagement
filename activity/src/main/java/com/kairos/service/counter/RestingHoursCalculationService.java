@@ -60,10 +60,8 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
         staffIds.forEach(staffId -> {
             if(staffId != null) {
-                if(staffShiftMapping.get(staffId)!=null) {
-                    Double restingHours = getTotalRestingHours(staffShiftMapping.get(staffId), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate.plusDays(1)), false);
+                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate.plusDays(1)), false);
                     staffRestingHours.put(staffId, restingHours);
-                }
             }
         });
         return staffRestingHours;
