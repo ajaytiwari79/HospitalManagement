@@ -5,7 +5,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -51,6 +51,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -978,7 +979,7 @@ public class StaffingLevelService extends MongoBaseService {
         return staffingLevel;
     }
 
-    private int getLowerIndex(Date startDate) {
+    public int getLowerIndex(Date startDate) {
 
         int lowerLimit = DateUtils.getHourFromDate(startDate) * 4;
         int minutes = DateUtils.getMinutesFromDate(startDate);
@@ -998,7 +999,7 @@ public class StaffingLevelService extends MongoBaseService {
         return lowerLimit+minuteOffset;
     }
 
-    private int getUpperIndex(Date endDate) {
+    public int getUpperIndex(Date endDate) {
         int upperLimit = DateUtils.getHourFromDate(endDate) * 4;
         int minutes = DateUtils.getMinutesFromDate(endDate);
         int minuteOffset = 0;

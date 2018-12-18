@@ -39,6 +39,48 @@ public class UnitPositionQueryResult {
     private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
+    private boolean markMainEmployment;
+    private boolean mainUnitPosition;
+    private String unitName;
+
+    public UnitPositionQueryResult() {
+        //Default Constructor
+    }
+
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Boolean published,Long parentUnitId) {
+        this.expertise = expertise;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastWorkingDate = lastWorkingDate;
+        this.id = id;
+        this.positionCode = positionCode;
+        this.union = union;
+        this.workingTimeAgreement=wta;
+        this.unitId=unitId;
+        this.published=published;
+        this.parentUnitId=parentUnitId;
+
+    }
+
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
+                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines) {
+        this.expertise = expertise;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastWorkingDate = lastWorkingDate;
+        this.id = id;
+        this.positionCode = positionCode;
+        this.union = union;
+        this.workingTimeAgreement=wta;
+        this.unitId=unitId;
+        this.parentUnitId=parentUnitId;
+        this.published=published;
+        this.reasonCode=reasonCode;
+        this.unitInfo=unitInfo;
+        this.mainUnitPosition=mainUnitPosition;
+        this.positionLines=positionLines;
+
+    }
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -190,11 +232,6 @@ public class UnitPositionQueryResult {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
-
-    public UnitPositionQueryResult() {
-        //default cons
-    }
-
     public Long getStaffId() {
         return staffId;
     }
@@ -203,16 +240,27 @@ public class UnitPositionQueryResult {
         this.staffId = staffId;
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta) {
-        this.expertise = expertise;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.lastWorkingDate = lastWorkingDate;
-        this.id = id;
-        this.positionCode = positionCode;
-        this.union = union;
-        this.workingTimeAgreement=wta;
-
+    public boolean isMarkMainEmployment() {
+        return markMainEmployment;
     }
 
+    public void setMarkMainEmployment(boolean markMainEmployment) {
+        this.markMainEmployment = markMainEmployment;
+    }
+
+    public boolean isMainUnitPosition() {
+        return mainUnitPosition;
+    }
+
+    public void setMainUnitPosition(boolean mainUnitPosition) {
+        this.mainUnitPosition = mainUnitPosition;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
 }

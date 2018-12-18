@@ -31,13 +31,13 @@ public class EmploymentType extends UserBaseEntity {
     //Added By Pavan
     private boolean editableAtUnitPosition;
     private Short weeklyMinutes;
-    private boolean mainEmployment;
+    private boolean markMainEmployment;
 
     public EmploymentType() {
         //Default Constructor
     }
 
-    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtUnitPosition, boolean mainEmployment) {
+    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtUnitPosition, boolean markMainEmployment) {
         this.id=id;
         this.name = name;
         this.description = description;
@@ -47,7 +47,7 @@ public class EmploymentType extends UserBaseEntity {
         this.employmentCategories = employmentCategories;
         this.paymentFrequency = paymentFrequency;
         this.editableAtUnitPosition = editableAtUnitPosition;
-        this.mainEmployment = mainEmployment;
+        this.markMainEmployment = markMainEmployment;
     }
 
     public String getName() {
@@ -122,11 +122,11 @@ public class EmploymentType extends UserBaseEntity {
         this.weeklyMinutes = weeklyMinutes;
     }
 
-    public boolean isMainEmployment() {
-        return mainEmployment;
+    public boolean isMarkMainEmployment() {
+        return markMainEmployment;
     }
 
-    public void setMainEmployment(boolean mainEmployment) {
-        this.mainEmployment = mainEmployment;
+    public void setMarkMainEmployment(boolean markMainEmployment) {
+        this.markMainEmployment = markMainEmployment;
     }
 }

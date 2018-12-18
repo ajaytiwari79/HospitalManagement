@@ -10,7 +10,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -57,16 +56,16 @@ public class SpringMailConfig implements ApplicationContextAware, EnvironmentAwa
         return mailSender;
     }
 
-    @Bean
-    public ClassLoaderTemplateResolver emailTemplateResolver() {
-        ClassLoaderTemplateResolver emailTemplateResolver = new ClassLoaderTemplateResolver();
-        emailTemplateResolver.setPrefix("templates/mail/");
-        emailTemplateResolver.setSuffix(".html");
-        emailTemplateResolver.setTemplateMode("HTML5");
-        emailTemplateResolver.setCharacterEncoding(EMAIL_TEMPLATE_ENCODING);
-        emailTemplateResolver.setOrder(1);
-        return emailTemplateResolver;
-    }
+//    @Bean
+//    public ClassLoaderTemplateResolver emailTemplateResolver() {
+//        ClassLoaderTemplateResolver emailTemplateResolver = new ClassLoaderTemplateResolver();
+//        emailTemplateResolver.setPrefix("templates/mail/");
+//        emailTemplateResolver.setSuffix(".html");
+//        emailTemplateResolver.setTemplateMode("HTML5");
+//        emailTemplateResolver.setCharacterEncoding(EMAIL_TEMPLATE_ENCODING);
+//        emailTemplateResolver.setOrder(1);
+//        return emailTemplateResolver;
+//    }
 
 
 }

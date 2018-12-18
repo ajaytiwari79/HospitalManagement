@@ -23,6 +23,7 @@ public class PlanningPeriodDTO {
     private DurationType durationType;
     private int recurringNumber; // TODO HARISH rename
     private String currentPhase;
+    private BigInteger currentPhaseId;
     private String nextPhase;
     private FlippingDateDTO requestToPuzzleDate;
     private FlippingDateDTO puzzleToConstructionDate;
@@ -179,5 +180,12 @@ public class PlanningPeriodDTO {
         this.color = color;
     }
 
+    public BigInteger getCurrentPhaseId() {
+        return currentPhaseId;
+    }
+
+    public void setCurrentPhaseId(BigInteger currentPhaseId) {
+        this.currentPhaseId = currentPhaseId;
+    }
 }
 

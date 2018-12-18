@@ -48,14 +48,6 @@ public class MaxAllocationPerShift implements ConstraintHandler {
         List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
         ShiftPlanningUtility.sortActivityLineIntervals(alis);
         int allocatedActivityCount = 0;
-        /*for (int i=1;i<alis.size();i++){
-            if(alis.get(i-1).getActivity().equals(activity) && !alis.get(i).getActivity().equals(activity)){
-                allocatedActivityCount++;
-            }
-        }
-        if(alis.get(alis.size()-1).getActivity().equals(activity)){
-            allocatedActivityCount++;
-        }*/
         ActivityLineInterval prev=null;
         for(ActivityLineInterval ali:alis){
             if(ali.getActivity().equals(activity) && !ali.getActivity().equals(prev==null?null:prev.getActivity())){

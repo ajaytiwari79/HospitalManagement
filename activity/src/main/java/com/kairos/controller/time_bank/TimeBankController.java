@@ -90,5 +90,11 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.updateBlankTimebank(unitPositionWithCtaDetailsDTO));
     }*/
 
+    @ApiOperation("Renew Timebank of Shifts")
+    @PutMapping("/renew_timebank_shifts")
+    public ResponseEntity<Map<String,Object>> renewTimebankOfShifts(){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.renewTimebankOfShifts());
+    }
+
 
 }

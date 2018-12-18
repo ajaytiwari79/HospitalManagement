@@ -3,7 +3,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
@@ -260,7 +260,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
          Map<BigInteger,ShiftState> realtimeShiftStateMap=oldRealtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         ShiftState realtimeShiftState;
         for (Shift shift:shifts) {
-            if (realtimeShiftStateMap.get(shift.getId()) == null) {
+            if (realtimeShiftStateMap.get(shift.getId()) == null&&!DateUtils.asLocalDate(shift.getStartDate()).isAfter(DateUtils.getCurrentLocalDate())) {
                 realtimeShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
                 realtimeShiftState.setId(null);
                 realtimeShiftState.setShiftId(shift.getId());

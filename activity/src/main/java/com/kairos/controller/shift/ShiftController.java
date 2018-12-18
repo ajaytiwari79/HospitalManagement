@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,9 +67,9 @@ public class ShiftController {
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
                                                                  @RequestParam(value = "startDate", required = false)
-                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
                                                                  @RequestParam(value = "endDate", required = false)
-                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) throws ParseException {
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) throws ParseException {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }

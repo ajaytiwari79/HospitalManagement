@@ -1,10 +1,14 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,6 +18,14 @@ import java.util.Set;
 
 public class ShiftActivityDTO {
 
+    private Set<ShiftStatus> status;
+    private String message;
+    private boolean success;
+    //This field is only for validation
+    //@JsonIgnore
+    private ActivityDTO activity;
+
+
     private BigInteger activityId;
     private Date startDate;
     private Date endDate;
@@ -22,36 +34,35 @@ public class ShiftActivityDTO {
     private String activityName;
     private long bid;
     private long pId;
+    //used in T&A view
+    private Long reasonCodeId;
+    //used for adding absence type of activities.
+    private Long absenceReasonCodeId;
     private String remarks;
+    //please don't use this id for any functionality this only for frontend
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
+    private boolean haltBreak;
     private BigInteger plannedTimeId;
-    private Set<ShiftStatus> status;
-    private String message;
-    private boolean success;
-    private Long absenceReasonCodeId;
+    private boolean breakShift;
+    private boolean breakReplaced;
+    private ReasonCodeDTO reasonCode;
+    private Long allowedBreakDurationInMinute;
+    private int timeBankCtaBonusHour;
+    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
 
-    //This field is only for validation
-    //@JsonIgnore
-    private ActivityDTO activity;
 
-    public ShiftActivityDTO( String activityname,Date startDate, Date endDate,BigInteger activityId) {
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activityName = activityname;
+        this.activityName = activityName;
     }
 
-
-    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
-        this.activityName = activityName;
-        this.id = id;
+    public ShiftActivityDTO(String activityName, BigInteger activityId, String message, boolean success) {
         this.message = message;
         this.success = success;
-    }
-
-    public ShiftActivityDTO(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
     }
@@ -59,6 +70,18 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
+    public ShiftActivityDTO(BigInteger activityId, String activityName) {
+        this.activityId = activityId;
+        this.activityName = activityName;
+    }
+
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+    }
 
     public BigInteger getPlannedTimeId() {
         return plannedTimeId;
@@ -202,5 +225,61 @@ public class ShiftActivityDTO {
 
     public void setAbsenceReasonCodeId(Long absenceReasonCodeId) {
         this.absenceReasonCodeId = absenceReasonCodeId;
+    }
+
+    public ReasonCodeDTO getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(ReasonCodeDTO reasonCode) {
+        this.reasonCode = reasonCode;
+    }
+
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
+
+    public boolean isHaltBreak() {
+        return haltBreak;
+    }
+
+    public void setHaltBreak(boolean haltBreak) {
+        this.haltBreak = haltBreak;
+    }
+
+    public boolean isBreakShift() {
+        return breakShift;
+    }
+
+    public void setBreakShift(boolean breakShift) {
+        this.breakShift = breakShift;
+    }
+
+    public boolean isBreakReplaced() {
+        return breakReplaced;
+    }
+
+    public void setBreakReplaced(boolean breakReplaced) {
+        this.breakReplaced = breakReplaced;
+    }
+
+    public int getTimeBankCtaBonusHour() {
+        return timeBankCtaBonusHour;
+    }
+
+    public void setTimeBankCtaBonusHour(int timeBankCtaBonusHour) {
+        this.timeBankCtaBonusHour = timeBankCtaBonusHour;
+    }
+
+    public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
+        return timeBankCTADistributions;
+    }
+
+    public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
     }
 }

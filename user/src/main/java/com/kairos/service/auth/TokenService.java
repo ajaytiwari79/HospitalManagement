@@ -1,4 +1,5 @@
 package com.kairos.service.auth;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.slf4j.Logger;
@@ -39,6 +40,14 @@ public class TokenService {
         return token;
     }
 
+    public String createForgotPasswordToken(User user) {
+        String token;
+        token = UUID.randomUUID().toString().toUpperCase();
+        user.setForgotTokenRequestTime(DateUtils.getLocalDateTime());
+        user.setForgotPasswordToken(token);
+        userGraphRepository.save(user);
+        return token;
+    }
 
 
 
@@ -51,7 +60,6 @@ public class TokenService {
     public boolean validateToken(String token) {
         return userService.findByAccessToken(token) != null;
     }
-
 
 
 
@@ -69,8 +77,6 @@ public class TokenService {
     }
 
 
-
-
     /**
      * Find the user by token and returns user
      * @param token
@@ -79,5 +85,6 @@ public class TokenService {
     public User getUserByToken(String token){
         return userService.findByAccessToken(token);
     }
+
 
 }

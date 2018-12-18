@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
@@ -172,11 +173,11 @@ public class ShiftTemplateService extends MongoBaseService {
             newShiftDTO.setId(null);
             newShiftDTO.setStaffId(shiftDTO.getStaffId());
             newShiftDTO.setUnitPositionId(shiftDTO.getUnitPositionId());
-            List<ShiftActivity> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
+            List<ShiftActivityDTO> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
                 Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(),shiftTemplateActivity.getStartTime());
                 Date endDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getEndTime());
-                ShiftActivity shiftActivity = new ShiftActivity(shiftTemplateActivity.getActivityName(),startDate,endDate,shiftTemplateActivity.getActivityId());
+                ShiftActivityDTO shiftActivity = new ShiftActivityDTO(shiftTemplateActivity.getActivityName(),startDate,endDate,shiftTemplateActivity.getActivityId());
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);

@@ -147,7 +147,7 @@ public class QuestionService extends MongoBaseService {
 
 
     public boolean deleteQuestionOfQuestionnaireSectionOfUnit(Long unitId, BigInteger questionId, BigInteger sectionId) {
-        QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByUnitIdAndId(unitId, sectionId);
+        QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findQuestionnaireSectionByUnitIdAndId(unitId, sectionId);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Section", sectionId);
         }
