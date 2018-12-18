@@ -681,7 +681,7 @@ public class AccessGroupService {
 
         }
         Boolean isAccessGroupExistWithSameName;
-        if ("Organization".equals(accessGroupDTO.getOrganizationCategory().value)) {
+        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory().value)) {
             isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId, accessGroupDTO.getAccountTypeIds());
 
         }else{
@@ -691,10 +691,7 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        /*if (accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId)) {
-            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
-        }*/
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
             dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
