@@ -245,4 +245,8 @@ public class ShiftActivity {
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
+
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate,this.endDate);
+    }
 }
