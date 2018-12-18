@@ -348,8 +348,8 @@ public class CompanyCreationService {
                         //user.setEmail(unitManagerDTO.getEmail());
                     }
                     else{
-                        setEncryptedPasswordAndAge(unitManagerDTO, user);
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+                        setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
                 }
 
