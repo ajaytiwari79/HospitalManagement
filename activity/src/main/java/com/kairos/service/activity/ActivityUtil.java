@@ -29,23 +29,23 @@ import static com.kairos.constants.AppConstants.*;
 
 public class ActivityUtil {
 
-    private static LocationActivityTab initializeLocationActivityTab(GlideTimeSettingsDTO glideTimeSettingsDTO){
-        Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckIn =new HashSet<>();
-        ActivityGlideTimeDetails activityGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-        ActivityGlideTimeDetails activityGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-        ActivityGlideTimeDetails activityGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
-        ActivityGlideTimeDetails activityGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+    private static LocationActivityTab initializeLocationActivityTab(GlideTimeSettingsDTO glideTimeSettingsDTO) {
+        Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckIn = new HashSet<>();
+        ActivityGlideTimeDetails activityGlideTimeDetailsForHome = new ActivityGlideTimeDetails(LocationEnum.HOME, glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityGlideTimeDetailsForUnit = new ActivityGlideTimeDetails(LocationEnum.OFFICE, glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityGlideTimeDetailsForDepot = new ActivityGlideTimeDetails(LocationEnum.DEPOT, glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
+        ActivityGlideTimeDetails activityGlideTimeDetailsForOther = new ActivityGlideTimeDetails(LocationEnum.OTHERS, glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
         activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForHome);
         activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForUnit);
         activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForDepot);
         activityGlideTimeDetailsForCheckIn.add(activityGlideTimeDetailsForOther);
 
 
-        Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckOut =new HashSet<>();
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot =new ActivityGlideTimeDetails(LocationEnum.DEPOT,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
-        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther =new ActivityGlideTimeDetails(LocationEnum.OTHERS,glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckOut = new HashSet<>();
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForHome = new ActivityGlideTimeDetails(LocationEnum.HOME, glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForUnit = new ActivityGlideTimeDetails(LocationEnum.OFFICE, glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForDepot = new ActivityGlideTimeDetails(LocationEnum.DEPOT, glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
+        ActivityGlideTimeDetails activityCheckOutGlideTimeDetailsForOther = new ActivityGlideTimeDetails(LocationEnum.OTHERS, glideTimeSettingsDTO.getGlideTimeForCheckOut().getBefore(), glideTimeSettingsDTO.getGlideTimeForCheckOut().getAfter());
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForHome);
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForUnit);
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForDepot);
@@ -127,8 +127,8 @@ public class ActivityUtil {
         return phaseTemplateValues;
     }
 
-    public static Activity initializeTimeCareActivities(TimeCareActivity timeCareActivity,Long orgType,List<Long> orgSubTypes,Long countryId,GlideTimeSettingsDTO glideTimeSettingsDTO,List<PhaseDTO> phases,List<Activity> activitiesByExternalIds
-            ,ActivityCategory activityCategory,List<Skill> skills, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId){
+    public static Activity initializeTimeCareActivities(TimeCareActivity timeCareActivity, Long orgType, List<Long> orgSubTypes, Long countryId, GlideTimeSettingsDTO glideTimeSettingsDTO, List<PhaseDTO> phases, List<Activity> activitiesByExternalIds
+            , ActivityCategory activityCategory, List<Skill> skills, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
         Optional<Activity> result = activitiesByExternalIds.stream().filter(activityByExternalId -> timeCareActivity.getId().equals(activityByExternalId.getExternalId())).findFirst();
         Activity activity = result.orElseGet(Activity::new);
         activity.setCountryId(countryId);
@@ -195,10 +195,11 @@ public class ActivityUtil {
         }
         return activity;
     }
-    public  static void initializeActivityTabs(Activity activity,List<PhaseTemplateValue> phaseTemplateValues,GlideTimeSettingsDTO glideTimeSettingsDTO){
+
+    public static void initializeActivityTabs(Activity activity, List<PhaseTemplateValue> phaseTemplateValues, GlideTimeSettingsDTO glideTimeSettingsDTO) {
 
         RulesActivityTab rulesActivityTab = new RulesActivityTab();
-        PQLSettings pqlSettings=new PQLSettings();
+        PQLSettings pqlSettings = new PQLSettings();
         rulesActivityTab.setPqlSettings(pqlSettings);
         activity.setRulesActivityTab(rulesActivityTab);
 
@@ -217,7 +218,7 @@ public class ActivityUtil {
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
 
-        PhaseSettingsActivityTab phaseSettingsActivityTab=new PhaseSettingsActivityTab(phaseTemplateValues);
+        PhaseSettingsActivityTab phaseSettingsActivityTab = new PhaseSettingsActivityTab(phaseTemplateValues);
         activity.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
 
         activity.setPermissionsActivityTab(new PermissionsActivityTab());
@@ -232,15 +233,14 @@ public class ActivityUtil {
         activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
 
 
-
     }
 
-    public static List<String> verifyCompositeActivities(boolean breakAllowed, List<Activity> activities){
-        List<String> invalidActivities=new ArrayList<>();
+    public static List<String> verifyCompositeActivities(boolean breakAllowed, List<Activity> activities) {
+        List<String> invalidActivities = new ArrayList<>();
         activities.forEach(activity -> {
-            if(activity.getRulesActivityTab().isBreakAllowed()!=breakAllowed
-                    && TimeTypeEnum.PAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())
-                    && TimeTypeEnum.UNPAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())){
+            if (activity.getRulesActivityTab().isBreakAllowed() != breakAllowed
+                    && !TimeTypeEnum.PAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())
+                    && !TimeTypeEnum.UNPAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())) {
                 invalidActivities.add(activity.getName());
             }
         });
