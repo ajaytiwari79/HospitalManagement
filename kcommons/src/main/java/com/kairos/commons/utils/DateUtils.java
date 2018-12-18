@@ -813,7 +813,4 @@ public  class DateUtils {
         return totalMinutes/(60*60*1000);
     }
 
-    public static Double getHoursFromTotalMinutes(double totalMinutes){
-        return totalMinutes/(60);
-    }
 }

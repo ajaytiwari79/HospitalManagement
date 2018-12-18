@@ -67,7 +67,6 @@ public class PlannedHoursCalculationService implements CounterService {
         List<KpiDataUnit> kpiDataUnits=shiftMongoRepository.findShiftsByKpiFilters(staffDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(filterDates.get(1)));
         kpiDataUnits.forEach(kpiData->{
             kpiData.setLabel(staffIdAndNameMap.get(kpiData.getRefId()));
-            kpiData.setValue(DateUtils.getHoursFromTotalMinutes(kpiData.getValue()));
         });
         return kpiDataUnits;
     }
