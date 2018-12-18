@@ -101,6 +101,20 @@ public class ClauseController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
     }
 
+    @ApiOperation("Get Clause MetaData")
+    @GetMapping(COUNTRY_URL + "/clause/meta_data")
+    public ResponseEntity<Object> getClauseMetaDataByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseMetaDataByCountryId(countryId));
+
+    }
+
+    @ApiOperation("get  clause metadata of unit")
+    @GetMapping(UNIT_URL + "/clause/meta_data")
+    public ResponseEntity<Object> getClauseMetadataByOrganizationId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseMetadataByOrganizationId(unitId));
+    }
+
+
 
 
 }
