@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
@@ -51,8 +52,9 @@ public class ShiftDetailsServiceTest {
     @Test
     public void shiftDetailsById() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = "{'id':297,'name':null,'activities':[{'startDate':'2019-01-09T17:15:00.000+0000', 'endDate':'2019-01-09T23:00:00.000+0000','activityName':'Devops','reasonCodeId':4,'id':834,'location': 'description':null,'wtaRuleViolations':[" +
-                "{'ruleTemplateId':462,'name':'Maximum shift’s length','counter':3}]}],'startDate':'2019-01-09T17:15:00.000+0000'," +
+        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        String jsonString = "{'id':297,'name':null,'activities':[{'startDate':'2019-01-09T17:15:00.000+0000', 'endDate':'2019-01-09T23:00:00.000+0000','activityName':'Devops','reasonCodeId':4,'id':834,'description':null,'wtaRuleViolations':[" +
+                "{'ruleTemplateId':462,'name':'Maximum shift length','counter':3}]}],'startDate':'2019-01-09T17:15:00.000+0000'," +
                 "'endDate':'2019-01-09T23:00:00.000+0000'}";
         ShiftWithActivityDTO shiftWithActivityDTO = mapper.readValue(jsonString, ShiftWithActivityDTO.class);
 
