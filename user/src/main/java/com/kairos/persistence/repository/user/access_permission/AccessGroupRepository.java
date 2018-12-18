@@ -282,7 +282,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("MATCH(org:Organization) WHERE id(org) IN {0} MATCH(ag:AccessGroup) WHERE id(ag)={1} \n" +
      "MERGE(org)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag)")
-    void CREATEAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
+    void createAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(user)={3} WITH employment\n" +
