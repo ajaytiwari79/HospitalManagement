@@ -20,6 +20,18 @@ public class DayType {
     private boolean holidayType;
     private boolean allowTimeSettings;
 
+    public DayType(Long id, String name, List<Day> validDays, List<CountryHolidayCalender> countryHolidayCalenders, boolean holidayType, boolean allowTimeSettings) {
+        this.id = id;
+        this.name = name;
+        this.validDays = validDays;
+        this.countryHolidayCalenders = countryHolidayCalenders;
+        this.holidayType = holidayType;
+        this.allowTimeSettings = allowTimeSettings;
+    }
+
+    public DayType() {
+    }
+
     public Long getId() {
         return id;
     }

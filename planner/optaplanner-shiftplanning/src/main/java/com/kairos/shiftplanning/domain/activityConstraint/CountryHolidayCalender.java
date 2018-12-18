@@ -23,6 +23,15 @@ public class CountryHolidayCalender {
     private Long dayTypeId;
     private String colorCode;
 
+    public CountryHolidayCalender(LocalDate holidayDate, LocalTime startTime, LocalTime endTime) {
+        this.holidayDate = holidayDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public CountryHolidayCalender() {
+    }
+
     public Long getId() {
         return id;
     }
