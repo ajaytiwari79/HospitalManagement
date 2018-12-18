@@ -680,10 +680,21 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
 
         }
-        if (accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId)) {
+        Boolean isAccessGroupExistWithSameName;
+        if ("Organization".equals(accessGroupDTO.getOrganizationCategory().value)) {
+            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId, accessGroupDTO.getAccountTypeIds());
+
+        }else{
+            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId);
+        }
+        if (isAccessGroupExistWithSameName) {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
+        /*if (accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId)) {
+            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
+
+        }*/
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
             dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
