@@ -96,7 +96,7 @@ public class ClauseService extends MongoBaseService {
             }
             clause.setTags(clauseTags);
         } else {
-            clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags);
+            clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags,clauseDto.getTemplateTypes());
             if (isUnitId) {
                 clause.setOrganizationId(referenceId);
             } else {
