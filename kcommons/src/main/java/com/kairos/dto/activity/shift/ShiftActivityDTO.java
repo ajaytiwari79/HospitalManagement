@@ -1,10 +1,12 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,6 @@ public class ShiftActivityDTO {
     //This field is only for validation
     //@JsonIgnore
     private ActivityDTO activity;
-
-
     private BigInteger activityId;
     private Date startDate;
     private Date endDate;
@@ -48,9 +48,13 @@ public class ShiftActivityDTO {
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
+
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
+    private int timeBankCtaBonusMinutes;
+    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
+
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
@@ -265,6 +269,7 @@ public class ShiftActivityDTO {
         this.breakReplaced = breakReplaced;
     }
 
+
     public Map<String, Object> getLocation() {
         return location;
     }
@@ -287,5 +292,20 @@ public class ShiftActivityDTO {
 
     public void setWtaRuleViolations(List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
         this.wtaRuleViolations = wtaRuleViolations;
+    }
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
+
+    public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
+        return timeBankCTADistributions;
+    }
+
+    public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
     }
 }
