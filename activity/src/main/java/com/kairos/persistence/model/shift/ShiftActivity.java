@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
+
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
@@ -243,9 +244,5 @@ public class ShiftActivity {
 
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-    }
-
-    public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
     }
 }
