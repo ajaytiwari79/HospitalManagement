@@ -49,7 +49,7 @@ public class ShiftActivityDTO {
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
-    private int timeBankCtaBonusHour;
+    private int timeBankCtaBonusMinutes;
     private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
 
 
@@ -267,12 +267,12 @@ public class ShiftActivityDTO {
         this.breakReplaced = breakReplaced;
     }
 
-    public int getTimeBankCtaBonusHour() {
-        return timeBankCtaBonusHour;
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
     }
 
-    public void setTimeBankCtaBonusHour(int timeBankCtaBonusHour) {
-        this.timeBankCtaBonusHour = timeBankCtaBonusHour;
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
     }
 
     public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {

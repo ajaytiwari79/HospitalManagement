@@ -55,7 +55,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -149,7 +148,7 @@ public class TimeBankCalculationService {
                                     if (!ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                                         ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId() , 0)+ctaTimeBankMin);
                                         shiftActivity.getTimeBankCTADistributions().add(new TimeBankCTADistributionDTO(ruleTemplate.getName(),ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId() , 0),ruleTemplate.getId(),DateUtils.asLocalDate(shiftInterval.getStartMillis())));
-                                        shiftActivity.setTimeBankCtaBonusHour(shiftActivity.getTimeBankCtaBonusHour()+ctaTimeBankMin);
+                                        shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes()+ctaTimeBankMin);
                                     }
                                 }
 
