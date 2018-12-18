@@ -171,8 +171,8 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     public Map<Long, Map<PhaseDefaultName, BigInteger>> getMapOfPhaseIdsAndUnitByParentIds( List<Long> unitIds) {
-        List<PhaseDTO> unitPhases = phaseMongoRepository.findAllPhaseOfUnitsByParentPhase(unitIds);
-        Map<Long,List<PhaseDTO>> phasesOrganizationMap = unitPhases.stream().collect(Collectors.groupingBy(k->k.getOrganizationId(),Collectors.toList()));
+        List<Phase> unitPhases = phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(unitIds);
+        Map<Long,List<Phase>> phasesOrganizationMap = unitPhases.stream().collect(Collectors.groupingBy(k->k.getOrganizationId(),Collectors.toList()));
         Map<Long, Map<PhaseDefaultName, BigInteger>> organizationPhasesMapWithParentCountryPhaseId = new HashMap<>();
         phasesOrganizationMap.forEach((organisationId, phaseDTOS) -> {
             Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = phaseDTOS.stream().collect(Collectors.toMap(k->k.getPhaseEnum(),v->v.getId()));

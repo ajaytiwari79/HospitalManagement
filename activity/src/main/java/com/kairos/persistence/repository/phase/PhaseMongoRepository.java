@@ -51,9 +51,6 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
     List<PhaseDTO> findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(Long unitId);
 
     @Query(value = "{'deleted':false,'organizationId':{'$in':?0}}",fields = "{'phaseEnum':1,'_id':1,'organizationId':1}")
-    List<PhaseDTO> findAllPhaseOfUnitsByParentPhase(List<Long> unitIds);
-
-    @Query(value = "{'deleted':false,'organizationId':{'$in':?0}}",fields = "{'phaseEnum':1,'_id':1,'organizationId':1}")
     List<Phase> findAllByUnitIdsAndDeletedFalse(List<Long> unitIds);
 
     @Query(value = "{'deleted':false,'countryId':?0}",fields = "{'phaseEnum':1,'_id':1,'organizationId':1}")
