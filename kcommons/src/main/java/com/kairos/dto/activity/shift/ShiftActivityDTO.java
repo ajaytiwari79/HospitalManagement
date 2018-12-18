@@ -6,11 +6,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -302,7 +298,7 @@ public class ShiftActivityDTO {
     }
 
     public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
-        return timeBankCTADistributions;
+        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
     }
 
     public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {

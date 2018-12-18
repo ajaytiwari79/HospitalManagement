@@ -1324,6 +1324,14 @@ public class ShiftService extends MongoBaseService {
         return new ShiftDetailViewDTO(plannedShifts, updateRealTime, staffValidatedShifts, plannerValidatedShifts);
     }
 
+    public ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap){
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
+        shiftWithActivityDTO.getActivities().forEach(s -> {
+            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
+            s.setActivity(activityDTO);
+        });
+        return shiftWithActivityDTO;
+    }
 
     public CompactViewDTO getCompactViewDetails(Long unitId, Date shiftStartDate) {
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
