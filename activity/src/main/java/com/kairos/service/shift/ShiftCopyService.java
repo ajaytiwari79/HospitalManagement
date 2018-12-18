@@ -29,6 +29,7 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.ShiftValidatorService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
@@ -94,6 +95,9 @@ public class ShiftCopyService extends MongoBaseService {
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject
+    private PayOutService payOutService;
+
     private static final Logger logger = LoggerFactory.getLogger(ShiftCopyService.class);
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
@@ -194,6 +198,7 @@ public class ShiftCopyService extends MongoBaseService {
         if (!newShifts.isEmpty()) {
             save(newShifts);
            timeBankService.updateDailyTimeBankEntries(copyShiftDTO,newShifts,staffUnitPosition,planningPeriodMap,activityMap,dataWrapper.getDayTypes());
+            payOutService.savePayOuts(staffUnitPosition,newShifts ,null,activityMap,dataWrapper.getDayTypes());
 
         }
         return statusMap;

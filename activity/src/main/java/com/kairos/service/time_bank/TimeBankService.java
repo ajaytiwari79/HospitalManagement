@@ -167,7 +167,7 @@ public class TimeBankService extends MongoBaseService {
                 List<Shift> shiftList = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftWithActivityDTOS, Shift.class);
                 for (Shift shift : shiftList) {
                     PayOut payOut = shiftAndPayOutMap.getOrDefault(shift.getId(), new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), dateTimeInterval.getStartLocalDate(), shift.getUnitId()));
-                    payOut = payOutCalculationService.calculateAndUpdatePayOut(dateTimeInterval, unitPositionWithCtaDetailsDTO, shift, activityWrapperMap, payOut);
+                    payOut = payOutCalculationService.calculateAndUpdatePayOut(dateTimeInterval, unitPositionWithCtaDetailsDTO.getUnitPosition(), shift, activityWrapperMap, payOut,unitPositionWithCtaDetailsDTO.getDayTypes());
                     if (payOut.getTotalPayOutMin() > 0) {
                         //Todo Pradeep should reafctor this method so that we can calculate accumulated payout
                         //payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());

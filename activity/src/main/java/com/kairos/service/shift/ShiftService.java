@@ -327,13 +327,11 @@ public class ShiftService extends MongoBaseService {
 
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityWrapperMap);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null,activityWrapperMap,false,byTandAPhase);
-
+        mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
         validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
-            //mainShift.setPlanningPeriodId(shiftWithActivityDTO.getPlanningPeriodId());
-            mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
