@@ -14,7 +14,8 @@ import java.util.Set;
 
 public class PayRollDTO {
     private BigInteger id;
-    @NotBlank
+
+    @NotBlank(message = "name.absent")
     private String name;
     private int code;
     private boolean active;
@@ -72,10 +73,5 @@ public class PayRollDTO {
 
     public void setApplicableForCountry(boolean applicableForCountry) {
         this.applicableForCountry = applicableForCountry;
-    }
-
-    @AssertTrue(message = "name.absent")
-    public boolean isValid() {
-        return (!StringUtils.isBlank(name));
     }
 }
