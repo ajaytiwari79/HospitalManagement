@@ -32,7 +32,7 @@ public class PayRoll extends MongoBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public int getCode() {

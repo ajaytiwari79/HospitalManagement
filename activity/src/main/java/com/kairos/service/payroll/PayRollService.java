@@ -10,13 +10,11 @@ import com.kairos.persistence.model.payroll.PayRoll;
 import com.kairos.persistence.repository.activity.PayRollRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 import static com.kairos.constants.AppConstants.LINK;
 import static com.kairos.constants.AppConstants.UNLINK;
@@ -29,57 +27,68 @@ public class PayRollService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public PayRollDTO createPayRoll(PayRollDTO payRollDTO){
-        if(payRollRepository.existsByNameIgnoreCaseAndDeletedFalse(payRollDTO.getName().trim())){
-            exceptionService.duplicateDataException("data.already.exists",payRollDTO.getName());
-        }
-        PayRoll payRoll=new PayRoll(null,payRollDTO.getName().trim(),payRollDTO.getCode(),payRollDTO.isActive());
+    public PayRollDTO createPayRoll(PayRollDTO payRollDTO) {
+        PayRoll payRoll = payRollRepository.getByDeletedFalseAndNameIgnoreCaseOrCode(payRollDTO.getName(),payRollDTO.getCode());
+        validatePayRoll(payRoll,payRollDTO);
+        payRoll = new PayRoll(null, payRollDTO.getName(), payRollDTO.getCode(), payRollDTO.isActive());
         save(payRoll);
         payRollDTO.setId(payRoll.getId());
         return payRollDTO;
     }
 
-    public PayRollDTO updatePayRoll(BigInteger payRollId,PayRollDTO payRollDTO){
-        if(payRollRepository.existsByNameIgnoreCaseAndDeletedFalseAndIdNot(payRollDTO.getName(),payRollId)){
-            exceptionService.duplicateDataException("data.already.exists",payRollDTO.getName());
+    public PayRollDTO updatePayRoll(BigInteger payRollId, PayRollDTO payRollDTO) {
+        PayRoll alreadyExist = payRollRepository.getByDeletedFalseAndIdNotOrNameIgnoreCaseAndCode(payRollId,payRollDTO.getName(),payRollDTO.getCode());
+        validatePayRoll(alreadyExist,payRollDTO);
+        PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
+        if (payRoll == null) {
+            exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
         }
-        PayRoll payRoll=payRollRepository.findById(payRollId).orElse(null);
-        if(payRoll==null){
-            exceptionService.dataNotFoundByIdException("data.not.found");
-        }
-        payRoll=new PayRoll(payRoll.getId(),payRollDTO.getName().trim(),payRollDTO.getCode(),payRollDTO.isActive());
+        payRoll = new PayRoll(payRoll.getId(), payRollDTO.getName(), payRollDTO.getCode(), payRollDTO.isActive());
         save(payRoll);
         return payRollDTO;
     }
 
-    public boolean deletePayRoll(BigInteger payRollId){
+    public boolean deletePayRoll(BigInteger payRollId) {
         payRollRepository.safeDeleteById(payRollId);
         return true;
     }
 
-    public PayRollDTO getPayRollById(BigInteger payRollId){
+    public PayRollDTO getPayRollById(BigInteger payRollId) {
         return payRollRepository.findByIdAndDeletedFalse(payRollId);
     }
 
-    public List<PayRollDTO> getAllPayRoll(){
+    public List<PayRollDTO> getAllPayRoll() {
         return payRollRepository.findAllByDeletedFalse();
     }
 
-    public List<PayRollDTO> linkPayRollWithCountry(Long countryId, Set<BigInteger> payRollIds,String action){
-        List<PayRoll> payRolls=payRollRepository.findAllByDeletedFalseAndIdIn(payRollIds);
-        if(CollectionUtils.isNotEmpty(payRolls)){
-            payRolls.forEach(payRoll -> {
-                if(LINK.equals(action))payRoll.getCountryIds().add(countryId);
-                else if(UNLINK.equals(action))payRoll.getCountryIds().remove(countryId);});
-            save(payRolls);
+    public PayRollDTO linkPayRollWithCountry(Long countryId, BigInteger payRollId, String action) {
+        PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
+        if (payRoll == null) {
+            exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(payRolls,PayRollDTO.class);
+
+        if (LINK.equals(action)) payRoll.getCountryIds().add(countryId);
+        else if (UNLINK.equals(action)) payRoll.getCountryIds().remove(countryId);
+        save(payRoll);
+        return ObjectMapperUtils.copyPropertiesByMapper(payRoll,PayRollDTO.class);
+
     }
 
-    public List<PayRollDTO> getAllPayRollOfCountry(Long countryId){
-        List<PayRollDTO> payRollDTOS=payRollRepository.findAllByDeletedFalse();
-        payRollDTOS.forEach(payRollDTO -> {if(payRollDTO.getCountryIds().contains(countryId))payRollDTO.setApplicableForCountry(true);});
+    public List<PayRollDTO> getAllPayRollOfCountry(Long countryId) {
+        List<PayRollDTO> payRollDTOS = payRollRepository.findAllByDeletedFalse();
+        payRollDTOS.forEach(payRollDTO -> {
+            if (payRollDTO.getCountryIds().contains(countryId)) payRollDTO.setApplicableForCountry(true);
+        });
         return payRollDTOS;
+    }
+
+    private void validatePayRoll(PayRoll payRoll,PayRollDTO payRollDTO){
+        if (payRoll!=null && payRollDTO.getName().equalsIgnoreCase(payRoll.getName())) {
+            exceptionService.duplicateDataException("payroll.already.exists.name", payRollDTO.getName());
+        }
+        if (payRoll!=null && payRollDTO.getCode()==payRoll.getCode()) {
+            exceptionService.duplicateDataException("payroll.already.exists.code", payRollDTO.getCode());
+        }
     }
 
 

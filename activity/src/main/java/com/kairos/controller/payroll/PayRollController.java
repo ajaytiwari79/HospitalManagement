@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_ID;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.payroll.PayRollConstants.*;
 
 /*
  *Created By Pavan on 14/12/18
@@ -28,43 +31,43 @@ public class PayRollController {
     private PayRollService payRollService;
 
     @ApiOperation("Create PayRoll at System level")
-    @PostMapping(value = "/payroll")
+    @PostMapping(PAYROLL)
     public ResponseEntity<Map<String,Object>> createPayRoll(@Valid @RequestBody PayRollDTO payRollDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.createPayRoll(payRollDTO));
     }
 
     @ApiOperation("update PayRoll at System level")
-    @PutMapping(value = "/payroll/{payRollId}")
+    @PutMapping(UPDATE_PAYROLL)
     public ResponseEntity<Map<String,Object>> updatePayRoll(@PathVariable BigInteger payRollId, @Valid @RequestBody PayRollDTO payRollDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.updatePayRoll(payRollId,payRollDTO));
     }
 
     @ApiOperation("delete PayRoll at System level")
-    @DeleteMapping(value = "/payroll/{payRollId}")
+    @DeleteMapping(DELETE_PAYROLL)
     public ResponseEntity<Map<String,Object>> deletePayRoll(@PathVariable BigInteger payRollId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.deletePayRoll(payRollId));
     }
 
     @ApiOperation("get PayRoll at System level")
-    @GetMapping(value = "/payroll/{payRollId}")
+    @GetMapping(GET_PAYROLL_BY_ID)
     public ResponseEntity<Map<String,Object>> getPayRollById(@PathVariable BigInteger payRollId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getPayRollById(payRollId));
     }
 
     @ApiOperation("get All PayRoll at System level")
-    @GetMapping(value = "/payroll")
+    @GetMapping(PAYROLL)
     public ResponseEntity<Map<String,Object>> getAllPayRoll(){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getAllPayRoll());
     }
 
     @ApiOperation("link PayRoll to country level from System level")
-    @PutMapping(value = "/payroll")
-    public ResponseEntity<Map<String,Object>> linkPayRollWithCountry(@RequestParam("countryId") Long countryId,@RequestParam("action") String action,@RequestBody Set<BigInteger> payRollIds){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.linkPayRollWithCountry(countryId,payRollIds,action));
+    @PutMapping(COUNTRY_URL+UPDATE_PAYROLL)
+    public ResponseEntity<Map<String,Object>> linkPayRollWithCountry(@PathVariable BigInteger payRollId,@PathVariable Long countryId,@RequestParam("action") String action){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.linkPayRollWithCountry(countryId,payRollId,action));
     }
 
     @ApiOperation("get PayRoll at country level")
-    @GetMapping(value = "/country/{countryId}/payroll")
+    @GetMapping(COUNTRY_URL+PAYROLL)
     public ResponseEntity<Map<String,Object>> getAllPayRollOfCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getAllPayRollOfCountry(countryId));
     }

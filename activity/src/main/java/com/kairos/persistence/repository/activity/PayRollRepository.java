@@ -7,6 +7,7 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.dto.activity.payroll.PayRollDTO;
 import com.kairos.persistence.model.payroll.PayRoll;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -24,7 +25,13 @@ public interface PayRollRepository extends MongoBaseRepository<PayRoll,BigIntege
 
     List<PayRollDTO> findByCountryIdsInAndDeletedFalse(Long countryId);
 
-    boolean existsByNameIgnoreCaseAndDeletedFalse(String name);
+    @Query("{deleted:false,$or:[{name:{$regex:?0,$options:'i'},code:?1}]}")
+    PayRoll getByDeletedFalseAndNameIgnoreCaseOrCode(String name, int code);
 
-    boolean existsByNameIgnoreCaseAndDeletedFalseAndIdNot(String name, BigInteger id);
+    @Query("{deleted:false,_id:{$ne:?0},$or:[{name:{$regex:?1,$options:'i'},code:?2}]}")
+    PayRoll getByDeletedFalseAndIdNotOrNameIgnoreCaseAndCode(BigInteger id, String name, int code);
+
+
+    PayRoll getByIdAndDeletedFalse(BigInteger id);
+
 }

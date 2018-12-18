@@ -1,1 +1,1 @@
-db.payRoll.createIndex( { code:1 }, { unique: true } )
+db.payRoll.createIndex( { code:1,deleted:1 }, { unique: true } )
