@@ -681,7 +681,7 @@ public class AccessGroupService {
 
         }
         Boolean isAccessGroupExistWithSameName;
-        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory().value)) {
+        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory())) {
             isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId, accessGroupDTO.getAccountTypeIds());
         }else{
             isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupId);

@@ -35,7 +35,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("MATCH (child:Organization) WHERE id(child)={0}\n" +
             "OPTIONAL MATCH (child)<-[:"+HAS_SUB_ORGANIZATION+"*]-(n{organizationLevel:'CITY'})\n" +
-            "WHERE not (n)<-[:"+HAS_SUB_ORGANIZATION+"]-()\n" +
+            "WHERE NOT (n)<-[:"+HAS_SUB_ORGANIZATION+"]-()\n" +
             "OPTIONAL MATCH (n)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(p:AccessGroup {name:{1}})\n" +
             "OPTIONAL MATCH (child)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(c:AccessGroup {name:{1}})\n" +
             "RETURN\n" +
