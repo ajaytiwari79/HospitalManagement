@@ -7,16 +7,19 @@ package com.kairos.dto.activity.payroll;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
 public class PayRollDTO {
     private BigInteger id;
+    @NotBlank
     private String name;
     private int code;
     private boolean active;
     private Set<Long> countryIds=new HashSet<>();
+
     private boolean applicableForCountry;
 
     public PayRollDTO() {
@@ -71,7 +74,7 @@ public class PayRollDTO {
         this.applicableForCountry = applicableForCountry;
     }
 
-    @AssertTrue(message = "Name can't be blank")
+    @AssertTrue(message = "name.absent")
     public boolean isValid() {
         return (!StringUtils.isBlank(name));
     }

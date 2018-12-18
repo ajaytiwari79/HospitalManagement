@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 
 @Service
 public class BankService extends MongoBaseService {
@@ -32,29 +33,29 @@ public class BankService extends MongoBaseService {
         return bankDTO;
     }
 
-    public BankDTO updateBank(BigInteger bankId,Long countryId, BankDTO bankDTO){
+    public BankDTO updateBank(BigInteger bankId, BankDTO bankDTO){
         if(bankRepository.existsByNameIgnoreCaseAndDeletedFalseAndIdNot(bankDTO.getName(),bankId)){
             exceptionService.duplicateDataException("data.already.exists",bankDTO.getName());
         }
-        Bank bank=bankRepository.findById(bankId);
-        if(payRoll==null){
+        Bank bank=bankRepository.getByIdAndDeletedFalse(bankId);
+        if(bank==null){
             exceptionService.dataNotFoundByIdException("data.not.found");
         }
-        payRoll=new PayRoll(payRoll.getId(),payRollDTO.getName().trim(),payRollDTO.getCode(),payRollDTO.isActive());
-        save(payRoll);
-        return payRollDTO;
+        bank=new Bank(bank.getId(),bankDTO.getName(),bankDTO.getDescription(),bankDTO.getRegistrationNumber(),bankDTO.getInternationalAccountNumber(),bankDTO.getSwiftCode(),bank.getCountryId());
+        save(bank);
+        return bankDTO;
     }
-//
-//    public boolean deletePayRoll(BigInteger payRollId){
-//        payRollRepository.safeDeleteById(payRollId);
-//        return true;
-//    }
-//
-//    public PayRollDTO getPayRollById(BigInteger payRollId){
-//        return payRollRepository.findByIdAndDeletedFalse(payRollId);
-//    }
-//
-//    public List<PayRollDTO> getAllPayRoll(){
-//        return payRollRepository.findAllByDeletedFalse();
-//    }
+
+    public boolean deleteBank(BigInteger bankId){
+        bankRepository.safeDeleteById(bankId);
+        return true;
+    }
+
+    public BankDTO getBankById(BigInteger bankId){
+        return bankRepository.findByIdAndDeletedFalse(bankId);
+    }
+
+    public List<BankDTO> getAllBank(Long countryId){
+        return bankRepository.findAllByCountryIdAndDeletedFalse(countryId);
+    }
 }

@@ -34,25 +34,50 @@ public class BankController {
 
     @ApiOperation("update bank")
     @PutMapping(value = "/country/{countryId}/bank/{bankId}")
-    public ResponseEntity<Map<String,Object>> updateBank(@PathVariable BigInteger bankId,@PathVariable BigInteger countryId, @Valid @RequestBody BankDTO bankDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.updateBank(bankId,countryId,bankDTO));
+    public ResponseEntity<Map<String,Object>> updateBank(@PathVariable BigInteger bankId, @Valid @RequestBody BankDTO bankDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.updateBank(bankId,bankDTO));
     }
 
-    @ApiOperation("delete PayRoll at System level")
-    @DeleteMapping(value = "/payroll/{payRollId}")
-    public ResponseEntity<Map<String,Object>> deletePayRoll(@PathVariable BigInteger payRollId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.deletePayRoll(payRollId));
+    @ApiOperation("delete bank ")
+    @DeleteMapping(value = "/country/{countryId}/bank/{bankId}")
+    public ResponseEntity<Map<String,Object>> deleteBank(@PathVariable BigInteger bankId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.deleteBank(bankId));
     }
 
-    @ApiOperation("get PayRoll at System level")
-    @GetMapping(value = "/payroll/{payRollId}")
-    public ResponseEntity<Map<String,Object>> getPayRollById(@PathVariable BigInteger payRollId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getPayRollById(payRollId));
+    @ApiOperation("get bank by id")
+    @GetMapping(value = "/country/{countryId}/bank/{bankId}")
+    public ResponseEntity<Map<String,Object>> getBankById(@PathVariable BigInteger bankId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankById(bankId));
     }
 
-    @ApiOperation("get All PayRoll at System level")
-    @GetMapping(value = "/payroll")
-    public ResponseEntity<Map<String,Object>> getAllPayRoll(){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getAllPayRoll());
+    @ApiOperation("get All Bank ")
+    @GetMapping(value = "/country/{countryId}/bank/")
+    public ResponseEntity<Map<String,Object>> getAllBank(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getAllBank(countryId));
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
