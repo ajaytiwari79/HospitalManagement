@@ -37,7 +37,7 @@ MATCH(up:UnitPosition) set up.mainUnitPosition=false
 //KPI
 add planned hours kPI
 db.getCollection('counter').insert({
-    "_id" : "10",
+    "_id" : "10",//nextsequence of kpiKairosSequence
     "type" : "PLANNED_HOURS",
     "title" : "Planned Hours",
     "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
@@ -50,3 +50,4 @@ db.getCollection('counter').insert({
 })
 
 db.getCollection('counter').updateMany({},{"$set":{ "chart" : "PIE","size" : "SIZE_2X2"}})
+
