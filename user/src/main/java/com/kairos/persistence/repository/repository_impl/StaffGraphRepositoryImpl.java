@@ -80,9 +80,9 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("employmentType", employmentType);
         }
         if(CollectionUtils.isEmpty(unitIds)){
-            stringBuilder.append(" MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) ");
+            stringBuilder.append(" MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false}) ");
         }else {
-            stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition)-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
+            stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition{deleted:false})-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
         }
         if(CollectionUtils.isNotEmpty(staffIds)) {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
