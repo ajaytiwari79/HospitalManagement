@@ -17,7 +17,9 @@ public class CoverPageVO {
     private boolean coverPageContentAdded;
     private boolean coverPageContentPartAdded;
     private boolean coverPageContentFullAdded;
-
+    private String  coverPageContentOneTextSection;
+    private String coverPageContentTwoTextSectionLeft;
+    private String coverPageContentTwoTextSectionRight;
     public boolean isCoverPageContentPartAdded() { return coverPageContentPartAdded; }
 
     public void setCoverPageContentPartAdded(boolean coverPageContentPartAdded) { this.coverPageContentPartAdded = coverPageContentPartAdded; }
@@ -55,6 +57,30 @@ public class CoverPageVO {
     public boolean isCoverPageContentAdded() { return coverPageContentAdded; }
 
     public void setCoverPageContentAdded(boolean coverPageContentAdded) { this.coverPageContentAdded = coverPageContentAdded; }
+
+    public String getCoverPageContentOneTextSection() {
+        return coverPageContentOneTextSection;
+    }
+
+    public void setCoverPageContentOneTextSection(String coverPageContentOneTextSection) {
+        this.coverPageContentOneTextSection = coverPageContentOneTextSection;
+    }
+
+    public String getCoverPageContentTwoTextSectionLeft() {
+        return coverPageContentTwoTextSectionLeft;
+    }
+
+    public void setCoverPageContentTwoTextSectionLeft(String coverPageContentTwoTextSectionLeft) {
+        this.coverPageContentTwoTextSectionLeft = coverPageContentTwoTextSectionLeft;
+    }
+
+    public String getCoverPageContentTwoTextSectionB() {
+        return coverPageContentTwoTextSectionRight;
+    }
+
+    public void setCoverPageContentTwoTextSectionB(String coverPageContentTwoTextSectionB) {
+        this.coverPageContentTwoTextSectionRight = coverPageContentTwoTextSectionB;
+    }
 
     @Override
     public boolean equals(Object o) {

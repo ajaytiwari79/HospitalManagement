@@ -39,7 +39,7 @@ public class UserDetailService {
      * @throws UsernameNotFoundException
      */
     public User loadUserByEmail(String userName , String password) throws UsernameNotFoundException {
-        User user=  userRepository.findByEmail("(?i)"+userName);
+        User user=  userRepository.findUserByEmailInAnyOrganization("(?i)"+userName);
          if (user == null) {
               logger.info("User is null");
                return null;

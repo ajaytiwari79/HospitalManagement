@@ -3,7 +3,7 @@ package com.kairos.dto.user.staff.unit_position;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.enums.EmploymentCategory;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -71,6 +71,7 @@ public class UnitPositionDTO {
     private boolean published;
     private Long accessGroupId;
     private String positionCodeName;
+    private boolean mainUnitPosition;
 
 
 
@@ -344,4 +345,13 @@ public class UnitPositionDTO {
     public void setPositionCodeName(String positionCodeName) {
         this.positionCodeName = positionCodeName;
     }
+
+    public boolean isMainUnitPosition() {
+        return mainUnitPosition;
+    }
+
+    public void setMainUnitPosition(boolean mainUnitPosition) {
+        this.mainUnitPosition = mainUnitPosition;
+    }
+
 }

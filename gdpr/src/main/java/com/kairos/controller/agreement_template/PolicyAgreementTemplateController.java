@@ -165,5 +165,10 @@ public class PolicyAgreementTemplateController {
 
     }
 
+    @ApiOperation(value = "All Template Type type ")
+    @GetMapping(UNIT_URL+"/template/all")
+    public ResponseEntity<Object> getAllTemplateType(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllTemplateType(unitId));
+    }
 
 }

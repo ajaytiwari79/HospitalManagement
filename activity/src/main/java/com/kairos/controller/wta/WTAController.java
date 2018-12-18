@@ -235,8 +235,8 @@ public class WTAController {
 
     @ApiOperation(value = "get current cta and wta applicable on unit position ")
     @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/applicable-cta-wta")
-    public ResponseEntity<Map<String, Object>> getWTACTAByOfUnitPosition(@RequestParam(value = "unitPositionId") Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByOfUnitPosition(unitPositionId));
+    public ResponseEntity<Map<String, Object>> getWTACTAByOfUnitPosition(@RequestParam(value = "unitPositionId") Long unitPositionId, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByOfUnitPosition(unitPositionId,startDate));
     }
 
 

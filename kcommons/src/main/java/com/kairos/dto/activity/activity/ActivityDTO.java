@@ -31,18 +31,20 @@ public class ActivityDTO {
     private List<Long> employmentTypes;
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
+    private TimeTypeDTO timeType;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
     private RulesActivityTabDTO rulesActivityTab;
     private List<ActivityDTO> compositeActivities;
 
     private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
     private Long countryActivityId;
-    private TimeTypeDTO timeType;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger parentId;
     private PermissionsActivityTabDTO permissionsActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private List<Long> skills;
+    private SkillActivityDTO skillActivityTab;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -260,7 +262,21 @@ public class ActivityDTO {
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
     }
 
+    public List<Long> getSkills() {
+        return skills;
+    }
 
+    public void setSkills(List<Long> skills) {
+        this.skills = skills;
+    }
+
+    public SkillActivityDTO getSkillActivityTab() {
+        return skillActivityTab;
+    }
+
+    public void setSkillActivityTab(SkillActivityDTO skillActivityTab) {
+        this.skillActivityTab = skillActivityTab;
+    }
 }
 
 

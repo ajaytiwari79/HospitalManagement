@@ -9,7 +9,9 @@ public class DayTypeDTO {
    private Long id;
    private String name;
    private List<Day> validDays=new ArrayList<>();
-
+    private List<CountryHolidayCalenderDTO> countryHolidayCalenderData;
+    private boolean holidayType;
+    private boolean allowTimeSettings = false;
     public DayTypeDTO() {
         //default constructor
 
@@ -19,6 +21,23 @@ public class DayTypeDTO {
         this.id = id;
         this.name = name;
         this.validDays = validDays;
+    }
+
+    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType,boolean allowTimeSettings) {
+        this.id = id;
+        this.name = name;
+        this.validDays = validDays;
+        this.countryHolidayCalenderData = countryHolidayCalenderData;
+        this.holidayType = holidayType;
+        this.allowTimeSettings = allowTimeSettings;
+    }
+
+    public boolean isAllowTimeSettings() {
+        return allowTimeSettings;
+    }
+
+    public void setAllowTimeSettings(boolean allowTimeSettings) {
+        this.allowTimeSettings = allowTimeSettings;
     }
 
     public Long getId() {
@@ -43,5 +62,21 @@ public class DayTypeDTO {
 
     public void setValidDays(List<Day> validDays) {
         this.validDays = validDays;
+    }
+
+    public List<CountryHolidayCalenderDTO> getCountryHolidayCalenderData() {
+        return countryHolidayCalenderData;
+    }
+
+    public void setCountryHolidayCalenderData(List<CountryHolidayCalenderDTO> countryHolidayCalenderData) {
+        this.countryHolidayCalenderData = countryHolidayCalenderData==null? new ArrayList<>():countryHolidayCalenderData;
+    }
+
+    public boolean isHolidayType() {
+        return holidayType;
+    }
+
+    public void setHolidayType(boolean holidayType) {
+        this.holidayType = holidayType;
     }
 }

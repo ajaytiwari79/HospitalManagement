@@ -1143,5 +1143,11 @@ public class CountryController {
 
     }
 
+    @ApiOperation(value = "get cuntry id by unit id ")
+    @GetMapping(value = UNIT_URL + "/country_id")
+    public ResponseEntity<Map<String, Object>> getCountryIdByUnitId(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryIdByUnitId(unitId));
+
+    }
 }
 

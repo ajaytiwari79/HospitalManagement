@@ -1,9 +1,11 @@
 package com.kairos.service.staffing_level;
 
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -39,6 +41,8 @@ import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang.CharSet;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -71,6 +75,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -267,8 +272,24 @@ public class StaffingLevelService extends MongoBaseService {
         this.save(staffingLevel);
         pushStaffingLevelGraphData(staffingLevel, shiftNotificationEvent.getUnitId());
 
+
     }
 
+    private List<StaffingLevel> verifyAndCreateStaffingLevel(List<StaffingLevel> staffingLevels,ShiftNotificationEvent shiftNotificationEvent) {
+        if (staffingLevels.isEmpty() && DateUtils.asLocalDate(shiftNotificationEvent.getShift().getStartDate()).equals(DateUtils.asLocalDate(shiftNotificationEvent.getShift().getEndDate()))) {
+            staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent));
+        } else if ((staffingLevels.isEmpty() || staffingLevels.size() == 1) && !DateUtils.asLocalDate(shiftNotificationEvent.getShift().getStartDate()).equals(DateUtils.asLocalDate(shiftNotificationEvent.getShift().getEndDate()))) {
+            if (staffingLevels.isEmpty()) {
+                staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent));
+                staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent));
+            } else {
+                StaffingLevel staffingLevel = staffingLevels.get(0);
+                Date startDate = staffingLevel.getCurrentDate().equals(DateUtils.onlyDate(shiftNotificationEvent.getShift().getStartDate())) ? shiftNotificationEvent.getShift().getStartDate() : shiftNotificationEvent.getShift().getEndDate();
+                staffingLevels.add(createDefaultStaffingLevel(shiftNotificationEvent));
+            }
+        }
+        return staffingLevels;
+    }
     private boolean isShiftPeriodModified(ShiftNotificationEvent shiftNotificationEvent) {
 
         return shiftNotificationEvent.getPreviousStateShift().getStartDate().equals(shiftNotificationEvent.getShift().getStartDate())
@@ -283,31 +304,39 @@ public class StaffingLevelService extends MongoBaseService {
      */
     public StaffingLevel updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(StaffingLevel staffingLevel, ShiftNotificationEvent shiftNotificationEvent) {
 
-        LocalTime shiftStartTime = LocalTime.ofSecondOfDay(new DateTime(shiftNotificationEvent.getShift().getStartDate()).getSecondOfDay());
+       for(ShiftActivity activity:shiftNotificationEvent.getShift().getActivities()) {
 
-        LocalTime shiftEndTime = LocalTime.ofSecondOfDay(new DateTime(shiftNotificationEvent.getShift().getEndDate()).getSecondOfDay());
+               int lowerLimit  = getLowerIndex(activity.getStartDate()) ;
+               int upperLimit = getUpperIndex(activity.getEndDate());
+               int currentAvailableStaffCount = 0;
+               for(int currentIndex = lowerLimit;currentIndex<=upperLimit;currentIndex++) {
+                   currentAvailableStaffCount = staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getAvailableNoOfStaff();
+                   staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(++currentAvailableStaffCount);
+                   staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
+                           filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activity.getActivityId())).findFirst().
+                           ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() + 1));
+               }
 
-        int detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
-        final AtomicInteger counter = new AtomicInteger(0);
-        staffingLevel.getPresenceStaffingLevelInterval().
-                stream().filter(staffingLevelInterval -> {
-            Duration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
-            LocalTime from = staffingLevelDuration.getFrom();
-            int startCounter = counter.get();
-            if (from.compareTo(shiftStartTime.plusMinutes(startCounter)) == 0) {
-                int endCounter = counter.addAndGet(detailLevelMinutes);
-                LocalTime shiftEndTimeLocal = shiftEndTime.compareTo(shiftStartTime.plusMinutes(endCounter)) <= 0 ? shiftEndTime : shiftStartTime.plusMinutes(endCounter);
-                return staffingLevelDuration.getTo().compareTo(shiftEndTimeLocal) >= 0 && staffingLevelDuration.getFrom().compareTo(shiftEndTime) < 0;
-            } else {
-                return false;
-            }
-
-
-        }).forEach(staffingLevelInterval -> {
-            int currentAvailableStaffCount = staffingLevelInterval.getAvailableNoOfStaff();
-            staffingLevelInterval.setAvailableNoOfStaff(++currentAvailableStaffCount);
-        });
+       }
         return staffingLevel;
+
+    }
+
+    private LocalTime[] getShiftStartTimeAndEndTimeForUpdateStaffingLevelAvailableCount(Date staffingLevelDate,Shift shift){
+        LocalDateTime shiftStartTime = DateUtils.asLocalDateTime(shift.getStartDate());
+        LocalDateTime shiftEndTime = DateUtils.asLocalDateTime(shift.getEndDate());
+        LocalDateTime staffingLevelDateTime =  DateUtils.asLocalDateTime(staffingLevelDate);
+        LocalTime[] localTimes = new LocalTime[]{};
+        if(shiftStartTime.toLocalTime().isAfter(shiftEndTime.toLocalTime())) {
+            if (shiftStartTime.toLocalDate().equals(staffingLevelDateTime.toLocalDate())){
+                localTimes = new LocalTime[]{shiftStartTime.toLocalTime(),LocalTime.of(23,59,59)};
+            }else if(shiftEndTime.toLocalDate().equals(staffingLevelDateTime.toLocalDate())){
+                localTimes = new LocalTime[]{LocalTime.of(00,00,00),shiftEndTime.toLocalTime()};
+            }
+        }else {
+            localTimes = new LocalTime[]{shiftStartTime.toLocalTime(),shiftEndTime.toLocalTime()};
+        }
+        return localTimes;
 
     }
 
@@ -321,29 +350,22 @@ public class StaffingLevelService extends MongoBaseService {
      */
     public StaffingLevel updateStaffingLevelAvailableStaffCountForUpdatedShift(StaffingLevel staffingLevel, ShiftNotificationEvent shiftNotificationEvent) {
 
-        LocalTime previousShiftStartTime = LocalTime.ofSecondOfDay(new DateTime(shiftNotificationEvent.getPreviousStateShift().getStartDate()).getSecondOfDay());
+        //increment staffing level available staff count for modified shift
+        for(ShiftActivity activity:shiftNotificationEvent.getPreviousStateShift().getActivities()) {
 
-        LocalTime previousShiftEndTime = LocalTime.ofSecondOfDay(new DateTime(shiftNotificationEvent.getPreviousStateShift().getEndDate()).getSecondOfDay());
-        int detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
-        final AtomicInteger counter = new AtomicInteger(0);
-        staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval -> {
-            Duration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
-            LocalTime from = staffingLevelDuration.getFrom();
-            int startCounter = counter.get();
-            if (from.compareTo(previousShiftStartTime.plusMinutes(startCounter)) == 0) {
-                int endCounter = counter.addAndGet(detailLevelMinutes);
-                LocalTime shiftEndTimeLocal = previousShiftEndTime.compareTo(previousShiftStartTime.plusMinutes(endCounter)) <= 0 ? previousShiftEndTime : previousShiftStartTime.plusMinutes(endCounter);
-                return staffingLevelDuration.getTo().compareTo(shiftEndTimeLocal) >= 0 && staffingLevelDuration.getFrom().compareTo(previousShiftEndTime) < 0;
-            } else {
-                return false;
+            int lowerLimit  = getLowerIndex(activity.getStartDate()) ;
+            int upperLimit = getUpperIndex(activity.getEndDate());
+            int currentAvailableStaffCount = 0;
+            for(int currentIndex = lowerLimit;currentIndex<=upperLimit;currentIndex++) {
+                currentAvailableStaffCount = staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getAvailableNoOfStaff();
+                staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(--currentAvailableStaffCount);
+                staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
+                        filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activity.getActivityId())).findFirst().
+                        ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() - 1));
             }
 
+        }
 
-        }).forEach(staffingLevelInterval -> {
-            int currentAvailableStaffCount = staffingLevelInterval.getAvailableNoOfStaff();
-            staffingLevelInterval.setAvailableNoOfStaff(currentAvailableStaffCount > 0 ? --currentAvailableStaffCount : 0);
-        });
-        //increment staffing level available staff count for modified shift
         staffingLevel = updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel, shiftNotificationEvent);
         return staffingLevel;
 
@@ -478,6 +500,7 @@ public class StaffingLevelService extends MongoBaseService {
         LocalTime fromTime;
         LocalTime toTime;
         Set<StaffingLevelActivity> activitySet;
+        Map<BigInteger,Integer> activityRankMap = new HashMap<>();
 
 
         Date date = null;
@@ -506,6 +529,7 @@ public class StaffingLevelService extends MongoBaseService {
 
                 staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
                 staffingDtoList.add(staffingDTO);
+                activityRankMap = new HashMap<>();
 
                 seq = 0;
                 staffingDTO = new PresenceStaffingLevelDto();
@@ -557,6 +581,8 @@ public class StaffingLevelService extends MongoBaseService {
             activitySet = new HashSet<StaffingLevelActivity>();
             Iterator<String> keyFirstItr = singleData.keySet().iterator();
 
+            int rank = 0;
+
             while (keyFirstItr.hasNext()) {
                 String keyTemp = keyFirstItr.next();
                 if (!keyTemp.equals("to") && !keyTemp.equals("from") && !keyTemp.equals("min")
@@ -565,6 +591,7 @@ public class StaffingLevelService extends MongoBaseService {
                     if (activityDB != null) {
                         StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId(), keyTemp, Integer.parseInt(singleData.get(keyTemp)), Integer.parseInt(singleData.get(keyTemp)));
                         activitySet.add(staffingLevelActivity);
+                        activityRankMap.put(activityDB.getId(),++rank);
                     }
                 }
             }
@@ -572,6 +599,7 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevelTimeSlList.add(staffingLevelTimeSlot);
         }
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
+        staffingDTO.getStaffingLevelSetting().setActivitiesRank(activityRankMap);
         staffingDtoList.add(staffingDTO);
 
         staffingDtoList.forEach(staffingLevelDto -> {
@@ -581,7 +609,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public void processStaffingLevel(MultipartFile file, long unitId) throws IOException {
 
-        CSVParser csvRecords = CSVFormat.DEFAULT.parse(new InputStreamReader(file.getInputStream()));
+        CSVParser csvRecords = CSVParser.parse(file.getInputStream(),StandardCharsets.UTF_8,CSVFormat.DEFAULT);
         List<Map<Date, Long>> recordSizeByDate = new ArrayList<>();
         List<CSVRecord> timeRecords = csvRecords.getRecords();
         CSVRecord headerRecord = timeRecords.get(1);
@@ -614,7 +642,7 @@ public class StaffingLevelService extends MongoBaseService {
         processRecords:
         for (Map<String, String> dayRecord : recordIndexes) {
 
-            fromToTimeRecord = new HashMap<>();
+            fromToTimeRecord = new LinkedHashMap<>();
             fromToTimeRecord.put("forDay", dayRecord.get("selectedDay"));
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>(timeRecords.size());
             for (CSVRecord csvRecord : timeRecords) {
@@ -883,28 +911,23 @@ public class StaffingLevelService extends MongoBaseService {
 
     private StaffingLevel updateStaffingLevelAvailableStaffCountForDeletedShift(StaffingLevel staffingLevel, ShiftNotificationEvent shiftNotificationEvent) {
 
-        LocalTime previousShiftStartTime = LocalTime.ofSecondOfDay(new DateTime(shiftNotificationEvent.getShift().getStartDate()).getSecondOfDay());
 
-        LocalTime previousShiftEndTime = LocalTime.ofSecondOfDay(new DateTime(shiftNotificationEvent.getShift().getEndDate()).getSecondOfDay());
-        int detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
-        final AtomicInteger counter = new AtomicInteger(0);
-        staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval -> {
-            Duration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
-            LocalTime from = staffingLevelDuration.getFrom();
-            int startCounter = counter.get();
-            if (from.compareTo(previousShiftStartTime.plusMinutes(startCounter)) == 0) {
-                int endCounter = counter.addAndGet(detailLevelMinutes);
-                LocalTime shiftEndTimeLocal = previousShiftEndTime.compareTo(previousShiftStartTime.plusMinutes(endCounter)) <= 0 ? previousShiftEndTime : previousShiftStartTime.plusMinutes(endCounter);
-                return staffingLevelDuration.getTo().compareTo(shiftEndTimeLocal) >= 0 && staffingLevelDuration.getFrom().compareTo(previousShiftEndTime) < 0;
-            } else {
-                return false;
+        for(ShiftActivity activity:shiftNotificationEvent.getShift().getActivities()) {
+
+            int lowerLimit  = getLowerIndex(activity.getStartDate()) ;
+            int upperLimit = getUpperIndex(activity.getEndDate());
+            int currentAvailableStaffCount = 0;
+            for(int currentIndex = lowerLimit;currentIndex<=upperLimit;currentIndex++) {
+                currentAvailableStaffCount = staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getAvailableNoOfStaff();
+                staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(--currentAvailableStaffCount);
+                staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
+                        filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activity.getActivityId())).findFirst().
+                        ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff()>0?staffingLevelActivity.getAvailableNoOfStaff() - 1:0));
             }
 
+        }
 
-        }).forEach(staffingLevelInterval -> {
-            int currentAvailableStaffCount = staffingLevelInterval.getAvailableNoOfStaff();
-            staffingLevelInterval.setAvailableNoOfStaff(currentAvailableStaffCount > 0 ? --currentAvailableStaffCount : 0);
-        });
+
         //increment staffing level available staff count for modified shift
         // staffingLevel = updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel, shiftNotificationEvent);
         return staffingLevel;
@@ -991,5 +1014,43 @@ public class StaffingLevelService extends MongoBaseService {
         return staffingLevel;
     }
 
+    private int getLowerIndex(Date startDate) {
+
+        int lowerLimit = DateUtils.getHourFromDate(startDate) * 4;
+        int minutes = DateUtils.getMinutesFromDate(startDate);
+        int minuteOffset = 0;
+        if(minutes>=45) {
+            minuteOffset = 4;
+        }
+        else if(minutes>=30) {
+            minuteOffset = 3;
+        }
+        else if(minutes>=15) {
+            minuteOffset = 2;
+        }
+        else if(minutes>=0){
+            minuteOffset = 1;
+        }
+        return lowerLimit+minuteOffset;
+    }
+
+    private int getUpperIndex(Date endDate) {
+        int upperLimit = DateUtils.getHourFromDate(endDate) * 4;
+        int minutes = DateUtils.getMinutesFromDate(endDate);
+        int minuteOffset = 0;
+        if(minutes>45) {
+            minuteOffset = 4;
+        }
+        else if(minutes>30) {
+            minuteOffset = 3;
+        }
+        else if(minutes>15) {
+            minuteOffset = 2;
+        }
+        else if(minutes>0){
+            minuteOffset = 1;
+        }
+        return upperLimit + minuteOffset;
+    }
 
 }

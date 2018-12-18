@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.5.RELEASE'
+        springBootVersion = '2.0.0.RELEASE'
         jacksonVersion = '2.9.2'
         projectVersion = "0.0.1"
         version = "0.0.1"
@@ -17,35 +17,35 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
-apply plugin: 'idea'
 apply plugin: 'application'
+
 version = "$projectVersion-SNAPSHOT"
+
 sourceCompatibility = 1.8
 mainClassName = 'com.kairos.KairosGdprApplication'
-
-
-
 
 repositories {
     mavenCentral()
     jcenter()
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.spring.io/plugins-release" }
-
+    maven { url "http://repo.spring.io/release/" }
 }
-
+task wrapper(type: Wrapper) { gradleVersion = '4.4' }
 ext {
-    springCloudVersion = 'Finchley.SR1'
+    springCloudVersion = 'Finchley.RELEASE'
 }
 dependencies {
 
     compile project(':kcommons')
+    compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile('org.slf4j:slf4j-api:1.7.7')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-starter-mail')
     // compile('org.apache.jackrabbit:jackrabbit-jcr-commons:2.17.2')
     //compile('org.apache.jackrabbit:jackrabbit-jcr2dav:2.10.1')
     //compile('javax.jcr:jcr:2.0')
@@ -57,7 +57,7 @@ dependencies {
     // swagger
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.6.1'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.6.1'
-    compile('org.springframework.boot:spring-boot-starter-web')
+
     compile('org.javers:javers-spring-boot-starter-mongo:3.10.0')
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
     testCompile('org.springframework.boot:spring-boot-starter-test')

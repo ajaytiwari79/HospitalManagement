@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.night_worker;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftQueryResult;
 
 import java.util.List;
 import java.util.Map;
