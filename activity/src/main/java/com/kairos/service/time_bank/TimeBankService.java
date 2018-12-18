@@ -382,7 +382,7 @@ public class TimeBankService extends MongoBaseService {
         Map<BigInteger,ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k->k.getId(), v->v));
         shift.getActivities().forEach(shiftActivity -> {
                 ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
-                shiftActivity.setTimeBankCtaBonusHour(shiftActivityDTO.getTimeBankCtaBonusHour());
+                shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
                 shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
         });
         shiftMongoRepository.save(shift);
