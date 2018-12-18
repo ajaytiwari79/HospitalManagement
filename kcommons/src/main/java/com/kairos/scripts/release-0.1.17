@@ -33,3 +33,20 @@ et.weeklyMinutes= CASE WHEN et.markMainEmployment=true THEN 2220 ELSE 420 END,
 et.mainEmployment=CASE WHEN et.markMainEmployment=true THEN true ELSE false END
 
 MATCH(up:UnitPosition) set up.mainUnitPosition=false
+
+//KPI
+add planned hours kPI
+db.getCollection('counter').insert({
+    "_id" : "10",
+    "type" : "PLANNED_HOURS",
+    "title" : "Planned Hours",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "PIE",
+    "size" : "SIZE_2X2"
+})
+
+db.getCollection('counter').updateMany({},{"$set":{ "chart" : "PIE","size" : "SIZE_2X2"}})
