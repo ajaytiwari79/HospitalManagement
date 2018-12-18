@@ -16,9 +16,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 
-import static com.kairos.constants.AppConstants.LINK;
-import static com.kairos.constants.AppConstants.UNLINK;
-
 @Service
 public class PayRollService extends MongoBaseService {
 
@@ -61,14 +58,17 @@ public class PayRollService extends MongoBaseService {
         return payRollRepository.findAllByDeletedFalse();
     }
 
-    public PayRollDTO linkPayRollWithCountry(Long countryId, BigInteger payRollId, String action) {
+    public PayRollDTO linkPayRollWithCountry(Long countryId, BigInteger payRollId, boolean checked) {
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
         if (payRoll == null) {
             exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
         }
 
-        if (LINK.equals(action)) payRoll.getCountryIds().add(countryId);
-        else if (UNLINK.equals(action)) payRoll.getCountryIds().remove(countryId);
+        if (checked){
+            payRoll.getCountryIds().add(countryId);
+        } else{
+            payRoll.getCountryIds().remove(countryId);
+        }
         save(payRoll);
         return ObjectMapperUtils.copyPropertiesByMapper(payRoll,PayRollDTO.class);
 
@@ -77,7 +77,9 @@ public class PayRollService extends MongoBaseService {
     public List<PayRollDTO> getAllPayRollOfCountry(Long countryId) {
         List<PayRollDTO> payRollDTOS = payRollRepository.findAllByDeletedFalse();
         payRollDTOS.forEach(payRollDTO -> {
-            if (payRollDTO.getCountryIds().contains(countryId)) payRollDTO.setApplicableForCountry(true);
+            if (payRollDTO.getCountryIds().contains(countryId)) {
+                payRollDTO.setApplicableForCountry(true);
+            };
         });
         return payRollDTOS;
     }

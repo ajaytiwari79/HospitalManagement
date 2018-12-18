@@ -21,10 +21,6 @@ public interface PayRollRepository extends MongoBaseRepository<PayRoll,BigIntege
 
     List<PayRollDTO> findAllByDeletedFalse();
 
-    List<PayRoll> findAllByDeletedFalseAndIdIn(Set<BigInteger> payRollIds);
-
-    List<PayRollDTO> findByCountryIdsInAndDeletedFalse(Long countryId);
-
     @Query("{deleted:false,$or:[{name:{$regex:?0,$options:'i'},code:?1}]}")
     PayRoll getByDeletedFalseAndNameIgnoreCaseOrCode(String name, int code);
 

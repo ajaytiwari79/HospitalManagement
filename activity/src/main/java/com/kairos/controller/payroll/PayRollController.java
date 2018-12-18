@@ -62,8 +62,8 @@ public class PayRollController {
 
     @ApiOperation("link PayRoll to country level from System level")
     @PutMapping(COUNTRY_URL+UPDATE_PAYROLL)
-    public ResponseEntity<Map<String,Object>> linkPayRollWithCountry(@PathVariable BigInteger payRollId,@PathVariable Long countryId,@RequestParam("action") String action){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.linkPayRollWithCountry(countryId,payRollId,action));
+    public ResponseEntity<Map<String,Object>> linkPayRollWithCountry(@PathVariable BigInteger payRollId,@PathVariable Long countryId,@RequestParam("checked") boolean checked){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.linkPayRollWithCountry(countryId,payRollId,checked));
     }
 
     @ApiOperation("get PayRoll at country level")
