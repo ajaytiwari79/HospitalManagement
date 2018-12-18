@@ -69,7 +69,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
                 int leaveCount = careDaysOptional.get().getLeavesAllowed();
 
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivitiesIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
+                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
                 if (leaveCount < (shifts.size()+1)) {
                     WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
                     infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);

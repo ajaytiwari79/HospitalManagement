@@ -6,5 +6,5 @@ package com.kairos.dto.activity.counter.enums;
  */
 
 public enum ChartType {
-    NUMBER_ONLY, GAUGE, PIE    ;
+    NUMBER_ONLY, GAUGE, PIE,BAR    ;
 }

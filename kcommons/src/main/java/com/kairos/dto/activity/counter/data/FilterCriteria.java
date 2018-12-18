@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.counter.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.enums.FilterType;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  */
 
 public class FilterCriteria {
+    @JsonProperty(value = "name")
     private FilterType type;
     private List<Object> values;
 

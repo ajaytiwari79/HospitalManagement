@@ -1,22 +1,24 @@
 package com.kairos.service.time_bank;
 
 
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.time_bank.TimeBankAndPayoutDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDTO;
 import com.kairos.dto.activity.time_bank.TimeBankVisualViewDTO;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOut;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -26,15 +28,11 @@ import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepositor
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -83,15 +81,15 @@ public class TimeBankService extends MongoBaseService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private OrganizationRestClient organizationRestClient;
-    @Inject
     private TimeTypeService timeTypeService;
     @Inject
     private PayOutRepository payOutRepository;
     @Inject
     private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
-    @Inject private PayOutCalculationService payOutCalculationService;
-    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject
+    private PayOutCalculationService payOutCalculationService;
+    @Inject
+    private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
     private ShiftService shiftService;
     @Inject
@@ -382,13 +380,13 @@ public class TimeBankService extends MongoBaseService {
         Map<BigInteger,ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k->k.getId(), v->v));
         shift.getActivities().forEach(shiftActivity -> {
                 ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
-                shiftActivity.setTimeBankCtaBonusHour(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+                shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
                 shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
         });
         shiftMongoRepository.save(shift);
     }
 
-    public boolean renewTimebankOfShifts() {
+    public boolean renewTimeBankOfShifts() {
         List<Shift> shifts = shiftMongoRepository.findAllByDeletedFalse();
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = new HashMap<>();
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());

@@ -208,7 +208,7 @@ public class ShiftController {
     }
 
     @ApiOperation("get a Shift detail by id")
-    @PostMapping(value = "/shift_details")
+    @PostMapping(value = "/shift/details")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> shiftDetailsById(@PathVariable Long unitId,@RequestBody List<BigInteger> shiftIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.shiftDetailsById(unitId,shiftIds));
@@ -217,7 +217,7 @@ public class ShiftController {
 
 
     @ApiOperation("update remarks in shift activity")
-    @PutMapping(value = "/shiftActivity/{shiftActivityId}")
+    @PutMapping(value = "/shift/shiftActivity/{shiftActivityId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger shiftActivityId,@RequestBody ShiftActivityDTO shiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.updateRemarkInShiftActivity(shiftActivityId,shiftActivityDTO));

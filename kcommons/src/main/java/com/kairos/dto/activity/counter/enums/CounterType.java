@@ -8,7 +8,7 @@ public enum CounterType {
     RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"),
     AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY("Average Resting Hours Per Presence Day"),
     SCHEDULED_HOURS_NET("Scheduled Hours-Net"),
-
+    PLANNED_HOURS("Planned Hours"),
     //VRP COUNTER
     TOTAL_KM_DRIVEN_PER_DAY("Total KM Driven Per Day"),
     TASK_UNPLANNED("Total Tasks Unplanned"),
