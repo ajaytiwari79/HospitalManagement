@@ -731,4 +731,7 @@ public class StaffRetrievalService {
     }
 
 
+    public Long getStaffDetailByUnitPositionId(Long unitId, Long unitPositionId) {
+       return staffGraphRepository.getStaffIdByUnitPositionIdAndUnitId(unitPositionId,unitId);
+    }
 }

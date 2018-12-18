@@ -708,6 +708,12 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT_WITHOUT_PARENT_ORG,HttpMethod.GET,UNIT_TIMEZONE,null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
         });
     }
+
+    //Temporary
+    public Long getStaffIdByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,STAFF_ID_BY_UNIT_POSITION_ID,Arrays.asList(new BasicNameValuePair("unitPositionId",unitPositionId.toString())), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        });
+    }
 }
 
 

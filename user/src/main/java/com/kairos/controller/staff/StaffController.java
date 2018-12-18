@@ -684,4 +684,11 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByIds(unitId,staffIds));
     }
 
+    @GetMapping(value = "/staff_id_by_unit_position")
+    @ApiOperation("get staff by unitPositionId")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByunitPositionId(@PathVariable Long unitId,@RequestParam Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByUnitPositionId(unitId,unitPositionId));
+    }
+
 }
