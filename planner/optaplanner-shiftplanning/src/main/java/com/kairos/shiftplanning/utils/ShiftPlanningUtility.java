@@ -2,8 +2,15 @@ package com.kairos.shiftplanning.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.enums.Day;
 import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.domain.activityConstraint.CountryHolidayCalender;
+import com.kairos.shiftplanning.domain.activityConstraint.DayType;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
@@ -38,6 +45,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.time.DayOfWeek;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -70,15 +79,15 @@ public class ShiftPlanningUtility {
     }
 
     public static void checker(Object... objs) throws Exception {
-        boolean same=objs[0]==objs[1];
+        boolean same = objs[0] == objs[1];
         int i = 0;
         i++;
         /*
-		Interval interval =(Interval) objs[2];
+        Interval interval =(Interval) objs[2];
 		Employee employee= (Employee)objs[1];*/
-       // DefaultKnowledgeHelper helper = (DefaultKnowledgeHelper) objs[0];
+        // DefaultKnowledgeHelper helper = (DefaultKnowledgeHelper) objs[0];
         List<AvailabilityRequest> requests = new ArrayList<>();
-		/*for (Object object : helper.getWorkingMemory().getObjects()) {
+        /*for (Object object : helper.getWorkingMemory().getObjects()) {
 			if ( object instanceof AvailabilityRequest && ((AvailabilityRequest)object).getEmployee().getId().equals(employee.getId())
 					&& ((AvailabilityRequest) object).containsInterval(interval)) {
 				requests.add((AvailabilityRequest)object);
@@ -94,7 +103,7 @@ public class ShiftPlanningUtility {
     public static boolean checkEmployeeCanWorkThisIntervalUsingDroolsMemory(Employee employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
-        StatefulKnowledgeSessionImpl kieSession =null;// ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
+        StatefulKnowledgeSessionImpl kieSession = null;// ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         for (Object object : kieSession.getObjects()) {
             if (object instanceof AvailabilityRequest && ((AvailabilityRequest) object).getEmployee().getId().equals(employee.getId())
                     && ((AvailabilityRequest) object).containsInterval(interval)) {
@@ -103,13 +112,14 @@ public class ShiftPlanningUtility {
         }
         return false;
     }
-    public static boolean checkDroolsMemory( ScoreDirector<BreaksIndirectAndActivityPlanningSolution> director) {
+
+    public static boolean checkDroolsMemory(ScoreDirector<BreaksIndirectAndActivityPlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<BreaksIndirectAndActivityPlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<BreaksIndirectAndActivityPlanningSolution>) ((DroolsScoreDirector<BreaksIndirectAndActivityPlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
         StatefulKnowledgeSessionImpl kieSession = null;//((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         //log.info("working mem size:"+kieSession.getObjects().size());
         for (Object object : kieSession.getObjects()) {
-            if(object==director.getWorkingSolution().getStaffingLevelMatrix()){
+            if (object == director.getWorkingSolution().getStaffingLevelMatrix()) {
                 //log.info("FOUND");
                 return true;
             }
@@ -121,7 +131,7 @@ public class ShiftPlanningUtility {
     public static boolean checkEmployeeAttemptedToPlanThisInterval(Employee employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
-        StatefulKnowledgeSessionImpl kieSession =null;// ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
+        StatefulKnowledgeSessionImpl kieSession = null;// ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         for (Object object : kieSession.getObjects()) {
             if (object instanceof AvailabilityRequest && ((AvailabilityRequest) object).getEmployee().getId().equals(employee.getId())
                     && ((AvailabilityRequest) object).overlaps(interval)) {
@@ -190,26 +200,27 @@ public class ShiftPlanningUtility {
     public static Integer getShiftsForInterval(StaffingLevelInterval interval, List<ShiftConstrutionPhase> shifts) {
         return (int) shifts.stream().filter(shift -> shift.getInterval() != null && shift.getInterval().contains(interval.getInterval())).count();
     }
-    public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, List<Shift> shifts,List<IndirectActivity> indirectActivityList) {
+
+    public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, List<Shift> shifts, List<IndirectActivity> indirectActivityList) {
         int[] invalidShiftIntervals = new int[1];
         staffingLevel.getIntervals().forEach(slInterval -> {
-            int availableEmployees= getStaffingLevelIntervalSatisfaction(slInterval,shifts,indirectActivityList);
-            invalidShiftIntervals[0]+=availableEmployees;
+            int availableEmployees = getStaffingLevelIntervalSatisfaction(slInterval, shifts, indirectActivityList);
+            invalidShiftIntervals[0] += availableEmployees;
         });
         return invalidShiftIntervals[0];
     }
 
     private static int getStaffingLevelIntervalSatisfaction(StaffingLevelInterval slInterval, List<Shift> shifts, List<IndirectActivity> indirectActivityList) {
-        slInterval.getActivityTypeLevels().forEach(activityTypeLevel ->{
-            int min= activityTypeLevel.getMinimumStaffRequired(),max=activityTypeLevel.getMaximumStaffRequired();
-            for (int i=0;i<shifts.size();i++){
+        slInterval.getActivityTypeLevels().forEach(activityTypeLevel -> {
+            int min = activityTypeLevel.getMinimumStaffRequired(), max = activityTypeLevel.getMaximumStaffRequired();
+            for (int i = 0; i < shifts.size(); i++) {
                 //TODO
             }
-        } );
+        });
         return 0;
     }
 
-    public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, Shift shift,List<IndirectActivity> indirectActivityList) {
+    public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, Shift shift, List<IndirectActivity> indirectActivityList) {
         int[] invalidShiftIntervals = new int[1];
         if (shift.getInterval() != null) {
             staffingLevel.getIntervals().forEach(slInterval -> {
@@ -446,8 +457,8 @@ public class ShiftPlanningUtility {
         return totalCostOfShift;
     }*/
 
-    public static String getIntervalAsString(Interval interval){
-        return interval.getStart().toString("dd[HH:mm")+"-"+interval.getEnd().toString("HH:mm]");
+    public static String getIntervalAsString(Interval interval) {
+        return interval.getStart().toString("dd[HH:mm") + "-" + interval.getEnd().toString("HH:mm]");
     }
 
     public static Comparator<ActivityLineInterval> getActivityIntervalStartTimeComparator() {
@@ -459,66 +470,72 @@ public class ShiftPlanningUtility {
         };*/
         return Comparator.comparing(ActivityLineInterval::getStart);
     }
-    public static List<ActivityLineInterval> filterActivityLineIntervals(List<ActivityLineInterval> intervals, Activity activity){
-        List<ActivityLineInterval> filteredActivityLineIntervals= new ArrayList<>();
-        for (ActivityLineInterval ali:intervals) {
-            if(ali.getActivity().getId().equals(activity.getId()))
+
+    public static List<ActivityLineInterval> filterActivityLineIntervals(List<ActivityLineInterval> intervals, Activity activity) {
+        List<ActivityLineInterval> filteredActivityLineIntervals = new ArrayList<>();
+        for (ActivityLineInterval ali : intervals) {
+            if (ali.getActivity().getId().equals(activity.getId()))
                 filteredActivityLineIntervals.add(ali);
         }
         return filteredActivityLineIntervals;
     }
-    public static List<ActivityLineInterval> sortAndNew(List<ActivityLineInterval> intervals){
-        List<ActivityLineInterval> sortedActivityLineIntervals= new ArrayList<>();
-        for (ActivityLineInterval ali:intervals) {
+
+    public static List<ActivityLineInterval> sortAndNew(List<ActivityLineInterval> intervals) {
+        List<ActivityLineInterval> sortedActivityLineIntervals = new ArrayList<>();
+        for (ActivityLineInterval ali : intervals) {
             sortedActivityLineIntervals.add(ali);
         }
         Collections.sort(sortedActivityLineIntervals);
         return sortedActivityLineIntervals;
     }
-    public static List<LocalDate> getSortedDates(List<Shift> shifts){
-        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->s.getStart().toLocalDate()).collect(Collectors.toSet()));
+
+    public static List<LocalDate> getSortedDates(List<Shift> shifts) {
+        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> s.getStart().toLocalDate()).collect(Collectors.toSet()));
         Collections.sort(dates);
         return dates;
     }
-    public static List<LocalDate> getSortedAndUniqueDates(List<Shift> shifts){
-        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->s.getStart().toLocalDate()).collect(Collectors.toSet()));
+
+    public static List<LocalDate> getSortedAndUniqueDates(List<Shift> shifts) {
+        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> s.getStart().toLocalDate()).collect(Collectors.toSet()));
         Collections.sort(dates);
         return dates;
     }
-    public static List<Shift> sortShifts(List<Shift> shifts){
+
+    public static List<Shift> sortShifts(List<Shift> shifts) {
         shifts.sort(Comparator.comparing(Shift::getStart));
         return shifts;
     }
-    public static List<Interval> getSortedIntervals(List<Shift> shifts){
-        List<Interval> intervals= new ArrayList<>();
-       for(Shift s:sortShifts(shifts)){
-           intervals.add(s.getInterval());
+
+    public static List<Interval> getSortedIntervals(List<Shift> shifts) {
+        List<Interval> intervals = new ArrayList<>();
+        for (Shift s : sortShifts(shifts)) {
+            intervals.add(s.getInterval());
         }
         return intervals;
     }
 
     public static Interval createInterval(LocalDate weekStart, int intervalLength, IntervalUnit intervalUnit) {
-        Interval interval=null;
-        if(IntervalUnit.WEEKS==intervalUnit){
-            interval= new Interval(weekStart.minusWeeks(intervalLength-1).toDateTimeAtStartOfDay(),weekStart.plusWeeks(1).toDateTimeAtStartOfDay());
+        Interval interval = null;
+        if (IntervalUnit.WEEKS == intervalUnit) {
+            interval = new Interval(weekStart.minusWeeks(intervalLength - 1).toDateTimeAtStartOfDay(), weekStart.plusWeeks(1).toDateTimeAtStartOfDay());
         }
         return interval;
     }
-    public static void sortActivityLineIntervals(List<ActivityLineInterval> intervals){
+
+    public static void sortActivityLineIntervals(List<ActivityLineInterval> intervals) {
         intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
     }
 
     /**
-     *
      * @param activityLineIntervals
      * @param ali
      * @return not null
      */
     public static List<ActivityLineInterval> getOverlappingActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals, ActivityLineInterval ali) {
-        List<ActivityLineInterval> overlappingAlis=new ArrayList<>();
-        if(activityLineIntervals!=null){
-            for(ActivityLineInterval ex:activityLineIntervals){
-                if(ex.getInterval().overlaps(ali.getInterval())){
+        List<ActivityLineInterval> overlappingAlis = new ArrayList<>();
+        if (activityLineIntervals != null) {
+            for (ActivityLineInterval ex : activityLineIntervals) {
+                if (ex.getInterval().overlaps(ali.getInterval())) {
                     overlappingAlis.add(ex);
                 }
             }
@@ -527,13 +544,13 @@ public class ShiftPlanningUtility {
     }
 
     public static void unassignShiftIntervalsOverlappingBreaks(ScoreDirector scoreDirector, ShiftRequestPhase shift, List<ShiftBreak> breaks) {
-        List<ActivityLineInterval> overlappingAlis=getOverlappingActivityLineIntervalsWithBreaks(shift, breaks);
+        List<ActivityLineInterval> overlappingAlis = getOverlappingActivityLineIntervalsWithBreaks(shift, breaks);
         //removeALIFromVariableListenerNotificationQueue(scoreDirector,overlappingAlis);
-        for(ActivityLineInterval ali: overlappingAlis){
-            scoreDirector.beforeVariableChanged(ali,"shift");
+        for (ActivityLineInterval ali : overlappingAlis) {
+            scoreDirector.beforeVariableChanged(ali, "shift");
             ali.setShift(null);
             //log.info("setting ali shift to null:"+ali);
-            scoreDirector.afterVariableChanged(ali,"shift");
+            scoreDirector.afterVariableChanged(ali, "shift");
         }
     }
 
@@ -547,87 +564,90 @@ public class ShiftPlanningUtility {
             Field notifiableList = vls.getClass().getDeclaredField("notifiableList");
             notifiableList.setAccessible(true);
             List<VariableListenerNotifiable> list = (List<VariableListenerNotifiable>) notifiableList.get(vls);
-                for (VariableListenerNotifiable vn : list) {
-                    log.info(vn.getVariableListener() + "--" + vn.getNotificationQueue().size());
-                }
-        }
-        catch (NoSuchFieldException e) {
+            for (VariableListenerNotifiable vn : list) {
+                log.info(vn.getVariableListener() + "--" + vn.getNotificationQueue().size());
+            }
+        } catch (NoSuchFieldException e) {
             e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
-    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithBreaks(ShiftRequestPhase shift,List<ShiftBreak> breaks){
-        List<ActivityLineInterval> alis=shift.getActivityLineIntervals();
-        List<ActivityLineInterval> overlappingAlis=new ArrayList<>();
-        for(ActivityLineInterval ali:alis){
-            for(ShiftBreak sb:breaks){
-                if(sb.getInterval().contains(ali.getStart())){
+    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithBreaks(ShiftRequestPhase shift, List<ShiftBreak> breaks) {
+        List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
+        List<ActivityLineInterval> overlappingAlis = new ArrayList<>();
+        for (ActivityLineInterval ali : alis) {
+            for (ShiftBreak sb : breaks) {
+                if (sb.getInterval().contains(ali.getStart())) {
                     overlappingAlis.add(ali);
                 }
             }
         }
-        return  overlappingAlis;
+        return overlappingAlis;
     }
-    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithInterval(ShiftRequestPhase shift,Interval interval){
-        List<ActivityLineInterval> alis=shift.getActivityLineIntervals();
-        List<ActivityLineInterval> overlappingAlis=new ArrayList<>();
-        for(ActivityLineInterval ali:alis){
-                if(interval.contains(ali.getStart())){
-                    overlappingAlis.add(ali);
+
+    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithInterval(ShiftRequestPhase shift, Interval interval) {
+        List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
+        List<ActivityLineInterval> overlappingAlis = new ArrayList<>();
+        for (ActivityLineInterval ali : alis) {
+            if (interval.contains(ali.getStart())) {
+                overlappingAlis.add(ali);
             }
         }
-        return  overlappingAlis;
+        return overlappingAlis;
     }
 
     public static boolean intervalOverlapsBreak(ShiftRequestPhase shift, DateTime start) {
-        boolean overlaps=false;
-        if(shift==null || CollectionUtils.isEmpty(shift.getBreaks())){
+        boolean overlaps = false;
+        if (shift == null || CollectionUtils.isEmpty(shift.getBreaks())) {
             return overlaps;
         }
-        for(ShiftBreak shiftBreak:shift.getBreaks()){
-            if(shiftBreak.getInterval()!=null && shiftBreak.getInterval().contains(start)){
-                overlaps=true;
+        for (ShiftBreak shiftBreak : shift.getBreaks()) {
+            if (shiftBreak.getInterval() != null && shiftBreak.getInterval().contains(start)) {
+                overlaps = true;
                 break;
             }
         }
         return overlaps;
     }
+
     public static boolean intervalOverlapsBreak(List<ShiftBreak> shiftBreaks, Interval interval) {
-        boolean overlaps=false;
-        if(shiftBreaks==null) return overlaps;
-        for(ShiftBreak shiftBreak:shiftBreaks){
-            if(shiftBreak.getInterval()!=null && shiftBreak.getInterval().overlaps(interval)){
-                overlaps=true;
+        boolean overlaps = false;
+        if (shiftBreaks == null) return overlaps;
+        for (ShiftBreak shiftBreak : shiftBreaks) {
+            if (shiftBreak.getInterval() != null && shiftBreak.getInterval().overlaps(interval)) {
+                overlaps = true;
                 break;
             }
         }
         return overlaps;
     }
-    public static  List<ActivityLineIntervalWrapper> toActivityWrapper(List<ActivityLineInterval> alis){
-        List<ActivityLineIntervalWrapper> aliw= new ArrayList<>();
-        if(CollectionUtils.isEmpty(alis)) return aliw;
-        for(ActivityLineInterval ali: alis){
-            aliw.add(new ActivityLineIntervalWrapper(ali,ali.getShift()));
+
+    public static List<ActivityLineIntervalWrapper> toActivityWrapper(List<ActivityLineInterval> alis) {
+        List<ActivityLineIntervalWrapper> aliw = new ArrayList<>();
+        if (CollectionUtils.isEmpty(alis)) return aliw;
+        for (ActivityLineInterval ali : alis) {
+            aliw.add(new ActivityLineIntervalWrapper(ali, ali.getShift()));
         }
         return aliw;
     }
-    public static  List<ActivityLineIntervalWrapper> toActivityWrapper(List<ActivityLineInterval> alis,ShiftRequestPhase shiftRequestPhase){
-        List<ActivityLineIntervalWrapper> aliw= new ArrayList<>();
-        if(CollectionUtils.isEmpty(alis)) return aliw;
-        for(ActivityLineInterval ali: alis){
-            if(Objects.equals(ali.getShift(),shiftRequestPhase))
+
+    public static List<ActivityLineIntervalWrapper> toActivityWrapper(List<ActivityLineInterval> alis, ShiftRequestPhase shiftRequestPhase) {
+        List<ActivityLineIntervalWrapper> aliw = new ArrayList<>();
+        if (CollectionUtils.isEmpty(alis)) return aliw;
+        for (ActivityLineInterval ali : alis) {
+            if (Objects.equals(ali.getShift(), shiftRequestPhase))
                 continue;
-            aliw.add(new ActivityLineIntervalWrapper(ali,shiftRequestPhase));
+            aliw.add(new ActivityLineIntervalWrapper(ali, shiftRequestPhase));
         }
         return aliw;
     }
+
     /*
     Receives length of array as bound so it -1 first thing to keep up with index of array
      */
-    public static int[] getRandomRange(int bound, Random random){
+    public static int[] getRandomRange(int bound, Random random) {
         try {
             if (bound == 1) {
                 return new int[]{0, 1};
@@ -639,25 +659,25 @@ public class ShiftPlanningUtility {
             //if(lower==upper)
             //log.info("range: {} {}",lower,upper);
             return new int[]{lower, upper};
-        }catch(Exception e){
-            log.error("Bad bound:"+bound,e);
+        } catch (Exception e) {
+            log.error("Bad bound:" + bound, e);
             throw e;
         }
     }
 
-    public static String solvedShiftPlanningProblem(List<ShiftDTO> shiftDTOS,Long unitId){
-        final String baseUrl="http://192.168.6.211:5555/kairos/activity/api/v1/organization/71/unit/"+unitId+"/sub-shifts";
+    public static String solvedShiftPlanningProblem(List<ShiftDTO> shiftDTOS, Long unitId) {
+        final String baseUrl = "http://192.168.6.211:5555/kairos/activity/api/v1/organization/71/unit/" + unitId + "/sub-shifts";
 
         HttpClient client = HttpClientBuilder.create().build();
-        Map<String,String> header = new HashedMap<>();
-        header.put("Authorization","bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJ1bHJpa0BrYWlyb3MuY29tIiwic2NvcGUiOlsid2ViY2xpZW50Il0sImRldGFpbHMiOnsiaWQiOjY3LCJ1c2VyTmFtZSI6InVscmlrQGthaXJvcy5jb20iLCJuaWNrTmFtZSI6IlVscmlrIiwiZmlyc3ROYW1lIjoiVWxyaWsiLCJsYXN0TmFtZSI6IlJhc211c3NlbiIsImVtYWlsIjoidWxyaWtAa2Fpcm9zLmNvbSIsInBhc3N3b3JkVXBkYXRlZCI6dHJ1ZSwiYWdlIjo2NiwiY291bnRyeUlkIjpudWxsLCJodWJNZW1iZXIiOmZhbHNlfSwiZXhwIjoxNTIwNDA1NDk3LCJhdXRob3JpdGllcyI6WyI3MV90YWJfNjciLCI3MV90YWJfNjgiLCI3MV90YWJfNjkiLCI3MV90YWJfNjMiLCI3MV90YWJfNjQiLCI3MV90YWJfNjUiLCI3MV90YWJfNjYiLCI3MV90YWJfNjAiLCI3MV90YWJfNjEiLCI3MV90YWJfNjIiLCI3MV90YWJfNTYiLCI3MV90YWJfNTciLCI3MV90YWJfNTgiLCI3MV90YWJfNTkiLCI3MV90YWJfMTA4IiwiNzFfdGFiXzEwOSIsIjcxX3RhYl8xMDYiLCI3MV90YWJfMTA3IiwiNzFfdGFiXzUyIiwiNzFfdGFiXzEwMCIsIjcxX3RhYl8xMDEiLCI3MV90YWJfNTMiLCI3MV90YWJfNTQiLCI3MV90YWJfNTUiLCI3MV90YWJfMTA0IiwiNzFfdGFiXzEwNSIsIjcxX3RhYl81MCIsIjcxX3RhYl8xMDIiLCI3MV90YWJfNTEiLCI3MV90YWJfMTAzIiwiNzFfdGFiXzg5IiwiNzFfdGFiXzgwIiwiNzFfdGFiXzg1IiwiNzFfdGFiXzg2IiwiNzFfdGFiXzg3IiwiNzFfdGFiXzg4IiwiNzFfdGFiXzgxIiwiNzFfdGFiXzgyIiwiNzFfdGFiXzgzIiwiNzFfdGFiXzg0IiwiNzFfdGFiXzc4IiwiNzFfdGFiXzc5IiwiNzFfbW9kdWxlXzEiLCI3MV90YWJfOSIsIjcxX21vZHVsZV80IiwiNzFfbW9kdWxlXzUiLCI3MV90YWJfNyIsIjcxX21vZHVsZV8yIiwiNzFfbW9kdWxlXzMiLCI3MV90YWJfOCIsIjcxX3RhYl81IiwiNzFfbW9kdWxlXzgiLCI3MV90YWJfNzQiLCI3MV90YWJfNzUiLCI3MV90YWJfNiIsIjcxX3RhYl83NiIsIjcxX3RhYl8zIiwiNzFfbW9kdWxlXzYiLCI3MV90YWJfNCIsIjcxX3RhYl83NyIsIjcxX21vZHVsZV83IiwiNzFfdGFiXzEiLCI3MV90YWJfNzAiLCI3MV90YWJfMiIsIjcxX3RhYl83MSIsIjcxX3RhYl83MiIsIjcxX3RhYl83MyIsIjcxX3RhYl8yNyIsIjcxX3RhYl8yOCIsIjcxX3RhYl8yOSIsIjcxX3RhYl8yMyIsIjcxX3RhYl8yNCIsIjcxX3RhYl8yNSIsIjcxX3RhYl8yNiIsIjcxX3RhYl8yMCIsIjcxX3RhYl8yMSIsIjcxX3RhYl8yMiIsIjcxX3RhYl8xNiIsIjcxX3RhYl8xNyIsIjcxX3RhYl8xOCIsIjcxX3RhYl8xOSIsIjcxX3RhYl8xMiIsIjcxX3RhYl8xMyIsIjcxX3RhYl8xNCIsIjcxX3RhYl8xNSIsIjcxX3RhYl85MCIsIjcxX3RhYl85MSIsIjcxX3RhYl85NiIsIjcxX3RhYl85NyIsIjcxX3RhYl8xMCIsIjcxX3RhYl85OCIsIjcxX3RhYl85OSIsIjcxX3RhYl8xMSIsIjcxX3RhYl85MiIsIjcxX3RhYl85MyIsIjcxX3RhYl85NCIsIjcxX3RhYl85NSIsIjcxX3RhYl80NSIsIjcxX3RhYl80NiIsIjcxX3RhYl80NyIsIjcxX3RhYl80OCIsIjcxX3RhYl8xMTEiLCI3MV90YWJfNDEiLCI3MV90YWJfNDIiLCI3MV90YWJfMTEyIiwiNzFfdGFiXzQzIiwiNzFfdGFiXzQ0IiwiNzFfdGFiXzExMCIsIjcxX3RhYl8xMTMiLCI3MV90YWJfNDAiLCI3MV90YWJfMzgiLCI3MV90YWJfMzkiLCI3MV90YWJfMzQiLCI3MV90YWJfMzUiLCI3MV90YWJfMzYiLCI3MV90YWJfMzciLCI3MV90YWJfMzAiLCI3MV90YWJfMzEiLCI3MV90YWJfMzIiLCI3MV90YWJfMzMiXSwianRpIjoiMzcyZTgzMjQtOGRhMS00YTYxLWE4YTctZjA4Mjg5ZjE0MGM1IiwiY2xpZW50X2lkIjoia2Fpcm9zIn0.PrgK1fGis9iyk5mfhY_f_tEb6o_Qkdp4VV86Pr38l4Q");
-        HttpUriRequest request= getPutRequest(shiftDTOS, null, null, baseUrl);
+        Map<String, String> header = new HashedMap<>();
+        header.put("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJ1bHJpa0BrYWlyb3MuY29tIiwic2NvcGUiOlsid2ViY2xpZW50Il0sImRldGFpbHMiOnsiaWQiOjY3LCJ1c2VyTmFtZSI6InVscmlrQGthaXJvcy5jb20iLCJuaWNrTmFtZSI6IlVscmlrIiwiZmlyc3ROYW1lIjoiVWxyaWsiLCJsYXN0TmFtZSI6IlJhc211c3NlbiIsImVtYWlsIjoidWxyaWtAa2Fpcm9zLmNvbSIsInBhc3N3b3JkVXBkYXRlZCI6dHJ1ZSwiYWdlIjo2NiwiY291bnRyeUlkIjpudWxsLCJodWJNZW1iZXIiOmZhbHNlfSwiZXhwIjoxNTIwNDA1NDk3LCJhdXRob3JpdGllcyI6WyI3MV90YWJfNjciLCI3MV90YWJfNjgiLCI3MV90YWJfNjkiLCI3MV90YWJfNjMiLCI3MV90YWJfNjQiLCI3MV90YWJfNjUiLCI3MV90YWJfNjYiLCI3MV90YWJfNjAiLCI3MV90YWJfNjEiLCI3MV90YWJfNjIiLCI3MV90YWJfNTYiLCI3MV90YWJfNTciLCI3MV90YWJfNTgiLCI3MV90YWJfNTkiLCI3MV90YWJfMTA4IiwiNzFfdGFiXzEwOSIsIjcxX3RhYl8xMDYiLCI3MV90YWJfMTA3IiwiNzFfdGFiXzUyIiwiNzFfdGFiXzEwMCIsIjcxX3RhYl8xMDEiLCI3MV90YWJfNTMiLCI3MV90YWJfNTQiLCI3MV90YWJfNTUiLCI3MV90YWJfMTA0IiwiNzFfdGFiXzEwNSIsIjcxX3RhYl81MCIsIjcxX3RhYl8xMDIiLCI3MV90YWJfNTEiLCI3MV90YWJfMTAzIiwiNzFfdGFiXzg5IiwiNzFfdGFiXzgwIiwiNzFfdGFiXzg1IiwiNzFfdGFiXzg2IiwiNzFfdGFiXzg3IiwiNzFfdGFiXzg4IiwiNzFfdGFiXzgxIiwiNzFfdGFiXzgyIiwiNzFfdGFiXzgzIiwiNzFfdGFiXzg0IiwiNzFfdGFiXzc4IiwiNzFfdGFiXzc5IiwiNzFfbW9kdWxlXzEiLCI3MV90YWJfOSIsIjcxX21vZHVsZV80IiwiNzFfbW9kdWxlXzUiLCI3MV90YWJfNyIsIjcxX21vZHVsZV8yIiwiNzFfbW9kdWxlXzMiLCI3MV90YWJfOCIsIjcxX3RhYl81IiwiNzFfbW9kdWxlXzgiLCI3MV90YWJfNzQiLCI3MV90YWJfNzUiLCI3MV90YWJfNiIsIjcxX3RhYl83NiIsIjcxX3RhYl8zIiwiNzFfbW9kdWxlXzYiLCI3MV90YWJfNCIsIjcxX3RhYl83NyIsIjcxX21vZHVsZV83IiwiNzFfdGFiXzEiLCI3MV90YWJfNzAiLCI3MV90YWJfMiIsIjcxX3RhYl83MSIsIjcxX3RhYl83MiIsIjcxX3RhYl83MyIsIjcxX3RhYl8yNyIsIjcxX3RhYl8yOCIsIjcxX3RhYl8yOSIsIjcxX3RhYl8yMyIsIjcxX3RhYl8yNCIsIjcxX3RhYl8yNSIsIjcxX3RhYl8yNiIsIjcxX3RhYl8yMCIsIjcxX3RhYl8yMSIsIjcxX3RhYl8yMiIsIjcxX3RhYl8xNiIsIjcxX3RhYl8xNyIsIjcxX3RhYl8xOCIsIjcxX3RhYl8xOSIsIjcxX3RhYl8xMiIsIjcxX3RhYl8xMyIsIjcxX3RhYl8xNCIsIjcxX3RhYl8xNSIsIjcxX3RhYl85MCIsIjcxX3RhYl85MSIsIjcxX3RhYl85NiIsIjcxX3RhYl85NyIsIjcxX3RhYl8xMCIsIjcxX3RhYl85OCIsIjcxX3RhYl85OSIsIjcxX3RhYl8xMSIsIjcxX3RhYl85MiIsIjcxX3RhYl85MyIsIjcxX3RhYl85NCIsIjcxX3RhYl85NSIsIjcxX3RhYl80NSIsIjcxX3RhYl80NiIsIjcxX3RhYl80NyIsIjcxX3RhYl80OCIsIjcxX3RhYl8xMTEiLCI3MV90YWJfNDEiLCI3MV90YWJfNDIiLCI3MV90YWJfMTEyIiwiNzFfdGFiXzQzIiwiNzFfdGFiXzQ0IiwiNzFfdGFiXzExMCIsIjcxX3RhYl8xMTMiLCI3MV90YWJfNDAiLCI3MV90YWJfMzgiLCI3MV90YWJfMzkiLCI3MV90YWJfMzQiLCI3MV90YWJfMzUiLCI3MV90YWJfMzYiLCI3MV90YWJfMzciLCI3MV90YWJfMzAiLCI3MV90YWJfMzEiLCI3MV90YWJfMzIiLCI3MV90YWJfMzMiXSwianRpIjoiMzcyZTgzMjQtOGRhMS00YTYxLWE4YTctZjA4Mjg5ZjE0MGM1IiwiY2xpZW50X2lkIjoia2Fpcm9zIn0.PrgK1fGis9iyk5mfhY_f_tEb6o_Qkdp4VV86Pr38l4Q");
+        HttpUriRequest request = getPutRequest(shiftDTOS, null, null, baseUrl);
         StringBuffer result = new StringBuffer();
         try {
             HttpResponse response = client.execute(request);
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String line = "";
-            log.info("status "+response.getStatusLine().toString());
+            log.info("status " + response.getStatusLine().toString());
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }
@@ -667,14 +687,14 @@ public class ShiftPlanningUtility {
         return "";
     }
 
-    public static HttpUriRequest getPutRequest(List<ShiftDTO> shiftDTOS, Map<String, Object> urlParameters, Map<String, String> headers, String url){
+    public static HttpUriRequest getPutRequest(List<ShiftDTO> shiftDTOS, Map<String, Object> urlParameters, Map<String, String> headers, String url) {
         HttpPut putRequest = new HttpPut(url);
-        if(headers == null) headers=new HashMap<String, String>();
+        if (headers == null) headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json");
         putRequest = (HttpPut) setHeaders(headers, putRequest);
-        if(urlParameters != null){
+        if (urlParameters != null) {
             List<BasicNameValuePair> parametersList = new ArrayList<BasicNameValuePair>();
-            for(Map.Entry<String, Object> entry : urlParameters.entrySet()){
+            for (Map.Entry<String, Object> entry : urlParameters.entrySet()) {
                 parametersList.add(new BasicNameValuePair(entry.getKey(), (String) entry.getValue()));
             }
             try {
@@ -684,7 +704,7 @@ public class ShiftPlanningUtility {
                 e.printStackTrace();
             }
         }
-        if(shiftDTOS != null){
+        if (shiftDTOS != null) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String body = mapper.writeValueAsString(shiftDTOS);
@@ -698,9 +718,9 @@ public class ShiftPlanningUtility {
         return putRequest;
     }
 
-    public static HttpUriRequest setHeaders(Map<String, String> headers, HttpUriRequest request){
-        if(headers != null){
-            for(Map.Entry<String, String> entry : headers.entrySet()){
+    public static HttpUriRequest setHeaders(Map<String, String> headers, HttpUriRequest request) {
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
                 request.setHeader(entry.getKey(), entry.getValue());
             }
         }
@@ -713,14 +733,14 @@ public class ShiftPlanningUtility {
 
     //TODO n2 complex need to improve
     public static List<ActivityLineIntervalWrapper> buildNullAssignWrappersForExIntervals(List<ActivityLineIntervalWrapper> activityLineIntervalWrappers) {
-        List<ActivityLineIntervalWrapper> overlappingAlisWrappers=new ArrayList<>();
-        if(activityLineIntervalWrappers.get(0).getShiftRequestPhase()==null) return overlappingAlisWrappers;
-        List<ActivityLineInterval> exAlisThisShift=activityLineIntervalWrappers.get(0).getShiftRequestPhase().getActivityLineIntervals();
-        if(exAlisThisShift!=null){
-            for(ActivityLineInterval ex:exAlisThisShift){
-                for(ActivityLineIntervalWrapper newAli:activityLineIntervalWrappers){
-                    if(ex.getInterval().overlaps(newAli.getActivityLineInterval().getInterval())){
-                        overlappingAlisWrappers.add(new ActivityLineIntervalWrapper(ex,null));
+        List<ActivityLineIntervalWrapper> overlappingAlisWrappers = new ArrayList<>();
+        if (activityLineIntervalWrappers.get(0).getShiftRequestPhase() == null) return overlappingAlisWrappers;
+        List<ActivityLineInterval> exAlisThisShift = activityLineIntervalWrappers.get(0).getShiftRequestPhase().getActivityLineIntervals();
+        if (exAlisThisShift != null) {
+            for (ActivityLineInterval ex : exAlisThisShift) {
+                for (ActivityLineIntervalWrapper newAli : activityLineIntervalWrappers) {
+                    if (ex.getInterval().overlaps(newAli.getActivityLineInterval().getInterval())) {
+                        overlappingAlisWrappers.add(new ActivityLineIntervalWrapper(ex, null));
                         break;
                     }
                 }
@@ -728,20 +748,21 @@ public class ShiftPlanningUtility {
         }
         return overlappingAlisWrappers;
     }
+
     public static String getMergedInterval(List<ActivityLineInterval> intervals) {
-        if(intervals.size()==0){
+        if (intervals.size() == 0) {
             return "NULL";
         }
         intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
         //log.info("before:"+intervals);
-        Interval mergedInterval=intervals.get(0).getInterval();
-        String id=intervals.get(0).getActivity().getId();
-        List<Interval> mergedIntervals= new ArrayList<>();
-        List<String> namesList= new ArrayList<>();
-        for (ActivityLineInterval ali:intervals) {
+        Interval mergedInterval = intervals.get(0).getInterval();
+        String id = intervals.get(0).getActivity().getId();
+        List<Interval> mergedIntervals = new ArrayList<>();
+        List<String> namesList = new ArrayList<>();
+        for (ActivityLineInterval ali : intervals) {
             if (mergedInterval.getEnd().equals(ali.getStart()) && id.equals(ali.getActivity().getId())) {
                 mergedInterval = mergedInterval.withEnd(ali.getEnd());
-            }else if (mergedInterval.getEnd().equals(ali.getStart()) && !id.equals(ali.getActivity().getId())) {
+            } else if (mergedInterval.getEnd().equals(ali.getStart()) && !id.equals(ali.getActivity().getId())) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
                 namesList.add(ali.getActivity().getName());
@@ -754,30 +775,31 @@ public class ShiftPlanningUtility {
         //to add last one
         mergedIntervals.add(mergedInterval);
         StringBuilder sb = new StringBuilder("\n");
-        intervals.forEach(i->{
-            sb.append(ShiftPlanningUtility.getIntervalAsString(i.getInterval())+":"+i.getActivity().getName()+"\n");
+        intervals.forEach(i -> {
+            sb.append(ShiftPlanningUtility.getIntervalAsString(i.getInterval()) + ":" + i.getActivity().getName() + "\n");
         });
         return sb.toString();
     }
+
     public static List<Interval> getMergedIntervals(List<ActivityLineInterval> intervals, boolean ignoreActivities) {
-        if(intervals.size()==0){
+        if (intervals.size() == 0) {
             return new ArrayList<>();
         }
         intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
-        Interval mergedInterval=intervals.get(0).getInterval();
-        String id=intervals.get(0).getActivity().getId();
-        List<Interval> mergedIntervals= new ArrayList<>();
-        for (ActivityLineInterval ali:intervals) {
-            if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities ||id.equals(ali.getActivity().getId()))) {
+        Interval mergedInterval = intervals.get(0).getInterval();
+        String id = intervals.get(0).getActivity().getId();
+        List<Interval> mergedIntervals = new ArrayList<>();
+        for (ActivityLineInterval ali : intervals) {
+            if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities || id.equals(ali.getActivity().getId()))) {
                 mergedInterval = mergedInterval.withEnd(ali.getEnd());
-            }else if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities ||!id.equals(ali.getActivity().getId()))) {
+            } else if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities || !id.equals(ali.getActivity().getId()))) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
-                id=ali.getActivity().getId();
+                id = ali.getActivity().getId();
             } else if (mergedInterval.getEnd().isBefore(ali.getStart())) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
-                id=ali.getActivity().getId();
+                id = ali.getActivity().getId();
             }
         }
         //to add last one
@@ -786,69 +808,71 @@ public class ShiftPlanningUtility {
     }
 
     public static int getMinutes(DateTime start, DateTime end) {
-        return new Interval(start,end).toDuration().toStandardMinutes().getMinutes();
+        return new Interval(start, end).toDuration().toStandardMinutes().getMinutes();
 
     }
 
     public static Interval getPossibleBreakStartInterval(ShiftBreak shiftBreak, ShiftRequestPhase shift) {
-        switch (shiftBreak.getOrder()){
+        switch (shiftBreak.getOrder()) {
             case 1:
-                return new Interval(shift.getStart().plusMinutes(FIRST_BREAK_START_MINUTES),shift.getStart().plusMinutes(FIRST_BREAK_END_MINUTES));
+                return new Interval(shift.getStart().plusMinutes(FIRST_BREAK_START_MINUTES), shift.getStart().plusMinutes(FIRST_BREAK_END_MINUTES));
             case 2:
-                return new Interval(shift.getStart().plusMinutes(SECOND_BREAK_START_MINUTES),shift.getStart().plusMinutes(SECOND_BREAK_END_MINUTES));
+                return new Interval(shift.getStart().plusMinutes(SECOND_BREAK_START_MINUTES), shift.getStart().plusMinutes(SECOND_BREAK_END_MINUTES));
             case 3:
-                return new Interval(shift.getStart().plusMinutes(THIRD_BREAK_START_MINUTES),shift.getStart().plusMinutes(THIRD_BREAK_END_MINUTES));
+                return new Interval(shift.getStart().plusMinutes(THIRD_BREAK_START_MINUTES), shift.getStart().plusMinutes(THIRD_BREAK_END_MINUTES));
         }
         return null;
     }
 
     /**
      * This creates matrix as date:Act1:[1,1]. this means 1 required and 1 optional making min/max as 1:2.
+     *
      * @param dates
      * @param alis
      * @param granularity
      * @param activities
      * @return
      */
-    public static Map<LocalDate, Object[]> createStaffingLevelMatrix(List<LocalDate> dates, List<ActivityLineInterval> alis,int  granularity,List<Activity> activities){
-        Map<LocalDate, Object[]> slMatrix=new HashMap<>();
-        for(LocalDate localDate:dates){
-            slMatrix.put(localDate,new int[1440/granularity][activities.size()*2]);
+    public static Map<LocalDate, Object[]> createStaffingLevelMatrix(List<LocalDate> dates, List<ActivityLineInterval> alis, int granularity, List<Activity> activities) {
+        Map<LocalDate, Object[]> slMatrix = new HashMap<>();
+        for (LocalDate localDate : dates) {
+            slMatrix.put(localDate, new int[1440 / granularity][activities.size() * 2]);
         }
-        for(ActivityLineInterval ali:alis){
-            if(ali.getActivity().isBlankActivity())continue;
-            if(ali.getActivity().isTypeAbsence()){
-                IntStream.rangeClosed(0,1440/granularity-1).forEach(i->{
-                    ((int[][])slMatrix.get(ali.getStart().toLocalDate()))[i][getActivityIndex(ali)]++;
+        for (ActivityLineInterval ali : alis) {
+            if (ali.getActivity().isBlankActivity()) continue;
+            if (ali.getActivity().isTypeAbsence()) {
+                IntStream.rangeClosed(0, 1440 / granularity - 1).forEach(i -> {
+                    ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[i][getActivityIndex(ali)]++;
                 });
 
-                ((int[][])slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(),granularity)][getActivityIndex(ali)]++;            }else{
+                ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(), granularity)][getActivityIndex(ali)]++;
+            } else {
             }
         }
-        printStaffingLevelMatrix(slMatrix,null);
+        printStaffingLevelMatrix(slMatrix, null);
         return slMatrix;
     }
 
-    public static void printStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrix,Map<LocalDate, Object[]> originalMatrix) {
-        slMatrix.forEach((k,v)->{
-            log.info("date:"+k);
-            int[] idx = { 0 };
-            Arrays.stream(v).forEach(i->log.info(k.toDateTimeAtStartOfDay().plusMinutes((idx[0]++)*15).toString("HH:mm")
-                    +(originalMatrix!=null?Arrays.toString((int[])originalMatrix.get(k)[idx[0]-1]):"")
-                    +Arrays.toString((int[])i)));
+    public static void printStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrix, Map<LocalDate, Object[]> originalMatrix) {
+        slMatrix.forEach((k, v) -> {
+            log.info("date:" + k);
+            int[] idx = {0};
+            Arrays.stream(v).forEach(i -> log.info(k.toDateTimeAtStartOfDay().plusMinutes((idx[0]++) * 15).toString("HH:mm")
+                    + (originalMatrix != null ? Arrays.toString((int[]) originalMatrix.get(k)[idx[0] - 1]) : "")
+                    + Arrays.toString((int[]) i)));
         });
     }
 
     public static Map<LocalDate, Object[]> reduceStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrixOriginal, List<ShiftRequestPhase> shifts,
-                                                                     List<ShiftBreak> shiftBreaks,List<IndirectActivity> indirectActivities, int granularity){
-        long start=System.currentTimeMillis();
-        Map<LocalDate, Object[]> slMatrix=deepCopyMatrix(slMatrixOriginal);
-        if(log.isDebugEnabled())
-            log.debug("1 reduceStaffingLevelMatrix() took"+(System.currentTimeMillis()-start)/1000.0);
+                                                                     List<ShiftBreak> shiftBreaks, List<IndirectActivity> indirectActivities, int granularity) {
+        long start = System.currentTimeMillis();
+        Map<LocalDate, Object[]> slMatrix = deepCopyMatrix(slMatrixOriginal);
+        if (log.isDebugEnabled())
+            log.debug("1 reduceStaffingLevelMatrix() took" + (System.currentTimeMillis() - start) / 1000.0);
 
         //boolean b=slMatrix.get(new LocalDate("2017-12-11"))[0]==slMatrixOriginal.get(new LocalDate("2017-12-11"))[0];
-        Map<UUID,List<ShiftBreak>> breaksPerShift=new HashMap<>();
-        if(shiftBreaks!=null) {
+        Map<UUID, List<ShiftBreak>> breaksPerShift = new HashMap<>();
+        if (shiftBreaks != null) {
             shiftBreaks.forEach(sb -> {
                 if (!breaksPerShift.containsKey(sb.getShift().getId())) {
                     breaksPerShift.put(sb.getShift().getId(), new ArrayList<>());
@@ -856,158 +880,197 @@ public class ShiftPlanningUtility {
                 breaksPerShift.get(sb.getShift().getId()).add(sb);
             });
         }
-        for(ShiftRequestPhase shift:shifts){
-            if(shift.getInterval()==null){
+        for (ShiftRequestPhase shift : shifts) {
+            if (shift.getInterval() == null) {
                 continue;
             }
-            if(shift.isAbsenceActivityApplied()){
-                for(ActivityLineInterval ali:shift.getActivityLineIntervals()){//TODO
-                    if(!ali.isRequired()) continue;
-                        IntStream.rangeClosed(0,1440/granularity-1).forEach(i->{
-                            int[] perIntervalStaffingLevel=((int[][])slMatrix.get(ali.getStart().toLocalDate()))[i];
-                            if(perIntervalStaffingLevel[getActivityMinIndex(ali)]>0){
-                                perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
-                            }else{
-                                perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
-                            }
-                        });
+            if (shift.isAbsenceActivityApplied()) {
+                for (ActivityLineInterval ali : shift.getActivityLineIntervals()) {//TODO
+                    if (!ali.isRequired()) continue;
+                    IntStream.rangeClosed(0, 1440 / granularity - 1).forEach(i -> {
+                        int[] perIntervalStaffingLevel = ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[i];
+                        if (perIntervalStaffingLevel[getActivityMinIndex(ali)] > 0) {
+                            perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
+                        } else {
+                            perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
+                        }
+                    });
                 }
-            }else{
-                for(ActivityLineInterval ali:shift.getActivityLineIntervals()){
+            } else {
+                for (ActivityLineInterval ali : shift.getActivityLineIntervals()) {
                     //first get index of twice-2 and then twice-1
-                        int[] perIntervalStaffingLevel=((int[][])slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(),granularity)];
-                        //[getActivityIndex(ali)]++;
-                            if(shiftBreaks!=null && intervalOverlapsBreak(breaksPerShift.get(ali.getShift().getId()),ali.getInterval())){
-                                continue;
-                            }
-                            if(indirectActivities!=null && intervalOverlapsIndirectActivities(indirectActivities,ali.getInterval(),shift.getEmployee())){
-                                continue;
-                            }
-                            if(perIntervalStaffingLevel[getActivityMinIndex(ali)]>0){
-                                perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
-                            }else{
-                                perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
-                            }
+                    int[] perIntervalStaffingLevel = ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(), granularity)];
+                    //[getActivityIndex(ali)]++;
+                    if (shiftBreaks != null && intervalOverlapsBreak(breaksPerShift.get(ali.getShift().getId()), ali.getInterval())) {
+                        continue;
+                    }
+                    if (indirectActivities != null && intervalOverlapsIndirectActivities(indirectActivities, ali.getInterval(), shift.getEmployee())) {
+                        continue;
+                    }
+                    if (perIntervalStaffingLevel[getActivityMinIndex(ali)] > 0) {
+                        perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
+                    } else {
+                        perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
+                    }
                 }
             }
         }
         //printStaffingLevelMatrix(slMatrix);
-        if(log.isDebugEnabled())
-            log.debug("2 reduceStaffingLevelMatrix() took"+(System.currentTimeMillis()-start)/1000.0);
+        if (log.isDebugEnabled())
+            log.debug("2 reduceStaffingLevelMatrix() took" + (System.currentTimeMillis() - start) / 1000.0);
 
         return slMatrix;
     }
+
     @Deprecated
-    private static boolean intervalOverlapsIndirectActivities(List<IndirectActivity> indirectActivities, Interval interval,Employee employee) {
-        for(IndirectActivity ic:indirectActivities){
-            if(ic.getInterval()!=null && ic.getInterval().overlaps(interval) && ic.getEmployees().contains(employee)) return true;
+    private static boolean intervalOverlapsIndirectActivities(List<IndirectActivity> indirectActivities, Interval interval, Employee employee) {
+        for (IndirectActivity ic : indirectActivities) {
+            if (ic.getInterval() != null && ic.getInterval().overlaps(interval) && ic.getEmployees().contains(employee))
+                return true;
         }
         return false;
     }
 
-    public static Map<LocalDate, Object[]> reduceALIsFromStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrixOriginal, List<ActivityLineInterval> alis,int granularity){
-        long start=System.currentTimeMillis();
-        Map<LocalDate, Object[]> slMatrix=deepCopyMatrix(slMatrixOriginal);
-        if(log.isDebugEnabled())
-            log.debug("1 reduceStaffingLevelMatrix() took"+(System.currentTimeMillis()-start)/1000.0);
-        boolean b=slMatrix.get(new LocalDate("2017-12-11"))[0]==slMatrixOriginal.get(new LocalDate("2017-12-11"))[0];
-        for(ActivityLineInterval ali:alis){
-            if(ali.getActivity().isTypeAbsence()){
-                    IntStream.rangeClosed(0,1440/granularity-1).forEach(i->{
-                        int[] perIntervalStaffingLevel=((int[][])slMatrix.get(ali.getStart().toLocalDate()))[i];
-                        if(perIntervalStaffingLevel[getActivityMinIndex(ali)]>0){
-                            perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
-                        }else{
-                            perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
-                        }
-                    });
-            }else{
-                    //first get index of twice-2 and then twice-1
-                    int[] perIntervalStaffingLevel=((int[][])slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(),granularity)];
-                    //[getActivityIndex(ali)]++;
-                    if(perIntervalStaffingLevel[getActivityMinIndex(ali)]>0){
+    public static Map<LocalDate, Object[]> reduceALIsFromStaffingLevelMatrix(Map<LocalDate, Object[]> slMatrixOriginal, List<ActivityLineInterval> alis, int granularity) {
+        long start = System.currentTimeMillis();
+        Map<LocalDate, Object[]> slMatrix = deepCopyMatrix(slMatrixOriginal);
+        if (log.isDebugEnabled())
+            log.debug("1 reduceStaffingLevelMatrix() took" + (System.currentTimeMillis() - start) / 1000.0);
+        boolean b = slMatrix.get(new LocalDate("2017-12-11"))[0] == slMatrixOriginal.get(new LocalDate("2017-12-11"))[0];
+        for (ActivityLineInterval ali : alis) {
+            if (ali.getActivity().isTypeAbsence()) {
+                IntStream.rangeClosed(0, 1440 / granularity - 1).forEach(i -> {
+                    int[] perIntervalStaffingLevel = ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[i];
+                    if (perIntervalStaffingLevel[getActivityMinIndex(ali)] > 0) {
                         perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
-                    }else{
+                    } else {
                         perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
                     }
+                });
+            } else {
+                //first get index of twice-2 and then twice-1
+                int[] perIntervalStaffingLevel = ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(), granularity)];
+                //[getActivityIndex(ali)]++;
+                if (perIntervalStaffingLevel[getActivityMinIndex(ali)] > 0) {
+                    perIntervalStaffingLevel[getActivityMinIndex(ali)]--;
+                } else {
+                    perIntervalStaffingLevel[getActivityMaxIndex(ali)]--;
+                }
             }
         }
         //printStaffingLevelMatrix(slMatrix);
-        if(log.isDebugEnabled())
-            log.debug("2 reduceStaffingLevelMatrix() took"+(System.currentTimeMillis()-start)/1000.0);
+        if (log.isDebugEnabled())
+            log.debug("2 reduceStaffingLevelMatrix() took" + (System.currentTimeMillis() - start) / 1000.0);
         return slMatrix;
     }
 
     private static Map<LocalDate, Object[]> deepCopyMatrix(Map<LocalDate, Object[]> slMatrixOriginal) {
-        Map<LocalDate, Object[]> copy= new HashMap<>();
-        for(LocalDate localDate:slMatrixOriginal.keySet()){
-            int[][] array=(int[][])slMatrixOriginal.get(localDate);
+        Map<LocalDate, Object[]> copy = new HashMap<>();
+        for (LocalDate localDate : slMatrixOriginal.keySet()) {
+            int[][] array = (int[][]) slMatrixOriginal.get(localDate);
             final int[][] result = new int[array.length][];
             for (int i = 0; i < array.length; i++) {
                 result[i] = Arrays.copyOf(array[i], array[i].length);
             }
-            copy.put(localDate,result);
+            copy.put(localDate, result);
         }
         return copy;
     }
 
-    public static int[] getTotalMissingMinAndMaxStaffingLevels(Map<LocalDate, Object[]> slMatrix,int[] activitiesRank){
-        long start=System.currentTimeMillis();
-        int[] missingMinAndMax=new int[2];
-        slMatrix.forEach((date,m )->{
-            int[][] matrix=(int[][]) m;
+    public static int[] getTotalMissingMinAndMaxStaffingLevels(Map<LocalDate, Object[]> slMatrix, int[] activitiesRank) {
+        long start = System.currentTimeMillis();
+        int[] missingMinAndMax = new int[2];
+        slMatrix.forEach((date, m) -> {
+            int[][] matrix = (int[][]) m;
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length; j++) {
                     //missingMinAndMax[j%2==0?0:1]+=matrix[i][j];//0,2,4 are for mins
-                    missingMinAndMax[j%2==0?0:1]+=Math.abs(matrix[i][j] * activitiesRank[j/2]);//0,2,4 are for mins
+                    missingMinAndMax[j % 2 == 0 ? 0 : 1] += Math.abs(matrix[i][j] * activitiesRank[j / 2]);//0,2,4 are for mins
                 }
             }
         });
-        if(log.isDebugEnabled())
-            log.debug("getTotalMissingMinAndMaxStaffingLevels() took"+(System.currentTimeMillis()-start)/1000.0);
+        if (log.isDebugEnabled())
+            log.debug("getTotalMissingMinAndMaxStaffingLevels() took" + (System.currentTimeMillis() - start) / 1000.0);
         return missingMinAndMax;
     }
+
     /*
     THis is not required as we can just reduce shifts from SL matrix. instead createStaffingLevelMatrix()
      */
     @Deprecated
-    public static Map<LocalDate, Object[]> createShiftsMatrix(List<ShiftRequestPhase> shifts,int  granularity, int activitiesCount){
-        Map<LocalDate, Object[]> slMatrix=new HashMap<>();
-        for(LocalDate localDate:shifts.stream().map(s->s.getDate()).collect(Collectors.toSet())){
-            slMatrix.put(localDate,new int[1440/granularity][activitiesCount]);
+    public static Map<LocalDate, Object[]> createShiftsMatrix(List<ShiftRequestPhase> shifts, int granularity, int activitiesCount) {
+        Map<LocalDate, Object[]> slMatrix = new HashMap<>();
+        for (LocalDate localDate : shifts.stream().map(s -> s.getDate()).collect(Collectors.toSet())) {
+            slMatrix.put(localDate, new int[1440 / granularity][activitiesCount]);
         }
 
         return slMatrix;
     }
-    public static int getTimeIndex(DateTime dateTime, int granularity){
-        return dateTime.getMinuteOfDay()/granularity;
+
+    public static int getTimeIndex(DateTime dateTime, int granularity) {
+        return dateTime.getMinuteOfDay() / granularity;
     }
+
     //activity with order 1 can return 0 if min and 1 if max
-    public static int getActivityIndex(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivity().getOrder()*2-(activityLineInterval.isRequired()?2:1);
+    public static int getActivityIndex(ActivityLineInterval activityLineInterval) {
+        return activityLineInterval.getActivity().getOrder() * 2 - (activityLineInterval.isRequired() ? 2 : 1);
     }
-    public static int getActivityMinIndex(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivity().getOrder()*2-2;
+
+    public static int getActivityMinIndex(ActivityLineInterval activityLineInterval) {
+        return activityLineInterval.getActivity().getOrder() * 2 - 2;
     }
-    public static int getActivityMaxIndex(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivity().getOrder()*2-1;
+
+    public static int getActivityMaxIndex(ActivityLineInterval activityLineInterval) {
+        return activityLineInterval.getActivity().getOrder() * 2 - 1;
     }
-    public static void breakConstraints(RuleContext kContext,HardMediumSoftLongScoreHolder scoreHolder, List<ShiftRequestPhase> shifts){
-        kContext=kContext;
+
+    public static void breakConstraints(RuleContext kContext, HardMediumSoftLongScoreHolder scoreHolder, List<ShiftRequestPhase> shifts) {
+        kContext = kContext;
     }
-    public static void tp2(Object object){
-        int i=1;
+
+    public static void tp2(Object object) {
+        int i = 1;
         return;
     }
 
     public static boolean checkEmployeesAvailability(List<ShiftRequestPhase> shifts, List<Employee> employeeList, DateTime startTime) {
-        for(Employee emp:employeeList){
-            boolean employeeAvailable=false;
+        for (Employee emp : employeeList) {
+            boolean employeeAvailable = false;
             //for()
         }
         return true;
     }
-    public static boolean intervalConstainsTimeIncludingEnd(Interval interval, DateTime dateTime){
+
+    public static boolean intervalConstainsTimeIncludingEnd(Interval interval, DateTime dateTime) {
         return interval.contains(dateTime) || interval.getEnd().isEqual(dateTime);
     }
+
+    public static boolean isValidForDayType(Shift shift,List<DayType> dayTypes){
+        boolean valid = false;
+        DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStart().getMillis(),shift.getEnd().getMillis());
+        for (DayType dayType : dayTypes) {
+            if (dayType.isHolidayType()) {
+                for (CountryHolidayCalender countryHolidayCalender : dayType.getCountryHolidayCalenders()) {
+                    DateTimeInterval dateTimeInterval;
+                    if (dayType.isAllowTimeSettings()) {
+                        java.time.LocalTime holidayEndTime = countryHolidayCalender.getEndTime().get(ChronoField.MINUTE_OF_DAY)==0 ? java.time.LocalTime.MAX: countryHolidayCalender.getEndTime();
+                        dateTimeInterval = new DateTimeInterval(DateUtils.asDate(countryHolidayCalender.getHolidayDate(), countryHolidayCalender.getStartTime()), DateUtils.asDate(countryHolidayCalender.getHolidayDate(), holidayEndTime));
+                    }else {
+                        dateTimeInterval = new DateTimeInterval(DateUtils.asDate(countryHolidayCalender.getHolidayDate()), DateUtils.asDate(countryHolidayCalender.getHolidayDate().plusDays(1)));
+                    }
+                    valid = dateTimeInterval.overlaps(shiftInterval);
+                    if (valid) {
+                        break;
+                    }
+                }
+            } else {
+                valid = dayType.getValidDays() != null && dayType.getValidDays().contains(shiftInterval.getStartLocalDate().getDayOfWeek());
+            }
+            if (valid) {
+                break;
+            }
+        }
+        return valid;
+    }
+
 }

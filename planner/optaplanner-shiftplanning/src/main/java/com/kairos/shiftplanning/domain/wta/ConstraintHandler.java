@@ -12,7 +12,8 @@ import java.util.List;
 public interface ConstraintHandler {
     //int checkConstraints(List<Shift> shifts);
     //int checkConstraints(Shift shift);
-    Logger log= LoggerFactory.getLogger(ConstraintHandler.class);
+    final static Logger log= LoggerFactory.getLogger(ConstraintHandler.class);
+
     ScoreLevel getLevel();
     int getWeight();
     default void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int contraintPenality){

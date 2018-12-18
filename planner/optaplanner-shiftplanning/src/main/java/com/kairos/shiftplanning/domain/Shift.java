@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
@@ -27,5 +28,12 @@ public interface Shift {
                 && this.getInterval().contains(interval) &&
                 (getBreaks()==null || getBreaks().stream().filter(brk->brk.getInterval().overlaps(interval)).findFirst()==null);
     }
+
+    default DateTimeInterval getDateTimeInterval(){
+        return getStart()==null || getEnd()==null || getStart().isAfter(getEnd()) ? null:
+                new DateTimeInterval(getStart().getMillis(),getEnd().getMillis());
+    }
+
+
 
 }

@@ -282,7 +282,7 @@ public class ShiftPlanningGenerator {
         //ContinousActivityPerShift continousActivityPerShift = new ContinousActivityPerShift(3,ScoreLevel.SOFT,-4);
         MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.MEDIUM,-1);//4
         MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.MEDIUM,-1);//5
-        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity);
+        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,null);
         return activityConstraints;
     }
 
