@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
+import static javax.management.timer.Timer.ONE_HOUR;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -815,7 +816,13 @@ public  class DateUtils {
     }
 
     public static Long getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
-        return TotalMilliSeconds/ONE_MINUTE;
+        return TotalMilliSeconds/ONE_HOUR;
+    }
+
+    public static Double getHoursByMinutes(double totalMinutes){
+        Integer hour  = (int) totalMinutes/(60);
+        Integer minutes = (int)totalMinutes % 60;
+        return new Double(hour+"."+minutes);
     }
 
 }
