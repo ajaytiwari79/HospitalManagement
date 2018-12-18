@@ -5,27 +5,11 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.RawRepresentationData;
-import com.kairos.dto.activity.counter.enums.ChartType;
-import com.kairos.dto.activity.counter.enums.CounterSize;
-import com.kairos.dto.activity.counter.enums.CounterType;
-import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
-import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
-import com.kairos.dto.planner.vrp.vrpPlanning.TaskDTO;
-import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.dto.activity.counter.chart.BaseChart;
-import com.kairos.dto.activity.counter.chart.PieChart;
-import com.kairos.dto.activity.counter.chart.DataUnit;
-import com.kairos.dto.activity.counter.chart.SingleNumberChart;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -33,24 +17,18 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class CounterDataService {
@@ -114,8 +92,8 @@ public class CounterDataService {
 //
 //    private KPI prepareTaskUnplannedKPI(long tasksUnplanned, long totalTasks){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Task", new ArrayList());
-//        ((PieChart) baseChart).getDataList().add(new DataUnit("Planned", null, decimalSpecification(totalTasks-tasksUnplanned)));
-//        ((PieChart) baseChart).getDataList().add(new DataUnit("UnPlanned", null, decimalSpecification(tasksUnplanned)));
+//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("Planned", null, decimalSpecification(totalTasks-tasksUnplanned)));
+//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("UnPlanned", null, decimalSpecification(tasksUnplanned)));
 //        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.PIE, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, false,null);
 //        kpi.setId(new BigInteger("1"));
 //        return kpi;
@@ -130,8 +108,8 @@ public class CounterDataService {
 //
 //    private KPI prepareTaskUnplannedHours(double unplannedMinutes, double plannedMinutes){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.DECIMAL, "Hours", new ArrayList());
-//        ((PieChart) baseChart).getDataList().add(new DataUnit("Planned Task", null, decimalSpecification(plannedMinutes/60.0)));
-//        ((PieChart) baseChart).getDataList().add(new DataUnit("UnPlanned Task", null, decimalSpecification(unplannedMinutes/60.0)));
+//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("Planned Task", null, decimalSpecification(plannedMinutes/60.0)));
+//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("UnPlanned Task", null, decimalSpecification(unplannedMinutes/60.0)));
 //        KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, false,null);
 //        kpi.setId(new BigInteger("2"));
 //        return kpi;
@@ -155,7 +133,7 @@ public class CounterDataService {
 //    private KPI prepareTasksPerStaffKPI(Map<String, Long> staffTaskData){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Tasks", new ArrayList());
 //        staffTaskData.forEach((staffName, taskCount) -> {
-//            ((PieChart) baseChart).getDataList().add(new DataUnit(staffName, null, decimalSpecification(taskCount)));
+//            ((PieChart) baseChart).getDataList().add(new KpiDataUnit(staffName, null, decimalSpecification(taskCount)));
 //        });
 //        KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, false, null);
 //        kpi.setId(new BigInteger("3"));
@@ -303,7 +281,7 @@ public class CounterDataService {
 //    private KPI prepareTotalKMDrivenByStaff(Map<String, Double> staffAndKMDetails){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "KMs", new ArrayList());
 //        staffAndKMDetails.forEach((staffName, kmDriven) -> {
-//            ((PieChart) baseChart).getDataList().add(new DataUnit(staffName, null, decimalSpecification(kmDriven)));
+//            ((PieChart) baseChart).getDataList().add(new KpiDataUnit(staffName, null, decimalSpecification(kmDriven)));
 //        });
 //        KPI kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_KM_DRIVEN_PER_STAFF, false,null);
 //        kpi.setId(new BigInteger("10"));
@@ -337,10 +315,8 @@ public class CounterDataService {
 //
 //    }
 
-    public Map generateKPIData(FilterCriteriaDTO filters){
-        //get unitPositionIds and get staffIds.
+    public Map generateKPIData(FilterCriteriaDTO filters,Long organizationId){
         List<BigInteger> kpiIds = filters.getKpiIds();
-        Long countryId = genericIntegrationService.getCountryIdOfOrganization(filters.getUnitId());
         List<KPI> kpis = counterRepository.getKPIsByIds(kpiIds);
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
         List<Future<RawRepresentationData>> kpiResults = new ArrayList<>();
@@ -351,12 +327,11 @@ public class CounterDataService {
         });
         for(BigInteger kpiId : filters.getKpiIds()){
             Callable<RawRepresentationData> data = () ->{
-                return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, countryId, kpiMap.get(kpiId));
+                return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, organizationId, kpiMap.get(kpiId));
             };
             Future<RawRepresentationData> responseData = executorService.submit(data);
             kpiResults.add(responseData);
         }
-
         List<RawRepresentationData> kpisData = new ArrayList();
         for(Future<RawRepresentationData> data : kpiResults){
             try {
@@ -382,9 +357,9 @@ public class CounterDataService {
         return kpisData.stream().collect(Collectors.toMap(kpiData -> kpiData.getCounterId(), kpiData -> kpiData));
     }
 
-    public Map<Long,Long> calculatePlannedHour(List<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
-        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
-        return staffPlannedHours;
-    }
+//    public Map<Long,Long> calculatePlannedHour(Set<Long> staffIds, Long unitId, LocalDate startDate, LocalDate endDate ){
+//        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByStaffIdsAndDate(staffIds, DateUtils.asDate(startDate),DateUtils.asDate(endDate));
+//        Map<Long,Long> staffPlannedHours = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getStaffId,Collectors.summingLong(d->d.getTotalTimeBankMin()+d.getContractualMin())));
+//        return staffPlannedHours;
+//    }
 }

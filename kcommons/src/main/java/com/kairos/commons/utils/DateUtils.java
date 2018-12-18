@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
+import static javax.management.timer.Timer.ONE_HOUR;
+import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
  * Created by oodles on 1/2/17.
@@ -649,6 +651,10 @@ public  class DateUtils {
         return (date == null) ? null : date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    public static Long getLongFromLocalDateimeTime(LocalDateTime date) {
+        return (date == null) ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
     public static LocalDate getDateFromEpoch(Long dateLong) {
         LocalDate date = null;
         if (Optional.ofNullable(dateLong).isPresent()) {
@@ -800,4 +806,23 @@ public  class DateUtils {
 
         return asZoneDateTime(date).getMinute();
     }
+
+    public static LocalDate getStartDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    public static LocalDate getEndDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+    }
+
+    public static Long getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
+        return TotalMilliSeconds/ONE_HOUR;
+    }
+
+    public static Double getHoursByMinutes(double totalMinutes){
+        Integer hour  = (int) totalMinutes/(60);
+        Integer minutes = (int)totalMinutes % 60;
+        return new Double(hour+"."+minutes);
+    }
+
 }

@@ -180,6 +180,14 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 "                {'$setUnion':['$clauseIdOrderedIndex','$subSections.clauseIdOrderedIndex']}]}}}}}";
         String groupOperation = "{ '$group' : { '_id' : '$_id' , 'clauseIds':{ '$addToSet' : '$clauseIds'}}}";
 
+        String project="{" +
+                "     \"$project\":{\n" +
+                "    \"clauseIds\":{\"$reduce\": {\n" +
+                "        \"input\":\"$clauseIds\",\n" +
+                "        \"initialValue\": [],\n" +
+                "        \"in\":{\"$concatArrays\" :[\"$$value\", \"$$this\"] }\n" +
+                "    }}}\n" +
+                " }";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("agreementSection", "agreementSections", "_id", "agreementSections"),
@@ -190,13 +198,14 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 new CustomAggregationOperation(Document.parse(addNonDeletedSubSection)),
                 unwind("subSections", true),
                 new CustomAggregationOperation(Document.parse(projectionOperation)),
-                new CustomAggregationOperation(Document.parse(groupOperation))
+                new CustomAggregationOperation(Document.parse(groupOperation)),
+                new CustomAggregationOperation(Document.parse(project))
         );
         AggregationResults<Map> response = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, Map.class);
         Set<BigInteger> clauseIdList = new HashSet<>();
         if (Optional.ofNullable(response.getUniqueMappedResult()).isPresent()) {
-            ArrayList<ArrayList<BigInteger>> arrayLists = (ArrayList<ArrayList<BigInteger>>) response.getUniqueMappedResult().get("clauseIds");
-            arrayLists.forEach(bigIntegers -> clauseIdList.addAll(new HashSet<BigInteger>(bigIntegers)));
+            ArrayList<BigInteger> arrayLists = (ArrayList<BigInteger>) response.getUniqueMappedResult().get("clauseIds");
+            arrayLists.addAll(arrayLists);
             return clauseIds.stream().filter(clauseId -> clauseIdList.contains(clauseId.toString())).collect(Collectors.toSet());
         }
         return clauseIdList;
