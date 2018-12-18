@@ -384,14 +384,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 .and("startDate").lte(endDate).and("endDate").gte(startDate);
         List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
         aggregationOperation.add(new MatchOperation(criteria));
-        aggregationOperation.add(new UnwindOperation(Fields.field("activities")));
+        aggregationOperation.add(unwind("activities"));
         if(CollectionUtils.isNotEmpty(shiftActivityStatus)){
-            aggregationOperation.add(new MatchOperation(Criteria.where("activities.status").in(shiftActivityStatus)));
+            aggregationOperation.add(match(Criteria.where("activities.status").in(shiftActivityStatus)));
         }
         if(CollectionUtils.isNotEmpty(timeTypeIds)){
-            aggregationOperation.add(new LookupOperation(Fields.field("activities"),Fields.field("activities._id"),Fields.field("_id"),Fields.field("activity")));
-            aggregationOperation.add(new UnwindOperation(Fields.field("activity")));
-            aggregationOperation.add(new MatchOperation(Criteria.where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
+            aggregationOperation.add(lookup("activities","activities._id","_id","activity"));
+            aggregationOperation.add(unwind("activity"));
+            aggregationOperation.add(match(Criteria.where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
         aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByForPlannedHours())));
         aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));

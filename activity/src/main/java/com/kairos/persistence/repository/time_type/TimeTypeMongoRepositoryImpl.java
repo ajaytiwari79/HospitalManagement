@@ -24,7 +24,7 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Set<BigInteger> findActivityIdsByTimeTypeIds(List<BigInteger> timeTypeIds) {
+    public Set<BigInteger> findAllTimeTypeIdsByTimeTypeIds(List<BigInteger> timeTypeIds) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("id").in(timeTypeIds)),
                 Aggregation.graphLookup("time_Type").startWith("id").connectFrom("_id").connectTo("upperLevelTimeTypeId").as("children"),
@@ -36,7 +36,7 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
     }
 
     @Override
-    public Set<BigInteger> findActivityIdssByTimeTypeEnum(List<String> timeTypeEnums) {
+    public Set<BigInteger> findTimeTypeIdssByTimeTypeEnum(List<String> timeTypeEnums) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("timeTypes").in(timeTypeEnums)),
                 Aggregation.project("id"),

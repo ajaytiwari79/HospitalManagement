@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface CustomTimeTypeMongoRepository {
 
-     Set<BigInteger> findActivityIdsByTimeTypeIds(List<BigInteger> timeTypeIds);
-     Set<BigInteger> findActivityIdssByTimeTypeEnum(List<String> timeTypeEnum);
+     Set<BigInteger> findAllTimeTypeIdsByTimeTypeIds(List<BigInteger> timeTypeIds);
+     Set<BigInteger> findTimeTypeIdssByTimeTypeEnum(List<String> timeTypeEnum);
 
 }

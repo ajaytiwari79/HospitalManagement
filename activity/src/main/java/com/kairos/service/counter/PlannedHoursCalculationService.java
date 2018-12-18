@@ -6,11 +6,9 @@ import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
@@ -19,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,9 +46,9 @@ public class PlannedHoursCalculationService implements CounterService {
         List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         if(filterBasedCriteria.get(FilterType.TIME_TYPE)!=null) {
               if(filterBasedCriteria.get(FilterType.TIME_TYPE).get(0) instanceof String){
-                  timeTypeIds=timeTypeMongoRepository.findActivityIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
+                  timeTypeIds=timeTypeMongoRepository.findTimeTypeIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
               }else{
-                  timeTypeIds=timeTypeMongoRepository.findActivityIdsByTimeTypeIds(getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
+                  timeTypeIds=timeTypeMongoRepository.findAllTimeTypeIdsByTimeTypeIds(getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
                   timeTypeIds.addAll(getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
               }
         }
