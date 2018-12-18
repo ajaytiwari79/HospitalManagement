@@ -147,4 +147,8 @@ public final class ApiConstants {
     public static final String GET_FUNCTIONS_OF_UNIT_POSITION=STAFF_WITH_STAFF_ID+"/unit_position/{unitPositionId}/functions";
     public static final String UNIT_TIMEZONE="/time_zone";
 
+    // /staff_by_employment_type
+    public static final String STAFF_BY_EMPLOYMENT_TYPE="/staff_by_employment_type";
+
+
 }

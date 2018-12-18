@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.counter.data;
 
-import com.kairos.dto.activity.counter.chart.DataUnit;
+import com.kairos.dto.activity.counter.chart.KpiDataUnit;
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -13,13 +13,13 @@ public class RawRepresentationData {
     private ChartType chartType;
     private String displayUnit;
     private RepresentationUnit unit;
-    private List<DataUnit> dataList;
+    private List<KpiDataUnit> dataList;
 
     public RawRepresentationData(){
 
     }
 
-    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<DataUnit> dataList){
+    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<KpiDataUnit> dataList){
         this.counterId = counterId;
         this.title = title;
         this.chartType = chartType;
@@ -60,11 +60,11 @@ public class RawRepresentationData {
         this.unit = unit;
     }
 
-    public List<DataUnit> getDataList() {
+    public List<KpiDataUnit> getDataList() {
         return dataList;
     }
 
-    public void setDataList(List<DataUnit> dataList) {
+    public void setDataList(List<KpiDataUnit> dataList) {
         this.dataList = dataList;
     }
 
