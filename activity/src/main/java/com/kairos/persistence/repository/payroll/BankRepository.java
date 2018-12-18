@@ -11,4 +11,8 @@ import java.math.BigInteger;
 
 @Repository
 public interface BankRepository extends MongoBaseRepository<Bank,BigInteger> {
+
+    boolean existsByNameIgnoreCaseAndDeletedFalse(String name);
+
+    boolean existsByNameIgnoreCaseAndDeletedFalseAndIdNot(String name,BigInteger id);
 }

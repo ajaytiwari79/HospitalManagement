@@ -27,15 +27,15 @@ public class BankController {
     private BankService bankService;
 
     @ApiOperation("Create bank")
-    @PostMapping(value = "/bank")
-    public ResponseEntity<Map<String,Object>> createBank(@Valid @RequestBody BankDTO bankDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.createBank(bankDTO));
+    @PostMapping(value = "/country/{countryId}/bank")
+    public ResponseEntity<Map<String,Object>> createBank(@PathVariable Long countryId,@Valid @RequestBody BankDTO bankDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.createBank(countryId,bankDTO));
     }
 
-    @ApiOperation("update PayRoll at System level")
-    @PutMapping(value = "/payroll/{payRollId}")
-    public ResponseEntity<Map<String,Object>> updatePayRoll(@PathVariable BigInteger payRollId, @Valid @RequestBody PayRollDTO payRollDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.updatePayRoll(payRollId,payRollDTO));
+    @ApiOperation("update bank")
+    @PutMapping(value = "/country/{countryId}/bank/{bankId}")
+    public ResponseEntity<Map<String,Object>> updateBank(@PathVariable BigInteger bankId,@PathVariable BigInteger countryId, @Valid @RequestBody BankDTO bankDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.updateBank(bankId,countryId,bankDTO));
     }
 
     @ApiOperation("delete PayRoll at System level")
