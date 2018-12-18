@@ -72,9 +72,4 @@ public class PayRollDTO {
     public void setApplicableForCountry(boolean applicableForCountry) {
         this.applicableForCountry = applicableForCountry;
     }
-
-    @AssertTrue(message = "name.absent")
-    public boolean isValid() {
-        return (!StringUtils.isBlank(name));
-    }
 }
