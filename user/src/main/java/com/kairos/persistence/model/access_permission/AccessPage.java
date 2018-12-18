@@ -30,7 +30,7 @@ public class AccessPage extends UserBaseEntity {
     private String moduleId;
     private boolean active;
     //this value is "false" only in case of "moduleId" : "module_1"
-    private boolean editable;
+    private Boolean editable;
 
 
     @Relationship(type = SUB_PAGE)
@@ -100,11 +100,11 @@ public class AccessPage extends UserBaseEntity {
         this.kpiEnabled = kpiEnabled;
     }
 
-    public boolean isEditable() {
+    public Boolean isEditable() {
         return editable;
     }
 
-    public void setEditable(boolean editable) {
+    public void setEditable(Boolean editable) {
         this.editable = editable;
     }
 }
