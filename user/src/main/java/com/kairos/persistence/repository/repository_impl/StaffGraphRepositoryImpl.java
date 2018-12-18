@@ -66,7 +66,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     @Override
     public List<StaffDTO> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
         Map<String, Object> queryParameters = new HashMap();
-        String staffFilterQuery="";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
         if(CollectionUtils.isNotEmpty(unitIds)){
@@ -94,8 +93,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) RETURN DISTINCT  {id:id(staff),firstName:staff.firstName ,lastName:staff.lastName} as data");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
-        staffFilterQuery += stringBuilder.toString();
-        List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
+        List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , stringBuilder.toString(), queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(result,Staff.class);
 
     }
