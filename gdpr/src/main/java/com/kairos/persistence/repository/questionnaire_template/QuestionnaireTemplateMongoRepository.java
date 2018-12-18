@@ -34,17 +34,32 @@ public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepositor
     @Query("{deleted:false,organizationId:?0,templateType:?1}")
     QuestionnaireTemplate findQuestionnaireTemplateByCountryIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
 
+    @Query("{deleted:false,organizationId:?0,templateType:?1,templateStatus:\"PUBLISHED\"}")
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
+
     @Query("{countryId:?0,templateType:?1,riskAssociatedEntity:?2,deleted:false}")
     QuestionnaireTemplate findQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndCountryId(Long countryId, QuestionnaireTemplateType templateType,QuestionnaireTemplateType riskAssociatedEntity);
+
+    @Query("{organizationId:?0,templateType:?1,riskAssociatedEntity:?2,deleted:false,templateStatus:\"PUBLISHED\"}")
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndOrganizationId(Long organizationId, QuestionnaireTemplateType templateType,QuestionnaireTemplateType riskAssociatedEntity);
 
     @Query("{countryId:?0,templateType:?1,defaultAssetTemplate:?2,deleted:false}")
     QuestionnaireTemplate findQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndCountryId(Long countryId, QuestionnaireTemplateType templateType,boolean defaultAssetTemplate);
 
+    @Query("{organizationId:?0,templateType:?1,defaultAssetTemplate:?2,deleted:false,templateStatus:\"PUBLISHED\"}")
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndOrganizationId(Long organizationId, QuestionnaireTemplateType templateType,boolean defaultAssetTemplate);
+
     @Query("{deleted:false,countryId:?0,assetTypeId:?1,assetSubTypeId:{$in:?2},templateType:?3}")
     QuestionnaireTemplate findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByCountryId(Long countryId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds,QuestionnaireTemplateType templateType);
 
+    @Query("{deleted:false,organizationId:?0,assetTypeId:?1,assetSubTypeId:{$in:?2},templateType:?3,templateStatus:\"PUBLISHED\"}")
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByOrganizationId(Long organizationId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds,QuestionnaireTemplateType templateType);
+
     @Query("{deleted:false,countryId:?0,assetTypeId:?1,assetSubTypeId:{$exists:false},templateType:?2}")
     QuestionnaireTemplate findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByCountryId(Long countryId, BigInteger assetTypeId,QuestionnaireTemplateType templateType);
+
+    @Query("{deleted:false,organizationId:?0,assetTypeId:?1,assetSubTypeId:{$exists:false},templateType:?2,templateStatus:\"PUBLISHED\"}")
+    QuestionnaireTemplate findPublishedQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByOrganizationId(Long organizationId, BigInteger assetTypeId,QuestionnaireTemplateType templateType);
 
     @Query("{deleted:false,templateType:?0,countryId:?1}")
     QuestionnaireTemplate findQuestionnaireTemplateByCountryIdAndTemplateType( QuestionnaireTemplateType templateType,Long countryId);

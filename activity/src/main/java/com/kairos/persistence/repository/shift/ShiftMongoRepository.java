@@ -88,4 +88,5 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,unitPositionId:?0,disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
     List<Shift> findAllShiftsBetweenDatesByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
 
+    List<Shift> findAllByDeletedFalse();
 }
