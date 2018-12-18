@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 
+import com.kairos.dto.activity.counter.chart.KpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -57,7 +58,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftResponseDTO> findShiftsBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
-    List<ShiftDTO> findShiftsByKpiFilters(List<Long> staffids, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
+    List<KpiDataUnit> findShiftsByKpiFilters(List<Long> staffids, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
 
 }

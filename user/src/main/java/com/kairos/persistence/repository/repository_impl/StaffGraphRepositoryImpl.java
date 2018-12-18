@@ -7,6 +7,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.neo4j.ogm.session.Session;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -54,8 +55,8 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         queryParameters.put("expertiseIds", staffIncludeFilterDTO.getExpertiseIds());
         queryParameters.put("maxDate", staffIncludeFilterDTO.getMaxOpenShiftDate());
         queryParameters.put("employmentTypeIds", staffIncludeFilterDTO.getEmploymentTypeIds());
-        List<Map> my=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
-        List<StaffUnitPositionQueryResult> staffUnitPositionList = ObjectMapperUtils.copyPropertiesOfListByMapper(my,StaffUnitPositionQueryResult.class);
+        List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
+        List<StaffUnitPositionQueryResult> staffUnitPositionList = ObjectMapperUtils.copyPropertiesOfListByMapper(result,StaffUnitPositionQueryResult.class);
 
 
         return staffUnitPositionList;
@@ -68,23 +69,23 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         String staffFilterQuery="";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
-        if(!unitIds.isEmpty()){
+        if(CollectionUtils.isNotEmpty(unitIds)){
             stringBuilder.append(" WHERE id(org) IN {unitIds}");
             queryParameters.put("unitIds", unitIds);
         }else{
             stringBuilder.append(" WHERE id(org) = {organizationId}");
             queryParameters.put("organizationId", organizationId);
         }
-        if(!employmentType.isEmpty()) {
+        if(CollectionUtils.isNotEmpty(employmentType)) {
             stringBuilder.append(" MATCH(empType:EmploymentType) WHERE id(empType) IN {employmentType}");
             queryParameters.put("employmentType", employmentType);
         }
-        if(unitIds.isEmpty()){
+        if(CollectionUtils.isEmpty(unitIds)){
             stringBuilder.append(" MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) ");
         }else {
             stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition)-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
         }
-        if(!staffIds.isEmpty()) {
+        if(CollectionUtils.isNotEmpty(staffIds)) {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
             queryParameters.put("staffIds",staffIds);
         }

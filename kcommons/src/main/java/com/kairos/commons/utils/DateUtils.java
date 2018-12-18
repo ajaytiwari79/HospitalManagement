@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
+import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
  * Created by oodles on 1/2/17.
@@ -813,7 +814,8 @@ public  class DateUtils {
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
-    public static Long getHoursFromTotalMilliSeconds(long TotalMilliSeconds){
-        return TotalMilliSeconds/(60*60*1000);
+    public static Long getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
+        return TotalMilliSeconds/ONE_MINUTE;
     }
+
 }

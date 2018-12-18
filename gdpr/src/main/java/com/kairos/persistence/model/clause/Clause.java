@@ -63,6 +63,13 @@ public class Clause extends MongoBaseEntity {
         this.tags=tags;
     }
 
+    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags,List<BigInteger> templateTypes) {
+        this.title = title;
+        this.description = description;
+        this.tags=tags;
+        this.templateTypes=templateTypes;
+    }
+
     public Clause(String title, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.title = title;
         this.description = description;

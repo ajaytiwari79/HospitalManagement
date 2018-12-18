@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.shift;
 
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
@@ -35,6 +35,7 @@ public class ShiftActivity {
     private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
+    private int timeBankCtaBonusMinutes;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private Long allowedBreakDurationInMinute;
 
@@ -66,6 +67,14 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
+
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
@@ -234,5 +243,9 @@ public class ShiftActivity {
 
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+    }
+
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
     }
 }
