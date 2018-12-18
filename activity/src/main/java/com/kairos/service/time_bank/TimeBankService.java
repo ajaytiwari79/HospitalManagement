@@ -410,7 +410,7 @@ public class TimeBankService extends MongoBaseService {
 
             }
         }
-        if (!dailyTimeBanks.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(dailyTimeBanks)) {
             save(dailyTimeBanks);
         }
         return true;
