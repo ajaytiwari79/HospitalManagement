@@ -4,18 +4,24 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 public class TimeBankCTADistribution {
 
     private String ctaName;
     private int minutes;
     private BigInteger ctaRuleTemplateId;
+    private LocalDate ctaDate;
 
     public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId) {
         this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
     }
+
+
+
+
 
     public TimeBankCTADistribution() {
     }
@@ -43,6 +49,15 @@ public class TimeBankCTADistribution {
 
     public void setCtaRuleTemplateId(BigInteger ctaRuleTemplateId) {
         this.ctaRuleTemplateId = ctaRuleTemplateId;
+    }
+
+
+    public LocalDate getCtaDate() {
+        return ctaDate;
+    }
+
+    public void setCtaDate(LocalDate ctaDate) {
+        this.ctaDate = ctaDate;
     }
 
     @Override

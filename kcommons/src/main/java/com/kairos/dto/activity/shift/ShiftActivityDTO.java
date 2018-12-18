@@ -1,11 +1,14 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -46,6 +49,8 @@ public class ShiftActivityDTO {
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
+    private int timeBankCtaBonusHour;
+    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
 
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
@@ -260,5 +265,21 @@ public class ShiftActivityDTO {
 
     public void setBreakReplaced(boolean breakReplaced) {
         this.breakReplaced = breakReplaced;
+    }
+
+    public int getTimeBankCtaBonusHour() {
+        return timeBankCtaBonusHour;
+    }
+
+    public void setTimeBankCtaBonusHour(int timeBankCtaBonusHour) {
+        this.timeBankCtaBonusHour = timeBankCtaBonusHour;
+    }
+
+    public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
+        return timeBankCTADistributions;
+    }
+
+    public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
     }
 }
