@@ -127,4 +127,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={1} OR user.email=~{0} ) AND id(user)<>{2} RETURN count(user) ")
     byte validateUserEmailAndCPRExceptCurrentUser(String email, String cprNumber, Long userId);
+
+    @Query("MATCH (user:User) WHERE ( user.cprNumber={0} OR user.email=~{1} ) RETURN user")
+    User findUserByCprNumberOrEmail(String cprNumber, String email);
 }
