@@ -148,7 +148,7 @@ public class ShiftDTO {
 
     @JsonIgnore
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
+        return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), this.getActivities().get(this.getActivities().size()-1).getEndDate().getTime());
     }
 
     public ShiftType getShiftType() {
