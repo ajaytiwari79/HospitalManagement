@@ -70,7 +70,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN id(staffs) AS id,staffs.firstName+\" \" +staffs.lastName AS name,staffs.profilePic AS profilePic,teams,skills order by name")
     List<StaffAdditionalInfoQueryResult> getStaffAndCitizenDetailsOfUnit(long unitId);
 
-    @Query("MATCH (unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(organization:Organization)<-[:"+IN_UNIT+"]-(unitPosition:UnitPosition) WHERE id(organization)={0} AND id(unitPosition)={1} with unitPermission,organization \n" +
+    @Query("MATCH (unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(organization:Organization)<-[:"+IN_UNIT+"]-(unitPosition:UnitPosition) WHERE id(organization)={0} AND id(unitPosition)={1} with unitPermission,organization,unitPosition \n" +
             "MATCH (unitPosition)<-[:"+BELONGS_TO_STAFF+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission)  with staff,organization " +
             "MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) with staff,organization,user " +
             "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,COLLECT(id(skills)) AS skills,organization,user" +
