@@ -4,14 +4,19 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 public class BankDTO {
     private BigInteger id;
+    @NotBlank(message = "name.absent")
     private String name;
     private String description;
+    @NotBlank(message = "registrationNumber.absent")
     private String registrationNumber;
+    @NotBlank(message = "internationalAccountNumber.absent")
     private String internationalAccountNumber;
+    @NotBlank(message = "swiftCode.absent")
     private String swiftCode; //stands for Society for Worldwide Interbank Financial Telecommunication
 
     public BankDTO() {
@@ -31,7 +36,7 @@ public class BankDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getDescription() {
@@ -47,7 +52,7 @@ public class BankDTO {
     }
 
     public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber;
+        this.registrationNumber = registrationNumber.trim();
     }
 
     public String getInternationalAccountNumber() {
@@ -55,7 +60,7 @@ public class BankDTO {
     }
 
     public void setInternationalAccountNumber(String internationalAccountNumber) {
-        this.internationalAccountNumber = internationalAccountNumber;
+        this.internationalAccountNumber = internationalAccountNumber.trim();
     }
 
     public String getSwiftCode() {
@@ -63,6 +68,6 @@ public class BankDTO {
     }
 
     public void setSwiftCode(String swiftCode) {
-        this.swiftCode = swiftCode;
+        this.swiftCode = swiftCode.trim();
     }
 }

@@ -1,4 +1,4 @@
-package com.kairos.persistence.repository.activity;
+package com.kairos.persistence.repository.payroll;
 /*
  *Created By Pavan on 14/12/18
  *
@@ -15,17 +15,11 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface PayRollRepository extends MongoBaseRepository<PayRoll,BigInteger> {
+public interface PayRollRepository extends MongoBaseRepository<PayRoll,BigInteger>,CustomPayRollRepository {
 
     PayRollDTO findByIdAndDeletedFalse(BigInteger id);
 
-    List<PayRollDTO> findAllByDeletedFalse();
-
-    @Query("{deleted:false,$or:[{name:{$regex:?0,$options:'i'},code:?1}]}")
-    PayRoll getByDeletedFalseAndNameIgnoreCaseOrCode(String name, int code);
-
-    @Query("{deleted:false,_id:{$ne:?0},$or:[{name:{$regex:?1,$options:'i'},code:?2}]}")
-    PayRoll getByDeletedFalseAndIdNotOrNameIgnoreCaseAndCode(BigInteger id, String name, int code);
+    List<PayRollDTO> findAllByDeletedFalseOrderByCreatedAtDesc();
 
     PayRoll getByIdAndDeletedFalse(BigInteger id);
 }
