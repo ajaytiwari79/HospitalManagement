@@ -1,0 +1,2 @@
+// created by vipul use in shifts(activity)
+db.shifts.updateMany({},{$set:{"activities.$[].status":"PUBLISH"}})
