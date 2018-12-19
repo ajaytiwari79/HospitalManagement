@@ -14,11 +14,13 @@ import java.util.Set;
 
 public class PayRollDTO {
     private BigInteger id;
+
     @NotBlank(message = "name.absent")
     private String name;
     private int code;
     private boolean active;
     private Set<Long> countryIds=new HashSet<>();
+
     private boolean applicableForCountry;
 
     public PayRollDTO() {
