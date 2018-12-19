@@ -24,7 +24,7 @@ public class NotificationEventListener {
     @Inject
     PriorityGroupService priorityGroupService;
 
-    @Async
+    //@Async
     @EventListener
     public void shiftNotificationEvent(ShiftNotificationEvent shiftNotificationEvent) throws UnsupportedEncodingException {
          logger.info("shift created details {}",shiftNotificationEvent);
