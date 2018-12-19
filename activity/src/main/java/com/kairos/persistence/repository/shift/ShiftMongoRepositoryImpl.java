@@ -245,10 +245,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(Criteria.where("deleted").is(false).and("id").in(shiftIds)),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activityObject"),
-                new CustomAggregationOperation(shiftWithActivityProjection()),
-               new CustomAggregationOperation(shiftWithActivityGroup())
-                //new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                //new CustomAggregationOperation(replaceRootForShift())
+                new CustomAggregationOperation(shiftWithActivityAndDescriptionProjection()),
+                new CustomAggregationOperation(shiftWithActivityGroup())
                 );
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
@@ -258,7 +256,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
        return mongoTemplate.find(query,Shift.class);
     }
 
-    public static Document shiftWithActivityProjection(){
+    public static Document shiftWithActivityAndDescriptionProjection(){
         String project = "{  \n" +
                 "      '$project':{  \n" +
                 "     '_id' : 1,\n" +
@@ -287,12 +285,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.reasonCodeId' : 1,\n" +
                 "        'activities.remarks' : 1,\n" +
                 "        'activities.activityName':1,\n" +
-                "        'activities.description':{  \n" +
-                "            '$arrayElemAt':[  \n" +
-                "               '$activityObject.description',\n" +
-                "               0\n" +
-                "            ]\n" +
-                "         }\n" +
+                "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
                 "      }\n" +
                 "   }";
         return Document.parse(project);
@@ -300,8 +293,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public static Document shiftWithActivityGroup(){
         String group = "{ '$group': {\n" +
-                "        '_id': {\n" +
-                "            '_id' : '$_id',\n" +
+                "    '_id': {\n" +
+                "    '_id' : '$_id',\n" +
                 "    'name' : '$name',\n" +
                 "    'startDate' : '$startDate',\n" +
                 "    'endDate' : '$endDate',\n" +
@@ -318,13 +311,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'phaseId' : '$phaseId',\n" +
                 "    'scheduledMinutes' : '$scheduledMinutes',\n" +
                 "    'durationMinutes' :'$durationMinutes',\n" +
-                "    'unitPositionId' : '$unitPositionId'\n" +
-                "            \n" +
-                "            },\n" +
-                "        'activities': { \n" +
-                "            '$addToSet':   '$activities'\n" +
-                "            ,\n" +
-                "        }\n" +
+                "    'unitPositionId'  : '$unitPositionId' },\n" +
+                "     'activities': { '$addToSet':'$activities'}\n" +
                 "    }}";
         return Document.parse(group);
     }
@@ -399,6 +387,49 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Aggregation aggregation=Aggregation.newAggregation(aggregationOperation);
         AggregationResults<KpiDataUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, KpiDataUnit.class);
         return result.getMappedResults();
+    }
+    public static Document shiftWithActivityProjection(){
+        String project = "{  \n" +
+                "      '$project':{  \n" +
+                "         '_id' : 1,\n" +
+                "    'name' : 1,\n" +
+                "    'startDate' : 1,\n" +
+                "    'endDate' : 1,\n" +
+                "    'disabled' : 1,\n" +
+                "    'bid' :1,\n" +
+                "    'pId' : 1,\n" +
+                "    'bonusTimeBank' : 1,\n" +
+                "    'amount' : 1,\n" +
+                "    'probability' : 1,\n" +
+                "    'accumulatedTimeBankInMinutes' : 1,\n" +
+                "    'remarks' : 1,\n" +
+                "    'staffId' : 1,\n" +
+                "    'unitId' : 1,\n" +
+                "    'phaseId' : 1,\n" +
+                "    'scheduledMinutes' : 1,\n" +
+                "    'durationMinutes' : 1,\n" +
+                "    'unitPositionId' : 1,\n" +
+                "\t'status':1,\n" +
+                "\t'activities.bid' : 1,\n" +
+                "\t'activities.id' : 1,\n" +
+                "        'activities.pId' : 1,\n" +
+                "        'activities.activityId' : 1,\n" +
+                "        'activities.startDate' : 1,\n" +
+                "        'activities.endDate' : 1,\n" +
+                "        'activities.scheduledMinutes' : 1,\n" +
+                "        'activities.durationMinutes' : 1,\n" +
+                "        'activities.plannedTimeId' : 1,\n" +
+                "        'activities.remarks' : 1,\n" +
+                "        'activities.activityName':1,\n" +
+                "'activities.activity':{  \n" +
+                "            '$arrayElemAt':[  \n" +
+                "               '$activities.activity',\n" +
+                "               0\n" +
+                "            ]\n" +
+                "         }\n" +
+                "      }\n" +
+                "   }";
+        return Document.parse(project);
     }
 
     private String groupByForPlannedHours(){

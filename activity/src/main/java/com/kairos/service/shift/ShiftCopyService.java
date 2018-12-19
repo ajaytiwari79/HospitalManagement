@@ -29,6 +29,8 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.pay_out.PayOutService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.ShiftValidatorService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.ShiftResponseDTO;
@@ -91,6 +93,11 @@ public class ShiftCopyService extends MongoBaseService {
     private MongoSequenceRepository mongoSequenceRepository;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject
+    private TimeBankService timeBankService;
+    @Inject
+    private PayOutService payOutService;
+
     private static final Logger logger = LoggerFactory.getLogger(ShiftCopyService.class);
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
@@ -159,7 +166,7 @@ public class ShiftCopyService extends MongoBaseService {
             ShiftResponseDTO shiftResponseDTO = shifts.get(counter);
             List<String> validationMessages = new ArrayList<>();
             for (Shift sourceShift : shiftResponseDTO.getShifts()) {
-                ShiftWithActivityDTO shiftWithActivityDTO = convertIntoShiftWithActivity(sourceShift,activityMap);
+                ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift,activityMap);
 
                 PlanningPeriodDTO planningPeriod = getCurrentPlanningPeriod(planningPeriodMap, shiftCreationStartDate);
                 Date startDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getStartDate()));
@@ -175,7 +182,7 @@ public class ShiftCopyService extends MongoBaseService {
                 shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
-                    newCreatedShiftWithActivityDTOs.add(convertIntoShiftWithActivity(newShifts.get(counter),activityMap));
+                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter),activityMap));
                 } else {
                     errorInCopyingShifts.add(shiftResponse);
                 }
@@ -190,17 +197,13 @@ public class ShiftCopyService extends MongoBaseService {
         statusMap.put("error", errorInCopyingShifts);
         if (!newShifts.isEmpty()) {
             save(newShifts);
+           timeBankService.updateDailyTimeBankEntries(copyShiftDTO,newShifts,staffUnitPosition,planningPeriodMap,activityMap,dataWrapper.getDayTypes());
+            payOutService.savePayOuts(staffUnitPosition,newShifts ,null,activityMap,dataWrapper.getDayTypes());
+
         }
         return statusMap;
     }
-    private ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap){
-        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
-        shiftWithActivityDTO.getActivities().forEach(s -> {
-            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
-            s.setActivity(activityDTO);
-        });
-        return shiftWithActivityDTO;
-    }
+
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffUnitPositionUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
