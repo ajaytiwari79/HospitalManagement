@@ -450,13 +450,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Staff getStaffByOrganizationHub(Long currentUnitId,Long userId);
 
     //not delete
-//    @Query("MATCH (org:Organization) Where id(org) IN {0}"+
-//            "MATCH (org)-[:"+IN_UNIT+"]-(up:UnitPosition)-[:"+BELONGS_TO_STAFF+"]-(staff:Staff)"+
-//            "MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
-//            "WHERE  date(positionLine.startDate) <= date({2}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({1}))"+
-//            "CASE WHEN {3} is null THEN staff ELSE where id(staff) in {3} END as staff"+
-//           " RETURN DISTINCT id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
-//    List<StaffPersonalDetailDTO> getStaffsByUnitIds(List<Long> unitIds,String startDate,String endDate,List<Long> staffIds);
+
 //
 //    @Query("MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) where id(organization)={0}\n" +
 //            "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]-(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+

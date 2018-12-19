@@ -7,6 +7,7 @@ import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
@@ -24,8 +25,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class PlannedHoursCalculationService implements CounterService {
-    @Inject
-    private TimeBankRepository timeBankRepository;
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject
@@ -54,9 +53,9 @@ public class PlannedHoursCalculationService implements CounterService {
               }
         }
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentType,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
-        List<StaffDTO> staffDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, String> staffIdAndNameMap = staffDTOS.stream().collect(Collectors.toMap(StaffDTO::getId, StaffDTO::getFullName));
-        List<KpiDataUnit> kpiDataUnits=shiftMongoRepository.findShiftsByKpiFilters(staffDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(filterDates.get(1)));
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
+        List<KpiDataUnit> kpiDataUnits=shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(filterDates.get(1)));
         kpiDataUnits.forEach(kpiData->{
             kpiData.setLabel(staffIdAndNameMap.get(kpiData.getRefId()));
             kpiData.setValue(DateUtils.getHoursByMinutes(kpiData.getValue()));

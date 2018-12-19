@@ -5,6 +5,7 @@ public class KpiDataUnit {
     private Number refId;
     private double value;
 
+
     /*
      * @author: mohit.shakya@oodlestechnologies.com
      * @dated: Jun/29/2018

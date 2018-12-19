@@ -1,6 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
@@ -10,6 +11,7 @@ import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
@@ -263,8 +265,8 @@ public class EmploymentTypeService {
             exceptionService.actionNotPermittedException("error.weekly_minutes.exceeds");
         }
     }
-    public List<StaffDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
-        return staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(),staffEmploymentTypeDTO.getUnitIds(),staffEmploymentTypeDTO.getEmploymentTypeIds(),staffEmploymentTypeDTO.getStartDate(),staffEmploymentTypeDTO.getEndDate(),staffEmploymentTypeDTO.getStaffIds());
+    public List<StaffKpiFilterDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(),staffEmploymentTypeDTO.getUnitIds(),staffEmploymentTypeDTO.getEmploymentTypeIds(),staffEmploymentTypeDTO.getStartDate(),staffEmploymentTypeDTO.getEndDate(),staffEmploymentTypeDTO.getStaffIds()),StaffKpiFilterDTO.class);
     }
 
 }

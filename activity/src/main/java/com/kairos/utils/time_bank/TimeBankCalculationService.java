@@ -179,7 +179,8 @@ public class TimeBankCalculationService {
     }
 
 
-    private int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,int totalWeeklyMinutes,int workingDaysInWeek,boolean calculateForConstractual) {
+
+    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,int totalWeeklyMinutes,int workingDaysInWeek,boolean calculateForConstractual) {
         Date date = DateUtils.asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
         for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
@@ -652,7 +653,7 @@ public class TimeBankCalculationService {
      * @param interval
      * @return Interval
      */
-    private Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
+    public Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
         Interval updatedInterval = null;
         DateTime unitPositionStartTime = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate());
         if (interval.contains(unitPositionStartTime) || interval.getStart().isAfter(unitPositionStartTime)) {
@@ -1138,6 +1139,8 @@ public class TimeBankCalculationService {
         }
         return scheduledMinutes;
     }
+
+
 
 
 }
