@@ -4,11 +4,14 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 public class PensionProviderDTO {
     private BigInteger id;
+    @NotBlank(message = "name.absent")
     private String name;
+    @NotBlank(message = "paymentNumber.absent")
     private String paymentNumber;
 
     public PensionProviderDTO() {
@@ -28,7 +31,7 @@ public class PensionProviderDTO {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getPaymentNumber() {
@@ -36,6 +39,6 @@ public class PensionProviderDTO {
     }
 
     public void setPaymentNumber(String paymentNumber) {
-        this.paymentNumber = paymentNumber;
+        this.paymentNumber = paymentNumber.trim();
     }
 }
