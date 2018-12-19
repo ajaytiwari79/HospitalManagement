@@ -69,10 +69,11 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Shift(Date startDate, Date endDate, Long unitPositionId) {
+    public Shift(Date startDate, Date endDate, Long unitPositionId,List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitPositionId = unitPositionId;
+        this.activities = shiftActivities;
     }
 
     public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,

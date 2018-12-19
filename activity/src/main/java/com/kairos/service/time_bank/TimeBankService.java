@@ -360,7 +360,7 @@ public class TimeBankService extends MongoBaseService {
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-        Shift shift = new Shift(startDate,endDate,unitPositionId);
+        Shift shift = new Shift(startDate,endDate,unitPositionId,new ArrayList<>());
         shift.setStaffId(staffAdditionalInfoDTO.getUnitPosition().getStaffId());
         saveTimeBank(staffAdditionalInfoDTO,shift);
         return true;
