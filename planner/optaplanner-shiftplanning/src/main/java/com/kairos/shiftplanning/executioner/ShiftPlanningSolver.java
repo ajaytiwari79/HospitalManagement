@@ -30,6 +30,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ShiftPlanningSolver {
     public static final String BASE_SRC = "src/main/resources/data/";
@@ -71,7 +72,7 @@ public class ShiftPlanningSolver {
 
     private List<File> getDroolFilesByConstraints(SolverConfigDTO solverConfig){
         File[] drlFiles = new File("/media/pradeep/bak/kairos/kairos-user/planner/src/main/resources/droolsFile/Shift_Planning").listFiles();
-        Map<String,File> fileMap = Arrays.asList(drlFiles).stream().collect(Collectors.toMap(k->k.getName(),v->v));
+        Map<String,File> fileMap = Stream.of(drlFiles).collect(Collectors.toMap(k->k.getName(), v->v));
         List<File> droolsFiles = new ArrayList<>();
         droolsFiles.add(fileMap.get("SHIFTPLANNING_BASE.drl"));
         for (ConstraintDTO constraintDTO : solverConfig.getConstraints()) {
