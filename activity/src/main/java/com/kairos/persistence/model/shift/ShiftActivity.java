@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
@@ -40,7 +39,7 @@ public class ShiftActivity {
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private Long allowedBreakDurationInMinute;
 
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
 
     public ShiftActivity() {
     }
