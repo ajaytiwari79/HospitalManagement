@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BankService extends MongoBaseService {
@@ -25,7 +26,7 @@ public class BankService extends MongoBaseService {
 
     public BankDTO createBank(Long countryId,BankDTO bankDTO){
         Bank bank = bankRepository.findByNameOrAccountNumber(bankDTO.getName(),bankDTO.getInternationalAccountNumber(),bankDTO.getRegistrationNumber(),bankDTO.getSwiftCode());
-        validateBankDetailsThrowsException(bank,bankDTO);
+        validateBankDetails(bank,bankDTO);
         bank=new Bank(null,bankDTO.getName(),bankDTO.getDescription(),bankDTO.getRegistrationNumber(),bankDTO.getInternationalAccountNumber(),bankDTO.getSwiftCode(),countryId);
         save(bank);
         bankDTO.setId(bank.getId());
@@ -34,7 +35,7 @@ public class BankService extends MongoBaseService {
 
     public BankDTO updateBank(BigInteger bankId, BankDTO bankDTO){
         Bank alreadyExist = bankRepository.findByNameOrAccountNumberAndIdNot(bankId,bankDTO.getName(),bankDTO.getInternationalAccountNumber(),bankDTO.getRegistrationNumber(),bankDTO.getSwiftCode());
-        validateBankDetailsThrowsException(alreadyExist,bankDTO);
+        validateBankDetails(alreadyExist,bankDTO);
         Bank bank=bankRepository.getByIdAndDeletedFalse(bankId);
         if(bank==null){
             exceptionService.dataNotFoundByIdException("bank.not.found");
@@ -58,8 +59,8 @@ public class BankService extends MongoBaseService {
         return bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
     }
 
-    private void validateBankDetailsThrowsException(Bank bank, BankDTO bankDTO){
-        if(bank!=null){
+    private void validateBankDetails(Bank bank, BankDTO bankDTO){
+        if(Optional.ofNullable(bank).isPresent()){
             if (bankDTO.getName().equalsIgnoreCase(bank.getName())) {
                 exceptionService.duplicateDataException("bank.already.exists.name", bankDTO.getName());
             }
