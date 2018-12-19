@@ -5,7 +5,6 @@ import com.kairos.enums.shift.ShiftStatus;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +29,7 @@ public class ShiftTemplateActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REJECT));
 
     public BigInteger getActivityId() {
         return activityId;

@@ -320,7 +320,7 @@ public class ShiftBreakService {
 
     private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate, boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute) {
         ShiftActivity childShift = new ShiftActivity(name, startDate, endDate, activityId, breakShift,absenceReasonCodeId,allowedBreakDurationInMinute);
-        childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
+        childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISH));
         return childShift;
     }
 

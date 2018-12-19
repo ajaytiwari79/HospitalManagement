@@ -370,9 +370,9 @@ public class OrganizationAddressService {
         return null;
     }
 
-    public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> reasonCodeIds, Long unitId) {
+    public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> absenceReasonCodeIds, Long unitId) {
         Map<String, Object> contactAddressData = organizationGraphRepository.getContactAddressOfParentOrganization(unitId);
-        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(reasonCodeIds);
+        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(absenceReasonCodeIds);
         List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes, ReasonCodeDTO.class);
         return new ReasonCodeWrapper(reasonCodeDTOS,contactAddressData);
     }
