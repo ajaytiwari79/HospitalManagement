@@ -413,7 +413,7 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_USER_ACCESS_ROLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
         });
     }
-    public ReasonCodeWrapper getAccessRoleAndReasoncodes() {
+    public ReasonCodeWrapper getAccessRoleAndReasonCodes() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, ACCESS_ROLE_AND_REASON_CODE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
         });
     }
@@ -425,6 +425,10 @@ public class GenericIntegrationService {
         });
     }
 
+    public ReasonCodeWrapper getUnitInfoAndReasonCodes(Long unitId,List<NameValuePair> requestParam) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, UNIT_LOCATION_AND_REASON_CODE, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
+        });
+    }
 
 
     //TimeSlotRestClient

@@ -1,7 +1,11 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.team.Team;
@@ -16,6 +20,7 @@ import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -31,10 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -77,6 +79,9 @@ public class OrganizationAddressService {
     private OrganizationService organizationService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
+
     public HashMap<String, Object> getAddress(long id, String type) {
 
         HashMap<String, Object> response = new HashMap<>(2);
@@ -177,7 +182,7 @@ public class OrganizationAddressService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -202,7 +207,7 @@ public class OrganizationAddressService {
 
             Organization organization = organizationGraphRepository.findOne(id);
             if (organization == null) {
-                exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
+                exceptionService.dataNotFoundByIdException("message.organization.id.notFound", id);
 
 
             }
@@ -212,7 +217,7 @@ public class OrganizationAddressService {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
                 exceptionService.dataNotFoundByIdException("message.organizationAddress.team.notFound");
-  }
+            }
             team.setContactAddress(contactAddress);
             teamGraphRepository.save(team);
         }
@@ -221,7 +226,7 @@ public class OrganizationAddressService {
 
     public Map<String, Object> saveBillingAddress(AddressDTO addressDTO, long unitId, boolean isAddressAlreadyExist) {
 
-        ContactAddress billingAddress=null;
+        ContactAddress billingAddress = null;
         if (isAddressAlreadyExist && addressDTO.getId() == null) {
             exceptionService.dataNotFoundByIdException("message.organizationAddress.contactaAddress.notNull");
             //throw new DataNotFoundByIdException("Address not found to update");
@@ -236,7 +241,7 @@ public class OrganizationAddressService {
 
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
 
@@ -280,7 +285,7 @@ public class OrganizationAddressService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -365,7 +370,12 @@ public class OrganizationAddressService {
         return null;
     }
 
-
+    public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> reasonCodeIds, Long unitId) {
+        Map<String, Object> contactAddressData = organizationGraphRepository.getContactAddressOfParentOrganization(unitId);
+        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(reasonCodeIds);
+        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes, ReasonCodeDTO.class);
+        return new ReasonCodeWrapper(reasonCodeDTOS,contactAddressData);
+    }
 
 
 }
