@@ -344,7 +344,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
         "WHEN organization IS NULL THEN \"organization\" \n" +
         "WHEN staff IS NULL THEN \"staff\"\n" +
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
-        "ELSE COLLECT({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
+        "ELSE COLLECT({id:id(unitPosition),startDate:unitPosition.startDate,endDate:unitPosition.endDate,positionCodeName:positionCode.name}) END ")
         Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
