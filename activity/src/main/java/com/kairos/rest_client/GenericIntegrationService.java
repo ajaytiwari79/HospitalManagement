@@ -714,10 +714,15 @@ public class GenericIntegrationService {
         });
     }
 
-    //Temporary
-    public Long getStaffIdByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_BY_UNIT_POSITION_ID, Arrays.asList(new BasicNameValuePair("unitPositionId", unitPositionId.toString())), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
-        });
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByUnitPositionId(Long unitId,LocalDate shiftDate, String type, Long unitPositionId,Set<Long> reasonCodeIds) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("type", type));
+        queryParamList.add(new BasicNameValuePair("startDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
+            queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
+        }
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_EMPLOYMENT_BY_UNIT_POSITION_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, unitPositionId);
     }
 
     public List<StaffDTO> getStaffsByFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO){

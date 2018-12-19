@@ -687,9 +687,9 @@ public class StaffController {
     @GetMapping(value = "/staff_employment_by_unit_position")
     @ApiOperation("get staff by unitPositionId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByUnitPositionId(@RequestParam("type") String type, @RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate,@RequestParam(value="reasonCodeIds",required = false) Set<Long> reasonCodeIds, @PathVariable long unitId, @PathVariable long staffId,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByUnitPositionId(@RequestParam("type") String type, @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,@RequestParam(value="reasonCodeIds",required = false) Set<Long> reasonCodeIds, @PathVariable long unitId, @PathVariable long staffId,
                                                                         @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByUnitPositionId(shiftDate, unitPositionId, unitId, type,reasonCodeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByUnitPositionId(startDate, unitPositionId, unitId, type,reasonCodeIds));
     }
 
 }

@@ -306,11 +306,10 @@ public class CostTimeAgreementService extends MongoBaseService {
         return unitPosition;
     }
 
-    private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate, Long unitId) {
-        Date endDate=unitPositionLineEndDate!=null? DateUtils.asDate(unitPositionLineEndDate):null;
-        Long staffId=genericIntegrationService.getStaffIdByUnitPositionIdAndUnitId(unitPositionId,unitId);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(unitPositionLineStartDate,staffId, AppConstants.ORGANIZATION,unitPositionId,Collections.emptySet());
-        timeBankService.updateTimeBankOnUnitPositionModification(unitPositionId, DateUtils.asDate(unitPositionLineStartDate), endDate, staffAdditionalInfoDTO);
+    private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
+        Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,ctaStartDate, AppConstants.ORGANIZATION,unitPositionId,Collections.emptySet());
+        timeBankService.updateTimeBankOnUnitPositionModification(unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
     }
 
     /**

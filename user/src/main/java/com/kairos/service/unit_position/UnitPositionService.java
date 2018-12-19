@@ -564,7 +564,7 @@ public class UnitPositionService {
      */
     public void updateTimeBank(long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate,Long unitId) {
 
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(unitPositionLineStartDate, unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(unitPositionLineStartDate, unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
         activityIntegrationService.updateTimeBankOnUnitPositionUpdation(unitPositionId, unitPositionLineStartDate, unitPositionLineEndDate, staffAdditionalInfoDTO);
     }
 
