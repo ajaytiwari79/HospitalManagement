@@ -40,7 +40,7 @@ public class StaffUnitPositionDetails {
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private ZoneId unitTimeZone;
     private Long countryId;
-    private List<AppliedFunctionDTO> appliedFunctions;
+    private List<AppliedFunctionDTO> appliedFunctions= new ArrayList<>();
     private BigInteger excludedPlannedTime;
     private BigInteger includedPlannedTime;
     private Long unitId;
@@ -65,7 +65,7 @@ public class StaffUnitPositionDetails {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
     public List<AppliedFunctionDTO> getAppliedFunctions() {
-        return appliedFunctions;
+        return Optional.ofNullable(appliedFunctions).orElse(new ArrayList<>());
     }
 
     public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {

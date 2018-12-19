@@ -179,7 +179,6 @@ public class AppConstants {
     public static final String REALTIME="Realtime";
     public static final String TIME_AND_ATTENDANCE="Time & Attendance";
     public static final String TENTATIVE="Tentative";
-    public static final String PAYROLL="Payroll";
     public static final String PRIORITY_GROUP1_NAME = "PRIORITY_GROUP1";
     public static final int STAFF_GRACE_PERIOD_DAYS=2;
     public static final int MANAGEMENT_GRACE_PERIOD_DAYS=2;
@@ -200,6 +199,10 @@ public class AppConstants {
     public static final String IS_BROKEN = " is broken";
     public static final long ONE_HOUR_MINUTES=60;
     public static final long SHIFT_LEAST_GRANULARITY =15;
+
+    //KPI  BAR chart property
+    public static final String XAXIS="label";
+    public static final String YAXIS="value";
 
 
 

@@ -8,6 +8,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.UnitPositionDTO;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.Expertise;
@@ -412,7 +413,7 @@ public class GenericIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CURRENT_USER_ACCESS_ROLE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
         });
     }
-    public ReasonCodeWrapper getAccessRoleAndReasoncodes() {
+    public ReasonCodeWrapper getAccessRoleAndReasonCodes() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, ACCESS_ROLE_AND_REASON_CODE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
         });
     }
@@ -424,6 +425,10 @@ public class GenericIntegrationService {
         });
     }
 
+    public ReasonCodeWrapper getUnitInfoAndReasonCodes(Long unitId,List<NameValuePair> requestParam) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, UNIT_LOCATION_AND_REASON_CODE, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
+        });
+    }
 
 
     //TimeSlotRestClient
@@ -710,9 +715,14 @@ public class GenericIntegrationService {
     }
 
     //Temporary
-    public Long getStaffIdByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId){
-        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,STAFF_ID_BY_UNIT_POSITION_ID,Arrays.asList(new BasicNameValuePair("unitPositionId",unitPositionId.toString())), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+    public Long getStaffIdByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_BY_UNIT_POSITION_ID, Arrays.asList(new BasicNameValuePair("unitPositionId", unitPositionId.toString())), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
+    }
+
+    public List<StaffDTO> getStaffsByFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
+        return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, STAFF_BY_EMPLOYMENT_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>(){});
+
     }
 }
 

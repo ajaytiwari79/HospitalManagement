@@ -55,19 +55,19 @@ public class PayOutCalculationService {
 
     /**
      * @param interval
-     * @param staffAdditionalInfoDTO
+     * @param unitPositionDetails
      * @param shift
      * @param activityWrapperMap
      * @param payOut
      * @return PayOut
      */
-    public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOut payOut) {
-        StaffUnitPositionDetails unitPositionDetails = staffAdditionalInfoDTO.getUnitPosition();
+    public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffUnitPositionDetails unitPositionDetails, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOut payOut,List<DayTypeDTO> dayTypeDTOS) {
+
         int totalPayOut = 0;
         int scheduledMin = 0;
         int contractualMin = interval.getStart().get(ChronoField.DAY_OF_WEEK) <= unitPositionDetails.getWorkingDaysInWeek() ? unitPositionDetails.getTotalWeeklyMinutes() / unitPositionDetails.getWorkingDaysInWeek() : 0;
         Map<BigInteger, Integer> ctaPayoutMinMap = new HashMap<>();
-        Map<Long,DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(), v->v));
 
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();

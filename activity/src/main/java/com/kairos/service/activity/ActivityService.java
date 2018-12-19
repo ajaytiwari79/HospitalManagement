@@ -762,7 +762,7 @@ public class ActivityService extends MongoBaseService {
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
 
         // Set access Role of staff
-        ReasonCodeWrapper reasonCodeWrapper  = genericIntegrationService.getAccessRoleAndReasoncodes();
+        ReasonCodeWrapper reasonCodeWrapper  = genericIntegrationService.getAccessRoleAndReasonCodes();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {

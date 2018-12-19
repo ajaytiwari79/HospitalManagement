@@ -88,7 +88,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivitIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
+        if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             int totalVeto = 0;
             int totalStopBricks = 0;
@@ -96,9 +96,9 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
             shifts.add(infoWrapper.getShift());
             for (ShiftWithActivityDTO shift : shifts) {
                 if(interval.contains(shift.getStartDate())){
-                    if (shift.getActivitIds().contains(vetoActivityId)) {
+                    if (shift.getActivityIds().contains(vetoActivityId)) {
                         totalVeto++;
-                    } else if (shift.getActivitIds().contains(stopBrickActivityId)) {
+                    } else if (shift.getActivityIds().contains(stopBrickActivityId)) {
                         totalStopBricks++;
                     }
                 }
