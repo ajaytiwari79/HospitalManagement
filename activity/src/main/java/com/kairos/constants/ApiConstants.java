@@ -148,4 +148,8 @@ public final class ApiConstants {
     public static final String UNIT_TIMEZONE="/time_zone";
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
 
+    // /staff_by_employment_type
+    public static final String STAFF_BY_EMPLOYMENT_TYPE="/staff_by_employment_type";
+
+
 }

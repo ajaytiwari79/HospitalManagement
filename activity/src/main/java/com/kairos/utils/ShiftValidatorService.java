@@ -520,7 +520,7 @@ public class ShiftValidatorService {
             CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
             for (ShiftWithActivityDTO shift : shifts) {
                 DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()),DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1)));
-                if (CollectionUtils.containsAny(shift.getActivitiesIds(), activitieIds) && interval.contains(shift.getStartDate())) {
+                if (CollectionUtils.containsAny(shift.getActivityIds(), activitieIds) && interval.contains(shift.getStartDate())) {
                     updatedShifts.add(shift);
                 }
             }
@@ -590,7 +590,7 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> filterShiftsByActivityIds(List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         shifts.forEach(shift -> {
-            boolean isValidShift = (CollectionUtils.isNotEmpty(activitieIds) && CollectionUtils.containsAny(activitieIds, shift.getActivitiesIds()));
+            boolean isValidShift = (CollectionUtils.isNotEmpty(activitieIds) && CollectionUtils.containsAny(activitieIds, shift.getActivityIds()));
             if (isValidShift) {
                 shiftQueryResultWithActivities.add(shift);
             }

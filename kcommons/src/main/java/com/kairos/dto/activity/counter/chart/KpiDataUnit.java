@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.counter.chart;
 
-public class DataUnit {
+public class KpiDataUnit {
     private String label;
     private Number refId;
     private double value;
@@ -10,7 +10,7 @@ public class DataUnit {
      * @dated: Jun/29/2018
      */
 
-    public DataUnit(String label, Number refId, double value) {
+    public KpiDataUnit(String label, Number refId, double value) {
         this.label = label;
         this.value = value;
         this.refId = refId;

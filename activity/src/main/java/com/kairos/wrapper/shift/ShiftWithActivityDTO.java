@@ -119,7 +119,7 @@ public class ShiftWithActivityDTO {
     }
 
     @JsonIgnore
-    public List<BigInteger> getActivitiesIds(){
+    public List<BigInteger> getActivityIds(){
         if(activityIds.isEmpty()) {
             activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList());
         }

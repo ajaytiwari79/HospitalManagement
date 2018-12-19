@@ -392,14 +392,14 @@ public class TimeBankService extends MongoBaseService {
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Shift shift) {
         Map<BigInteger, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getId(), v -> v));
         shift.getActivities().forEach(shiftActivity -> {
-            ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
-            shiftActivity.setTimeBankCtaBonusHour(shiftActivityDTO.getTimeBankCtaBonusMinutes());
-            shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+                ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
+                shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+                shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
         });
         shiftMongoRepository.save(shift);
     }
 
-    public boolean renewTimebankOfShifts() {
+    public boolean renewTimeBankOfShifts() {
         List<Shift> shifts = shiftMongoRepository.findAllByDeletedFalse();
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = new HashMap<>();
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());
@@ -462,7 +462,7 @@ public class TimeBankService extends MongoBaseService {
         Map<BigInteger, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getId(), v -> v));
         shifts.forEach(current -> current.getActivities().forEach(shiftActivity -> {
             ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
-            shiftActivity.setTimeBankCtaBonusHour(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
             shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
         }));
         shiftMongoRepository.saveAll(shifts);

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
+import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -83,6 +84,8 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH  (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(c)={0} AND et.deleted={1} return id(et) as id,et.name as name")
     List<EmploymentTypeQueryResult> getEmploymentTypeByCountry(Long countryId, Boolean isDeleted);
+
+
 
 
 }

@@ -44,12 +44,11 @@ public class ShiftActivityDTO {
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
-
+    private int timeBankCtaBonusMinutes;
+    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
-    private int timeBankCtaBonusMinutes;
-    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
@@ -265,7 +264,6 @@ public class ShiftActivityDTO {
         this.breakReplaced = breakReplaced;
     }
 
-
     public Map<String, Object> getLocation() {
         return location;
     }
@@ -298,7 +296,7 @@ public class ShiftActivityDTO {
     }
 
     public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
-        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
+        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>(0));
     }
 
     public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
