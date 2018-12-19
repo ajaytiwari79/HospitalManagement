@@ -7,7 +7,7 @@ package com.kairos.service.payroll;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.payroll.PayRollDTO;
 import com.kairos.persistence.model.payroll.PayRoll;
-import com.kairos.persistence.repository.activity.PayRollRepository;
+import com.kairos.persistence.repository.payroll.PayRollRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class PayRollService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public PayRollDTO createPayRoll(PayRollDTO payRollDTO) {
-        PayRoll payRoll = payRollRepository.getByDeletedFalseAndNameIgnoreCaseOrCode(payRollDTO.getName(),payRollDTO.getCode());
+        PayRoll payRoll = payRollRepository.findByNameOrCode(payRollDTO.getName(),payRollDTO.getCode());
         validatePayRoll(payRoll,payRollDTO);
         payRoll = new PayRoll(null, payRollDTO.getName(), payRollDTO.getCode(), payRollDTO.isActive());
         save(payRoll);
@@ -34,7 +34,7 @@ public class PayRollService extends MongoBaseService {
     }
 
     public PayRollDTO updatePayRoll(BigInteger payRollId, PayRollDTO payRollDTO) {
-        PayRoll alreadyExist = payRollRepository.getByDeletedFalseAndIdNotOrNameIgnoreCaseAndCode(payRollId,payRollDTO.getName(),payRollDTO.getCode());
+        PayRoll alreadyExist = payRollRepository.findByNameOrCodeExcludingById(payRollId,payRollDTO.getName(),payRollDTO.getCode());
         validatePayRoll(alreadyExist,payRollDTO);
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
         if (payRoll == null) {
@@ -55,7 +55,7 @@ public class PayRollService extends MongoBaseService {
     }
 
     public List<PayRollDTO> getAllPayRoll() {
-        return payRollRepository.findAllByDeletedFalse();
+        return payRollRepository.findAllByDeletedFalseOrderByCreatedAtDesc();
     }
 
     public PayRollDTO linkPayRollWithCountry(Long countryId, BigInteger payRollId, boolean checked) {
@@ -63,7 +63,6 @@ public class PayRollService extends MongoBaseService {
         if (payRoll == null) {
             exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
         }
-
         if (checked){
             payRoll.getCountryIds().add(countryId);
         } else{
@@ -75,7 +74,7 @@ public class PayRollService extends MongoBaseService {
     }
 
     public List<PayRollDTO> getAllPayRollOfCountry(Long countryId) {
-        List<PayRollDTO> payRollDTOS = payRollRepository.findAllByDeletedFalse();
+        List<PayRollDTO> payRollDTOS = payRollRepository.findAllByDeletedFalseOrderByCreatedAtDesc();
         payRollDTOS.forEach(payRollDTO -> {
             if (payRollDTO.getCountryIds().contains(countryId)) {
                 payRollDTO.setApplicableForCountry(true);
