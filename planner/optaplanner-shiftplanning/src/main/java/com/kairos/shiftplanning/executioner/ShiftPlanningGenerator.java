@@ -246,14 +246,14 @@ public class ShiftPlanningGenerator {
         int i = 0;
         for(Employee emp:employees){
             for(LocalDate date:getPlanningDays()) {
-                List<ActivityLineInterval> activityLineIntervalList = activityLineIntervals.subList(i,i=i+5);
+                /*List<ActivityLineInterval> activityLineIntervalList = activityLineIntervals.subList(i,i=i+5);
                 activityLineIntervalList.sort(Comparator.comparing(ActivityLineInterval::getStart));
-                ActivityLineInterval ali = null;
+                ActivityLineInterval ali = null;*/
                 ShiftRequestPhase sa = new ShiftRequestPhase();
                 sa.setEmployee(emp);
                 sa.setId(UUID.randomUUID());
                 sa.setDate(date);
-                sa.setActivityLineIntervals(activityLineIntervalList);
+                /*sa.setActivityLineIntervals(activityLineIntervalList);
                 sa.setStartTime(activityLineIntervalList.get(0).getStart().toLocalTime());
                 sa.setEndTime(activityLineIntervalList.get(activityLineIntervalList.size()-1).getEnd().toLocalTime());
                 int j= 0;
@@ -268,7 +268,7 @@ public class ShiftPlanningGenerator {
                         ali = null;
                     }
                     activityLineInterval.setNext(ali);
-                }
+                }*/
                 shiftList.add(sa);
             }
         }
@@ -302,8 +302,8 @@ public class ShiftPlanningGenerator {
         dayTypes.add(new DayType(7l,"Public Holiday",new ArrayList<>(),countryHolidayCalenders,true,false));
         countryHolidayCalenders = new ArrayList<>();
         countryHolidayCalenders.add(new CountryHolidayCalender(java.time.LocalDate.of(2017,12,18), java.time.LocalTime.of(0,0),java.time.LocalTime.of(12,0)));
-        countryHolidayCalenders.add(new CountryHolidayCalender(java.time.LocalDate.of(2017,12,27),java.time.LocalTime.of(12,0),java.time.LocalTime.of(24,0)));
-        countryHolidayCalenders.add(new CountryHolidayCalender(java.time.LocalDate.of(2018,1,1),java.time.LocalTime.of(17,0),java.time.LocalTime.of(24,0)));
+        countryHolidayCalenders.add(new CountryHolidayCalender(java.time.LocalDate.of(2017,12,27),java.time.LocalTime.of(12,0),java.time.LocalTime.of(23,0)));
+        countryHolidayCalenders.add(new CountryHolidayCalender(java.time.LocalDate.of(2018,1,1),java.time.LocalTime.of(17,0),java.time.LocalTime.of(23,0)));
         dayTypes.add(new DayType(7l,"Half Public Holiday",new ArrayList<>(),countryHolidayCalenders,true,true));
         return dayTypes;
 
@@ -653,9 +653,9 @@ public class ShiftPlanningGenerator {
                     }
                 }
                 else if(activity.isTypePresence()){
-                    for(int staffNum=0;staffNum<3;staffNum++){//first staff is required
-                        for(int j=46;j<72;j++){//32..80
-                            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,staffNum<2, activity,staffNum);
+                    for(int staffNum=0;staffNum<5;staffNum++){//first staff is required
+                        for(int j=46;j<52;j++){//32..80
+                            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,staffNum<3, activity,staffNum);
                             dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
                         }
                     }
@@ -788,7 +788,7 @@ public class ShiftPlanningGenerator {
         activity2.setActivityConstraints(getActivityContraints());
         Activity activity3 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null);
         activity3.setActivityConstraints(getActivityContraints());
-        Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, "Team C",timeTypes[0], 4,1, null);
+        Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null);
         activity4.setActivityConstraints(getActivityContraints());
         activityPlannerEntities.add(activity);
         activityPlannerEntities.add(activity2);

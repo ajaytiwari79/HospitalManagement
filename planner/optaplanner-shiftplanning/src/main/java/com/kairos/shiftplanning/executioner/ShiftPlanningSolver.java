@@ -54,7 +54,7 @@ public class ShiftPlanningSolver {
         List<File> droolsFiles = getDroolFilesByConstraints(solverConfig);
         solverFactory = SolverFactory.createFromXmlResource(config2);
         solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(droolsFiles);
-       // solverFactory.getSolverConfig().setEnvironmentMode(EnvironmentMode.FULL_ASSERT);
+        //solverFactory.getSolverConfig().setEnvironmentMode(EnvironmentMode.FULL_ASSERT);
         solver = solverFactory.buildSolver();
         //solverFactoryBreaks = SolverFactory.createFromXmlResource(config_breaks);
         //solverBreaks = solverFactoryBreaks.buildSolver();
@@ -70,7 +70,7 @@ public class ShiftPlanningSolver {
     }
 
     private List<File> getDroolFilesByConstraints(SolverConfigDTO solverConfig){
-        File[] drlFiles = new File("/home/mohit/Documents/mykairos/kairos-user/planner/src/main/resources/droolsFile/Shift_Planning").listFiles();
+        File[] drlFiles = new File("/media/pradeep/bak/kairos/kairos-user/planner/src/main/resources/droolsFile/Shift_Planning").listFiles();
         Map<String,File> fileMap = Arrays.asList(drlFiles).stream().collect(Collectors.toMap(k->k.getName(),v->v));
         List<File> droolsFiles = new ArrayList<>();
         droolsFiles.add(fileMap.get("SHIFTPLANNING_BASE.drl"));

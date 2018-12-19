@@ -844,9 +844,9 @@ public class ShiftPlanningUtility {
                 IntStream.rangeClosed(0, 1440 / granularity - 1).forEach(i -> {
                     ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[i][getActivityIndex(ali)]++;
                 });
-
-                ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(), granularity)][getActivityIndex(ali)]++;
             } else {
+                ((int[][]) slMatrix.get(ali.getStart().toLocalDate()))[getTimeIndex(ali.getStart(), granularity)][getActivityIndex(ali)]++;
+
             }
         }
         printStaffingLevelMatrix(slMatrix, null);

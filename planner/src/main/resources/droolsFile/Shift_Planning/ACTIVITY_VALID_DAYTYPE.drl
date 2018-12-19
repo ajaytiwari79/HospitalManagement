@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 /********Activity Rules*******/
-rule "Min Length of Activity"
+rule "Activity Used on a DayType"
 salience 20
     when
         $ac:Activity()
