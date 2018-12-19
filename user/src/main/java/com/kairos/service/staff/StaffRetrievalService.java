@@ -685,19 +685,19 @@ public class StaffRetrievalService {
         List<StaffUnitPositionDetails> unitPositionDetails = unitPositionService.getUnitPositionsDetails(unitPositionIds, organization, countryId);
         Map<Long, StaffUnitPositionDetails> unitPositionDetailsMap = unitPositionDetails.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-        Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
+        Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.toList()));
+        //staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
+                new DayTypeDTO(dayType.getId(),dayType.getName(),dayType.getValidDays(),ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class),dayType.isHolidayType(),dayType.isAllowTimeSettings())
+        ).collect(Collectors.toList());
         // TODO incorrect we dont need to set in all staff
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
+            staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
             staffAdditionalInfoDTO.setUnitId(organization.getId());
             staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
             staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
-            List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
-                    new DayTypeDTO(dayType.getId(),dayType.getName(),dayType.getValidDays(),ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class),dayType.isHolidayType(),dayType.isAllowTimeSettings())
-            ).collect(Collectors.toList());
-            staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
-            staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
             if (Optional.ofNullable(unitPositionDetailsMap.get(Long.valueOf(staffAdditionalInfoDTO.getId()))).isPresent()) {
                 staffAdditionalInfoDTO.setUnitPosition((unitPositionDetailsMap.get(Long.valueOf(staffAdditionalInfoDTO.getId()))));
             }
