@@ -565,7 +565,7 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate,@RequestParam(value="reasonCodeIds",required = false) Set<Long> reasonCodeIds, @PathVariable long unitId, @PathVariable long staffId,
                                                                       @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type,reasonCodeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(shiftDate,staffId, unitPositionId, unitId, type,reasonCodeIds));
     }
     // We need only limited data so we are making a substitute of above API
     @RequestMapping(value = "/{staffId}/unit_position/{unitPositionId}/functions", method = RequestMethod.GET)
@@ -684,11 +684,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByIds(unitId,staffIds));
     }
 
-    @GetMapping(value = "/staff_id_by_unit_position")
+    @GetMapping(value = "/staff_employment_by_unit_position")
     @ApiOperation("get staff by unitPositionId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffByunitPositionId(@PathVariable Long unitId,@RequestParam Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailByUnitPositionId(unitId,unitPositionId));
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByUnitPositionId(@RequestParam("type") String type, @RequestParam("shiftDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shiftDate,@RequestParam(value="reasonCodeIds",required = false) Set<Long> reasonCodeIds, @PathVariable long unitId, @PathVariable long staffId,
+                                                                        @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByUnitPositionId(shiftDate, unitPositionId, unitId, type,reasonCodeIds));
     }
 
 }
