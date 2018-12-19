@@ -11,6 +11,9 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PensionProviderService extends MongoBaseService {
@@ -30,39 +33,39 @@ public class PensionProviderService extends MongoBaseService {
         return pensionProviderDTO;
     }
 
-//    public BankDTO updateBank(BigInteger bankId, BankDTO bankDTO){
-//        Bank alreadyExist = bankRepository.findByNameOrAccountNumberAndIdNot(bankId,bankDTO.getName(),bankDTO.getInternationalAccountNumber(),bankDTO.getRegistrationNumber(),bankDTO.getSwiftCode());
-//        validateBankDetailsThrowsException(alreadyExist,bankDTO);
-//        Bank bank=bankRepository.getByIdAndDeletedFalse(bankId);
-//        if(bank==null){
-//            exceptionService.dataNotFoundByIdException("bank.not.found");
-//        }
-//        bank=new Bank(bank.getId(),bankDTO.getName(),bankDTO.getDescription(),bankDTO.getRegistrationNumber(),bankDTO.getInternationalAccountNumber(),bankDTO.getSwiftCode(),bank.getCountryId());
-//        save(bank);
-//        return bankDTO;
-//
-//    }
-//
-//    public boolean deleteBank(BigInteger bankId){
-//        bankRepository.safeDeleteById(bankId);
-//        return true;
-//    }
-//
-//    public BankDTO getBankById(BigInteger bankId){
-//        return bankRepository.findByIdAndDeletedFalse(bankId);
-//    }
-//
-//    public List<BankDTO> getAllBank(Long countryId){
-//        return bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
-//    }
+    public PensionProviderDTO updatePensionProvider(BigInteger pensionProviderId,PensionProviderDTO pensionProviderDTO){
+        PensionProvider alreadyExist = pensionProviderRepository.findByNameOrPaymentNumberAndIdNot(pensionProviderDTO.getName(),pensionProviderDTO.getPaymentNumber(),pensionProviderId);
+        validatePensionProviderDetails(alreadyExist,pensionProviderDTO);
+        PensionProvider pensionProvider=pensionProviderRepository.getByIdAndDeletedFalse(pensionProviderId);
+        if(!Optional.ofNullable(pensionProvider).isPresent()){
+            exceptionService.dataNotFoundByIdException("pension_provider.not.found");
+        }
+        pensionProvider=new PensionProvider(pensionProvider.getId(),pensionProviderDTO.getName(),pensionProviderDTO.getPaymentNumber(),pensionProvider.getCountryId());
+        pensionProviderRepository.save(pensionProvider);
+        return pensionProviderDTO;
+
+    }
+
+    public boolean deletePensionProvider(BigInteger pensionProviderId){
+        pensionProviderRepository.safeDeleteById(pensionProviderId);
+        return true;
+    }
+
+    public PensionProviderDTO getPensionProviderById(BigInteger pensionProviderId){
+        return pensionProviderRepository.findByIdAndDeletedFalse(pensionProviderId);
+    }
+
+    public List<PensionProviderDTO> getAllPensionProvider(Long countryId){
+        return pensionProviderRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+    }
 
     private void validatePensionProviderDetails(PensionProvider pensionProvider, PensionProviderDTO pensionProviderDTO){
         if(pensionProvider!=null){
             if (pensionProviderDTO.getName().equalsIgnoreCase(pensionProvider.getName())) {
-                exceptionService.duplicateDataException("bank.already.exists.name", pensionProviderDTO.getName());
+                exceptionService.duplicateDataException("pension_provider.already.exists.name", pensionProviderDTO.getName());
             }
             if (pensionProviderDTO.getPaymentNumber().equalsIgnoreCase(pensionProvider.getPaymentNumber())) {
-                exceptionService.duplicateDataException("bank.already.exists.account", pensionProviderDTO.getPaymentNumber());
+                exceptionService.duplicateDataException("pension_provider.already.exists.payment_number", pensionProviderDTO.getPaymentNumber());
             }
         }
 
