@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionLinesQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public class StaffKpiFilterQueryResult {
     private Long id;
     private String firstName;
     private String lastName;
-    private List<UnitPositionLinesQueryResult> positionLines;
+    private List<UnitPositionQueryResult> unitPosition;
 
     public StaffKpiFilterQueryResult() {
     }
@@ -39,11 +40,11 @@ public class StaffKpiFilterQueryResult {
         this.lastName = lastName;
     }
 
-    public List<UnitPositionLinesQueryResult> getPositionLines() {
-        return positionLines;
+    public List<UnitPositionQueryResult> getUnitPosition() {
+        return unitPosition;
     }
 
-    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
-        this.positionLines = positionLines;
+    public void setUnitPosition(List<UnitPositionQueryResult> unitPosition) {
+        this.unitPosition = unitPosition;
     }
 }

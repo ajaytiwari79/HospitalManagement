@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.kpi;
 
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -7,26 +9,15 @@ public class StaffKpiFilterDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    //UnitPosition startDate endate
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private List<UnitPositionLinesDTO> positionLines;
+    private List<UnitPositionWithCtaDetailsDTO> unitPositionWithCtaDetailsDTOS;
 
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public List<UnitPositionWithCtaDetailsDTO> getUnitPositionWithCtaDetailsDTOS() {
+        return unitPositionWithCtaDetailsDTOS;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setUnitPositionWithCtaDetailsDTOS(List<UnitPositionWithCtaDetailsDTO> unitPositionWithCtaDetailsDTOS) {
+        this.unitPositionWithCtaDetailsDTOS = unitPositionWithCtaDetailsDTOS;
     }
 
     public Long getId() {
@@ -51,14 +42,6 @@ public class StaffKpiFilterDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public List<UnitPositionLinesDTO> getPositionLines() {
-        return positionLines;
-    }
-
-    public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
-        this.positionLines = positionLines;
     }
 
     public String getFullName(){

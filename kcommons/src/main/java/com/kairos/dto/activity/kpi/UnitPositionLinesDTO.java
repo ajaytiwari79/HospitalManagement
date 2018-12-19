@@ -1,5 +1,8 @@
 package com.kairos.dto.activity.kpi;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 
@@ -87,5 +90,10 @@ public class UnitPositionLinesDTO {
 
     public void setTotalWeeklyMinutes(Integer totalWeeklyMinutes) {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
+    @JsonIgnore
+    public DateTimeInterval getInterval(){
+        return endDate!=null ? new DateTimeInterval(DateUtils.asDate(startDate),DateUtils.asDate(endDate)) : null;
     }
 }

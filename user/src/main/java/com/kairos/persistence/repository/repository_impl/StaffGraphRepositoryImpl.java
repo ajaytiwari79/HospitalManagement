@@ -88,7 +88,9 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         stringBuilder.append(" MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
                 "WHERE  date(positionLine.startDate) <= date({endDate}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({startDate}))"+
-                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) RETURN   id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,collect(positionLine) as positionLines");
+                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
+                "WITH {id:id(up),startDate:up.startDate,endDate:up.endDate,positionLines:collect(positionLine)} as up,staff\n" +
+                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,collect(up) as unitPosition");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
 
