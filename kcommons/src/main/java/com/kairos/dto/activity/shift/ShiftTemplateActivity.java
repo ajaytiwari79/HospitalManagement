@@ -29,7 +29,7 @@ public class ShiftTemplateActivity {
     private String backgroundColor;
     private boolean haltBreak;
     private BigInteger plannedTimeId;
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REJECT));
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
 
     public BigInteger getActivityId() {
         return activityId;

@@ -1123,7 +1123,7 @@ public class ShiftService extends MongoBaseService {
         );
         shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
         shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(0).getEndDate());
-        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISH));
+        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.REQUEST));
         return shiftWithActivityDTO;
     }
 
