@@ -1,4 +1,5 @@
-package com.kairos.persistence.model.payroll;/*
+package com.kairos.persistence.model.payroll;
+/*
  *Created By Pavan on 17/12/18
  *
  */

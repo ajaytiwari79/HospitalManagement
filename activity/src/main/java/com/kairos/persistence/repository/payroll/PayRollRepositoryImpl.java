@@ -1,9 +1,9 @@
-package com.kairos.persistence.repository.payroll;/*
+package com.kairos.persistence.repository.payroll;
+/*
  *Created By Pavan on 19/12/18
  *
  */
 
-import com.kairos.persistence.model.payroll.Bank;
 import com.kairos.persistence.model.payroll.PayRoll;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -28,7 +28,7 @@ public class PayRollRepositoryImpl implements CustomPayRollRepository {
     }
 
     @Override
-    public PayRoll findNameOrCodeExcludingById(BigInteger id, String name, int code) {
+    public PayRoll findByNameOrCodeExcludingById(BigInteger id, String name, int code) {
         List<Criteria> criteriaList=prepareCriteriaList(name,code);
         Query query = new Query(Criteria.where("deleted").is(false).and("_id").ne(id).orOperator(criteriaList.toArray(new Criteria[0])));
         return mongoTemplate.findOne(query,PayRoll.class);

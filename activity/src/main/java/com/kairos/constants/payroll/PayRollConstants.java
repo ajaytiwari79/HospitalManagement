@@ -16,6 +16,4 @@ public class PayRollConstants {
     public static final String DELETE_BANK="/bank/{bankId}";
     public static final String UPDATE_BANK="/bank/{bankId}";
     public static final String GET_BANK_BY_ID="/bank/{bankId}";
-
-
 }

@@ -34,7 +34,7 @@ public class PayRollService extends MongoBaseService {
     }
 
     public PayRollDTO updatePayRoll(BigInteger payRollId, PayRollDTO payRollDTO) {
-        PayRoll alreadyExist = payRollRepository.findNameOrCodeExcludingById(payRollId,payRollDTO.getName(),payRollDTO.getCode());
+        PayRoll alreadyExist = payRollRepository.findByNameOrCodeExcludingById(payRollId,payRollDTO.getName(),payRollDTO.getCode());
         validatePayRoll(alreadyExist,payRollDTO);
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
         if (payRoll == null) {

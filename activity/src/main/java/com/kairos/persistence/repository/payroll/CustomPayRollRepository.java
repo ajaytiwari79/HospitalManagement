@@ -11,5 +11,5 @@ public interface CustomPayRollRepository {
 
     PayRoll findByNameOrCode(String name, int code);
 
-    PayRoll findNameOrCodeExcludingById(BigInteger id, String name, int code);
+    PayRoll findByNameOrCodeExcludingById(BigInteger id, String name, int code);
 }

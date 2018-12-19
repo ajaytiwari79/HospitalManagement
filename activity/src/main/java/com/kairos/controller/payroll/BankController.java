@@ -57,29 +57,4 @@ public class BankController {
     public ResponseEntity<Map<String,Object>> getAllBank(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getAllBank(countryId));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
