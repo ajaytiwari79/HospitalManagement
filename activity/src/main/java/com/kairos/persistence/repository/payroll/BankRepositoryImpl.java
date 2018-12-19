@@ -21,15 +21,15 @@ public class BankRepositoryImpl implements CustomBankRepository{
 
     @Override
     public Bank findByNameOrAccountNumber(String name, String internationalAccountNumber, String registrationNumber, String swiftCode) {
-        Criteria [] criteriaList=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
-        Query query = new Query(Criteria.where("deleted").is(false).orOperator(criteriaList));
+        Criteria [] criterias=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
+        Query query = new Query(Criteria.where("deleted").is(false).orOperator(criterias));
         return mongoTemplate.findOne(query,Bank.class);
     }
 
     @Override
     public Bank findByNameOrAccountNumberAndIdNot(BigInteger id, String name, String internationalAccountNumber, String registrationNumber, String swiftCode) {
-        Criteria [] criteriaList=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
-        Query query = new Query(Criteria.where("deleted").is(false).and("_id").ne(id).orOperator(criteriaList));
+        Criteria [] criterias=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
+        Query query = new Query(Criteria.where("deleted").is(false).and("_id").ne(id).orOperator(criterias));
         return mongoTemplate.findOne(query,Bank.class);
     }
 
