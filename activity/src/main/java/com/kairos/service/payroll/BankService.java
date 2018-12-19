@@ -28,7 +28,7 @@ public class BankService extends MongoBaseService {
         Bank bank = bankRepository.findByNameOrAccountNumber(bankDTO.getName(),bankDTO.getInternationalAccountNumber(),bankDTO.getRegistrationNumber(),bankDTO.getSwiftCode());
         validateBankDetails(bank,bankDTO);
         bank=new Bank(null,bankDTO.getName(),bankDTO.getDescription(),bankDTO.getRegistrationNumber(),bankDTO.getInternationalAccountNumber(),bankDTO.getSwiftCode(),countryId);
-        save(bank);
+        bankRepository.save(bank);
         bankDTO.setId(bank.getId());
         return bankDTO;
     }
@@ -37,11 +37,11 @@ public class BankService extends MongoBaseService {
         Bank alreadyExist = bankRepository.findByNameOrAccountNumberAndIdNot(bankId,bankDTO.getName(),bankDTO.getInternationalAccountNumber(),bankDTO.getRegistrationNumber(),bankDTO.getSwiftCode());
         validateBankDetails(alreadyExist,bankDTO);
         Bank bank=bankRepository.getByIdAndDeletedFalse(bankId);
-        if(bank==null){
+        if(!Optional.ofNullable(bank).isPresent()){
             exceptionService.dataNotFoundByIdException("bank.not.found");
         }
         bank=new Bank(bank.getId(),bankDTO.getName(),bankDTO.getDescription(),bankDTO.getRegistrationNumber(),bankDTO.getInternationalAccountNumber(),bankDTO.getSwiftCode(),bank.getCountryId());
-        save(bank);
+        bankRepository.save(bank);
         return bankDTO;
 
     }

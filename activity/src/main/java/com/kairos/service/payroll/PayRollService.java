@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PayRollService extends MongoBaseService {
@@ -28,7 +29,7 @@ public class PayRollService extends MongoBaseService {
         PayRoll payRoll = payRollRepository.findByNameOrCode(payRollDTO.getName(),payRollDTO.getCode());
         validatePayRoll(payRoll,payRollDTO);
         payRoll = new PayRoll(null, payRollDTO.getName(), payRollDTO.getCode(), payRollDTO.isActive());
-        save(payRoll);
+        payRollRepository.save(payRoll);
         payRollDTO.setId(payRoll.getId());
         return payRollDTO;
     }
@@ -37,11 +38,11 @@ public class PayRollService extends MongoBaseService {
         PayRoll alreadyExist = payRollRepository.findByNameOrCodeExcludingById(payRollId,payRollDTO.getName(),payRollDTO.getCode());
         validatePayRoll(alreadyExist,payRollDTO);
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
-        if (payRoll == null) {
+        if (!Optional.ofNullable(payRoll).isPresent()) {
             exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
         }
         payRoll = new PayRoll(payRoll.getId(), payRollDTO.getName(), payRollDTO.getCode(), payRollDTO.isActive());
-        save(payRoll);
+        payRollRepository.save(payRoll);
         return payRollDTO;
     }
 
@@ -60,7 +61,7 @@ public class PayRollService extends MongoBaseService {
 
     public PayRollDTO linkPayRollWithCountry(Long countryId, BigInteger payRollId, boolean checked) {
         PayRoll payRoll = payRollRepository.getByIdAndDeletedFalse(payRollId);
-        if (payRoll == null) {
+        if (!Optional.ofNullable(payRoll).isPresent()) {
             exceptionService.dataNotFoundByIdException("payroll.not.found",payRollId);
         }
         if (checked){
@@ -68,7 +69,7 @@ public class PayRollService extends MongoBaseService {
         } else{
             payRoll.getCountryIds().remove(countryId);
         }
-        save(payRoll);
+        payRollRepository.save(payRoll);
         return ObjectMapperUtils.copyPropertiesByMapper(payRoll,PayRollDTO.class);
 
     }
@@ -84,12 +85,14 @@ public class PayRollService extends MongoBaseService {
     }
 
     private void validatePayRoll(PayRoll payRoll,PayRollDTO payRollDTO){
-        if (payRoll!=null && payRollDTO.getName().equalsIgnoreCase(payRoll.getName())) {
-            exceptionService.duplicateDataException("payroll.already.exists.name", payRollDTO.getName());
+        if(Optional.ofNullable(payRoll).isPresent()){
+            if (payRollDTO.getName().equalsIgnoreCase(payRoll.getName())) {
+                exceptionService.duplicateDataException("payroll.already.exists.name", payRollDTO.getName());
+            }else if (payRollDTO.getCode()==payRoll.getCode()) {
+                exceptionService.duplicateDataException("payroll.already.exists.code", payRollDTO.getCode());
+            }
         }
-        if (payRoll!=null && payRollDTO.getCode()==payRoll.getCode()) {
-            exceptionService.duplicateDataException("payroll.already.exists.code", payRollDTO.getCode());
-        }
+
     }
 
 

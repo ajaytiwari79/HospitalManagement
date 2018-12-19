@@ -21,24 +21,24 @@ public class BankRepositoryImpl implements CustomBankRepository{
 
     @Override
     public Bank findByNameOrAccountNumber(String name, String internationalAccountNumber, String registrationNumber, String swiftCode) {
-        List<Criteria> criteriaList=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
-        Query query = new Query(Criteria.where("deleted").is(false).orOperator(criteriaList.toArray(new Criteria[0])));
+        Criteria [] criterias=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
+        Query query = new Query(Criteria.where("deleted").is(false).orOperator(criterias));
         return mongoTemplate.findOne(query,Bank.class);
     }
 
     @Override
     public Bank findByNameOrAccountNumberAndIdNot(BigInteger id, String name, String internationalAccountNumber, String registrationNumber, String swiftCode) {
-        List<Criteria> criteriaList=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
-        Query query = new Query(Criteria.where("deleted").is(false).and("_id").ne(id).orOperator(criteriaList.toArray(new Criteria[0])));
+        Criteria [] criterias=prepareCriteriaList(name,internationalAccountNumber,registrationNumber,swiftCode);
+        Query query = new Query(Criteria.where("deleted").is(false).and("_id").ne(id).orOperator(criterias));
         return mongoTemplate.findOne(query,Bank.class);
     }
 
-    private List<Criteria> prepareCriteriaList(String name, String internationalAccountNumber, String registrationNumber, String swiftCode){
-        Criteria nameCriteria=Criteria.where("name").is(name).regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
-        Criteria accountNumberCriteria=Criteria.where("internationalAccountNumber").is(internationalAccountNumber).regex(Pattern.compile("^" + internationalAccountNumber + "$", Pattern.CASE_INSENSITIVE));
-        Criteria registrationNumberCriteria=Criteria.where("registrationNumber").is(registrationNumber).regex(Pattern.compile("^" + registrationNumber + "$", Pattern.CASE_INSENSITIVE));
-        Criteria swiftCodeCriteria=Criteria.where("swiftCode").is(swiftCode).regex(Pattern.compile("^" + swiftCode + "$", Pattern.CASE_INSENSITIVE));
-        return Arrays.asList(nameCriteria,accountNumberCriteria,registrationNumberCriteria,swiftCodeCriteria);
+    private Criteria[] prepareCriteriaList(String name, String internationalAccountNumber, String registrationNumber, String swiftCode){
+        Criteria nameCriteria=Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
+        Criteria accountNumberCriteria=Criteria.where("internationalAccountNumber").regex(Pattern.compile("^" + internationalAccountNumber + "$", Pattern.CASE_INSENSITIVE));
+        Criteria registrationNumberCriteria=Criteria.where("registrationNumber").regex(Pattern.compile("^" + registrationNumber + "$", Pattern.CASE_INSENSITIVE));
+        Criteria swiftCodeCriteria=Criteria.where("swiftCode").regex(Pattern.compile("^" + swiftCode + "$", Pattern.CASE_INSENSITIVE));
+        return new Criteria[]{nameCriteria,accountNumberCriteria,registrationNumberCriteria,swiftCodeCriteria};
 
     }
 }
