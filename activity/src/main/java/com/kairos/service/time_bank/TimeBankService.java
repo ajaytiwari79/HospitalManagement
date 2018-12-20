@@ -216,8 +216,8 @@ public class TimeBankService extends MongoBaseService {
             List<Shift> shifts = shiftMongoRepository.findAllShiftsBetweenDatesByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate.toDate(), endDate.toDate());
             while (startDate.isBefore(endDate)) {
                 Interval interval = new Interval(startDate, startDate.plusDays(1).withTimeAtStartOfDay());
-                shiftWithActivityDTOS = getShiftsByInterval(shiftWithActivityDTOS, interval);
-                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getUnitPosition(), interval, shiftWithActivityDTOS, dailyTimeBankEntryAndUnitPositionMap, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes());
+                List<ShiftWithActivityDTO> shiftWithActivityDTOPerInteral = getShiftsByInterval(shiftWithActivityDTOS, interval);
+                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(staffAdditionalInfoDTO.getUnitPosition(), interval, shiftWithActivityDTOPerInteral, dailyTimeBankEntryAndUnitPositionMap, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes());
                 if (dailyTimeBank != null) {
                     accumulatedTimeBank = accumulatedTimeBank + dailyTimeBank.getTotalTimeBankMin();
                     dailyTimeBank.setAccumultedTimeBankMin(accumulatedTimeBank);
