@@ -270,9 +270,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'scheduledMinutes' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
                 "    'unitPositionId' : 1,\n" +
-                "\t'status':1,\n" +
-                "\t'activities.timeBankCtaBonusMinutes' : 1,\n" +
-                "\t'activities._id' : 1,\n" +
+                "    'status':1,\n" +
+                "        'activities.timeBankCtaBonusMinutes' : 1,\n" +
+                "        'activities._id' : 1,\n" +
+                "        'activities.status' : 1,\n" +
+                "        'activities.breakShift' : 1,\n" +
+                "        'activities.allowedBreakDurationInMinute' : 1,\n" +
                 "        'activities.pId' : 1,\n" +
                 "        'activities.id' : 1,\n" +
                 "        'activities.activityId' : 1,\n" +

@@ -1,12 +1,11 @@
 package com.kairos.controller.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
