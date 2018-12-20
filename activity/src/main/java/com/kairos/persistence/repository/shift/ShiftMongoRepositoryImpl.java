@@ -85,7 +85,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 new CustomAggregationOperation(shiftWithActivityProjection()),
                 new CustomAggregationOperation(shiftWithActivityGroup()),
                 new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(replaceRootForShift())
+                new CustomAggregationOperation(replaceRootForShift()),
+                sort(Sort.DEFAULT_DIRECTION,"startDate")
 
                 /*group("_id","name","startDate","endDate","disabled","bonusTimeBank","amount","probability","accumulatedTimeBankInMinutes","remarks","staffId","unitId","scheduledMinutes","durationMinutes","unitPositionId","status").addToSet("activities").as("activities"),
                 project("_id._id","_id.name","_id.startDate","_id.endDate","_id.disabled","_id.pId","_id.bonusTimeBank","_id.amount","_id.probability","_id.accumulatedTimeBankInMinutes","_id.remarks","_id.staffId","_id.unitId","_id.scheduledMinutes","_id.durationMinutes","_id.unitPositionId","_id.status").and("activities").as("_id.activities")*/
