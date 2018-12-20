@@ -93,9 +93,7 @@ public class TeamService {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound");
 
         }
-
         ContactAddress contactAddress=null;
-
         if(!teamDTO.isHasAddressOfUnit()) {
             logger.info("Setting Contact Address of Team different from Unit");
             AddressDTO addressDTO = teamDTO.getContactAddress();
@@ -233,6 +231,7 @@ public class TeamService {
             }
         }
         Team team = new Team(teamDTO.getName(),teamDTO.isHasAddressOfUnit(),teamDTO.getDescription(),teamDTO.getVisitourId(),contactAddress);
+
 
         group.getTeamList().add(team);
         groupGraphRepository.save(group,2);
