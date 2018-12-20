@@ -588,11 +588,50 @@ public class StaffRetrievalService {
         return staffGraphRepository.getStaffByPriorityGroupStaffIncludeFilter(staffIncludeFilterDTO, unitId);
     }
 
-    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, long staffId, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds) {
+    /**
+     *
+     * @param startDate
+     * @param unitPositionId
+     * @param organizationId
+     * @param type
+     * @param reasonCodeIds
+     * @return
+     */
+    public StaffAdditionalInfoDTO getStaffEmploymentDataByUnitPositionId(LocalDate startDate, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds){
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndUnitPositionId(organizationId, unitPositionId);
+        return getStaffEmploymentData(startDate,staffAdditionalInfoQueryResult, unitPositionId, organizationId, type, reasonCodeIds);
+    }
+
+    /**
+     *
+     * @param startDate
+     * @param staffId
+     * @param unitPositionId
+     * @param organizationId
+     * @param type
+     * @param reasonCodeIds
+     * @return
+     */
+    public StaffAdditionalInfoDTO getStaffEmploymentDataByUnitPositionIdAndStaffId(LocalDate startDate, long staffId, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds){
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organizationId, staffId);
+        return getStaffEmploymentData(startDate,staffAdditionalInfoQueryResult, unitPositionId, organizationId, type, reasonCodeIds);
+    }
+
+    /**
+     *
+     * @param shiftDate
+     * @param staffAdditionalInfoQueryResult
+     * @param unitPositionId
+     * @param organizationId
+     * @param type
+     * @param reasonCodeIds
+     * @return
+     */
+    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate,StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds) {
         Organization organization = organizationService.getOrganizationDetail(organizationId, type);
         Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(organizationId).getId();
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId, shiftDate);
-        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organization.getId(), staffId);
+
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         if (unitPosition != null) {
             staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeFromCPRNumber(staffAdditionalInfoDTO.getCprNumber()));
@@ -731,4 +770,7 @@ public class StaffRetrievalService {
     }
 
 
+    public Long getStaffDetailByUnitPositionId(Long unitId, Long unitPositionId) {
+       return staffGraphRepository.getStaffIdByUnitPositionIdAndUnitId(unitPositionId,unitId);
+    }
 }
