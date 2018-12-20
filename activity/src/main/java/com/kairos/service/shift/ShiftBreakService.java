@@ -285,7 +285,7 @@ public class ShiftBreakService {
                 Date previousShiftEndDate=null;
                 if (!shifts.get(i).isBreakShift()) {
                     Long currentShiftDuration = (shifts.get(i).getEndDate().getTime() - shifts.get(i).getStartDate().getTime()) / ONE_MINUTE;
-                    if ((lastBlockingShiftAdded && i == shifts.size() - 1)) { // we need to increase the start date of it
+                    if (lastBlockingShiftAdded && i == shifts.size() - 1) { // we need to increase the start date of it
                         if (currentShiftDuration > breakAvailability.getEndBeforeMinutes()) {//  shift duration 60 min and blocking 30 min so we can move this start with 30 min
                             if ((currentShiftDuration - breakAvailability.getEndBeforeMinutes())>=requiredReduceShiftByMinutes){// current shift duration -blocking is greater or equal what we want duration
                                 currentReduceShiftByMinutes=requiredReduceShiftByMinutes;
