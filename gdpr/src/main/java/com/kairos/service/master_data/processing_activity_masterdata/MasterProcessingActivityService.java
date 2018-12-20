@@ -205,7 +205,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         }
         if (!updateSubProcessingActivities.isEmpty()) {
             Map<String, Object> updatedSubProcessingActivityList = updateSubProcessingActivities(countryId, updateSubProcessingActivities, parentProcessingActivity);
-            subProcessingActivityIds.addAll((List<BigInteger>) updatedSubProcessingActivityList.get(IDS_LIST));
+            subProcessingActivityIds.addAll((Set<BigInteger>) updatedSubProcessingActivityList.get(IDS_LIST));
             subProcessingActivityList.addAll((List<MasterProcessingActivity>) updatedSubProcessingActivityList.get(PROCESSING_ACTIVITIES));
         }
         updatedSubProcessingActivities.put(IDS_LIST, subProcessingActivityIds);
