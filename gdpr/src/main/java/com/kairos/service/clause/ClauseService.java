@@ -81,7 +81,7 @@ public class ClauseService extends MongoBaseService {
         if (CollectionUtils.isNotEmpty(clauseDto.getTags())) {
             clauseTags = clauseTagService.saveClauseTagList(referenceId, isUnitId, clauseDto.getTags());
         } else {
-            clauseTags = isUnitId ? Collections.singletonList(clauseTagMongoRepository.findDefaultTagByUnitId(referenceId)) : Collections.singletonList(clauseTagMongoRepository.findDefaultTagByCountryId(referenceId));
+            clauseTags = Collections.singletonList(clauseTagMongoRepository.findDefaultTag());
         }
         if (Optional.ofNullable(clause).isPresent()) {
             if (isUnitId) {

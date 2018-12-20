@@ -3,7 +3,6 @@ package com.kairos.dto.user.country.experties;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.commons.utils.date_validator.FutureLocalDate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,7 +42,7 @@ public class CopyExpertiseDTO {
     // TODO REMOVE FOR FE compactibility
     private Long startDateMillis;
     private Long endDateMillis;
-    private SectorDTO sectorDTO;
+    private SectorDTO sector;
 
     public CopyExpertiseDTO() {
         // DC
@@ -183,12 +182,12 @@ public class CopyExpertiseDTO {
         this.breakPaymentSetting = breakPaymentSetting;
     }
 
-    public SectorDTO getSectorDTO() {
-        return sectorDTO;
+    public SectorDTO getSector() {
+        return sector;
     }
 
-    public void setSectorDTO(SectorDTO sectorDTO) {
-        this.sectorDTO = sectorDTO;
+    public void setSector(SectorDTO sector) {
+        this.sector = sector;
     }
 
     public UnionIDNameDTO getUnion() {

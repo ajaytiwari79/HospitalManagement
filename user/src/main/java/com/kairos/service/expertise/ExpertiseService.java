@@ -778,10 +778,10 @@ public class ExpertiseService {
         Expertise targetExpertise = new Expertise(copyExpertiseDTO.getName(), copyExpertiseDTO.getDescription(), sourceExpertise.get().getCountry(), DateUtils.getDateFromLocalDate(copyExpertiseDTO.getStartDate()), DateUtils.getDateFromLocalDate(copyExpertiseDTO.getEndDate()),
                 copyExpertiseDTO.getFullTimeWeeklyMinutes() != null ? copyExpertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                 copyExpertiseDTO.getNumberOfWorkingDaysInWeek() != null ? copyExpertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, copyExpertiseDTO.getBreakPaymentSetting(), false, false, false,
-                getSector(copyExpertiseDTO.getSectorDTO(),country));
+                getSector(copyExpertiseDTO.getSector(),country));
 
         prepareExpertiseWhileCopy(targetExpertise, copyExpertiseDTO, sourceExpertise.get(),country);
-        copyExpertiseDTO.getSectorDTO().setId(targetExpertise.getSector().getId());
+        copyExpertiseDTO.getSector().setId(targetExpertise.getSector().getId());
         return copyExpertiseDTO;
     }
 

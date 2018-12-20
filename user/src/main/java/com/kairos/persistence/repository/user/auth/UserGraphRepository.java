@@ -59,8 +59,12 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "Match (staff)-[:STAFF_HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)-[r:ACCESS_GROUP_HAS_ACCESS_TO_PAGE]->(subPage) return {pageId:id(subPage),pageName:subPage.name,read:r.read,write:r.write} as result")
     List<Map<String, Object>> getPermissionForModuleInOrganization(long accessPageId, long orgId, long userId);
 
-    @Query("MATCH (u:User) WHERE u.email=~{0} AND Not u:Client RETURN u")
+    @Query("MATCH (u:User) WHERE u.email=~{0}  RETURN u")
     User findByEmail(String email);
+
+    @Query("Match (user:User) WHERE user.email=~{0} " +
+            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) return user")
+    User findUserByEmailInAnyOrganization(String email);
 
     User findByKmdExternalId(Long kmdExternalId);
 
@@ -123,4 +127,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={1} OR user.email=~{0} ) AND id(user)<>{2} RETURN count(user) ")
     byte validateUserEmailAndCPRExceptCurrentUser(String email, String cprNumber, Long userId);
+
+    @Query("MATCH (user:User) WHERE ( user.cprNumber={0} OR user.email=~{1} ) RETURN user")
+    User findUserByCprNumberOrEmail(String cprNumber, String email);
 }

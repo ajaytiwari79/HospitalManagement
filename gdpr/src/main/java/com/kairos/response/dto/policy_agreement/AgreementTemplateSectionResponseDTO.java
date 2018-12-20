@@ -19,6 +19,7 @@ public class AgreementTemplateSectionResponseDTO {
     private boolean signatureComponentRightAlign;
     private String  signatureHtml;
     private boolean coverPageAdded;
+    private boolean includeContentPage;
     private CoverPageVO coverPageData;
 
     private List<ClauseBasicResponseDTO> clauseListForTemplate = new ArrayList<>();
@@ -55,4 +56,12 @@ public class AgreementTemplateSectionResponseDTO {
     public String getSignatureHtml() { return signatureHtml; }
 
     public void setSignatureHtml(String signatureHtml) { this.signatureHtml = signatureHtml; }
+
+    public boolean isIncludeContentPage() {
+        return includeContentPage;
+    }
+
+    public void setIncludeContentPage(boolean includeContentPage) {
+        this.includeContentPage = includeContentPage;
+    }
 }

@@ -31,7 +31,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
 
    public StaffingLevel findByUnitIdAndCurrentDateAndDeletedFalseCustom(Long unitId, Date currentDate) {
 
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("currentDate").is(currentDate));
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("currentDate").is(currentDate).and("deleted").is(false));
         query.limit(1);
 
         return mongoTemplate.findOne(query,StaffingLevel.class);
