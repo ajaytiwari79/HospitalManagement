@@ -5,7 +5,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.counter.chart.KpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -13,7 +12,6 @@ import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import io.swagger.models.Operation;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -249,6 +247,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.remove(query,Shift.class);
     }
 
+
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -373,6 +372,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         AggregationResults<ShiftResponseDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftResponseDTO.class);
         return result.getMappedResults();
     }
+
 
     @Override
     public void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark) {
