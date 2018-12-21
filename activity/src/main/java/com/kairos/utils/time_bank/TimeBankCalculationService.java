@@ -185,17 +185,23 @@ public class TimeBankCalculationService {
         Date date = DateUtils.asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
         if(CollectionUtils.isNotEmpty(positionLines)){
+            boolean valid = false;
             for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
                 if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
-                    for (UnitPositionLinesDTO positionLine : positionLines) {
-                        DateTimeInterval positionInterval = positionLine.getInterval();
-                        if((positionInterval==null && positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate)) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
-                            contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getTotalWeeklyMinutes() : 0;
-                        }
-                    }
+                    valid = true;
                     break;
                 }
             }
+            if(valid){
+                for (UnitPositionLinesDTO positionLine : positionLines) {
+                    DateTimeInterval positionInterval = positionLine.getInterval();
+                    if((positionInterval==null && positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate)) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
+                        contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
+                        break;
+                    }
+                }
+            }
+
         }else {
             for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
                 if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){

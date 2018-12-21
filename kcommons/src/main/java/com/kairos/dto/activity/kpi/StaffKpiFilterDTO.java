@@ -2,22 +2,21 @@ package com.kairos.dto.activity.kpi;
 
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class StaffKpiFilterDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private List<UnitPositionWithCtaDetailsDTO> unitPositionWithCtaDetailsDTOS;
+    private List<UnitPositionWithCtaDetailsDTO> unitPosition;
 
 
-    public List<UnitPositionWithCtaDetailsDTO> getUnitPositionWithCtaDetailsDTOS() {
-        return unitPositionWithCtaDetailsDTOS;
+    public List<UnitPositionWithCtaDetailsDTO> getUnitPosition() {
+        return unitPosition;
     }
 
-    public void setUnitPositionWithCtaDetailsDTOS(List<UnitPositionWithCtaDetailsDTO> unitPositionWithCtaDetailsDTOS) {
-        this.unitPositionWithCtaDetailsDTOS = unitPositionWithCtaDetailsDTOS;
+    public void setUnitPosition(List<UnitPositionWithCtaDetailsDTO> unitPosition) {
+        this.unitPosition = unitPosition;
     }
 
     public Long getId() {

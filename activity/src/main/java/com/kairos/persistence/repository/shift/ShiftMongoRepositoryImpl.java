@@ -2,10 +2,10 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.chart.KpiDataUnit;
+import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -13,7 +13,6 @@ import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import io.swagger.models.Operation;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -368,7 +368,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.findAndModify(new Query(new Criteria("activities.id").is(shiftActivityId)), update, Shift.class);
     }
     @Override
-    public List<KpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
+    public List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
         Criteria criteria=Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").lte(endDate).and("endDate").gte(startDate);
         List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
@@ -385,8 +385,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByForPlannedHours())));
         aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
         Aggregation aggregation=Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<KpiDataUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, KpiDataUnit.class);
-        return result.getMappedResults();
+        AggregationResults<BasicChartKpiDateUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, BasicChartKpiDateUnit.class);
+        return result.getMappedResults().stream().map(a->(CommonKpiDataUnit)a).collect(Collectors.toList());
     }
     public static Document shiftWithActivityProjection(){
         String project = "{  \n" +

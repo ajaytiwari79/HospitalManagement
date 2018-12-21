@@ -203,6 +203,7 @@ public class AppConstants {
     //KPI  BAR chart property
     public static final String XAXIS="label";
     public static final String YAXIS="value";
+    public static final String LINEFIELD="lineValue";
 
 
 

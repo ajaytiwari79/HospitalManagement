@@ -3,9 +3,8 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
@@ -201,7 +200,7 @@ public class CounterDistService extends MongoBaseService {
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
         filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
         filters.setUnitId(unitId);
-        Map<BigInteger, RawRepresentationData> data = counterDataService.generateKPIData(filters,unitId);
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filters,unitId);
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
         });

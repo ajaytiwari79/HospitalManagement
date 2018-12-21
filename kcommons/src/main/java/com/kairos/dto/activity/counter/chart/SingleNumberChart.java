@@ -14,7 +14,7 @@ public class SingleNumberChart extends BaseChart {
     private double value;
     private RepresentationUnit unit;
     private String displayUnit;
-    private List<KpiDataUnit> dataList;
+    private List<CommonKpiDataUnit> dataList;
 
     public SingleNumberChart(){
         super(ChartType.NUMBER_ONLY);
@@ -56,11 +56,11 @@ public class SingleNumberChart extends BaseChart {
         this.displayUnit = displayUnit;
     }
 
-    public List<KpiDataUnit> getDataList() {
+    public List<CommonKpiDataUnit> getDataList() {
         return dataList;
     }
 
-    public void setDataList(List<KpiDataUnit> dataList) {
+    public void setDataList(List<CommonKpiDataUnit> dataList) {
         this.dataList = dataList;
     }
 }
