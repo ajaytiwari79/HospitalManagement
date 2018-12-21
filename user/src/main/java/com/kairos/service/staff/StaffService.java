@@ -1338,9 +1338,8 @@ public class StaffService {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId);
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            unitPositionDetails = new StaffUnitPositionDetails(unitId);
-
-            convertUnitPositionObject(unitPosition, unitPositionDetails);
+            unitPositionDetails = convertUnitPositionObject(unitPosition);
+            unitPositionDetails.setUnitId(unitId);
             List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
             unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
         }

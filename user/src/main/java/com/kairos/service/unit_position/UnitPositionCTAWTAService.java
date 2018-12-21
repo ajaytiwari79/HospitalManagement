@@ -129,10 +129,10 @@ public class UnitPositionCTAWTAService {
         if (Optional.ofNullable(unitPosition).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
             Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
-            unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            unitPositionDetails = convertUnitPositionObject(unitPosition);
             unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
             unitPositionDetails.setCountryId(countryId);
-            convertUnitPositionObject(unitPosition, unitPositionDetails);
+
             unitPositionDetails.setCountryId(countryId);
             unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
         }
