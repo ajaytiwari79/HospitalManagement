@@ -903,6 +903,7 @@ public class AccessGroupService {
             boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
             boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
+            userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
         }
         //Todo till here
         return userAccessRoleDTO;

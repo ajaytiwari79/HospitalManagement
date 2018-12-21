@@ -163,4 +163,18 @@ public class DayTypeService {
     }
 
 
+    public List<DayType> getDayTypeByDateTest(Long countryId) {
+        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.findByIdAndHolidayDateBetween(countryId);
+        List<DayType> dayTypes = new ArrayList<>();;
+        if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
+            dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
+        } else {
+             Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
+             dayTypes = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        }
+        return dayTypes;
+
+    }
+
+
 }
