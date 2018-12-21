@@ -241,7 +241,7 @@ public class ShiftBreakService {
         mergeShifts(shifts);// if we have 2 consecutive shift then we will merge them.
 
         if (numberOfBreakAllotted != numberOfBreakRequired) {
-            reAdjustShiftDuration(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailabilitySettings,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired),breakWTATemplate.getBreakGapMinutes());
+            adjustShiftDurationAndAddRemaingBreaks(breakActivity,mainShift,shifts, lastBlockingShiftAdded, breakAvailabilitySettings,  breakSettings.subList(numberOfBreakAllotted, numberOfBreakRequired),breakWTATemplate.getBreakGapMinutes());
         }
         return shifts;
     }
@@ -269,7 +269,7 @@ public class ShiftBreakService {
         }
     }
 
-    private  void reAdjustShiftDuration(Activity breakActivity,Shift mainShift,List<ShiftActivity> shifts, boolean lastBlockingShiftAdded, BreakAvailabilitySettings breakAvailability, List<BreakSettings> breakSettings,short gapBetweenBreaks) {
+    private  void adjustShiftDurationAndAddRemaingBreaks(Activity breakActivity, Shift mainShift, List<ShiftActivity> shifts, boolean lastBlockingShiftAdded, BreakAvailabilitySettings breakAvailability, List<BreakSettings> breakSettings, short gapBetweenBreaks) {
         for (BreakSettings breakSetting : breakSettings) {
             long requiredReduceShiftByMinutes;
             if (gapBetweenBreaks>0){
@@ -376,7 +376,7 @@ public class ShiftBreakService {
             childShift = new ShiftActivity(currentShiftActivity.get().getActivityName(), startDate, endDate, currentShiftActivity.get().getActivityId(), true, currentShiftActivity.get().getAbsenceReasonCodeId(), allowedBreakDurationInMinute);
 
         } else {
-            childShift = new ShiftActivity(breakActivity.getName(), startDate, endDate, shift.getId(), true, shift.getActivities().get(0).getAbsenceReasonCodeId(), allowedBreakDurationInMinute);
+            childShift = new ShiftActivity(breakActivity.getName(), startDate, endDate, breakActivity.getId(), true, shift.getActivities().get(0).getAbsenceReasonCodeId(), allowedBreakDurationInMinute);
 
         }
         return childShift;
