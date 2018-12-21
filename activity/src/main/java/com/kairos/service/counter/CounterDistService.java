@@ -249,7 +249,12 @@ public class CounterDistService extends MongoBaseService {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
-        return counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(unitId,kpiIds),unitId);
+        tabKPIDTOS.forEach(tabKPIDTO -> {
+            tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
+        });
+        return tabKPIDTOS;
     }
 
     public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, Long countryId, Long unitId, Long staffId, ConfLevel level) {
