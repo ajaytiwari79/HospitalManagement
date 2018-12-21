@@ -310,11 +310,13 @@ public class ShiftService extends MongoBaseService {
         if(byTandAPhase){
             shiftState=shiftStateMongoRepository.findOne(shiftDTO.getId());
             if(shiftState!=null){
-                ObjectMapperUtils.copyProperties(shiftDTO,shiftState,"id","accessGroupRole","actualPhaseState","validated");
+                mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftState.class);
+                mainShift.setId(shiftState.getId());
+                ((ShiftState)mainShift).setAccessGroupRole(shiftState.getAccessGroupRole());
+                ((ShiftState)mainShift).setValidated(shiftState.getValidated());
             }else{
-                shiftState= ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+                mainShift= ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
             }
-            mainShift = shiftState;
         }else {
             mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         }
@@ -431,9 +433,11 @@ public class ShiftService extends MongoBaseService {
             shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+
         }
         shiftMongoRepository.saveEntities(shifts);
+        shifts.forEach(shift ->updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO));
+
     }
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type) {
@@ -1238,7 +1242,12 @@ public class ShiftService extends MongoBaseService {
             }
         }
         if(shiftState!=null){
-            ObjectMapperUtils.copyProperties(shiftDTO,shiftState,"id","accessGroupRole","shiftStatePhaseId");
+            ShiftState existingShiftState = shiftState;
+            shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftState.class);
+            shiftState.setId(existingShiftState.getId());
+            shiftState.setAccessGroupRole(existingShiftState.getAccessGroupRole());
+            shiftState.setValidated(existingShiftState.getValidated());
+            shiftState.setShiftStatePhaseId(existingShiftState.getShiftStatePhaseId());
         }else {
             shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
         }
