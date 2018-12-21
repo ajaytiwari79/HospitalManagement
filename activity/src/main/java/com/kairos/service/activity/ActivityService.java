@@ -282,8 +282,8 @@ public class ActivityService extends MongoBaseService {
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyProperties(generalTab, generalActivityTabWithTagDTO, "tags");
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
+        generalActivityTabWithTagDTO.setTags(null);
         if (!generalDTO.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         }
@@ -311,8 +311,8 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyProperties(generalTab, generalActivityTabWithTagDTO, "tags");
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
+        generalActivityTabWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
@@ -982,8 +982,8 @@ public class ActivityService extends MongoBaseService {
         }
 
 
-        Activity activityCopied = new Activity();
-        ObjectMapperUtils.copyProperties(activityFromDatabase.get(), activityCopied, "id");
+        Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(),Activity.class);
+        activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
