@@ -61,6 +61,16 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
     }
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,boolean breakReplaced) {
+        this.activityId = activityId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+        this.breakShift=breakShift;
+        this.absenceReasonCodeId = absenceReasonCodeId;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.breakReplaced=breakReplaced;
+    }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
