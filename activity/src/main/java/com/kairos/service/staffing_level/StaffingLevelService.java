@@ -1024,7 +1024,7 @@ public class StaffingLevelService extends MongoBaseService {
     }
 
 
-    private StaffingLevel getStaffingLevelIfExist(Map<LocalDate, StaffingLevel> localDateStaffingLevelMap, DateWiseActivityDTO currentDate, List<StaffingLevelInterval> staffingLevelIntervals, StaffingLevelTemplate staffingLevelTemplate, Long unitId) {
+    public StaffingLevel getStaffingLevelIfExist(Map<LocalDate, StaffingLevel> localDateStaffingLevelMap, DateWiseActivityDTO currentDate, List<StaffingLevelInterval> staffingLevelIntervals, StaffingLevelTemplate staffingLevelTemplate, Long unitId) {
         StaffingLevel staffingLevel = localDateStaffingLevelMap.get(currentDate.getLocalDate());
         if (staffingLevel != null) {
             staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
@@ -1041,7 +1041,7 @@ public class StaffingLevelService extends MongoBaseService {
         return staffingLevel;
     }
 
-    private int getLowerIndex(Date startDate) {
+    public int getLowerIndex(Date startDate) {
 
         int lowerLimit = DateUtils.getHourFromDate(startDate) * 4;
         int minutes = DateUtils.getMinutesFromDate(startDate);
@@ -1061,7 +1061,7 @@ public class StaffingLevelService extends MongoBaseService {
         return lowerLimit+minuteOffset;
     }
 
-    private int getUpperIndex(Date endDate) {
+    public int getUpperIndex(Date endDate) {
         int upperLimit = DateUtils.getHourFromDate(endDate) * 4;
         int minutes = DateUtils.getMinutesFromDate(endDate);
         int minuteOffset = 0;
