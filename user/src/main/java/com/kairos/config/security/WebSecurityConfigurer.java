@@ -18,7 +18,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.SCHEDULER_EXECUTE_JOB;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.enums.rest_client.MicroService.SCHEDULER;
 
 
 @Configuration
@@ -79,6 +82,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(API_KMD_CARE_STAFF_SHIFTS);
         web.ignoring().antMatchers(API_TIME_CARE_SHIFTS);
         web.ignoring().antMatchers(API_TIME_SLOTS_NAME);
+        web.ignoring().antMatchers(API_V1+SCHEDULER_EXECUTE_JOB);
         web.ignoring().antMatchers(API_KMD_CARE_TIME_SLOTS);
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/unit/{unitId}/client/client_ids_by_unitIds");
 

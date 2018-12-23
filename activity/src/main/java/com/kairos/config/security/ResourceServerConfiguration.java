@@ -1,14 +1,11 @@
 package com.kairos.config.security;
 
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -17,8 +14,6 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
-import java.io.IOException;
 
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.API_CREATE_KMD_TASK_DEMAND;
@@ -42,6 +37,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .antMatchers("/planner/vrp_completed/**").permitAll()
                 .antMatchers(API_ORGANIZATION_UNIT_URL+"/getShiftPlanningInfo").permitAll()
                 .antMatchers(API_ORGANIZATION_UNIT_URL+"/sub-shifts").permitAll()
+                .antMatchers(API_V1+ SCHEDULER_EXECUTE_JOB).permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/**").authenticated();
     }

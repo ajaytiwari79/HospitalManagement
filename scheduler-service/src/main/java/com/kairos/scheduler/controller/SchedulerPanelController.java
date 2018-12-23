@@ -1,6 +1,7 @@
 package com.kairos.scheduler.controller;
 
 
+import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -16,9 +17,12 @@ import javax.inject.Inject;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 
@@ -49,7 +53,7 @@ public class SchedulerPanelController {
     }
 
 
-    @PostMapping("")
+    @PostMapping
     @ApiOperation("Create Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable  long unitId,
                                                                  @RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) throws IOException {
@@ -100,6 +104,28 @@ public class SchedulerPanelController {
     public ResponseEntity<Map<String, Object>> getDefaultData() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getDefaultData());
     }
+
+
+   /* @PostMapping("/default_data")
+    @ApiOperation("Get default data")
+    public ResponseEntity<Map<String, Object>> createSchedulerPanel(@PathVariable Long unitId, @RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTOs));
+    }*/
+
+    @PutMapping("/update_scheduler_panel_By_jobsubtype")
+    @ApiOperation("update scheduler panel")
+    public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelByJobSubTypeAndEntityId(schedulerPanelDTO));
+    }
+
+    @DeleteMapping("/delete_jobbysubType_and_entity_id")
+    @ApiOperation("delete job by subType")
+    public ResponseEntity<Map<String, Object>> deleteSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJobBySubTypeAndEntityId(schedulerPanelDTO));
+    }
+
+
+
 
 
     /**

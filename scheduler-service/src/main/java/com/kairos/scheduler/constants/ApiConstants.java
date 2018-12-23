@@ -6,5 +6,7 @@ public class ApiConstants {
     public final static String API_SCHEDULER_URL = UNIT_URL + "/scheduler_panel";
     public final static String API_UNIT_TIMEZONE_MAPPING_URL = UNIT_URL + "/unit_timezone_mapping";
 
+    public final static String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";
+
 
 }

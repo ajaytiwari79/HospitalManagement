@@ -2,6 +2,7 @@ package com.kairos.scheduler.service;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.UserRestClientAuth;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.user.auth.AccessTokenDTO;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -16,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 import java.util.Map;
+
+import static com.kairos.scheduler.constants.ApiConstants.SCHEDULER_EXECUTE_JOB;
+
 @Service
 public class UserIntegrationService {
 
@@ -42,6 +46,11 @@ public class UserIntegrationService {
 
     }
 
+
+    public void exceuteScheduleJob(KairosSchedulerExecutorDTO job){
+        userRestClient.publishRequest(job,null,false, IntegrationOperation.CREATE,SCHEDULER_EXECUTE_JOB,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        },true);
+    }
 
 
 

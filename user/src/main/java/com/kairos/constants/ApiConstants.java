@@ -37,4 +37,14 @@ public final class ApiConstants {
     public static final String APPLY_CTA_WTA = "/unitPosition/{unitPositionId}/apply_cta_wta";
     public static final String APPLY_CTA_WTA_END_DATE = "/unitPosition/{unitPositionId}/apply_end_date";
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
+
+
+    //Scheduler restClient
+    public static final String CREATE_SCHEDULER_PANEL = "/scheduler_panel";
+    public static final String UPDATE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/update_scheduler_panel_By_jobsubtype";
+    public static final String DELETE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/delete_jobbysubType_and_entity_id";
+    public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";
+
+
+
 }

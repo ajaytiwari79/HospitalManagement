@@ -19,7 +19,8 @@ public class ActivityToSchedulerLogsQueueListener {
     @Inject
     private SchedulerPanelService schedulerPanelService;
 
-    @KafkaListener(topics=ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC)
+    //Todo Yatharth uncomment this code when it kafka is ready
+    //@KafkaListener(topics=ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC)
     public void processMessage(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

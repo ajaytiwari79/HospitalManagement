@@ -34,7 +34,6 @@ public class KafkaProducer {
 
         try{
             kafkaTemplateJobQueue.send(USER_TO_SCHEDULER_JOB_QUEUE_TOPIC,job).get();
-
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
             throw new Exception("Unable to register scheduled job, Please try again.");
@@ -46,7 +45,7 @@ public class KafkaProducer {
 
     public void pushToSchedulerLogsQueue(KairosSchedulerLogsDTO logs) {
 
-        kafkaTemplateLogsQueue.send(USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC,logs);
+        //kafkaTemplateLogsQueue.send(USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC,logs);
     }
 
 }

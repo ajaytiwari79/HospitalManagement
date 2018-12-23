@@ -2,17 +2,14 @@ package com.kairos.scheduler.kafka.producer;
 
 
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
-import com.kairos.enums.scheduler.Result;
 import com.kairos.scheduler.custom_exception.InvalidJobSubTypeException;
+import com.kairos.scheduler.service.ActivityIntegrationService;
+import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import javax.inject.Inject;
 
@@ -26,6 +23,8 @@ public class KafkaProducer {
     private KafkaTemplate<Integer, KairosSchedulerExecutorDTO> kafkaTemplate;
     @Inject
     private SchedulerPanelService schedulerPanelService;
+    @Inject private ActivityIntegrationService activityIntegrationService;
+    @Inject private UserIntegrationService userIntegrationService;
 
 
     private static Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
@@ -35,13 +34,19 @@ public class KafkaProducer {
         String queueLabel;
         if(userSubTypes.contains(job.getJobSubType())) {
             queueLabel = SCHEDULER_TO_USER_QUEUE_TOPIC;
+            activityIntegrationService.exceuteScheduleJob(job);
         }
         else if(activitySubTypes.contains(job.getJobSubType())) {
             queueLabel = SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC;
+            activityIntegrationService.exceuteScheduleJob(job);
         }
         else {
             throw new InvalidJobSubTypeException("Invalid jobSubType");
         }
+
+
+        //Todo Yatharth uncomment this code when it kafka is ready
+        /*
         KairosSchedulerLogsDTO schedulerLog;
         ListenableFuture<SendResult<Integer,KairosSchedulerExecutorDTO>> future =  kafkaTemplate.send(queueLabel, job);
         future.addCallback(new ListenableFutureCallback<SendResult<Integer, KairosSchedulerExecutorDTO>>() {
@@ -58,7 +63,7 @@ public class KafkaProducer {
                 schedulerPanelService.createJobScheduleDetails(schedulerLog);
 
             }
-        });
+        });*/
     }
 
     /*public void pushToActivityQueue(KairosSchedulerExecutorDTO job) {
