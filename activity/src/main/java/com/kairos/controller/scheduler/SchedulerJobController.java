@@ -8,17 +8,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
 import java.util.Map;
+
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.SCHEDULER_EXECUTE_JOB;
 
 /**
  * @author pradeep
  * @date - 23/12/18
  */
-@RequestMapping
-public class SchedulerController {
+@RestController(API_V1+ SCHEDULER_EXECUTE_JOB)
+public class SchedulerJobController {
 
     @Inject
     private JobQueueExecutor schedulerToActivityQueueService;
@@ -29,4 +32,6 @@ public class SchedulerController {
         schedulerToActivityQueueService.execute(job);
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
     }
+
+
 }
