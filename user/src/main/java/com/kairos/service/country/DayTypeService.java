@@ -11,6 +11,7 @@ import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGrap
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -165,12 +166,14 @@ public class DayTypeService {
 
     public List<DayType> getDayTypeByDateTest(Long countryId) {
         CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.findByIdAndHolidayDateBetween(countryId);
-        List<DayType> dayTypes = new ArrayList<>();;
+        List<DayType> dayTypes=new ArrayList<>();
+        Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
+        List<DayType> dayTypeList = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
             dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
-        } else {
-             Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
-             dayTypes = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        }
+        if(CollectionUtils.isNotEmpty(dayTypeList)){
+            dayTypes.addAll(dayTypeList);
         }
         return dayTypes;
 
