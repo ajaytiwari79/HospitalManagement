@@ -1148,11 +1148,19 @@ public class OrganizationService {
     }
 
     public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<ExpertiseQueryResult> expertise = new ArrayList<>();
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
         // set Expertise
-        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByOrganizationId(unitId));
+        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
+            expertise = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
+        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
+            expertise = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId());
+        }
+        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyPropertiesOfListByMapper(expertise,Expertise.class));
         return organizationMappingDTO;
     }
 
