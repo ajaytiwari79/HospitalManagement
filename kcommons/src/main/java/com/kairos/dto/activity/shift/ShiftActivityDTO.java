@@ -44,6 +44,7 @@ public class ShiftActivityDTO {
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
+
     private int timeBankCtaBonusMinutes;
     private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private Map<String, Object> location;// location where this activity needs to perform

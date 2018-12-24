@@ -506,7 +506,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Override
     public List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("parentId").in(activityIds).and("deleted").is(false).and("unitId").is(unitId)),
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId).orOperator(Criteria.where("parentId").in(activityIds),Criteria.where("id").in(activityIds))),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 project().and("id").as("activity._id").and("name").as("activity.name")
                         .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")
