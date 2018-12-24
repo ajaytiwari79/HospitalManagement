@@ -164,7 +164,7 @@ public class DayTypeService {
     }
 
 
-    public List<DayType> getDayTypeByDateTest(Long countryId) {
+    public List<DayType> getCurrentApplicableDayType(Long countryId) {
         CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.findByIdAndHolidayDateBetween(countryId);
         List<DayType> dayTypes=new ArrayList<>();
         Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
