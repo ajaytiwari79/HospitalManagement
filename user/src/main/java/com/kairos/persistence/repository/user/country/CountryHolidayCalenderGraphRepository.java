@@ -37,7 +37,7 @@ public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseReposito
             "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " + "return ch.holidayDate as holidayDate, dt as dayType ")
     CountryHolidayCalendarQueryResult findByIdAndHolidayDateBetween(Long countryId, LocalDate start, LocalDate end);
 
-    @Query("MATCH (c:Country)-[:"+HAS_HOLIDAY+"]-(ch:CountryHolidayCalender) WHERE id(c) = {0} AND DATE(ch.holidayDate)=DATE()  AND TIME(ch.startTime)<=TIME() AND TIME(ch.endTime)>=TIME() AND ch.isEnabled = true WITH ch as ch " +
+    @Query("MATCH (country:Country)-[:"+HAS_HOLIDAY+"]-(ch:CountryHolidayCalender) WHERE id(country) = {0} AND DATE(ch.holidayDate)=DATE()  AND TIME(ch.startTime)<=TIME() AND TIME(ch.endTime)>=TIME() AND ch.isEnabled = true WITH ch as ch " +
             "MATCH (ch)-[:"+DAY_TYPE+"]-(dt:DayType{isEnabled:true}) " +
             "RETURN ch.holidayDate as holidayDate, dt as dayType ")
     CountryHolidayCalendarQueryResult findByCountryId(Long countryId);
