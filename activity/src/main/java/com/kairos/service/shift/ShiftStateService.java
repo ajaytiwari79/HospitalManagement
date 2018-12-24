@@ -58,7 +58,9 @@ public class ShiftStateService {
         List<ShiftState> timeAndAttendanceShiftStates=null;
         List<ShiftState> oldRealtimeShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(s->s.getId()).collect(Collectors.toList()),phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.REALTIME)).findFirst().get().getId());
         realtimeShiftStates=createRealTimeShiftState(realtimeShiftStates,oldRealtimeShiftStates,shifts,phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.REALTIME)).findFirst().get().getId());
-        if( !realtimeShiftStates.isEmpty()) shiftMongoRepository.saveEntities(realtimeShiftStates);
+        if( !realtimeShiftStates.isEmpty()) {
+             shiftMongoRepository.saveEntities(realtimeShiftStates);
+          }
         if(!checkIn) {
             timeAndAttendanceShiftStates = createTimeAndAttendanceShiftState(timeAndAttendanceShiftStates, oldRealtimeShiftStates, shifts, phases.stream().filter(phase -> phase.getPhaseEnum().equals(PhaseDefaultName.TIME_ATTENDANCE)).findFirst().get().getId());
             if (!timeAndAttendanceShiftStates.isEmpty())
