@@ -3,16 +3,12 @@ package com.kairos.controller.shift;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.shift.ShiftCopyService;
-import com.kairos.service.shift.ShiftService;
+import com.kairos.service.shift.*;
 import com.kairos.dto.activity.shift.CopyShiftDTO;
 import com.kairos.dto.activity.shift.ShiftPublishDTO;
-import com.kairos.service.shift.ShiftSickService;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +23,6 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -51,6 +46,9 @@ public class ShiftController {
     @Inject
     private ActivityService activityService;
     @Inject private ShiftCopyService shiftCopyService;
+    @Inject
+    private ShiftStateService shiftStateService;
+
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -211,4 +209,12 @@ public class ShiftController {
     public ResponseEntity<Map<String,Object>> getShiftsDetailsForCompactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
+
+    @ApiOperation("create shift state")
+    @GetMapping("/shift/create_state")
+    public ResponseEntity<Map<String,Object>> createShiftState(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftStateService.createShiftState(unitId,startDate,endDate));
+    }
+
+
 }
