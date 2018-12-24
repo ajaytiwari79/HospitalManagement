@@ -22,7 +22,7 @@ public class AssessmentBasicResponseDTO {
     private Staff approver;
     private AssessmentStatus assessmentStatus;
     private List<RiskBasicResponseDTO> risks=new ArrayList<>();
-    private LocalDate assessmentScheduledDate;
+    private LocalDate assessmentLaunchedDate;
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
@@ -61,9 +61,9 @@ public class AssessmentBasicResponseDTO {
 
     public void setAssessmentStatus(AssessmentStatus assessmentStatus) { this.assessmentStatus = assessmentStatus; }
 
-    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+    public LocalDate getAssessmentLaunchedDate() { return assessmentLaunchedDate; }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 
