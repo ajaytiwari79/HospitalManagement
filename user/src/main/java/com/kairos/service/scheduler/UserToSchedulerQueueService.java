@@ -33,7 +33,7 @@ public class UserToSchedulerQueueService {
     private KafkaProducer kafkaProducer;
     public void pushToJobQueueOnEmploymentEnd(Long employmentEndDate, Long currentEmploymentEndDate,Long organiationId,Long employmentId, ZoneId unitTimeZone) throws Exception {
 
-        String url = "";
+        String url = null;
         if ((Optional.ofNullable(employmentEndDate).isPresent() && !employmentEndDate.equals(currentEmploymentEndDate)) ||
                 (!Optional.ofNullable(employmentEndDate).isPresent() && Optional.ofNullable(currentEmploymentEndDate).isPresent())) {
             KairosScheduleJobDTO scheduledJob;
