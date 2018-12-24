@@ -76,8 +76,7 @@ public class WTAService extends MongoBaseService {
     private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Inject
     private TagService tagService;
-    @Inject
-    private WTAOrganizationService wtaOrganizationService;
+
     @Inject
     private WTABuilderService wtaBuilderService;
     @Inject
@@ -262,7 +261,7 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    private List<WTABaseRuleTemplate> updateRuleTemplatesAndSave(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesId) {
+    public List<WTABaseRuleTemplate> updateRuleTemplatesAndSave(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesId) {
         List<WTABaseRuleTemplateDTO> oldRuleTemplates = wtaBaseRuleTemplateGraphRepository.findAllByIdIn(oldRuleTemplatesId);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         for (WTABaseRuleTemplateDTO currentRuleTemplateToBeLinked : newRuleTemplatesToBeLinked) {
@@ -291,11 +290,11 @@ public class WTAService extends MongoBaseService {
         }
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()))) {
-            logger.info("Its a future date wo we don't need to create we need to update in same");
+            logger.info("Its a future date and date is same as previous so we don't need to create wta we need to update in same");
             if (!updateDTO.getRuleTemplates().isEmpty()) {
                 ruleTemplates = updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
             }
-        } else {
+        } else{
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
             versionWTA.setDeleted(false);
@@ -318,7 +317,7 @@ public class WTAService extends MongoBaseService {
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
         oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
-        if (oldWta.getEndDate() != null) {
+        if (updateDTO.getEndDate() != null) {
             oldWta.setEndDate(new Date(updateDTO.getEndDateMillis()));
         }
 
