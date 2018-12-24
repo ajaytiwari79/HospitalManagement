@@ -431,7 +431,7 @@ public class UserService {
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
             Long countryId = organizationGraphRepository.getCountryId(organizationId);
-            List<DayType> dayTypes=dayTypeService.getDayTypeByDate(countryId,DateUtils.getDate());
+            List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
             Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
             boolean checkDayType=true;
             List<AccessGroup> accessGroups=accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
