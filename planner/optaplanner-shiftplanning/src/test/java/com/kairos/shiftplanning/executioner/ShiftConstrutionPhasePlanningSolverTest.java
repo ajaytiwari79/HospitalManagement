@@ -53,6 +53,7 @@ public class ShiftConstrutionPhasePlanningSolverTest {
         /*constraintDTOS.add(new ConstraintDTO(null, DURATION_BETWEEN_SHIFTS.toString(), commonDescription+"ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS", ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ConstraintLevel.HARD, penaltyHard, PLANNING_PROBLEM_ID, null, COUNTRY_ID, ORGANIZATION_SERVICE_ID, ORGANIZATION_SUB_SERVICE_ID));*/
         constraintDTOS.add(new ConstraintDTO("Shortest duration for this activity, relative to shift length","Shortest duration for this activity, relative to shift length", ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ConstraintLevel.HARD, 5, 5l));
         constraintDTOS.add(new ConstraintDTO("Max number of allocations pr. shift for this activity per staff", "Max number of allocations pr. shift for this activity per staff",  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ConstraintLevel.HARD, 5,5l));
+   //     constraintDTOS.add(new ConstraintDTO("If this activity is used on a Tuesday", "If this activity is used on a Tuesday",  ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ConstraintLevel.SOFT, 4,5l));
         return new SolverConfigDTO(constraintDTOS);
     }
 

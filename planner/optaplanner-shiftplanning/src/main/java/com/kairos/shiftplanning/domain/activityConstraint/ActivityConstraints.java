@@ -11,15 +11,25 @@ public class ActivityConstraints {
     private ContinousActivityPerShift continousActivityPerShift;
     private MaxDiffrentActivity maxDiffrentActivity;
     private MinimumLengthofActivity minimumLengthofActivity;
+    private ActivityDayType activityDayType;//Activity is used on a DayType
 
 
-    public ActivityConstraints(LongestDuration longestDuration, ShortestDuration shortestDuration, MaxAllocationPerShift maxAllocationPerShift,MaxDiffrentActivity maxDiffrentActivity,MinimumLengthofActivity minimumLengthofActivity) {
+    public ActivityConstraints(LongestDuration longestDuration, ShortestDuration shortestDuration, MaxAllocationPerShift maxAllocationPerShift,MaxDiffrentActivity maxDiffrentActivity,MinimumLengthofActivity minimumLengthofActivity,ActivityDayType activityDayType) {
         this.longestDuration = longestDuration;
         this.shortestDuration = shortestDuration;
         this.maxAllocationPerShift = maxAllocationPerShift;
         //this.continousActivityPerShift = continousActivityPerShift;
         this.maxDiffrentActivity = maxDiffrentActivity;
         this.minimumLengthofActivity = minimumLengthofActivity;
+        this.activityDayType = activityDayType;
+    }
+
+    public ActivityDayType getActivityDayType() {
+        return activityDayType;
+    }
+
+    public void setActivityDayType(ActivityDayType activityDayType) {
+        this.activityDayType = activityDayType;
     }
 
     public MaxDiffrentActivity getMaxDiffrentActivity() {
@@ -72,6 +82,8 @@ public class ActivityConstraints {
     public void setMaxAllocationPerShift(MaxAllocationPerShift maxAllocationPerShift) {
         this.maxAllocationPerShift = maxAllocationPerShift;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

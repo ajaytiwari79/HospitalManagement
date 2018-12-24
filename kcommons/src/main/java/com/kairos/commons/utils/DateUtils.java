@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 import static javax.management.timer.Timer.ONE_HOUR;
-import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
  * Created by oodles on 1/2/17.
@@ -498,9 +497,6 @@ public  class DateUtils {
 
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
-    }
-    public static DateTime getDateTimeByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
-        return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute());
     }
 
     public static Date getDateByLocalDate(LocalDate localDate) {

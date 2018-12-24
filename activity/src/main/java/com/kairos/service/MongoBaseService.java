@@ -49,13 +49,8 @@ public class MongoBaseService {
                 //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
                 className = entity.getClass().getSuperclass().getSimpleName();
             }
-            entity.setId(mongoSequenceRepository.nextSequence(className));
-        }
-        /**
-         *  Set createdAt if entity don't have createdAt
-         * */
-        if(entity.getCreatedAt() == null){
             entity.setCreatedAt(DateUtils.getDate());
+            entity.setId(mongoSequenceRepository.nextSequence(className));
         }
         /**
          *  Set updatedAt time as current time
@@ -94,13 +89,6 @@ public class MongoBaseService {
                  *  Get class name for sequence class
                  * */
                 String className = entity.getClass().getSimpleName();
-
-                /**
-                 *  Set createdAt if entity don't have createdAt
-                 * */
-                if(entity.getCreatedAt() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                }
                 /**
                  *  Set updatedAt time as current time
                  * */
@@ -108,6 +96,7 @@ public class MongoBaseService {
 
 
                 if(entity.getId() == null){
+                    entity.setCreatedAt(DateUtils.getDate());
                     /**
                      *  Set Id if entity don't have Id
                      * */
@@ -197,18 +186,13 @@ public class MongoBaseService {
                 String className = entity.getClass().getSimpleName();
 
                 /**
-                 *  Set createdAt if entity don't have createdAt
-                 * */
-                if(entity.getCreatedAt() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                }
-                /**
                  *  Set updatedAt time as current time
                  * */
                 entity.setUpdatedAt(DateUtils.getDate());
 
 
                 if(entity.getId() == null){
+                    entity.setCreatedAt(DateUtils.getDate());
                     /**
                      *  Set Id if entity don't have Id
                      * */

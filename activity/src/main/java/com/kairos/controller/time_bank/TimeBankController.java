@@ -68,7 +68,11 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
     }
 
-
+    @ApiOperation("Update time bank after modification of unitPositionLine")
+    @PutMapping("unit_position/{unitPositionId}/update_time_bank")
+    public ResponseEntity<Map<String,Object>> updateTimeBankOnUnitPositionModification(@PathVariable Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date unitPositionLineStartDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date unitPositionLineEndDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnUnitPositionModification(unitPositionId,unitPositionLineStartDate,unitPositionLineEndDate,staffAdditionalInfoDTO));
+    }
     /*@RequestMapping(value = "/saveTimeBank", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getTimeBankIncludedTimeTypes() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.saveTimeBank());

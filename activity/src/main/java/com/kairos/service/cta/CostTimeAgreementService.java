@@ -1,12 +1,15 @@
 package com.kairos.service.cta;
 
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.FixedValueType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
@@ -32,6 +35,7 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
@@ -49,6 +53,7 @@ import java.util.stream.Collectors;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.enums.cta.CalculateValueType.FIXED_VALUE;
 import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 
 /**
@@ -81,6 +86,8 @@ public class CostTimeAgreementService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
+    @Inject
+    private TimeBankService timeBankService;
 
 
 
@@ -280,6 +287,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             responseCTA.setParentId(oldCTA.getId());
             responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
             save(costTimeAgreement);
+            updateTimeBankByUnitPositionIdPerStaff(unitPositionId, ctaDTO.getStartDate(), ctaDTO.getEndDate(),unitId);
         } else {
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
             ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
@@ -296,6 +304,12 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         unitPosition.setCostTimeAgreement(responseCTA);
         return unitPosition;
+    }
+
+    private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
+        Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,ctaStartDate, AppConstants.ORGANIZATION,unitPositionId,Collections.emptySet());
+        timeBankService.updateTimeBankOnUnitPositionModification(unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
     }
 
     /**

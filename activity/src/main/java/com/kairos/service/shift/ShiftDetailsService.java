@@ -58,7 +58,7 @@ public class ShiftDetailsService extends MongoBaseService {
         for (ShiftWithActivityDTO shift : shiftWithActivityDTOS) {
             for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
                 if (!shiftActivityDTO.isBreakShift()) {
-                    shiftActivityDTO.setReasonCode(shiftActivityDTO.getReasonCodeId() != null ? reasonCodeDTOMap.get(shiftActivityDTO.getReasonCodeId()) : reasonCodeDTOMap.get(shiftActivityDTO.getAbsenceReasonCodeId()));
+                    shiftActivityDTO.setReasonCode(reasonCodeDTOMap.get(shiftActivityDTO.getAbsenceReasonCodeId()));
                 }
                 shiftActivityDTO.setLocation(reasonCodeWrapper.getContactAddressData());
                 shiftActivityDTO.setWtaRuleViolations(wtaRuleViolationMap.get(shift.getId()));
@@ -73,10 +73,9 @@ public class ShiftDetailsService extends MongoBaseService {
     }
 
     private ReasonCodeWrapper findReasonCodes(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
-        Set<Long> reasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
-        reasonCodeIds.addAll(shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getReasonCodeId())).collect(Collectors.toSet()));
+        Set<Long> absenceReasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
         List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("reasonCodeIds", reasonCodeIds.toString()));
+        requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", absenceReasonCodeIds.toString()));
         ReasonCodeWrapper reasonCodeWrapper = genericIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
         return reasonCodeWrapper;
 

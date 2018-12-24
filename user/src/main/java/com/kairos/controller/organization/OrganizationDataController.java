@@ -133,8 +133,8 @@ public class OrganizationDataController {
     @ApiOperation(value = "get organization Location and reason code by Ids for shift details")
     @GetMapping(value = UNIT_URL + UNIT_LOCATION_AND_REASON_CODE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAddressAndReasonCodeOfOrganization(@PathVariable Long unitId, @RequestParam("reasonCodeIds") Set<Long> reasonCodeIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationAddressService.getAddressAndReasonCodeOfOrganization(reasonCodeIds,unitId ));
+    public ResponseEntity<Map<String, Object>> getAddressAndReasonCodeOfOrganization(@PathVariable Long unitId, @RequestParam("absenceReasonCodeIds") Set<Long> absenceReasonCodeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationAddressService.getAddressAndReasonCodeOfOrganization(absenceReasonCodeIds,unitId ));
     }
 
 

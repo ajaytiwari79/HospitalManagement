@@ -4,9 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Day {
-    SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY,EVERYDAY;
+    MONDAY(1),TUESDAY(2),WEDNESDAY(3),THURSDAY(4),FRIDAY(5),SATURDAY(6),SUNDAY(7),EVERYDAY(8);
 
-        @JsonCreator
+    private int value;
+
+    Day(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    @JsonCreator
         public static Day fromValue(String value) {
             return getEnumFromString(Day.class, value);
         }

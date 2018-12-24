@@ -179,6 +179,7 @@ public class AppConstants {
     public static final String REALTIME="Realtime";
     public static final String TIME_AND_ATTENDANCE="Time & Attendance";
     public static final String TENTATIVE="Tentative";
+    public static final String PAYROLL="Payroll";
     public static final String PRIORITY_GROUP1_NAME = "PRIORITY_GROUP1";
     public static final int STAFF_GRACE_PERIOD_DAYS=2;
     public static final int MANAGEMENT_GRACE_PERIOD_DAYS=2;
