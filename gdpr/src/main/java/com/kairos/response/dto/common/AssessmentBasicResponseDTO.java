@@ -17,6 +17,7 @@ public class AssessmentBasicResponseDTO {
     private String name;
     private LocalDate endDate;
     private LocalDate completedDate;
+    private LocalDate startDate;
     private String comment;
     private List<Staff> assigneeList;
     private Staff approver;
@@ -68,4 +69,12 @@ public class AssessmentBasicResponseDTO {
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 
     public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
 }
