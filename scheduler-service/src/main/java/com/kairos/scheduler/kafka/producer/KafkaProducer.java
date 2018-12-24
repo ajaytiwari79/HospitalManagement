@@ -34,7 +34,7 @@ public class KafkaProducer {
         String queueLabel;
         if(userSubTypes.contains(job.getJobSubType())) {
             queueLabel = SCHEDULER_TO_USER_QUEUE_TOPIC;
-            activityIntegrationService.exceuteScheduleJob(job);
+            userIntegrationService.exceuteScheduleJob(job);
         }
         else if(activitySubTypes.contains(job.getJobSubType())) {
             queueLabel = SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC;
