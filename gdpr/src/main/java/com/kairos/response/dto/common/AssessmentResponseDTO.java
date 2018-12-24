@@ -28,7 +28,7 @@ public class AssessmentResponseDTO {
     private AssetBasicResponseDTO asset;
     private ProcessingActivityBasicDTO processingActivity;
     private List<RiskBasicResponseDTO> risks;
-    private LocalDate assessmentScheduledDate;
+    private LocalDate assessmentLaunchedDate;
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     private LocalDate startDate;
 
@@ -76,11 +76,11 @@ public class AssessmentResponseDTO {
 
     public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
 
-    public LocalDate getAssessmentScheduledDate() {
-        return assessmentScheduledDate;
+    public LocalDate getAssessmentLaunchedDate() {
+        return assessmentLaunchedDate;
     }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() {
         return assessmentSchedulingFrequency;
