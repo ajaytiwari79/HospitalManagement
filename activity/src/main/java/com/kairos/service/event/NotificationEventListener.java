@@ -1,6 +1,6 @@
 package com.kairos.service.event;
 
-import com.kairos.service.mail.MailService;
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.event.ShiftNotificationEvent;

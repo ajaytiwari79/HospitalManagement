@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.data_inventory.assessment;
 
 
+import com.kairos.enums.DurationType;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
@@ -37,10 +38,13 @@ public class Assessment extends MongoBaseEntity {
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
     private UserVO assessmentLastAssistBy;
-    private LocalDate assessmentScheduledDate;
+    private LocalDate assessmentLaunchedDate;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
+
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
+    private int relativeDeadlineDuration;
+    private DurationType relativeDeadlineType;
 
 
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull List<Staff> assigneeList, @NotNull Staff approver,String comment,@NotNull(message = "error.message.start.date.not.Selected") LocalDate startDate) {
@@ -60,9 +64,9 @@ public class Assessment extends MongoBaseEntity {
 
     public void setAssessmentLastAssistBy(UserVO assessmentLastAssistBy) { this.assessmentLastAssistBy = assessmentLastAssistBy; }
 
-    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+    public LocalDate getAssessmentLaunchedDate() { return assessmentLaunchedDate; }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
 
     public boolean isRiskAssessment() { return riskAssessment; }
 
@@ -119,4 +123,22 @@ public class Assessment extends MongoBaseEntity {
     public LocalDate getStartDate() { return startDate; }
 
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public int getRelativeDeadlineDuration() {
+        return relativeDeadlineDuration;
+    }
+
+    public void setRelativeDeadlineDuration(int relativeDeadlineDuration) {
+        this.relativeDeadlineDuration = relativeDeadlineDuration;
+    }
+
+    public DurationType getRelativeDeadlineType() {
+        return relativeDeadlineType;
+    }
+
+    public void setRelativeDeadlineType(DurationType relativeDeadlineType) {
+        this.relativeDeadlineType = relativeDeadlineType;
+    }
+
+
 }

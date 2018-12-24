@@ -42,8 +42,8 @@ public class PasswordUpdateDTO {
         this.confirmPassword = confirmPassword;
     }
 
-    @AssertTrue(message="The password fields mush match")
-    private boolean isValid() {
+    @AssertTrue(message="message.staff.user.password.notmatch")
+    public boolean isValid() {
         return Arrays.equals(this.newPassword,this.confirmPassword);
     }
 }

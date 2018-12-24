@@ -164,7 +164,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false).and("state").is(ActivityStateEnum.PUBLISHED)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 project("$id", "name", "description", "ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId").and("timeType").arrayElementAt(0).as("timeType"),
                 match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
@@ -257,6 +257,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     //Ignorecase
+
     public Activity getActivityByNameAndUnitId(Long unitId, String name) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
         return  mongoTemplate.findOne(query, Activity.class);
@@ -505,7 +506,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Override
     public List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("parentId").in(activityIds).and("deleted").is(false).and("unitId").is(unitId)),
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId).orOperator(Criteria.where("parentId").in(activityIds),Criteria.where("id").in(activityIds))),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 project().and("id").as("activity._id").and("name").as("activity.name")
                         .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")

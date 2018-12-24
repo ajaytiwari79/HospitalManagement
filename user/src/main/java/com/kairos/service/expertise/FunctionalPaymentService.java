@@ -322,7 +322,7 @@ public class FunctionalPaymentService {
 
                     //Creating new and updating values
 
-                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), DateUtils.asLocalDate(startDate),
+                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), startDate,
                             functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
                     functionalPayment.setParentFunctionalPayment(existing);
                     functionalPayment.setPublished(functionalPaymentQueryResult.isPublished());

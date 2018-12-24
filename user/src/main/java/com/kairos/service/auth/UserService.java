@@ -1,10 +1,14 @@
 package com.kairos.service.auth;
 
+import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
+import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UnitModuleAccess;
@@ -31,6 +35,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -86,7 +91,12 @@ public class UserService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private DayTypeService dayTypeService;
-
+    @Inject
+    private MailService mailService;
+    @Inject
+    private TokenService tokenService;
+    @Inject
+    EnvConfig config;
     /**
      * Calls UserGraphRepository,
      * creates a new user as provided in method argument
@@ -188,9 +198,14 @@ public class UserService {
         return userGraphRepository.findByAccessToken(token);
     }
 
+    public User findByForgotPasswordToken(String token) {
+        return userGraphRepository.findByForgotPasswordToken(token);
+    }
+
     public User findAndRemoveAccessToken(String accessToken) {
         return userGraphRepository.findAndRemoveAccessToken(accessToken);
     }
+
 
     public User generateTokenToUser(User currentUser) {
         currentUser.setAccessToken(UUID.randomUUID().toString().toUpperCase());
@@ -416,7 +431,7 @@ public class UserService {
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
             Long countryId = organizationGraphRepository.getCountryId(organizationId);
-            List<DayType> dayTypes=dayTypeService.getDayTypeByDate(countryId,DateUtils.getDate());
+            List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
             Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
             boolean checkDayType=true;
             List<AccessGroup> accessGroups=accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
@@ -684,4 +699,43 @@ public class UserService {
     public Long getUserSelectedLanguageId(Long userId) {
         return userGraphRepository.getUserSelectedLanguageId(userId);
     }
+
+    public boolean forgotPassword(String userEmail){
+        if(userEmail.endsWith("kairos.com")||userEmail.endsWith("kairosplanning.com")){
+            logger.error("Currently email ends with kairos.com or kairosplanning.com are not valid " + userEmail);
+            exceptionService.dataNotFoundByIdException("message.user.mail.invalid", userEmail);
+        }
+        User currentUser = userGraphRepository.findByEmail(userEmail);
+        if (!Optional.ofNullable(currentUser).isPresent()) {
+            logger.error("No User found by email " + userEmail);
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
+        }
+        String token = tokenService.createForgotPasswordToken(currentUser);
+        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT,config.getSendGridApiKey());
+        return true;
+    }
+
+    public boolean resetPassword(String token ,PasswordUpdateDTO passwordUpdateDTO) {
+        if(!passwordUpdateDTO.isValid()){
+            exceptionService.actionNotPermittedException("message.staff.user.password.notmatch");
+        }
+        User user = findByForgotPasswordToken(token);
+        if (!Optional.ofNullable(user).isPresent()) {
+            logger.error("No User found by token");
+            exceptionService.dataNotFoundByIdException("message.user.token.notFound");
+        }
+        //We are validating password reset token for 2 hours.
+        DateTimeInterval interval = new DateTimeInterval(DateUtils.asDate(user.getForgotTokenRequestTime()), DateUtils.asDate(user.getForgotTokenRequestTime().plusHours(2)));
+        if (!interval.contains(DateUtils.asDate(DateUtils.getCurrentLocalDateTime()))) {
+            logger.error("Password reset token expired");
+            exceptionService.dataNotFoundByIdException("message.user.token.expired");
+        }
+        CharSequence password = CharBuffer.wrap(passwordUpdateDTO.getConfirmPassword());
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.setForgotPasswordToken(null);
+        userGraphRepository.save(user);
+        return true;
+    }
+
+
 }

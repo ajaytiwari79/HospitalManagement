@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
+import static javax.management.timer.Timer.ONE_HOUR;
 
 /**
  * Created by oodles on 1/2/17.
@@ -334,6 +335,10 @@ public  class DateUtils {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static LocalDate asLocalDate(Long date) {
+        return Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
     public static LocalDate asLocalDate(String receivedDate) {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
@@ -345,6 +350,10 @@ public  class DateUtils {
 
     public static LocalTime asLocalTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalTime();
+    }
+
+    public static LocalTime asLocalTime(Long date) {
+        return LocalDateTime.ofInstant(new Date(date).toInstant(), ZoneId.systemDefault()).toLocalTime();
     }
 
     public static Date asDate(LocalTime localTime) {
@@ -406,6 +415,10 @@ public  class DateUtils {
 
     public static Date getDate() {
         return new Date();
+    }
+
+    public static LocalDate getLocalDate(){
+        return LocalDate.now();
     }
 
     public static Date parseStringDate(String dateString, SimpleDateFormat dateFormat) throws ParseException {
@@ -597,6 +610,9 @@ public  class DateUtils {
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
             }
+            case YEAR: {
+                return localDate.plusYears(duration * recurringNumber);
+            }
         }
         return localDate;
     }
@@ -629,6 +645,10 @@ public  class DateUtils {
 
     public static Long getLongFromLocalDate(LocalDate date) {
         return (date == null) ? null : date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public static Long getLongFromLocalDateimeTime(LocalDateTime date) {
+        return (date == null) ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static LocalDate getDateFromEpoch(Long dateLong) {
@@ -782,4 +802,23 @@ public  class DateUtils {
 
         return asZoneDateTime(date).getMinute();
     }
+
+    public static LocalDate getStartDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    public static LocalDate getEndDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+    }
+
+    public static Long getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
+        return TotalMilliSeconds/ONE_HOUR;
+    }
+
+    public static Double getHoursByMinutes(double totalMinutes){
+        Integer hour  = (int) totalMinutes/(60);
+        Integer minutes = (int)totalMinutes % 60;
+        return new Double(hour+"."+minutes);
+    }
+
 }

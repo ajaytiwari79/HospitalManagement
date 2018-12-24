@@ -36,7 +36,21 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) end as positionLines, "+
             " appliedFunctions as appliedFunctions")
-    UnitPositionQueryResult getUnitPositionById(Long unitPositionId,String shiftDate);
+    UnitPositionQueryResult getUnitPositionByIdAndDate(Long unitPositionId,String shiftDate);
+
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +
+            "WITH unitPosition,positionLine ORDER BY positionLine.startDate LIMIT 1 \n" +
+            "MATCH (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
+            "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
+            "WITH expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
+            "OPTIONAL MATCH (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
+            "WITH expertise,unitPosition,positionLine, employmentType,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions "+
+            " RETURN expertise as expertise,unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,unitPosition.lastWorkingDate as lastWorkingDate,\n" +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) end as positionLines, "+
+            " appliedFunctions as appliedFunctions")
+    UnitPositionQueryResult getUnitPositionById(Long unitPositionId);
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0} " +
             "OPTIONAL MATCH (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
@@ -44,16 +58,16 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " RETURN  id(unitPosition) as id , appliedFunctions as appliedFunctions")
     UnitPositionQueryResult findAppliedFunctionsAtUnitPosition(Long unitPositionId,String shiftDate);
 
-    @Query("MATCH(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
+    @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(user:User) where id(staff) IN {2}\n" +
             "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
             "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
             "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
-            " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
+            "MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
             "MATCH (positionLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "WITH expertise,staff,unit,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
-            "return id(staff) as staffId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
-            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
-            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines , " +
+            "WITH expertise,staff,unit,user,unitPosition,positionLine,{employmentTypeCategory:relation.employmentTypeCategory,name:et.name,id:id(et)} as employmentType \n" +
+            "return id(staff) as staffId,id(user) as userId,staff as staff,expertise as expertise,unit.unitTimeZone as unitTimeZone," +
+            "CASE positionLine when null then [] else COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60),id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek ,\n" +
+            " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,employmentType:employmentType}) end as positionLines , " +
             "id(unitPosition) as id,unitPosition.startDate as startDate")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
@@ -96,7 +110,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "return expertise as expertise,unionData as union, positionCode as positionCode, id(unitPosition) as id,\n" +
-            " unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
+            " unitPosition.startDate as startDate,unitPosition.mainUnitPosition as mainUnitPosition, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
             "UNION " +
@@ -107,7 +121,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "return expertise as expertise,unionData as union, positionCode as positionCode,id(unitPosition) as id,\n" +
+            "return expertise as expertise,unitPosition.mainUnitPosition as mainUnitPosition,unionData as union, positionCode as positionCode,id(unitPosition) as id,\n" +
             " unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId,id(org) as unitId,\n" +
@@ -163,7 +177,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "RETURN id(unitPosition) as id,unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
+            "RETURN id(unitPosition) as id,unitPosition.startDate as startDate, unitPosition.endDate as endDate,unitPosition.mainUnitPosition as mainUnitPosition, \n" +
             " CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId, id(subOrg)  as unitId,{id:id(subOrg),name:subOrg.name} as unitInfo,expertise as expertise,unionData as union, positionCode as positionCode " +
             "UNION " +
@@ -173,7 +187,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "RETURN id(unitPosition) as id, unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
+            "RETURN id(unitPosition) as id, unitPosition.startDate as startDate, unitPosition.endDate as endDate,unitPosition.mainUnitPosition as mainUnitPosition, \n" +
             " CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId, id(org)  as unitId ,\n" +
             "{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union, positionCode as positionCode")
@@ -282,7 +296,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             " freeChoiceToPension:seniorityLevel.freeChoiceToPension,to:seniorityLevel.to,functions:collect(functionData[0])," +
             "payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevel, "+
-            " {employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType," +
+            " {employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType),editableAtUnitPosition:employmentType.editableAtUnitPosition,weeklyMinutes:employmentType.weeklyMinutes,markMainEmployment:employmentType.markMainEmployment} as employmentType," +
             "positionLine.workingDaysInWeek as workingDaysInWeek,positionLine.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, \n" +
             "(positionLine.totalWeeklyMinutes % 60) as totalWeeklyMinutes,(positionLine.totalWeeklyMinutes / 60) as  totalWeeklyHours," +
             " positionLine.startDate as startDate, positionLine.endDate as endDate, CASE when pgaRel.payGroupAreaAmount IS NULL THEN 0.0 ELSE toInteger(toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37)))) END as hourlyCost,\n" +
@@ -330,7 +344,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
         "WHEN organization IS NULL THEN \"organization\" \n" +
         "WHEN staff IS NULL THEN \"staff\"\n" +
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
-        "ELSE COLLECT({id:id(unitPosition),positionCodeName:positionCode.name}) END ")
+        "ELSE COLLECT({id:id(unitPosition),startDate:unitPosition.startDate,endDate:unitPosition.endDate,positionCodeName:positionCode.name}) END ")
         Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
@@ -373,5 +387,16 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false})-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WHERE id(staff) ={0} AND id(expertise) IN {1} AND id(sector) ={2}" +
             "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
     boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
+
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)  where id(staff)={0}\n" +
+            "MATCH(user)<-[:"+BELONGS_TO+"]-(staffList:Staff)\n" +
+            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE up.mainUnitPosition=true AND " +
+            "(({2} IS NULL AND (up.endDate IS NULL OR DATE(up.endDate) >= DATE({1}))) \n" +
+            "OR ({2} IS NOT NULL AND DATE(up.startDate) <= DATE({2}) AND (up.endDate IS NULL OR DATE(up.endDate)>DATE({1}))) ) \n" +
+            "WITH up,collect(empType) as empType  \n" +
+            "MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
+            "WITH up,org, CASE WHEN ANY(et in empType WHERE et.markMainEmployment=true) then true ELSE false END as markMainEmployment " +
+            "RETURN id(up) as id,up.startDate as startDate,up.endDate as endDate,markMainEmployment as markMainEmployment,id(org) as unitId,org.name as unitName \n ")
+    List<UnitPositionQueryResult> findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate);
 
 }

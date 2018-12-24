@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
@@ -29,12 +30,14 @@ public class AssessmentDTO {
     private  List<Staff> assigneeList;
     private boolean riskAssessment;
     private Staff approver;
-    private LocalDate assessmentScheduledDate;
+    private LocalDate assessmentLaunchedDate;
     private QuestionnaireTemplateType riskAssociatedEntity;
     @NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
+    private int relativeDeadlineDuration;
+    private DurationType relativeDeadlineType;
 
     public BigInteger getId() { return id; }
 
@@ -60,9 +63,9 @@ public class AssessmentDTO {
 
     public void setApprover(Staff approver) { this.approver = approver; }
 
-    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+    public LocalDate getAssessmentLaunchedDate() { return assessmentLaunchedDate; }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 
@@ -79,4 +82,21 @@ public class AssessmentDTO {
     public LocalDate getStartDate() { return startDate; }
 
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public int getRelativeDeadlineDuration() {
+        return relativeDeadlineDuration;
+    }
+
+    public void setRelativeDeadlineDuration(int relativeDeadlineDuration) {
+        this.relativeDeadlineDuration = relativeDeadlineDuration;
+    }
+
+    public DurationType getRelativeDeadlineType() {
+        return relativeDeadlineType;
+    }
+
+    public void setRelativeDeadlineType(DurationType relativeDeadlineType) {
+        this.relativeDeadlineType = relativeDeadlineType;
+    }
+
 }

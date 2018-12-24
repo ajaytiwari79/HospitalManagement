@@ -22,6 +22,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Date;
 import java.util.List;
@@ -68,6 +69,10 @@ public class User extends UserBaseEntity {
     private Profile profile;
 
     private int otp;
+    //sendgrid mail
+    private String forgotPasswordToken;
+
+    private LocalDateTime forgotTokenRequestTime;
 
     //define, first time password changed or not
     private boolean isPasswordUpdated;
@@ -181,6 +186,14 @@ public class User extends UserBaseEntity {
         this.kmdExternalId = kmdExternalId;
     }
 
+    public LocalDateTime getForgotTokenRequestTime() {
+        return forgotTokenRequestTime;
+    }
+
+    public void setForgotTokenRequestTime(LocalDateTime forgotTokenRequestTime) {
+        this.forgotTokenRequestTime = forgotTokenRequestTime;
+    }
+
     /**
      * getAccessToken
      *
@@ -197,6 +210,14 @@ public class User extends UserBaseEntity {
      */
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getForgotPasswordToken() {
+        return forgotPasswordToken;
+    }
+
+    public void setForgotPasswordToken(String forgotPasswordToken) {
+        this.forgotPasswordToken = forgotPasswordToken;
     }
 
     /**

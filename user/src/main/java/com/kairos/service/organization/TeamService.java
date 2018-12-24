@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -25,7 +26,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
-import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
@@ -45,39 +45,31 @@ import static com.kairos.constants.AppConstants.TEAM_LABEL;
 @Transactional
 @Service
 public class TeamService {
-
     private static final Logger logger = LoggerFactory.getLogger(TeamService.class);
-
     @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
-
     @Inject
     private GroupGraphRepository groupGraphRepository;
-
     @Inject
     private Scheduler scheduler;
     @Inject
     IntegrationService integrationService;
-
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
-
     @Inject
     private StaffGraphRepository staffGraphRepository;
-
     @Inject
     private RegionService regionService;
-
     @Inject
     private AddressVerificationService addressVerificationService;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
-    OrganizationService organizationService;
+    private OrganizationService organizationService;
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
@@ -88,7 +80,7 @@ public class TeamService {
     private ExceptionService exceptionService;
 
 
-    public Map<String, Object> createTeam(long groupId, Long unitId, TeamDTO teamDTO, String type) {
+    public Map<String, Object> createTeam(Long groupId, Long unitId, TeamDTO teamDTO, String type) {
         Long orgId = organizationService.getOrganizationIdByTeamIdOrGroupIdOrOrganizationId(type, unitId);
         Group group = groupGraphRepository.findOne(groupId);
         if(group == null){
@@ -101,15 +93,7 @@ public class TeamService {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound");
 
         }
-
-
-        Team team = new Team(teamDTO.getName(),teamDTO.isHasAddressOfUnit());
-        team.setVisitourId(teamDTO.getVisitourId());
-        team.setDescription(teamDTO.getDescription());
-        ContactAddress contactAddress;
-
-
-
+        ContactAddress contactAddress=null;
         if(!teamDTO.isHasAddressOfUnit()) {
             logger.info("Setting Contact Address of Team different from Unit");
             AddressDTO addressDTO = teamDTO.getContactAddress();
@@ -213,8 +197,6 @@ public class TeamService {
                 }
                 return null;
             }
-            team.setContactAddress(contactAddress);
-            teamGraphRepository.save(team);
 
 
         }else{
@@ -255,14 +237,12 @@ public class TeamService {
                 contactAddress.setStreetUrl(organizationContactAddress.getContactAddress().getStreetUrl());
                 contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
                 contactAddress.setFloorNumber(organizationContactAddress.getContactAddress().getFloorNumber());
-                team.setContactAddress(contactAddress);
-                teamGraphRepository.save(team);
             }
         }
-
-        logger.info("Preparing response");
+        Team team = new Team(teamDTO.getName(),teamDTO.isHasAddressOfUnit(),teamDTO.getDescription(),teamDTO.getVisitourId(),contactAddress);
         group.getTeamList().add(team);
-        groupGraphRepository.save(group);
+        groupGraphRepository.save(group,2);
+        logger.info("Preparing response");
         Map<String, Object> response = new HashMap<>();
         response.put("id", team.getId());
         response.put("name", team.getName());

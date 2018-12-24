@@ -1,7 +1,8 @@
 package com.kairos.rule_validator.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
-import com.kairos.dto.activity.shift.ShiftActivity;
+
+
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityIdsDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -9,6 +10,8 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 

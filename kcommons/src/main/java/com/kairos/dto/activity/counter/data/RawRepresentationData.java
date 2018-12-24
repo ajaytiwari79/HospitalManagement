@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.counter.data;
 
-import com.kairos.dto.activity.counter.chart.DataUnit;
+import com.kairos.dto.activity.counter.chart.KpiDataUnit;
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -13,19 +13,24 @@ public class RawRepresentationData {
     private ChartType chartType;
     private String displayUnit;
     private RepresentationUnit unit;
-    private List<DataUnit> dataList;
+    private List<KpiDataUnit> dataList;
+    private String xAxis;
+    private String yAxis;
 
     public RawRepresentationData(){
 
     }
 
-    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<DataUnit> dataList){
+    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<KpiDataUnit> dataList,String xAxis,String yAxis){
         this.counterId = counterId;
         this.title = title;
         this.chartType = chartType;
         this.displayUnit = displayUnit.getDisplayValue();
         this.unit = unit;
         this.dataList = dataList;
+        this.xAxis=xAxis;
+        this.yAxis=yAxis;
+
     }
 
     public BigInteger getCounterId() {
@@ -60,11 +65,11 @@ public class RawRepresentationData {
         this.unit = unit;
     }
 
-    public List<DataUnit> getDataList() {
+    public List<KpiDataUnit> getDataList() {
         return dataList;
     }
 
-    public void setDataList(List<DataUnit> dataList) {
+    public void setDataList(List<KpiDataUnit> dataList) {
         this.dataList = dataList;
     }
 
@@ -74,5 +79,21 @@ public class RawRepresentationData {
 
     public void setChartType(ChartType chartType) {
         this.chartType = chartType;
+    }
+
+    public String getxAxis() {
+        return xAxis;
+    }
+
+    public void setxAxis(String xAxis) {
+        this.xAxis = xAxis;
+    }
+
+    public String getyAxis() {
+        return yAxis;
+    }
+
+    public void setyAxis(String yAxis) {
+        this.yAxis = yAxis;
     }
 }

@@ -1,18 +1,11 @@
 package com.kairos.controller.shift;
 
-import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.shift.ShiftCopyService;
-import com.kairos.service.shift.ShiftService;
-import com.kairos.dto.activity.shift.CopyShiftDTO;
-import com.kairos.dto.activity.shift.ShiftPublishDTO;
-import com.kairos.service.shift.ShiftSickService;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.service.shift.ShiftTemplateService;
+import com.kairos.service.shift.*;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,11 +18,13 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+
 
 /**
  * Created by vipul on 30/8/17.
@@ -38,18 +33,21 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
 public class ShiftController {
-
-
     @Inject
     private ShiftService shiftService;
-
     @Inject
     private ShiftSickService shiftSickService;
-    @Inject private ShiftTemplateService shiftTemplateService;
-
+    @Inject
+    private ShiftTemplateService shiftTemplateService;
     @Inject
     private ActivityService activityService;
-    @Inject private ShiftCopyService shiftCopyService;
+    @Inject
+    private ShiftCopyService shiftCopyService;
+    @Inject
+    private ShiftDetailsService shiftDetailsService;
+    @Inject
+    private ShiftStateService shiftStateService;
+
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -66,9 +64,9 @@ public class ShiftController {
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
                                                                  @RequestParam(value = "startDate", required = false)
-                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
                                                                  @RequestParam(value = "endDate", required = false)
-                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) throws ParseException {
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) throws ParseException {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }
@@ -210,4 +208,27 @@ public class ShiftController {
     public ResponseEntity<Map<String,Object>> getShiftsDetailsForCompactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
+
+    @ApiOperation("get a Shift detail by id")
+    @PostMapping(value = "/shift/details")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> shiftDetailsById(@PathVariable Long unitId,@RequestBody List<BigInteger> shiftIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.shiftDetailsById(unitId,shiftIds));
+    }
+
+
+
+    @ApiOperation("update remarks in shift activity")
+    @PutMapping(value = "/shift/shiftActivity/{shiftActivityId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger shiftActivityId,@RequestBody ShiftActivityDTO shiftActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.updateRemarkInShiftActivity(shiftActivityId,shiftActivityDTO));
+    }
+
+    @ApiOperation("create shift state")
+    @GetMapping("/shift/create_state")
+    public ResponseEntity<Map<String,Object>> createShiftState(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftStateService.createShiftState(unitId,startDate,endDate));
+    }
+
 }

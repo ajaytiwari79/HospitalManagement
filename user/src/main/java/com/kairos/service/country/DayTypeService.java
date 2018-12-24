@@ -1,5 +1,6 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
@@ -9,7 +10,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.organization.OrganizationService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -106,7 +107,7 @@ public class DayTypeService {
         calendar.set(Calendar.SECOND, 59);
         Date endDate = calendar.getTime();
         CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(countryId, startDate.getTime(), endDate.getTime());
+                findByIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate.getTime()), DateUtils.asLocalDate(endDate.getTime()));
 
         if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
             List<DayType> dayTypes = new ArrayList<>();
@@ -159,6 +160,22 @@ public class DayTypeService {
 
     public List<DayType> getDayTypes(List<Long> dayTypeIds) {
         return dayTypeGraphRepository.getDayTypes(dayTypeIds);
+    }
+
+
+    public List<DayType> getCurrentApplicableDayType(Long countryId) {
+        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.findByCountryId(countryId);
+        List<DayType> dayTypes=new ArrayList<>();
+        Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
+        List<DayType> dayTypeList = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
+            dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
+        }
+        if(CollectionUtils.isNotEmpty(dayTypeList)){
+            dayTypes.addAll(dayTypeList);
+        }
+        return dayTypes;
+
     }
 
 

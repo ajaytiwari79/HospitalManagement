@@ -1,13 +1,11 @@
-package com.kairos.dto.activity.shift;
+package com.kairos.persistence.model.shift;
 
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -37,10 +35,14 @@ public class ShiftActivity {
     private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
-    //Yatharth adding embedded object for frontend
-    private ReasonCodeDTO reasonCode;
+    private List<TimeBankCTADistribution> timeBankCTADistributions;
+    private Long allowedBreakDurationInMinute;
+    private int timeBankCtaBonusMinutes;
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
+    }
 
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
 
     public ShiftActivity() {
     }
@@ -54,19 +56,39 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
         this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+    }
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute,boolean breakReplaced) {
+        this.activityId = activityId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activityName = activityName;
+        this.breakShift=breakShift;
+        this.absenceReasonCodeId = absenceReasonCodeId;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.breakReplaced=breakReplaced;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
     }
 
+
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
@@ -213,19 +235,27 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
     }
 
-    public ReasonCodeDTO getReasonCode() {
-        return reasonCode;
-    }
-
-    public void setReasonCode(ReasonCodeDTO reasonCode) {
-        this.reasonCode = reasonCode;
-    }
-
     public boolean isBreakReplaced() {
         return breakReplaced;
     }
 
     public void setBreakReplaced(boolean breakReplaced) {
         this.breakReplaced = breakReplaced;
+    }
+
+    public List<TimeBankCTADistribution> getTimeBankCTADistributions() {
+        return timeBankCTADistributions;
+    }
+
+    public void setTimeBankCTADistributions(List<TimeBankCTADistribution> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
+    }
+
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
 }

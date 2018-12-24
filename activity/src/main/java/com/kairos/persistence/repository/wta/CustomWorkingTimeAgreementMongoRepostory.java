@@ -41,15 +41,21 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
     List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date);
+
     List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> upIds);
 
     List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds);
 
     WTAQueryResultDTO getWTAByUnitPositionIdAndDate(Long unitPositionId, Date date);
 
-    List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date);
-    WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId,Date date);
+    List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
+
+    List<WTAQueryResultDTO> getWTAByUnitPositionIdsAndDates(List<Long> unitPositionIds, Date startDate, Date endDate);
+
+    WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId, Date date);
+
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
+
     void setEndDateToWTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
 
 }

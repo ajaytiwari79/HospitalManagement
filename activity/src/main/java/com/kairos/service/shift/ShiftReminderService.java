@@ -1,9 +1,10 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
-import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -19,7 +20,6 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.*;
 import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.mail.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -87,8 +87,9 @@ public class ShiftReminderService extends MongoBaseService {
     }
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
-        schedulerServiceRestClient.publishRequest(jobIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+        // TODO VIPUL please verify when needed
+        /*schedulerServiceRestClient.publishRequest(jobIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        }, null, null);*/
 
 
     }

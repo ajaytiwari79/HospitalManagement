@@ -24,3 +24,55 @@ db.getCollection('clause').updateMany({"tags.0":{"$exists":false}},{"$addToSet":
             "deleted" : false
         }
     }})
+
+
+// For setting weekly minutes and full time employment in previously created Employment Type
+MATCH(et:EmploymentType{deleted:false})
+SET
+et.weeklyMinutes= CASE WHEN et.markMainEmployment=true THEN 2220 ELSE 420 END,
+et.mainEmployment=CASE WHEN et.markMainEmployment=true THEN true ELSE false END
+
+MATCH(up:UnitPosition) set up.mainUnitPosition=false
+
+//gdpr
+for add default tag
+db.getCollection('clause').updateMany({"tags.0":{"$exists":false}},{"$addToSet":{"tags" : {
+            "_id" : "19",
+            "name" : "None",
+            "defaultTag" : true,
+            "countryId" : NumberLong(18712),
+            "createdAt" : ISODate("2018-11-02T10:05:04.898Z"),
+            "updatedAt" : ISODate("2018-12-03T10:22:43.931Z"),
+            "deleted" : false
+        }
+    }})
+
+
+// For setting weekly minutes and full time employment in previously created Employment Type
+
+MATCH(et:EmploymentType{deleted:false})
+SET
+et.weeklyMinutes= CASE WHEN et.markMainEmployment=true THEN 2220 ELSE 420 END,
+et.mainEmployment=CASE WHEN et.markMainEmployment=true THEN true ELSE false END
+
+MATCH(up:UnitPosition) set up.mainUnitPosition=false
+
+//KPI
+add planned hours kPI
+db.getCollection('counter').insert({
+    "_id" : "10",//nextsequence of kpiKairosSequence
+    "type" : "PLANNED_HOURS",
+    "title" : "Planned Hours",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_2X2"
+})
+
+db.getCollection('counter').updateMany({},{"$set":{ "chart" : "PIE","size" : "SIZE_2X2"}})
+
+// if planned hours kpi available
+db.getCollection('counter').update({"_id":"16"},{"$set":{"chart":"BAR"}})

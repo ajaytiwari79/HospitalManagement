@@ -238,9 +238,9 @@ public class ActivityUtil {
     public static List<String> verifyCompositeActivities(boolean breakAllowed, List<Activity> activities){
         List<String> invalidActivities=new ArrayList<>();
         activities.forEach(activity -> {
-            if(activity.getRulesActivityTab().isBreakAllowed()!=breakAllowed
-                    && activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.PAID_BREAK)
-                    && activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.UNPAID_BREAK)){
+            if (activity.getRulesActivityTab().isBreakAllowed() != breakAllowed
+                    && !TimeTypeEnum.PAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())
+                    && !TimeTypeEnum.UNPAID_BREAK.equals(activity.getBalanceSettingsActivityTab().getTimeType())) {
                 invalidActivities.add(activity.getName());
             }
         });

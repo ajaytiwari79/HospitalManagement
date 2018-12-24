@@ -1,7 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
+import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
@@ -15,14 +20,12 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
-import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.utils.DateUtil;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -65,6 +68,8 @@ public class EmploymentTypeService {
     @Inject
     private OrganizationService organizationService;
     @Inject
+    private StaffGraphRepository staffGraphRepository;
+    @Inject
     private ExceptionService exceptionService;
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
 
@@ -75,13 +80,14 @@ public class EmploymentTypeService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
+
         boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), -1L);
         if (isAlreadyExists) {
             exceptionService.duplicateDataException("message.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
 
         }
         EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
-                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMainEmployment());
+                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
         employmentTypeToCreate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
@@ -110,7 +116,7 @@ public class EmploymentTypeService {
         }
         EmploymentType employmentType=new EmploymentType(employmentTypeToUpdate.getId(),employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
                 employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
-                employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMainEmployment());
+                employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
         employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         return employmentTypeGraphRepository.save(employmentType);
     }
@@ -258,6 +264,11 @@ public class EmploymentTypeService {
             exceptionService.actionNotPermittedException("error.weekly_minutes.exceeds");
         }
     }
+
+    public List<StaffDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
+        return staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(),staffEmploymentTypeDTO.getUnitIds(),staffEmploymentTypeDTO.getEmploymentTypeIds(),staffEmploymentTypeDTO.getStartDate(),staffEmploymentTypeDTO.getEndDate(),staffEmploymentTypeDTO.getStaffIds());
+    }
+
 
 
 }

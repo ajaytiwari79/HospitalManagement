@@ -112,13 +112,8 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 				className = entity.getClass().getSuperclass().getSimpleName();
 			}
-			entity.setId(nextSequence(className));
-		}
-		/**
-		 *  Set createdAt if entity don't have createdAt
-		 * */
-		if(entity.getCreatedAt() == null){
 			entity.setCreatedAt(DateUtils.getDate());
+			entity.setId(nextSequence(className));
 		}
 		/**
 		 *  Set updatedAt time as current time
@@ -159,13 +154,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 				 *  Get class name for sequence class
 				 * */
 				String className = entity.getClass().getSimpleName();
-
-				/**
-				 *  Set createdAt if entity don't have createdAt
-				 * */
-				if(entity.getCreatedAt() == null){
-					entity.setCreatedAt(DateUtils.getDate());
-				}
 				/**
 				 *  Set updatedAt time as current time
 				 * */
@@ -173,6 +161,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
 				if(entity.getId() == null){
+					entity.setCreatedAt(DateUtils.getDate());
 					/**
 					 *  Set Id if entity don't have Id
 					 * */

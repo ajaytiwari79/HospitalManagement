@@ -5,7 +5,6 @@ import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
-import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
@@ -22,8 +21,10 @@ import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
@@ -54,19 +55,19 @@ public class PayOutCalculationService {
 
     /**
      * @param interval
-     * @param staffAdditionalInfoDTO
+     * @param unitPositionDetails
      * @param shift
      * @param activityWrapperMap
      * @param payOut
      * @return PayOut
      */
-    public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOut payOut) {
-        StaffUnitPositionDetails unitPositionDetails = staffAdditionalInfoDTO.getUnitPosition();
+    public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffUnitPositionDetails unitPositionDetails, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOut payOut,List<DayTypeDTO> dayTypeDTOS) {
+
         int totalPayOut = 0;
         int scheduledMin = 0;
         int contractualMin = interval.getStart().get(ChronoField.DAY_OF_WEEK) <= unitPositionDetails.getWorkingDaysInWeek() ? unitPositionDetails.getTotalWeeklyMinutes() / unitPositionDetails.getWorkingDaysInWeek() : 0;
         Map<BigInteger, Integer> ctaPayoutMinMap = new HashMap<>();
-        Map<Long,DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(), v->v));
 
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
@@ -74,7 +75,7 @@ public class PayOutCalculationService {
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
                 for (CTARuleTemplateDTO ruleTemplate : unitPositionDetails.getCtaRuleTemplates()) {
-                    boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, unitPositionDetails, shift.getPhaseId(), activity.getId(),activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftInterval.getStartLocalDate(),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
+                    boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, unitPositionDetails, shift.getPhaseId(), activity.getId(),activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftInterval,shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                     if (ruleTemplateValid) {
                         int ctaPayOutMin = 0;
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
@@ -83,19 +84,21 @@ public class PayOutCalculationService {
                         }
                         if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)) {
                             for (CompensationTableInterval ctaIntervalDTO : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
-                                DateTimeInterval ctaInterval = getCTAInterval(ctaIntervalDTO, interval.getStart());
-                                if (ctaInterval.overlaps(shiftInterval)) {
-                                    int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).getMinutes();
-                                    if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
-                                        ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
-                                        totalPayOut += ctaPayOutMin;
-                                        break;
-                                    } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
-                                        ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
-                                        totalPayOut += ctaPayOutMin;
-                                        break;
-                                    }
+                                List<DateTimeInterval> ctaIntervals = getCTAInterval(ctaIntervalDTO, interval.getStart());
+                                for (DateTimeInterval ctaInterval : ctaIntervals) {
+                                    if (ctaInterval.overlaps(shiftInterval)) {
+                                        int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).getMinutes();
+                                        if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
+                                            ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
+                                            totalPayOut += ctaPayOutMin;
+                                            break;
+                                        } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
+                                            ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
+                                            totalPayOut += ctaPayOutMin;
+                                            break;
+                                        }
 
+                                    }
                                 }
                             }
                         }
@@ -120,11 +123,19 @@ public class PayOutCalculationService {
      * @param startDate
      * @return DateTimeInterval
      */
-    private DateTimeInterval getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
-        int ctaStart = (interval.getFrom().getHour() * 60) + interval.getFrom().getMinute();
-        int intervalEnd = (interval.getTo().getHour() * 60) + interval.getTo().getMinute();
-        int ctaEnd = ctaStart >= intervalEnd ? 1440 + intervalEnd : intervalEnd;
-        return new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
+    private List<DateTimeInterval> getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
+        List<DateTimeInterval> ctaIntervals = new ArrayList<>(2);
+        if(interval.getFrom().isAfter(interval.getTo())){
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS),startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
+        }
+        else if(interval.getFrom().equals(interval.getTo())){
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
+        }
+        else{
+            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
+        }
+        return ctaIntervals;
     }
 
     /**

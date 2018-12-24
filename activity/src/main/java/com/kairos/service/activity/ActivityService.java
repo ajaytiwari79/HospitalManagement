@@ -23,7 +23,6 @@ import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -32,7 +31,6 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.skill.Skill;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
@@ -50,7 +48,8 @@ import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.SkillRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
@@ -65,7 +64,6 @@ import com.kairos.utils.external_plateform_shift.Transstatus;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
-import com.kairos.wrapper.activity.SkillActivityDTO;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -284,8 +282,8 @@ public class ActivityService extends MongoBaseService {
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyProperties(generalTab, generalActivityTabWithTagDTO, "tags");
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
+        generalActivityTabWithTagDTO.setTags(null);
         if (!generalDTO.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         }
@@ -313,8 +311,8 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = new GeneralActivityTabWithTagDTO();
-        ObjectMapperUtils.copyProperties(generalTab, generalActivityTabWithTagDTO, "tags");
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
+        generalActivityTabWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
@@ -434,8 +432,8 @@ public class ActivityService extends MongoBaseService {
         organizationActivityService.verifyBreakAllowedOfActivities(activity.get().getRulesActivityTab().isBreakAllowed(), activityMatched);
         List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.get().setCompositeActivities(compositeActivities);
-        save(activity.get());
         updateCompositeActivity(activityMatched, activity.get(), compositeActivities);
+        save(activity.get());
         return compositeShiftActivityDTOs;
     }
 
@@ -448,7 +446,9 @@ public class ActivityService extends MongoBaseService {
             compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
             compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
         }
-        save(activityMatched);
+        if (!activityMatched.isEmpty()) {
+            save(activityMatched);
+        }
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
@@ -764,7 +764,7 @@ public class ActivityService extends MongoBaseService {
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
 
         // Set access Role of staff
-        ReasonCodeWrapper reasonCodeWrapper  = genericIntegrationService.getAccessRoleAndReasoncodes();
+        ReasonCodeWrapper reasonCodeWrapper  = genericIntegrationService.getAccessRoleAndReasonCodes();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
@@ -984,8 +984,8 @@ public class ActivityService extends MongoBaseService {
         }
 
 
-        Activity activityCopied = new Activity();
-        ObjectMapperUtils.copyProperties(activityFromDatabase.get(), activityCopied, "id");
+        Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(),Activity.class);
+        activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
