@@ -1,21 +1,25 @@
 package com.kairos.persistence.model.wta.templates;
 
-import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.COPY_OF;
@@ -30,7 +34,8 @@ public class WTABuilderService extends MongoBaseService {
 
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
-    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
 
     public List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplateDTO> WTARuleTemplateDTOS, boolean ignoreId) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
@@ -211,6 +216,60 @@ public class WTABuilderService extends MongoBaseService {
         newWta.setId(null);
         return newWta;
 
+    }
+    public WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        if (DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()))) {
+
+            if (!updateDTO.getRuleTemplates().isEmpty()) {
+                ruleTemplates = updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
+            }
+        } else{
+            WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+            versionWTA.setId(null);
+            versionWTA.setDeleted(false);
+            versionWTA.setStartDate(oldWta.getStartDate());
+            versionWTA.setEndDate(new Date(updateDTO.getStartDateMillis()));
+            versionWTA.setCountryParentWTA(null);
+            ruleTemplates = copyRuleTemplates(updateDTO.getRuleTemplates(), true);
+            if (!ruleTemplates.isEmpty()) {
+                save(ruleTemplates);
+            }
+            save(versionWTA);
+            oldWta.setParentId(versionWTA.getId());
+        }
+        oldWta.setDescription(updateDTO.getDescription());
+        oldWta.setName(updateDTO.getName());
+        oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
+        if (updateDTO.getEndDate() != null) {
+            oldWta.setEndDate(new Date(updateDTO.getEndDateMillis()));
+        }else {
+            oldWta.setEndDate(null);
+        }
+        oldWta.setRuleTemplateIds(ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList()));
+        save(oldWta);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
+        return wtaResponseDTO;
+    }
+
+    public List<WTABaseRuleTemplate> updateRuleTemplatesAndSave(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesId) {
+        List<WTABaseRuleTemplateDTO> oldRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByIdIn(oldRuleTemplatesId);
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        for (WTABaseRuleTemplateDTO currentRuleTemplateToBeLinked : newRuleTemplatesToBeLinked) {
+            WTABaseRuleTemplateDTO existingWtaRuleTemplate = oldRuleTemplates.stream().filter(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getId().equals(currentRuleTemplateToBeLinked.getId())).findAny().orElse(null);
+
+            if (existingWtaRuleTemplate != null) {// existing rule template found so we need to update in same
+                ruleTemplates.add(copyRuleTemplate(currentRuleTemplateToBeLinked, false));
+            } else {
+                ruleTemplates.add(copyRuleTemplate(currentRuleTemplateToBeLinked, true));
+            }
+        }
+        if (!ruleTemplates.isEmpty()) {
+            save(ruleTemplates);
+        }
+
+        return ruleTemplates;
     }
 
 
