@@ -325,7 +325,7 @@ public class ShiftBreakService {
                             shiftEndDate =previousShiftEndDate;
                             shiftStartDate  = new Date(shiftEndDate.getTime() - breakSetting.getBreakDurationInMinute() * ONE_MINUTE);
                             shifts.add(i , getShiftObject(breakActivity.getName(), breakActivity.getId(), shiftStartDate,
-                                    shiftEndDate, true, null, breakSetting.getShiftDurationInMinute()));
+                                    shiftEndDate, true, null, breakSetting.getBreakDurationInMinute()));
 
                             shiftEndDate=shiftStartDate;
                             shiftStartDate =  new Date(shiftEndDate.getTime() - gapBetweenBreaks * ONE_MINUTE);
@@ -343,7 +343,7 @@ public class ShiftBreakService {
                             shiftStartDate = shiftEndDate; // setting the previous end as next start
                             shiftEndDate = new Date(shiftStartDate.getTime() + breakSetting.getBreakDurationInMinute() * ONE_MINUTE);
                             shifts.add(i + 3, getShiftObject(breakActivity.getName(), breakActivity.getId(), shiftStartDate,
-                                    shiftEndDate, true, null, breakSetting.getShiftDurationInMinute()));
+                                    shiftEndDate, true, null, breakSetting.getBreakDurationInMinute()));
                         }break;
                     }
                 }
