@@ -41,8 +41,8 @@ public final class ApiConstants {
 
     //Scheduler restClient
     public static final String CREATE_SCHEDULER_PANEL = "/scheduler_panel";
-    public static final String UPDATE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/update_scheduler_panel_By_jobsubtype";
-    public static final String DELETE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/delete_jobbysubType_and_entity_id";
+    public static final String UPDATE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/update_scheduler_panel_by_jobsubtype";
+    public static final String DELETE_SCHEDULER_PANEL = CREATE_SCHEDULER_PANEL+"/delete_jobbysubtype_and_entity_id";
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";
     public final static String JOB_DETAILS = "/job_details";
 

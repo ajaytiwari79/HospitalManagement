@@ -30,7 +30,7 @@ public class AssessmentDTO {
     private  List<Staff> assigneeList;
     private boolean riskAssessment;
     private Staff approver;
-    private LocalDate assessmentScheduledDate;
+    private LocalDate assessmentLaunchedDate;
     private QuestionnaireTemplateType riskAssociatedEntity;
     @NotNull(message = "message.assessment.scheduling.frequency.not.Selected")
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
@@ -63,9 +63,9 @@ public class AssessmentDTO {
 
     public void setApprover(Staff approver) { this.approver = approver; }
 
-    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+    public LocalDate getAssessmentLaunchedDate() { return assessmentLaunchedDate; }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
 
     public AssessmentSchedulingFrequency getAssessmentSchedulingFrequency() { return assessmentSchedulingFrequency; }
 

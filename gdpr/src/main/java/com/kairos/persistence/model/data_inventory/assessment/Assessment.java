@@ -38,7 +38,7 @@ public class Assessment extends MongoBaseEntity {
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
     private BigInteger questionnaireTemplateId;
     private UserVO assessmentLastAssistBy;
-    private LocalDate assessmentScheduledDate;
+    private LocalDate assessmentLaunchedDate;
     @NotNull(message = "error.message.start.date.not.Selected")
     private LocalDate startDate;
 
@@ -64,9 +64,9 @@ public class Assessment extends MongoBaseEntity {
 
     public void setAssessmentLastAssistBy(UserVO assessmentLastAssistBy) { this.assessmentLastAssistBy = assessmentLastAssistBy; }
 
-    public LocalDate getAssessmentScheduledDate() { return assessmentScheduledDate; }
+    public LocalDate getAssessmentLaunchedDate() { return assessmentLaunchedDate; }
 
-    public void setAssessmentScheduledDate(LocalDate assessmentScheduledDate) { this.assessmentScheduledDate = assessmentScheduledDate; }
+    public void setAssessmentLaunchedDate(LocalDate assessmentLaunchedDate) { this.assessmentLaunchedDate = assessmentLaunchedDate; }
 
     public boolean isRiskAssessment() { return riskAssessment; }
 

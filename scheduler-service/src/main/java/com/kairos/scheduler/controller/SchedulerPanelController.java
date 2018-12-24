@@ -112,13 +112,13 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTOs));
     }*/
 
-    @PutMapping("/update_scheduler_panel_By_jobsubtype")
+    @PutMapping("/update_scheduler_panel_by_jobsubtype")
     @ApiOperation("update scheduler panel")
     public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelByJobSubTypeAndEntityId(schedulerPanelDTO));
     }
 
-    @DeleteMapping("/delete_jobbysubType_and_entity_id")
+    @DeleteMapping("/delete_jobbysubtype_and_entity_id")
     @ApiOperation("delete job by subType")
     public ResponseEntity<Map<String, Object>> deleteSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJobBySubTypeAndEntityId(schedulerPanelDTO));

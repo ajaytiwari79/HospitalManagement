@@ -121,11 +121,6 @@ public class ObjectMapperUtils {
         return mapper;
     }
 
-    //Todo Please don't use again pradeep remove this method
-    @Deprecated
-     public static void copyProperties(Object source, Object destination, String ...ignoreProperties) {
-              BeanUtils.copyProperties(source,destination,ignoreProperties);
-        }
 
 
 }

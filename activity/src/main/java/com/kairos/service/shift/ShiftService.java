@@ -146,76 +146,44 @@ public class ShiftService extends MongoBaseService {
     private TimeBankService timeBankService;
     @Inject
     private TimeBankRepository timeBankRepository;
-    @Inject
-    private PayOutService payOutService;
-    @Inject
-    private StaffingLevelMongoRepository staffingLevelMongoRepository;
-    @Inject
-    private TimeBankCalculationService timeBankCalculationService;
-    @Inject
-    private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
-    @Inject
-    private WTAService wtaService;
-    @Inject
-    private ExceptionService exceptionService;
-    @Inject
-    private OpenShiftMongoRepository openShiftMongoRepository;
-    @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
-    @Inject
-    private StaffWTACounterRepository wtaCounterRepository;
-    @Inject
-    private BreakSettingMongoRepository breakSettingMongoRepository;
-    @Inject
-    private WorkingTimeAgreementMongoRepository wtaMongoRepository;
-
-    @Inject
-    private PhaseSettingsService phaseSettingsService;
-    @Inject
-    private PhaseSettingsRepository phaseSettingsRepository;
-    @Inject
-    private LocaleService localeService;
-    @Inject
-    private ShiftValidatorService shiftValidatorService;
-    @Inject
-    private ShiftTemplateRepository shiftTemplateRepository;
-    @Inject
-    private IndividualShiftTemplateRepository individualShiftTemplateRepository;
-    @Inject
-    private ActivityConfigurationRepository activityConfigurationRepository;
-    @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
-
-    @Inject
-    private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
-
-    @Inject
-    private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject
-    private ActivityService activityService;
-    @Inject
-    private OrganizationActivityService organizationActivityService;
-    @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
-    @Inject
-    private UnitDataService unitDataService;
-    @Inject
-    private StaffActivitySettingRepository staffActivitySettingRepository;
-    @Inject
-    private ShiftStateMongoRepository shiftStateMongoRepository;
-    @Inject
-    private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
-    @Inject
-    private ShiftBreakService shiftBreakService;
-    @Inject
-    private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
-    @Inject
-    private GenericIntegrationService genericIntegrationService;
+    @Inject private PayOutService payOutService;
+    @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    @Inject private TimeBankCalculationService timeBankCalculationService;
+    @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
+    @Inject private WTAService wtaService;
+    @Inject private ExceptionService exceptionService;
+    @Inject private OpenShiftMongoRepository openShiftMongoRepository;
+    @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private StaffWTACounterRepository wtaCounterRepository;
+    @Inject private BreakSettingMongoRepository breakSettingMongoRepository;
+    @Inject private WorkingTimeAgreementMongoRepository wtaMongoRepository;
+    @Inject private PhaseSettingsService phaseSettingsService;
+    @Inject private PhaseSettingsRepository phaseSettingsRepository;
+    @Inject private LocaleService localeService;
+    @Inject private ShiftValidatorService shiftValidatorService;
+    @Inject private ShiftTemplateRepository shiftTemplateRepository;
+    @Inject private IndividualShiftTemplateRepository individualShiftTemplateRepository;
+    @Inject private ActivityConfigurationRepository activityConfigurationRepository;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ActivityService activityService;
+    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject private MongoSequenceRepository mongoSequenceRepository;
+    @Inject private UnitDataService unitDataService;
+    @Inject private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject private ShiftStateMongoRepository shiftStateMongoRepository;
+    @Inject private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
+    @Inject private ShiftBreakService shiftBreakService;
+    @Inject private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
+    @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
     @Inject private ShiftReminderService shiftReminderService;
     @Inject private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private StaffingLevelService staffingLevelService;
+    @Inject
+    private ShiftStateService shiftStateService;
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
@@ -310,11 +278,13 @@ public class ShiftService extends MongoBaseService {
         if(byTandAPhase){
             shiftState=shiftStateMongoRepository.findOne(shiftDTO.getId());
             if(shiftState!=null){
-                ObjectMapperUtils.copyProperties(shiftDTO,shiftState,"id","accessGroupRole","actualPhaseState","validated");
+                mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftState.class);
+                mainShift.setId(shiftState.getId());
+                ((ShiftState)mainShift).setAccessGroupRole(shiftState.getAccessGroupRole());
+                ((ShiftState)mainShift).setValidated(shiftState.getValidated());
             }else{
-                shiftState= ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+                mainShift= ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
             }
-            mainShift = shiftState;
         }else {
             mainShift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         }
@@ -431,9 +401,11 @@ public class ShiftService extends MongoBaseService {
             shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+
         }
         shiftMongoRepository.saveEntities(shifts);
+        shifts.forEach(shift ->updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO));
+
     }
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type) {
@@ -1177,7 +1149,7 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftState> checkAndCreateRealtimeState(List<Shift> shifts,List<ShiftState> shiftStates,BigInteger phaseId){
         List<ShiftState> newShiftStates=new ArrayList<>();
-        newShiftStates=timeAndAttendanceService.createRealTimeShiftState(newShiftStates,shiftStates,shifts,phaseId);
+        newShiftStates=shiftStateService.createRealTimeShiftState(newShiftStates,shiftStates,shifts,phaseId);
         if(!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
         return newShiftStates;
 
@@ -1238,7 +1210,12 @@ public class ShiftService extends MongoBaseService {
             }
         }
         if(shiftState!=null){
-            ObjectMapperUtils.copyProperties(shiftDTO,shiftState,"id","accessGroupRole","shiftStatePhaseId");
+            ShiftState existingShiftState = shiftState;
+            shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftState.class);
+            shiftState.setId(existingShiftState.getId());
+            shiftState.setAccessGroupRole(existingShiftState.getAccessGroupRole());
+            shiftState.setValidated(existingShiftState.getValidated());
+            shiftState.setShiftStatePhaseId(existingShiftState.getShiftStatePhaseId());
         }else {
             shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
         }
@@ -1426,5 +1403,4 @@ public class ShiftService extends MongoBaseService {
         }
         return activityShiftStatusSettings;
     }
-
 }
