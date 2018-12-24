@@ -154,6 +154,9 @@ public final class ApiConstants {
     // /staff_by_employment_type
     public static final String STAFF_BY_EMPLOYMENT_TYPE="/staff_by_employment_type";
 
+    //Scheduler
+    public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";
+
 
 
 }

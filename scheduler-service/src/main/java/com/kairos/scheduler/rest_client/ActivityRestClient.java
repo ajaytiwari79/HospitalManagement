@@ -15,7 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,10 +25,14 @@ import java.util.List;
 
 import static com.kairos.scheduler.rest_client.RestClientUrlUtil.getBaseUrl;
 
+/**
+ * @author pradeep
+ * @date - 23/12/18
+ */
+@Component
+public class ActivityRestClient {
 
-@Service
-public class UserRestClient {
-    private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
+    private final static Logger logger = LoggerFactory.getLogger(ActivityRestClient.class);
 
     @Inject
     @Qualifier("restTemplate")
@@ -42,7 +46,7 @@ public class UserRestClient {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private EnvConfig env ;
+    private EnvConfig env;
 
 
     public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
@@ -62,7 +66,7 @@ public class UserRestClient {
 
 
     public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, boolean withoutAuth, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit,id,env.getUserServiceUrl())+uri;
+        final String baseUrl = getBaseUrl(isUnit,id,env.getActivityServiceUrl())+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange;
@@ -75,9 +79,9 @@ public class UserRestClient {
                         getHttpMethod(integrationOperation),
                         httpEntity, typeReference,pathParams);
                 if(restExchange.getStatusCode().value()==401) {
-                  //  tokenAuthService.getNewAuthToken();
-                //headers.remove("Authorization");
-                headers.set("Authorization","bearer "+ tokenAuthService.getNewAuthToken());
+                    /*tokenAuthService.getNewAuthToken();
+                    headers.remove("Authorization");*/
+                    headers.set("Authorization","bearer "+ tokenAuthService.getNewAuthToken());
                     httpEntity= new HttpEntity<T>(t,headers);
                     restExchange = schedulerServiceRestTemplate.exchange(
                             url,
@@ -87,7 +91,7 @@ public class UserRestClient {
 
             }
             else {
-                 restExchange = restTemplate.exchange(
+                restExchange = restTemplate.exchange(
                         url,
                         getHttpMethod(integrationOperation),
                         new HttpEntity<>(t), typeReference, pathParams);
@@ -102,14 +106,14 @@ public class UserRestClient {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-       }
+        }
 
     }
 
 
     public String getURIWithParam(List<NameValuePair> queryParam){
         try {
-        URIBuilder builder = new URIBuilder();
+            URIBuilder builder = new URIBuilder();
             if(queryParam!=null && !queryParam.isEmpty()) {
                 builder.setParameters(queryParam);
             }
@@ -119,4 +123,5 @@ public class UserRestClient {
         }
         return null;
     }
+
 }
