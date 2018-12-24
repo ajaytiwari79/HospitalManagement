@@ -79,8 +79,8 @@ public class WTAOrganizationService extends MongoBaseService {
         if (DateUtils.getLocalDate(updateDTO.getStartDateMillis()).isBefore(LocalDate.now())) {
             exceptionService.actionNotPermittedException("message.wta.start-end-date");
         }
-        boolean isWTAAlreadyExists = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
-        if (isWTAAlreadyExists) {
+        WorkingTimeAgreement WTADuplicate = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
+        if (Optional.ofNullable(WTADuplicate).isPresent()) {
             logger.info("Duplicate WTA name in organization :", wtaId);
             exceptionService.duplicateDataException("message.wta.name.alreadyExists",updateDTO.getName());
         }

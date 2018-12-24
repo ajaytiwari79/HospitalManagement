@@ -38,7 +38,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
-    boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
+    WorkingTimeAgreement checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
     List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date);
 
