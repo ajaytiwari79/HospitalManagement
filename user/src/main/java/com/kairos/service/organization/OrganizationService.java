@@ -93,6 +93,7 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.DateUtil;
@@ -277,6 +278,8 @@ public class OrganizationService {
     private AccountTypeGraphRepository accountTypeGraphRepository;
     @Inject
     private UnitTypeGraphRepository unitTypeGraphRepository;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -1149,18 +1152,11 @@ public class OrganizationService {
 
     public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        List<ExpertiseQueryResult> expertise = new ArrayList<>();
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
         // set Expertise
-        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            expertise = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
-        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            expertise = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId());
-        }
-        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyPropertiesOfListByMapper(expertise,Expertise.class));
+        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyPropertiesOfListByMapper(staffRetrievalService.getExpertiesByCountryIdAndUnitId(countryId,unitId),Expertise.class));
         return organizationMappingDTO;
     }
 
