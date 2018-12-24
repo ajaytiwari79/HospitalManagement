@@ -7,7 +7,7 @@ package com.kairos.service.counter;
 
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -92,8 +92,8 @@ public class CounterDataService {
 //
 //    private KPI prepareTaskUnplannedKPI(long tasksUnplanned, long totalTasks){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Task", new ArrayList());
-//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("Planned", null, decimalSpecification(totalTasks-tasksUnplanned)));
-//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("UnPlanned", null, decimalSpecification(tasksUnplanned)));
+//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("Planned", null, decimalSpecification(totalTasks-tasksUnplanned)));
+//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("UnPlanned", null, decimalSpecification(tasksUnplanned)));
 //        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.PIE, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, false,null);
 //        kpi.setId(new BigInteger("1"));
 //        return kpi;
@@ -108,8 +108,8 @@ public class CounterDataService {
 //
 //    private KPI prepareTaskUnplannedHours(double unplannedMinutes, double plannedMinutes){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.DECIMAL, "Hours", new ArrayList());
-//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("Planned Task", null, decimalSpecification(plannedMinutes/60.0)));
-//        ((PieChart) baseChart).getDataList().add(new KpiDataUnit("UnPlanned Task", null, decimalSpecification(unplannedMinutes/60.0)));
+//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("Planned Task", null, decimalSpecification(plannedMinutes/60.0)));
+//        ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit("UnPlanned Task", null, decimalSpecification(unplannedMinutes/60.0)));
 //        KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, false,null);
 //        kpi.setId(new BigInteger("2"));
 //        return kpi;
@@ -133,7 +133,7 @@ public class CounterDataService {
 //    private KPI prepareTasksPerStaffKPI(Map<String, Long> staffTaskData){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Tasks", new ArrayList());
 //        staffTaskData.forEach((staffName, taskCount) -> {
-//            ((PieChart) baseChart).getDataList().add(new KpiDataUnit(staffName, null, decimalSpecification(taskCount)));
+//            ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit(staffName, null, decimalSpecification(taskCount)));
 //        });
 //        KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, false, null);
 //        kpi.setId(new BigInteger("3"));
@@ -281,7 +281,7 @@ public class CounterDataService {
 //    private KPI prepareTotalKMDrivenByStaff(Map<String, Double> staffAndKMDetails){
 //        BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "KMs", new ArrayList());
 //        staffAndKMDetails.forEach((staffName, kmDriven) -> {
-//            ((PieChart) baseChart).getDataList().add(new KpiDataUnit(staffName, null, decimalSpecification(kmDriven)));
+//            ((PieChart) baseChart).getDataList().add(new CommonKpiDataUnit(staffName, null, decimalSpecification(kmDriven)));
 //        });
 //        KPI kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_KM_DRIVEN_PER_STAFF, false,null);
 //        kpi.setId(new BigInteger("10"));
@@ -319,21 +319,21 @@ public class CounterDataService {
         List<BigInteger> kpiIds = filters.getKpiIds();
         List<KPI> kpis = counterRepository.getKPIsByIds(kpiIds);
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi->kpi.getId(), kpi -> kpi));
-        List<Future<RawRepresentationData>> kpiResults = new ArrayList<>();
+        List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
         if(filters.getFilters() != null)
         filters.getFilters().forEach(filter -> {
             filterBasedCriteria.put(filter.getType(), filter.getValues());
         });
         for(BigInteger kpiId : filters.getKpiIds()){
-            Callable<RawRepresentationData> data = () ->{
+            Callable<CommonRepresentationData> data = () ->{
                 return counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(filterBasedCriteria, organizationId, kpiMap.get(kpiId));
             };
-            Future<RawRepresentationData> responseData = executorService.submit(data);
+            Future<CommonRepresentationData> responseData = executorService.submit(data);
             kpiResults.add(responseData);
         }
-        List<RawRepresentationData> kpisData = new ArrayList();
-        for(Future<RawRepresentationData> data : kpiResults){
+        List<CommonRepresentationData> kpisData = new ArrayList();
+        for(Future<CommonRepresentationData> data : kpiResults){
             try {
                 kpisData.add(data.get());
             } catch(InterruptedException ex){
@@ -344,13 +344,13 @@ public class CounterDataService {
         }
 
 //      TODO: to be used with counter data processing.
-//        List<Future<RawRepresentationData>> counterResults = new ArrayList<>();  //will be used for counter data collections.
+//        List<Future<CommonRepresentationData>> counterResults = new ArrayList<>();  //will be used for counter data collections.
 //        Map<BigInteger, Counter> counterMap = new HashedMap();
 //        for(BigInteger counterId : filters.getCounterIds()){
-//            Callable<RawRepresentationData> data = () ->{
+//            Callable<CommonRepresentationData> data = () ->{
 //                return counterServiceMapping.getService(kpiMap.get(counterId).getType()).getCalculatedCounter(filterBasedCriteria, countryId, counterMap.get(counterId));
 //            };
-//            Future<RawRepresentationData> responseData = executorService.submit(data);
+//            Future<CommonRepresentationData> responseData = executorService.submit(data);
 //            counterResults.add(responseData);
 //        }
 
