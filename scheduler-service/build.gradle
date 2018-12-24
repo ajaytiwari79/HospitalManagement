@@ -56,7 +56,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
 
-
+    compile('org.springframework.boot:spring-boot-starter-mail')
     compile('org.slf4j:slf4j-api:1.7.7')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 

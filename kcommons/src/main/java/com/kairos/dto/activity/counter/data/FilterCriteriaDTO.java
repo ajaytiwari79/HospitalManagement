@@ -12,6 +12,11 @@ public class FilterCriteriaDTO {
     public FilterCriteriaDTO() {
     }
 
+    public FilterCriteriaDTO(Long unitId, List<BigInteger> kpiIds) {
+        this.unitId = unitId;
+        this.kpiIds = kpiIds;
+    }
+
     public FilterCriteriaDTO(List<FilterCriteria> filters) {
         this.filters = filters;
     }

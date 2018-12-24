@@ -1,35 +1,32 @@
 package com.kairos.dto.activity.counter.data;
 
-import com.kairos.dto.activity.counter.chart.KpiDataUnit;
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import java.math.BigInteger;
 import java.util.List;
 
-public class RawRepresentationData {
-    private BigInteger counterId;
+public class CommonRepresentationData {
+    protected BigInteger counterId;
     private String title;
     private ChartType chartType;
     private String displayUnit;
     private RepresentationUnit unit;
-    private List<KpiDataUnit> dataList;
-    private String xAxis;
-    private String yAxis;
+    protected List<CommonKpiDataUnit> dataList;
 
-    public RawRepresentationData(){
+    public CommonRepresentationData(){
 
     }
 
-    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<KpiDataUnit> dataList,String xAxis,String yAxis){
+    public CommonRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList){
+
         this.counterId = counterId;
         this.title = title;
         this.chartType = chartType;
         this.displayUnit = displayUnit.getDisplayValue();
         this.unit = unit;
         this.dataList = dataList;
-        this.xAxis=xAxis;
-        this.yAxis=yAxis;
 
     }
 
@@ -65,11 +62,11 @@ public class RawRepresentationData {
         this.unit = unit;
     }
 
-    public List<KpiDataUnit> getDataList() {
+    public List<CommonKpiDataUnit> getDataList() {
         return dataList;
     }
 
-    public void setDataList(List<KpiDataUnit> dataList) {
+    public void setDataList(List<CommonKpiDataUnit> dataList) {
         this.dataList = dataList;
     }
 
@@ -81,19 +78,5 @@ public class RawRepresentationData {
         this.chartType = chartType;
     }
 
-    public String getxAxis() {
-        return xAxis;
-    }
 
-    public void setxAxis(String xAxis) {
-        this.xAxis = xAxis;
-    }
-
-    public String getyAxis() {
-        return yAxis;
-    }
-
-    public void setyAxis(String yAxis) {
-        this.yAxis = yAxis;
-    }
 }

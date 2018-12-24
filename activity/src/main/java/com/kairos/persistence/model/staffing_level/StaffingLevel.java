@@ -28,6 +28,7 @@ public class StaffingLevel extends MongoBaseEntity {
     private BigInteger phaseId;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
 
     public List<StaffingLevelInterval> getAbsenceStaffingLevelInterval() {
         return absenceStaffingLevelInterval;
@@ -36,9 +37,6 @@ public class StaffingLevel extends MongoBaseEntity {
     public void setAbsenceStaffingLevelInterval(List<StaffingLevelInterval> absenceStaffingLevelInterval) {
         this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
     }
-
-    private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();;
-
 
 
     public StaffingLevel() {

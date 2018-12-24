@@ -25,6 +25,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
+
 /**
  * Created by vipul on 30/8/17.
  */
@@ -44,6 +45,8 @@ public class ShiftController {
     private ShiftCopyService shiftCopyService;
     @Inject
     private ShiftDetailsService shiftDetailsService;
+    @Inject
+    private ShiftStateService shiftStateService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -221,4 +224,11 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger shiftActivityId,@RequestBody ShiftActivityDTO shiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.updateRemarkInShiftActivity(shiftActivityId,shiftActivityDTO));
     }
+
+    @ApiOperation("create shift state")
+    @GetMapping("/shift/create_state")
+    public ResponseEntity<Map<String,Object>> createShiftState(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftStateService.createShiftState(unitId,startDate,endDate));
+    }
+
 }

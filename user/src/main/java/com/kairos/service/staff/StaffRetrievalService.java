@@ -165,7 +165,7 @@ public class StaffRetrievalService {
 
         Map<String, Object> personalInfo = new HashMap<>(2);
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        List<ExpertiseQueryResult> expertise = new ArrayList<>();
+
         List<Language> languages;
         List<EngineerType> engineerTypes;
         if (countryId != null) {
@@ -175,20 +175,25 @@ public class StaffRetrievalService {
             languages = Collections.emptyList();
             engineerTypes = Collections.emptyList();
         }
-        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-
-        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            expertise = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
-        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            expertise = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId());
-        }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
-        personalInfo.put("expertise", expertise);
+        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId,unitId));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
         return personalInfo;
 
+    }
+
+    public  List<ExpertiseQueryResult> getExpertisesOfUnitByCountryId(Long countryId, long unitId)
+    {
+        List<ExpertiseQueryResult> expertises = new ArrayList<>();
+        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
+            expertises = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
+        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
+            expertises = expertiseGraphRepository.findExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId());
+        }
+        return expertises;
     }
 
 

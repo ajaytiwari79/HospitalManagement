@@ -90,6 +90,7 @@ public class StaffingLevelUtil {
             absenceStaffingLevelDto.setMaxNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());
             absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
             absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+            absenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
             absenceStaffingLevelDtos.add(absenceStaffingLevelDto);
 
         }
