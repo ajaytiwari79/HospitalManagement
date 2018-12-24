@@ -37,7 +37,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .antMatchers("/planner/vrp_completed/**").permitAll()
                 .antMatchers(API_ORGANIZATION_UNIT_URL+"/getShiftPlanningInfo").permitAll()
                 .antMatchers(API_ORGANIZATION_UNIT_URL+"/sub-shifts").permitAll()
-                .antMatchers(API_V1+ SCHEDULER_EXECUTE_JOB).permitAll()
+                //.antMatchers(API_V1+ SCHEDULER_EXECUTE_JOB).permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/**").authenticated();
     }

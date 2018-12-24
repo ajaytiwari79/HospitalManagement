@@ -79,9 +79,9 @@ public class ActivityRestClient {
                         getHttpMethod(integrationOperation),
                         httpEntity, typeReference,pathParams);
                 if(restExchange.getStatusCode().value()==401) {
-                    tokenAuthService.getNewAuthToken();
-                    headers.remove("Authorization");
-                    headers.add("Authorization","bearer "+ tokenAuthService.getNewAuthToken());
+                    /*tokenAuthService.getNewAuthToken();
+                    headers.remove("Authorization");*/
+                    headers.set("Authorization","bearer "+ tokenAuthService.getNewAuthToken());
                     httpEntity= new HttpEntity<T>(t,headers);
                     restExchange = schedulerServiceRestTemplate.exchange(
                             url,
