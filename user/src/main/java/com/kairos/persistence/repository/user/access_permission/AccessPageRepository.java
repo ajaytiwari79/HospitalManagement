@@ -366,8 +366,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) " +
             "MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType) " +
             "WITH collect(dayType) as dayType,accessGroup,org,unitPermission " +
-            "WHERE ANY(dt in dayType where id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
-            "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
+            "WHERE ANY(dt IN dayType WHERE id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
+            "MATCH (accessPage:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) \n" +
             "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule}) as permissions\n" +
             "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
