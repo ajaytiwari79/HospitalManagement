@@ -970,6 +970,7 @@ public class StaffService {
             organization.getEmployments().add(employment);
         }
         organizationGraphRepository.save(organization);
+        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         if (accessGroupId != null) {
@@ -1003,7 +1004,7 @@ public class StaffService {
             }
             employment.getUnitPermissions().add(unitPermission);
         }
-
+        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
         employmentGraphRepository.save(employment);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())), organization.getId());
 

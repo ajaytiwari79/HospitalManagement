@@ -278,10 +278,15 @@ public class TimeAndAttendanceService extends MongoBaseService {
         Map<BigInteger,ShiftState> realtimeShiftStateMap=realtimeShiftStates.stream().collect(Collectors.toMap(k->k.getShiftId(),v->v));
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=timeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phaseId)&&shiftState.getAccessGroupRole().equals(AccessGroupRole.STAFF)).collect(Collectors.toMap(k->k.getShiftId(),v->v));
         for (Shift shift:shifts) {
-            if (timeAndAttendanceShiftStateMap.get(shift.getId()) != null) {
-                ObjectMapperUtils.copyProperties(realtimeShiftStateMap.get(shift.getId()), timeAndAttendanceShiftStateMap.get(shift.getId()), "id","shiftStatePhaseId", "accessGroupRole","attendanceSettingId");
-                timeAndAttendanceShiftStateMap.get(shift.getId()).getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
-                timeAndAttendanceShiftStates.add(timeAndAttendanceShiftStateMap.get(shift.getId()));
+            if (timeAndAttendanceShiftStateMap.containsKey(shift.getId())) {
+                ShiftState existingTimeAttendanceShiftState = timeAndAttendanceShiftStateMap.get(shift.getId());
+                ShiftState realTimeShiftState = realtimeShiftStateMap.get(shift.getId());
+                ShiftState timeAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realTimeShiftState,ShiftState.class);
+                timeAttendanceShiftState.setShiftStatePhaseId(existingTimeAttendanceShiftState.getShiftStatePhaseId());
+                timeAttendanceShiftState.setAccessGroupRole(existingTimeAttendanceShiftState.getAccessGroupRole());
+                timeAttendanceShiftState.setId(existingTimeAttendanceShiftState.getId());
+                timeAttendanceShiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+                timeAndAttendanceShiftStates.add(timeAttendanceShiftState);
             } else {
                 if (realtimeShiftStateMap.get(shift.getId()) != null) {
                     timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftStateMap.get(shift.getId()), ShiftState.class);
