@@ -570,7 +570,7 @@ public class WTAService extends MongoBaseService {
 
     public WTAResponseDTO updateWtaOfUnitPosition(Long unitId, WTADTO wtadto, Boolean oldUnitPositionPublished) {
         Optional<WorkingTimeAgreement> oldWta = wtaRepository.findById(wtadto.getId());
-        if (!Optional.ofNullable(oldWta).isPresent()) {
+        if (!oldWta.isPresent()) {
             logger.info("wta not found while updating at unit %d", wtadto.getId());
             exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
@@ -620,7 +620,7 @@ public class WTAService extends MongoBaseService {
             versionWTA.setId(null);
             versionWTA.setDeleted(false);
             versionWTA.setStartDate(oldWta.getStartDate());
-            versionWTA.setEndDate(new Date(updateDTO.getStartDateMillis()));
+            versionWTA.setEndDate(DateUtils.asDate(updateDTO.getStartDate().minusDays(1)));
             versionWTA.setCountryParentWTA(null);
             versionWTA.setOrganizationParentId(oldWta.getOrganizationParentId());
             ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), true);
@@ -632,7 +632,8 @@ public class WTAService extends MongoBaseService {
         }
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
-        oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
+        oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
+        oldWta.setCreatedAt(DateUtils.getCurrentDayStart());
         if (updateDTO.getEndDate() != null) {
             oldWta.setEndDate(new Date(updateDTO.getEndDateMillis()));
         }else {
