@@ -1,5 +1,6 @@
 package com.kairos.service.cta;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -233,18 +234,28 @@ public class CountryCTAService extends MongoBaseService {
         CTABasicDetailsDTO ctaBasicDetailsDTO = genericIntegrationService.getCtaBasicDetailsDTO(countryId,requestParam);
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
 
-        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
-        updateCostTimeAgreement.setId(costTimeAgreement.getId());
-        costTimeAgreement.setId(null);
-        costTimeAgreement.setDisabled(true);
-        this.save(costTimeAgreement);
-        updateCostTimeAgreement.setCountryId(costTimeAgreement.getCountryId());
-        updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
-        updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
-        updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
-        buildCTA(null,updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO,null);
-        this.save(updateCostTimeAgreement);
-        return ObjectMapperUtils.copyPropertiesByMapper(updateCostTimeAgreement, CollectiveTimeAgreementDTO.class);
+        // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
+        boolean isFutureSameDateCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        if (isFutureSameDateCTA){
+            buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO,null);
+            this.save(costTimeAgreement);
+            collectiveTimeAgreementDTO=ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CollectiveTimeAgreementDTO.class);
+        }else
+        {
+            CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+            updateCostTimeAgreement.setId(costTimeAgreement.getId());
+            costTimeAgreement.setId(null);
+            costTimeAgreement.setDisabled(true);
+            this.save(costTimeAgreement);
+            updateCostTimeAgreement.setCountryId(costTimeAgreement.getCountryId());
+            updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
+            updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+            updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
+            buildCTA(null,updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO,null);
+            this.save(updateCostTimeAgreement);
+         collectiveTimeAgreementDTO=ObjectMapperUtils.copyPropertiesByMapper(updateCostTimeAgreement, CollectiveTimeAgreementDTO.class);
+        }
+        return collectiveTimeAgreementDTO;
     }
 
 

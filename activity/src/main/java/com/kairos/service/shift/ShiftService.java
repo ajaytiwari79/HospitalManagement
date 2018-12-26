@@ -1018,25 +1018,25 @@ public class ShiftService extends MongoBaseService {
     private void removeOppositeStatus(ShiftActivity shiftActivity,ShiftStatus shiftStatus){
     switch (shiftStatus){
         case LOCK:
-            shiftActivity.getStatus().remove(ShiftStatus.UNLOCK);
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(UNLOCK);add(UNPUBLISH);add(REQUEST);}});
             break;
         case FIX:
-            shiftActivity.getStatus().remove(ShiftStatus.UNFIX);
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(UNFIX);add(REQUEST);}});
             break;
         case UNFIX:
-            shiftActivity.getStatus().remove(ShiftStatus.FIX);
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(FIX);add(REQUEST);}});
             break;
         case APPROVE:
-            shiftActivity.getStatus().remove(ShiftStatus.REJECT);
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REJECT);add(UNPUBLISH);add(REQUEST);}});
             break;
         case REJECT:
-            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(APPROVE);add(PUBLISH);}});
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(APPROVE);add(PUBLISH);add(REQUEST);}});
             break;
         case UNLOCK:
-            shiftActivity.getStatus().remove(ShiftStatus.LOCK);
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(LOCK);add(REQUEST);}});
             break;
         case PUBLISH:
-            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(REJECT);}});
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(UNPUBLISH);add(REJECT);}});
             break;
     }
     }
