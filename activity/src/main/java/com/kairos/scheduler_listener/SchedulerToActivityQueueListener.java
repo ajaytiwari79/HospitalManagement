@@ -17,7 +17,8 @@ public class SchedulerToActivityQueueListener {
     @Inject
     private JobQueueExecutor schedulerToActivityQueueService;
 
-    @KafkaListener(topics=SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC)
+    //Todo Yatharth uncomment this code when it kafka is ready
+    //@KafkaListener(topics=SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC)
     public void processMessage(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

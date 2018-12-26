@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
+import com.kairos.dto.activity.kpi.UnitPositionLinesDTO;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 
@@ -23,7 +24,6 @@ import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 
-import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
@@ -179,36 +179,27 @@ public class TimeBankCalculationService {
     }
 
 
-    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<UnitPositionLinesDTO> positionLines) {
+    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,List<com.kairos.dto.user.employment.UnitPositionLinesDTO> positionLines) {
         Date date = DateUtils.asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
-        if(CollectionUtils.isNotEmpty(positionLines)){
+        if(CollectionUtils.isNotEmpty(positionLines)) {
             boolean valid = false;
             for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
-                if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
+                if (planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)) {
                     valid = true;
                     break;
                 }
             }
-            if(valid){
-                for (UnitPositionLinesDTO positionLine : positionLines) {
+            if (valid) {
+                for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
                     DateTimeInterval positionInterval = positionLine.getInterval();
-                    if((positionInterval==null && positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate)) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
+                    if ((positionInterval == null && positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate)) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
                         contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
                         break;
                     }
                 }
             }
-
-        }/*else {
-            for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
-                if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
-                    contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= workingDaysInWeek ? totalWeeklyMinutes / workingDaysInWeek : 0;
-                    contractualOrTimeBankMinutes = calculateForConstractual ? contractualOrTimeBankMinutes : -contractualOrTimeBankMinutes;
-                    break;
-                }
-            }
-        }*/
+        }
         return contractualOrTimeBankMinutes;
     }
 
@@ -672,7 +663,7 @@ public class TimeBankCalculationService {
      * @param interval
      * @return Interval
      */
-    private Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
+    public Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
         Interval updatedInterval = null;
         DateTime unitPositionStartTime = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate());
         if (interval.contains(unitPositionStartTime) || interval.getStart().isAfter(unitPositionStartTime)) {
@@ -1158,6 +1149,8 @@ public class TimeBankCalculationService {
         }
         return scheduledMinutes;
     }
+
+
 
 
 }

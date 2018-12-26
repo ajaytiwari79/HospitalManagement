@@ -13,7 +13,7 @@ import java.util.List;
 public class PieChart extends BaseChart {
     private RepresentationUnit unit;
     private String displayUnit;
-    private List<KpiDataUnit> dataList;
+    private List<CommonKpiDataUnit> dataList;
 
     public PieChart(RepresentationUnit unit, String displayUnit, List dataList) {
         super(ChartType.PIE);

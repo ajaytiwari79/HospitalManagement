@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -48,7 +49,7 @@ public class ActivityDTO {
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
-    private List<Long> tags = new ArrayList<>();
+    private List<BigInteger> tags = new ArrayList<>();
 
     public ActivityDTO() {
         //default constructor
@@ -160,16 +161,11 @@ public class ActivityDTO {
     }
 
     public List<BigInteger> getTags() {
-        List<BigInteger> tags = new ArrayList<>();
-        for (Long tag : this.tags) {
-            tags.add(BigInteger.valueOf(tag));
-        }
-        return tags;
+        return this.tags;
     }
 
 
-    public void setTags(List<Long> tags) {
-
+    public void setTags(List<BigInteger> tags) {
         this.tags = tags;
     }
 

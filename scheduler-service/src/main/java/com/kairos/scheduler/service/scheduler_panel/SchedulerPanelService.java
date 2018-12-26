@@ -241,7 +241,7 @@ public class SchedulerPanelService extends MongoBaseService {
      * @author yatharth
      * @lastmodifiedby
      */
-    public void updateSchedulerPanelByJobSubTypeAndEntityId(SchedulerPanelDTO schedulerPanelDTO) {
+    public boolean updateSchedulerPanelByJobSubTypeAndEntityId(SchedulerPanelDTO schedulerPanelDTO) {
 
         SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanelDTO.getJobSubType(),schedulerPanelDTO.getEntityId(),schedulerPanelDTO.getUnitId());
         if(!Optional.ofNullable(schedulerPanelDB).isPresent()) {
@@ -273,7 +273,7 @@ public class SchedulerPanelService extends MongoBaseService {
             dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelDB.getId());
             dynamicCronScheduler.startCronJob(schedulerPanelDB,timezone);
         }
-
+        return true;
     }
 
 
@@ -482,7 +482,7 @@ public class SchedulerPanelService extends MongoBaseService {
      * @author yatharth
      * @lastmodifiedby
      */
-    public void deleteJobBySubTypeAndEntityId(SchedulerPanelDTO schedulerPanel) {
+    public boolean deleteJobBySubTypeAndEntityId(SchedulerPanelDTO schedulerPanel) {
 
         SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
                 schedulerPanel.getUnitId());
@@ -492,6 +492,7 @@ public class SchedulerPanelService extends MongoBaseService {
         schedulerPanelDB.setDeleted(true);
         schedulerPanelDB.setActive(false);
         save(schedulerPanelDB);
+        return true;
     }
 
     /**
