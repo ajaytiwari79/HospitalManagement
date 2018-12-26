@@ -1002,7 +1002,7 @@ public class ShiftService extends MongoBaseService {
                         if (validAccessGroup) {
                             removeOppositeStatus(shiftActivity,shiftPublishDTO.getStatus());
                             shiftActivity.getStatus().add(shiftPublishDTO.getStatus());
-                            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true));
+                            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true,shiftActivity.getStatus()));
                         } else {
                             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("access.group.not.matched"), false));
                         }

@@ -64,7 +64,13 @@ public class ShiftActivityDTO {
         this.id = id;
         this.activityName = activityName;
     }
-
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success,Set<ShiftStatus> status) {
+        this.message = message;
+        this.success = success;
+        this.id = id;
+        this.activityName = activityName;
+        this.status=status;
+    }
     public ShiftActivityDTO() {
     }
 
