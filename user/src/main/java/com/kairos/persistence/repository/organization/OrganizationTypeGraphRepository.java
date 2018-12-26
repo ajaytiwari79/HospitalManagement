@@ -170,9 +170,9 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             " with DISTINCT organizationType, organizationSubType\n" +
             " optional match  (organizationSubType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->( organizationSubService:OrganizationService{isEnabled:true}) with  DISTINCT organizationType, organizationSubType ,organizationSubService      \n" +
             "optional match (organizationSubService)<-[:"+ORGANIZATION_SUB_SERVICE+"]-(organizationService:OrganizationService {isEnabled:true} )             \n" +
-            "return id(organizationType) as id, organizationType.name as name , " +
-            "CASE WHEN organizationSubType IS NOT NULL THEN  collect(distinct { id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as organizationSubTypes ,\n" +
-            "CASE WHEN organizationService IS NOT NULL THEN collect(distinct {id:id(organizationService),name:organizationService.name}) ELSE [] END as organizationServices ," +
-            "CASE WHEN organizationSubService IS NOT NULL THEN  collect(distinct { id:id(organizationSubService),name:organizationSubService.name}) ELSE [] END as organizationSubServices")
+            "return id(organizationType) as id, organizationType.name as name ,\n" +
+            "collect(distinct {id:id(organizationSubType),name:organizationSubType.name}) as organizationSubTypes,\n" +
+            "collect(distinct {id:id(organizationService),name:organizationService.name})  as organizationServices,\n "+
+            "collect(distinct { id:id(organizationSubService),name:organizationSubService.name}) as organizationSubServices")
     OrganizationTypeSubTypeAndServicesQueryResult getOrganizationTypeSubTypesServiceAndSubServices(Long unitId);
 }
