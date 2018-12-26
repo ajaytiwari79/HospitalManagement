@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.staffing_level;
 
+import com.kairos.dto.activity.staffing_level.StaffingLevelDto;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -23,5 +24,9 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Date startDate, Date endDate);
     @Query("{deleted:false,unitId:?0,currentDate:{$in:?1}}")
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
+
+    @Query("{deleted:false,unitId:?0,currentDate:?1,updatedAt:{$gt:?2}}")
+    StaffingLevel findByStaffingLevelIfUpdated(Long unitId, Date currentDate,Date updatedAt);
+
 
 }

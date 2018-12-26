@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.activity;
 
 
-import com.kairos.dto.activity.counter.chart.KpiDataUnit;
+import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -60,7 +60,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds);
 
-    List<KpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
+    List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
     void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark);
 }

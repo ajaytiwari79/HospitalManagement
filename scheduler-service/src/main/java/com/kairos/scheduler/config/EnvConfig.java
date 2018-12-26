@@ -26,9 +26,13 @@ public class EnvConfig {
     @Value("${user.loginapi.authPassword}")
     private String userServiceAuthPassword;
 
+    @Value("${gateway.activityservice.url}")
+    private String activityServiceUrl;
 
 
-
+    public String getActivityServiceUrl() {
+        return activityServiceUrl;
+    }
 
     public String getUserServiceUrl() {
         return userServiceUrl;
