@@ -7,12 +7,10 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by oodles on 28/11/17.
@@ -47,7 +45,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ActivityRuleViolation activityRuleViolation;
-            if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) && CollectionUtils.isNotEmpty(staffSkills) &&!CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills)) {
+            if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
+                    CollectionUtils.isNotEmpty(staffSkills) && !CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills)) {
                 errorMessages.add(exceptionService.convertMessage("message.activity.skill.match", shiftActivityDTO.getActivity().getName()));
                  activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
                 if(activityRuleViolation==null){

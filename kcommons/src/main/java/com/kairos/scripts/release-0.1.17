@@ -27,6 +27,28 @@ db.getCollection('clause').updateMany({"tags.0":{"$exists":false}},{"$addToSet":
 
 
 // For setting weekly minutes and full time employment in previously created Employment Type
+MATCH(et:EmploymentType{deleted:false})
+SET
+et.weeklyMinutes= CASE WHEN et.markMainEmployment=true THEN 2220 ELSE 420 END,
+et.mainEmployment=CASE WHEN et.markMainEmployment=true THEN true ELSE false END
+
+MATCH(up:UnitPosition) set up.mainUnitPosition=false
+
+//gdpr
+for add default tag
+db.getCollection('clause').updateMany({"tags.0":{"$exists":false}},{"$addToSet":{"tags" : {
+            "_id" : "19",
+            "name" : "None",
+            "defaultTag" : true,
+            "countryId" : NumberLong(18712),
+            "createdAt" : ISODate("2018-11-02T10:05:04.898Z"),
+            "updatedAt" : ISODate("2018-12-03T10:22:43.931Z"),
+            "deleted" : false
+        }
+    }})
+
+
+// For setting weekly minutes and full time employment in previously created Employment Type
 
 MATCH(et:EmploymentType{deleted:false})
 SET

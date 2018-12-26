@@ -3,18 +3,14 @@ package com.planner.service.shift_planning;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
-
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
-
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.TimeType;
 import com.kairos.shiftplanning.domain.activityConstraint.*;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
-import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.domain.shift_planning.Shift;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,7 @@
 package com.kairos.scheduler.kafka.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 import com.kairos.scheduler.service.scheduler_panel.UserToSchedulerQueueService;
 import org.slf4j.Logger;
@@ -21,10 +22,12 @@ public class UserToSchedulerJobQueueListener {
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
     private ObjectMapper objectMapper;
-    @KafkaListener(topics=USER_TO_SCHEDULER_JOB_QUEUE_TOPIC)
+
+    //Todo Yatharth uncomment this code when it kafka is ready
+    //@KafkaListener(topics=USER_TO_SCHEDULER_JOB_QUEUE_TOPIC)
     public void processMessage(String message) {
         try {
-            KairosScheduleJobDTO job = objectMapper.readValue(message,KairosScheduleJobDTO.class);
+            KairosScheduleJobDTO job = ObjectMapperUtils.JsonStringToObject(message,KairosScheduleJobDTO.class);
             userToSchedulerQueueService.handleJob(job);
 
             logger.info("received content = '{}'", job.toString());

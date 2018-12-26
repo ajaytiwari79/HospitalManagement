@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -25,7 +26,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
-import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
@@ -93,9 +93,7 @@ public class TeamService {
             exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound");
 
         }
-
         ContactAddress contactAddress=null;
-
         if(!teamDTO.isHasAddressOfUnit()) {
             logger.info("Setting Contact Address of Team different from Unit");
             AddressDTO addressDTO = teamDTO.getContactAddress();
@@ -105,6 +103,7 @@ public class TeamService {
                 logger.info("Google Map verified address received ");
 
                 // -------Parse Address from DTO -------- //
+
                 //ZipCode
                 if (addressDTO.getZipCodeValue() == 0) {
                     logger.info("No ZipCode value received");
@@ -128,11 +127,13 @@ public class TeamService {
                 }
                 logger.info("Geography Data: " + geographyData);
 
+
                 // Geography Data
                 contactAddress.setMunicipality(municipality);
                 contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
                 contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
                 contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
+
 
                 // Coordinates
                 contactAddress.setLongitude(addressDTO.getLongitude());
@@ -177,6 +178,8 @@ public class TeamService {
 
                     }
                     logger.info("Geography Data: " + geographyData);
+
+
                     // Geography Data
                     contactAddress.setMunicipality(municipality);
                     contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
@@ -200,16 +203,20 @@ public class TeamService {
             logger.info("Setting Contact Address of Team same as Unit");
             if(organizationContactAddress.getOrganization() != null){
                 contactAddress = organizationContactAddress.getContactAddress();
+
                 ZipCode zipCode = organizationContactAddress.getZipCode();
                 logger.debug("zip code found is "+zipCode);
                 if(zipCode == null){
                     exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+                    
                 }
                 Municipality municipality = organizationContactAddress.getMunicipality();
                 if(municipality == null){
                     exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
                 }
+
+
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
@@ -233,7 +240,6 @@ public class TeamService {
             }
         }
         Team team = new Team(teamDTO.getName(),teamDTO.isHasAddressOfUnit(),teamDTO.getDescription(),teamDTO.getVisitourId(),contactAddress);
-
         group.getTeamList().add(team);
         groupGraphRepository.save(group,2);
         logger.info("Preparing response");

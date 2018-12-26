@@ -1,12 +1,12 @@
 package com.kairos.service.counter;
 
 import com.kairos.dto.activity.counter.chart.BaseChart;
-import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RepresentationService {
-    public BaseChart getRepresentationData(RawRepresentationData data){
+    public BaseChart getRepresentationData(CommonRepresentationData data){
         switch (data.getChartType()){
             case PIE: return getPieChartData(data);
             case GAUGE: return getGaugeChartData(data);
@@ -16,15 +16,15 @@ public class RepresentationService {
         return null;
     }
 
-    private BaseChart getPieChartData(RawRepresentationData data){
+    private BaseChart getPieChartData(CommonRepresentationData data){
         return null;
     }
 
-    private BaseChart getGaugeChartData(RawRepresentationData data){
+    private BaseChart getGaugeChartData(CommonRepresentationData data){
         return null;
     }
 
-    private BaseChart getNumberOnlyRepresentation(RawRepresentationData data){
+    private BaseChart getNumberOnlyRepresentation(CommonRepresentationData data){
         return null;
     }
 }

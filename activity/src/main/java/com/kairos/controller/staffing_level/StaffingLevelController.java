@@ -166,4 +166,11 @@ public class StaffingLevelController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.createStaffingLevelFromStaffingLevelTemplate(unitId, staffingLevelFromTemplateDTO,templateId));
     }
+
+    @GetMapping(value = "/updated_staffing_level")
+    @ApiOperation("get staffing level if Updated")
+    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestParam("currentDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date currentDate,@RequestParam("updatedAt")@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss",iso = DateTimeFormat.ISO.DATE) Date updatedAt) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedAt,currentDate));
+    }
 }

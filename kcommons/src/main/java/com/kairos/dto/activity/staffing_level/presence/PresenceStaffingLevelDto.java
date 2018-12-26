@@ -25,6 +25,7 @@ public class PresenceStaffingLevelDto {
     private Integer weekCount;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval =new ArrayList<>();
+    private Date updatedAt;
 
     public PresenceStaffingLevelDto() {
         //default constructor
@@ -86,7 +87,11 @@ public class PresenceStaffingLevelDto {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
 
-
-
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

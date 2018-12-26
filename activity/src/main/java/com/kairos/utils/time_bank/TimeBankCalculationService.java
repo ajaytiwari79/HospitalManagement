@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
+import com.kairos.dto.activity.kpi.UnitPositionLinesDTO;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 
@@ -102,7 +103,7 @@ public class TimeBankCalculationService {
             dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(), unitPosition.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate())));
             int totalDailyTimebank = 0;
             int dailyScheduledMin = 0;
-            int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(shifts.get(0).getStartDate()),totalWeeklyMinutes,unitPosition.getWorkingDaysInWeek(),true);
+            int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(shifts.get(0).getStartDate()),totalWeeklyMinutes,unitPosition.getWorkingDaysInWeek(),true,null);
             Map<BigInteger, Integer> ctaTimeBankMinMap = new HashMap<>();
             Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(), v->v));
             for (ShiftWithActivityDTO shift : shifts) {
@@ -179,14 +180,35 @@ public class TimeBankCalculationService {
     }
 
 
-    private int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,int totalWeeklyMinutes,int workingDaysInWeek,boolean calculateForConstractual) {
+    //Todo pradeep please refactor this method for unitPositionLine
+    public int getContractualAndTimeBankByPlanningPeriod(Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate,int totalWeeklyMinutes,int workingDaysInWeek,boolean calculateForConstractual,List<UnitPositionLinesDTO> positionLines) {
         Date date = DateUtils.asDate(localDate);
         int contractualOrTimeBankMinutes = 0;
-        for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
-            if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
-                contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= workingDaysInWeek ? totalWeeklyMinutes / workingDaysInWeek : 0;
-                contractualOrTimeBankMinutes = calculateForConstractual ? contractualOrTimeBankMinutes : -contractualOrTimeBankMinutes;
-                break;
+        if(CollectionUtils.isNotEmpty(positionLines)){
+            boolean valid = false;
+            for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
+                if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
+                    valid = true;
+                    break;
+                }
+            }
+            if(valid){
+                for (UnitPositionLinesDTO positionLine : positionLines) {
+                    DateTimeInterval positionInterval = positionLine.getInterval();
+                    if((positionInterval==null && positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate)) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
+                        contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
+                        break;
+                    }
+                }
+            }
+
+        }else {
+            for (DateTimeInterval planningPeriodInterval : planningPeriodIntervals) {
+                if(planningPeriodInterval.contains(date) || planningPeriodInterval.getEndLocalDate().equals(localDate)){
+                    contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= workingDaysInWeek ? totalWeeklyMinutes / workingDaysInWeek : 0;
+                    contractualOrTimeBankMinutes = calculateForConstractual ? contractualOrTimeBankMinutes : -contractualOrTimeBankMinutes;
+                    break;
+                }
             }
         }
         return contractualOrTimeBankMinutes;
@@ -561,7 +583,7 @@ public class TimeBankCalculationService {
                 if (calculateContractual || !dailyTimeBanksDates.contains(interval.getStart().toLocalDate())) {
                     boolean vaild = (unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) || (startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY);
                     if(vaild) {
-                        contractualMinutes+= getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(startDate),totalWeeklyMinutes,unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek(),true);
+                        contractualMinutes+= getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(startDate),totalWeeklyMinutes,unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek(),true,null);
                     }
                 }
                 startDate = startDate.plusDays(1);
@@ -652,7 +674,7 @@ public class TimeBankCalculationService {
      * @param interval
      * @return Interval
      */
-    private Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
+    public Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
         Interval updatedInterval = null;
         DateTime unitPositionStartTime = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getStartDate());
         if (interval.contains(unitPositionStartTime) || interval.getStart().isAfter(unitPositionStartTime)) {
@@ -1138,6 +1160,8 @@ public class TimeBankCalculationService {
         }
         return scheduledMinutes;
     }
+
+
 
 
 }

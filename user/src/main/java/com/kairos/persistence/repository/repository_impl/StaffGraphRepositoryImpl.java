@@ -1,15 +1,13 @@
 package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
 import com.kairos.persistence.model.staff.StaffUnitPositionQueryResult;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import org.apache.commons.collections.CollectionUtils;
+import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
@@ -64,7 +62,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     @Override
-    public List<StaffDTO> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
+    public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
         Map<String, Object> queryParameters = new HashMap();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
@@ -90,12 +88,22 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         stringBuilder.append(" MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
                 "WHERE  date(positionLine.startDate) <= date({endDate}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({startDate}))"+
-                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) RETURN DISTINCT  {id:id(staff),firstName:staff.firstName ,lastName:staff.lastName} as data");
+                "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
+                "with  COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek,\n" +
+                "avgDailyWorkingHours:positionLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) as ups,up,staff "+
+                "WITH {id:id(up),startDate:up.startDate,endDate:up.endDate,positionLines:ups } as up,staff\n" +
+                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,collect(up) as unitPosition");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
-        List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , stringBuilder.toString(), queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(result,Staff.class);
 
+        Result results=session.query( stringBuilder.toString(), queryParameters);
+        List<StaffKpiFilterQueryResult> staffKpiFilterQueryResults= new ArrayList<>();
+        results.forEach(result->{
+            staffKpiFilterQueryResults.add(ObjectMapperUtils.copyPropertiesByMapper(result,StaffKpiFilterQueryResult.class));
+        });
+
+        return staffKpiFilterQueryResults;
+//
     }
 
 

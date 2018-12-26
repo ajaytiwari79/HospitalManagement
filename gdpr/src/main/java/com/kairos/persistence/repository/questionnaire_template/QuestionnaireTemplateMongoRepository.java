@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepositor
 
     @Query("{deleted:false,organizationId:?0,templateType:?1}")
     QuestionnaireTemplate findQuestionnaireTemplateByCountryIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
+
 
     @Query("{deleted:false,organizationId:?0,templateType:?1,templateStatus:\"PUBLISHED\"}")
     QuestionnaireTemplate findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(Long countryId, QuestionnaireTemplateType templateType);
