@@ -239,11 +239,7 @@ public class WTABuilderService extends MongoBaseService {
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
         oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
-        if (updateDTO.getEndDate() != null) {
-            oldWta.setEndDate(new Date(updateDTO.getEndDateMillis()));
-        }else {
-            oldWta.setEndDate(null);
-        }
+        oldWta.setEndDate(updateDTO.getEndDate() != null?new Date(updateDTO.getEndDateMillis()):null);
         oldWta.setRuleTemplateIds(ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList()));
         save(oldWta);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
