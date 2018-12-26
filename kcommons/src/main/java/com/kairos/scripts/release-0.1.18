@@ -13,3 +13,4 @@ db.shiftState.updateMany({},{$set:{"activities.$[].status":["REQUEST"]}})
 
 db.phases.updateMany({},{$set:{status:["PUBLISH","UNPUBLISH","FIX","LOCK","UNLOCK","UNFIX","PENDING","REQUEST","VALIDATE","REJECT","APPROVE"]}})
 db.activities.updateMany({},{$set:{"phaseSettingsActivityTab.phaseTemplateValues.$[].activityShiftStatusSettings":[]}})
+db.individualShiftTemplate.updateMany({},{$set:{"activities.$[].status":["PUBLISH"]}})
