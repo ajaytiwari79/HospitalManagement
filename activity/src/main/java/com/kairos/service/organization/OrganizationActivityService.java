@@ -213,8 +213,8 @@ public class OrganizationActivityService extends MongoBaseService {
         logger.info("activity.getTags() ================ > " + activity.getTags());
         //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
+        generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab,GeneralActivityTabWithTagDTO.class);
-        generalActivityTabWithTagDTO.setTags(null);
         if(!activity.getTags().isEmpty()){
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
