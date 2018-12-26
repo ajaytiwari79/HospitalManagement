@@ -266,7 +266,7 @@ public class FunctionalPaymentService {
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
         if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
-                    functionalPaymentDTO.getStartDate().minusDays(1L));
+                    functionalPaymentDTO.getStartDate().minusDays(1L).toString());
             parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
             if (functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
                 functionalPayment.get().setEndDate(null);
@@ -279,7 +279,7 @@ public class FunctionalPaymentService {
 
 
     public void updateAmountInFunctionalTable(Long payTableId, LocalDate startDate, LocalDate endDate, BigDecimal percentageValue) {
-        List<FunctionalPayment> functionalPaymentList = functionalPaymentGraphRepository.findAllActiveByPayTableId(payTableId, startDate, null);
+        List<FunctionalPayment> functionalPaymentList = functionalPaymentGraphRepository.findAllActiveByPayTableId(payTableId, startDate.toString(), null);
         List<FunctionalPayment> toBreakInNewList = new ArrayList<>();
         List<FunctionalPayment> toUpdateInExisting = new ArrayList<>();
         for (FunctionalPayment functionalPayment : functionalPaymentList) {

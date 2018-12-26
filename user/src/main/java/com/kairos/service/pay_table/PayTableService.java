@@ -1,6 +1,7 @@
 package com.kairos.service.pay_table;
 
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
@@ -40,6 +41,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.management.timer.Timer.ONE_DAY;
 
 /**
@@ -85,19 +87,19 @@ public class PayTableService {
 
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
         List<FunctionDTO> functions = functionGraphRepository.getFunctionsByOrganizationLevel(organizationLevelId);
-        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate);
+        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate.toString());
         PayTableResponse payTable = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
             for (PayTableResponse currentPayTable : payTableQueryResults) {
                 if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
-                        (new DateTime(currentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(currentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
-                        && (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                        (currentPayTable.getEndDateMillis().isAfter(startDate) || currentPayTable.getEndDateMillis().isEqual(startDate))
+                        && (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
                     payTable = currentPayTable;
                     break;
                 }
                 if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
-                        (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                        (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
                     payTable = currentPayTable;
                     break;
                 }
@@ -148,9 +150,9 @@ public class PayTableService {
     private void validatePayLevel(PayTableResponse payTableToValidate, LocalDate startDateMillis, LocalDate endDateMillis) {
         if (payTableToValidate.getEndDateMillis() != null) {
             logger.info("new  startDate{}", startDateMillis + "  End date " + endDateMillis);
-            Days days = Days.daysBetween(new DateTime(startDateMillis).toLocalDate(), new DateTime(payTableToValidate.getEndDateMillis()).toLocalDate());
+            long days = DAYS.between(startDateMillis, payTableToValidate.getEndDateMillis());
             logger.info("difference in days" + days);
-            if (days.getDays() != -1) {
+            if (days != -1) {
                 exceptionService.actionNotPermittedException("message.startdate.allowed",new DateTime(payTableToValidate.getEndDateMillis().plusDays(1)));
 
             }
@@ -163,7 +165,7 @@ public class PayTableService {
     private void prepareDates(PayTable payTable, PayTableUpdateDTO payTableDTO) {
         if (!payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
             // The start date is modified Now We need to compare is it less than today
-            if (new DateTime(payTableDTO.getStartDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
+            if (payTableDTO.getStartDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
                 exceptionService.actionNotPermittedException("message.startdate.lessthan");
 
             }
@@ -178,7 +180,7 @@ public class PayTableService {
 
         // If already not present now its present    Previous its absent
         else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
-            if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
+            if (payTableDTO.getEndDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
                 exceptionService.actionNotPermittedException("message.endtdate.lessthan");
 
             }
@@ -188,7 +190,7 @@ public class PayTableService {
         // If already present and still present // NOw checking are they same or different
         else if (Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
             if (!payTable.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {//The end date is modified Now We need to compare is it less than today
-                if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
+                if (payTableDTO.getEndDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
                     exceptionService.actionNotPermittedException("message.endtdate.lessthan");
 
                 }
@@ -537,7 +539,7 @@ public class PayTableService {
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
         logger.debug(payTable.getStartDateMillis() + "----" + publishedDate);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
-            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDate.minusDays(1));
+            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDate.minusDays(1).toString());
             parentPayTable.setEndDateMillis(publishedDate);
             parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
