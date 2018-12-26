@@ -119,6 +119,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
+import static com.kairos.enums.shift.ShiftStatus.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -322,8 +323,7 @@ public class ShiftService extends MongoBaseService {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
         boolean presenceTypeShift = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         if (TimeTypes.WORKING_TYPE.toString().equals(activityWrapper.getTimeType())) {
-            applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shift.getStartDate(), shift, false, null, presenceTypeShift));
-
+            staffingLevelService.updateStaffingLevelAvailableStaffCount(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shift.getStartDate(), shift, false, null, presenceTypeShift));
         }
     }
 
@@ -612,7 +612,7 @@ public class ShiftService extends MongoBaseService {
             //anil m2 notify event for updating staffing level
             boolean presenceTypeShift = !(firstActivity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || firstActivity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
             if (activityWrapperMap.get(firstActivity.getId()).getTimeType().equals(TimeTypes.WORKING_TYPE.toString())) {
-                applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
+                staffingLevelService.updateStaffingLevelAvailableStaffCount(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
                         true, oldStateOfShift, presenceTypeShift, false, activityChangeStatus(activityOld, firstActivity) == ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE
                         , activityChangeStatus(activityOld, firstActivity) == ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE));
             }
@@ -752,7 +752,7 @@ public class ShiftService extends MongoBaseService {
         payOutService.deletePayOut(shift.getId());
 
         boolean isShiftForPreence = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
-        applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
+        staffingLevelService.updateStaffingLevelAvailableStaffCount(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
                 false, null, isShiftForPreence, true, false, false));
         List<BigInteger> jobIds=shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         shiftReminderService.deleteReminderTrigger(jobIds,shift.getUnitId());
@@ -1000,8 +1000,9 @@ public class ShiftService extends MongoBaseService {
                         boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
+                            removeOppositeStatus(shiftActivity,shiftPublishDTO.getStatus());
                             shiftActivity.getStatus().add(shiftPublishDTO.getStatus());
-                            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true));
+                            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true,shiftActivity.getStatus()));
                         } else {
                             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("access.group.not.matched"), false));
                         }
@@ -1013,7 +1014,31 @@ public class ShiftService extends MongoBaseService {
         }
         return shiftActivityResponseDTOS;
     }
-
+    private void removeOppositeStatus(ShiftActivity shiftActivity,ShiftStatus shiftStatus){
+    switch (shiftStatus){
+        case LOCK:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(UNLOCK);add(UNPUBLISH);add(REQUEST);}});
+            break;
+        case FIX:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(UNFIX);add(REQUEST);}});
+            break;
+        case UNFIX:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(FIX);add(REQUEST);}});
+            break;
+        case APPROVE:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REJECT);add(UNPUBLISH);add(REQUEST);}});
+            break;
+        case REJECT:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(APPROVE);add(PUBLISH);add(REQUEST);}});
+            break;
+        case UNLOCK:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(LOCK);add(REQUEST);}});
+            break;
+        case PUBLISH:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(UNPUBLISH);add(REJECT);}});
+            break;
+    }
+    }
 
     public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate,ViewType viewType) {
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
@@ -1095,7 +1120,7 @@ public class ShiftService extends MongoBaseService {
         );
         shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
         shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(0).getEndDate());
-        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.REQUEST));
+        shiftWithActivityDTO.setStatus(Arrays.asList(REQUEST));
         return shiftWithActivityDTO;
     }
 
