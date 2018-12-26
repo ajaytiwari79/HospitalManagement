@@ -119,6 +119,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
+import static com.kairos.enums.shift.ShiftStatus.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -1000,6 +1001,7 @@ public class ShiftService extends MongoBaseService {
                         boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
+                            removeOppositeStatus(shiftActivity,shiftPublishDTO.getStatus());
                             shiftActivity.getStatus().add(shiftPublishDTO.getStatus());
                             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true));
                         } else {
@@ -1013,7 +1015,31 @@ public class ShiftService extends MongoBaseService {
         }
         return shiftActivityResponseDTOS;
     }
-
+    private void removeOppositeStatus(ShiftActivity shiftActivity,ShiftStatus shiftStatus){
+    switch (shiftStatus){
+        case LOCK:
+            shiftActivity.getStatus().remove(ShiftStatus.UNLOCK);
+            break;
+        case FIX:
+            shiftActivity.getStatus().remove(ShiftStatus.UNFIX);
+            break;
+        case UNFIX:
+            shiftActivity.getStatus().remove(ShiftStatus.FIX);
+            break;
+        case APPROVE:
+            shiftActivity.getStatus().remove(ShiftStatus.REJECT);
+            break;
+        case REJECT:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(APPROVE);add(PUBLISH);}});
+            break;
+        case UNLOCK:
+            shiftActivity.getStatus().remove(ShiftStatus.LOCK);
+            break;
+        case PUBLISH:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(REJECT);}});
+            break;
+    }
+    }
 
     public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate,ViewType viewType) {
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
@@ -1095,7 +1121,7 @@ public class ShiftService extends MongoBaseService {
         );
         shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
         shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(0).getEndDate());
-        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.REQUEST));
+        shiftWithActivityDTO.setStatus(Arrays.asList(REQUEST));
         return shiftWithActivityDTO;
     }
 
