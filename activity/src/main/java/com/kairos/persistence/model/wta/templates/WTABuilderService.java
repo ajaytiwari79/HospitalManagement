@@ -219,11 +219,9 @@ public class WTABuilderService extends MongoBaseService {
     }
     public WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()))) {
-
-            if (!updateDTO.getRuleTemplates().isEmpty()) {
-                ruleTemplates = updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
-            }
+        if (DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate())) && !updateDTO.getRuleTemplates().isEmpty())
+        {
+            ruleTemplates = updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
         } else{
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
