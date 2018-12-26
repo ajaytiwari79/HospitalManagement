@@ -837,7 +837,7 @@ public class UnitPositionService {
     // since we have positionLine are on date so we are matching and might we wont have any active position line on date.
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId) {
 
-        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionByIdWithPositionLines(unitPositionId);
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
         if (unitPosition != null) {
             unitPositionDetails = convertUnitPositionObject(unitPosition);
