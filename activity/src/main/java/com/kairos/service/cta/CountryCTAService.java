@@ -280,8 +280,8 @@ public class CountryCTAService extends MongoBaseService {
 
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
-        boolean isFutureSameDateCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (isFutureSameDateCTA){
+        boolean isSameDateFutureCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        if (isSameDateFutureCTA){
             costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
             buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  true, false,null,null);
             this.save(costTimeAgreement);
