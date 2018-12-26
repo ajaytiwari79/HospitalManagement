@@ -58,10 +58,10 @@ public class ShiftActivityDTO {
         this.activityName = activityName;
     }
 
-    public ShiftActivityDTO(String activityName, BigInteger activityId, String message, boolean success) {
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
         this.message = message;
         this.success = success;
-        this.activityId = activityId;
+        this.id = id;
         this.activityName = activityName;
     }
 
