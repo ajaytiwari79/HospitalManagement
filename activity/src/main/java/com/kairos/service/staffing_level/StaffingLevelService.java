@@ -184,7 +184,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public Map<String, StaffingLevel> getPresenceStaffingLevel(Long unitId, Date startDate, Date endDate) {
         logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(unitId, startDate, endDate);
         Map<String, StaffingLevel> staffingLevelsMap = staffingLevels.parallelStream().collect(Collectors.toMap(staffingLevel -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDateTime dateTime = DateUtils.asLocalDateTime(staffingLevel.getCurrentDate());
@@ -858,7 +858,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     public StaffingLevelDto getStaffingLevel(Long unitId, Date startDate, Date endDate) {
         logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(unitId, startDate, endDate);
         Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap = new HashMap<String, PresenceStaffingLevelDto>();
         Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap = new HashMap<String, AbsenceStaffingLevelDto>();
         for (StaffingLevel staffingLevel : staffingLevels) {
