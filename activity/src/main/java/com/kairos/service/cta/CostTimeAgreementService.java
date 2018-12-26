@@ -258,7 +258,9 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
-        if (unitPosition.isPublished()) {
+        // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
+        boolean isFutureCTA = oldCTA.getStartDate().isEqual(ctaDTO.getStartDate()) && (ctaDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || ctaDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        if (unitPosition.isPublished() && !isFutureCTA) {
             ctaDTO.setId(null);
             CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
@@ -309,7 +311,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
         Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,ctaStartDate, AppConstants.ORGANIZATION,unitPositionId,Collections.emptySet());
-        timeBankService.updateTimeBankOnUnitPositionModification(unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
+//        timeBankService.updateTimeBankOnUnitPositionModification(unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
     }
 
     /**

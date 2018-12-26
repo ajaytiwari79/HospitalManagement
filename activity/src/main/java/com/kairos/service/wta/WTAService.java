@@ -65,7 +65,6 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
 public class WTAService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository wtaRepository;
-
     @Inject
     private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
@@ -76,7 +75,6 @@ public class WTAService extends MongoBaseService {
     private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Inject
     private TagService tagService;
-
     @Inject
     private WTABuilderService wtaBuilderService;
     @Inject
