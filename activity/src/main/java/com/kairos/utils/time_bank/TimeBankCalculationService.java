@@ -556,7 +556,6 @@ public class TimeBankCalculationService {
      */
     public int calculateTimeBankForInterval(Set<DateTimeInterval> planningPeriodIntervals,Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, boolean isByOverView, List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
         List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
-        int totalWeeklyMinutes = unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes();
         if (!calculateContractual) {
             dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d -> DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toList());
         }
