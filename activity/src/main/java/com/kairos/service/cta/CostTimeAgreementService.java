@@ -2,18 +2,18 @@ package com.kairos.service.cta;
 
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.activity.OrganizationActivityDTO;
-import com.kairos.dto.activity.cta.*;
-import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.cta.*;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.FixedValueType;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.enums.cta.*;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
@@ -25,22 +25,15 @@ import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
-import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
-import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,12 +41,10 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.COPY_OF;
-import static com.kairos.enums.cta.CalculateValueType.FIXED_VALUE;
-import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 
 /**
@@ -78,12 +69,11 @@ public class CostTimeAgreementService extends MongoBaseService {
     @Inject
     private CountryCTAService countryCTAService;
     @Inject
-    private OrganizationRestClient organizationRestClient;
-    @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
     private TableSettingService tableSettingService;
-    @Inject private ActivityService activityService;
+    @Inject
+    private ActivityService activityService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
@@ -258,9 +248,11 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
+        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
+        boolean calculativeValueChanged=checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,ctaDTO.getRuleTemplates());
         // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
         boolean isSameFutureDateCTA = oldCTA.getStartDate().isEqual(ctaDTO.getStartDate()) && (ctaDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || ctaDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (unitPosition.isPublished() && !isSameFutureDateCTA) {
+        if (unitPosition.isPublished() && !isSameFutureDateCTA && calculativeValueChanged) {
             ctaDTO.setId(null);
             CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
@@ -306,6 +298,23 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         unitPosition.setCostTimeAgreement(responseCTA);
         return unitPosition;
+    }
+
+    private boolean checkCalculativeValueChanged(List<CTARuleTemplate> ctaRuleTemplatesOfCTA, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
+        AtomicBoolean calculativeValueChange=new AtomicBoolean(false);
+        ctaRuleTemplateDTOS.forEach(currentRuleTemplateToBeLinkedDTO->{
+            CTARuleTemplate ctaRuleTemplate=ctaRuleTemplatesOfCTA.stream().filter(ruleTemplate -> ruleTemplate.getId().equals(currentRuleTemplateToBeLinkedDTO.getId())).findAny().orElse(null);
+            if (ctaRuleTemplate==null){ // this means  a new template is added now we need to check for date
+                calculativeValueChange.getAndSet(true);
+                return;
+            }
+            CTARuleTemplate currentRuleTemplateToBeLinked = ObjectMapperUtils.copyPropertiesByMapper(currentRuleTemplateToBeLinkedDTO, CTARuleTemplate.class);
+            if (!ctaRuleTemplate.equals(currentRuleTemplateToBeLinked)){
+                calculativeValueChange.getAndSet(true);
+                return;
+            }
+        });
+        return calculativeValueChange.get();
     }
 
     private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {

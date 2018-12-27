@@ -271,11 +271,11 @@ public class WTAService extends MongoBaseService {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
 
         boolean calculativeValueChanged=false;
+        boolean sameFutureDateWTA = DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
         if (!updateDTO.getRuleTemplates().isEmpty()) {
-            ruleTemplates =wtaBuilderService.updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
-            calculativeValueChanged=ruleTemplates.get(0).isCalculativeValueChange();
+            ruleTemplates = wtaBuilderService.updateRuleTemplates(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
+            calculativeValueChanged = ruleTemplates.get(0).isCalculativeValueChange();
         }
-        boolean sameFutureDateWTA=DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
         if(!sameFutureDateWTA && calculativeValueChanged){ // since calculative values are changed and dates are not same so we need to make a new copy
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
@@ -285,6 +285,10 @@ public class WTAService extends MongoBaseService {
             oldWta.setParentId(versionWTA.getId());
             oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
             oldWta.setEndDate(updateDTO.getEndDateMillis() != null?new Date(updateDTO.getEndDateMillis()):null);
+            ruleTemplates.forEach(ruleTemplate -> ruleTemplate.setId(null));
+        }
+        if (!ruleTemplates.isEmpty()) {
+            save(ruleTemplates);
         }
         // This is may be not used as We cant change expertise
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
@@ -599,16 +603,16 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
 
+    private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        boolean sameFutureDateWTA = DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
         boolean calculativeValueChanged=false;
         if (!updateDTO.getRuleTemplates().isEmpty()) {
-            ruleTemplates =wtaBuilderService.updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
-            calculativeValueChanged=ruleTemplates.get(0).isCalculativeValueChange();
+            ruleTemplates = wtaBuilderService.updateRuleTemplates(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
+            calculativeValueChanged = ruleTemplates.get(0).isCalculativeValueChange();
         }
-        boolean sameFutureDateWTA=DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if(!sameFutureDateWTA && calculativeValueChanged){ // since calculative values are hanged and dates are not same so we need to make a new copy
+        if (!sameFutureDateWTA && calculativeValueChanged) { // since calculative values are changed and dates are not same so we need to make a new copy
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
             versionWTA.setDeleted(false);
@@ -620,6 +624,10 @@ public class WTAService extends MongoBaseService {
             oldWta.setParentId(versionWTA.getId());
             oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
             oldWta.setEndDate(updateDTO.getEndDate() != null?DateUtils.asDate(updateDTO.getEndDate()):null);
+            ruleTemplates.forEach(ruleTemplate -> ruleTemplate.setId(null));
+        }
+        if (!ruleTemplates.isEmpty()) {
+            save(ruleTemplates);
         }
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());

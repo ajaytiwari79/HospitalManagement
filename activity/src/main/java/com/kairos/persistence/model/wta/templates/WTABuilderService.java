@@ -15,7 +15,6 @@ import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.management.timer.Timer;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -218,14 +217,17 @@ public class WTABuilderService extends MongoBaseService {
         return newWta;
 
     }
+
     public WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+
+        boolean sameFutureDateWTA=DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        ruleTemplates= updateRuleTemplates(updateDTO.getRuleTemplates(),oldWta.getRuleTemplateIds());
         boolean calculativeValueChanged=false;
         if (!updateDTO.getRuleTemplates().isEmpty()) {
-            ruleTemplates =updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
-            calculativeValueChanged=ruleTemplates.get(0).isCalculativeValueChange();
+             ruleTemplates = updateRuleTemplates(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
+             calculativeValueChanged= ruleTemplates.get(0).isCalculativeValueChange();
         }
-        boolean sameFutureDateWTA=DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
         if(!sameFutureDateWTA && calculativeValueChanged){ // since calculative values are changed and dates are not same so we need to make a new copy
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
@@ -236,6 +238,10 @@ public class WTABuilderService extends MongoBaseService {
             oldWta.setParentId(versionWTA.getId());
             oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
             oldWta.setEndDate(updateDTO.getEndDateMillis() != null?new Date(updateDTO.getEndDateMillis()):null);
+            ruleTemplates.forEach(ruleTemplate->ruleTemplate.setId(null));
+        }
+        if (!ruleTemplates.isEmpty()) {
+            save(ruleTemplates);
         }
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
@@ -246,9 +252,9 @@ public class WTABuilderService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    public List<WTABaseRuleTemplate> updateRuleTemplatesAndSave(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesId) {
+    public List<WTABaseRuleTemplate> updateRuleTemplates(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesIds) {
 
-        List<WTABaseRuleTemplate> oldRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByIdInAndDeletedFalse(oldRuleTemplatesId);
+        List<WTABaseRuleTemplate> oldRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByIdInAndDeletedFalse(oldRuleTemplatesIds);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         for (WTABaseRuleTemplateDTO currentRuleTemplateToBeLinked : newRuleTemplatesToBeLinked) {
             WTABaseRuleTemplate existingWtaRuleTemplate = oldRuleTemplates.stream().filter(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getId().equals(currentRuleTemplateToBeLinked.getId())).findAny().orElse(null);
@@ -269,10 +275,6 @@ public class WTABuilderService extends MongoBaseService {
                 ruleTemplates.add(0,wtaBaseRuleTemplate);
             }
         }
-        if (!ruleTemplates.isEmpty()) {
-            save(ruleTemplates);
-        }
-
         return ruleTemplates;
     }
 
