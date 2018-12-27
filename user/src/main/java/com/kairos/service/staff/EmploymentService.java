@@ -862,8 +862,8 @@ public class EmploymentService {
         return true;
     }
 
-    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO) {
-        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString()), UnitPositionQueryResult.class);
+    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO,long unitPositionId) {
+        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(),unitPositionId), UnitPositionQueryResult.class);
         Set<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toSet());
         if (CollectionUtils.isNotEmpty(unitPositionIds)) {
             List<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(new ArrayList<>(unitPositionIds));
