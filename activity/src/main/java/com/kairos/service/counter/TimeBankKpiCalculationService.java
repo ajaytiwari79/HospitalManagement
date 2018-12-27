@@ -51,16 +51,20 @@ public class TimeBankKpiCalculationService implements  CounterService {
     @Inject
     private TimeBankRepository timeBankRepository;
 
-    private Set<DateTimeInterval> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate,List<BigInteger> phaseIds) {
+    private Map<Long,Set<DateTimeInterval>> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate,List<BigInteger> phaseIds) {
+        Map<Long,Set<DateTimeInterval>> unitAndDateTimeIntervalMap=new HashMap<>();
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdsAndBetweenDates(unitIds, startDate, endDate);
-
-        Set<DateTimeInterval> dateTimeIntervals =new HashSet<>();
-        if(CollectionUtils.isNotEmpty(phaseIds)){
-            dateTimeIntervals=planningPeriods.stream().filter(planningPeriod -> phaseIds.contains(planningPeriod.getCurrentPhaseId())).map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
-        }else{
-            dateTimeIntervals=planningPeriods.stream().map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
-        }
-        return dateTimeIntervals;
+        Map<Long,List<PlanningPeriod>> unitAndPlanningPeriodMap=planningPeriods.stream().collect(Collectors.groupingBy(PlanningPeriod::getUnitId,Collectors.toList()));
+        unitIds.forEach(unitId->{
+            Set<DateTimeInterval> dateTimeIntervals;
+            if(CollectionUtils.isNotEmpty(phaseIds)){
+                dateTimeIntervals=planningPeriods.stream().filter(planningPeriod -> phaseIds.contains(planningPeriod.getCurrentPhaseId())).map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
+            }else{
+                dateTimeIntervals=planningPeriods.stream().map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
+            }
+            unitAndDateTimeIntervalMap.put(unitId,dateTimeIntervals);
+        });
+        return unitAndDateTimeIntervalMap;
     }
 
     private Map<Long,List<DailyTimeBankEntry>> getDailyTimeBankEntryByDate(List<Long> unitPositionIds, LocalDate startDate, LocalDate endDate, List<String> daysOfWeek) {
@@ -78,7 +82,6 @@ public class TimeBankKpiCalculationService implements  CounterService {
     }
 
     private List<CommonKpiDataUnit> getTimeBankForUnitKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi){
-        Set<BigInteger> timeTypeIds=new HashSet<>();
         List<BigInteger> phaseIds=filterBasedCriteria.containsKey(FilterType.PHASE)?getBigIntegerValue(filterBasedCriteria.get(FilterType.PHASE)):new ArrayList<>();
         List<String> daysOfWeek=filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK)?filterBasedCriteria.get(FilterType.DAYS_OF_WEEK):Stream.of(DayOfWeek.values()).map(Enum::name).collect(Collectors.toList());
         List<Long> staffIds=(filterBasedCriteria.get(FilterType.STAFF_IDS) != null)?getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
@@ -86,12 +89,14 @@ public class TimeBankKpiCalculationService implements  CounterService {
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,new ArrayList<>(),organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-        Set<DateTimeInterval> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)),phaseIds);
-        Map<Long,List<DailyTimeBankEntry>> dailyTimeBankEntries=getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getUnitPosition().stream().map(unitPositionWithCtaDetailsDTO -> unitPositionWithCtaDetailsDTO.getId())).collect(Collectors.toList()),filterDates.get(0),filterDates.get(1),daysOfWeek);
+        Map<Long,Set<DateTimeInterval>> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)),phaseIds);
+        Map<Long,List<DailyTimeBankEntry>> unitPositionAndDailyTimeBank=getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getUnitPosition().stream().map(unitPositionWithCtaDetailsDTO -> unitPositionWithCtaDetailsDTO.getId())).collect(Collectors.toList()),filterDates.get(0),filterDates.get(1),daysOfWeek);
         staffKpiFilterDTOS.forEach(staffKpiFilterDTO -> staffKpiFilterDTO.getUnitPosition().forEach(unitPositionWithCtaDetailsDTO -> {
-            int j=timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel,new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)),DateUtils.getLongFromLocalDate(filterDates.get(1))),staffKpiFilterDTOS.get(0).getUnitPosition().get(0),false,dailyTimeBankEntries.getOrDefault(unitPositionWithCtaDetailsDTO.getId(),new ArrayList<>()),false);
-            logger.info("      --        "+j);
+            List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionAndDailyTimeBank.getOrDefault(unitPositionWithCtaDetailsDTO.getId(),new ArrayList<>());
+            int timeBankOfInterval=timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(organizationId),new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)),DateUtils.getLongFromLocalDate(filterDates.get(1))),staffKpiFilterDTOS.get(0).getUnitPosition().get(0),false,dailyTimeBankEntries,false);
+            int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(ti -> ti.getTotalTimeBankMin()).sum();
+            int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
+            logger.info("      --        "+totalTimeBank);
         }));
         return null;
     }
