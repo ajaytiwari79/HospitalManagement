@@ -390,13 +390,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)  where id(staff)={0}\n" +
             "MATCH(user)<-[:"+BELONGS_TO+"]-(staffList:Staff)\n" +
-            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE up.mainUnitPosition=true AND " +
+            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE id(up)<>{3} up.mainUnitPosition=true AND " +
             "(({2} IS NULL AND (up.endDate IS NULL OR DATE(up.endDate) >= DATE({1}))) \n" +
             "OR ({2} IS NOT NULL AND DATE(up.startDate) <= DATE({2}) AND (up.endDate IS NULL OR DATE(up.endDate)>DATE({1}))) ) \n" +
             "WITH up,collect(empType) as empType  \n" +
             "MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
             "WITH up,org, CASE WHEN ANY(et in empType WHERE et.markMainEmployment=true) then true ELSE false END as markMainEmployment " +
             "RETURN id(up) as id,up.startDate as startDate,up.endDate as endDate,markMainEmployment as markMainEmployment,id(org) as unitId,org.name as unitName \n ")
-    List<UnitPositionQueryResult> findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate);
+    List<UnitPositionQueryResult> findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate,long id);
 
 }
