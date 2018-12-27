@@ -291,6 +291,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             oldCTA.setStartDate(ctaDTO.getStartDate());
             oldCTA.setEndDate(ctaDTO.getEndDate());
             oldCTA.setDescription(ctaDTO.getDescription());
+            oldCTA.setName(ctaDTO.getName());
             save(oldCTA);
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
