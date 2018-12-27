@@ -5,9 +5,11 @@ import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
 import com.kairos.enums.RiskSeverity;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataCategory;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
+//import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
+//import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -191,6 +193,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setAccessorParties(processingActivityDTO.getAccessorParties());
         processingActivity.setProcessingLegalBasis(processingActivityDTO.getProcessingLegalBasis());
         processingActivity.setSuggested(processingActivityDTO.isSuggested());
+        processingActivity.setDataSubjects(processingActivityDTO.getDataSubjectList());
         return processingActivity;
 
     }

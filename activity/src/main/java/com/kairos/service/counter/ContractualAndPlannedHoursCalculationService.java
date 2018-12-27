@@ -90,7 +90,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
                 if (interval != null) {
                     DateTime startDate = interval.getStart();
                     while (startDate.isBefore(interval.getEnd())) {
-                        contractualMinutes += timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, DateUtils.asLocalDate(startDate), totalWeeklyMinutes, 0, true, positionWithCtaDetailsDTO.getPositionLines());
+                        contractualMinutes += timeBankCalculationService.getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals, DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getPositionLines());
                         startDate = startDate.plusDays(1);
                     }
                 }
