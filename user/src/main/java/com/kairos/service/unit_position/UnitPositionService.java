@@ -306,7 +306,7 @@ public class UnitPositionService {
     private List<FunctionWithAmountQueryResult> findAndValidateFunction(UnitPositionDTO unitPositionDTO) {
         List<Long> funIds = unitPositionDTO.getFunctions().stream().map(FunctionsDTO::getId).collect(Collectors.toList());
         List<FunctionWithAmountQueryResult> functions = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevelAndIds
-                (unitPositionDTO.getUnitId(), unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(), unitPositionDTO.getStartDate(),
+                (unitPositionDTO.getUnitId(), unitPositionDTO.getExpertiseId(), unitPositionDTO.getSeniorityLevelId(), unitPositionDTO.getStartDate().toString(),
                         funIds);
 
         if (functions.size() != unitPositionDTO.getFunctions().size()) {
