@@ -668,8 +668,9 @@ public class EmploymentService {
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
-         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, employment.getEndDateMillis(), parentOrganization.getId(), employment.getId(),
-             parentOrganization.getTimeZone());
+        //TODO Commented temporary due to kafka down on QA server
+//         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, employment.getEndDateMillis(), parentOrganization.getId(), employment.getId(),
+//             parentOrganization.getTimeZone());
         employment.setEndDateMillis(employmentEndDate);
         if (!Optional.ofNullable(employmentEndDate).isPresent()) {
             employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
