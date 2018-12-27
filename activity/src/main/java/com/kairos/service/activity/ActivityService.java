@@ -952,7 +952,7 @@ public class ActivityService extends MongoBaseService {
         }
         //Checking the time type of activity whether it's eligible for copy or not
         ActivityDTO eligibleForCopy = activityMongoRepository.eligibleForCopy(activityId);
-        if (!eligibleForCopy.isActivityCanBeCopied()) {
+        if (eligibleForCopy==null || !eligibleForCopy.isActivityCanBeCopied()) {
             exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
         }
         Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(), Activity.class);
