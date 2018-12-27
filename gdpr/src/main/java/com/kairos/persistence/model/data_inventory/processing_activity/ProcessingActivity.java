@@ -5,7 +5,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
