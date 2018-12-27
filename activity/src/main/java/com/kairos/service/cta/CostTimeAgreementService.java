@@ -300,7 +300,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         return unitPosition;
     }
 
-    private boolean checkCalculativeValueChanged(List<CTARuleTemplate> ctaRuleTemplatesOfCTA, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
+    public boolean checkCalculativeValueChanged(List<CTARuleTemplate> ctaRuleTemplatesOfCTA, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
         AtomicBoolean calculativeValueChange=new AtomicBoolean(false);
         ctaRuleTemplateDTOS.forEach(currentRuleTemplateToBeLinkedDTO->{
             CTARuleTemplate ctaRuleTemplate=ctaRuleTemplatesOfCTA.stream().filter(ruleTemplate -> ruleTemplate.getId().equals(currentRuleTemplateToBeLinkedDTO.getId())).findAny().orElse(null);

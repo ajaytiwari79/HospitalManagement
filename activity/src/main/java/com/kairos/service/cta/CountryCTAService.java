@@ -10,6 +10,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.Expertise;
 import com.kairos.persistence.model.wta.Organization;
 import com.kairos.persistence.model.wta.OrganizationType;
+import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -46,6 +47,7 @@ public class CountryCTAService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject private CostTimeAgreementService costTimeAgreementService;
     @Inject private PhaseMongoRepository phaseMongoRepository;
+    @Inject private CTARuleTemplateRepository ctaRuleTemplateRepository;
 
     /**
      *
@@ -235,8 +237,11 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
 
         // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
-        boolean isFutureSameDateCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (isFutureSameDateCTA){
+
+        boolean isSameDateFutureCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(costTimeAgreement.getRuleTemplateIds());
+        boolean calculativeValueChanged=costTimeAgreementService.checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,collectiveTimeAgreementDTO.getRuleTemplates());
+        if (isSameDateFutureCTA || !calculativeValueChanged){
             costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
             buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO,null);
             this.save(costTimeAgreement);
@@ -281,7 +286,9 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
         boolean isSameDateFutureCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (isSameDateFutureCTA){
+        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(costTimeAgreement.getRuleTemplateIds());
+        boolean calculativeValueChanged=costTimeAgreementService.checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,collectiveTimeAgreementDTO.getRuleTemplates());
+        if (isSameDateFutureCTA || !calculativeValueChanged){
             costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
             buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  true, false,null,null);
             this.save(costTimeAgreement);
@@ -295,7 +302,6 @@ public class CountryCTAService extends MongoBaseService {
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         buildCTA(null,updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, false,null,null);
-
         this.save(updateCostTimeAgreement);
         }
         return collectiveTimeAgreementDTO;
