@@ -462,8 +462,13 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.unitPosition.ctawtamissing", existingCtaWtaWrapper.getCta().isEmpty(), existingCtaWtaWrapper.getWta().isEmpty(), unitPositionId);
         }
         EmploymentType employmentType = employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(), 0).orElse(null);
-        if (employmentType != null && (employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO,unitPositionId)) {
-            oldUnitPosition.setMainUnitPosition(true);
+        if (employmentType != null && (employmentType.isMarkMainEmployment() || unitPositionDTO.isMainUnitPosition())) {
+            if(employmentService.eligibleForMainUnitPosition(unitPositionDTO,unitPositionId)){
+                oldUnitPosition.setMainUnitPosition(true);
+            }else {
+                oldUnitPosition.setMainUnitPosition(unitPositionDTO.isMainUnitPosition());
+            }
+
         }
 
         UnitPositionLineEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentUnitPositionLine.getId());
@@ -471,7 +476,6 @@ public class UnitPositionService {
         UnitPositionQueryResult unitPositionQueryResult;
         List<NameValuePair> changedParams = new ArrayList<>();
         oldUnitPosition.setPublished(!saveAsDraft);
-        oldUnitPosition.setMainUnitPosition(unitPositionDTO.isMainUnitPosition());
         PositionLineChangeResultDTO changeResultDTO = calculativeValueChanged(unitPositionDTO, positionLineEmploymentTypeRelationShip, currentUnitPositionLine, existingCtaWtaWrapper, changedParams);
         /**
          *  Old unit position's calculative values is changed
@@ -725,7 +729,7 @@ public class UnitPositionService {
 
                 ctawtaWrapper.getCta().forEach(cta -> {
                     if ((positionLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(positionLine.getStartDate())) ||
-                            positionLine.getEndDate() != null && (cta.getStartDate().isBefore(positionLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getStartDate())))) {
+                            positionLine.getEndDate() != null && (cta.getStartDate().isBefore(positionLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getStartDate()) ||cta.getEndDate().equals(positionLine.getStartDate())  ))) {
                         positionLine.setCostTimeAgreement(cta);
                     }
                 });
@@ -734,7 +738,7 @@ public class UnitPositionService {
                     LocalDate wtaStartDate = DateUtils.asLocalDate(wta.getStartDate());
                     LocalDate wtaEndDate =wta.getEndDate()!=null?DateUtils.asLocalDate(wta.getEndDate()):null;
                     if ((positionLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(positionLine.getStartDate())) ||
-                            positionLine.getEndDate() != null && (wtaStartDate.isBefore(positionLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(positionLine.getStartDate())))) {
+                            positionLine.getEndDate() != null && (wtaStartDate.isBefore(positionLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(positionLine.getStartDate()) || wtaEndDate.equals(positionLine.getStartDate()) ))) {
                         positionLine.setWorkingTimeAgreement(wta);
                     }
                 });
