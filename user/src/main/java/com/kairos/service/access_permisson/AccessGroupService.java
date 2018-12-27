@@ -759,7 +759,7 @@ public class AccessGroupService {
      */
     public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId) {
 
-        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId);
+        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId, AccessGroupRole.MANAGEMENT.toString());
     }
 
     public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
