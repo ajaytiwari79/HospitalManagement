@@ -229,9 +229,6 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
-        if(activity.getPermissionsActivityTab()!=null) {
-            generalActivityTabWithTagDTO.setEligibleForCopy(activity.getPermissionsActivityTab().isEligibleForCopy());
-        }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
@@ -296,7 +293,6 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         activityService.updateBalanceSettingTab(generalDTO,activity);
         activityService.updateNotesTabOfActivity(generalDTO,activity);
-        activityService.updatePermissionsTabOfActivity(generalDTO,activity);
         save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
@@ -306,9 +302,8 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
-        generalActivityTabWithTagDTO.setEligibleForCopy(activity.getPermissionsActivityTab().isEligibleForCopy());
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
+
     }
 
    /* public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
@@ -362,7 +357,9 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        if (!activityFromDatabase.get().getPermissionsActivityTab().isEligibleForCopy()) {
+        //Checking the time type of activity whether it's eligible for copy or not
+        ActivityDTO eligibleForCopy=activityMongoRepository.eligibleForCopy(activityId);
+        if (!eligibleForCopy.isActivityCanBeCopied()) {
             exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
@@ -373,9 +370,6 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
-        PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
-        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
-        activityDTO.setPermissionsActivityTab(permissionsActivityTabDTO);
         return activityDTO;
     }
 

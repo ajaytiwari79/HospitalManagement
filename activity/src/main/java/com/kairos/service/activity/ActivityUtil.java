@@ -219,9 +219,6 @@ public class ActivityUtil {
 
         PhaseSettingsActivityTab phaseSettingsActivityTab=new PhaseSettingsActivityTab(phaseTemplateValues);
         activity.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
-
-        activity.setPermissionsActivityTab(new PermissionsActivityTab());
-
         activity.setNotesActivityTab(new NotesActivityTab());
 
         SkillActivityTab skillActivityTab = new SkillActivityTab();

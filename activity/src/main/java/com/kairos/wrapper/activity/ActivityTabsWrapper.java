@@ -42,7 +42,6 @@ public class ActivityTabsWrapper {
     private List<DayType> dayTypes;
     private List<TimeTypeDTO> timeTypes;
     private LocationActivityTab locationActivityTab;
-    private PermissionsActivityTab permissionsActivityTab;
     private List<EmploymentTypeDTO> employmentTypes;
     private List<Long> rulesTabDayTypes= new ArrayList<>();
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
@@ -246,17 +245,6 @@ public class ActivityTabsWrapper {
 
     public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
         this.locationActivityTab = locationActivityTab;
-    }
-
-    public PermissionsActivityTab getPermissionsActivityTab() {
-        return permissionsActivityTab;
-    }
-
-    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
-        this.permissionsActivityTab = permissionsActivityTab;
-    }
-    public ActivityTabsWrapper(PermissionsActivityTab permissionsActivityTab) {
-        this.permissionsActivityTab = permissionsActivityTab;
     }
 
     public List<EmploymentTypeDTO> getEmploymentTypes() {
