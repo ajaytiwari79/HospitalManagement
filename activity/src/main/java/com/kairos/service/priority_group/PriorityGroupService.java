@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.SEND_GRID_API_KEY;
+
 @Service
 @Transactional
 public class PriorityGroupService extends MongoBaseService {
@@ -228,9 +230,9 @@ public class PriorityGroupService extends MongoBaseService {
             int fibonacciCounter = 0;//Using it to put fibonacci order in email for testing.
             for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
 
-                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
+                mailService.sendPlainMailWithSendGrid(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
                         staffUnitPositionQueryResult.getAccumulatedTimeBank(),staffUnitPositionQueryResult.getDeltaWeeklytimeBank(),
-                        staffUnitPositionQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT);
+                        staffUnitPositionQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT,SEND_GRID_API_KEY);
                 openShiftNotification = new OpenShiftNotification(entry.getKey(),staffUnitPositionQueryResult.getStaffId());
                 openShiftNotifications.add(openShiftNotification);
             }
