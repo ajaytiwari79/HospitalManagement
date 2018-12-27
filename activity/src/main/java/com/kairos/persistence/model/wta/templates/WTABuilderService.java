@@ -15,6 +15,7 @@ import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.management.timer.Timer;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -229,13 +230,12 @@ public class WTABuilderService extends MongoBaseService {
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
             versionWTA.setDeleted(false);
-            versionWTA.setStartDate(oldWta.getStartDate());
             versionWTA.setEndDate(new Date(updateDTO.getStartDateMillis()));
             versionWTA.setCountryParentWTA(null);
             save(versionWTA);
             oldWta.setParentId(versionWTA.getId());
             oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
-            oldWta.setEndDate(updateDTO.getEndDate() != null?new Date(updateDTO.getEndDateMillis()):null);
+            oldWta.setEndDate(updateDTO.getEndDateMillis() != null?new Date(updateDTO.getEndDateMillis()):null);
         }
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());

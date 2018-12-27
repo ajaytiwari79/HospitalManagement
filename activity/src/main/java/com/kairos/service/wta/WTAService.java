@@ -280,13 +280,11 @@ public class WTAService extends MongoBaseService {
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
             versionWTA.setDeleted(false);
-            versionWTA.setStartDate(oldWta.getStartDate());
             versionWTA.setEndDate(new Date(updateDTO.getStartDateMillis()));
-            ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), true);
             save(versionWTA);
             oldWta.setParentId(versionWTA.getId());
-            oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
-            oldWta.setEndDate(updateDTO.getEndDate() != null?new Date(updateDTO.getEndDateMillis()):null);
+            oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
+            oldWta.setEndDate(updateDTO.getEndDateMillis() != null?new Date(updateDTO.getEndDateMillis()):null);
         }
         // This is may be not used as We cant change expertise
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
