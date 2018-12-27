@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.wta.templates;
 
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -28,6 +30,14 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
+    transient protected boolean calculativeValueChange;
+
+    public WTABaseRuleTemplate(){}
+
+    public WTABaseRuleTemplate(String name,String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -61,14 +71,6 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
         this.ruleTemplateCategoryId = ruleTemplateCategoryId;
     }
-
-    public WTABaseRuleTemplate(){}
-
-    public WTABaseRuleTemplate(String name,String description) {
-        this.name = name;
-        this.description = description;
-    }
-
 
     public String getName() {
         return name;
@@ -124,5 +126,26 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     public void setManagementCanIgnoreCounter(Integer managementCanIgnoreCounter) {
         this.managementCanIgnoreCounter = managementCanIgnoreCounter;
+    }
+
+    public boolean isCalculativeValueChange() {
+        return calculativeValueChange;
+    }
+
+    public void setCalculativeValueChange(boolean calculativeValueChange) {
+        this.calculativeValueChange = calculativeValueChange;
+    }
+
+
+    public boolean equals(WTABaseRuleTemplateDTO o) {
+        if (o == null) return false;
+        return disabled == o.isDisabled() &&
+                Objects.equals(phaseTemplateValues, o.getPhaseTemplateValues()) &&
+                Objects.equals(staffCanIgnoreCounter, o.getStaffCanIgnoreCounter()) &&
+                Objects.equals(managementCanIgnoreCounter, o.getManagementCanIgnoreCounter());
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(disabled, wtaTemplateType, phaseTemplateValues, staffCanIgnoreCounter, managementCanIgnoreCounter);
     }
 }

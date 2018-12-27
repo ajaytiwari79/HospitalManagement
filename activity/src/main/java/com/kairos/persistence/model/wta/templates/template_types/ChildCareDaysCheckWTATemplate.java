@@ -15,6 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -103,4 +104,22 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         this.activityIds = activityIds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        ChildCareDaysCheckWTATemplate that = (ChildCareDaysCheckWTATemplate) o;
+        return borrowLeave == that.borrowLeave &&
+                carryForwardLeave == that.carryForwardLeave &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(activityIds, that.activityIds) &&
+                cutOffIntervalUnit == that.cutOffIntervalUnit;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), activityIds, borrowLeave, carryForwardLeave, recommendedValue, cutOffIntervalUnit);
+    }
 }

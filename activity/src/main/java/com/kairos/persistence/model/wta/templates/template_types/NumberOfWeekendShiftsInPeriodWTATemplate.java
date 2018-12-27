@@ -14,10 +14,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -228,5 +225,27 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         return updatedShifts;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        NumberOfWeekendShiftsInPeriodWTATemplate that = (NumberOfWeekendShiftsInPeriodWTATemplate) o;
+        return intervalLength == that.intervalLength &&
+                restingTimeAllowed == that.restingTimeAllowed &&
+                restingTime == that.restingTime &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(fromDayOfWeek, that.fromDayOfWeek) &&
+                Objects.equals(fromTime, that.fromTime) &&
+                Objects.equals(toTime, that.toTime) &&
+                Objects.equals(toDayOfWeek, that.toDayOfWeek) &&
+                Objects.equals(intervalUnit, that.intervalUnit) &&
+                minMaxSetting == that.minMaxSetting;
+    }
 
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), fromDayOfWeek, fromTime, toTime, toDayOfWeek, intervalLength, intervalUnit, restingTimeAllowed, restingTime, recommendedValue, minMaxSetting);
+    }
 }

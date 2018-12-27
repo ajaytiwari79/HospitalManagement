@@ -28,5 +28,6 @@ public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<
     WTABaseRuleTemplate existsByName(Long countryId, String name);
 
     List<WTABaseRuleTemplateDTO> findAllByIdIn(List<BigInteger> ids);
+    List<WTABaseRuleTemplate> findAllByIdInAndDeletedFalse(List<BigInteger> ids);
 
 }
