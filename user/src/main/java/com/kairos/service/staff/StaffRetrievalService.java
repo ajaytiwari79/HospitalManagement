@@ -176,7 +176,8 @@ public class StaffRetrievalService {
             engineerTypes = Collections.emptyList();
         }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
-        personalInfo.put("personalInfo", retrievePersonalInfo(staff,unitId));
+
+        personalInfo.put("personalInfo", retrievePersonalInfo(unitId,staff));
         personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId,unitId));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
@@ -197,7 +198,8 @@ public class StaffRetrievalService {
     }
 
 
-    public Map<String, Object> retrievePersonalInfo(Staff staff,Long unitId) {
+
+    public Map<String, Object> retrievePersonalInfo(Long unitId,Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", user.getFirstName());
@@ -770,14 +772,17 @@ public class StaffRetrievalService {
         return expertiseIds;
     }
 
+
+
+
     public List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertiseWithExperience(Long unitId,Long staffId){
-        List<SectorAndStaffExpertiseQueryResult> sectorAndStaffExpertiseQueryResults=new ArrayList<>();
-        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            sectorAndStaffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperienceByServiceIdsAndLevelId(staffId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
-        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            sectorAndStaffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperienceByServiceIds(staffId, servicesAndLevel.getServicesId());
-        }
-        return sectorAndStaffExpertiseQueryResults;
+                List<SectorAndStaffExpertiseQueryResult> sectorAndStaffExpertiseQueryResults=new ArrayList<>();
+                organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+                if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
+                        sectorAndStaffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperienceByServiceIdsAndLevelId(staffId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
+                    } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
+                        sectorAndStaffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperienceByServiceIds(staffId, servicesAndLevel.getServicesId());
+                    }
+                return sectorAndStaffExpertiseQueryResults;
     }
 }
