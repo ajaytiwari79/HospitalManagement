@@ -104,6 +104,7 @@ public class ShiftStateService {
                     timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(realtimeShiftStateMap.get(shift.getId()), ShiftState.class);
                 }else{
                     timeAndAttendanceShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
+                    timeAndAttendanceShiftState.setShiftId(shift.getId());
                 }
                 timeAndAttendanceShiftState.setId(null);
                 timeAndAttendanceShiftState.setShiftStatePhaseId(phaseId);
