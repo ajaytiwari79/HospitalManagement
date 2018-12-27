@@ -10,6 +10,7 @@ public enum CounterType {
     SCHEDULED_HOURS_NET("Scheduled Hours-Net"),
     PLANNED_HOURS("Planned Hours"),
     CONTRACTUAL_AND_PLANNED_HOURS("Contractual And Planned Hours Of Staff"),
+    TIME_BANK_FOR_UNIT("TimeBank For Unit"),
     //VRP COUNTER
     TOTAL_KM_DRIVEN_PER_DAY("Total KM Driven Per Day"),
     TASK_UNPLANNED("Total Tasks Unplanned"),

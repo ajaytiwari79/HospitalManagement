@@ -47,14 +47,29 @@ public class TimeBankKpiCalculationService implements  CounterService {
     @Inject
     private TimeBankRepository timeBankRepository;
 
-    private Set<DateTimeInterval> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate) {
+    private Set<DateTimeInterval> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate,List<BigInteger> phaseIds) {
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdsAndBetweenDates(unitIds, startDate, endDate);
-        Set<DateTimeInterval> dateTimeIntervals = planningPeriods.stream().map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
+        Set<DateTimeInterval> dateTimeIntervals =new HashSet<>();
+        if(CollectionUtils.isNotEmpty(phaseIds)){
+            dateTimeIntervals=planningPeriods.stream().filter(planningPeriod -> phaseIds.contains(planningPeriod.getId())).map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
+        }else{
+            dateTimeIntervals=planningPeriods.stream().map(planningPeriod -> new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
+        }
         return dateTimeIntervals;
     }
 
-    private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> unitPositionIds, Date startDate, Date endDate) {
-        return timeBankRepository.findAllDailyTimeBankByIdsAndBetweenDates(new ArrayList<>(),null,null);
+    private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> unitPositionIds, LocalDate startDate, LocalDate endDate, List<String> daysOfWeek) {
+        List<DailyTimeBankEntry> dailyTimeBankEntries= timeBankRepository.findAllDailyTimeBankByIdsAndBetweenDates(unitPositionIds,DateUtils.asDate(startDate),DateUtils.asDate(endDate));
+        List<LocalDate> localDates=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(daysOfWeek)){
+            for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)){
+                if(daysOfWeek.contains(date.getDayOfWeek().toString())){
+                    localDates.add(date);
+                }
+            }
+            dailyTimeBankEntries=dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> localDates.contains(dailyTimeBankEntry.getDate())).collect(Collectors.toList());
+        }
+        return dailyTimeBankEntries;
     }
 
     private List<CommonKpiDataUnit> getTimeBankForUnitKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, boolean kpi){
@@ -64,19 +79,12 @@ public class TimeBankKpiCalculationService implements  CounterService {
         List<Long> staffIds=(filterBasedCriteria.get(FilterType.STAFF_IDS) != null)?getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
         List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
-        List<String> shiftActivityStatus=(filterBasedCriteria.get(FilterType.APPROVAL_STATUS)!=null)?filterBasedCriteria.get(FilterType.APPROVAL_STATUS):new ArrayList<>();
-        List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentType,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,new ArrayList<>(),organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-        Set<DateTimeInterval> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)));
-        List<DailyTimeBankEntry> dailyTimeBankEntries=getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getUnitPosition().stream().map(unitPositionWithCtaDetailsDTO -> unitPositionWithCtaDetailsDTO.getId())).collect(Collectors.toList()),DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)));
-        List<CommonKpiDataUnit> basicChartKpiDateUnits=shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(filterDates.get(1)));
-        basicChartKpiDateUnits.forEach(kpiData->{
-            kpiData.setLabel(staffIdAndNameMap.get(kpiData.getRefId()));
-            ((BasicChartKpiDateUnit)kpiData).setValue(DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit)kpiData).getValue()));
-        });
-        return basicChartKpiDateUnits;
+        Set<DateTimeInterval> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)),phaseIds);
+        List<DailyTimeBankEntry> dailyTimeBankEntries=getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getUnitPosition().stream().map(unitPositionWithCtaDetailsDTO -> unitPositionWithCtaDetailsDTO.getId())).collect(Collectors.toList()),filterDates.get(0),filterDates.get(1),daysOfWeek);
+        return null;
     }
 
     private List<Long> getLongValue(List<Object> objects){
