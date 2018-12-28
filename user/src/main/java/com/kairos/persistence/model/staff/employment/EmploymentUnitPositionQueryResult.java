@@ -3,8 +3,6 @@ package com.kairos.persistence.model.staff.employment;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.time.LocalDate;
-
 /**
  * Created by yatharth on 16/4/18.
  */

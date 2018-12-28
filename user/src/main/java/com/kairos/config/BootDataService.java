@@ -850,7 +850,49 @@ public class BootDataService {
         staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, michalAsStaff));
     }
 
+    private void createEmploymentForCityLevel() {
+        employmentForMichal = new Employment("working as visitator", michalAsStaff);
+        employmentForLiva = new Employment("working as planner", livaAsStaff);
+        employmentForAlma = new Employment("working as task giver", almaAsStaff);
+        oodlesCityLevel.getEmployments().add(employmentForMichal);
+        oodlesCityLevel.getEmployments().add(employmentForLiva);
+        oodlesCityLevel.getEmployments().add(employmentForAlma);
+        organizationGraphRepository.save(oodlesCityLevel);
 
+    }
+
+    private void createUnitEmploymentForCityLevel() {
+        accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.VISITATOR);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
+        AccessPermission accessPermission = new AccessPermission(accessGroup);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
+        employmentForMichal.getUnitPermissions().add(unitPermission);
+        oodlesCityLevel.getEmployments().add(employmentForMichal);
+
+        accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.TASK_GIVERS);
+        unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
+        accessPermission = new AccessPermission(accessGroup);
+        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+        unitEmpAccessGraphRepository.save(taskGiverAccess);
+        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
+        employmentForAlma.getUnitPermissions().add(unitPermission);
+        oodlesCityLevel.getEmployments().add(employmentForAlma);
+
+        accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.PLANNER);
+        unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
+        accessPermission = new AccessPermission(accessGroup);
+        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+        unitEmpAccessGraphRepository.save(plannerAccess);
+        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
+        employmentForLiva.getUnitPermissions().add(unitPermission);
+        oodlesCityLevel.getEmployments().add(employmentForLiva);
+        organizationGraphRepository.save(oodlesCityLevel);
+    }
 
     private void createPaymentTypes() {
         PaymentType creditCard = new PaymentType();

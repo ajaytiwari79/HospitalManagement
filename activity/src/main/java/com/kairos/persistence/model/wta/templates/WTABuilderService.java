@@ -217,29 +217,34 @@ public class WTABuilderService extends MongoBaseService {
         return newWta;
 
     }
+
     public WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate())) && !updateDTO.getRuleTemplates().isEmpty())
-        {
-            ruleTemplates = updateRuleTemplatesAndSave(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
-        } else{
+
+        boolean sameFutureDateWTA=DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        ruleTemplates= updateRuleTemplates(updateDTO.getRuleTemplates(),oldWta.getRuleTemplateIds());
+        boolean calculativeValueChanged=false;
+        if (!updateDTO.getRuleTemplates().isEmpty()) {
+             ruleTemplates = updateRuleTemplates(updateDTO.getRuleTemplates(), oldWta.getRuleTemplateIds());
+             calculativeValueChanged= ruleTemplates.get(0).isCalculativeValueChange();
+        }
+        if(!sameFutureDateWTA && calculativeValueChanged){ // since calculative values are changed and dates are not same so we need to make a new copy
             WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
             versionWTA.setId(null);
             versionWTA.setDeleted(false);
-            versionWTA.setStartDate(oldWta.getStartDate());
             versionWTA.setEndDate(new Date(updateDTO.getStartDateMillis()));
             versionWTA.setCountryParentWTA(null);
-            ruleTemplates = copyRuleTemplates(updateDTO.getRuleTemplates(), true);
-            if (!ruleTemplates.isEmpty()) {
-                save(ruleTemplates);
-            }
             save(versionWTA);
             oldWta.setParentId(versionWTA.getId());
+            oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
+            oldWta.setEndDate(updateDTO.getEndDateMillis() != null?new Date(updateDTO.getEndDateMillis()):null);
+            ruleTemplates.forEach(ruleTemplate->ruleTemplate.setId(null));
+        }
+        if (!ruleTemplates.isEmpty()) {
+            save(ruleTemplates);
         }
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
-        oldWta.setStartDate(new Date(updateDTO.getStartDateMillis()));
-        oldWta.setEndDate(updateDTO.getEndDate() != null?new Date(updateDTO.getEndDateMillis()):null);
         oldWta.setRuleTemplateIds(ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList()));
         save(oldWta);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
@@ -247,22 +252,29 @@ public class WTABuilderService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    public List<WTABaseRuleTemplate> updateRuleTemplatesAndSave(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesId) {
-        List<WTABaseRuleTemplateDTO> oldRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByIdIn(oldRuleTemplatesId);
+    public List<WTABaseRuleTemplate> updateRuleTemplates(List<WTABaseRuleTemplateDTO> newRuleTemplatesToBeLinked, List<BigInteger> oldRuleTemplatesIds) {
+
+        List<WTABaseRuleTemplate> oldRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByIdInAndDeletedFalse(oldRuleTemplatesIds);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         for (WTABaseRuleTemplateDTO currentRuleTemplateToBeLinked : newRuleTemplatesToBeLinked) {
-            WTABaseRuleTemplateDTO existingWtaRuleTemplate = oldRuleTemplates.stream().filter(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getId().equals(currentRuleTemplateToBeLinked.getId())).findAny().orElse(null);
-
+            WTABaseRuleTemplate existingWtaRuleTemplate = oldRuleTemplates.stream().filter(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getId().equals(currentRuleTemplateToBeLinked.getId())).findAny().orElse(null);
+            WTABaseRuleTemplate wtaBaseRuleTemplate;
             if (existingWtaRuleTemplate != null) {// existing rule template found so we need to update in same
-                ruleTemplates.add(copyRuleTemplate(currentRuleTemplateToBeLinked, false));
+                 wtaBaseRuleTemplate=copyRuleTemplate(currentRuleTemplateToBeLinked, false);
+                if (!wtaBaseRuleTemplate.equals(existingWtaRuleTemplate)){ // since both are not equal this means any caculative value is changes in this case we need to create a new
+                    // I am adding to 0 index so that in the callee function we just check for 0 index
+                    wtaBaseRuleTemplate.setCalculativeValueChange(true);
+                    ruleTemplates.add(0,wtaBaseRuleTemplate);
+                }else {
+                    ruleTemplates.add(wtaBaseRuleTemplate);
+                }
             } else {
-                ruleTemplates.add(copyRuleTemplate(currentRuleTemplateToBeLinked, true));
+                wtaBaseRuleTemplate=copyRuleTemplate(currentRuleTemplateToBeLinked, true);
+                wtaBaseRuleTemplate.setCalculativeValueChange(true);// since this is a new rule template added so it is a case of calculative value change and we need to
+                //create a new
+                ruleTemplates.add(0,wtaBaseRuleTemplate);
             }
         }
-        if (!ruleTemplates.isEmpty()) {
-            save(ruleTemplates);
-        }
-
         return ruleTemplates;
     }
 

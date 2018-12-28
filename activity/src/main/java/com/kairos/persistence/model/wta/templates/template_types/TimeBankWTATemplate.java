@@ -8,6 +8,8 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 
+import java.util.Objects;
+
 import static com.kairos.utils.ShiftValidatorService.*;
 
 
@@ -67,4 +69,19 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.TIME_BANK;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        TimeBankWTATemplate that = (TimeBankWTATemplate) o;
+        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                minMaxSetting == that.minMaxSetting;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), recommendedValue, minMaxSetting);
+    }
 }

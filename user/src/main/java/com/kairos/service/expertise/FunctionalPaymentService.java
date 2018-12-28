@@ -383,7 +383,7 @@ public class FunctionalPaymentService {
                 exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
         }
-        functionalPaymentMatrix.getSeniorityLevelFunction().addAll(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue));
+        functionalPaymentMatrix.getSeniorityLevelFunction().add(getSeniorityLevelFunctionList(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction(), seniorityLevels, functions,percentageValue).get(0));
         return functionalPaymentMatrix;
     }
 

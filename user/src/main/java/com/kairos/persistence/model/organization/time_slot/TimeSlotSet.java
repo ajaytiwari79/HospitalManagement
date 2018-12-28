@@ -1,16 +1,14 @@
 package com.kairos.persistence.model.organization.time_slot;
 
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Created by prabjot on 5/12/17.

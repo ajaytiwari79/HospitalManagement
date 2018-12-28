@@ -6,8 +6,6 @@ import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.time.LocalDate;
-
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_IN_UNIT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_GROUP;
 

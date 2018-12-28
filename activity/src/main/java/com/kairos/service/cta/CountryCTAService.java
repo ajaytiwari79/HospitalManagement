@@ -10,6 +10,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.Expertise;
 import com.kairos.persistence.model.wta.Organization;
 import com.kairos.persistence.model.wta.OrganizationType;
+import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -46,6 +47,7 @@ public class CountryCTAService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject private CostTimeAgreementService costTimeAgreementService;
     @Inject private PhaseMongoRepository phaseMongoRepository;
+    @Inject private CTARuleTemplateRepository ctaRuleTemplateRepository;
 
     /**
      *
@@ -66,7 +68,8 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  false, true,ctaBasicDetailsDTO,null);
-
+        costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
+        costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getEndDate());
         costTimeAgreement.setCountryId(countryId);
         this.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
@@ -138,8 +141,7 @@ public class CountryCTAService extends MongoBaseService {
             }
         }
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
-        costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
-        costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getEndDate());
+
     }
 
 
@@ -235,10 +237,16 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
 
         // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
-        boolean isFutureSameDateCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (isFutureSameDateCTA){
-            costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+
+        boolean isSameDateFutureCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        boolean isPastDateCTA =collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate());
+        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(costTimeAgreement.getRuleTemplateIds());
+        boolean calculativeValueChanged=costTimeAgreementService.checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,collectiveTimeAgreementDTO.getRuleTemplates());
+        if ( !isPastDateCTA && (isSameDateFutureCTA || !calculativeValueChanged)){
+            costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+            costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
             buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO,null);
+            costTimeAgreement.setCountryId(countryId);
             this.save(costTimeAgreement);
             collectiveTimeAgreementDTO=ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CollectiveTimeAgreementDTO.class);
         }else
@@ -247,6 +255,7 @@ public class CountryCTAService extends MongoBaseService {
             updateCostTimeAgreement.setId(costTimeAgreement.getId());
             costTimeAgreement.setId(null);
             costTimeAgreement.setDisabled(true);
+            costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getStartDate().minusDays(1));
             this.save(costTimeAgreement);
             updateCostTimeAgreement.setCountryId(costTimeAgreement.getCountryId());
             updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
@@ -281,8 +290,12 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
         boolean isSameDateFutureCTA = collectiveTimeAgreementDTO.getStartDate().isEqual(collectiveTimeAgreementDTO.getStartDate()) && (collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || collectiveTimeAgreementDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (isSameDateFutureCTA){
-            costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+        boolean isPastDateCTA =collectiveTimeAgreementDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate());
+        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(costTimeAgreement.getRuleTemplateIds());
+        boolean calculativeValueChanged=costTimeAgreementService.checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,collectiveTimeAgreementDTO.getRuleTemplates());
+        if (!isPastDateCTA &&  (isSameDateFutureCTA || !calculativeValueChanged)){
+            costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+            costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
             buildCTA(null,costTimeAgreement, collectiveTimeAgreementDTO,  true, false,null,null);
             this.save(costTimeAgreement);
         }
@@ -290,12 +303,12 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CostTimeAgreement.class);
         updateCostTimeAgreement.setId(costTimeAgreement.getId());
         costTimeAgreement.setDisabled(true);
+        costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getStartDate().minusDays(1));
         this.save(costTimeAgreement);
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         buildCTA(null,updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, false,null,null);
-
         this.save(updateCostTimeAgreement);
         }
         return collectiveTimeAgreementDTO;

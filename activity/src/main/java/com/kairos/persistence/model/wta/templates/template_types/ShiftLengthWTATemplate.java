@@ -3,6 +3,8 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.dto.activity.wta.templates.ShiftLengthWTATemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -17,6 +19,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -119,5 +122,24 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         super(name, description);
         this.timeLimit = timeLimit;
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        ShiftLengthWTATemplate that = (ShiftLengthWTATemplate) o;
+        return timeLimit == that.timeLimit &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(dayTypeIds, that.dayTypeIds) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds) &&
+                Objects.equals(partOfDays, that.partOfDays) &&
+                minMaxSetting == that.minMaxSetting;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(timeLimit, dayTypeIds, timeTypeIds, partOfDays, recommendedValue, minMaxSetting);
     }
 }

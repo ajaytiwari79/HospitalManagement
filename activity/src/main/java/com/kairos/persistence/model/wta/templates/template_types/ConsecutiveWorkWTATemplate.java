@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -140,5 +141,27 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     public ConsecutiveWorkWTATemplate(String name, String description) {
         super(name, description);
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        ConsecutiveWorkWTATemplate that = (ConsecutiveWorkWTATemplate) o;
+        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                intervalLength == that.intervalLength &&
+                Objects.equals(partOfDays, that.partOfDays) &&
+                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds) &&
+                minMaxSetting == that.minMaxSetting &&
+                Objects.equals(intervalUnit, that.intervalUnit) &&
+                Objects.equals(consecutiveDays, that.consecutiveDays);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting, intervalLength, intervalUnit, consecutiveDays);
     }
 }

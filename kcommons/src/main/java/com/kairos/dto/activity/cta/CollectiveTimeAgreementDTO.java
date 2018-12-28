@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author pradeep
@@ -104,7 +105,7 @@ public class CollectiveTimeAgreementDTO {
     }
 
     public List<CTARuleTemplateDTO> getRuleTemplates() {
-        return ruleTemplates;
+        return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
     public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {

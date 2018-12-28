@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -144,4 +145,22 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         return intervals;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        ShortestAndAverageDailyRestWTATemplate that = (ShortestAndAverageDailyRestWTATemplate) o;
+        return intervalLength == that.intervalLength &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, that.intervalUnit) &&
+                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, recommendedValue, plannedTimeIds, timeTypeIds);
+    }
 }

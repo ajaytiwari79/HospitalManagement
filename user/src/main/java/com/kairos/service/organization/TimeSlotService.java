@@ -138,8 +138,8 @@ public class TimeSlotService {
             logger.error("Invalid time slot id " + timeSlotSetId);
             exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
         }
-        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate(),
-                timeSlotSetDTO.getEndDate(), timeSlotSet.getTimeSlotType());
+        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate().toString(),
+                timeSlotSetDTO.getEndDate().toString(), timeSlotSet.getTimeSlotType());
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
         for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
 
@@ -233,7 +233,7 @@ public class TimeSlotService {
             exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
 
         }
-        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByStartDateAfter(unitId, timeSlotSetToDelete.getEndDate());
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByStartDateAfter(unitId, timeSlotSetToDelete.getEndDate().toString());
         if (Optional.ofNullable(timeSlotSet).isPresent()) {
             timeSlotSet.setStartDate(timeSlotSetToDelete.getEndDate());
             timeSlotSetRepository.save(timeSlotSet);
@@ -249,7 +249,7 @@ public class TimeSlotService {
     }
 
     private Map<String, Object> prepareTimeSlotResponse(Organization unit) {
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode(),LocalDate.now());
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);
         response.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
@@ -389,7 +389,7 @@ public class TimeSlotService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode(),LocalDate.now());
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         return timeSlotWrappers;
     }
 
@@ -399,7 +399,7 @@ public class TimeSlotService {
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId, LocalDate.now());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId);
         return timeSlotMap;
     }
 
