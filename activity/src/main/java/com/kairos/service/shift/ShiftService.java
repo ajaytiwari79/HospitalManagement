@@ -1194,11 +1194,6 @@ public class ShiftService extends MongoBaseService {
         if(shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
             validateRealTimeShift(unitId,shiftDTO,phaseMap);
         }
-        TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
-        DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.getDate(), true);
-        if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
-            exceptionService.invalidRequestException("message.shift.cannot.update");
-        }
         if (shiftDTO.getShiftId() == null) {
             shiftDTO.setShiftId(shiftDTO.getId());
         }
@@ -1304,7 +1299,8 @@ public class ShiftService extends MongoBaseService {
             updateRealTime.add(shiftDTO);
         }
         if (!staffValidatedShifts.isEmpty()) {
-            graceInterval = shiftValidatorService.getGracePeriodInterval(timeAttendanceGracePeriod, staffValidatedShifts.get(0).getStartDate(), false);
+            Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(staffValidatedShifts.get(0).getUnitId(), PhaseDefaultName.TIME_ATTENDANCE.toString());
+            graceInterval = shiftValidatorService.getGracePeriodInterval(phase, staffValidatedShifts.get(0).getStartDate(), false);
             for (ShiftDTO staffValidatedShift : staffValidatedShifts) {
                 if (staffValidatedShift.getValidated() == null&&graceInterval.contains(staffValidatedShift.getStartDate())) {
                     staffValidatedShift.setEditable(true);
