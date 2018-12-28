@@ -264,6 +264,9 @@ public class FunctionalPaymentService {
 
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
         if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
+            if (parentFunctionalPayment.getStartDate().isEqual(functionalPaymentDTO.getStartDate()) || parentFunctionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate())){
+                exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan_or_equals.parent_startDate");
+            }
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
                     functionalPaymentDTO.getStartDate().minusDays(1L).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
             parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
