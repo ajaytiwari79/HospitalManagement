@@ -4,6 +4,8 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
+import java.util.Objects;
+
 public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
 
     private int belowAge;
@@ -77,5 +79,24 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
         this.belowAge = belowYear;
         this.aboveAge = aboveYear;
         this.pregnant = pregnant;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        EmployeesWithIncreasedRiskWTATemplate that = (EmployeesWithIncreasedRiskWTATemplate) o;
+        return belowAge == that.belowAge &&
+                aboveAge == that.aboveAge &&
+                pregnant == that.pregnant &&
+                restingTimeAllowed == that.restingTimeAllowed &&
+                restingTime == that.restingTime;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), belowAge, aboveAge, pregnant, restingTimeAllowed, restingTime);
     }
 }

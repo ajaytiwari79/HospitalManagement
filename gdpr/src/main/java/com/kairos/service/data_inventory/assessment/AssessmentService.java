@@ -214,6 +214,11 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
+        if (assessmentDTO.getStartDate().isBefore(LocalDate.now())) {
+            exceptionService.invalidRequestException("message.assessment.enter.valid.startdate");
+        }else if(assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())){
+            exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
+        }
         Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssigneeList(), assessmentDTO.getApprover(), assessmentDTO.getComment(),assessmentDTO.getStartDate());
         assessment.setOrganizationId(unitId);
         QuestionnaireTemplate questionnaireTemplate;
@@ -235,14 +240,15 @@ public class AssessmentService extends MongoBaseService {
         } else if (QuestionnaireTemplateStatus.DRAFT.equals(questionnaireTemplate.getTemplateStatus())) {
             exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
         }
-        if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
-            if (!Optional.ofNullable(assessmentDTO.getAssessmentScheduledDate()).isPresent()) {
+        /*if (AssessmentSchedulingFrequency.CUSTOM_DATE.equals(assessmentDTO.getAssessmentSchedulingFrequency())) {
+            if (!Optional.ofNullable(assessmentDTO.getAssessmentLaunchedDate()).isPresent()) {
                 exceptionService.invalidRequestException("message.assessment.scheduling.date.not.Selected");
-            } else if (LocalDate.now().equals(assessmentDTO.getAssessmentScheduledDate()) || assessmentDTO.getAssessmentScheduledDate().isBefore(LocalDate.now())) {
+            } else if (LocalDate.now().equals(assessmentDTO.getAssessmentLaunchedDate()) || assessmentDTO.getAssessmentLaunchedDate().isBefore(LocalDate.now())) {
                 exceptionService.invalidRequestException("message.assessment.enter.valid.date");
-            }
-            assessment.setAssessmentScheduledDate(assessmentDTO.getAssessmentScheduledDate());
-        }
+
+            assessment.setAssessmentLaunchedDate(assessmentDTO.getAssessmentLaunchedDate());
+        }}*/
+        assessment.setAssessmentLaunchedDate(LocalDate.now());
         assessment.setAssessmentSchedulingFrequency(assessmentDTO.getAssessmentSchedulingFrequency());
         assessment.setQuestionnaireTemplateId(questionnaireTemplate.getId());
         return assessment;
@@ -558,6 +564,7 @@ public class AssessmentService extends MongoBaseService {
                 exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
             }
             assessment.setAssessmentStatus(status);
+            assessment.setCompletedDate(LocalDate.now());
             saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         }
         assessmentMongoRepository.save(assessment);

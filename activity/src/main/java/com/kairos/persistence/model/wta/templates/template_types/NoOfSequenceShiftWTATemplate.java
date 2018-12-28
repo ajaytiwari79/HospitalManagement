@@ -10,6 +10,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -96,5 +97,24 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         //this.sequence=sequence;
         this.sequenceShiftTo = sequenceShiftTo;
         this.sequenceShiftFrom = sequenceShiftFrom;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        NoOfSequenceShiftWTATemplate that = (NoOfSequenceShiftWTATemplate) o;
+        return restingTimeAllowed == that.restingTimeAllowed &&
+                restingTime == that.restingTime &&
+                sequenceShiftFrom == that.sequenceShiftFrom &&
+                sequenceShiftTo == that.sequenceShiftTo &&
+                Objects.equals(timeTypeIds, that.timeTypeIds);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), restingTimeAllowed, restingTime, sequenceShiftFrom, sequenceShiftTo, timeTypeIds);
     }
 }

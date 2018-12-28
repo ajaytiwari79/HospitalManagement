@@ -120,7 +120,7 @@ public class UnitPositionCTAWTAService {
     }
     //  TODO Pradeep INCORRECT function NAME and working
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
-        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionByIdAndDate(unitPositionId, DateUtils.getCurrentLocalDate().toString());
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         if(unitPosition==null ){
             //For handling unitPosition applicable in future with nearest unitPositionLine from current date
             unitPosition=unitPositionGraphRepository.getUnitPositionById(unitPositionId);
@@ -129,10 +129,10 @@ public class UnitPositionCTAWTAService {
         if (Optional.ofNullable(unitPosition).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
             Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
-            unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+            unitPositionDetails = convertUnitPositionObject(unitPosition);
             unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
             unitPositionDetails.setCountryId(countryId);
-            convertUnitPositionObject(unitPosition, unitPositionDetails);
+
             unitPositionDetails.setCountryId(countryId);
             unitPositionDetails.setUnitTimeZone(organization.get().getTimeZone());
         }

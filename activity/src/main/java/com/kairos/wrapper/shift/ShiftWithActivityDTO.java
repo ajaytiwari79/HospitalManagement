@@ -1,6 +1,7 @@
 package com.kairos.wrapper.shift;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -9,6 +10,7 @@ import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import org.joda.time.Interval;
+import org.springframework.data.annotation.Transient;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -51,12 +53,14 @@ public class ShiftWithActivityDTO {
 
     private List<ShiftStatus> status;
     private String timeType;
+    @JsonIgnore
     private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
+    @JsonIgnore
     private List<BigInteger> activityIds = new ArrayList<>();
+    @JsonIgnore
     private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
     private BigInteger phaseId;
     private ShiftType shiftType;
-
     //~ ===================================Constructors=======================================================
     public ShiftWithActivityDTO() {
     }
@@ -86,7 +90,7 @@ public class ShiftWithActivityDTO {
 
     public List<BigInteger> getActivitiesTimeTypeIds(){
         if(activitiesTimeTypeIds.isEmpty()) {
-            activitiesTimeTypeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
+            activitiesTimeTypeIds = activities.stream().filter(shiftActivityDTO -> shiftActivityDTO.getActivity()!=null).map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
         }
         return activitiesTimeTypeIds;
     }
@@ -114,8 +118,8 @@ public class ShiftWithActivityDTO {
         return activitiesPlannedTimeIds;
     }
 
-
-    public List<BigInteger> getActivitIds(){
+    @JsonIgnore
+    public List<BigInteger> getActivityIds(){
         if(activityIds.isEmpty()) {
             activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList());
         }
@@ -298,11 +302,11 @@ public class ShiftWithActivityDTO {
         this.unitId = unitId;
     }
 
-
+    @JsonIgnore
     public DateTimeInterval getDateTimeInterval() {
         return new DateTimeInterval(startDate.getTime(), endDate.getTime());
     }
-
+    @JsonIgnore
     public Interval getInterval() {
         return new Interval(startDate.getTime(), endDate.getTime());
     }
@@ -315,4 +319,5 @@ public class ShiftWithActivityDTO {
     public void setTimeType(String timeType) {
         this.timeType = timeType;
     }
+
 }

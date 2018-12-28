@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -88,7 +89,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivitIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
+        if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             int totalVeto = 0;
             int totalStopBricks = 0;
@@ -96,9 +97,9 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
             shifts.add(infoWrapper.getShift());
             for (ShiftWithActivityDTO shift : shifts) {
                 if(interval.contains(shift.getStartDate())){
-                    if (shift.getActivitIds().contains(vetoActivityId)) {
+                    if (shift.getActivityIds().contains(vetoActivityId)) {
                         totalVeto++;
-                    } else if (shift.getActivitIds().contains(stopBrickActivityId)) {
+                    } else if (shift.getActivityIds().contains(stopBrickActivityId)) {
                         totalStopBricks++;
                     }
                 }
@@ -119,4 +120,22 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
         return activityIds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        VetoAndStopBricksWTATemplate that = (VetoAndStopBricksWTATemplate) o;
+        return numberOfWeeks == that.numberOfWeeks &&
+                Float.compare(that.totalBlockingPoints, totalBlockingPoints) == 0 &&
+                Objects.equals(validationStartDate, that.validationStartDate) &&
+                Objects.equals(vetoActivityId, that.vetoActivityId) &&
+                Objects.equals(stopBrickActivityId, that.stopBrickActivityId);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), numberOfWeeks, validationStartDate, vetoActivityId, stopBrickActivityId, totalBlockingPoints);
+    }
 }

@@ -201,6 +201,11 @@ public class AppConstants {
     public static final long ONE_HOUR_MINUTES=60;
     public static final long SHIFT_LEAST_GRANULARITY =15;
 
+    //KPI  BAR chart property
+    public static final String XAXIS="label";
+    public static final String YAXIS="value";
+    public static final String LINEFIELD="lineValue";
+    public static final String SEND_GRID_API_KEY="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";
 
 
 }

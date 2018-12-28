@@ -4,7 +4,6 @@ package com.kairos.dto.gdpr.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -32,6 +31,7 @@ public class ProcessingActivityDTO {
     private List<BigInteger> accessorParties;
     private List<BigInteger> processingLegalBasis;
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
+    private List<ProcessingActivityRelatedDataSubject> dataSubjectList=new ArrayList<>();
     private BigInteger responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -121,6 +121,14 @@ public class ProcessingActivityDTO {
     public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
+
+    public List<ProcessingActivityRelatedDataSubject> getDataSubjectList() {
+        return dataSubjectList;
+    }
+
+    public void setDataSubjectList(List<ProcessingActivityRelatedDataSubject> dataSubjectList) {
+        this.dataSubjectList = dataSubjectList;
+    }
 
     public ProcessingActivityDTO() {
     }

@@ -25,8 +25,9 @@ public class AccessPageDTO {
     private boolean accessibleForOrganization;
     private List<OrganizationCategory> accessibleFor = new ArrayList<>();
     //this value is true only in case of "moduleId" : "module_1"
-    private boolean editable;
+    private Boolean editable;
     private boolean hasSubTabs;
+    private int sequence;
 
 
     public Long getParentTabId() {
@@ -110,11 +111,11 @@ public class AccessPageDTO {
         this.accessibleFor = accessibleFor;
     }
 
-    public boolean isEditable() {
+    public Boolean isEditable() {
         return editable;
     }
 
-    public void setEditable(boolean editable) {
+    public void setEditable(Boolean editable) {
         this.editable = editable;
     }
 
@@ -124,5 +125,13 @@ public class AccessPageDTO {
 
     public void setHasSubTabs(boolean hasSubTabs) {
         this.hasSubTabs = hasSubTabs;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

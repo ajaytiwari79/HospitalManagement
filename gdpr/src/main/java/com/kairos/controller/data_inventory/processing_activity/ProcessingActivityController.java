@@ -3,7 +3,8 @@ package com.kairos.controller.data_inventory.processing_activity;
 
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
+//import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -182,6 +183,12 @@ public class ProcessingActivityController {
     public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
         processingActivityDTO.setSuggested(true);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.saveProcessingActivityAndSuggestToCountryAdmin(unitId, countryId, processingActivityDTO));
+    }
+
+    @ApiOperation(value = "Get  Processing activity Metadata")
+    @GetMapping("/processing_activity/meta_data")
+    public ResponseEntity<Object> getProcessingActivityMetaData(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityMetaData(unitId));
     }
 
 

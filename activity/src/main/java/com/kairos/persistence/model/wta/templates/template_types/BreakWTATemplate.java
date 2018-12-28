@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 
+import java.util.Objects;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -47,5 +48,21 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
 
     public void setBreakAvailability(Set<BreakAvailabilitySettings> breakAvailability) {
         this.breakAvailability = breakAvailability;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        BreakWTATemplate that = (BreakWTATemplate) o;
+        return breakGapMinutes == that.breakGapMinutes &&
+                Objects.equals(breakAvailability, that.breakAvailability);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), breakGapMinutes, breakAvailability);
     }
 }

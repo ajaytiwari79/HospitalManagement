@@ -266,8 +266,8 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping("/calculate_planned_hours")
-    public ResponseEntity<Map<String, Object>> calculatePlannedHours(@PathVariable Long unitId, @RequestParam List<Long> staffIds, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterDataService.calculatePlannedHour(staffIds,unitId,startDate,endDate));
-    }
+//    @GetMapping("/calculate_planned_hours")
+//    public ResponseEntity<Map<String, Object>> calculatePlannedHours(@PathVariable Long unitId, @RequestParam List<Long> staffIds, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam( value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterDataService.calculatePlannedHour(staffIds,unitId,startDate,endDate));
+//    }
 }

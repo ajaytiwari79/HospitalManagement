@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 
 
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
@@ -53,8 +54,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, startDate:{$gte:?1,$lte:?2}}")
     List<Shift> findAllShiftsByStaffIds(List<Long> staffIds, Date startDate, Date endDate);
 
-    @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, 'activities.activityId':{$in:[?1]}, 'startDate':{$lt:?3} , 'endDate': {$gt:?2}}")
-    List<Shift> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, List<BigInteger> activityIds, LocalDateTime startDate, LocalDateTime endDate);
+    @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, 'startDate':{$lt:?2} , 'endDate': {$gt:?1}}")
+    List<Shift> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate);
 
 
     @Query("{deleted:false, _id:{'$in':?0}}")
@@ -81,4 +82,11 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,_id:{$in:?0}}")
     List<Shift> findAllShiftByIds(List<BigInteger> shiftIds);
 
+    @Query("{deleted:false,unitPositionId:{$in:?0},disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
+    List<Shift> findAllShiftsBetweenDatesByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
+
+    @Query("{deleted:false,unitPositionId:?0,disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
+    List<Shift> findAllShiftsBetweenDatesByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
+
+    List<Shift> findAllByDeletedFalse();
 }

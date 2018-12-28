@@ -23,6 +23,8 @@ public class AbsenceStaffingLevelDto {
     private int minNoOfStaff;
     private int maxNoOfStaff;
     private int absentNoOfStaff;
+    private Date updatedAt;
+    private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
 
     public Long getUnitId() {
         return unitId;
@@ -115,6 +117,15 @@ public class AbsenceStaffingLevelDto {
         this.absentNoOfStaff = absentNoOfStaff;
     }
 
-    private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
+
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
 
 }

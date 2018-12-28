@@ -1,12 +1,12 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -21,8 +21,6 @@ public class ShiftActivityDTO {
     //This field is only for validation
     //@JsonIgnore
     private ActivityDTO activity;
-
-
     private BigInteger activityId;
     private Date startDate;
     private Date endDate;
@@ -47,6 +45,11 @@ public class ShiftActivityDTO {
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
+    private int timeBankCtaBonusMinutes;
+    private List<TimeBankCTADistributionDTO> timeBankCTADistributions = new ArrayList<>();
+    private Map<String, Object> location;// location where this activity needs to perform
+    private String description;// this is from activity description and used in shift detail popup
+    private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
@@ -55,13 +58,19 @@ public class ShiftActivityDTO {
         this.activityName = activityName;
     }
 
-    public ShiftActivityDTO(String activityName, BigInteger activityId, String message, boolean success) {
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
         this.message = message;
         this.success = success;
-        this.activityId = activityId;
+        this.id = id;
         this.activityName = activityName;
     }
-
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success,Set<ShiftStatus> status) {
+        this.message = message;
+        this.success = success;
+        this.id = id;
+        this.activityName = activityName;
+        this.status=status;
+    }
     public ShiftActivityDTO() {
     }
 
@@ -260,5 +269,44 @@ public class ShiftActivityDTO {
 
     public void setBreakReplaced(boolean breakReplaced) {
         this.breakReplaced = breakReplaced;
+    }
+
+    public Map<String, Object> getLocation() {
+        return location;
+    }
+
+    public void setLocation(Map<String, Object> location) {
+        this.location = location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<WorkTimeAgreementRuleViolation> getWtaRuleViolations() {
+        return wtaRuleViolations;
+    }
+
+    public void setWtaRuleViolations(List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
+        this.wtaRuleViolations = wtaRuleViolations;
+    }
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
+
+    public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
+        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>(0));
+    }
+
+    public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
     }
 }

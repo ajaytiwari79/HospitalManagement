@@ -275,10 +275,8 @@ public class PhaseService extends MongoBaseService {
         return phaseDTO;
     }
 
-    public List<String> getAllApplicablePhaseStatus() {
-        return Stream.of(ShiftStatus.values())
-                .map(Enum::name)
-                .collect(Collectors.toList());
+    public List<ShiftStatus> getAllApplicablePhaseStatus() {
+        return ShiftStatus.getAllStatusExceptRequestAndPending();
     }
 
     /**

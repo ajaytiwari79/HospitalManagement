@@ -1,31 +1,33 @@
 package com.kairos.dto.activity.counter.data;
 
-import com.kairos.dto.activity.counter.chart.DataUnit;
+import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import java.math.BigInteger;
 import java.util.List;
 
-public class RawRepresentationData {
-    private BigInteger counterId;
+public class CommonRepresentationData {
+    protected BigInteger counterId;
     private String title;
     private ChartType chartType;
     private String displayUnit;
     private RepresentationUnit unit;
-    private List<DataUnit> dataList;
+    protected List<CommonKpiDataUnit> dataList;
 
-    public RawRepresentationData(){
+    public CommonRepresentationData(){
 
     }
 
-    public RawRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<DataUnit> dataList){
+    public CommonRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList){
+
         this.counterId = counterId;
         this.title = title;
         this.chartType = chartType;
         this.displayUnit = displayUnit.getDisplayValue();
         this.unit = unit;
         this.dataList = dataList;
+
     }
 
     public BigInteger getCounterId() {
@@ -60,11 +62,11 @@ public class RawRepresentationData {
         this.unit = unit;
     }
 
-    public List<DataUnit> getDataList() {
+    public List<CommonKpiDataUnit> getDataList() {
         return dataList;
     }
 
-    public void setDataList(List<DataUnit> dataList) {
+    public void setDataList(List<CommonKpiDataUnit> dataList) {
         this.dataList = dataList;
     }
 
@@ -75,4 +77,6 @@ public class RawRepresentationData {
     public void setChartType(ChartType chartType) {
         this.chartType = chartType;
     }
+
+
 }

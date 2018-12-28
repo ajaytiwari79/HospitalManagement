@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
+import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.dto.user.staff.staff.Staff;
 
 import java.math.BigInteger;
@@ -40,12 +41,13 @@ public class StaffUnitPositionDetails {
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private ZoneId unitTimeZone;
     private Long countryId;
-    private List<AppliedFunctionDTO> appliedFunctions;
+    private List<AppliedFunctionDTO> appliedFunctions= new ArrayList<>();
     private BigInteger excludedPlannedTime;
     private BigInteger includedPlannedTime;
     private Long unitId;
     private Float hourlyCost;
     private Long functionId;
+    private List<UnitPositionLinesDTO> positionLines;
 
     public StaffUnitPositionDetails() {
 
@@ -65,7 +67,7 @@ public class StaffUnitPositionDetails {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
     public List<AppliedFunctionDTO> getAppliedFunctions() {
-        return appliedFunctions;
+        return Optional.ofNullable(appliedFunctions).orElse(new ArrayList<>());
     }
 
     public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
@@ -257,5 +259,13 @@ public class StaffUnitPositionDetails {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public List<UnitPositionLinesDTO> getPositionLines() {
+        return positionLines;
+    }
+
+    public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
+        this.positionLines = positionLines;
     }
 }

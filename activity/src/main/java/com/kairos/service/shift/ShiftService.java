@@ -14,7 +14,6 @@ import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
-import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
@@ -44,6 +43,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
@@ -85,6 +85,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.user_service_data.UnitDataService;
@@ -111,7 +112,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -119,6 +119,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
+import static com.kairos.enums.shift.ShiftStatus.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -180,7 +181,10 @@ public class ShiftService extends MongoBaseService {
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
     @Inject private ShiftReminderService shiftReminderService;
     @Inject private PhaseMongoRepository phaseMongoRepository;
-    @Inject private ShiftStateService shiftStateService;
+    @Inject
+    private StaffingLevelService staffingLevelService;
+    @Inject
+    private ShiftStateService shiftStateService;
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
@@ -293,13 +297,11 @@ public class ShiftService extends MongoBaseService {
 
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityWrapperMap);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null,activityWrapperMap,false,byTandAPhase);
-
+        mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
-        validateStaffingLevel(phase, mainShift, activityWrapper.getActivity(), true, staffAdditionalInfoDTO);
+        validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
-            //mainShift.setPlanningPeriodId(shiftWithActivityDTO.getPlanningPeriodId());
-            mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
@@ -321,8 +323,7 @@ public class ShiftService extends MongoBaseService {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
         boolean presenceTypeShift = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         if (TimeTypes.WORKING_TYPE.toString().equals(activityWrapper.getTimeType())) {
-            applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shift.getStartDate(), shift, false, null, presenceTypeShift));
-
+            staffingLevelService.updateStaffingLevelAvailableStaffCount(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shift.getStartDate(), shift, false, null, presenceTypeShift));
         }
     }
 
@@ -611,7 +612,7 @@ public class ShiftService extends MongoBaseService {
             //anil m2 notify event for updating staffing level
             boolean presenceTypeShift = !(firstActivity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || firstActivity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
             if (activityWrapperMap.get(firstActivity.getId()).getTimeType().equals(TimeTypes.WORKING_TYPE.toString())) {
-                applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
+                staffingLevelService.updateStaffingLevelAvailableStaffCount(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
                         true, oldStateOfShift, presenceTypeShift, false, activityChangeStatus(activityOld, firstActivity) == ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE
                         , activityChangeStatus(activityOld, firstActivity) == ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE));
             }
@@ -626,9 +627,7 @@ public class ShiftService extends MongoBaseService {
         Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap();
         List<ReasonCodeDTO> reasonCodeDTOS;
         if(Optional.ofNullable(unitPositionId).isPresent()){
-
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitPositionAndFindFunctionsAfterDate(startDate, staffId, unitPositionId);
-
             reasonCodeDTOS = staffAdditionalInfoDTO.getReasonCodes();
             if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId, type);
@@ -721,9 +720,13 @@ public class ShiftService extends MongoBaseService {
         }
         shiftValidatorService.validateStatusOfShiftOnDelete(shift);
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
+        List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId(),Collections.emptySet());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),  shift.getActivities().get(0).getStartDate(),null);
-        validateStaffingLevel(phase, shift, activityWrapper.getActivity(), false, staffAdditionalInfoDTO);
+        validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO);
         Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues(), staffAdditionalInfoDTO.getUserAccessRoleDTO());
         Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
         List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
@@ -731,8 +734,6 @@ public class ShiftService extends MongoBaseService {
             exceptionService.actionNotPermittedException(messages.get(0));
         }
         shift.setDeleted(true);
-        List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
-        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -751,7 +752,7 @@ public class ShiftService extends MongoBaseService {
         payOutService.deletePayOut(shift.getId());
 
         boolean isShiftForPreence = !(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
-        applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
+        staffingLevelService.updateStaffingLevelAvailableStaffCount(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
                 false, null, isShiftForPreence, true, false, false));
         List<BigInteger> jobIds=shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         shiftReminderService.deleteReminderTrigger(jobIds,shift.getUnitId());
@@ -781,69 +782,99 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
-    private void validateStaffingLevel(Phase phase, Shift shift, Activity activity, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private void validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger,ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Date shiftStartDate = shift.getActivities().get(0).getStartDate();
         Date shiftEndDate = shift.getActivities().get(shift.getActivities().size() - 1).getEndDate();
-        if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
-            PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-            if (!Optional.ofNullable(phaseSettings).isPresent()) {
-                exceptionService.dataNotFoundException("message.phaseSettings.absent");
-            }
-            if (!phaseSettings.isManagementEligibleForOverStaffing() || !phaseSettings.isManagementEligibleForUnderStaffing() || !phaseSettings.isStaffEligibleForOverStaffing() || !phaseSettings.isStaffEligibleForUnderStaffing()) {
-                Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
-                Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
-                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(), startDate1, endDate1);
-                if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
-                    exceptionService.actionNotPermittedException("message.staffingLevel.absent");
-                }
-                List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
-                for (StaffingLevel staffingLevel : staffingLevels) {
-                    List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
-                            activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
-                    for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
-                        int shiftsCount = 0;
-                        boolean checkForUnderStaffing = false;
-                        Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(activity.getId())).findFirst();
-                        if (staffingLevelActivity.isPresent()) {
-                            ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getFrom());
-                            ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getTo());
-                            DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-                            for (Shift shift1 : shifts) {
-                                if (shift1.getActivities().get(0).getActivityId().equals(activity.getId()) && interval.overlaps(shift1.getInterval())) {
-                                    if (!checkOverStaffing) {
-                                        checkForUnderStaffing = true;
-                                    }
-                                    shiftsCount++;
-                                }
-                            }
-                            int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
-                            boolean checkForStaff = staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff();
-                            boolean checkForManagement = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-                            if ((checkOverStaffing && totalCount >= 0)) {
-                                if ((checkForStaff && checkForManagement) && (!phaseSettings.isManagementEligibleForOverStaffing() && !phaseSettings.isStaffEligibleForOverStaffing())) {
-                                    exceptionService.actionNotPermittedException("message.shift.overStaffing");
-                                } else if (checkForStaff ? !phaseSettings.isStaffEligibleForOverStaffing() : !phaseSettings.isManagementEligibleForOverStaffing()) {
-                                    exceptionService.actionNotPermittedException("message.shift.overStaffing");
-                                }
-                            }
-                            if (!checkOverStaffing && checkForUnderStaffing && totalCount <= 0) {
-                                if ((checkForStaff && checkForManagement) && (!phaseSettings.isStaffEligibleForUnderStaffing() && !phaseSettings.isManagementEligibleForUnderStaffing())) {
-                                    exceptionService.actionNotPermittedException("message.shift.underStaffing");
-                                } else if (checkForStaff ? !phaseSettings.isStaffEligibleForUnderStaffing() : !phaseSettings.isManagementEligibleForUnderStaffing()) {
-                                    exceptionService.actionNotPermittedException("message.shift.underStaffing");
-                                }
-                            }
-                        } else {
-                            exceptionService.actionNotPermittedException("message.staffingLevel.activity");
-                        }
+        PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        if (!Optional.ofNullable(phaseSettings).isPresent()) {
+            exceptionService.dataNotFoundException("message.phaseSettings.absent");
+        }
 
+        if (isVerificationRequired(checkOverStaffing, staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff(), staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement(),
+                phaseSettings)) {
+           /* Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
+            Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));*/
+            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), shiftStartDate, shiftEndDate);
+            if (CollectionUtils.isNotEmpty(staffingLevels)) {
+                exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+            }
+            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
+            List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
+            StaffingLevel staffingLevel = staffingLevels.get(0);
+            for (ShiftActivity shiftActivity : shift.getActivities()) {
+                ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+                if (activityWrapper.getActivity().getRulesActivityTab().isEligibleForStaffingLevel()) {
+                    int lowerLimit = 0;
+                    int upperLimit = 0;
+                    List<StaffingLevelInterval> applicableIntervals = staffingLevel.getAbsenceStaffingLevelInterval();
+                    if (ShiftType.PRESENCE.equals(shift.getShiftType())) {
+                        applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
+                        if(!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
+                            lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
+                            upperLimit = 95;
+                            checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
+                            lowerLimit = 0;
+                            upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
+                            if(staffingLevels.size()<2) {
+                                exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+                            }
+                            staffingLevel = staffingLevels.get(1);
+                            applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
+
+                            checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
+
+                        }else {
+                            lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
+                            upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
+                            checkStaffingLevelInterval(lowerLimit,upperLimit,applicableIntervals,staffingLevel,shiftActivities,checkOverStaffing,shiftActivity);
+                        }
                     }
                 }
             }
         }
-
     }
 
+    private void checkStaffingLevelInterval(int lowerLimit,int upperLimit,List<StaffingLevelInterval> applicableIntervals,StaffingLevel staffingLevel,
+                                            List<ShiftActivity> shiftActivities,boolean checkOverStaffing,ShiftActivity shiftActivity) {
+        for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
+            int shiftsCount = 0;
+            Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
+            if (staffingLevelActivity.isPresent()) {
+                ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getFrom());
+                ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelDuration().getTo());
+                DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+                for (ShiftActivity shiftActivityDB : shiftActivities) {
+                    if (shiftActivityDB.getActivityId().equals(shiftActivity.getActivityId()) && interval.overlaps(shiftActivityDB.getInterval())) {
+                        shiftsCount++;
+                    }
+                }
+                int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
+                if ((checkOverStaffing && totalCount >= 0)) {
+                    exceptionService.actionNotPermittedException("message.shift.overStaffing");
+
+                }
+                if (!checkOverStaffing && totalCount <= 0) {
+                    exceptionService.actionNotPermittedException("message.shift.underStaffing");
+
+                }
+            } else {
+                exceptionService.actionNotPermittedException("message.staffingLevel.activity");
+            }
+        }
+    }
+    private boolean isVerificationRequired(boolean checkOverStaffing,boolean staff,boolean management,PhaseSettings phaseSettings) {
+        boolean result = false;
+        if(staff&&management) {
+            result = checkOverStaffing?!(phaseSettings.isManagementEligibleForOverStaffing()||phaseSettings.isStaffEligibleForOverStaffing()):!(phaseSettings.
+                    isManagementEligibleForUnderStaffing()||phaseSettings.isManagementEligibleForUnderStaffing());
+        } else if(staff) {
+            result = checkOverStaffing?!phaseSettings.isStaffEligibleForOverStaffing():!phaseSettings.isStaffEligibleForUnderStaffing();
+        }
+        else if(management) {
+            result = checkOverStaffing?!phaseSettings.isManagementEligibleForOverStaffing():!phaseSettings.isManagementEligibleForUnderStaffing();
+        }
+        return result;
+    }
     private ShiftWithViolatedInfoDTO getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, String timeType, Date fromDate) {
         Date endDate = new DateTime(fromDate).withTimeAtStartOfDay().plusDays(8).toDate();
         Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
@@ -969,8 +1000,9 @@ public class ShiftService extends MongoBaseService {
                         boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
+                            removeOppositeStatus(shiftActivity,shiftPublishDTO.getStatus());
                             shiftActivity.getStatus().add(shiftPublishDTO.getStatus());
-                            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true));
+                            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("message.shift.status.added"), true,shiftActivity.getStatus()));
                         } else {
                             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage("access.group.not.matched"), false));
                         }
@@ -982,7 +1014,34 @@ public class ShiftService extends MongoBaseService {
         }
         return shiftActivityResponseDTOS;
     }
-
+    private void removeOppositeStatus(ShiftActivity shiftActivity,ShiftStatus shiftStatus){
+    switch (shiftStatus){
+        case LOCK:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(UNLOCK);add(UNPUBLISH);add(REQUEST);}});
+            break;
+        case FIX:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(UNFIX);add(REQUEST);}});
+            break;
+        case UNFIX:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(FIX);add(REQUEST);}});
+            break;
+        case APPROVE:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REJECT);add(UNPUBLISH);add(REQUEST);}});
+            break;
+        case REJECT:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(APPROVE);add(PUBLISH);add(REQUEST);}});
+            break;
+        case UNLOCK:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(LOCK);add(REQUEST);}});
+            break;
+        case PUBLISH:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(UNPUBLISH);add(REJECT);}});
+            break;
+        case UNPUBLISH:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(PUBLISH);}});
+            break;
+    }
+    }
 
     public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate,ViewType viewType) {
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
@@ -1064,7 +1123,7 @@ public class ShiftService extends MongoBaseService {
         );
         shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
         shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(0).getEndDate());
-        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
+        shiftWithActivityDTO.setStatus(Arrays.asList(REQUEST));
         return shiftWithActivityDTO;
     }
 
@@ -1263,6 +1322,14 @@ public class ShiftService extends MongoBaseService {
         return new ShiftDetailViewDTO(plannedShifts, updateRealTime, staffValidatedShifts, plannerValidatedShifts);
     }
 
+    public ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap){
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
+        shiftWithActivityDTO.getActivities().forEach(s -> {
+            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
+            s.setActivity(activityDTO);
+        });
+        return shiftWithActivityDTO;
+    }
 
     public CompactViewDTO getCompactViewDetails(Long unitId, Date shiftStartDate) {
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);

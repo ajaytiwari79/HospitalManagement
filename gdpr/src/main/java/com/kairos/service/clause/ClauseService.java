@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
+import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -52,6 +53,9 @@ public class ClauseService extends MongoBaseService {
 
     @Inject
     private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
+    @Inject
+    private PolicyAgreementTemplateService policyAgreementTemplateService;
+
 
 
     /**
@@ -92,7 +96,7 @@ public class ClauseService extends MongoBaseService {
             }
             clause.setTags(clauseTags);
         } else {
-            clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags);
+            clause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), clauseTags,clauseDto.getTemplateTypes());
             if (isUnitId) {
                 clause.setOrganizationId(referenceId);
             } else {
@@ -171,5 +175,27 @@ public class ClauseService extends MongoBaseService {
         return true;
     }
 
+    /**
+     *
+     * @param countryId
+     * @return
+     */
+    public Map<String,Object> getClauseMetaDataByCountryId(Long countryId) {
+        Map<String,Object> clauseMetaDataMap=new HashMap<>();
+        clauseMetaDataMap.put("clauseTagList", clauseTagService.getAllClauseTagByCountryId(countryId));
+        clauseMetaDataMap.put("templateTypeList",templateTypeService.getAllTemplateType(countryId));
+        return clauseMetaDataMap;
+    }
 
+    /**
+     *
+     * @param unitId
+     * @return
+     */
+    public Map<String,Object> getClauseMetadataByOrganizationId(Long unitId) {
+        Map<String,Object> clauseMetaDataMap=new HashMap<>();
+        clauseMetaDataMap.put("clauseTagList",clauseTagService.getAllClauseTagByUnitId(unitId));
+        clauseMetaDataMap.put("templateTypeList",policyAgreementTemplateService.getAllTemplateType(unitId));
+        return clauseMetaDataMap;
+    }
 }

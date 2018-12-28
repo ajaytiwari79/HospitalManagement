@@ -26,6 +26,11 @@ public class ReasonCodeDTO {
         //Default Constructor
     }
 
+    public ReasonCodeDTO(Long id, @NotBlank(message = "message.reasonCode.name.notEmpty") String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

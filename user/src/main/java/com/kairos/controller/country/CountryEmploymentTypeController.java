@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -108,9 +110,12 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getDayTypesAndEmploymentTypesAtUnit(unitId,false));
     }
 
-
-
-
+    @RequestMapping(value =COUNTRY_URL+"/staff_by_employment_type", method = RequestMethod.POST)
+    @ApiOperation("get staff by employment type")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByEmploymentType (@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getStaffByEmploymentTypeAndUnitId(staffEmploymentTypeDTO));
+    }
 
 
 }

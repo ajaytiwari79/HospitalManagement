@@ -2,10 +2,14 @@ package com.kairos.dto.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.user.employment.UnitPositionLinesDTO;
+
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitPositionWithCtaDetailsDTO {
@@ -23,6 +27,7 @@ public class UnitPositionWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
     private int fullTimeWeeklyMinutes;
     private float hourlyCost;
+    private List<UnitPositionLinesDTO> positionLines;
 
 
     public UnitPositionWithCtaDetailsDTO(Long id) {
@@ -41,6 +46,14 @@ public class UnitPositionWithCtaDetailsDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
+
+    public List<UnitPositionLinesDTO> getPositionLines() {
+        return positionLines;
+    }
+
+    public void setPositionLines(List<UnitPositionLinesDTO> positionLines) {
+        this.positionLines = Optional.ofNullable(positionLines).isPresent() ? positionLines : new ArrayList<>();
+    }
 
     public Integer getTotalWeeklyHours() {
         return totalWeeklyHours;
@@ -150,6 +163,5 @@ public class UnitPositionWithCtaDetailsDTO {
     public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
-
 
 }

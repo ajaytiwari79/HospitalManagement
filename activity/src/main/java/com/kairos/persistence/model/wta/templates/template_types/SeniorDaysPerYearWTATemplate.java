@@ -14,6 +14,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -77,7 +78,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                 int leaveCount = careDaysOptional.get().getLeavesAllowed();
 
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivitIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
+                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
                 if (leaveCount < (shifts.size()+1)) {
                     WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id, this.name, 0, true, false);
                     infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
@@ -118,5 +119,23 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        SeniorDaysPerYearWTATemplate that = (SeniorDaysPerYearWTATemplate) o;
+        return borrowLeave == that.borrowLeave &&
+                carryForwardLeave == that.carryForwardLeave &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(ageRange, that.ageRange) &&
+                Objects.equals(activityIds, that.activityIds) &&
+                cutOffIntervalUnit == that.cutOffIntervalUnit;
+    }
 
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), ageRange, activityIds, borrowLeave, carryForwardLeave, cutOffIntervalUnit, recommendedValue);
+    }
 }
