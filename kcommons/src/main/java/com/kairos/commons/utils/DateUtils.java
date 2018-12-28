@@ -818,7 +818,7 @@ public  class DateUtils {
     public static Double getHoursByMinutes(double totalMinutes){
         Integer hour  = (int) totalMinutes/(60);
         Integer minutes = (int)totalMinutes % 60;
-        return new Double(hour+"."+minutes);
+        return new Double(hour+"."+Math.abs(minutes));
     }
 
 }
