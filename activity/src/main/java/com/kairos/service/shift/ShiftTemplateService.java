@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
@@ -103,7 +104,10 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
-        ObjectMapperUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
+        ShiftTemplate existingShiftTemplate = shiftTemplate;
+        shiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(shiftTemplateDTO,ShiftTemplate.class);
+        shiftTemplate.setCreatedBy(existingShiftTemplate.getCreatedBy());
+       // ObjectMapperUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
         save(shiftTemplate);
         return shiftTemplateDTO;
     }
@@ -167,16 +171,16 @@ public class ShiftTemplateService extends MongoBaseService {
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
-            ShiftDTO newShiftDTO = new ShiftDTO();
-            ObjectMapperUtils.copyProperties(individualShiftTemplateDTO,newShiftDTO, "activities");
+            ShiftDTO newShiftDTO = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO,ShiftDTO.class);
+            newShiftDTO.setActivities(null);
             newShiftDTO.setId(null);
             newShiftDTO.setStaffId(shiftDTO.getStaffId());
             newShiftDTO.setUnitPositionId(shiftDTO.getUnitPositionId());
-            List<ShiftActivity> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
+            List<ShiftActivityDTO> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
                 Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(),shiftTemplateActivity.getStartTime());
                 Date endDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getEndTime());
-                ShiftActivity shiftActivity = new ShiftActivity(shiftTemplateActivity.getActivityName(),startDate,endDate,shiftTemplateActivity.getActivityId());
+                ShiftActivityDTO shiftActivity = new ShiftActivityDTO(shiftTemplateActivity.getActivityName(),startDate,endDate,shiftTemplateActivity.getActivityId());
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);

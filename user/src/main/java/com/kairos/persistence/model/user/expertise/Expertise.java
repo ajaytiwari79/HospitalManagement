@@ -32,7 +32,7 @@ public class Expertise extends UserBaseEntity {
     private String description;
 
     @Relationship(type = BELONGS_TO)
-    Country country;
+    private Country country;
 
     @Relationship(type = BELONGS_TO_SECTOR)
     private Sector sector;

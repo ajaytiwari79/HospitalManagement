@@ -34,6 +34,7 @@ public class StaffUnitPositionDetails {
     private Float avgDailyWorkingHours;
     private Long id;
     private Long staffId;
+    private Long userId;
     private Float salary;
     private int totalWeeklyMinutes;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
@@ -248,5 +249,13 @@ public class StaffUnitPositionDetails {
 
     public void setFunctionId(Long functionId) {
         this.functionId = functionId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

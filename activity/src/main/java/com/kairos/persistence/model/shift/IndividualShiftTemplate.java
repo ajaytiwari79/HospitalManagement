@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.shift;
 
-import com.kairos.dto.activity.shift.ShiftActivity;
+
 import com.kairos.dto.activity.shift.ShiftTemplateActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 

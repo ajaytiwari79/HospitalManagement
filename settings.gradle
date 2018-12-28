@@ -24,7 +24,7 @@ include 'planner'
 include "planner:optaplanner-shiftplanning"
 include "planner:optaplanner-taskplanning"
 include "planner:optaplanner-vrp-taskplanning"
-include "planner:responseWrapper"
+//include "planner:responseWrapper"
 include 'gdpr'
 include 'planner:optaplanner-vrp-taskplanning'
 findProject(':planner:optaplanner-vrp-taskplanning')?.name = 'optaplanner-vrp-taskplanning'

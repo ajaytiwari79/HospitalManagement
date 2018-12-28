@@ -141,6 +141,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         dataSubject.setName(dataSubjectDTO.getName());
         dataSubject.setDataCategories(dataSubjectDTO.getDataCategories());
         dataSubject.setDescription(dataSubjectDTO.getDescription());
+        dataSubjectMappingRepository.save(dataSubject);
         return dataSubjectDTO;
 
     }

@@ -22,7 +22,7 @@ public class ClauseBasicResponseDTO {
     private String description;
     private String descriptionHtml;
     private List<ClauseTagDTO> tags = new ArrayList<>();
-
+    private boolean linkedWithOtherTemplate;
 
     public BigInteger getId() {
         return id;
@@ -63,6 +63,14 @@ public class ClauseBasicResponseDTO {
     public String getDescriptionHtml() { return descriptionHtml; }
 
     public void setDescriptionHtml(String descriptionHtml) { this.descriptionHtml = descriptionHtml; }
+
+    public boolean isLinkedWithOtherTemplate() {
+        return linkedWithOtherTemplate;
+    }
+
+    public void setLinkedWithOtherTemplate(boolean linkedWithOtherTemplate) {
+        this.linkedWithOtherTemplate = linkedWithOtherTemplate;
+    }
 
     public ClauseBasicResponseDTO() {
     }
