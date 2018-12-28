@@ -122,11 +122,11 @@ public class WTADTO {
     }
 
     public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
-        return Optional.ofNullable(this.ruleTemplates).orElse(new ArrayList<>());
+        return this.ruleTemplates;
     }
 
     public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
+        this.ruleTemplates = Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
     public Long getOrganizationType() {

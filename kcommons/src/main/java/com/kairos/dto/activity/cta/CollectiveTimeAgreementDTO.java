@@ -105,11 +105,11 @@ public class CollectiveTimeAgreementDTO {
     }
 
     public List<CTARuleTemplateDTO> getRuleTemplates() {
-        return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
+        return ruleTemplates;
     }
 
     public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
+        this.ruleTemplates = Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
     public List<Long> getUnitIds() {

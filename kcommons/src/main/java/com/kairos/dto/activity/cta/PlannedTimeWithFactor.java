@@ -2,6 +2,8 @@ package com.kairos.dto.activity.cta;
 
 import com.kairos.enums.cta.AccountType;
 
+import java.util.Objects;
+
 public class PlannedTimeWithFactor {
     private float scale;
     private boolean add;
@@ -53,5 +55,22 @@ public class PlannedTimeWithFactor {
 
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PlannedTimeWithFactor that = (PlannedTimeWithFactor) o;
+        return Float.compare(that.scale, scale) == 0 &&
+                add == that.add &&
+                subtract == that.subtract &&
+                accountType == that.accountType;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(scale, add, subtract, accountType);
     }
 }

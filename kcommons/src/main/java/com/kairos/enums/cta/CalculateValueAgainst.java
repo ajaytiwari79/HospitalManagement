@@ -2,6 +2,8 @@ package com.kairos.enums.cta;
 
 import com.kairos.dto.activity.cta.FixedValue;
 
+import java.util.Objects;
+
 public class CalculateValueAgainst{
     private CalculateValueType calculateValue;
     private float scale;
@@ -41,6 +43,19 @@ public class CalculateValueAgainst{
         this.fixedValue = fixedValue;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CalculateValueAgainst that = (CalculateValueAgainst) o;
+        return Float.compare(that.scale, scale) == 0 &&
+                calculateValue == that.calculateValue &&
+                Objects.equals(fixedValue, that.fixedValue);
+    }
 
+    @Override
+    public int hashCode() {
 
+        return Objects.hash(calculateValue, scale, fixedValue);
+    }
 }
