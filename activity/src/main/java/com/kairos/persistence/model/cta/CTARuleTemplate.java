@@ -338,5 +338,39 @@ public class CTARuleTemplate extends MongoBaseEntity {
                 break;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CTARuleTemplate that = (CTARuleTemplate) o;
+        return disabled == that.disabled &&
+                calculateScheduledHours == that.calculateScheduledHours &&
+                Objects.equals(payrollType, that.payrollType) &&
+                Objects.equals(payrollSystem, that.payrollSystem) &&
+                calculationUnit == that.calculationUnit &&
+                Objects.equals(compensationTable, that.compensationTable) &&
+                Objects.equals(calculateValueAgainst, that.calculateValueAgainst) &&
+                approvalWorkFlow == that.approvalWorkFlow &&
+                Objects.equals(phaseInfo, that.phaseInfo) &&
+                budgetType == that.budgetType &&
+                Objects.equals(calculateValueIfPlanned, that.calculateValueIfPlanned) &&
+                Objects.equals(employmentTypes, that.employmentTypes) &&
+                planningCategory == that.planningCategory &&
+                Objects.equals(staffFunctions, that.staffFunctions) &&
+                Objects.equals(plannedTimeWithFactor, that.plannedTimeWithFactor) &&
+                activityTypeForCostCalculation == that.activityTypeForCostCalculation &&
+                Objects.equals(activityIds, that.activityIds) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
+                Objects.equals(dayTypeIds, that.dayTypeIds) &&
+                calculationFor == that.calculationFor;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(disabled, payrollType, payrollSystem, calculationUnit, compensationTable, calculateValueAgainst, approvalWorkFlow, phaseInfo, budgetType, calculateValueIfPlanned, employmentTypes, planningCategory, staffFunctions, plannedTimeWithFactor, activityTypeForCostCalculation, activityIds, timeTypeIds, plannedTimeIds, dayTypeIds, calculateScheduledHours, calculationFor);
+    }
 }
 

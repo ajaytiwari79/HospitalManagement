@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateUtils;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,7 +126,7 @@ public class WTADTO {
     }
 
     public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
+        this.ruleTemplates = Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
     public Long getOrganizationType() {

@@ -10,10 +10,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -160,5 +157,25 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
             }
         });
         return updatedShifts;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        DaysOffInPeriodWTATemplate that = (DaysOffInPeriodWTATemplate) o;
+        return intervalLength == that.intervalLength &&
+                restingTimeAllowed == that.restingTimeAllowed &&
+                restingTime == that.restingTime &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, that.intervalUnit) &&
+                minMaxSetting == that.minMaxSetting;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, minMaxSetting, restingTimeAllowed, restingTime, recommendedValue);
     }
 }

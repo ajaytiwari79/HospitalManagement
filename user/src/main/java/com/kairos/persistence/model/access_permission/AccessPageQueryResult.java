@@ -21,6 +21,7 @@ public class AccessPageQueryResult {
     private boolean active;
     private String moduleId;
     private Long parentId;
+    private int sequence;
 
     public String getModuleId() {
         return moduleId;
@@ -103,6 +104,14 @@ public class AccessPageQueryResult {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 
     @Override

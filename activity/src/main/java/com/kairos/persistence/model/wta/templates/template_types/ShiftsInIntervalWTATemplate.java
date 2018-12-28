@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -130,5 +131,26 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
                 brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null ) return false;
+        if (!super.equals(o)) return false;
+        ShiftsInIntervalWTATemplate that = (ShiftsInIntervalWTATemplate) o;
+        return intervalLength == that.intervalLength &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, that.intervalUnit) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
+                Objects.equals(partOfDays, that.partOfDays) &&
+                minMaxSetting == that.minMaxSetting;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, timeTypeIds, plannedTimeIds, partOfDays, recommendedValue, minMaxSetting);
     }
 }

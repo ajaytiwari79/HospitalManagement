@@ -19,6 +19,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -34,12 +35,12 @@ import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
-import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelActivityRankRepository;
@@ -105,6 +106,7 @@ public class ShiftValidatorService {
     private StaffingLevelActivityRankRepository staffingLevelActivityRankRepository;
     @Inject
     private PhaseSettingsRepository phaseSettingsRepository;
+    @Inject private PhaseMongoRepository phaseMongoRepository;
 
     private static ExceptionService exceptionService;
 
@@ -116,27 +118,27 @@ public class ShiftValidatorService {
 
     public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
         DateTimeInterval graceInterval = null;
-        TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
+        Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         if (validatedByStaff) {
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
+            graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         } else {
             if (staffShiftDTO.getValidated() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
-            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(staffShiftDTO.getValidated()), validatedByStaff);
+            graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         }
-        if (!graceInterval.contains(shiftDTO.getActivities().get(0).getStartDate())) {
+        if (!graceInterval.contains(DateUtils.getDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
     }
 
-    public DateTimeInterval getGracePeriodInterval(TimeAttendanceGracePeriod timeAttendanceGracePeriod, Date date, boolean forStaff) {
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        ZonedDateTime endDate = null;
+    public DateTimeInterval getGracePeriodInterval(Phase phase, Date date, boolean forStaff) {
+        ZonedDateTime startDate = DateUtils.asZoneDateTime(date);
+        ZonedDateTime endDate;
         if (forStaff) {
-            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
+            endDate = startDate.plusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).plusDays(phase.getGracePeriodByStaff()).plusDays(1);
         } else {
-            endDate = startDate.plusWeeks(1).plusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
+            endDate = startDate.plusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).plusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).plusDays(1);
         }
         return new DateTimeInterval(startDate, endDate);
     }
@@ -158,11 +160,10 @@ public class ShiftValidatorService {
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
         validateAbsenceReasonCodeRule(activityWrapperMap,shift,ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills(),ruleTemplateSpecificInfo,exceptionService);
-        Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise(),ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
-        Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
-                .and(activityExpertiseSpecification)
+        Specification<ShiftWithActivityDTO> activitySpecification =
+                activityExpertiseSpecification
                 .and(activitySkillSpec)
                 .and(wtaRulesSpecification);
 
@@ -309,12 +310,9 @@ public class ShiftValidatorService {
     public List<String> validateShiftWhileCopy(StaffUnitPositionUnitDataWrapper dataWrapper, ShiftWithActivityDTO shiftWithActivityDTO, StaffUnitPositionDetails staffUnitPositionDetails, List<WTAQueryResultDTO> wtaQueryResultDTOS, PlanningPeriodDTO planningPeriod, Map<BigInteger, ActivityWrapper> activityWrapperMap,List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs) {
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo =  getRuleTemplateSpecificInfo(planningPeriod,shiftWithActivityDTO,wtaQueryResultDTOS.get(0),staffUnitPositionDetails,activityWrapperMap,dataWrapper, newCreatedShiftWithActivityDTOs);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
-        Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffUnitPositionDetails.getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffUnitPositionDetails.getExpertise(),null);
 
-        Specification<ShiftWithActivityDTO> activitySpecification =
-                 activityEmploymentTypeSpecification
-                .and(activityExpertiseSpecification)
+        Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification
                 .and(wtaRulesSpecification);
         List<String> voilatedRules;
         activitySpecification.validateRules(shiftWithActivityDTO);

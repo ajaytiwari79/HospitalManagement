@@ -36,6 +36,8 @@ public class AccessPage extends UserBaseEntity {
     @Relationship(type = SUB_PAGE)
     List<AccessPage> subPages;
 
+    private int sequence;
+
     public AccessPage(String name){
         this.name = name;
     }
@@ -106,5 +108,13 @@ public class AccessPage extends UserBaseEntity {
 
     public void setEditable(Boolean editable) {
         this.editable = editable;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

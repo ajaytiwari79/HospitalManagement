@@ -6,6 +6,8 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
+import java.util.Objects;
+
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -81,5 +83,24 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
         this.nightShiftSequence = nightShiftSequence;
         wtaTemplateType=WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        DaysOffAfterASeriesWTATemplate that = (DaysOffAfterASeriesWTATemplate) o;
+        return intervalLength == that.intervalLength &&
+                nightShiftSequence == that.nightShiftSequence &&
+                restingTimeAllowed == that.restingTimeAllowed &&
+                restingTime == that.restingTime &&
+                Objects.equals(intervalUnit, that.intervalUnit);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, nightShiftSequence, restingTimeAllowed, restingTime);
     }
 }
