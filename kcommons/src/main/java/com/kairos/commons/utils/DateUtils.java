@@ -821,4 +821,23 @@ public  class DateUtils {
         return new Double(hour+"."+minutes);
     }
 
+
+    /**
+     * Case : localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-28 return true
+     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-27 return false
+     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-29 return true
+     */
+    public static boolean isEqualsAndAfter(LocalDate localDate,LocalDate localDateAfterAndEqual){
+        return localDate.equals(localDateAfterAndEqual) && localDateAfterAndEqual.isAfter(localDate);
+    }
+
+    /**
+     * Case : localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-28 return true
+     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-27 return true
+     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-29 return false
+     */
+    public static boolean isEqualsAndBefore(LocalDate localDate,LocalDate localDateAfterAndEqual){
+        return localDateAfterAndEqual.isBefore(localDate) || localDate.equals(localDateAfterAndEqual);
+    }
+
 }

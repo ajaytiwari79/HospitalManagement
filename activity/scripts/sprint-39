@@ -1,0 +1,1 @@
+db.shifts.updateMany({},{$set:{"activities.$[].timeBankCtaBonusMinutes":NumberInt(0),"activities.$[].timeBankCTADistributions":[]}})
