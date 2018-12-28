@@ -10,6 +10,8 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.util.*;
 
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -23,7 +25,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
     private boolean restingTimeAllowed;

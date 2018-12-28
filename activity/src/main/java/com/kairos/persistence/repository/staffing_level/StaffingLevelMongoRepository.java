@@ -25,8 +25,5 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     @Query("{deleted:false,unitId:?0,currentDate:{$in:?1}}")
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
 
-    @Query("{deleted:false,unitId:?0,currentDate:?1,updatedAt:{$gt:?2}}")
-    StaffingLevel findByStaffingLevelIfUpdated(Long unitId, Date currentDate,Date updatedAt);
-
 
 }

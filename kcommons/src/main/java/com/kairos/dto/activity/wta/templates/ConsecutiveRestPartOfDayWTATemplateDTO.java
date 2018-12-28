@@ -27,7 +27,6 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
-    private Long consecutiveDays;
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -80,13 +79,6 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public Long getConsecutiveDays() {
-        return consecutiveDays;
-    }
-
-    public void setConsecutiveDays(Long consecutiveDays) {
-        this.consecutiveDays = consecutiveDays;
-    }
 
     public ConsecutiveRestPartOfDayWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;

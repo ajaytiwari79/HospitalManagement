@@ -7,6 +7,8 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -18,9 +20,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<String> balanceType;//multiple check boxes
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-
     private List<BigInteger> timeTypeIds;
     private List<BigInteger> plannedTimeIds;
     protected List<PartOfDay> partOfDays;

@@ -1,6 +1,7 @@
 package com.kairos.controller.staffing_level;
 
 import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
+import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -169,8 +170,8 @@ public class StaffingLevelController {
 
     @GetMapping(value = "/updated_staffing_level")
     @ApiOperation("get staffing level if Updated")
-    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestParam("currentDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date currentDate,@RequestParam("updatedAt")@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss",iso = DateTimeFormat.ISO.DATE) Date updatedAt) {
+    public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedAt,currentDate));
+                staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
     }
 }
