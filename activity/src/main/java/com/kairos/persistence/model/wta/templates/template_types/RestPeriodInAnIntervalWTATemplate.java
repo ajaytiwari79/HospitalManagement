@@ -13,6 +13,7 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -113,4 +114,21 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
         return maxRestTime;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        RestPeriodInAnIntervalWTATemplate that = (RestPeriodInAnIntervalWTATemplate) o;
+        return intervalLength == that.intervalLength &&
+                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, that.intervalUnit) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, recommendedValue, timeTypeIds);
+    }
 }
