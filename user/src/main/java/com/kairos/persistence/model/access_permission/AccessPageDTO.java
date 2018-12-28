@@ -27,6 +27,7 @@ public class AccessPageDTO {
     //this value is true only in case of "moduleId" : "module_1"
     private Boolean editable;
     private boolean hasSubTabs;
+    private int sequence;
 
 
     public Long getParentTabId() {
@@ -124,5 +125,13 @@ public class AccessPageDTO {
 
     public void setHasSubTabs(boolean hasSubTabs) {
         this.hasSubTabs = hasSubTabs;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }
