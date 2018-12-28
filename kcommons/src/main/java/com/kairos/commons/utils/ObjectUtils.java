@@ -30,6 +30,10 @@ public class ObjectUtils {
     public static boolean isCollectionEmpty(@Nullable Collection<?> collection){
         return (collection == null || collection.isEmpty());
     }
+
+    public static boolean isCollectionNotEmpty(@Nullable Collection<?> collection){
+        return !(collection == null || collection.isEmpty());
+    }
     public static boolean isEmpty(@Nullable Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
