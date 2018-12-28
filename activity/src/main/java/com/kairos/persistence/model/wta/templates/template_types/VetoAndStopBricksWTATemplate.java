@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.ShiftValidatorService.*;
 
@@ -119,4 +120,22 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
         return activityIds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        VetoAndStopBricksWTATemplate that = (VetoAndStopBricksWTATemplate) o;
+        return numberOfWeeks == that.numberOfWeeks &&
+                Float.compare(that.totalBlockingPoints, totalBlockingPoints) == 0 &&
+                Objects.equals(validationStartDate, that.validationStartDate) &&
+                Objects.equals(vetoActivityId, that.vetoActivityId) &&
+                Objects.equals(stopBrickActivityId, that.stopBrickActivityId);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), numberOfWeeks, validationStartDate, vetoActivityId, stopBrickActivityId, totalBlockingPoints);
+    }
 }

@@ -15,6 +15,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -345,6 +346,42 @@ public class CTARuleTemplateDTO {
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
 //                .append("timeTypes", timeTypes)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CTARuleTemplateDTO that = (CTARuleTemplateDTO) o;
+        return disabled == that.disabled &&
+                calculateScheduledHours == that.calculateScheduledHours &&
+                Objects.equals(payrollType, that.payrollType) &&
+                Objects.equals(payrollSystem, that.payrollSystem) &&
+                calculationUnit == that.calculationUnit &&
+                Objects.equals(compensationTable, that.compensationTable) &&
+                Objects.equals(calculateValueAgainst, that.calculateValueAgainst) &&
+                approvalWorkFlow == that.approvalWorkFlow &&
+                Objects.equals(phaseInfo, that.phaseInfo) &&
+                budgetType == that.budgetType &&
+                Objects.equals(calculateValueIfPlanned, that.calculateValueIfPlanned) &&
+                Objects.equals(employmentTypes, that.employmentTypes) &&
+                planningCategory == that.planningCategory &&
+                Objects.equals(staffFunctions, that.staffFunctions) &&
+                Objects.equals(plannedTimeWithFactor, that.plannedTimeWithFactor) &&
+                calculationFor == that.calculationFor &&
+                activityTypeForCostCalculation == that.activityTypeForCostCalculation &&
+                Objects.equals(activityIds, that.activityIds) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
+                Objects.equals(dayTypeIds, that.dayTypeIds) &&
+                Objects.equals(days, that.days) &&
+                Objects.equals(publicHolidays, that.publicHolidays);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(disabled, payrollType, payrollSystem, calculationUnit, compensationTable, calculateValueAgainst, approvalWorkFlow, phaseInfo, budgetType, calculateValueIfPlanned, employmentTypes, planningCategory, staffFunctions, plannedTimeWithFactor, calculateScheduledHours, calculationFor, activityTypeForCostCalculation, activityIds, timeTypeIds, plannedTimeIds, dayTypeIds, days, publicHolidays);
     }
 }
 

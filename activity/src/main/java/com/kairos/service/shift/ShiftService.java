@@ -1037,6 +1037,9 @@ public class ShiftService extends MongoBaseService {
         case PUBLISH:
             shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(UNPUBLISH);add(REJECT);}});
             break;
+        case UNPUBLISH:
+            shiftActivity.getStatus().removeAll(new ArrayList<ShiftStatus>(){{add(REQUEST);add(PUBLISH);}});
+            break;
     }
     }
 
