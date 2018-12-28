@@ -2,7 +2,6 @@ package com.kairos.dto.gdpr.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.javers.core.metamodel.annotation.ValueObject;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -10,7 +9,7 @@ import java.math.BigInteger;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ValueObject
+
 public class ProcessingActivityRelatedDataCategory {
 
 
