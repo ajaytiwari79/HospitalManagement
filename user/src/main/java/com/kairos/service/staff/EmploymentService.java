@@ -668,8 +668,9 @@ public class EmploymentService {
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
-         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, employment.getEndDateMillis(), parentOrganization.getId(), employment.getId(),
-             parentOrganization.getTimeZone());
+        //TODO Commented temporary due to kafka down on QA server
+//         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, employment.getEndDateMillis(), parentOrganization.getId(), employment.getId(),
+//             parentOrganization.getTimeZone());
         employment.setEndDateMillis(employmentEndDate);
         if (!Optional.ofNullable(employmentEndDate).isPresent()) {
             employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
@@ -862,8 +863,8 @@ public class EmploymentService {
         return true;
     }
 
-    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO) {
-        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString()), UnitPositionQueryResult.class);
+    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO,long unitPositionId) {
+        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(),unitPositionId), UnitPositionQueryResult.class);
         Set<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toSet());
         if (CollectionUtils.isNotEmpty(unitPositionIds)) {
             List<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(new ArrayList<>(unitPositionIds));

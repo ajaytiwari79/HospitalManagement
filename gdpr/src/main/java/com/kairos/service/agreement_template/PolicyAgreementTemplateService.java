@@ -209,7 +209,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                     template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
         }
-        List<ClauseBasicResponseDTO> clauseListForTemplate = isUnitId ? clauseMongoRepository.findAllClauseByUnitId(referenceId) : clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO);
+        List<ClauseBasicResponseDTO> clauseListForTemplate = isUnitId ? clauseMongoRepository.findAllClauseByUnitId(referenceId) : clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO, template.getTemplateTypeId());
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId, isUnitId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {

@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -104,5 +105,23 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 brokeRuleTemplate(infoWrapper,limitAndCounter[1],isValid, this);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!super.equals(o)) return false;
+        DurationBetweenShiftsWTATemplate that = (DurationBetweenShiftsWTATemplate) o;
+        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, that.timeTypeIds) &&
+                minMaxSetting == that.minMaxSetting;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting);
     }
 }

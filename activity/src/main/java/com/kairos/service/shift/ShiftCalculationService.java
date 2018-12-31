@@ -32,12 +32,12 @@ public class ShiftCalculationService {
                         dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
                     }
                 });
-                List<LocalDate> publicHoliday = publicHolidays.get(dayTypeId);
-                if (CollectionUtils.isNotEmpty(publicHoliday)) {
+                //List<LocalDate> publicHoliday = publicHolidays.get(dayTypeId);
+                /*if (CollectionUtils.isNotEmpty(publicHoliday)) {
                     publicHolidaysDates.addAll(publicHoliday);
-                }
+                }*/
             }
-            ctaRuleTemplateDTO.setPublicHolidays(publicHolidaysDates);
+            //ctaRuleTemplateDTO.setPublicHolidays(publicHolidaysDates);
             ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
         });
     }
