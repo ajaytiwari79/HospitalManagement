@@ -101,11 +101,11 @@ public class TimeBankKpiCalculationService implements  CounterService {
         }
         unitIds.forEach(unitId->{
             Long totalTimeBankOfUnit=0l;
-            String unitName=(unitAndStaffKpiFilterMap.get(unitId).isEmpty())?unitAndStaffKpiFilterMap.get(unitId).get(0).getUnitName():"";
+            String unitName=(!unitAndStaffKpiFilterMap.get(unitId).isEmpty())?unitAndStaffKpiFilterMap.get(unitId).get(0).getUnitName():"";
             for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
                 for (UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO : staffKpiFilterDTO.getUnitPosition()) {
                     List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionAndDailyTimeBank.getOrDefault(unitPositionWithCtaDetailsDTO.getId(),new ArrayList<>());
-                    int timeBankOfInterval=timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(organizationId),new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)),DateUtils.getLongFromLocalDate(filterDates.get(1))),staffKpiFilterDTOS.get(0).getUnitPosition().get(0),false,dailyTimeBankEntries,false);
+                    int timeBankOfInterval=timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId),new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)),DateUtils.getLongFromLocalDate(filterDates.get(1))),unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
                     int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(value -> value.getTotalTimeBankMin()).sum();
                     int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
                     logger.info(staffKpiFilterDTO.getFirstName()+ "  "+ totalTimeBank);
