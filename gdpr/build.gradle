@@ -64,6 +64,15 @@ dependencies {
 
 
 }
+sonarqube {
+    properties {
+        property "sonar.projectName", "gdpr"
+        property "sonar.projectKey", "kairos:gdpr"
+        property "sonar.sources", "src/main"
+        property "sonar.skip.tests", "true"
+        property "sonar.exclusions", "**/*test*/**"
+    }
+}
 
 dependencyManagement {
     imports {
