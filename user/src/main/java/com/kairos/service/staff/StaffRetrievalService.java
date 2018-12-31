@@ -176,6 +176,7 @@ public class StaffRetrievalService {
             engineerTypes = Collections.emptyList();
         }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
+
         personalInfo.put("personalInfo", retrievePersonalInfo(unitId,staff));
         personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId,unitId));
         personalInfo.put("languages", languages);
@@ -195,6 +196,7 @@ public class StaffRetrievalService {
         }
         return expertises;
     }
+
 
 
     public Map<String, Object> retrievePersonalInfo(Long unitId,Staff staff) {
@@ -767,6 +769,7 @@ public class StaffRetrievalService {
         }
         return expertiseIds;
     }
+
 
 
 

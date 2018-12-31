@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -52,22 +53,22 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "MATCH(unit)-[:"+CONTACT_ADDRESS+"]-(:ContactAddress)-[:"+MUNICIPALITY+"]-(municipality:Municipality)<-[rel:"+HAS_MUNICIPALITY+"]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
             "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) \n" +
-            "where  functionalPayment.startDate<={1} AND (functionalPayment.endDate IS NULL OR functionalPayment.endDate>={1})\n" +
+            "WHERE  date(functionalPayment.startDate)<=DATE({1}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({1}))\n" +
             "MATCH(sl)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment) \n" +
             "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) \n" +
             " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +
             "RETURN distinct id(function) as id,function.name as name,rel.amount as amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
-    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,Long selectedDate,Long seniorityLevelId,Long unitId);
+    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,String selectedDate,Long seniorityLevelId,Long unitId);
 
 
     @Query("MATCH (unit:Organization) where id(unit)={0} \n" +
             "MATCH(unit)-[:"+CONTACT_ADDRESS+"]-(:ContactAddress)-[:"+MUNICIPALITY+"]-(municipality:Municipality)<-[rel:"+HAS_MUNICIPALITY+"]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={1} \n" +
             "MATCH(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false,published:true})-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) \n" +
-            "where  functionalPayment.startDate<={3} AND (functionalPayment.endDate IS NULL OR functionalPayment.endDate>={3})\n" +
+            "WHERE  DATE(functionalPayment.startDate)<=DATE({3}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({3}))\n" +
             "MATCH(sl)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment) \n" +
             "with slf,fpm  MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) WHERE ID(function) IN {4} \n" +
             " MATCH (fpm)-[:"+HAS_PAY_GROUP_AREA+"]-(payGroupArea) \n" +
             "RETURN distinct function as function,rel.amount as amount,rel.amountEditableAtUnit as amountEditableAtUnit")
-    List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId,Long expertiseId, Long seniorityLevelId,Long selectedDate, List<Long> functions);
+    List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId, Long expertiseId, Long seniorityLevelId, String selectedDate, List<Long> functions);
 }

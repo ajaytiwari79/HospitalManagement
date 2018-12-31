@@ -192,7 +192,7 @@ public class EmploymentService {
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId", staff.getExternalId());
-        LocalDate dateOfBirth = (user.getDateOfBirth()) == null ? null : DateUtils.getLocalDateFromDate(user.getDateOfBirth());
+        LocalDate dateOfBirth = (user.getDateOfBirth());
         map.put("dateOfBirth", dateOfBirth);
 
         return map;
@@ -862,6 +862,7 @@ public class EmploymentService {
         employmentGraphRepository.save(employment);
         return true;
     }
+
 
     public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO,long unitPositionId) {
         List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(),unitPositionId), UnitPositionQueryResult.class);
