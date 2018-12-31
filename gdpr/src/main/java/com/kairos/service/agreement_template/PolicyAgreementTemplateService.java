@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.agreement_template.PolicyAgreementTempl
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
+import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
@@ -209,7 +210,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
                     template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
         }
-        List<ClauseBasicResponseDTO> clauseListForTemplate = isUnitId ? clauseMongoRepository.findAllClauseByUnitId(referenceId) : clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO, template.getTemplateTypeId());
+        List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
+        List<ClauseBasicResponseDTO> clauseListForTemplate =  new ArrayList<>();
+        if(isUnitId){
+            clauseListForUnitLevelTemplate = clauseMongoRepository.findAllClauseByUnitId(referenceId);
+        }else{
+            clauseListForTemplate = clauseMongoRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationMetaDataDTO, template.getTemplateTypeId());
+        }
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId, isUnitId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
@@ -232,6 +239,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 clauseBasicResponseDTO.setLinkedWithOtherTemplate(true);
             }
         });
+        agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelTemplate);
         agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
         agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
         agreementTemplateResponse.setSections(agreementSectionResponseDTOS);

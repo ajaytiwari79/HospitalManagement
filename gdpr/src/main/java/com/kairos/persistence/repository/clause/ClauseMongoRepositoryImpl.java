@@ -10,6 +10,7 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -84,7 +85,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     }
 
     @Override
-    public List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId) {
+    public List<UnitLevelClauseResponseDTO> findAllClauseByUnitId(Long unitId) {
         String groupOperationOnClauseAndTemplateType = "{'$group' : {'_id':{'_id':'$_id','title' : '$title','tags' : '$tags','description' : '$description','createdAt' : '$createdAt'},'templateTypes' :{$push: { $arrayElemAt: [ '$templateTypes', 0 ] }}}}";
         String projectOperationOnClauseAndTemplateType = "{ '$project' : {'_id':'$_id._id','title' : '$_id.title','tags' : '$_id.tags','description' :'$_id.description','createdAt' :'$_id.createdAt','templateTypes' : '$templateTypes'}}";
         Aggregation aggregation = Aggregation.newAggregation(
@@ -96,7 +97,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 //project(Fields.fields("id", "title", "tags", "description", "createdAt")),
                 sort(Sort.Direction.DESC, "createdAt")
         );
-        AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
+        AggregationResults<UnitLevelClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, UnitLevelClauseResponseDTO.class);
         return result.getMappedResults();
     }
 
@@ -147,7 +148,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("templateTypes").in(templateTypeId).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
                         .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
-                lookup("templateType","templateTypeId","_id","templateTypes"),
+                //lookup("templateType","templateTypeId","_id","templateTypes"),
                 sort(Sort.Direction.DESC, "createdAt")
         );
         AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
