@@ -218,6 +218,6 @@ public class StaffAdditionalInfoDTO {
     }
 
     public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
-        this.reasonCodes = Optional.ofNullable(reasonCodes).isPresent() ? reasonCodes : new ArrayList<>();
+        this.reasonCodes = Optional.ofNullable(reasonCodes).orElse(new ArrayList<>());
     }
 }
