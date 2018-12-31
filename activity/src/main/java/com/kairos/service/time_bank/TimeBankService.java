@@ -455,17 +455,19 @@ public class TimeBankService extends MongoBaseService {
     }
 
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
-        Map<BigInteger, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getId(), v -> v));
-        shifts.forEach(shift -> {
-            shift.getActivities().forEach(shiftActivity -> {
-                if (shiftActivityDTOMap.containsKey(shiftActivity.getId())) {
-                    ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
-                    shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
-                    shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
-                }
+        if(CollectionUtils.isNotEmpty(shifts)){
+            Map<BigInteger, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getId(), v -> v));
+            shifts.forEach(shift -> {
+                shift.getActivities().forEach(shiftActivity -> {
+                    if (shiftActivityDTOMap.containsKey(shiftActivity.getId())) {
+                        ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
+                        shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+                        shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+                    }
+                });
             });
-        });
-        shiftMongoRepository.saveEntities(shifts);
+            shiftMongoRepository.saveEntities(shifts);
+        }
     }
 
     public boolean renewTimeBankOfShifts() {
