@@ -29,7 +29,7 @@ public interface CustomClauseRepository {
 
     List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId);
 
-    List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO);
+    List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO, BigInteger templateTypeId);
 
     ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, BigInteger id);
 

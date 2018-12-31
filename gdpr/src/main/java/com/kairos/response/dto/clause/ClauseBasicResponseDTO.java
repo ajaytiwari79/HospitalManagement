@@ -24,7 +24,7 @@ public class ClauseBasicResponseDTO {
     private String descriptionHtml;
     private List<ClauseTagDTO> tags = new ArrayList<>();
     private boolean linkedWithOtherTemplate;
-    private List<TemplateTypeResponseDTO> templateTypes;
+    private List<TemplateTypeResponseDTO> templateTypes = new ArrayList<>();
 
     public BigInteger getId() {
         return id;
