@@ -3,3 +3,32 @@ db.time_Type.updateMany({},{$set:{"activityCanBeCopied":false}})
 
 db.shifts.updateMany({},{$set:{"activities.$[].timeBankCtaBonusMinutes":NumberInt(0),"activities.$[].timeBankCTADistributions":[]}})
 
+add planned hours kPI
+db.getCollection('counter').insert({
+    "_id" : "17",//nextsequence of kpiKairosSequence and  update kpiKairosSequence
+    "type" : "CONTRACTUAL_AND_PLANNED_HOURS",
+    "title" : "Contractual And Planned Hours Of Staff",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_8X2"
+})
+
+db.getCollection('counter').insert({
+    "_id" : "17",//nextsequence of kpiKairosSequence and  update kpiKairosSequence
+    "type" : "TIME_BANK_FOR_UNIT",
+    "title" : "TimeBank For Unit",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "PIE",
+    "size" : "SIZE_2X2"
+})
+
+
+db.getCollection('counter').updateMany({"chart" : "BAR"},{"$set":{"size" : "SIZE_8X2"}})
