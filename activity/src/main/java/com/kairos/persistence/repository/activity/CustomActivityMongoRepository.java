@@ -78,4 +78,6 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
+    ActivityDTO eligibleForCopy(BigInteger activityId);
+
 }

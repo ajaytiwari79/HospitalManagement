@@ -85,9 +85,15 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
     @Override
     public List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId) {
+        String groupOperationOnClauseAndTemplateType = "{'$group' : {'_id':{'_id':'$_id','title' : '$title','tags' : '$tags','description' : '$description','createdAt' : '$createdAt'},'templateTypes' :{$push: { $arrayElemAt: [ '$templateTypes', 0 ] }}}}";
+        String projectOperationOnClauseAndTemplateType = "{ '$project' : {'_id':'$_id._id','title' : '$_id.title','tags' : '$_id.tags','description' :'$_id.description','createdAt' :'$_id.createdAt','templateTypes' : '$templateTypes'}}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
-                project(Fields.fields("id", "title", "tags", "description", "createdAt")),
+                unwind("templateTypes"),
+                lookup("templateType", "templateTypes", "_id", "templateTypes"),
+                new CustomAggregationOperation(Document.parse(groupOperationOnClauseAndTemplateType)),
+                new CustomAggregationOperation(Document.parse(projectOperationOnClauseAndTemplateType)),
+                //project(Fields.fields("id", "title", "tags", "description", "createdAt")),
                 sort(Sort.Direction.DESC, "createdAt")
         );
         AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
@@ -135,12 +141,13 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+    public List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO, BigInteger templateTypeId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("templateTypes").in(templateTypeId).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
                         .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
+                lookup("templateType","templateTypeId","_id","templateTypes"),
                 sort(Sort.Direction.DESC, "createdAt")
         );
         AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);

@@ -473,22 +473,21 @@ public class TimeBankService extends MongoBaseService {
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = new HashMap<>();
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());
         for (Shift shift : shifts) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
-            if (!staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId())) {
-                try {
-                    staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId(), new HashSet<>());
-                    CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
+            try {
+                StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId(), new HashSet<>());
+                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
+                if(Optional.ofNullable(ctaResponseDTO).isPresent() && CollectionUtils.isNotEmpty(ctaResponseDTO.getRuleTemplates())){
                     staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     staffAdditionalInfoDTOMap.put(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO);
-                } catch (Exception e) {
-                    logger.info("staff is not the part of this Unit");
+                    if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId())) {
+                        dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()),new DateTime(shift.getStartDate()),new DateTime(shift.getEndDate())));
+                    }
                 }
+            } catch (Exception e) {
+                logger.info("staff is not the part of this Unit");
             }
-            if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId()) && CollectionUtils.isNotEmpty(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()).getUnitPosition().getCtaRuleTemplates())) {
-                dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()),new DateTime(shift.getStartDate()),new DateTime(shift.getEndDate())));
 
-            }
         }
         if (CollectionUtils.isNotEmpty(dailyTimeBanks)) {
             save(dailyTimeBanks);
