@@ -35,6 +35,7 @@ public class ActivityTagDTO {
     private TimeCalculationActivityTab timeCalculationActivityTab;
     private List<Long> dayTypes= new ArrayList<>();
     private RulesActivityTab rulesActivityTab;
+    private boolean activityCanBeCopied;
 
     private Long parentId;
     private ActivityStateEnum state;
@@ -164,6 +165,8 @@ public class ActivityTagDTO {
         this.state = state;
     }
 
+
+
     public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
         return balanceSettingsActivityTab;
     }
@@ -186,6 +189,14 @@ public class ActivityTagDTO {
 
     public void setRulesActivityTab(RulesActivityTab rulesActivityTab) {
         this.rulesActivityTab = rulesActivityTab;
+    }
+
+    public boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
