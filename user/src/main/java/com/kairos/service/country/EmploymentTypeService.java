@@ -268,7 +268,8 @@ public class EmploymentTypeService {
     }
 
     public List<StaffKpiFilterDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds()), StaffKpiFilterDTO.class);
+        Organization organization=organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(),organization.isParentOrganization()), StaffKpiFilterDTO.class);
     }
 
 
