@@ -50,7 +50,7 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     Boolean findByIdNotEqualAndLabelAndCountryId(List<BigInteger> timeTypeIds,List<String> timeTypeNames, Long countryId);
 
     @Query(value = "{id:{$ne:?0},label: ?1,countryId:?2,deleted : false}",exists = true)
-    Boolean timeTypeAlreadyExistsByLabelAndCountryId(BigInteger timeTypeId,String timeTypeName, Long countryId);
+    boolean timeTypeAlreadyExistsByLabelAndCountryId(BigInteger timeTypeId,String timeTypeName, Long countryId);
 
     @Query("{id:{$in:?0},deleted : false}")
     List<TimeType> findAllByTimeTypeIds(List<BigInteger> id);

@@ -23,17 +23,11 @@ public class TimeType extends MongoBaseEntity{
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
+    private boolean activityCanBeCopied;
 
     public TimeType() {}
-    public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
-        this.upperLevelTimeTypeId = upperLevelTimeTypeId;
-        this.label = label;
-        this.description = description;
-    }
 
-
-
-    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,boolean activityCanBeCopied) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
@@ -41,6 +35,7 @@ public class TimeType extends MongoBaseEntity{
         this.leafNode = true;
         this.secondLevelType=secondLevelType;
         this.countryId=countryId;
+        this.activityCanBeCopied=activityCanBeCopied;
     }
 
     public Long getCountryId() {
@@ -118,4 +113,11 @@ public class TimeType extends MongoBaseEntity{
         this.secondLevelType = secondLevelType;
     }
 
+    public boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied;
+    }
 }
