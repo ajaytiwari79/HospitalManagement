@@ -62,7 +62,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     @Override
-    public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
+    public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds,boolean parentOrganization) {
         Map<String, Object> queryParameters = new HashMap();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
@@ -77,10 +77,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             stringBuilder.append(" MATCH(empType:EmploymentType) WHERE id(empType) IN {employmentType}");
             queryParameters.put("employmentType", employmentType);
         }
-        if(CollectionUtils.isEmpty(unitIds)){
-            stringBuilder.append(" MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false}) ");
-        }else {
+        if(CollectionUtils.isNotEmpty(unitIds) || !parentOrganization){
             stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition{deleted:false})-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
+        }else {
+            stringBuilder.append(" MATCH (org)-[:" + HAS_EMPLOYMENTS + "]-(emp:Employment)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false}) ");
         }
         if(CollectionUtils.isNotEmpty(staffIds)) {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
