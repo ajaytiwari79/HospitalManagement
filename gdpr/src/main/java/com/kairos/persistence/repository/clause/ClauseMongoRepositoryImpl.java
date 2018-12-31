@@ -141,12 +141,13 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+    public List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO, BigInteger templateTypeId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("templateTypes").in(templateTypeId).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
                         .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
+                lookup("templateType","templateTypeId","_id","templateTypes"),
                 sort(Sort.Direction.DESC, "createdAt")
         );
         AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
