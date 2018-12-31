@@ -41,6 +41,7 @@ public class GeneralActivityTabWithTagDTO {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;
+    private boolean activityCanBeCopied;
 
     public Integer getAddTimeTo() {
         return addTimeTo;
@@ -231,5 +232,13 @@ public class GeneralActivityTabWithTagDTO {
 
     public void setPrintoutSymbol(String printoutSymbol) {
         this.printoutSymbol = printoutSymbol;
+    }
+
+    public boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied;
     }
 }

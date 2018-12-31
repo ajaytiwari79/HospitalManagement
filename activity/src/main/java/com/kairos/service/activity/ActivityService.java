@@ -296,6 +296,7 @@ public class ActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        generalActivityTabWithTagDTO.setActivityCanBeCopied(generalDTO.isActivityCanBeCopied());
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
 
     }
@@ -307,6 +308,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
+        generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
@@ -325,6 +327,10 @@ public class ActivityService extends MongoBaseService {
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activity.getBalanceSettingsActivityTab().getTimeTypeId(), countryId));
+        TimeType timeType=timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType!=null){
+            generalActivityTabWithTagDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
+        }
         return activityTabsWrapper;
     }
 
@@ -369,6 +375,7 @@ public class ActivityService extends MongoBaseService {
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
+        generalActivityTabDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
         updateActivityCategory(activity, countryId);
         /*save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);

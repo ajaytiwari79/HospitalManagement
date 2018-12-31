@@ -17,6 +17,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
@@ -28,6 +29,7 @@ import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.OrganizationRestClient;
@@ -130,6 +132,7 @@ public class OrganizationActivityService extends MongoBaseService {
     private GlideTimeSettingsService glideTimeSettingsService;
     @Inject private WTAService wtaService;
     @Inject private CostTimeAgreementService costTimeAgreementService;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -231,6 +234,10 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
+        TimeType timeType= timeTypeMongoRepository.findOneById(balanceSettingsActivityTab.getTimeTypeId());
+        if(timeType!=null){
+            generalActivityTabWithTagDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
+        }
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
         return activityTabsWrapper;
     }
@@ -302,6 +309,7 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        generalActivityTabWithTagDTO.setActivityCanBeCopied(generalDTO.isActivityCanBeCopied());
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
 
     }
