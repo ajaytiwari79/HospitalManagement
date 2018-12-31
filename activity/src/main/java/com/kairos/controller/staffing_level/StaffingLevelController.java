@@ -168,7 +168,7 @@ public class StaffingLevelController {
                 staffingLevelService.createStaffingLevelFromStaffingLevelTemplate(unitId, staffingLevelFromTemplateDTO,templateId));
     }
 
-    @GetMapping(value = "/updated_staffing_level")
+    @PostMapping(value = "/updated_staffing_level")
     @ApiOperation("get staffing level if Updated")
     public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
