@@ -55,7 +55,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
     private LocationActivityTab locationActivityTab;
-    private PermissionsActivityTab permissionsActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     @JsonIgnore
     private boolean disabled;
@@ -312,15 +311,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
         BeanUtils.copyProperties(source, target, _id, organizationSubType, organizationType);
         return target;
     }
-
-    public PermissionsActivityTab getPermissionsActivityTab() {
-        return permissionsActivityTab;
-    }
-
-    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
-        this.permissionsActivityTab = permissionsActivityTab;
-    }
-
 
     public String getExternalId() {
         return externalId;
