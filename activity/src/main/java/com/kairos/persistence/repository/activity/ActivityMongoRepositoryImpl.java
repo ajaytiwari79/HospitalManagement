@@ -77,7 +77,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
-                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
 
         );
@@ -122,7 +121,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("rulesActivityTab").as("rulesActivityTab")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
-                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
 
         );
@@ -143,7 +141,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
-                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
@@ -189,7 +186,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 //  graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
-                project("name", "generalActivityTab", "compositeActivities", "permissionsActivityTab"));
+                project("name", "generalActivityTab", "compositeActivities"));
 
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
@@ -402,7 +399,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("optaPlannerSettingActivityTab").as("activity.optaPlannerSettingActivityTab")
                         .and("ctaAndWtaSettingsActivityTab").as("activity.ctaAndWtaSettingsActivityTab")
                         .and("locationActivityTab").as("activity.locationActivityTab")
-                        .and("permissionsActivityTab").as("activity.permissionsActivityTab")
                         .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
         );
@@ -435,7 +431,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("optaPlannerSettingActivityTab").as("activity.optaPlannerSettingActivityTab")
                         .and("ctaAndWtaSettingsActivityTab").as("activity.ctaAndWtaSettingsActivityTab")
                         .and("locationActivityTab").as("activity.locationActivityTab")
-                        .and("permissionsActivityTab").as("activity.permissionsActivityTab")
                         .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
         );
@@ -525,7 +520,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("optaPlannerSettingActivityTab").as("activity.optaPlannerSettingActivityTab")
                         .and("ctaAndWtaSettingsActivityTab").as("activity.ctaAndWtaSettingsActivityTab")
                         .and("locationActivityTab").as("activity.locationActivityTab")
-                        .and("permissionsActivityTab").as("activity.permissionsActivityTab")
                         .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
         );
@@ -553,4 +547,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
+    @Override
+    public ActivityDTO eligibleForCopy(BigInteger activityId) {
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("_id").is(activityId).and("deleted").is(false))
+                ,lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType")
+                ,project().and("id").as("id").and("timeType.activityCanBeCopied").as("activityCanBeCopied"));
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
+    }
 }

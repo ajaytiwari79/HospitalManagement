@@ -30,7 +30,6 @@ public class ActivityTagDTO {
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
-    private PermissionsActivityTab permissionsActivityTab;
     private LocalDate startDate;
     private LocalDate endDate;
     private TimeCalculationActivityTab timeCalculationActivityTab;
@@ -163,14 +162,6 @@ public class ActivityTagDTO {
 
     public void setState(ActivityStateEnum state) {
         this.state = state;
-    }
-
-    public PermissionsActivityTab getPermissionsActivityTab() {
-        return permissionsActivityTab;
-    }
-
-    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
-        this.permissionsActivityTab = permissionsActivityTab;
     }
 
     public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {

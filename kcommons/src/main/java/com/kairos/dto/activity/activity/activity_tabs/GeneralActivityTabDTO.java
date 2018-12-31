@@ -40,7 +40,6 @@ public class GeneralActivityTabDTO {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;
-    private boolean eligibleForCopy;
 
     public GeneralActivityTabDTO() {
         // dc
@@ -110,17 +109,6 @@ public class GeneralActivityTabDTO {
     public void setModifiedDocumentName(String modifiedDocumentName) {
         this.modifiedDocumentName = modifiedDocumentName;
     }
-
-    public boolean isEligibleForCopy() {
-        return eligibleForCopy;
-    }
-
-    public void setEligibleForCopy(boolean eligibleForCopy) {
-        this.eligibleForCopy = eligibleForCopy;
-    }
-
-
-
 
     public String getUltraShortName() {
         return ultraShortName;
