@@ -36,6 +36,7 @@ dependencies {
 */
 plugins {
     id 'net.researchgate.release' version '2.6.0'
+    id "org.sonarqube" version "2.5"
 }
 
 version '0.0.1'
@@ -66,7 +67,16 @@ subprojects{
         compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
     }
 }
-
+sonarqube {
+    properties {
+        property "sonar.projectName", "kairos"
+        property "sonar.projectKey", "kairos"
+        property "sonar.sources","src"
+        property "sonar.host.url","http://localhost:9000"
+        property "sonar.login","bc108db3fb3802d76a37527c5c739bbc9a5a9075"
+        property "sonar.sourceEncoding", "UTF-8"
+    }
+}
 
 subprojects {
     task allDeps(type: DependencyReportTask) {}
