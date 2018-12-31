@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -268,7 +269,7 @@ public class FunctionalPaymentService {
                 exceptionService.dataNotFoundByIdException("message.publishDate.notlessthan_or_equals.parent_startDate");
             }
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
-                    functionalPaymentDTO.getStartDate().minusDays(1L).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+                    functionalPaymentDTO.getStartDate().minusDays(1L).toString());
             parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
             if (functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
                 functionalPayment.get().setEndDate(null);
@@ -280,19 +281,19 @@ public class FunctionalPaymentService {
     }
 
 
-    public void updateAmountInFunctionalTable(Long payTableId, Date startDate, Date endDate, BigDecimal percentageValue) {
-        List<FunctionalPayment> functionalPaymentList = functionalPaymentGraphRepository.findAllActiveByPayTableId(payTableId, startDate.getTime(), null);
+    public void updateAmountInFunctionalTable(Long payTableId, LocalDate startDate, LocalDate endDate, BigDecimal percentageValue) {
+        List<FunctionalPayment> functionalPaymentList = functionalPaymentGraphRepository.findAllActiveByPayTableId(payTableId, startDate.toString(), null);
         List<FunctionalPayment> toBreakInNewList = new ArrayList<>();
         List<FunctionalPayment> toUpdateInExisting = new ArrayList<>();
         for (FunctionalPayment functionalPayment : functionalPaymentList) {
             if (endDate == null) {
-                if (functionalPayment.getStartDate().isAfter(DateUtils.asLocalDate(startDate).minusDays(1))) {
+                if (functionalPayment.getStartDate().isAfter(startDate.minusDays(1))) {
                     toUpdateInExisting.add(functionalPayment);
-                } else if (functionalPayment.getStartDate().isBefore(DateUtils.asLocalDate(startDate))) {
+                } else if (functionalPayment.getStartDate().isBefore(startDate)) {
                     toBreakInNewList.add(functionalPayment);
                 }
             } else {
-                if (functionalPayment.getEndDate() != null || (functionalPayment.getStartDate().isAfter(DateUtils.asLocalDate(startDate).minusDays(1)) && functionalPayment.getEndDate().isBefore(DateUtils.asLocalDate(startDate).plusDays(1)))) {
+                if (functionalPayment.getEndDate() != null || (functionalPayment.getStartDate().isAfter(startDate.minusDays(1)) && functionalPayment.getEndDate().isBefore(startDate.plusDays(1)))) {
                     toUpdateInExisting.add(functionalPayment);
                 } else {
                     toBreakInNewList.add(functionalPayment);
@@ -315,16 +316,16 @@ public class FunctionalPaymentService {
 
             for (FunctionalPaymentQueryResult functionalPaymentQueryResult : functionalPaymentQueryResults) {
 
-                if (functionalPaymentQueryResult.getEndDate() == null && functionalPaymentQueryResult.getStartDate().isBefore(DateUtils.asLocalDate(startDate))) {
+                if (functionalPaymentQueryResult.getEndDate() == null && functionalPaymentQueryResult.getStartDate().isBefore(startDate)) {
                     FunctionalPayment existing = functionalPaymentMap.get(functionalPaymentQueryResult.getId());
                     existing.setStartDate(functionalPaymentQueryResult.getStartDate());
-                    existing.setEndDate(DateUtils.asLocalDate(startDate).minusDays(1));
+                    existing.setEndDate(startDate.minusDays(1));
 
                     functionalPaymentListBeforeDate.add(existing);
 
                     //Creating new and updating values
 
-                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), DateUtils.asLocalDate(startDate),
+                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), startDate,
                             functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
                     functionalPayment.setParentFunctionalPayment(existing);
                     functionalPayment.setPublished(functionalPaymentQueryResult.isPublished());

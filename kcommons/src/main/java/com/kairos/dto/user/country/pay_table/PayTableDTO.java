@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
@@ -22,10 +23,10 @@ public class PayTableDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-    private Date startDateMillis;
+    private LocalDate startDateMillis;
 
 
-    private Date endDateMillis;
+    private LocalDate endDateMillis;
     @NotNull(message = "Level can not be null")
     private Long levelId;
 
@@ -61,19 +62,19 @@ public class PayTableDTO {
         this.shortName = shortName;
     }
 
-    public Date getStartDateMillis() {
+    public LocalDate getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Date startDateMillis) {
+    public void setStartDateMillis(LocalDate startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public LocalDate getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(LocalDate endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -101,15 +102,6 @@ public class PayTableDTO {
         this.percentageValue = percentageValue;
     }
 
-    public PayTableDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, String paymentUnit, Long levelId) {
-        this.name = name;
-        this.shortName = shortName;
-        this.description = description;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.paymentUnit = paymentUnit;
-        this.levelId = levelId;
-    }
 
     @Override
     public String toString() {
@@ -131,10 +123,7 @@ public class PayTableDTO {
             return false;
         }
         if (Optional.ofNullable(this.endDateMillis).isPresent()) {
-            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
-            return dateValue;
+            return endDateMillis.isAfter(startDateMillis.minusDays(1));
         }
         return true;
     }

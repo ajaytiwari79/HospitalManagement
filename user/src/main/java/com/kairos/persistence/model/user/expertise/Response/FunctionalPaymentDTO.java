@@ -14,9 +14,7 @@ public class FunctionalPaymentDTO {
     @Min(0)
     private Long expertiseId;
     private Long id;
-    @Convert(LocalDateConverter.class)
     private LocalDate startDate;
-    @Convert(LocalDateConverter.class)
     private LocalDate endDate;
     private PaidOutFrequencyEnum paymentUnit;
     private boolean published;

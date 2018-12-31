@@ -161,9 +161,9 @@ public class ClientAddressService{
         address.put("municipalityId", (municipality == null) ? null : municipality.getId());
         address.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
         address.put("addressProtected", contactAddress.isAddressProtected());
+        address.put("description", contactAddress.getDescription());
         address.put("startDate", DateConverter.getDate(contactAddress.getStartDate()));
         address.put("endDate", DateConverter.getDate(contactAddress.getEndDate()));
-        address.put("description", contactAddress.getDescription());
         address.put("street1", contactAddress.getStreet());
         address.put("locationName",contactAddress.getLocationName());
         return address;
@@ -349,9 +349,7 @@ public class ClientAddressService{
         contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
         contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
         contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        contactAddress.setStartDate(addressDTO.getStartDate());
         contactAddress.setTypeOfHousing(housingType);
-        contactAddress.setEndDate(addressDTO.getEndDate());
         contactAddress.setStreet(addressDTO.getStreet());
         contactAddress.setHouseNumber(addressDTO.getHouseNumber());
         contactAddress.setFloorNumber(addressDTO.getFloorNumber());

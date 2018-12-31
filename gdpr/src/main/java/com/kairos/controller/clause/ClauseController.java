@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -91,7 +92,7 @@ public class ClauseController {
 
     @ApiOperation("get all clause of unit")
     @GetMapping(UNIT_URL + "/clause")
-    public ResponseEntity<ResponseDTO<List<ClauseBasicResponseDTO>>> getAllClause(@PathVariable Long unitId) {
+    public ResponseEntity<ResponseDTO<List<UnitLevelClauseResponseDTO>>> getAllClause(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.getAllClauseByUnitId(unitId));
     }
 

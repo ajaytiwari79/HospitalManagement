@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -14,7 +15,9 @@ import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedS
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -44,8 +47,7 @@ public class User extends UserBaseEntity {
     private String email;
     private Long lastSelectedParentOrgId;
     private Long lastSelectedChildOrgId;
-    @DateLong
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     //uniqueness of user
     private String timeCareExternalId;
@@ -376,7 +378,7 @@ public class User extends UserBaseEntity {
      * @param dateOfBirth
      * @Use while uploading multiple client in batch
      */
-    public User(String firstName, String lastName, String cprNumber, Date dateOfBirth) {
+    public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -504,11 +506,11 @@ public class User extends UserBaseEntity {
         this.pregnant = pregnant;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff.employment;
 
+
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
@@ -9,8 +10,8 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class EmploymentUnitPositionQueryResult {
 
-Long earliestUnitPositionStartDateMillis;
-Long employmentEndDateMillis;
+private Long earliestUnitPositionStartDateMillis;
+private Long employmentEndDateMillis;
 
     public Long getEarliestUnitPositionStartDateMillis() {
         return earliestUnitPositionStartDateMillis;
