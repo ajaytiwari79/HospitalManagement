@@ -7,6 +7,7 @@ import com.kairos.persistence.model.clause.Clause;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigInteger;
@@ -27,7 +28,7 @@ public interface CustomClauseRepository {
 
     List<ClauseResponseDTO> findAllClauseByCountryId(Long countryId);
 
-    List<ClauseBasicResponseDTO> findAllClauseByUnitId(Long unitId);
+    List<UnitLevelClauseResponseDTO> findAllClauseByUnitId(Long unitId);
 
     List<ClauseBasicResponseDTO> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO, BigInteger templateTypeId);
 

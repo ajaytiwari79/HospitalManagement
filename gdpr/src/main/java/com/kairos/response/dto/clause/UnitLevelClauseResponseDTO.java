@@ -15,7 +15,7 @@ import java.util.List;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClauseBasicResponseDTO {
+public class UnitLevelClauseResponseDTO {
 
     private BigInteger id;
     private String title;
@@ -24,6 +24,7 @@ public class ClauseBasicResponseDTO {
     private String descriptionHtml;
     private List<ClauseTagDTO> tags = new ArrayList<>();
     private boolean linkedWithOtherTemplate;
+    private List<TemplateTypeResponseDTO> templateTypes = new ArrayList<>();
 
     public BigInteger getId() {
         return id;
@@ -73,6 +74,14 @@ public class ClauseBasicResponseDTO {
         this.linkedWithOtherTemplate = linkedWithOtherTemplate;
     }
 
-    public ClauseBasicResponseDTO() {
+    public List<TemplateTypeResponseDTO> getTemplateTypes() {
+        return templateTypes;
+    }
+
+    public void setTemplateTypes(List<TemplateTypeResponseDTO> templateTypes) {
+        this.templateTypes = templateTypes;
+    }
+
+    public UnitLevelClauseResponseDTO() {
     }
 }
