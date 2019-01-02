@@ -161,10 +161,16 @@ public class WTAService extends MongoBaseService {
             wtaResponseDTO.setEndDateMillis(wta.getEndDate().getTime());
         }
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
-        save(wta);
-        wtaResponseDTO.setId(wta.getId());
-        assignWTAToNewOrganization(wta, wtaDTO, wtaBasicDetailsDTO, creatingFromCountry);
+        if(creatingFromCountry) {
+            save(wta);
+            wtaResponseDTO.setId(wta.getId());
+        }
 
+        Map<Long,WTAResponseDTO> wtaResponseDTOMap = assignWTAToNewOrganization(wta, wtaDTO, wtaBasicDetailsDTO, creatingFromCountry);
+
+        if(!creatingFromCountry) {
+            wtaResponseDTO = wtaResponseDTOMap.get(referenceId);
+        }
 
         // Adding this wta to all organization type
 
@@ -175,12 +181,14 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    private void assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry) {
+    private Map<Long,WTAResponseDTO> assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
         List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(o -> o.getId()).collect(Collectors.toList());
         List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdsAndName(organizationIds, wtadto.getName());
         Map<String, WorkingTimeAgreement> workingTimeAgreementMap = workingTimeAgreementList.stream().collect(Collectors.toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v));
         Map<String, BigInteger> activitiesIdsAndUnitIdsMap = getActivityMapWithUnitId(wtadto.getRuleTemplates(), wtaBasicDetailsDTO.getOrganizations());
+        Map<Long,WTAResponseDTO> wtaResponseDTOMap = new HashMap<>();
+        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<WTAResponseDTO>();
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
             if (workingTimeAgreementMap.get(wtadto.getName() + "_" + organization.getId() + "_" + wta.getOrganizationType().getId()) == null) {
@@ -199,17 +207,31 @@ public class WTAService extends MongoBaseService {
                     save(ruleTemplates);
                     List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
                     workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
+                    WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates);
+
                 }
 
                 workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
                 workingTimeAgreement.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
                 workingTimeAgreement.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
+                WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
+                wtaResponseDTOMap.put(organization.getId(),wtaResponseDTO);
+
+
                 workingTimeAgreements.add(workingTimeAgreement);
             }
         });
         if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);
+            workingTimeAgreements.forEach(workingTimeAgreement ->  {
+                WTAResponseDTO wtaResponseDTO = wtaResponseDTOMap.get(workingTimeAgreement.getOrganization().getId());
+                wtaResponseDTO.setId(workingTimeAgreement.getId());
+
+                }
+            );
         }
+
+        return wtaResponseDTOMap;
     }
 
 
