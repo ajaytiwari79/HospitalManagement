@@ -618,6 +618,4 @@ public class PayTableService {
            exceptionService.actionNotPermittedException("published_pay_table.exists",publishedDate);
         }
     }
-
-
 }
