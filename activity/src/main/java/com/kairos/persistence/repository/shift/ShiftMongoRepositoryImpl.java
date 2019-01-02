@@ -385,7 +385,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Override
     public List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
         Criteria criteria=Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("disabled").is(false)
-                .and("startDate").lte(endDate).and("endDate").gte(startDate);
+                .and("startDate").gte(startDate).lte(endDate);
         List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
         aggregationOperation.add(new MatchOperation(criteria));
         aggregationOperation.add(unwind("activities"));
