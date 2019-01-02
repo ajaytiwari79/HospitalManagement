@@ -765,15 +765,14 @@ public class StaffRetrievalService {
         return expertiseIds;
     }
 
-    public  List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndUnitId(Long staffId, long unitId)
-    {
-        List<StaffExperienceInExpertiseDTO> expertises = new ArrayList<>();
+    public  List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndUnitId(Long staffId, long unitId) {
+        List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = new ArrayList<>();
         organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            expertises = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndServicesAndLevel(staffId,servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
+            staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndServicesAndLevel(staffId,servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
         } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            expertises = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndServices(staffId, servicesAndLevel.getServicesId());
+            staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndServices(staffId, servicesAndLevel.getServicesId());
         }
-        return expertises;
+        return staffExperienceInExpertiseDTOList;
     }
 }
