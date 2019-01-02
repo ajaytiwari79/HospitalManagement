@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.wrapper.PositionCodeUnionWrapper;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -67,6 +68,8 @@ public class PositionCodeService {
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
     public PositionCode createPositionCode(Long id, PositionCodeDTO positionCodeDTO, String type) {
         Long unitId = organizationService.getOrganization(id, type);
         PositionCode position = null;
@@ -184,16 +187,15 @@ public class PositionCodeService {
 
     }
 
-    public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long id, String type, Long staffId) {
+    public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long unitId, String type, Long staffId) {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
 
-        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staffId);
-
-        Organization organization = organizationService.getOrganizationDetail(id, type);
+        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId,unitId);
+        Organization organization = organizationService.getOrganizationDetail(unitId, type);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
            exceptionService.dataNotFoundByIdException("message.positioncode.organization.notfound");
 
