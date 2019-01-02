@@ -195,9 +195,6 @@ public class PositionCodeService {
         }
 
         List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId,unitId);
-
-        //List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndUnitId(staffId);
-
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
            exceptionService.dataNotFoundByIdException("message.positioncode.organization.notfound");
