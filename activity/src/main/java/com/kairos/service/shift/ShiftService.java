@@ -118,6 +118,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.MULTIPLE_ACTIVITY;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 import static com.kairos.enums.shift.ShiftStatus.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
@@ -229,19 +230,21 @@ public class ShiftService extends MongoBaseService {
             shiftWithViolatedInfoDTO = saveShift(activityWrapper, staffAdditionalInfoDTO, shiftDTO,phase, byTandAPhase);
 
         }
-
-        addReasonCode(shiftWithViolatedInfoDTO,staffAdditionalInfoDTO.getReasonCodes());
-
+        addReasonCode(shiftWithViolatedInfoDTO.getShifts(),staffAdditionalInfoDTO.getReasonCodes());
         return shiftWithViolatedInfoDTO;
     }
 
-    public void addReasonCode(ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO,List<ReasonCodeDTO> reasonCodes) {
-
+    public void addReasonCode(List<ShiftDTO> shiftDTOS,List<ReasonCodeDTO> reasonCodes) {
         Map<Long,ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(reasoncodeDTO->reasoncodeDTO.getId(),v->v));
-        for(ShiftDTO shift:shiftWithViolatedInfoDTO.getShifts()) {
-            for(ShiftActivityDTO activity:shiftWithViolatedInfoDTO.getShifts().get(0).getActivities()) {
+        for(ShiftDTO shift:shiftDTOS) {
+            Set<BigInteger> multipleActivityCount = new HashSet<>();
+            for(ShiftActivityDTO activity:shift.getActivities()) {
                 activity.setReasonCode(reasonCodeDTOMap.get(activity.getAbsenceReasonCodeId()));
+                if(!activity.isBreakShift()){
+                    multipleActivityCount.add(activity.getActivityId());
+                }
             }
+            shift.setMultipleActivity(multipleActivityCount.size() > MULTIPLE_ACTIVITY);
         }
     }
 
@@ -619,7 +622,7 @@ public class ShiftService extends MongoBaseService {
 
         }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
-        addReasonCode(shiftWithViolatedInfoDTO,staffAdditionalInfoDTO.getReasonCodes());
+        addReasonCode(shiftWithViolatedInfoDTO.getShifts(),staffAdditionalInfoDTO.getReasonCodes());
         return shiftWithViolatedInfoDTO;
     }
 
@@ -654,7 +657,6 @@ public class ShiftService extends MongoBaseService {
             List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
             reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId,requestParam);
         }
-        Map<Long,ReasonCodeDTO> reasonCodeMap = reasonCodeDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         //When UnitPositionID is not present then we are retreiving shifts for all staffs(NOT only for UnitPosition).
         if (startDate == null) {
             startDate = DateUtils.getLocalDate();
@@ -664,13 +666,7 @@ public class ShiftService extends MongoBaseService {
         }
         List<ShiftDTO> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId) :
                 shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId);
-
-        for(ShiftDTO shift:shifts) {
-            for(ShiftActivityDTO activity: shift.getActivities()) {
-                activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
-            }
-        }
-
+        addReasonCode(shifts,reasonCodeDTOS);
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
