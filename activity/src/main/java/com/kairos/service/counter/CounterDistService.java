@@ -522,6 +522,7 @@ public class CounterDistService extends MongoBaseService {
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(new ArrayList<>(subOrgTypeIds), new ArrayList<>());
         Map<Long,Set<BigInteger>> subOrgTypeOrKPIMap=orgTypeMappingDTOS.stream().collect(Collectors.groupingBy(OrgTypeMappingDTO::getOrgTypeId,Collectors.mapping(OrgTypeMappingDTO::getKpiId,Collectors.toSet())));
         Map<Long,Set<BigInteger>> unitIdOrKpiMap=new HashMap<>();
+        List<Long> unitIds=orgTypeDTOS.stream().map(orgTypeDTO -> orgTypeDTO.getUnitId()).collect(toList());
         orgTypeDTOS.forEach(orgTypeDTO -> {
             orgTypeDTO.getOrgTypeIds().forEach(subOrgType->{
                if(subOrgTypeOrKPIMap.get(subOrgType)!=null){
@@ -533,10 +534,9 @@ public class CounterDistService extends MongoBaseService {
                }
             });
         });
-        List<Long> unitIds=new ArrayList<>();
         unitIdOrKpiMap.entrySet().forEach(k->{
-            if(!unitIdOrKpiMap.get(k.getKey()).contains(orgTypeMappingDTO.getKpiId())){
-                unitIds.add(k.getKey());
+            if(unitIdOrKpiMap.get(k.getKey()).contains(orgTypeMappingDTO.getKpiId())){
+                unitIds.remove(k.getKey());
             }
         });
         if(!unitIds.isEmpty()) {
