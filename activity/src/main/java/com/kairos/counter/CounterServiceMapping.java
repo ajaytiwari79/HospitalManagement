@@ -41,7 +41,7 @@ public class CounterServiceMapping {
 
     @Inject
     public void calculateTimeBankForUnit(TimeBankKpiCalculationService timeBankKpiCalculationService) {
-        this.counters.put(CounterType.TIME_BANK_FOR_UNIT, timeBankKpiCalculationService);
+        this.counters.put(CounterType.TIMEBANK, timeBankKpiCalculationService);
         logger.info("Enum mapping for time bank for unit : "+this.counters);
     }
 
