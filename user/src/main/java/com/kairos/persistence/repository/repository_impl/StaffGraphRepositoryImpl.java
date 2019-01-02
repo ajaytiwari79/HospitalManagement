@@ -62,7 +62,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     @Override
-    public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds) {
+    public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds,boolean parentOrganization) {
         Map<String, Object> queryParameters = new HashMap();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("MATCH (org:Organization)");
@@ -77,10 +77,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             stringBuilder.append(" MATCH(empType:EmploymentType) WHERE id(empType) IN {employmentType}");
             queryParameters.put("employmentType", employmentType);
         }
-        if(CollectionUtils.isEmpty(unitIds)){
-            stringBuilder.append(" MATCH (org)-[:"+HAS_EMPLOYMENTS+"]-(emp:Employment)-[:"+BELONGS_TO+"]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false}) ");
-        }else {
+        if(CollectionUtils.isNotEmpty(unitIds) || !parentOrganization){
             stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(up:UnitPosition{deleted:false})-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
+        }else {
+            stringBuilder.append(" MATCH (org)-[:" + HAS_EMPLOYMENTS + "]-(emp:Employment)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition{deleted:false}) ");
         }
         if(CollectionUtils.isNotEmpty(staffIds)) {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
@@ -89,10 +89,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         stringBuilder.append(" MATCH (up)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)"+
                 "WHERE  date(positionLine.startDate) <= date({endDate}) AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date({startDate}))"+
                 "MATCH (positionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
-                "with  COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek,\n" +
-                "avgDailyWorkingHours:positionLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) as ups,up,staff "+
-                "WITH {id:id(up),startDate:up.startDate,endDate:up.endDate,positionLines:ups } as up,staff\n" +
-                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,collect(up) as unitPosition");
+                "WITH  COLLECT({totalWeeklyMinutes:(positionLine.totalWeeklyMinutes % 60),startDate:positionLine.startDate,totalWeeklyHours:(positionLine.totalWeeklyMinutes / 60), hourlyCost:positionLine.hourlyCost,id:id(positionLine), workingDaysInWeek:positionLine.workingDaysInWeek,\n" +
+                "avgDailyWorkingHours:positionLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:positionLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:positionLine.totalWeeklyMinutes}) as ups,up,staff,org "+
+                "WITH {id:id(up),startDate:up.startDate,endDate:up.endDate,positionLines:ups } as up,staff,org\n" +
+                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,id(org) as unitId,org.name as unitName,collect(up) as unitPosition");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
 
