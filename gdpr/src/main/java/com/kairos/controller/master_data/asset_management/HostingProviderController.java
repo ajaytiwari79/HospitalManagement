@@ -51,7 +51,7 @@ public class HostingProviderController {
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable Integer hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, hostingProviderId));
 
     }
@@ -66,14 +66,14 @@ public class HostingProviderController {
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable Integer hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(countryId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable Integer hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, hostingProviderId, hostingProviderDTO));
 
     }

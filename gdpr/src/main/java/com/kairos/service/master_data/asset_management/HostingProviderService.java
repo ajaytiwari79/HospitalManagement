@@ -8,6 +8,8 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
+import com.kairos.persistence.model.master_data.default_asset_setting.HostingProviderMD;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -22,6 +24,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -37,6 +40,9 @@ public class HostingProviderService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private HostingProviderMDRepository hostingProviderMDRepository;
+
 
     /**
      * @param countryId
@@ -46,25 +52,29 @@ public class HostingProviderService extends MongoBaseService {
      * and if exist then simply add  HostingProvider to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
-
-        Map<String, List<HostingProvider>> result = new HashMap<>();
+    public Map<String, List<HostingProviderMD>> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+    //TODO still need to optimize we can get name of list in string from here
+        Map<String, List<HostingProviderMD>> result = new HashMap<>();
         Set<String> hostingProviderNames = new HashSet<>();
         if (!hostingProviderDTOS.isEmpty()) {
             for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
                 hostingProviderNames.add(hostingProvider.getName());
             }
-            List<HostingProvider> existing = findMetaDataByNamesAndCountryId(countryId, hostingProviderNames, HostingProvider.class);
+            List<String> nameInLowerCase = hostingProviderNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<HostingProviderMD> existing = hostingProviderMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
-            List<HostingProvider> newHostingProviders = new ArrayList<>();
+            List<HostingProviderMD> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
                 for (String name : hostingProviderNames) {
 
-                    HostingProvider newHostingProvider = new HostingProvider(name, countryId, SuggestedDataStatus.APPROVED);
+                    HostingProviderMD newHostingProvider = new HostingProviderMD(name, countryId, SuggestedDataStatus.APPROVED);
                     newHostingProviders.add(newHostingProvider);
                 }
 
-                newHostingProviders = hostingProviderMongoRepository.saveAll(getNextSequence(newHostingProviders));
+                newHostingProviders = hostingProviderMDRepository.saveAll(newHostingProviders);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingProviders);
@@ -82,7 +92,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
-        return hostingProviderMongoRepository.findAllByCountryIdAndSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return hostingProviderMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -93,11 +103,11 @@ public class HostingProviderService extends MongoBaseService {
      * @return HostingProvider object fetch by id
      * @throws DataNotFoundByIdException if HostingProvider not exist for given id
      */
-    public HostingProvider getHostingProviderById(Long countryId, BigInteger id) {
+    public HostingProviderMD getHostingProviderById(Long countryId, Integer id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId, id);
+        HostingProviderMD exist = hostingProviderMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("No data found");
         } else {
             return exist;
 
@@ -105,16 +115,15 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingProvider(Long countryId, BigInteger id) {
+    public Boolean deleteHostingProvider(Long countryId, Integer id) {
 
-        HostingProvider hostingProvider = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(hostingProvider).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(hostingProvider);
-            return true;
-
+        Integer resultCount = hostingProviderMDRepository.deleteByIdAndCountryId(id, countryId);
+        if (resultCount > 0) {
+            LOGGER.info("Hosting Provider deleted successfully for id :: {}", id);
+        }else{
+            throw new DataNotFoundByIdException("No data found");
         }
+        return true;
     }
 
 
@@ -126,8 +135,8 @@ public class HostingProviderService extends MongoBaseService {
      * @return return updated HostingProvider object
      * @throws DuplicateDataException if HostingProvider exist with same name
      */
-    public HostingProviderDTO updateHostingProvider(Long countryId, BigInteger id, HostingProviderDTO hostingProviderDTO) {
-
+    public HostingProviderDTO updateHostingProvider(Long countryId, Integer id, HostingProviderDTO hostingProviderDTO) {
+        //TODO What actually this code is doing?
         HostingProvider hostingProvider = hostingProviderMongoRepository.findByName(countryId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
@@ -135,12 +144,12 @@ public class HostingProviderService extends MongoBaseService {
             }
             throw new DuplicateDataException("data  exist for  " + hostingProviderDTO.getName());
         }
-        hostingProvider = hostingProviderMongoRepository.findByid(id);
-        if (!Optional.ofNullable(hostingProvider).isPresent()) {
+        Integer resultCount =  hostingProviderMDRepository.updateHostingProviderName(hostingProviderDTO.getName(), id);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }
-        hostingProvider.setName(hostingProviderDTO.getName());
-        hostingProviderMongoRepository.save(hostingProvider);
         return hostingProviderDTO;
 
     }

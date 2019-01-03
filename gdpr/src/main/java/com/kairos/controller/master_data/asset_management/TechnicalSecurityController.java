@@ -49,7 +49,7 @@ public class TechnicalSecurityController {
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
     @GetMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId) {
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable Integer techSecurityMeasureId) {
            return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
     }
 
@@ -62,7 +62,7 @@ public class TechnicalSecurityController {
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
     @DeleteMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId) {
+    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable Integer techSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
 
     }
@@ -70,7 +70,7 @@ public class TechnicalSecurityController {
 
     @ApiOperation("update Technical security measure by id")
     @PutMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
+    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable Integer techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(countryId, techSecurityMeasureId, securityMeasure));
 
     }

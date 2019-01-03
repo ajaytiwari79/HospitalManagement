@@ -51,7 +51,7 @@ public class StorageFormatController {
 
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> getStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger storageFormatId) {
+    public ResponseEntity<Object> getStorageFormat(@PathVariable Long countryId, @PathVariable Integer storageFormatId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(countryId, storageFormatId));
     }
 
@@ -65,7 +65,7 @@ public class StorageFormatController {
 
     @ApiOperation("delete StorageFormat  by id")
     @DeleteMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger storageFormatId) {
+    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long countryId, @PathVariable Integer storageFormatId) {
       return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(countryId, storageFormatId));
 
     }
@@ -73,7 +73,7 @@ public class StorageFormatController {
 
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable Integer storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(countryId, storageFormatId, storageFormat));
 
     }

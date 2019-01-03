@@ -8,6 +8,8 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
+import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormatMD;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -22,6 +24,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -37,6 +40,9 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private StorageFormatMDRepository storageFormatMDRepository;
+
     /**
      * @param countryId
      * @param
@@ -46,28 +52,28 @@ public class StorageFormatService extends MongoBaseService {
      * and if exist then simply add  StorageFormat to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
-    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
-
-        Map<String, List<StorageFormat>> result = new HashMap<>();
+    public Map<String, List<StorageFormatMD>> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
+        //TODO still need to optimize we can get name of list in string from here
+        Map<String, List<StorageFormatMD>> result = new HashMap<>();
         Set<String> storageFormatNames = new HashSet<>();
         if (!storageFormatDTOS.isEmpty()) {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
             }
-            List<StorageFormat> existing = findMetaDataByNamesAndCountryId(countryId, storageFormatNames, StorageFormat.class);
+            List<String> nameInLowerCase = storageFormatNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<StorageFormatMD> existing = storageFormatMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
-            List<StorageFormat> newStorageFormats = new ArrayList<>();
+            List<StorageFormatMD> newStorageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-
-                    StorageFormat newStorageFormat = new StorageFormat(name,countryId,SuggestedDataStatus.APPROVED);
+                    StorageFormatMD newStorageFormat = new StorageFormatMD(name,countryId,SuggestedDataStatus.APPROVED);
                     newStorageFormats.add(newStorageFormat);
-
                 }
-
-
-                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
+                newStorageFormats = storageFormatMDRepository.saveAll(newStorageFormats);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -85,7 +91,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long countryId) {
-        return storageFormatMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return storageFormatMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
     /**
@@ -95,11 +101,11 @@ public class StorageFormatService extends MongoBaseService {
      * @return StorageFormat object fetch via given id
      * @throws DataNotFoundByIdException throw exception if StorageFormat not exist for given id
      */
-    public StorageFormat getStorageFormat(Long countryId, BigInteger id) {
+    public StorageFormatMD getStorageFormat(Long countryId, Integer id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, id);
+        StorageFormatMD exist = storageFormatMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+            throw new DataNotFoundByIdException("No data found");
         } else {
             return exist;
 
@@ -107,16 +113,14 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(Long countryId, BigInteger id) {
-
-        StorageFormat storageFormat = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(storageFormat).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+    public Boolean deleteStorageFormat(Long countryId, Integer id) {
+        Integer resultCount = storageFormatMDRepository.deleteByIdAndCountryId(id, countryId);
+        if (resultCount > 0) {
+            LOGGER.info("Storage Format deleted successfully for id :: {}", id);
+        }else{
+            throw new DataNotFoundByIdException("No data found");
         }
-            delete(storageFormat);
-            return true;
-
-
+        return true;
     }
 
 
@@ -128,8 +132,8 @@ public class StorageFormatService extends MongoBaseService {
      * @return StorageFormat updated object
      * @throws DuplicateDataException throw exception if data not exist for given id
      */
-    public StorageFormatDTO updateStorageFormat(Long countryId, BigInteger id, StorageFormatDTO storageFormatDTO) {
-
+    public StorageFormatDTO updateStorageFormat(Long countryId, Integer id, StorageFormatDTO storageFormatDTO) {
+        //TODO What actually this code is doing?
         StorageFormat storageFormat = storageFormatMongoRepository.findByNameAndCountryId(countryId, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
@@ -137,12 +141,12 @@ public class StorageFormatService extends MongoBaseService {
             }
             throw new DuplicateDataException("data  exist for  " + storageFormatDTO.getName());
         }
-        storageFormat = storageFormatMongoRepository.findByid(id);
-        if (!Optional.ofNullable(storageFormat).isPresent()) {
+        Integer resultCount =  storageFormatMDRepository.updateStorageFormatName(storageFormatDTO.getName(), id);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, storageFormatDTO.getName());
         }
-        storageFormat.setName(storageFormatDTO.getName());
-        storageFormatMongoRepository.save(storageFormat);
         return storageFormatDTO;
 
 
