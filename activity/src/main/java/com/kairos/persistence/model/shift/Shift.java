@@ -55,6 +55,7 @@ public class Shift extends MongoBaseEntity {
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
+    private int timeBankCtaBonusMinutes;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -357,6 +358,13 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
 
     @Override
     public String toString() {

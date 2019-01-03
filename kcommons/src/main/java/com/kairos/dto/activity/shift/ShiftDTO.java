@@ -61,6 +61,10 @@ public class ShiftDTO {
     private boolean functionDeleted;
     private ShiftType shiftType;
     private BigInteger shiftStatePhaseId;
+    private int timeBankCtaBonusMinutes;
+    private int deltaTimeBankMinutes;
+    private long accumulatedTimeBankMinutes;
+    private int plannedMinutes;
 
    public ShiftDTO(BigInteger id, Date startDate,Date endDate,Long unitId,Long staffId) {
        this.id = id;
@@ -407,5 +411,37 @@ public class ShiftDTO {
 
     public void setFunctionDeleted(boolean functionDeleted) {
         this.functionDeleted = functionDeleted;
+    }
+
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
+
+    public int getDeltaTimeBankMinutes() {
+        return deltaTimeBankMinutes;
+    }
+
+    public void setDeltaTimeBankMinutes(int deltaTimeBankMinutes) {
+        this.deltaTimeBankMinutes = deltaTimeBankMinutes;
+    }
+
+    public long getAccumulatedTimeBankMinutes() {
+        return accumulatedTimeBankMinutes;
+    }
+
+    public void setAccumulatedTimeBankMinutes(long accumulatedTimeBankMinutes) {
+        this.accumulatedTimeBankMinutes = accumulatedTimeBankMinutes;
+    }
+
+    public int getPlannedMinutes() {
+        return plannedMinutes;
+    }
+
+    public void setPlannedMinutes(int plannedMinutes) {
+        this.plannedMinutes = plannedMinutes;
     }
 }

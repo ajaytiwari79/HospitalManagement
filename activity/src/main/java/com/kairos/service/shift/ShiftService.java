@@ -45,6 +45,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
@@ -662,12 +663,23 @@ public class ShiftService extends MongoBaseService {
                 endDate = DateUtils.getLocalDate();
             }
         }
-        List<ShiftDTO> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId) :
-                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId);
-
+        List<ShiftDTO> shifts;
+        Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = new HashMap<>();
+        if(Optional.ofNullable(unitPositionId).isPresent()){
+            shifts = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId);
+            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(unitPositionId,DateUtils.asDate(startDate),DateUtils.asDate(endDate));
+            dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getDate(),v->v));
+        }else {
+            shifts = shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId);
+        }
         for(ShiftDTO shift:shifts) {
             for(ShiftActivityDTO activity: shift.getActivities()) {
                 activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
+                activity.setPlannedMinutes(activity.getScheduledMinutes() + activity.getTimeBankCtaBonusMinutes());
+            }
+            shift.setPlannedMinutes(shift.getScheduledMinutes() + shift.getTimeBankCtaBonusMinutes());
+            if(dateDailyTimeBankEntryMap.containsKey(DateUtils.asLocalDate(shift.getStartDate()))){
+                shift.setDeltaTimeBankMinutes(dateDailyTimeBankEntryMap.get(DateUtils.asLocalDate(shift.getStartDate())).getTotalTimeBankMin());
             }
         }
 

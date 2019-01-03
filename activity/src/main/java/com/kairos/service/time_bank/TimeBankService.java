@@ -23,6 +23,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -208,7 +209,7 @@ public class TimeBankService extends MongoBaseService {
             //shiftWithActivityDTOS.sort((shift1,shift2)->shift1.getStartDate().compareTo(shift2.getStartDate()));
             startDate=new DateTime(shiftWithActivityDTOS.get(0).getStartDate());
             endDate=new DateTime(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getStartDate()).plusDays(1).withTimeAtStartOfDay();
-            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate.toDate(), endDate.toDate());
+            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate.toDate(), endDate.toDate());
             Map<String, DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getUnitPositionId() + "" + k.getDate(), v -> v));
             DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate.toDate()); // TODO PRADEEP WE CAN USE SHIFT DATE -1  as parameter to find the last date entry
             long accumulatedTimeBank = dailyTimeBankEntry != null ? dailyTimeBankEntry.getAccumultedTimeBankMin() : 0;
@@ -457,15 +458,18 @@ public class TimeBankService extends MongoBaseService {
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
         if(CollectionUtils.isNotEmpty(shifts)){
             Map<BigInteger, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getId(), v -> v));
-            shifts.forEach(shift -> {
-                shift.getActivities().forEach(shiftActivity -> {
+            for (Shift shift : shifts) {
+                int timeBankCtaBonusMinutes = 0;
+                for (ShiftActivity shiftActivity : shift.getActivities()) {
                     if (shiftActivityDTOMap.containsKey(shiftActivity.getId())) {
                         ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
                         shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+                        timeBankCtaBonusMinutes += shiftActivityDTO.getTimeBankCtaBonusMinutes();
                         shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
                     }
-                });
-            });
+                }
+                shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
+            }
             shiftMongoRepository.saveEntities(shifts);
         }
     }
@@ -502,7 +506,7 @@ public class TimeBankService extends MongoBaseService {
 
         LocalDate startDate =  copyShiftDTO.getStartDate();
         LocalDate endDate = copyShiftDTO.getEndDate();
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffUnitPosition.getId(),DateUtils.asDate( startDate.minusDays(1)), DateUtils.asDate(endDate));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(staffUnitPosition.getId(),DateUtils.asDate( startDate.minusDays(1)), DateUtils.asDate(endDate));
         Map<String, DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getUnitPositionId() + "" + k.getDate(), v -> v));
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>();
         Optional<DailyTimeBankEntry> dailyTimeBankEntry = dailyTimeBankEntries.stream().filter(timebank -> timebank.getDate().isEqual(copyShiftDTO.getStartDate())).findAny();
