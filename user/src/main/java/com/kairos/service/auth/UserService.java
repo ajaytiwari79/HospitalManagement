@@ -378,7 +378,8 @@ public class UserService {
     public UserOrganizationsDTO getLoggedInUserOrganizations() {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
-        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(currentUser.getLastSelectedOrganizationId(), userLanguageId);
+        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
+                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
         return userOrganizationsDTO;
     }
 
@@ -414,8 +415,7 @@ public class UserService {
     }
 
     public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
-        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        long currentUserId = currentUser.getId();
+        long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         if (permissionData.isHub()) {
@@ -461,8 +461,6 @@ public class UserService {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
-
-
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedChildAndParentId(organizationId);
@@ -667,7 +665,7 @@ public class UserService {
 
     public Boolean updateLastSelectedChildAndParentId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if(!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
+        if(!currentUser.getLastSelectedOrganizationId().equals(organizationId)){
             userGraphRepository.save(currentUser);
         }
         return true;
