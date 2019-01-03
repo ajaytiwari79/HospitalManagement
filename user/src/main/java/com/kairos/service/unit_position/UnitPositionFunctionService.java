@@ -69,6 +69,11 @@ public class UnitPositionFunctionService {
         return functionId;
     }
 
+    public Long removeFunctionOnDeleteShift(Long unitPositionId, Date appliedDate) {
+        Long functionId = unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+        return functionId;
+    }
+
 
     /**
      * @param unitPositionId
