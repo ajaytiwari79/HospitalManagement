@@ -25,4 +25,12 @@ public interface DataDisposalMDRepository extends JpaRepository<DataDisposalMD, 
     Integer updateDataDisposalName(String name, Integer id);
 
 
+    @Transactional
+    @Modifying
+    @Query(value = "delete from DataDisposalMD d where d.id = ?1 and d.countryId = ?2")
+    Integer deleteByIdAndCountryId(Integer id, Long countryId);
+
+
+
+
 }

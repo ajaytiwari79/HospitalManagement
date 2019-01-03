@@ -65,7 +65,7 @@ public class DataDisposalController {
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable Integer dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(countryId, dataDisposalId));
 
     }

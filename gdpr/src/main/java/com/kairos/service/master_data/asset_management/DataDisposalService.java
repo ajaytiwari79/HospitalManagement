@@ -106,7 +106,7 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataDisposalById(Long countryId, BigInteger id) {
+    /*public Boolean deleteDataDisposalById(Long countryId, BigInteger id) {
 
         DataDisposal dataDisposal = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(dataDisposal).isPresent()) {
@@ -115,6 +115,15 @@ public class DataDisposalService extends MongoBaseService {
         delete(dataDisposal);
         return true;
 
+    }*/
+    public Boolean deleteDataDisposalById(Long countryId, Integer id) {
+        Integer resultCount = dataDisposalMDRepository.deleteByIdAndCountryId(id, countryId);
+       if (resultCount > 0) {
+           LOGGER.info("Data Disposal deleted successfully for id :: {}", id);
+       }else{
+           throw new DataNotFoundByIdException("No data found");
+       }
+        return true;
     }
 
 
