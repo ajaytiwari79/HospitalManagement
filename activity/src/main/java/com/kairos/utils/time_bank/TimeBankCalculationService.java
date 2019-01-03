@@ -193,7 +193,7 @@ public class TimeBankCalculationService {
             if (valid) {
                 for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
                     DateTimeInterval positionInterval = positionLine.getInterval();
-                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
+                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate)))) {
                         contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
                         break;
                     }
