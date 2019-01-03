@@ -8,7 +8,6 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -31,7 +30,6 @@ public class StaffUnitPositionDetails {
     private LocalDate endDate;
     private Long lastModificationDate;
     private long id;
-    private PositionCode positionCode;
     private WTAResponseDTO workingTimeAgreement;
     private CTAResponseDTO costTimeAgreement;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
@@ -134,14 +132,6 @@ public class StaffUnitPositionDetails {
 
     public void setUnitTimeZone(ZoneId unitTimeZone) {
         this.unitTimeZone = unitTimeZone;
-    }
-
-    public PositionCode getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCode positionCode) {
-        this.positionCode = positionCode;
     }
 
     public WTAResponseDTO getWorkingTimeAgreement() {

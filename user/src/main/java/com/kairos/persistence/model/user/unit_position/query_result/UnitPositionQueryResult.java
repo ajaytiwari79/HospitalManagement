@@ -1,12 +1,10 @@
 package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
@@ -26,7 +24,6 @@ public class UnitPositionQueryResult {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long id;
-    private PositionCode positionCode;
     private Organization union;
     private LocalDate lastWorkingDate;
     private Long parentUnitId;
@@ -39,7 +36,6 @@ public class UnitPositionQueryResult {
     private Boolean editable=true;
     private Boolean published;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private boolean markMainEmployment;
     private boolean mainUnitPosition;
     private String unitName;
 
@@ -47,13 +43,12 @@ public class UnitPositionQueryResult {
         //Default Constructor
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Boolean published,Long parentUnitId) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Boolean published,Long parentUnitId) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
         this.lastWorkingDate = lastWorkingDate;
         this.id = id;
-        this.positionCode = positionCode;
         this.union = union;
         this.workingTimeAgreement=wta;
         this.unitId=unitId;
@@ -62,14 +57,13 @@ public class UnitPositionQueryResult {
 
     }
 
-    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id,Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
                                    Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
         this.lastWorkingDate = lastWorkingDate;
         this.id = id;
-        this.positionCode = positionCode;
         this.union = union;
         this.workingTimeAgreement=wta;
         this.unitId=unitId;
@@ -121,18 +115,9 @@ public class UnitPositionQueryResult {
         this.endDate = endDate;
     }
 
-    public PositionCode getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCode positionCode) {
-        this.positionCode = positionCode;
-    }
-
     public Long getId() {
         return id;
     }
-
 
     public void setId(long id) {
         this.id = id;
@@ -238,14 +223,6 @@ public class UnitPositionQueryResult {
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
-    }
-
-    public boolean isMarkMainEmployment() {
-        return markMainEmployment;
-    }
-
-    public void setMarkMainEmployment(boolean markMainEmployment) {
-        this.markMainEmployment = markMainEmployment;
     }
 
     public boolean isMainUnitPosition() {

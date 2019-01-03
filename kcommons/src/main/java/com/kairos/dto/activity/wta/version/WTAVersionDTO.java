@@ -2,7 +2,6 @@ package com.kairos.dto.activity.wta.version;
 
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.commons.utils.DateUtils;
 
 
@@ -29,7 +28,6 @@ public class WTAVersionDTO {
     private Long parentUnitId;
     private Long unitId;
     private Map<String, Object> unitInfo;
-    private PositionCodeDTO positionCode;
     private Long unitPositionId;
 
     public WTAVersionDTO() {
@@ -140,14 +138,6 @@ public class WTAVersionDTO {
 
     public void setUnitInfo(Map<String, Object> unitInfo) {
         this.unitInfo = unitInfo;
-    }
-
-    public PositionCodeDTO getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCodeDTO positionCode) {
-        this.positionCode = positionCode;
     }
 
     public Long getStartDateMillis() {

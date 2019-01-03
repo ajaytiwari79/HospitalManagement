@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -35,7 +34,6 @@ public class CTAResponseDTO {
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
-    private PositionCodeDTO positionCode;
     private Long unitPositionId;
     private Boolean disabled;
 
@@ -47,7 +45,7 @@ public class CTAResponseDTO {
         this.id = id;
         this.parentId = parentId;
     }
-    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description,PositionCodeDTO positionCodeDTO) {
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description) {
         this.id = id;
         this.name = name;
         this.expertise = expertise;
@@ -57,7 +55,6 @@ public class CTAResponseDTO {
         this.disabled = disabled;
         this.unitPositionId = unitPositionId;
         this.description=description;
-        this.positionCode=positionCodeDTO;
     }
 
 
@@ -98,14 +95,6 @@ public class CTAResponseDTO {
 
     public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
-    }
-
-    public PositionCodeDTO getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCodeDTO positionCode) {
-        this.positionCode = positionCode;
     }
 
     public BigInteger getId() {

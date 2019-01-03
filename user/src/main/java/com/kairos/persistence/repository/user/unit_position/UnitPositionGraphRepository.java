@@ -93,10 +93,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Organization)  \n" +
             "OPTIONAL MATCH(subOrg)<-[:"+IN_UNIT+"]-(unitPosition:UnitPosition{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WITH unitPosition,org,subOrg,staff,employment \n" +
             "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "return expertise as expertise,unionData as union, positionCode as positionCode, id(unitPosition) as id,\n" +
+            "return expertise as expertise,unionData as union, id(unitPosition) as id,\n" +
             " unitPosition.startDate as startDate,unitPosition.mainUnitPosition as mainUnitPosition, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
@@ -105,10 +104,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "MATCH(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
-            "MATCH(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "return expertise as expertise,unitPosition.mainUnitPosition as mainUnitPosition,unionData as union, positionCode as positionCode,id(unitPosition) as id,\n" +
+            "return expertise as expertise,unitPosition.mainUnitPosition as mainUnitPosition,unionData as union, id(unitPosition) as id,\n" +
             " unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId,id(org) as unitId,\n" +
@@ -159,12 +157,11 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("MATCH(org:Organization)<-[:"+IN_UNIT+"]-(unitPosition:UnitPosition{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WHERE id(staff)={0} AND id(org)={1}\n" +
             "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode{deleted:false}) \n" +
             "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "RETURN id(unitPosition) as id,unitPosition.startDate as startDate, unitPosition.endDate as endDate,unitPosition.mainUnitPosition as mainUnitPosition, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
-            "unitPosition.lastWorkingDate as lastWorkingDate,id(org)  as unitId,{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union, positionCode as positionCode")
+            "unitPosition.lastWorkingDate as lastWorkingDate,id(org)  as unitId,{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId,Long unitId);
 
     @Query("MATCH(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) where id(expertise)={2}\n" +
@@ -183,15 +180,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) where id(user)={0}\n" +
             "MATCH(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization)\n" +
             "MATCH(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff)\n" +
-            "MATCH(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-            "return  id(unitPosition) as id,positionCode as positionCode,unitPosition.history as history, \n" +
+            "return  id(unitPosition) as id,unitPosition.history as history, \n" +
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY unitPosition.creationDate" +
             " UNION " +
             "MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
             "MATCH(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "MATCH(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
-            "MATCH(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-            "return id(unitPosition) as id, positionCode as positionCode,unitPosition.history as history,\n" +
+            "return id(unitPosition) as id, unitPosition.history as history,\n" +
             "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo ORDER BY unitPosition.creationDate")
     List<UnitPositionQueryResult> getAllUnitPositionsBasicDetailsAndWTAByUser(long userId);
 
@@ -239,8 +234,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " avgDailyWorkingHours:positionLine.avgDailyWorkingHours,employmentType:employmentType}) end as positionLines")
     UnitPositionQueryResult getUnitPositionOfStaff(Long staffId, Long unitId);
 
-    @Query("MATCH(unitPosition:UnitPosition)-[:HAS_POSITION_CODE]-(pc:PositionCode) where id(unitPosition)={0} return unitPosition.published as published ," +
-            "unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id,pc as positionCode")
+    @Query("MATCH(unitPosition:UnitPosition) where id(unitPosition)={0} return unitPosition.published as published ," +
+            "unitPosition.startDate as startDate, unitPosition.endDate as endDate, id(unitPosition) as id")
     UnitPositionQueryResult findByUnitPositionId(Long unitPositionId);
 
     @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0} " +
@@ -296,13 +291,12 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 @Query("OPTIONAL MATCH (organization:Organization)  WHERE id(organization)={0}\n" +
         "OPTIONAL MATCH (staff:Staff)  WHERE id(staff)={1}\n" +
         "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true}) \n" +
-        "OPTIONAL MATCH(unitPosition)-[:"+HAS_POSITION_CODE+"]->(positionCode:PositionCode) " +
         "RETURN \n" +
         "CASE \n" +
         "WHEN organization IS NULL THEN \"organization\" \n" +
         "WHEN staff IS NULL THEN \"staff\"\n" +
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
-        "ELSE COLLECT({id:id(unitPosition),startDate:unitPosition.startDate,endDate:unitPosition.endDate,positionCodeName:positionCode.name}) END ")
+        "ELSE COLLECT({id:id(unitPosition),startDate:unitPosition.startDate,endDate:unitPosition.endDate}) END ")
         Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
@@ -342,20 +336,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "END")
     String validateOrganizationStaffUnitPosition(Long unitId,Long staffId,Long unitPositionId);
 
-    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false})-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) WHERE id(staff) ={0} AND id(expertise) IN {1} AND id(sector) ={2}" +
-            "RETURN CASE WHEN count(up)>0 THEN true ELSE false END as result")
-    boolean unitPositionExistsByStaffIdAndExpertiseIdsIn(Long staffId,Set<Long> expertiseIds,Long sectorId);
-
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]->(user:User)  where id(staff)={0}\n" +
             "MATCH(user)<-[:"+BELONGS_TO+"]-(staffList:Staff)\n" +
-            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{mainUnitPosition:TRUE})-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE id(up)<> {3} AND  " +
+            "OPTIONAL MATCH(staffList)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{mainUnitPosition:TRUE}) WHERE id(up)<> {3} AND  " +
             "(({2} IS NULL AND (up.endDate IS NULL OR DATE(up.endDate) >= DATE({1}))) \n" +
             "OR ({2} IS NOT NULL AND DATE(up.startDate) <= DATE({2}) AND (up.endDate IS NULL OR DATE(up.endDate)>DATE({1}))) ) \n" +
-            "WITH up,collect(empType) as empType  \n" +
+            "WITH up  \n" +
             "MATCH(up)-[:"+IN_UNIT+"]-(org:Organization)\n" +
-            "WITH up,org, CASE WHEN ANY(et in empType WHERE et.markMainEmployment=true) then true ELSE false END as markMainEmployment " +
-            "RETURN id(up) as id,up.startDate as startDate,up.endDate as endDate,markMainEmployment as markMainEmployment,id(org) as unitId,org.name as unitName \n ")
-    List<UnitPositionQueryResult> findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate,long id);
+            "RETURN id(up) as id,up.startDate as startDate,up.endDate as endDate,org.name as unitName \n ")
+    UnitPositionQueryResult findAllByStaffIdAndBetweenDates(Long staffId, String startDate, String endDate,long id);
 
 
 }
