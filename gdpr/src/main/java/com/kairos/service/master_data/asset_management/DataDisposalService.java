@@ -52,6 +52,7 @@ public class DataDisposalService extends MongoBaseService {
      */
     public Map<String, List<DataDisposalMD>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
 
+        //TODO still need to optimize we can get name of list in string from here
         Map<String, List<DataDisposalMD>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
         for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
@@ -82,8 +83,8 @@ public class DataDisposalService extends MongoBaseService {
      * @param countryId
      * @return list of DataDisposal
      */
-    public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
-        return dataDisposalMongoRepository.findAllByCountryIdAndSortByCreatedDate(countryId, new Sort(Sort.Direction.DESC, "createdAt"));
+    public List<DataDisposalMD> getAllDataDisposal(Long countryId) {
+        return dataDisposalMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -94,11 +95,10 @@ public class DataDisposalService extends MongoBaseService {
      * @return object of data disposal
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
-    public DataDisposal getDataDisposalById(Long countryId, BigInteger id) {
-
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
+    public DataDisposalMD getDataDisposalById(Long countryId, Integer id) {
+        DataDisposalMD exist = dataDisposalMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("No data found");
         } else {
             return exist;
 

@@ -49,7 +49,7 @@ public class DataDisposalController {
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable Integer dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, dataDisposalId));
 
     }

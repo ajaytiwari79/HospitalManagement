@@ -30,7 +30,11 @@ public interface DataDisposalMDRepository extends JpaRepository<DataDisposalMD, 
     @Query(value = "delete from DataDisposalMD d where d.id = ?1 and d.countryId = ?2")
     Integer deleteByIdAndCountryId(Integer id, Long countryId);
 
+    @Query(value = "SELECT d FROM DataDisposalMD d WHERE d.id = ?1 and d.countryId = ?2 and d.deleted = ?3")
+    DataDisposalMD findByIdAndCountryIdAndDeleted(Integer id, Long countryId, boolean deleted);
 
 
+    @Query(value = "SELECT d FROM DataDisposalMD d WHERE d.countryId = ?1 and d.deleted = false order by createdAt desc")
+    List<DataDisposalMD> findAllByCountryIdAndSortByCreatedDate(Long countryId);
 
 }

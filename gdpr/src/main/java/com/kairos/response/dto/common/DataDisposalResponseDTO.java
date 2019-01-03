@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataDisposalResponseDTO {
 
-    private BigInteger id;
+    private Integer id;
 
     private String name;
 
@@ -32,9 +32,9 @@ public class DataDisposalResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Integer getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getName() { return name; }
 
