@@ -41,3 +41,9 @@ remove n.endDate
 
 MATCH (f:User) where exists(f.dateOfBirth)
 set f.dateOfBirth=toString(date(datetime({epochmillis:f.dateOfBirth})))
+
+MATCH (f:FunctionalPayment)
+set f.startDate=toString(date(datetime({epochmillis:f.startDate})))
+
+MATCH (f:FunctionalPayment) where exists(f.endDate)
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
