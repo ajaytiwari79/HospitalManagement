@@ -83,7 +83,7 @@ public class DataDisposalService extends MongoBaseService {
      * @param countryId
      * @return list of DataDisposal
      */
-    public List<DataDisposalMD> getAllDataDisposal(Long countryId) {
+    public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
         return dataDisposalMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 

@@ -7,7 +7,10 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
+import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
+import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasureMD;
+import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -22,6 +25,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -37,6 +41,9 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    OrganizationalSecurityMeasureMDRepository organizationalSecurityMeasureMDRepository;
+
 
     /**
      * @param countryId
@@ -47,26 +54,29 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS) {
-
-        Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
+    public Map<String, List<OrganizationalSecurityMeasureMD>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS) {
+        //TODO still need to optimize we can get name of list in string from here
+        Map<String, List<OrganizationalSecurityMeasureMD>> result = new HashMap<>();
         Set<String> orgSecurityMeasureNames = new HashSet<>();
         if (!securityMeasureDTOS.isEmpty()) {
             for (OrganizationalSecurityMeasureDTO securityMeasure : securityMeasureDTOS) {
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
+            List<String> nameInLowerCase = orgSecurityMeasureNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
 
-            List<OrganizationalSecurityMeasure> existing = findMetaDataByNamesAndCountryId(countryId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<OrganizationalSecurityMeasureMD> existing = organizationalSecurityMeasureMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
-            List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
+            List<OrganizationalSecurityMeasureMD> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
 
-                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId,SuggestedDataStatus.APPROVED);
+                    OrganizationalSecurityMeasureMD newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasureMD(name,countryId,SuggestedDataStatus.APPROVED);
                     newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
-                newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(newOrgSecurityMeasures));
+                newOrgSecurityMeasures = organizationalSecurityMeasureMDRepository.saveAll(newOrgSecurityMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newOrgSecurityMeasures);
@@ -83,7 +93,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long countryId) {
-        return organizationalSecurityMeasureMongoRepository.findAllByCountryIdSortByCreatedDate(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return organizationalSecurityMeasureMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -94,11 +104,11 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return OrganizationalSecurityMeasure object fetch via id
      * @throws DataNotFoundByIdException throw exception if OrganizationalSecurityMeasure not exist for given id
      */
-    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId, BigInteger id) {
+    public OrganizationalSecurityMeasureMD getOrganizationalSecurityMeasure(Long countryId, Integer id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, id);
+        OrganizationalSecurityMeasureMD exist = organizationalSecurityMeasureMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("No data found");
         } else {
             return exist;
 
@@ -106,13 +116,13 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public Boolean deleteOrganizationalSecurityMeasure(Long countryId, BigInteger id) {
-
-        OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(orgSecurityMeasure).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+    public Boolean deleteOrganizationalSecurityMeasure(Long countryId, Integer id) {
+        Integer resultCount = organizationalSecurityMeasureMDRepository.deleteByIdAndCountryId(id, countryId);
+        if (resultCount > 0) {
+            LOGGER.info("Organizational Security Measure deleted successfully for id :: {}", id);
+        }else{
+            throw new DataNotFoundByIdException("No data found");
         }
-        delete(orgSecurityMeasure);
         return true;
 
     }
@@ -125,8 +135,9 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return return updated OrganizationalSecurityMeasure object
      * @throws DuplicateDataException if OrganizationalSecurityMeasure not exist for given id
      */
-    public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, BigInteger id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
+    public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, Integer id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
 
+        //TODO What actually this code is doing?
         OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByName(countryId, securityMeasureDTO.getName());
         if (Optional.ofNullable(orgSecurityMeasure).isPresent()) {
             if (id.equals(orgSecurityMeasure.getId())) {
@@ -134,13 +145,13 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
             }
             throw new DuplicateDataException("data exist of " + securityMeasureDTO.getName());
         }
-        orgSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByid(id);
 
-        if (!Optional.ofNullable(orgSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organization Security Measure", id);
+        Integer resultCount =  organizationalSecurityMeasureMDRepository.updateOrganizationalSecurityMeasureName(securityMeasureDTO.getName(), id);
+        if(resultCount <=0){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Organizational Security Measure", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, securityMeasureDTO.getName());
         }
-        orgSecurityMeasure.setName(securityMeasureDTO.getName());
-        organizationalSecurityMeasureMongoRepository.save(orgSecurityMeasure);
         return securityMeasureDTO;
 
     }

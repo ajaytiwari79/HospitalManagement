@@ -76,7 +76,7 @@ public class AssetService extends MongoBaseService {
     @Inject
     private OrganizationTechnicalSecurityMeasureService organizationTechnicalSecurityMeasureService;
     @Inject
-    private OrganizationOrganizationalSecurityMeasureService organizationalSecurityMeasureService;
+    private OrganizationOrganizationalSecurityMeasureService organizationOrganizationalSecurityMeasureService;
     @Inject
     private OrganizationAssetTypeService organizationAssetTypeService;
 
@@ -340,7 +340,7 @@ public class AssetService extends MongoBaseService {
         assetMetaDataMap.put("storageFormatList",organizationStorageFormatService.getAllStorageFormat(unitId));
         assetMetaDataMap.put("dataDisposalList",organizationDataDisposalService.getAllDataDisposal(unitId));
         assetMetaDataMap.put("technicalSecurityMeasureList",organizationTechnicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
-        assetMetaDataMap.put("organizationalSecurityMeasureList",organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
+        assetMetaDataMap.put("organizationalSecurityMeasureList",organizationOrganizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
         assetMetaDataMap.put("organizationAssetTypeList",organizationAssetTypeService.getAllAssetType(unitId));
         assetMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return assetMetaDataMap;
