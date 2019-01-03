@@ -378,8 +378,7 @@ public class UserService {
     public UserOrganizationsDTO getLoggedInUserOrganizations() {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
-        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
+        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(currentUser.getLastSelectedOrganizationId(), userLanguageId);
         return userOrganizationsDTO;
     }
 
@@ -415,7 +414,8 @@ public class UserService {
     }
 
     public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
-        long currentUserId = UserContext.getUserDetails().getId();
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        long currentUserId = currentUser.getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         if (permissionData.isHub()) {
@@ -465,6 +465,7 @@ public class UserService {
 
             permissionData.setOrganizationPermissions(unitPermission);
         }
+        updateLastSelectedChildAndParentId(organizationId);
         return permissionData;
     }
 
@@ -664,15 +665,11 @@ public class UserService {
         return permissionList;
     }
 
-    public Boolean updateLastSelectedChildAndParentId(OrganizationSelectionDTO organizationSelectionDTO) {
+    public Boolean updateLastSelectedChildAndParentId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedParentOrgId()).isPresent()) {
-            currentUser.setLastSelectedParentOrgId(organizationSelectionDTO.getLastSelectedParentOrgId());
+        if(!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
+            userGraphRepository.save(currentUser);
         }
-        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()) {
-            currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
-        }
-        userGraphRepository.save(currentUser);
         return true;
     }
 

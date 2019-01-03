@@ -74,7 +74,7 @@ public class OrganizationHierarchyService {
 
     public List<QueryResult> generateHierarchy(long parentOrganizationId) {
         List<QueryResult> resultQueryResults=new ArrayList<>();
-        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+
         List<OrganizationWrapper> organizationWrappers=userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(Collectors.toList()));
 
