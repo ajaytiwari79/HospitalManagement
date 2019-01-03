@@ -158,7 +158,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     @Override
     public WorkingTimeAgreement checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId) {
-        return mongoTemplate.findOne(new Query(Criteria.where("name").is(name).and("organization.id").is(unitId).and("_id").ne(wtaId).and("deleted").is(false)), WorkingTimeAgreement.class);
+        return mongoTemplate.findOne(new Query(Criteria.where("name").is(name).and("organization.id").is(unitId).and("id").ne(wtaId).and("deleted").is(false)), WorkingTimeAgreement.class);
     }
 
     @Override
