@@ -256,7 +256,7 @@ public class TimeBankService extends MongoBaseService {
             }
             startDate = startDate.plusDays(1);
         }
-        if (!dailyTimeBanks.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(dailyTimeBanks)) {
             updateBonusHoursOfTimeBankInShift(shiftWithActivityDTOS, shifts);
         }
         return dailyTimeBanks;
