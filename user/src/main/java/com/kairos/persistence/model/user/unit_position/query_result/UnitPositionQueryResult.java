@@ -38,6 +38,7 @@ public class UnitPositionQueryResult {
     private List<AppliedFunctionDTO> appliedFunctions;
     private boolean mainUnitPosition;
     private String unitName;
+    private float taxDeductionPercentage;
 
     public UnitPositionQueryResult() {
         //Default Constructor
@@ -58,7 +59,7 @@ public class UnitPositionQueryResult {
     }
 
     public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id,Organization union, LocalDate lastWorkingDate,  WTAResponseDTO wta,Long unitId,Long parentUnitId,Boolean published,
-                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines) {
+                                   Map<String, Object> reasonCode,Map<String, Object> unitInfo,boolean mainUnitPosition,List<UnitPositionLinesQueryResult> positionLines,float taxDeductionPercentage) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -73,6 +74,7 @@ public class UnitPositionQueryResult {
         this.unitInfo=unitInfo;
         this.mainUnitPosition=mainUnitPosition;
         this.positionLines=positionLines;
+        this.taxDeductionPercentage=taxDeductionPercentage;
 
     }
 
@@ -239,5 +241,13 @@ public class UnitPositionQueryResult {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public float getTaxDeductionPercentage() {
+        return taxDeductionPercentage;
+    }
+
+    public void setTaxDeductionPercentage(float taxDeductionPercentage) {
+        this.taxDeductionPercentage = taxDeductionPercentage;
     }
 }

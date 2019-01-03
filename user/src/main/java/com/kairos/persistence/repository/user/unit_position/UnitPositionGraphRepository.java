@@ -95,8 +95,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
             "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "return expertise as expertise,unionData as union, id(unitPosition) as id,\n" +
-            " unitPosition.startDate as startDate,unitPosition.mainUnitPosition as mainUnitPosition, unitPosition.endDate as endDate, \n" +
+            "RETURN expertise as expertise,unionData as union, id(unitPosition) as id,\n" +
+            " unitPosition.startDate as startDate,unitPosition.mainUnitPosition as mainUnitPosition,unitPosition.taxDeductionPercentage as taxDeductionPercentage, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
             "UNION " +
@@ -106,7 +106,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
             "OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "return expertise as expertise,unitPosition.mainUnitPosition as mainUnitPosition,unionData as union, id(unitPosition) as id,\n" +
+            "RETURN expertise as expertise,unitPosition.mainUnitPosition as mainUnitPosition,unitPosition.taxDeductionPercentage as taxDeductionPercentage,unionData as union, id(unitPosition) as id,\n" +
             " unitPosition.startDate as startDate, unitPosition.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published, \n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org) as parentUnitId,id(org) as unitId,\n" +
@@ -160,7 +160,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH (unitPosition)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "RETURN id(unitPosition) as id,unitPosition.startDate as startDate, unitPosition.endDate as endDate,unitPosition.mainUnitPosition as mainUnitPosition, \n" +
-            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
+            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, unitPosition.history as history,unitPosition.taxDeductionPercentage as taxDeductionPercentage,unitPosition.editable as editable,unitPosition.published as published,\n" +
             "unitPosition.lastWorkingDate as lastWorkingDate,id(org)  as unitId,{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId,Long unitId);
 

@@ -811,8 +811,8 @@ public  class DateUtils {
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
-    public static Long getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
-        return TotalMilliSeconds/ONE_HOUR;
+    public static Long getMinutesFromTotalMilliSeconds(long totalMilliSeconds){
+        return totalMilliSeconds/ONE_HOUR;
     }
 
     public static Double getHoursByMinutes(double totalMinutes){

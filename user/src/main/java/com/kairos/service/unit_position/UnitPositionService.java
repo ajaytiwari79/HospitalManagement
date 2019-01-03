@@ -781,7 +781,7 @@ public class UnitPositionService {
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
                 , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.isMainUnitPosition(),
-                Collections.singletonList(unitPositionLinesQueryResult));
+                Collections.singletonList(unitPositionLinesQueryResult),unitPositionDTO.getTaxDeductionPercentage());
 
     }
 
