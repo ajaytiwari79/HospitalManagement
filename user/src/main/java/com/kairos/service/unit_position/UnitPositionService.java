@@ -529,6 +529,7 @@ public class UnitPositionService {
             } else {
                 unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaWrapper.getCta().get(0));
             }
+            updateTimeBank(unitPositionId, unitPositionQueryResult.getStartDate(),unitPositionQueryResult.getEndDate(),unitId);
         }
         // calculative value is not changed it means only end date is updated.
         else {
@@ -563,7 +564,6 @@ public class UnitPositionService {
      * @param unitId
      */
     public void updateTimeBank(long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate,Long unitId) {
-
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(unitPositionLineStartDate, unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
         activityIntegrationService.updateTimeBankOnUnitPositionUpdation(unitPositionId, unitPositionLineStartDate, unitPositionLineEndDate, staffAdditionalInfoDTO);
     }
