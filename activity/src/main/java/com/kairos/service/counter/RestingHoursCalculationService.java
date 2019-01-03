@@ -62,7 +62,7 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
         staffIds.forEach(staffId -> {
             if(staffId != null) {
-                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate.plusDays(1)), false);
+                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate), false);
                     staffRestingHours.put(staffId, restingHours);
             }
         });
@@ -84,7 +84,7 @@ public class RestingHoursCalculationService implements CounterService {
         List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentTypes,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), organizationId, filterDates.get(0).atStartOfDay(), filterDates.get(1).atStartOfDay());
+        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), organizationId, filterDates.get(0).atStartOfDay(), DateUtils.getEndOfDayFromLocalDate(filterDates.get(1)));
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {

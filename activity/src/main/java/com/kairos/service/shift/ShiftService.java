@@ -1,10 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.commons.utils.ArrayUtil;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
@@ -117,6 +114,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
+import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.AppConstants.MULTIPLE_ACTIVITY;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
@@ -306,7 +304,8 @@ public class ShiftService extends MongoBaseService {
         validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
+            boolean isUpdate = byTandAPhase;
+            saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, mainShift, staffAdditionalInfoDTO,isUpdate,staffAdditionalInfoDTO.getTimeSlotSets());
             payOutService.savePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
             ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfoDTO.getViolatedRules(), ShiftViolatedRules.class);
@@ -1270,7 +1269,7 @@ public class ShiftService extends MongoBaseService {
     public void validateRealTimeShift(Long unitId,ShiftDTO shiftDTO,Map<String,Phase> phaseMap){
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
         ShiftState shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        Map<BigInteger,ShiftActivity> activityMap=shiftState.getActivities().stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
+        Map<BigInteger,ShiftActivity> activityMap=shiftState.getActivities().stream().filter(distinctByKey(a->a.getActivityId())).collect(Collectors.toMap(k->k.getActivityId(),v->v));
         boolean realtime=phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate());
         if(realtime){
             shiftDTO.getActivities().forEach(shiftActivity -> {
