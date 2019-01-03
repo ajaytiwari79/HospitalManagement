@@ -442,9 +442,9 @@ public class UserService {
                 }
             }
             if(checkDayType){
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds,organizationId);
             } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId,organizationId);
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 

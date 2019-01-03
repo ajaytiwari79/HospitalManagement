@@ -7,18 +7,19 @@ import com.kairos.dto.gdpr.filter.FilterAttributes;
 import com.kairos.dto.gdpr.filter.FilterResponseDTO;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.enums.gdpr.FilterType;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ public class OrganizationHierarchyService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private TreeStructureService treeStructureService;
+    @Inject
+    UserGraphRepository userGraphRepository;
 
     public QueryResult generateHierarchyMinimum(long parentOrganizationId) {
         List<Map<String, Object>> units = organizationGraphRepository.getSubOrgHierarchy(parentOrganizationId);
@@ -69,8 +72,11 @@ public class OrganizationHierarchyService {
         return treeStructureService.getTreeStructure(list);
     }
 
-    public QueryResult generateHierarchy(long parentOrganizationId) {
-        List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchy(parentOrganizationId);
+    public List<QueryResult> generateHierarchy(long parentOrganizationId) {
+        List<QueryResult> resultQueryResults=new ArrayList<>();
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        List<OrganizationWrapper> organizationWrappers=userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
+        List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(Collectors.toList()));
 
         if (units.isEmpty()) {
             Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
@@ -89,7 +95,7 @@ public class OrganizationHierarchyService {
             queryResult.setParentOrganization(organization.isParentOrganization());
             queryResult.setTimeZone(organization.getTimeZone()!=null? organization.getTimeZone().getId():null);
             queryResult.setOrganizationLevel(organization.getOrganizationLevel());
-            return queryResult;
+            return Arrays.asList(queryResult);
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -113,16 +119,22 @@ public class OrganizationHierarchyService {
             } else {
                 List<QueryResult> queryResults = new ArrayList<>();
                 QueryResult child = objectMapper.convertValue(((Map<String, Object>) unit.get("data")).get("child"), QueryResult.class);
-                child.setAccessable(true);
-                queryResults.add(child);
-                QueryResult queryResult = objectMapper.convertValue(parentUnit, QueryResult.class);
-                queryResult.setChildren(queryResults);
-                queryResult.setAccessable(true);
-                list.add(queryResult);
+                if(child.getId()!=0){
+                    child.setAccessable(true);
+                    queryResults.add(child);
+                    QueryResult queryResult = objectMapper.convertValue(parentUnit, QueryResult.class);
+                    queryResult.setChildren(queryResults);
+                    queryResult.setAccessable(true);
+                    list.add(queryResult);
+                }else{
+                    resultQueryResults.add(objectMapper.convertValue(parentUnit, QueryResult.class));
+                }
+
             }
             ids.add(id);
         }
-        return treeStructureService.getTreeStructure(list);
+        resultQueryResults.add(treeStructureService.getTreeStructure(list));
+        return resultQueryResults;
     }
 
     /**
