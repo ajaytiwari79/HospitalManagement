@@ -61,7 +61,8 @@ dependencies {
     compile('org.javers:javers-spring-boot-starter-mongo:3.10.0')
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
     testCompile('org.springframework.boot:spring-boot-starter-test')
-
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
 
 }
 sonarqube {

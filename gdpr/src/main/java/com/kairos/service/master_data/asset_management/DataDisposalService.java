@@ -6,6 +6,8 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -20,6 +22,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -35,6 +38,9 @@ public class DataDisposalService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private DataDisposalMDRepository dataDisposalMDRepository;
+
 
     /**
      * @param countryId
@@ -44,23 +50,27 @@ public class DataDisposalService extends MongoBaseService {
      * and if exist then simply add  data disposal to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
-    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+    public Map<String, List<DataDisposalMD>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
 
-        Map<String, List<DataDisposal>> result = new HashMap<>();
+        Map<String, List<DataDisposalMD>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
         for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
             dataDisposalsNames.add(dataDisposal.getName());
         }
-        List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
+
+        List<String> nameInLowerCase = dataDisposalsNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<DataDisposalMD> existing = dataDisposalMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-        List<DataDisposal> newDataDisposals = new ArrayList<>();
+        List<DataDisposalMD> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposal newDataDisposal = new DataDisposal(name, countryId, SuggestedDataStatus.APPROVED);
+                DataDisposalMD newDataDisposal = new DataDisposalMD(name, countryId, SuggestedDataStatus.APPROVED);
                 newDataDisposals.add(newDataDisposal);
             }
-
-            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+            newDataDisposals = dataDisposalMDRepository.saveAll(newDataDisposals);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataDisposals);
@@ -116,7 +126,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return updated data disposal object
      * @throws DuplicateDataException if data disposal exist with same name then throw exception
      */
-    public DataDisposalDTO updateDataDisposal(Long countryId, BigInteger id, DataDisposalDTO dataDisposalDTO) {
+    /*public DataDisposalDTO updateDataDisposal(Long countryId, BigInteger id, DataDisposalDTO dataDisposalDTO) {
 
 
         DataDisposal dataDisposal = dataDisposalMongoRepository.findByName(countryId, dataDisposalDTO.getName());
@@ -134,6 +144,24 @@ public class DataDisposalService extends MongoBaseService {
         dataDisposalMongoRepository.save(dataDisposal);
         return dataDisposalDTO;
 
+    }*/
+    public DataDisposalDTO updateDataDisposal(Long countryId, Integer id, DataDisposalDTO dataDisposalDTO) {
+
+        //TODO What actually this code is doing?
+        DataDisposal dataDisposal = dataDisposalMongoRepository.findByName(countryId, dataDisposalDTO.getName());
+        if (Optional.ofNullable(dataDisposal).isPresent()) {
+            if (id.equals(dataDisposal.getId())) {
+                return dataDisposalDTO;
+            }
+            throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
+        }
+        Integer resultCount =  dataDisposalMDRepository.updateDataDisposalName(dataDisposalDTO.getName(), id);
+        if(resultCount <=0){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataDisposalDTO.getName());
+        }
+        return dataDisposalDTO;
     }
 
     /**

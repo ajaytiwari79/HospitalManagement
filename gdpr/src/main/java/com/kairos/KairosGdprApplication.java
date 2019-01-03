@@ -20,6 +20,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -35,6 +37,8 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableCircuitBreaker
 @SpringBootApplication
 @EnableAsync
+@EnableJpaRepositories
+@EnableJpaAuditing
 @EnableMongoRepositories(basePackages = "com.kairos.persistence.repository", repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosGdprApplication {
 
