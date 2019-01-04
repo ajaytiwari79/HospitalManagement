@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level")
@@ -122,6 +125,11 @@ public class StaffingLevel extends MongoBaseEntity {
 
         this.getPresenceStaffingLevelInterval().addAll(staffingLevelTimeSlots);
 
+    }
+
+    @JsonIgnore
+    public StaffingLevelInterval getAbsenceStaffingLevel() {
+        return isCollectionNotEmpty(absenceStaffingLevelInterval) ? absenceStaffingLevelInterval.get(0) : null;
     }
 
     @Override

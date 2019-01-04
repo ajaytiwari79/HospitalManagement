@@ -7,6 +7,8 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,10 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
-    private int intervalLength;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
+    private int intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-    private Long consecutiveDays;
 
 
     public int getIntervalLength() {
@@ -102,12 +105,5 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
-    public Long getConsecutiveDays() {
-        return consecutiveDays;
-    }
-
-    public void setConsecutiveDays(Long consecutiveDays) {
-        this.consecutiveDays = consecutiveDays;
-    }
 
 }

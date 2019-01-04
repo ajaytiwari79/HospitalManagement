@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
@@ -47,7 +48,7 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable BigInteger wtaId, @RequestBody WTADTO wta) {
+    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfCountry(countryId, wtaId, wta));
     }
 
@@ -151,7 +152,7 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWtaOfOrganization(@PathVariable long unitId, @PathVariable BigInteger wtaId, @RequestBody WTADTO wta) {
+    public ResponseEntity<Map<String, Object>> updateWtaOfOrganization(@PathVariable long unitId, @PathVariable BigInteger wtaId, @RequestBody  @Valid WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.updateWtaOfOrganization(unitId, wtaId, wta));
     }
 
@@ -164,18 +165,18 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA of UnitPosition")
     @PutMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody WTADTO wtadto, @RequestParam Boolean unitPositionPublished) {
+    public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean unitPositionPublished) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId, wtadto, unitPositionPublished));
     }
 
 
-    @ApiOperation(value = "Update WTA of Organization by Expertise")
+    @ApiOperation(value = "get default WTA info of country")
     @GetMapping(value = PARENT_ORGANIZATION_URL+ COUNTRY_URL + "/getDefaultWtaInfo")
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfo(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfo(countryId));
     }
 
-    @ApiOperation(value = "Update WTA of Organization by Expertise")
+    @ApiOperation(value = "get default WTA info of Unit")
     @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/getDefaultWtaInfoForUnit")
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfoForUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfoForUnit(unitId));
@@ -269,7 +270,7 @@ public class WTAController {
 
     @ApiOperation(value = "Create a New WTA at Organization")
     @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL+ "/wta")
-    public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId, @Validated @RequestBody WTADTO wta) {
+    public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId, @Validated @RequestBody @Valid WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(unitId, wta, false,false));
     }
 }

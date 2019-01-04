@@ -6,11 +6,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffAfterASeriesWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long intervalLength;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
+    private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private int nightShiftSequence;
     private boolean restingTimeAllowed;

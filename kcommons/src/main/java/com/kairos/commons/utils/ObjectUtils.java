@@ -44,4 +44,8 @@ public class ObjectUtils {
     public static <T> boolean isNull(T object){
         return !Optional.ofNullable(object).isPresent();
     }
+
+    public static <T> boolean isNotNull(T object){
+        return Optional.ofNullable(object).isPresent();
+    }
 }

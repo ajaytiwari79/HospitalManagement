@@ -19,7 +19,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.wta.Organization;
+import com.kairos.persistence.model.wta.WTAOrganization;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -143,7 +143,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             // Set activity Ids according to unit activity Ids
             organisationCTA.setId(null);
             assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(),unitActivities.get(organisationCTA.getId()));
-            organisationCTA.setOrganization(new Organization(organizationId, "", ""));
+            organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
             organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
             List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class);
             List<BigInteger> ruleTemplateIds = new ArrayList<>();
@@ -482,7 +482,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         OrganizationDTO organization = genericIntegrationService.getOrganization();
         collectiveTimeAgreementDTO.setId(null);
         CostTimeAgreement costTimeAgreement = buildCTA(collectiveTimeAgreementDTO);
-        costTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
+        costTimeAgreement.setOrganization(new WTAOrganization(organization.getId(), organization.getName(), organization.getDescription()));
         this.save(costTimeAgreement);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;

@@ -13,6 +13,8 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,9 +37,10 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private int intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-    private Long consecutiveDays;
 
     public int getIntervalLength() {
         return intervalLength;
@@ -110,13 +113,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
-    public Long getConsecutiveDays() {
-        return consecutiveDays;
-    }
-
-    public void setConsecutiveDays(Long consecutiveDays) {
-        this.consecutiveDays = consecutiveDays;
-    }
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
@@ -155,13 +151,12 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                 Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
                 Objects.equals(timeTypeIds, that.timeTypeIds) &&
                 minMaxSetting == that.minMaxSetting &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(consecutiveDays, that.consecutiveDays);
+                Objects.equals(intervalUnit, that.intervalUnit);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting, intervalLength, intervalUnit, consecutiveDays);
+        return Objects.hash(super.hashCode(), partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting, intervalLength, intervalUnit);
     }
 }
