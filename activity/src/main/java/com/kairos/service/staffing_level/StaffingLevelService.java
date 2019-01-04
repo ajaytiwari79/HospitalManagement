@@ -1077,29 +1077,29 @@ public class StaffingLevelService extends MongoBaseService {
         return upperLimit + minuteOffset - 1;
     }
 
-    public List<StaffingLevelDto> getStaffingLevelIfUpdated(Long unitId, List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
+    public StaffingLevelDto getStaffingLevelIfUpdated(Long unitId, List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         Map<LocalDate, Date> dateDateMap = updatedStaffingLevels.stream().collect(Collectors.toMap(k -> k.getCurrentDate(), v -> v.getUpdatedAt()));
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, dateDateMap.keySet());
-        List<StaffingLevelDto> staffingLevelDtos = new ArrayList<>(staffingLevels.size());
+        Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap = new HashMap<>();
+        Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap = new HashMap<>();
         for (StaffingLevel staffingLevel : staffingLevels) {
             Date updatedDate = dateDateMap.get(DateUtils.asLocalDate(staffingLevel.getCurrentDate()));
             if (isNotNull(updatedDate) && staffingLevel.getUpdatedAt().after(updatedDate)) {
-                Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap = new HashMap<>();
-                Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap = new HashMap<>();
+
                 if (isCollectionNotEmpty(staffingLevel.getPresenceStaffingLevelInterval())) {
                     PresenceStaffingLevelDto presenceStaffingLevelDto = ObjectMapperUtils.copyPropertiesByMapper(staffingLevel, PresenceStaffingLevelDto.class);
                     presenceStaffingLevelMap.put(asLocalDate(presenceStaffingLevelDto.getCurrentDate()).toString(), presenceStaffingLevelDto);
                 }
                 if (isCollectionNotEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
                     AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(), staffingLevel.getPhaseId(),
-                            staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(),staffingLevel.getAbsenceStaffingLevel().getMinNoOfStaff(),staffingLevel.getAbsenceStaffingLevel().getMaxNoOfStaff(),staffingLevel.getAbsenceStaffingLevel().getAvailableNoOfStaff(),staffingLevel.getUpdatedAt(),staffingLevel.getAbsenceStaffingLevel().getStaffingLevelActivities(),staffingLevel.getUnitId());
+                            staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getAbsenceStaffingLevel().getMinNoOfStaff(), staffingLevel.getAbsenceStaffingLevel().getMaxNoOfStaff(), staffingLevel.getAbsenceStaffingLevel().getAvailableNoOfStaff(), staffingLevel.getUpdatedAt(), staffingLevel.getAbsenceStaffingLevel().getStaffingLevelActivities(), staffingLevel.getUnitId());
                     absenceStaffingLevelMap.put(asLocalDate(absenceStaffingLevelDto.getCurrentDate()).toString(), absenceStaffingLevelDto);
                 }
-                staffingLevelDtos.add(new StaffingLevelDto(presenceStaffingLevelMap, absenceStaffingLevelMap));
+
             }
 
         }
-        return staffingLevelDtos;
+        return new StaffingLevelDto(presenceStaffingLevelMap, absenceStaffingLevelMap);
     }
 
 }
