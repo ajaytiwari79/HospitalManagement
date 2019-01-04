@@ -196,9 +196,5 @@ public class AuthController {
         return userInfo;
     }
 
-    //remove
-    @RequestMapping(value = "/user/selected_organizations", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String,Object>> updateLastOrganizationSelectedByUser(@Valid @RequestBody OrganizationSelectionDTO organizationSelectionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);//;userService.updateLastSelectedChildAndParentId(organizationSelectionDTO));
-    }
+
 }
