@@ -26,7 +26,7 @@ public interface OrganizationalSecurityMeasureMDRepository extends JpaRepository
 
     @Transactional
     @Modifying
-    @Query(value = "delete from OrganizationalSecurityMeasureMD osm where osm.id = ?1 and osm.countryId = ?2")
+    @Query(value = "update OrganizationalSecurityMeasureMD set deleted = true where id = ?1 and countryId = ?2")
     Integer deleteByIdAndCountryId(Integer id, Long countryId);
 
     @Query(value = "SELECT osm FROM OrganizationalSecurityMeasureMD osm WHERE osm.id = ?1 and osm.countryId = ?2 and osm.deleted = ?3")

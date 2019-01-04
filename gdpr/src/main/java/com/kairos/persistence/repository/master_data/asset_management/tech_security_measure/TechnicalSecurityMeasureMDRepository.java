@@ -28,7 +28,7 @@ public interface TechnicalSecurityMeasureMDRepository extends JpaRepository<Tech
 
     @Transactional
     @Modifying
-    @Query(value = "delete from TechnicalSecurityMeasureMD tsm where tsm.id = ?1 and tsm.countryId = ?2")
+    @Query(value = "update TechnicalSecurityMeasureMD set deleted = true where id = ?1 and countryId = ?2")
     Integer deleteByIdAndCountryId(Integer id, Long countryId);
 
     @Query(value = "SELECT tsm FROM TechnicalSecurityMeasureMD tsm WHERE tsm.id = ?1 and tsm.countryId = ?2 and tsm.deleted = ?3")

@@ -27,7 +27,7 @@ public interface StorageFormatMDRepository extends JpaRepository<StorageFormatMD
 
     @Transactional
     @Modifying
-    @Query(value = "delete from StorageFormatMD sf where sf.id = ?1 and sf.countryId = ?2")
+    @Query(value = "update StorageFormatMD set deleted = true where id = ?1 and countryId = ?2")
     Integer deleteByIdAndCountryId(Integer id, Long countryId);
 
     @Query(value = "SELECT sf FROM StorageFormatMD sf WHERE sf.id = ?1 and sf.countryId = ?2 and sf.deleted = ?3")

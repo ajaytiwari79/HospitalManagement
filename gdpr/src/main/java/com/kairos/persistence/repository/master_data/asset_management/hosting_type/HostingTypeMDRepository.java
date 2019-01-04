@@ -27,7 +27,7 @@ public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, In
 
     @Transactional
     @Modifying
-    @Query(value = "delete from HostingTypeMD ht where ht.id = ?1 and ht.countryId = ?2")
+    @Query(value = "update HostingTypeMD set deleted = true where id = ?1 and countryId = ?2")
     Integer deleteByIdAndCountryId(Integer id, Long countryId);
 
     @Query(value = "SELECT ht FROM HostingTypeMD ht WHERE ht.id = ?1 and ht.countryId = ?2 and ht.deleted = ?3")
