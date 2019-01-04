@@ -1,0 +1,31 @@
+
+// TO change existing Dates in below domains
+MATCH (payTable:PayTable)
+set payTable.startDateMillis=toString(date(datetime({epochmillis:payTable.startDateMillis})));
+
+MATCH (payTable:PayTable) WHERE EXISTS(payTable.endDateMillis)
+set payTable.endDateMillis=toString(date(datetime({epochmillis:payTable.endDateMillis})));
+
+MATCH (f:Function)
+set f.startDate=toString(date(datetime({epochmillis:f.startDate})));
+
+MATCH (f:Function) where exists(f.endDate)
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
+
+MATCH (f:TimeSlotSet)
+set f.startDate=toString(date(datetime({epochmillis:f.startDate})))
+
+MATCH (f:TimeSlotSet) where exists(f.endDate)
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
+
+MATCH (n:ContactAddress) remove n.startDate
+remove n.endDate
+
+MATCH (f:User) where exists(f.dateOfBirth)
+set f.dateOfBirth=toString(date(datetime({epochmillis:f.dateOfBirth})))
+
+MATCH (f:FunctionalPayment)
+set f.startDate=toString(date(datetime({epochmillis:f.startDate})))
+
+MATCH (f:FunctionalPayment) where exists(f.endDate)
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
