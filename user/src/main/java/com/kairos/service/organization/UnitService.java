@@ -83,7 +83,7 @@ public class UnitService {
 
         Map<String, Object> response = new HashMap<>(2);
         response.put("parentInfo", parentOrgDefaultDetails(parentOrganization));
-        List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(parentOrganization.getId(), null);
+        List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId, null);
         response.put("units", units.size() != 0 ? units : Collections.emptyList());
 
         List<Map<String, Object>> groups = organizationGraphRepository.getGroups(organizationId);
