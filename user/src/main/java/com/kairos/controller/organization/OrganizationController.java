@@ -454,11 +454,11 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Organization Hierarchy")
-    @GetMapping(PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy")
+    @GetMapping("/organization_flow/hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab(@PathVariable long organizationId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationHierarchyService.generateHierarchy(organizationId));
+                organizationHierarchyService.generateHierarchy());
     }
 
     @ApiOperation(value = "Get Organization Clients with min details")
@@ -1265,15 +1265,6 @@ public class OrganizationController {
                                                                             @RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
-
-    /* Not in use
-    @ApiOperation(value = "Get timetype_presencetype by unitID")
-    @RequestMapping(value = UNIT_URL + "/timetype_presencetype", method = RequestMethod.GET)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
-    }
-    */
 
     @ApiOperation(value = "Get available time zones")
     @GetMapping(PARENT_ORGANIZATION_URL+UNIT_URL+"/timeZones")

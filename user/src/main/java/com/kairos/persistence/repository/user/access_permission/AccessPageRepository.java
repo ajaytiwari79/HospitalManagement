@@ -368,10 +368,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH collect(dayType) as dayType,accessGroup,org,unitPermission " +
             "WHERE ANY(dt IN dayType WHERE id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) \n" +
+            "MATCH (org) WHERE id(org)={2} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule,sequence:accessPage.sequence}) as permissions\n" +
             "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
-    List<UserPermissionQueryResult> fetchStaffPermissionsWithDayTypes(Long userId, Set<Long> dayTypeIds);
+    List<UserPermissionQueryResult> fetchStaffPermissionsWithDayTypes(Long userId, Set<Long> dayTypeIds,Long organizationId);
 
 
 
@@ -384,10 +385,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
+            "MATCH (org) WHERE id(org)={1} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule,sequence:accessPage.sequence}) as permissions\n" +
             "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
-    List<UserPermissionQueryResult> fetchStaffPermissions(Long userId);
+    List<UserPermissionQueryResult> fetchStaffPermissions(Long userId,Long organizationId);
 
 
 

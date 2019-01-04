@@ -94,6 +94,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.activity.ActivityUtil.*;
 import static org.springframework.http.MediaType.APPLICATION_XML;
@@ -338,35 +339,14 @@ public class ActivityService extends MongoBaseService {
         return activityCategoryRepository.findByCountryId(countryId);
     }
 
-   /* public ActivityTabsWrapper getBalanceSettingsTabOfActivity(BigInteger activityId, Long countryId) {
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
-        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
-        }
-        BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsActivityTab, presenceType);
-        activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), countryId));
-        return activityTabsWrapper;
-    }*/
-
     public BalanceSettingsActivityTab updateBalanceSettingTab(GeneralActivityTabDTO generalActivityTabDTO, Activity activity) {
-        /*BalanceSettingsActivityTab balanceSettingsTab = new BalanceSettingsActivityTab();
-        ObjectMapperUtils.copyProperties(generalActivityTabDTO, balanceSettingsTab);
-        *//*Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(balanceDTO.getActivityId())));
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
-        }*/
         TimeType timeType = timeTypeMongoRepository.findOneById(generalActivityTabDTO.getTimeTypeId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timetype.notfound");
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
-        //activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
-        //updating activity category based on time type
         Long countryId = activity.getCountryId();
         if (countryId == null) {
             countryId = genericIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
@@ -377,10 +357,6 @@ public class ActivityService extends MongoBaseService {
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
         generalActivityTabDTO.setActivityCanBeCopied(timeType.isActivityCanBeCopied());
         updateActivityCategory(activity, countryId);
-        /*save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
-        activityTabsWrapper.setActivityCategories(activityCategoryRepository.findByCountryId(countryId));
-        return activityTabsWrapper;*/
         return activity.getBalanceSettingsActivityTab();
     }
 
@@ -1012,10 +988,8 @@ public class ActivityService extends MongoBaseService {
     }
 
     private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {
-        //Collections.sort(communicationActivityDTO.getActivityReminderSettings(), Comparator.comparing(ActivityReminderSettings::getSequence));
         int counter = 0;
         if (!communicationActivityDTO.getActivityReminderSettings().isEmpty()) {
-            //  byte lastSequence = communicationActivityDTO.getActivityReminderSettings().get(communicationActivityDTO.getActivityReminderSettings().size() - 1).getSequence();
             for (ActivityReminderSettings currentSettings : communicationActivityDTO.getActivityReminderSettings()) {
 
                 if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
@@ -1085,8 +1059,21 @@ public class ActivityService extends MongoBaseService {
 //        }
     }
 
-    public List<BigInteger> getActivitiesIdByTimeTypes(List<BigInteger> timeTypeIds) {
-        List<Activity> activities = activityMongoRepository.getActivitiesByTimeTypeId(timeTypeIds);
-        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toList());
+
+    public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes){
+        Activity activity = activityMongoRepository.findOne(activityId);
+        if (isNull(activity)) {
+            exceptionService.dataNotFoundByIdException("message.organization.id", activityId);
+        }
+        if(removeNotes) {
+            activity.getNotesActivityTab().setOriginalDocumentName(null);
+            activity.getNotesActivityTab().setModifiedDocumentName(null);
+        }else {
+            activity.getGeneralActivityTab().setOriginalIconName(null);
+            activity.getGeneralActivityTab().setModifiedIconName(null);
+        }
+        save(activity);
+        return true;
     }
+
 }

@@ -5,7 +5,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -28,9 +27,6 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
 
-    @Relationship(type = HAS_POSITION_CODE)
-    private PositionCode positionCode;
-
     @Relationship(type = BELONGS_TO_STAFF, direction = "INCOMING")
     private Staff staff;
 
@@ -52,6 +48,7 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_POSITION_LINES)
     private List<UnitPositionLine> unitPositionLines;
     private boolean mainUnitPosition;
+    private float taxDeductionPercentage;
 
     public UnitPosition() {
 
@@ -62,20 +59,12 @@ public class UnitPosition extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public UnitPosition(PositionCode positionCode, Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published) {
-        this.positionCode = positionCode;
+    public UnitPosition(Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published,float taxDeductionPercentage) {
         this.unit = unit;
         this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;
         this.published=published;
-    }
-
-    public PositionCode getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCode positionCode) {
-        this.positionCode = positionCode;
+        this.taxDeductionPercentage=taxDeductionPercentage;
     }
 
     public Expertise getExpertise() {
@@ -178,11 +167,18 @@ public class UnitPosition extends UserBaseEntity {
         this.mainUnitPosition = mainUnitPosition;
     }
 
+    public float getTaxDeductionPercentage() {
+        return taxDeductionPercentage;
+    }
+
+    public void setTaxDeductionPercentage(float taxDeductionPercentage) {
+        this.taxDeductionPercentage = taxDeductionPercentage;
+    }
+
     @Override
     public String toString() {
         return "UnitPosition{" +
                 "expertise=" + expertise +
-                ", positionCode=" + positionCode +
                 ", staff=" + staff +
                 ", union=" + union +
                 ", unit=" + unit +
