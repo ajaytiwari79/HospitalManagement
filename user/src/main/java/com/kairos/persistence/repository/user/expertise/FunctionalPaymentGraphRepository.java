@@ -84,7 +84,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} " +
             "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) "+
-            "SET rel.amount=toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100) ")
+            "SET rel.amount=toString(toFloat(rel.amount)+(( toFloat(rel.amount)*toFloat({1}))/100)) ")
     void updateFunctionalAmount(List<Long> functionalPaymentIds, String percentageValue);
 
 
