@@ -70,14 +70,17 @@ public class UnitService {
     public Map<String, Object> getManageHierarchyData(long parentOrganizationId) {
 
         Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
+
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", parentOrganizationId);
         }
 
-        Country country = organizationGraphRepository.getCountry(parentOrganizationId);
-        if (!Optional.ofNullable(country).isPresent()) {
+        Organization parentOrganization = organization.isParentOrganization()? organization : organizationService.fetchParentOrganization(parentOrganizationId);
+        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound");
         }
+
         Map<String, Object> response = new HashMap<>(2);
         response.put("parentInfo", parentOrgDefaultDetails(organization));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(parentOrganizationId, null);
@@ -86,19 +89,17 @@ public class UnitService {
         List<Map<String, Object>> groups = organizationGraphRepository.getGroups(parentOrganizationId);
         response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
 
-        if (Optional.ofNullable(country.getId()).isPresent()) {
-            response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(country.getId())));
-        }
+        response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
 
         OrganizationTypeAndSubType organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(parentOrganizationId);
 
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(country.getId());
+        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
         response.put("organizationTypes", organizationTypes);
         response.put("businessTypes", businessTypes);
-        response.put("unitTypes", unitTypeGraphRepository.getAllUnitTypeOfCountry(country.getId()));
+        response.put("unitTypes", unitTypeGraphRepository.getAllUnitTypeOfCountry(countryId));
         response.put("companyTypes", CompanyType.getListOfCompanyType());
         response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
-        response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(country.getId()));
+        response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId));
         response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(parentOrganizationId));
         return response;
     }
