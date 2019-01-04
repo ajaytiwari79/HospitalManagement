@@ -7,7 +7,6 @@ import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
@@ -150,7 +149,6 @@ public class UnitPositionCTAWTAService {
                 UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getUnitPositionId());
                 currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
                 currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
-                currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
             }
         });
         return ctaTableSettingWrapper;
@@ -169,7 +167,6 @@ public class UnitPositionCTAWTAService {
             if (unitPositionQueryResult != null) {
                 currentWTA.setUnitInfo(unitPositionQueryResult.getUnitInfo());
                 currentWTA.setUnitPositionId(unitPositionQueryResult.getId());
-                currentWTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(unitPositionQueryResult.getPositionCode(), PositionCodeDTO.class));
             }
         });
         return wtaWithTableSettings;

@@ -865,32 +865,14 @@ public class EmploymentService {
 
 
     public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO,long unitPositionId) {
-        List<UnitPositionQueryResult> unitPositionQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(),unitPositionId), UnitPositionQueryResult.class);
-        Set<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toSet());
-        if (CollectionUtils.isNotEmpty(unitPositionIds)) {
-            List<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(new ArrayList<>(unitPositionIds));
-            Map<Long, UnitPosition> unitPositionMap = unitPositions.stream().collect(Collectors.toMap(UnitPosition::getId, Function.identity()));
-            List<UnitPosition> unitPositionList = new ArrayList<>();
-            verifyMainUnitPositions(unitPositionQueryResults, unitPositionMap, unitPositionList);
-            unitPositionGraphRepository.saveAll(unitPositionList);
+        UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(),unitPositionId);
+        if(unitPositionQueryResult!=null){
+            if(unitPositionQueryResult.getEndDate()==null){
+                exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate());
+            } else {
+                exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate());
+            }
         }
         return true;
-    }
-
-
-    private void verifyMainUnitPositions(List<UnitPositionQueryResult> unitPositionQueryResults, Map<Long, UnitPosition> unitPositionMap, List<UnitPosition> unitPositionList) {
-        for (UnitPositionQueryResult unitPositionQueryResult : unitPositionQueryResults) {
-            if (unitPositionQueryResult.isMarkMainEmployment()) {
-                if(unitPositionQueryResult.getEndDate()==null){
-                    exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate());
-                } else {
-                    exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate());
-                }
-
-            }
-            UnitPosition unitPosition = unitPositionMap.get(unitPositionQueryResult.getId());
-            unitPosition.setMainUnitPosition(false);
-            unitPositionList.add(unitPosition);
-        }
     }
 }

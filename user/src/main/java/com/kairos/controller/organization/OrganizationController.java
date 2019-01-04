@@ -1266,15 +1266,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
-    /* Not in use
-    @ApiOperation(value = "Get timetype_presencetype by unitID")
-    @RequestMapping(value = UNIT_URL + "/timetype_presencetype", method = RequestMethod.GET)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
-    }
-    */
-
     @ApiOperation(value = "Get available time zones")
     @GetMapping(PARENT_ORGANIZATION_URL+UNIT_URL+"/timeZones")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

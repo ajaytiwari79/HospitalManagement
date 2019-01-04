@@ -14,7 +14,6 @@ import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -525,15 +524,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization)-[r:" + HAS_SUB_ORGANIZATION + "]->(unit:Organization) WHERE id(org)={0} AND id(unit)={1} RETURN count(r)")
     Integer checkParentChildRelation(Long organizationId, Long unitId);
 
-    @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n \n" +
-            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true})  WHERE org.isKairosHub =false \n" +
-
-            "MATCH (org)-[:" + HAS_POSITION_CODE + "]->(p:PositionCode {deleted:false}) RETURN p")
-    List<PositionCode> getPositionCodesOfParentOrganization(Long organizationId);
-
-
-    @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_POSITION_CODE + "]->(p:PositionCode {deleted:false}) WHERE id(o)={0} RETURN p")
-    List<PositionCode> getPositionCodes(Long organizationId);
 
     @Query(" MATCH (organization:Organization) WHERE id(organization)={0} WITH organization\n" +
             "MATCH (organization)-[r:PROVIDE_SERVICE]->(os) WHERE os.imported=true WITH distinct os,r\n" +
@@ -568,7 +558,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2}\n" +
             "RETURN et ORDER BY et.name ASC")
-//    id(et) as id, et.name as name, et.description as description
     EmploymentType getEmploymentTypeByOrganizationAndEmploymentId(Long organizationId, Long employmentId, Boolean isDeleted);
 
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
