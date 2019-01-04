@@ -396,12 +396,19 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH (accessPage) -[: " +SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN accessPage.name as name,accessPage.moduleId as moduleId, collect(DISTINCT subPages) as child ORDER BY accessPage.moduleId")
     List<KPIAccessPageQueryResult> getKPITabsListForCountry(Long countryId);
 
-    @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
-            "MATCH(org)-[: " + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) WITH accessgroup\n" +
+//    @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
+//            "MATCH(org)-[: " + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) WITH accessgroup\n" +
+//            "MATCH(accessgroup)-[r:HAS_ACCESS_OF_TABS ]->(accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+//            "OPTIONAL MATCH (accessPage) -[: " + SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN \n" +
+//            "accessPage.name as name,accessPage.moduleId as moduleId, collect(DISTINCT subPages) as child ORDER BY accessPage.moduleId")
+    @Query("MATCH (user:User) ,(org:Organization)  where id(org)=958 AND id(user)=18652\n" +
+            "MATCH (user)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]-(emp:Employment)\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org) \n" +
+            "MATCH(up)-[:HAS_ACCESS_GROUP]-(accessgroup:AccessGroup{deleted: false,enabled:true})\n" +
             "MATCH(accessgroup)-[r:HAS_ACCESS_OF_TABS ]->(accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
-            "OPTIONAL MATCH (accessPage) -[: " + SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN \n" +
+            "OPTIONAL MATCH (accessPage) -[: SUB_PAGE]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN \n" +
             "accessPage.name as name,accessPage.moduleId as moduleId, collect(DISTINCT subPages) as child ORDER BY accessPage.moduleId")
-    List<KPIAccessPageQueryResult> getKPITabsListForUnit(Long unitId);
+    List<KPIAccessPageQueryResult> getKPITabsListForUnit(Long unitId,Long userId);
 
 
     @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) WHERE n.moduleId={0} RETURN subPages")
