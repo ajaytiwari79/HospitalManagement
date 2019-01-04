@@ -375,14 +375,6 @@ public class UserService {
         return true;
     }
 
-    //delete if not use
-    public UserOrganizationsDTO getLoggedInUserOrganizations() {
-        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
-        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId,currentUser.getLastSelectedOrganizationId());
-        return userOrganizationsDTO;
-    }
 
     public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, List<Long> accessibleModules, boolean parentOrganization) {
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
