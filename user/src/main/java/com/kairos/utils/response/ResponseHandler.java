@@ -25,7 +25,6 @@ public final class ResponseHandler {
         map.put("status", status.value());
         map.put("isSuccess", isSuccess);
         map.put("data", responseObj);
-
         map.put("time_stamp", dateTime);
         return new ResponseEntity<Map<String, Object>>(map, status);
 
