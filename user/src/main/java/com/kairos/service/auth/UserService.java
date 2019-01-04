@@ -656,7 +656,7 @@ public class UserService {
         return permissionList;
     }
 
-    public Boolean updateLastSelectedOrganizationId(Long organizationId) {
+    private Boolean updateLastSelectedOrganizationId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         currentUser.setLastSelectedOrganizationId(organizationId);
         userGraphRepository.save(currentUser);
