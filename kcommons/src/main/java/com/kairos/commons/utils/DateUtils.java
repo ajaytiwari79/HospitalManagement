@@ -826,8 +826,33 @@ public  class DateUtils {
         return new Double(hour+"."+minutes);
     }
 
+    public static Date plusDays(Date date,int plusDays){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));
+    }
+
+    public static Date plusMonths(Date date,int plusMonths){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMonths(plusMonths));
+    }
+
+    public static Date plusWeeks(Date date,int plusWeeks){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusWeeks(plusWeeks));
+    }
+
+    public static Date plusHours(Date date,int plusHours){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusHours(plusHours));
+    }
+
+    public static Date plusMinutes(Date date,int plusMinutes){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMinutes(plusMinutes));
+    }
+
+    public static Date plusSeconds(Date date,int plusSeconds) {
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusSeconds(plusSeconds));
+    }
+
     public static LocalDateTime getLocalDateTimeFromLocalDate(LocalDate localDate){
         return localDate.atStartOfDay();
+
     }
 
 }
