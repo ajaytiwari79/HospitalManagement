@@ -32,6 +32,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -559,6 +560,36 @@ public class CostTimeAgreementService extends MongoBaseService {
         save(costTimeAgreement);
 
         return costTimeAgreementRepository.getOneCtaById(costTimeAgreement.getId());
+    }
+
+
+    public void updateExistingPhaseIdOfCTA(){
+        List<CostTimeAgreement> costTimeAgreements = costTimeAgreementRepository.findAll();
+        List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(18712l);
+        Map<BigInteger,PhaseDefaultName> phaseDefaultNameMap = countryPhase.stream().collect(Collectors.toMap(k->k.getId(),v->v.getPhaseEnum()));
+        Map<Long,Map<PhaseDefaultName, BigInteger>> mapMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(costTimeAgreements)){
+            for (CostTimeAgreement costTimeAgreement : costTimeAgreements) {
+                List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(costTimeAgreement.getRuleTemplateIds());
+                if(costTimeAgreement.getOrganization()!=null){
+                    if(!mapMap.containsKey(costTimeAgreement.getOrganization().getId())){
+                        List<Phase> unitPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(costTimeAgreement.getOrganization().getId());
+                        Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = unitPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum(),v->v.getId()));
+                        mapMap.put(costTimeAgreement.getOrganization().getId(),parentPhasesAndUnitPhaseIdMap);
+                    }
+                    for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
+                        Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = mapMap.get(costTimeAgreement.getOrganization().getId());
+                        for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : ctaRuleTemplate.getPhaseInfo()) {
+                            BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseDefaultNameMap.get(ctaRuleTemplatePhaseInfo.getPhaseId()),ctaRuleTemplatePhaseInfo.getPhaseId());
+                            ctaRuleTemplatePhaseInfo.setPhaseId(phaseId);
+                        }
+                    }
+                    if(CollectionUtils.isNotEmpty(ctaRuleTemplates)) {
+                        ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
+                    }
+                }
+            }
+        }
     }
 
 }

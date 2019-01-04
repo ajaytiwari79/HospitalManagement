@@ -26,5 +26,6 @@ public interface CTARuleTemplateRepository extends MongoBaseRepository<CTARuleTe
     @Query("{ruleTemplateCategoryId:?0,deleted:false}")
     List<CTARuleTemplate> findAllByCategoryId(BigInteger ruleTemplateCategoryId);
 
+    @Query("{'_id':{'$in':?0},'deleted':false}")
     List<CTARuleTemplate> findAllByIdAndDeletedFalse(List<BigInteger> ids);
 }
