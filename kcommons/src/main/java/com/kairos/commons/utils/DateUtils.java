@@ -811,9 +811,9 @@ public  class DateUtils {
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
-    public static Double getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
+    public static Double getMinutesFromTotalMilliSeconds(long totalMilliSeconds){
         long seconds, minutes, hours;
-        seconds = TotalMilliSeconds / 1000;
+        seconds = totalMilliSeconds / 1000;
         minutes = seconds / 60;
         hours = minutes / 60;
         minutes = minutes % 60;
