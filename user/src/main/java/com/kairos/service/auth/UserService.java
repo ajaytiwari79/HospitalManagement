@@ -456,7 +456,7 @@ public class UserService {
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
-        updateLastSelectedChildAndParentId(organizationId);
+        updateLastSelectedOrganizationId(organizationId);
         return permissionData;
     }
 
@@ -656,7 +656,7 @@ public class UserService {
         return permissionList;
     }
 
-    public Boolean updateLastSelectedChildAndParentId(Long organizationId) {
+    public Boolean updateLastSelectedOrganizationId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         currentUser.setLastSelectedOrganizationId(organizationId);
         userGraphRepository.save(currentUser);
