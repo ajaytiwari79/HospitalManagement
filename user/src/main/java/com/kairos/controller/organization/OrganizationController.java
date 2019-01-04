@@ -454,11 +454,11 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Organization Hierarchy")
-    @GetMapping(PARENT_ORGANIZATION_URL+"/organization_flow/hierarchy")
+    @GetMapping("/organization_flow/hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab(@PathVariable long organizationId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationHierarchyService.generateHierarchy(organizationId));
+                organizationHierarchyService.generateHierarchy());
     }
 
     @ApiOperation(value = "Get Organization Clients with min details")

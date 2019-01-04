@@ -379,7 +379,7 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
         UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
+                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId,currentUser.getLastSelectedOrganizationId());
         return userOrganizationsDTO;
     }
 
@@ -665,9 +665,8 @@ public class UserService {
 
     public Boolean updateLastSelectedChildAndParentId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if(!currentUser.getLastSelectedOrganizationId().equals(organizationId)){
-            userGraphRepository.save(currentUser);
-        }
+        currentUser.setLastSelectedOrganizationId(organizationId);
+        userGraphRepository.save(currentUser);
         return true;
     }
 

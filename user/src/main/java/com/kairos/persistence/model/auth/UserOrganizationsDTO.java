@@ -24,11 +24,12 @@ public class UserOrganizationsDTO {
         // default constructor
     }
 
-    public UserOrganizationsDTO(List<OrganizationWrapper> organizations, Long lastSelectedChildOrgId, Long lastSelectedParentOrgId, Long userLangugaeId){
+    public UserOrganizationsDTO(List<OrganizationWrapper> organizations, Long lastSelectedChildOrgId, Long lastSelectedParentOrgId, Long userLangugaeId,Long lastSelectedOrganizationId){
         this.organizations = organizations;
         this.lastSelectedChildOrgId = lastSelectedChildOrgId;
         this.lastSelectedParentOrgId = lastSelectedParentOrgId;
         this.userLangugaeId = userLangugaeId;
+        this.lastSelectedOrganizationId=lastSelectedOrganizationId;
     }
 
     public List<OrganizationWrapper> getOrganizations() {

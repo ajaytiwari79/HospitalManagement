@@ -72,31 +72,30 @@ public class OrganizationHierarchyService {
         return treeStructureService.getTreeStructure(list);
     }
 
-    public List<QueryResult> generateHierarchy(long parentOrganizationId) {
+    public List<QueryResult> generateHierarchy() {
         List<QueryResult> resultQueryResults=new ArrayList<>();
-
         List<OrganizationWrapper> organizationWrappers=userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(Collectors.toList()));
 
-        if (units.isEmpty()) {
-            Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
-            if (organization == null) {
-                return null;
-            }
-            QueryResult queryResult = new QueryResult();
-            queryResult.setId(organization.getId());
-            queryResult.setUnion(organization.isUnion());
-            queryResult.setName(organization.getName());
-            queryResult.setKairosHub(organization.isKairosHub());
-            queryResult.setAccessable(true);
-            queryResult.setType(ORGANIZATION_LABEL);
-            queryResult.setPreKairos(organization.isPrekairos());
-            queryResult.setEnabled(organization.isEnable());
-            queryResult.setParentOrganization(organization.isParentOrganization());
-            queryResult.setTimeZone(organization.getTimeZone()!=null? organization.getTimeZone().getId():null);
-            queryResult.setOrganizationLevel(organization.getOrganizationLevel());
-            return Arrays.asList(queryResult);
-        }
+//        if (units.isEmpty()) {
+//            Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
+//            if (organization == null) {
+//                return null;
+//            }
+//            QueryResult queryResult = new QueryResult();
+//            queryResult.setId(organization.getId());
+//            queryResult.setUnion(organization.isUnion());
+//            queryResult.setName(organization.getName());
+//            queryResult.setKairosHub(organization.isKairosHub());
+//            queryResult.setAccessable(true);
+//            queryResult.setType(ORGANIZATION_LABEL);
+//            queryResult.setPreKairos(organization.isPrekairos());
+//            queryResult.setEnabled(organization.isEnable());
+//            queryResult.setParentOrganization(organization.isParentOrganization());
+//            queryResult.setTimeZone(organization.getTimeZone()!=null? organization.getTimeZone().getId():null);
+//            queryResult.setOrganizationLevel(organization.getOrganizationLevel());
+//            return Arrays.asList(queryResult);
+//        }
 
         ObjectMapper objectMapper = new ObjectMapper();
 
