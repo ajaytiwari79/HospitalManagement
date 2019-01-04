@@ -401,4 +401,11 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,genericIntegrationService.getStaff(countryId,14098L));
 
     }
+
+
+    @ApiOperation("Remove upload Attachments in Activity")
+    @PostMapping(value = "/activity/{activityId}/remove_uploaded_attachments")
+    ResponseEntity<Map<String, Object>> addDocumentInNotesTab(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
+    }
 }
