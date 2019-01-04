@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetTypeDTO {
 
-    private BigInteger id;
+    private Integer id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
@@ -26,11 +26,11 @@ public class AssetTypeDTO {
     @Valid
     private List<AssetTypeDTO> subAssetTypes = new ArrayList<>();
 
-    public BigInteger getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
