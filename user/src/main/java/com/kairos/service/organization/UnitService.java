@@ -101,7 +101,7 @@ public class UnitService {
         response.put("companyTypes", CompanyType.getListOfCompanyType());
         response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
         response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(country.getId()));
-        response.put("accessGroups", accessGroupService.getOrganizationAccessGroupsForUnitCreation(parentOrganizationId));
+        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroupsForUnitCreation(parentOrganizationId));
         return response;
     }
 
