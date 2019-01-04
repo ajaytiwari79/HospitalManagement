@@ -375,6 +375,7 @@ public class UserService {
         return true;
     }
 
+    //delete if not use
     public UserOrganizationsDTO getLoggedInUserOrganizations() {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;

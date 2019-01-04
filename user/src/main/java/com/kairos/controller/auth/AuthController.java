@@ -177,6 +177,7 @@ public class AuthController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updatePassword(firstTimePasswordUpdateDTO));
     }
 
+    //delete if not use
     @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getLoggedInUserOrganizations());

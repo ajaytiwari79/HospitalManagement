@@ -76,7 +76,7 @@ public class OrganizationHierarchyService {
         List<QueryResult> resultQueryResults=new ArrayList<>();
         List<OrganizationWrapper> organizationWrappers=userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(Collectors.toList()));
-
+//current not use delete after verify
 //        if (units.isEmpty()) {
 //            Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
 //            if (organization == null) {
