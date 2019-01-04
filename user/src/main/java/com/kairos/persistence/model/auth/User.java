@@ -45,8 +45,7 @@ public class User extends UserBaseEntity {
     protected Gender gender;
     private boolean pregnant;
     private String email;
-    private Long lastSelectedParentOrgId;
-    private Long lastSelectedChildOrgId;
+    private Long lastSelectedOrganizationId;
     private LocalDate dateOfBirth;
 
     //uniqueness of user
@@ -201,6 +200,14 @@ public class User extends UserBaseEntity {
      */
     public String getAccessToken() {
         return accessToken;
+    }
+
+    public Long getLastSelectedOrganizationId() {
+        return lastSelectedOrganizationId;
+    }
+
+    public void setLastSelectedOrganizationId(Long lastSelectedOrganizationId) {
+        this.lastSelectedOrganizationId = lastSelectedOrganizationId;
     }
 
     /**
@@ -480,22 +487,6 @@ public class User extends UserBaseEntity {
 
     public void setHubMember(Boolean hubMember) {
         this.hubMember = hubMember;
-    }
-
-    public Long getLastSelectedParentOrgId() {
-        return lastSelectedParentOrgId;
-    }
-
-    public void setLastSelectedParentOrgId(Long lastSelectedParentOrgId) {
-        this.lastSelectedParentOrgId = lastSelectedParentOrgId;
-    }
-
-    public Long getLastSelectedChildOrgId() {
-        return lastSelectedChildOrgId;
-    }
-
-    public void setLastSelectedChildOrgId(Long lastSelectedChildOrgId) {
-        this.lastSelectedChildOrgId = lastSelectedChildOrgId;
     }
 
     public boolean isPregnant() {
