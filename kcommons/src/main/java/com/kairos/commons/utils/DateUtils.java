@@ -826,4 +826,8 @@ public  class DateUtils {
         return new Double(hour+"."+minutes);
     }
 
+    public static LocalDateTime getLocalDateTimeFromLocalDate(LocalDate localDate){
+        return localDate.atStartOfDay();
+    }
+
 }
