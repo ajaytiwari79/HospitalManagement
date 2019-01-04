@@ -123,8 +123,8 @@ public class ActivityIntegrationService {
         List<NameValuePair> param = new ArrayList<>();
         param.add(startDate);
         param.add(endDate);
-        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/"+unitPositionId+"/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        });
+        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/{unitPositionId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        },unitPositionId);
     }
 
     public void createTimeTypes(Long countryId){
