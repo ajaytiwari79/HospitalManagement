@@ -1,7 +1,6 @@
 package com.kairos.service.organization;
 
 import com.kairos.dto.user.organization.*;
-import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Organization;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -60,7 +58,7 @@ public class UnitService {
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
         response.put("accountType", parentOrg.getAccountType());
-        response.put("accessGroups",accessGroupService.getOrganizationAccessGroups(parentOrg.getId()));
+        response.put("accessGroups",accessGroupService.getOrganizationManagementAccessGroups(parentOrg.getId()));
         //response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
         response.put("businessTypes", parentOrg.getBusinessTypes());
         response.put("companyCategory", parentOrg.getCompanyCategory());
@@ -101,7 +99,7 @@ public class UnitService {
         response.put("companyTypes", CompanyType.getListOfCompanyType());
         response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
         response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(country.getId()));
-        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroupsForUnitCreation(parentOrganizationId));
+        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(parentOrganizationId));
         return response;
     }
 
