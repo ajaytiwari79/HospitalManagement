@@ -27,6 +27,7 @@ public class CTAResponseDTO {
     private ExpertiseResponseDTO expertise;
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
+
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;

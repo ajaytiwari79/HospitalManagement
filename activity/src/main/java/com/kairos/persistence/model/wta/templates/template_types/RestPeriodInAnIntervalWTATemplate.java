@@ -9,7 +9,10 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.springframework.security.core.parameters.P;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private float recommendedValue;
     private List<BigInteger> timeTypeIds = new ArrayList<>();

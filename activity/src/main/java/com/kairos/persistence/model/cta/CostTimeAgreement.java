@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.Expertise;
-import com.kairos.persistence.model.wta.Organization;
 import com.kairos.persistence.model.wta.OrganizationType;
+import com.kairos.persistence.model.wta.WTAOrganization;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +29,7 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private OrganizationType organizationSubType;
     private Long countryId;
     private BigInteger organizationParentId;
-    private Organization organization;
+    private WTAOrganization organization;
     private BigInteger parentId;
     private BigInteger parentCountryCTAId;
     private List<BigInteger> ruleTemplateIds =new ArrayList<>();
@@ -53,11 +52,11 @@ public class CostTimeAgreement extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-    public Organization getOrganization() {
+    public WTAOrganization getOrganization() {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(WTAOrganization organization) {
         this.organization = organization;
     }
 

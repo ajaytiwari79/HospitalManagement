@@ -211,7 +211,7 @@ public class WTAService extends MongoBaseService {
 
                 }
 
-                workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
+                workingTimeAgreement.setOrganization(new WTAOrganization(organization.getId(), organization.getName(), organization.getDescription()));
                 workingTimeAgreement.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
                 workingTimeAgreement.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
                 WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
@@ -565,7 +565,7 @@ public class WTAService extends MongoBaseService {
                 workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
             }
             workingTimeAgreement.setId(null);
-            workingTimeAgreement.setOrganization(new Organization(organisationId, "", ""));
+            workingTimeAgreement.setOrganization(new WTAOrganization(organisationId, "", ""));
             workingTimeAgreement.setCountryParentWTA(w.getId());
             workingTimeAgreement.setCountryId(null);
             workingTimeAgreement.setParentId(wtaResponseDTO.getId());

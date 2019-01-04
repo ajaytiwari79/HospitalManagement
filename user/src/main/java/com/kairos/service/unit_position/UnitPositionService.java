@@ -534,7 +534,6 @@ public class UnitPositionService {
 
     }
 
-    //===========currently working
 
     /**
      * @param unitPositionId

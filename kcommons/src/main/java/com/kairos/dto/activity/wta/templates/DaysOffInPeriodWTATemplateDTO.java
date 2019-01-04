@@ -6,6 +6,9 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
+
 /**
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE10
@@ -15,7 +18,9 @@ import com.kairos.enums.wta.WTATemplateType;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long intervalLength;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
+    private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private MinMaxSetting minMaxSetting;
     private boolean restingTimeAllowed;

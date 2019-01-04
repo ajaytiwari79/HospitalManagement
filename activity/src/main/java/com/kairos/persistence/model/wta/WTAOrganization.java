@@ -5,15 +5,17 @@ package com.kairos.persistence.model.wta;
  * @date - 11/4/18
  */
 
-public class Organization {
+
+//It is an Value object for WorkTimeAgreement and CostTimeAgreement
+public class WTAOrganization {
     private Long id;
     private String name;
     private String description;
 
-    public Organization() {
+    public WTAOrganization() {
     }
 
-    public Organization(Long id, String name, String description) {
+    public WTAOrganization(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
