@@ -826,7 +826,6 @@ public  class DateUtils {
         return new Double(hour+"."+minutes);
     }
 
-
     public static Date plusDays(Date date,int plusDays){
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));
     }
@@ -850,8 +849,10 @@ public  class DateUtils {
     public static Date plusSeconds(Date date,int plusSeconds) {
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusSeconds(plusSeconds));
     }
+
     public static LocalDateTime getLocalDateTimeFromLocalDate(LocalDate localDate){
         return localDate.atStartOfDay();
+
     }
 
 }
