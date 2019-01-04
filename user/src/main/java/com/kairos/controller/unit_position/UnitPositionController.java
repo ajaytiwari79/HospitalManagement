@@ -104,6 +104,12 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.removeFunction(unitId,unitPositionId, appliedDate));
     }
 
+    @ApiOperation(value = "remove function to unit position on delete Shift")
+    @DeleteMapping(value = "/unit_position/{unitPositionId}/remove_function_on_delete_shift")
+    public ResponseEntity<Map<String, Object>> removeFunctionOnDeleteShift(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.removeFunctionOnDeleteShift(unitPositionId, appliedDate));
+    }
+
     /**
      *
      * @param unitPositionId
