@@ -417,7 +417,8 @@ public class AccessPageService {
         return kpiTabs;
     }
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
-        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId);
+        Long userId=UserContext.getUserDetails().getId();
+        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
     }
