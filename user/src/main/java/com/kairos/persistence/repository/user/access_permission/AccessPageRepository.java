@@ -53,7 +53,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WHERE id(parent)=id(ps.p) WITH r2,ps,ag\n" +
             "OPTIONAL MATCH (child:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag)\n" +
             "WHERE id(child)=id(ps.c) WITH r,r2,ps,ag\n" +
-            "RETURN {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
+            "RETURN {name:ps.p.name,id:id(ps.p),sequence:ps.p.sequence,selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
             "UNION\n" +
             // Fetch modules which does not have child
             "MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
