@@ -67,14 +67,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPosition(Long unitEmploymentPositionId, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate) {
         Criteria criteria;
         if(Optional.ofNullable(endDate).isPresent()){
-            criteria=Criteria.where("deleted").is(false).and("unitPositionId").is(unitEmploymentPositionId).and("disabled").is(false)
+            criteria=Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)
                     .and("startDate").lte(endDate).and("endDate").gte(startDate);
         }
         else{
-            criteria=Criteria.where("deleted").is(false).and("unitPositionId").is(unitEmploymentPositionId).and("disabled").is(false)
+            criteria=Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)
                     .and("startDate").gte(startDate).orOperator(Criteria.where("endDate").gte(startDate));
         }
         Aggregation aggregation = Aggregation.newAggregation(
@@ -95,6 +95,20 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         );
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public List<Shift> findAllShiftByIntervalAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate){
+        Criteria criteria;
+        if(Optional.ofNullable(endDate).isPresent()){
+            criteria=Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)
+                    .and("startDate").lte(endDate).and("endDate").gte(startDate);
+        }
+        else{
+            criteria=Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)
+                    .and("startDate").gte(startDate).orOperator(Criteria.where("endDate").gte(startDate));
+        }
+        return mongoTemplate.find(new Query(criteria),Shift.class);
     }
 
 
