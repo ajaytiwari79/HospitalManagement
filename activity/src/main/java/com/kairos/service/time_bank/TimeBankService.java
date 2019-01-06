@@ -454,7 +454,7 @@ public class TimeBankService extends MongoBaseService {
                     shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     staffAdditionalInfoDTOMap.put(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO);
                     if (staffAdditionalInfoDTOMap.containsKey(shift.getUnitPositionId())) {
-                        dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()),new DateTime(shift.getStartDate()),new DateTime(shift.getEndDate())));
+                        dailyTimeBanks.addAll(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getUnitPositionId()),shift));
                     }
                 }
             } catch (Exception e) {
