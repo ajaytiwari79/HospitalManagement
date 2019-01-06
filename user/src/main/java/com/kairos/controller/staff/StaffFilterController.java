@@ -47,7 +47,7 @@ public class StaffFilterController {
     @ApiOperation("To get all and favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllAndFavouriteFilters(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllAndFavouriteFilters(moduleId, organizationId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllAndFavouriteFilters(moduleId,  unitId));
     }
 
     @RequestMapping(value = "/filter/{filterId}", method = RequestMethod.DELETE)
