@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class AccessorPartyResponseDTO {
 
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -33,9 +33,9 @@ public class AccessorPartyResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

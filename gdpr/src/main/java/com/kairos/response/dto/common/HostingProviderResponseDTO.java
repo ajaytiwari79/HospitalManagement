@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HostingProviderResponseDTO {
 
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -20,7 +20,7 @@ public class HostingProviderResponseDTO {
 
     private LocalDate suggestedDate;
 
-    public HostingProviderResponseDTO(Integer id, String name, Long organizationId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
+    public HostingProviderResponseDTO(Long id, String name, Long organizationId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
         this.id = id;
         this.name = name;
         this.organizationId = organizationId;
@@ -40,9 +40,9 @@ public class HostingProviderResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public Integer getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(Integer id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

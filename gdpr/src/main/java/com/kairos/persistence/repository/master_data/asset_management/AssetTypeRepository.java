@@ -19,7 +19,7 @@ import java.util.Set;
 @JaversSpringDataAuditable
 public interface AssetTypeRepository extends JpaRepository<AssetTypeMD,Integer> {
 
-    @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?1 and at.deleted = false and lower(at.name) = lower(?2) and subAssetType = ?3")
+    @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?2 and at.deleted = false and lower(at.name) = lower(?1) and subAssetType = ?3")
     AssetTypeMD findByNameAndCountryIdAndSubAssetType(String name,Long countryId, boolean hasSubAssetType);
 
 
