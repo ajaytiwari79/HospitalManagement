@@ -1152,13 +1152,13 @@ public class ShiftService extends MongoBaseService {
 
     public CompactViewDTO getDetailViewInfo(Long unitId, Long staffId, Date shiftStartDate) {
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
-        List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
+        List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(p->p.getPhaseEnum().toString(), Function.identity()));
         Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(shiftStartDate).plusDays(1));
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationBystaffId(staffId, shiftStartDate, endDate);
         shifts.forEach(shift -> shift.setDurationMinutes((int) shift.getInterval().getMinutes()));
         List<ShiftState> shiftStatesList=shiftStateMongoRepository.getAllByStaffsByIdsBetweenDate(shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList()),shiftStartDate,endDate);
-        List<ShiftState> realTimeShiftStatesList=checkAndCreateRealtimeState(shifts,shiftStatesList.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
+        List<ShiftState> realTimeShiftStatesList= checkAndCreateRealtimeAndDraftState(shifts,shiftStatesList.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap);
         shiftStatesList.addAll(realTimeShiftStatesList);
         shiftStatesList.forEach(shiftState -> shiftState.setDurationMinutes((int) shiftState.getInterval().getMinutes()));
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
@@ -1170,9 +1170,10 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public List<ShiftState> checkAndCreateRealtimeState(List<Shift> shifts,List<ShiftState> shiftStates,BigInteger phaseId){
+    public List<ShiftState> checkAndCreateRealtimeAndDraftState(List<Shift> shifts, List<ShiftState> shiftStates, Map<String, Phase> phaseMap){
         List<ShiftState> newShiftStates=new ArrayList<>();
-        newShiftStates=shiftStateService.createRealTimeShiftState(newShiftStates,shiftStates,shifts,phaseId);
+        newShiftStates=shiftStateService.createRealTimeShiftState(newShiftStates,shiftStates,shifts,phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
+        newShiftStates.addAll(shiftStateService.createDraftShiftState(newShiftStates,shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
         if(!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
         return newShiftStates;
 
@@ -1328,7 +1329,7 @@ public class ShiftService extends MongoBaseService {
 
     public CompactViewDTO getCompactViewDetails(Long unitId, Date shiftStartDate) {
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
-        List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
+        List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(p->p.getPhaseEnum().toString(), Function.identity()));
         Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(shiftStartDate).plusDays(1));
         List<StaffDTO> staffResponseDTOS = genericIntegrationService.getStaffListByUnit();
@@ -1337,7 +1338,7 @@ public class ShiftService extends MongoBaseService {
         Map<Long,List<AttendanceTimeSlotDTO>> staffsTimeAndAttendance=(CollectionUtils.isNotEmpty(timeAndAttendance))?timeAndAttendance.stream().collect(Collectors.toMap(k->k.getStaffId(), v->v.getAttendanceTimeSlot())):new HashMap<>();
         List<Shift> shifts = shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds, shiftStartDate, endDate);
         List<ShiftState> shiftStates = shiftStateMongoRepository.getAllByStaffsByIdsBetweenDate(staffIds, shiftStartDate, endDate);
-        List<ShiftState> realTimeShiftStatesList=checkAndCreateRealtimeState(shifts,shiftStates.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
+        List<ShiftState> realTimeShiftStatesList= checkAndCreateRealtimeAndDraftState(shifts,shiftStates.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap);
         shiftStates.addAll(realTimeShiftStatesList);
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
