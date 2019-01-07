@@ -145,15 +145,12 @@ public class StaffRetrievalService {
 
         StaffEmploymentDTO staffEmploymentDTO = null;
         Staff staff = null;
-
+        Organization  unit = organizationGraphRepository.findOne(unitId);
+        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getTeamStaff(unitId, staffId);
             staffEmploymentDTO = new StaffEmploymentDTO(staff, null);
         } else if (ORGANIZATION.equalsIgnoreCase(type)) {
-            Organization unit = organizationGraphRepository.findOne(unitId);
-            Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
-            // unit is parent so fetching all staff from itself
-            //staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             staffEmploymentDTO = staffGraphRepository.getStaffAndEmploymentByUnitId(parentOrganization.getId(), staffId);
             staff = Optional.ofNullable(staffEmploymentDTO).isPresent() ? staffEmploymentDTO.getStaff() : null;
         }
@@ -177,8 +174,8 @@ public class StaffRetrievalService {
         }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
 
-        personalInfo.put("personalInfo", retrievePersonalInfo(unitId,staff));
-        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId,unitId));
+        personalInfo.put("personalInfo", retrievePersonalInfo(staff));
+        personalInfo.put("expertise", getExpertisesOfUnitByCountryId(countryId,parentOrganization.getId()));
         personalInfo.put("languages", languages);
         personalInfo.put("engineerTypes", engineerTypes);
         return personalInfo;
@@ -199,7 +196,7 @@ public class StaffRetrievalService {
 
 
 
-    public Map<String, Object> retrievePersonalInfo(Long unitId,Staff staff) {
+    public Map<String, Object> retrievePersonalInfo(Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", user.getFirstName());
@@ -216,11 +213,9 @@ public class StaffRetrievalService {
         map.put("careOfName", staff.getCareOfName());
         map.put("gender", user.getGender());
         map.put("pregnant", user.isPregnant());
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(getSectorWiseExpertiseWithExperience(unitId,staff.getId()), SectorAndStaffExpertiseQueryResult.class);
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staff.getId()), SectorAndStaffExpertiseQueryResult.class);
         map.put("sectorWiseExpertise", getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         map.put("expertiseIds", getExpertiseIds(staffExpertiseQueryResults));
-        //staffExpertiseQueryResults.stream().map(staffExpertise->staffExpertise.getExpertiseWithExperience().stream().map(a->a.getExpertiseId()).collect(Collectors.toList()))
-        // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
         map.put("workPercent", staff.getWorkPercent());
         map.put("overtime", staff.getOvertime());
@@ -770,17 +765,16 @@ public class StaffRetrievalService {
         return expertiseIds;
     }
 
-
-
-
-    public List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertiseWithExperience(Long unitId,Long staffId){
-                List<SectorAndStaffExpertiseQueryResult> sectorAndStaffExpertiseQueryResults=new ArrayList<>();
-                organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-                if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-                        sectorAndStaffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperienceByServiceIdsAndLevelId(staffId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
-                    } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-                        sectorAndStaffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperienceByServiceIds(staffId, servicesAndLevel.getServicesId());
-                    }
-                return sectorAndStaffExpertiseQueryResults;
+    public  List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndUnitId(Long staffId, long unitId) {
+        List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = new ArrayList<>();
+        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        if(Optional.ofNullable(servicesAndLevel).isPresent()) {
+            if (CollectionUtils.isNotEmpty(servicesAndLevel.getServicesId()) && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
+                staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndServicesAndLevel(staffId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
+            } else if (CollectionUtils.isNotEmpty(servicesAndLevel.getServicesId())) {
+                staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndServices(staffId, servicesAndLevel.getServicesId());
+            }
+        }
+        return staffExperienceInExpertiseDTOList;
     }
 }

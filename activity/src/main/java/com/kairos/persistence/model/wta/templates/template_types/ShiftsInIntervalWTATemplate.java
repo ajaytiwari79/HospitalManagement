@@ -12,6 +12,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();

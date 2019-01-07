@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -35,7 +34,6 @@ public class UnitPositionDTO {
     private BigInteger workingTimeAgreementId;
     private Double salary;
     private int totalWeeklyMinutes;
-    private PositionCodeDTO positionCode;
     private CTAResponseDTO costTimeAgreement;
     private BigInteger costTimeAgreementId;
     private OrganizationDTO union;
@@ -186,14 +184,6 @@ public class UnitPositionDTO {
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public PositionCodeDTO getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCodeDTO positionCode) {
-        this.positionCode = positionCode;
     }
 
     public CTAResponseDTO getCostTimeAgreement() {

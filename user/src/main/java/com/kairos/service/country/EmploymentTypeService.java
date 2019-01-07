@@ -89,7 +89,7 @@ public class EmploymentTypeService {
 
         }
         EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
-                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
+                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition());
         employmentTypeToCreate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
@@ -118,7 +118,7 @@ public class EmploymentTypeService {
         }
         EmploymentType employmentType=new EmploymentType(employmentTypeToUpdate.getId(),employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
                 employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
-                employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
+                employmentTypeDTO.isEditableAtUnitPosition());
         employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         return employmentTypeGraphRepository.save(employmentType);
     }
@@ -268,7 +268,8 @@ public class EmploymentTypeService {
     }
 
     public List<StaffKpiFilterDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds()), StaffKpiFilterDTO.class);
+        Organization organization=organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(),organization.isParentOrganization()), StaffKpiFilterDTO.class);
     }
 
 

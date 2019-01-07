@@ -1,10 +1,7 @@
 package com.kairos.counter;
 
 import com.kairos.dto.activity.counter.enums.CounterType;
-import com.kairos.service.counter.ContractualAndPlannedHoursCalculationService;
-import com.kairos.service.counter.CounterService;
-import com.kairos.service.counter.PlannedHoursCalculationService;
-import com.kairos.service.counter.RestingHoursCalculationService;
+import com.kairos.service.counter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,6 +37,12 @@ public class CounterServiceMapping {
     public void calculateContractualAndPlannedHours(ContractualAndPlannedHoursCalculationService contractualAndPlannedHoursCalculationService) {
         this.counters.put(CounterType.CONTRACTUAL_AND_PLANNED_HOURS, contractualAndPlannedHoursCalculationService);
         logger.info("Enum mapping for contractual and planned hours : "+this.counters);
+    }
+
+    @Inject
+    public void calculateTimeBankForUnit(TimeBankKpiCalculationService timeBankKpiCalculationService) {
+        this.counters.put(CounterType.TIMEBANK, timeBankKpiCalculationService);
+        logger.info("Enum mapping for time bank for unit : "+this.counters);
     }
 
     public CounterService getService(CounterType counterType){

@@ -540,7 +540,8 @@ public class PayTableService {
         logger.debug(payTable.getStartDateMillis() + "----" + publishedDate);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
             payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDate.minusDays(1).toString());
-            parentPayTable.setEndDateMillis(publishedDate);
+            validatePayTableToPublish(payTableId,publishedDate);
+            parentPayTable.setEndDateMillis(publishedDate.minusDays(1));
             parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
@@ -564,7 +565,6 @@ public class PayTableService {
 
 
     public List<PayTableResponse> getPayTablesByOrganizationLevel(Long organizationLevelId) {
-
         return payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
     }
@@ -613,5 +613,9 @@ public class PayTableService {
 
     }
 
-
+    private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate){
+         if(payTableGraphRepository.existsByDate(payTableId,publishedDate.toString())){
+           exceptionService.actionNotPermittedException("published_pay_table.exists",publishedDate);
+        }
+    }
 }

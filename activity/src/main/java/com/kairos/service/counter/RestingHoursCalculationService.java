@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
@@ -61,7 +62,7 @@ public class RestingHoursCalculationService implements CounterService {
         Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(shift -> shift.getStaffId(), Collectors.toList()));
         staffIds.forEach(staffId -> {
             if(staffId != null) {
-                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate.plusDays(1)), false);
+                    Double restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId,new ArrayList<>()), DateUtils.getLongFromLocalDateimeTime(startDate),DateUtils.getLongFromLocalDateimeTime(endDate), false);
                     staffRestingHours.put(staffId, restingHours);
             }
         });
@@ -77,13 +78,13 @@ public class RestingHoursCalculationService implements CounterService {
         // TO BE USED FOR AVERAGE CALCULATION.
         double multiplicationFactor = 1;
         //FIXME: fixed time interval TO BE REMOVED ONCE FILTERS IMPLEMENTED PROPERLY
-        List staffIds= (filterBasedCriteria.get(FilterType.STAFF_IDS) != null)?getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
+        List staffIds= (filterBasedCriteria.get(FilterType.STAFF_IDS) != null)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
         List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
-        List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
-        List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
+        List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
+        List<Long> employmentTypes = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentTypes,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), organizationId, filterDates.get(0).atStartOfDay(), filterDates.get(1).atStartOfDay());
+        Map<Long, Double> staffRestingHours = calculateRestingHours(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), organizationId, DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(0)), DateUtils.getLocalDateTimeFromLocalDate(filterDates.get(1)).plusDays(1));
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         for (Map.Entry<Long, Double> entry : staffRestingHours.entrySet()) {
@@ -104,9 +105,7 @@ public class RestingHoursCalculationService implements CounterService {
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.YAXIS);
     }
 
-    private List<Long> getLongValue(List<Object> objects){
-        return objects.stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList());
-    }
+
 }
 
 

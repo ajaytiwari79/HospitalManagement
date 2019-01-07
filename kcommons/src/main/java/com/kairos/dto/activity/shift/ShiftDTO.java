@@ -65,6 +65,11 @@ public class ShiftDTO {
     private int deltaTimeBankMinutes;
     private long accumulatedTimeBankMinutes;
     private int plannedMinutes;
+    private boolean multipleActivity;
+
+    public ShiftDTO() {
+        //default Const
+    }
 
    public ShiftDTO(BigInteger id, Date startDate,Date endDate,Long unitId,Long staffId) {
        this.id = id;
@@ -382,13 +387,6 @@ public class ShiftDTO {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
 
-    public ShiftDTO() {
-        //default Const
-    }
-
-
-
-
     public BigInteger getParentOpenShiftId() {
         return parentOpenShiftId;
     }
@@ -411,6 +409,14 @@ public class ShiftDTO {
 
     public void setFunctionDeleted(boolean functionDeleted) {
         this.functionDeleted = functionDeleted;
+    }
+
+    public boolean isMultipleActivity() {
+        return multipleActivity;
+    }
+
+    public void setMultipleActivity(boolean multipleActivity) {
+        this.multipleActivity = multipleActivity;
     }
 
     public int getTimeBankCtaBonusMinutes() {

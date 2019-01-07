@@ -7,6 +7,8 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.time.LocalTime;
 
 
@@ -27,7 +29,9 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     @JsonFormat(pattern = "HH:mm")
     private LocalTime toTime;
     private String toDayOfWeek;
-    private long intervalLength;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
+    private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private boolean restingTimeAllowed;
     private int restingTime;

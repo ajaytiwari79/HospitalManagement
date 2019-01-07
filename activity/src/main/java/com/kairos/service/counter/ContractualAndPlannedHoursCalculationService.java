@@ -2,13 +2,13 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.BarLineChartKPiDateUnit;
 import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.BarLineChartKPIRepresentationData;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
@@ -57,17 +57,17 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     private List<CommonKpiDataUnit> getContractualAndPlannedHoursKpiDate(Long organizationId, Map<FilterType, List> filterBasedCriteria) {
-        List<Long> staffIds = filterBasedCriteria.containsKey(FilterType.STAFF_IDS) ? getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
+        List<Long> staffIds = filterBasedCriteria.containsKey(FilterType.STAFF_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
         List<LocalDate> filterDates = filterBasedCriteria.containsKey(FilterType.TIME_INTERVAL) ? filterBasedCriteria.get(FilterType.TIME_INTERVAL) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
-        List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS) ? getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
-        List<Long> employmentType = filterBasedCriteria.containsKey(FilterType.EMPLOYMENT_TYPE) ? getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
+        List<Long> unitIds = filterBasedCriteria.containsKey(FilterType.UNIT_IDS) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)) : new ArrayList();
+        List<Long> employmentType = filterBasedCriteria.containsKey(FilterType.EMPLOYMENT_TYPE) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)) : new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentType, organizationId, filterDates.get(0).toString(), filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         Set<DateTimeInterval> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)));
         Map<Long,Double> calculateContractualForInterval= calculateContractualHoursForInterval(planningPeriodIntervel,new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)),DateUtils.getLongFromLocalDate(filterDates.get(1))),staffKpiFilterDTOS);
         log.info("contractual hours ",calculateContractualForInterval);
-        List<CommonKpiDataUnit> commonKpiDataUnits = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), new ArrayList<>(), new HashSet<>(), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)));
+        List<CommonKpiDataUnit> commonKpiDataUnits = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), new ArrayList<>(), new HashSet<>(), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         Map<Long,Double> staffAndPlannedHoursMap=commonKpiDataUnits.stream().collect(Collectors.toMap(k->k.getRefId().longValue(),v->DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit)v).getValue())));
         List<CommonKpiDataUnit> kpiDataUnits = calculateContractualForInterval.entrySet().stream().map(entry->new BarLineChartKPiDateUnit(staffIdAndNameMap.get(entry.getKey()), entry.getKey(), entry.getValue(),staffAndPlannedHoursMap.get(entry.getKey()))).collect(Collectors.toList());
         return kpiDataUnits;
@@ -105,17 +105,14 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getContractualAndPlannedHoursKpiDate(organizationId,filterBasedCriteria);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.YAXIS,AppConstants.LINEFIELD);
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.BAR_YAXIS,AppConstants.LINEFIELD);
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getContractualAndPlannedHoursKpiDate(organizationId,filterBasedCriteria);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.YAXIS,AppConstants.LINEFIELD);
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS,AppConstants.BAR_YAXIS,AppConstants.LINEFIELD);
     }
 
-    private List<Long> getLongValue(List<Object> objects) {
-        return objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toList());
-    }
 
 }

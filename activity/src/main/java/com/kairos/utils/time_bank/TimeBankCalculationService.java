@@ -193,7 +193,7 @@ public class TimeBankCalculationService {
             if (valid) {
                 for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
                     DateTimeInterval positionInterval = positionLine.getInterval();
-                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
+                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate)))) {
                         contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
                         break;
                     }
@@ -555,9 +555,9 @@ public class TimeBankCalculationService {
      * @return int
      */
     public int calculateTimeBankForInterval(Set<DateTimeInterval> planningPeriodIntervals,Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, boolean isByOverView, List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
-        List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
+        Set<LocalDate> dailyTimeBanksDates = new HashSet<>();
         if (!calculateContractual) {
-            dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d -> DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toList());
+            dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d -> DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toSet());
         }
         if (isByOverView) {
             interval = getIntervalByDateForOverview(unitPositionWithCtaDetailsDTO, interval);
@@ -568,7 +568,7 @@ public class TimeBankCalculationService {
         if (interval != null) {
             DateTime startDate = interval.getStart();
             while (startDate.isBefore(interval.getEnd())) {
-                if (calculateContractual || !dailyTimeBanksDates.contains(interval.getStart().toLocalDate())) {
+                if (calculateContractual || !dailyTimeBanksDates.contains(startDate.toLocalDate())) {
                     boolean vaild = (unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) || (startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY);
                     if(vaild) {
                         contractualMinutes+= getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(startDate),unitPositionWithCtaDetailsDTO.getPositionLines());
