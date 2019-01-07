@@ -110,7 +110,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").in(unitId).and("deleted").is(deleted)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 unwind("tags", true),
                 lookup("tag", "tags", "_id", "tags_data"),
@@ -132,7 +132,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityTagDTO> findAllActivityByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").in(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
+                match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 unwind("tags", true),
                 lookup("tag", "tags", "_id", "tags_data"),
@@ -155,8 +155,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true).and("state").is(ActivityStateEnum.PUBLISHED)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("$id", "name", "description", "ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
-                        .and("timeType").arrayElementAt(0).as("timeType"),
                 match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
         AggregationResults<ActivityWithCTAWTASettingsDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCTAWTASettingsDTO.class);
