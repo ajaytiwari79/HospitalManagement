@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -61,6 +62,7 @@ public class ShiftWithActivityDTO {
     private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
     private BigInteger phaseId;
     private ShiftType shiftType;
+    private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
     //~ ===================================Constructors=======================================================
     public ShiftWithActivityDTO() {
     }
@@ -320,4 +322,11 @@ public class ShiftWithActivityDTO {
         this.timeType = timeType;
     }
 
+    public List<WorkTimeAgreementRuleViolation> getWtaRuleViolations() {
+        return wtaRuleViolations;
+    }
+
+    public void setWtaRuleViolations(List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
+        this.wtaRuleViolations = wtaRuleViolations;
+    }
 }
