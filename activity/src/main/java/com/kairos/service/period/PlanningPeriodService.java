@@ -52,6 +52,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 /**
  * Created by prerna on 6/4/18.
  */
@@ -605,29 +607,32 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
-        BigInteger PlanningPeriodPhaseId= getPlanningPeriodPreviousPhaseId(planningPeriod,unitId);
-        List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(planningPeriodId, PlanningPeriodPhaseId, unitId);
-        List<Shift> shiftList = shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(), unitId);
-        List<StaffingLevelState> staffingLevelStates = staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId, PlanningPeriodPhaseId, unitId);
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
-        List<Shift> currentPhaseShifts=shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
-        restoreFunctions(shiftStates,  unitId,currentPhaseShifts);
-        restoreShifts(shiftStates, shiftList, unitId);
-        restoreAvailabilityCount(staffingLevels, staffingLevelStates);
-        shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
+        BigInteger planningPeriodPhaseId= getPlanningPeriodPreviousPhaseId(planningPeriod,unitId);
+        if(isNotNull(planningPeriodPhaseId)){
+            List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(planningPeriodId, planningPeriodPhaseId, unitId);
+            List<Shift> shiftList = shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(), unitId);
+            List<StaffingLevelState> staffingLevelStates = staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId, planningPeriodPhaseId, unitId);
+            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
+            List<Shift> currentPhaseShifts = shiftMongoRepository.findAllShiftsByCurrentPhaseAndPlanningPeriod(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
+            restoreFunctions(shiftStates, unitId, currentPhaseShifts);
+            restoreShifts(shiftStates, shiftList, unitId);
+            restoreAvailabilityCount(staffingLevels, staffingLevelStates);
+            shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
+        }
         return true;
     }
 
+    //get previous phase id of planning phases if request then return null
     private BigInteger getPlanningPeriodPreviousPhaseId(PlanningPeriod planningPeriod, Long unitId){
-        BigInteger planningPeriodPhaseId;
+        BigInteger planningPeriodPhaseId=null;
         List<Phase> phases=phaseMongoRepository.getPlanningPhasesByUnit(unitId);
         Phase planningPeriodphase=phases.stream().filter(phase -> phase.getId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
         Map<PhaseDefaultName,BigInteger> phaseEnumAndIdMap=phases.stream().collect(Collectors.toMap(k->k.getPhaseEnum(),v->v.getId()));
-        if(planningPeriodphase.getPhaseEnum().equals(PhaseDefaultName.CONSTRUCTION)){
-            planningPeriodPhaseId=phaseEnumAndIdMap.get(PhaseDefaultName.PUZZLE);
-        }else if(planningPeriodphase.getPhaseEnum().equals(PhaseDefaultName.DRAFT)){
+        if(planningPeriodphase.getPhaseEnum().equals(PhaseDefaultName.DRAFT)){
             planningPeriodPhaseId=phaseEnumAndIdMap.get(PhaseDefaultName.CONSTRUCTION);
-        }else{
+        }else if(planningPeriodphase.getPhaseEnum().equals(PhaseDefaultName.CONSTRUCTION)){
+            planningPeriodPhaseId=phaseEnumAndIdMap.get(PhaseDefaultName.PUZZLE);
+        }else if(planningPeriodphase.getPhaseEnum().equals(PhaseDefaultName.PUZZLE)){
             planningPeriodPhaseId=phaseEnumAndIdMap.get(PhaseDefaultName.REQUEST);
         }
         return planningPeriodPhaseId;
