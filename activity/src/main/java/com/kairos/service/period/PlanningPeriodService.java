@@ -668,7 +668,7 @@ public class PlanningPeriodService extends MongoBaseService {
                         }
                     });
                 } else {
-                    staffingLevel.getAbsenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+                    staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
                         staffingLevelInterval.setAvailableNoOfStaff(0);
                     });
                 }
