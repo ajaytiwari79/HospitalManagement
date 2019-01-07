@@ -29,10 +29,8 @@ public class ShiftDTO {
     private Date endDate;
     private long bid;
     private long pId;
-    private long bonusTimeBank;
     private long amount;
     private long probability;
-    private long accumulatedTimeBankInMinutes;
     private String remarks;
     private BigInteger parentOpenShiftId;
     private Long unitId;
@@ -88,22 +86,6 @@ public class ShiftDTO {
 
 
 
-    public ShiftDTO(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivityDTO> activities, Long staffId, Long unitId, Long unitPositionId) {
-        this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.bid = bid;
-        this.pId = pId;
-        this.bonusTimeBank = bonusTimeBank;
-        this.amount = amount;
-        this.probability = probability;
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
-        this.remarks = remarks;
-        this.activities = activities;
-        this.staffId = staffId;
-        this.unitId = unitId;
-        this.unitPositionId = unitPositionId;
-    }
 
 
     public boolean isEditable() {
@@ -245,13 +227,6 @@ public class ShiftDTO {
         this.pId = pId;
     }
 
-    public long getBonusTimeBank() {
-        return bonusTimeBank;
-    }
-
-    public void setBonusTimeBank(long bonusTimeBank) {
-        this.bonusTimeBank = bonusTimeBank;
-    }
 
     public long getAmount() {
         return amount;
@@ -267,14 +242,6 @@ public class ShiftDTO {
 
     public void setProbability(long probability) {
         this.probability = probability;
-    }
-
-    public long getAccumulatedTimeBankInMinutes() {
-        return accumulatedTimeBankInMinutes;
-    }
-
-    public void setAccumulatedTimeBankInMinutes(long accumulatedTimeBankInMinutes) {
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
     public BigInteger getShiftStatePhaseId() {
@@ -356,10 +323,8 @@ public class ShiftDTO {
                 ", endDate=" + endDate +
                 ", bid=" + bid +
                 ", pId=" + pId +
-                ", bonusTimeBank=" + bonusTimeBank +
                 ", amount=" + amount +
                 ", probability=" + probability +
-                ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
                 ", remarks='" + remarks + '\'' +
                 ", unitId=" + unitId +
                 ", staffId=" + staffId +

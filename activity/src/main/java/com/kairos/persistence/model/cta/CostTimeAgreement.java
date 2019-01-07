@@ -36,8 +36,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean disabled;
-    private Long createdBy;
-    private Long lastModifiedBy;
     private Long unitPositionId;
 
     public CostTimeAgreement() {
@@ -174,13 +172,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public Long getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(Long lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
 
     public BigInteger getOrganizationParentId() {
         return organizationParentId;

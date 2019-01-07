@@ -11,7 +11,6 @@ public class ShiftTemplate extends MongoBaseEntity {
     private String name;
     private Set<BigInteger> individualShiftTemplateIds;
     private Long unitId;
-    private Long createdBy;
 
     public ShiftTemplate() {
         //Default Constructor
@@ -48,11 +47,4 @@ public class ShiftTemplate extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 }

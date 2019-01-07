@@ -36,8 +36,6 @@ public class CTARuleTemplate extends MongoBaseEntity {
     private PlanningCategory planningCategory;
     private List<Long> staffFunctions = new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    private Long createdBy;
-    private Long lastModifiedBy;
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
@@ -316,28 +314,8 @@ public class CTARuleTemplate extends MongoBaseEntity {
         this.createdBy = createdBy;
     }
 
-    public Long getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(Long lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
 
 
-
-    public static void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
-
-        switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
-            case TIME_TYPE_ACTIVITY:
-                ctaRuleTemplate.setActivityIds(new ArrayList<>());
-                break;
-            default:
-                ctaRuleTemplate.setPlannedTimeIds(null);
-                ctaRuleTemplate.setTimeTypeIds(null);
-                break;
-        }
-    }
 
     @Override
     public boolean equals(Object o) {

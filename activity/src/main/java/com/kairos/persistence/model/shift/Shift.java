@@ -3,17 +3,12 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.commons.utils.DateTimeInterval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.*;
 import java.util.Date;
 import java.util.List;
 
@@ -50,8 +45,6 @@ public class Shift extends MongoBaseEntity {
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
     private boolean sickShift;
-    private Long createdBy ;//= UserContext.getUserDetails().getId();
-    private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
@@ -137,13 +130,6 @@ public class Shift extends MongoBaseEntity {
         this.shiftType = shiftType;
     }
 
-    public Long getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(Long updatedBy) {
-        this.updatedBy = updatedBy;
-    }
 
     public Long getCreatedBy() {
         return createdBy;

@@ -20,7 +20,28 @@ public abstract class MongoBaseEntity {
     @LastModifiedDate
     protected Date updatedAt;
     @JsonIgnore
-    protected boolean deleted ;
+    protected boolean deleted;
+    @JsonIgnore
+    protected Long createdBy;
+    @JsonIgnore
+    protected Long lastModifiedBy;
+
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Long getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(Long lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
     public BigInteger getId() {
         return id;
