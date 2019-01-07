@@ -1350,6 +1350,7 @@ public class StaffService {
     public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
         Long userId = UserContext.getUserDetails().getId();
+
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
