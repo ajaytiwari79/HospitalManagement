@@ -411,7 +411,7 @@ public class ShiftService extends MongoBaseService {
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0), Shift.class);
         Date shiftStartDate = DateUtils.onlyDate(shift.getActivities().get(0).getStartDate());
         //reason code will be sanem for all shifts.
-        Set<Long> reasonCodeIds = shiftWithViolatedInfo.getShifts().get(0).getActivities().stream().map(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()).collect(Collectors.toSet());
+        Set<Long> reasonCodeIds = shiftWithViolatedInfo.getShifts().get(0).getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()!=null).map(shiftActivity -> shiftActivity.getAbsenceReasonCodeId()).collect(Collectors.toSet());
 
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftStartDate), shift.getStaffId(), type, shift.getUnitPositionId(),reasonCodeIds);
 
