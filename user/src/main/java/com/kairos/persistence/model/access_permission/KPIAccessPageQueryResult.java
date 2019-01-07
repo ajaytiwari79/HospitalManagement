@@ -11,6 +11,7 @@ public class KPIAccessPageQueryResult {
     private String moduleId;
     private boolean read;
     private boolean write;
+    private boolean active;
     private List<KPIAccessPageDTO> child;
 
     public String getName() {
@@ -51,5 +52,13 @@ public class KPIAccessPageQueryResult {
 
     public void setWrite(boolean write) {
         this.write = write;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

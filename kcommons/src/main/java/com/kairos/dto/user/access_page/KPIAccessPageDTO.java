@@ -7,6 +7,7 @@ public class KPIAccessPageDTO {
     private String moduleId;
     private boolean read;
     private boolean write;
+    private boolean active;
     private List<KPIAccessPageDTO> child;
 
     public KPIAccessPageDTO(){
@@ -56,5 +57,13 @@ public class KPIAccessPageDTO {
 
     public void setWrite(boolean write) {
         this.write = write;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

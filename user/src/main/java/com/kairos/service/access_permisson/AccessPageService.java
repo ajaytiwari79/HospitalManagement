@@ -423,6 +423,12 @@ public class AccessPageService {
             unitId=parentHub.getId();
         }
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);
+        accessPages.forEach(accessPage->{
+            accessPage.getChild().forEach(kpiAccessPageDTO -> {
+                kpiAccessPageDTO.setActive(kpiAccessPageDTO.isRead()||kpiAccessPageDTO.isWrite());
+            });
+            accessPage.setActive(accessPage.isRead()||accessPage.isWrite());
+        });
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
     }
