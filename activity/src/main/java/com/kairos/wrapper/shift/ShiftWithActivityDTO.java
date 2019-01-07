@@ -63,7 +63,6 @@ public class ShiftWithActivityDTO {
     private BigInteger phaseId;
     private ShiftType shiftType;
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
-    //~ ===================================Constructors=======================================================
     public ShiftWithActivityDTO() {
     }
 
@@ -143,7 +142,6 @@ public class ShiftWithActivityDTO {
         this.phaseId = phaseId;
     }
 
-    //~ ===================================Setters and Getters=======================================================
     public List<ShiftStatus> getStatus() {
         return status;
     }
