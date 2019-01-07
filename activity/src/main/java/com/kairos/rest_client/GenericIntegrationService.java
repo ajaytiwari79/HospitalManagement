@@ -379,6 +379,7 @@ public class GenericIntegrationService {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
         queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate!=null? shiftDate.toString():DateUtils.getCurrentLocalDate().toString()));
+        reasonCodeIds.removeIf(Objects::isNull);
         if(CollectionUtils.isNotEmpty(reasonCodeIds)) {
             queryParamList.add(new BasicNameValuePair("reasonCodeIds",RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
