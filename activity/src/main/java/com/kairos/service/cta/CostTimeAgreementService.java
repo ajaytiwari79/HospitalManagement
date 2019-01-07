@@ -32,6 +32,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -285,7 +286,9 @@ public class CostTimeAgreementService extends MongoBaseService {
         } else {
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
             ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
-            save(ctaRuleTemplates);
+            if(CollectionUtils.isNotEmpty(ctaRuleTemplates)){
+                save(ctaRuleTemplates);
+            }
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             oldCTA.setRuleTemplateIds(ruleTemplateIds);
             oldCTA.setStartDate(ctaDTO.getStartDate());
