@@ -558,29 +558,28 @@ public class PlanningPeriodService extends MongoBaseService {
 
 
     public void createShiftState(List<Shift> shifts, BigInteger currentPhaseId, Map<Long, Map<Long, Set<LocalDate>>> unitPositionWithShiftDateFunctionIdMap) {
-        if (shifts.isEmpty()) {
-            return;
-        }
-        List<ShiftState> shiftStates = new ArrayList<>();
-        shifts.stream().forEach(shift -> {
-            ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
-            shiftState.setShiftId(shift.getId());
-            shiftState.setShiftStatePhaseId(currentPhaseId);
-            shiftState.setId(null);
-            Long unitPositionId = shift.getUnitPositionId();
-            if (!unitPositionWithShiftDateFunctionIdMap.isEmpty() && !unitPositionWithShiftDateFunctionIdMap.get(unitPositionId).isEmpty()) {
-                Map<Long, Set<LocalDate>> functionIdWithDates = unitPositionWithShiftDateFunctionIdMap.get(unitPositionId);
-                for (Long functionId : functionIdWithDates.keySet()) {
-                    Set<LocalDate> datesByFunctionId = functionIdWithDates.get(functionId);
-                    //TODO change date format
-                    if (datesByFunctionId.contains(DateUtils.asLocalDate(shift.getStartDate()))) {
-                        shiftState.setFunctionId(functionId);
+        if (!shifts.isEmpty()) {
+            List<ShiftState> shiftStates = new ArrayList<>();
+            shifts.stream().forEach(shift -> {
+                ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
+                shiftState.setShiftId(shift.getId());
+                shiftState.setShiftStatePhaseId(currentPhaseId);
+                shiftState.setId(null);
+                Long unitPositionId = shift.getUnitPositionId();
+                if (!unitPositionWithShiftDateFunctionIdMap.isEmpty() && !unitPositionWithShiftDateFunctionIdMap.get(unitPositionId).isEmpty()) {
+                    Map<Long, Set<LocalDate>> functionIdWithDates = unitPositionWithShiftDateFunctionIdMap.get(unitPositionId);
+                    for (Long functionId : functionIdWithDates.keySet()) {
+                        Set<LocalDate> datesByFunctionId = functionIdWithDates.get(functionId);
+                        //TODO change date format
+                        if (datesByFunctionId.contains(DateUtils.asLocalDate(shift.getStartDate()))) {
+                            shiftState.setFunctionId(functionId);
+                        }
                     }
                 }
-            }
-            shiftStates.add(shiftState);
-        });
-        save(shiftStates);
+                shiftStates.add(shiftState);
+            });
+            save(shiftStates);
+        }
     }
 
     public void createStaffingLevelState(List<StaffingLevel> staffingLevels, BigInteger currentPhaseId, BigInteger planningPeriodId) {
@@ -601,7 +600,7 @@ public class PlanningPeriodService extends MongoBaseService {
     /**
      * for restore shift initial data
      */
-    public boolean setShiftsDataToInitialData(BigInteger planningPeriodId, Long unitId) {
+    public boolean restoreShiftToPreviousPhase(BigInteger planningPeriodId, Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(planningPeriodId, unitId);
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
@@ -643,17 +642,16 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public void restoreShifts(List<ShiftState> shiftStates, List<Shift> shiftList, Long unitId) {
-        if (shiftStates.isEmpty()) {
-            return;
+        if (!shiftStates.isEmpty()) {
+            List<Shift> shifts = new ArrayList<>();
+            shiftStates.forEach(shiftState -> {
+                Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftState, Shift.class);
+                shift.setId(shiftState.getShiftId());
+                shifts.add(shift);
+            });
+            save(shifts);
+            shiftService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
         }
-        List<Shift> shifts = new ArrayList<>();
-        shiftStates.forEach(shiftState -> {
-            Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftState, Shift.class);
-            shift.setId(shiftState.getShiftId());
-            shifts.add(shift);
-        });
-        save(shifts);
-        shiftService.updateShiftDailyTimeBankAndPaidOut(shifts,shiftList, unitId);
     }
 
     public void restoreAvailabilityCount(List<StaffingLevel> staffingLevels, List<StaffingLevelState> staffingLevelStates) {
