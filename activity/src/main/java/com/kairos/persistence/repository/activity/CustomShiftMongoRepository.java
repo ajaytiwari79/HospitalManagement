@@ -63,4 +63,5 @@ public interface CustomShiftMongoRepository {
     List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
     void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark);
+    List<Shift> findAllShiftByIntervalAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
 }
