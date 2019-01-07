@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskBasicResponseDTO {
 
-    private BigInteger id;
+    private Integer id;
     private String name;
     private String description;
     private String riskRecommendation;
@@ -20,16 +20,11 @@ public class RiskBasicResponseDTO {
     private boolean isReminderActive;
     private int daysToReminderBefore;
     private RiskSeverity riskLevel;
-    private Staff riskOwner;
 
 
-    public BigInteger getId() { return id; }
+    public Integer getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
-
-    public Staff getRiskOwner() { return riskOwner; }
-
-    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getName() { return name; }
 

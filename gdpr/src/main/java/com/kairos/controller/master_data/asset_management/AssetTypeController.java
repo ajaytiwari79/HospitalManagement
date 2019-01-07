@@ -47,7 +47,7 @@ public class AssetTypeController {
 
     @ApiOperation("get AssetType by id")
     @GetMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId) {
+    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable Integer assetTypeId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, assetTypeId));
 

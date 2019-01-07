@@ -37,7 +37,7 @@ public class AssetTypeMD extends BaseEntity {
     @JoinColumn(name="assetType_id")
     private AssetTypeMD assetType;
 
-    @OneToMany(mappedBy="assetType", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy="assetType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AssetTypeMD> subAssetTypes=new ArrayList<AssetTypeMD>();
 
 

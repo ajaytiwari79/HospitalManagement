@@ -14,7 +14,7 @@ import java.util.List;
 public class AssetTypeRiskResponseDTO {
 
     @NotNull
-    private BigInteger id;
+    private Integer id;
     @NotBlank
     private String name;
     private List<RiskBasicResponseDTO> risks=new ArrayList<>();
@@ -22,9 +22,9 @@ public class AssetTypeRiskResponseDTO {
     private List<AssetTypeRiskResponseDTO> subAssetTypes=new ArrayList<>();
 
 
-    public BigInteger getId() { return id; }
+    public Integer getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getName() { return name; }
 

@@ -298,7 +298,8 @@ public class AssessmentService extends MongoBaseService {
             if (CollectionUtils.isEmpty(((ProcessingActivityResponseDTO) entity).getRisks())) {
                 exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
             }
-            riskIds.addAll(((ProcessingActivityResponseDTO) entity).getRisks().stream().map(RiskBasicResponseDTO::getId).collect(Collectors.toSet()));
+            //TODO changed due to id changes from Biginteger to Integer
+            //riskIds.addAll(((ProcessingActivityResponseDTO) entity).getRisks().stream().map(RiskBasicResponseDTO::getId).collect(Collectors.toSet()));
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(unitId);
         }
         assessment.setRiskIds(riskIds);

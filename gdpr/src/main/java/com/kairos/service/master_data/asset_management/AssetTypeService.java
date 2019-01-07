@@ -1,7 +1,10 @@
 package com.kairos.service.master_data.asset_management;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
@@ -15,6 +18,7 @@ import com.kairos.persistence.repository.master_data.asset_management.AssetTypeM
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -164,17 +168,66 @@ public class AssetTypeService extends MongoBaseService {
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRisk(Long countryId) {
-        return assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
+        List<AssetTypeMD> assetTypes = assetTypeRepository.getAllAssetTypes(countryId);
+        List<AssetTypeRiskResponseDTO> assetTypesWithAllData = new ArrayList<>();
+        assetTypesWithAllData = buildAssetTypeOrSubTypeResponseData(assetTypes);
+        return assetTypesWithAllData;
     }
 
+    /**
+     *  THis method is used to build response of asset type and asset sub type. This method used recursion
+     *  to prepare the data of asset sub type.
+     *
+     * @param assetTypes - It may be asset type or asset sub type.
+     * @return List<AssetTypeRiskResponseDTO> - List of asset-type or Sub asset-type response DTO.
+     */
+    private List<AssetTypeRiskResponseDTO> buildAssetTypeOrSubTypeResponseData(List<AssetTypeMD> assetTypes){
+        List<AssetTypeRiskResponseDTO> assetTypeRiskResponseDTOS = new ArrayList<>();
+        for(AssetTypeMD assetType : assetTypes){
+            AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO();
+            assetTypeRiskResponseDTO.setId(assetType.getId());
+            assetTypeRiskResponseDTO.setName(assetType.getName());
+            assetTypeRiskResponseDTO.setHasSubAsset(assetType.isHasSubAsset());
+            if(!assetType.getRisks().isEmpty()){
+                assetTypeRiskResponseDTO.setRisks(buildAssetTypeRisksResponse(assetType.getRisks()));
+            }
+            if(assetType.isHasSubAsset()){
+                assetTypeRiskResponseDTO.setSubAssetTypes(buildAssetTypeOrSubTypeResponseData(assetType.getSubAssetTypes()));
+            }
+            assetTypeRiskResponseDTOS.add(assetTypeRiskResponseDTO);
+        }
+        return assetTypeRiskResponseDTOS;
+    }
+
+    /**
+     * Description : This method is used to convert Risks of asset-type or Sub asset-type to Risk Response DTO
+     *  Convert RiskMD into RiskBasicResponseDTO
+     * @param risks - Risks of asset-type or Sub asset-type
+     * @return List<RiskBasicResponseDTO> - List of RiskResponse DTO.
+     */
+    private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<RiskMD> risks){
+        List<RiskBasicResponseDTO> riskBasicResponseDTOS = new ArrayList<>();
+        for(RiskMD assetTypeRisk : risks){
+            RiskBasicResponseDTO riskBasicResponseDTO = new RiskBasicResponseDTO();
+            riskBasicResponseDTO.setId(assetTypeRisk.getId());
+            riskBasicResponseDTO.setName(assetTypeRisk.getName());
+            riskBasicResponseDTO.setDescription(assetTypeRisk.getDescription());
+            riskBasicResponseDTO.setRiskRecommendation(assetTypeRisk.getRiskRecommendation());
+            riskBasicResponseDTO.setRiskLevel(assetTypeRisk.getRiskLevel());
+            riskBasicResponseDTO.setDaysToReminderBefore(assetTypeRisk.getDaysToReminderBefore());
+            riskBasicResponseDTO.setReminderActive(assetTypeRisk.isReminderActive());
+            riskBasicResponseDTOS.add(riskBasicResponseDTO);
+        }
+        return riskBasicResponseDTOS;
+    }
 
     /**
      * @param countryId
      * @param
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public AssetType getAssetTypeById(Long countryId, BigInteger id) {
-        AssetType assetType = assetTypeMongoRepository.findByCountryIdAndId(countryId, id);
+    public AssetTypeMD getAssetTypeById(Long countryId, Integer id) {
+        AssetTypeMD assetType = assetTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", id);
         }
