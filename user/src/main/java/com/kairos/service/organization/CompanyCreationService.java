@@ -354,8 +354,11 @@ public class CompanyCreationService {
                 }
 
                 userGraphRepository.save(user);
-                staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
-
+                if(parentOrganization) {
+                    staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
+                } else {
+                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
+                }
             }
         }
         return unitManagerDTO;
@@ -581,26 +584,29 @@ public class CompanyCreationService {
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
         //or parent has any missing required details
 
-        List<Organization> organizations = new ArrayList<>();
-        organizations.addAll(organization.getChildren());
-        organizations.add(organization);
-        validateBasicDetails(organizations, exceptionService);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
+        if(parentId !=null) {
+            List<Organization> organizations = new ArrayList<>();
+            organizations.addAll(organization.getChildren());
+            organizations.add(organization);
+            validateBasicDetails(organizations, exceptionService);
 
-        List<Long> unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
+            List<Long> unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
+            staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+            unitIds.add(organizationId);
+            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
+                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
+            }
 
+            validateUserDetails(staffPersonalDetailDTOS, exceptionService);
 
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
-        unitIds.add(organizationId);
-        if (staffPersonalDetailDTOS.size() != unitIds.size()) {
-            exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
+            List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
+            validateAddressDetails(organizationContactAddresses, exceptionService);
+
+            organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
+        } else {
+            staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(Arrays.asList(organization.getId()), organizationId);
         }
-
-        validateUserDetails(staffPersonalDetailDTOS, exceptionService);
-
-        List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
-        validateAddressDetails(organizationContactAddresses, exceptionService);
-
-        organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
         List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);

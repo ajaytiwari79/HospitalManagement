@@ -112,7 +112,7 @@ public class UnitService {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
         Country country = organizationGraphRepository.getCountry(unitId);
-        companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), unitId);
+        companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), null);
         organizationBasicDTO.setBoardingCompleted(true);
         return organizationBasicDTO;
 
