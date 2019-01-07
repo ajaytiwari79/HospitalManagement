@@ -606,7 +606,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
-        BigInteger PlanningPeriodPhaseId=getPlanningPeriodPhaseId(planningPeriod,unitId);
+        BigInteger PlanningPeriodPhaseId= getPlanningPeriodPreviousPhaseId(planningPeriod,unitId);
         List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(planningPeriodId, PlanningPeriodPhaseId, unitId);
         List<Shift> shiftList = shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(), unitId);
         List<StaffingLevelState> staffingLevelStates = staffingLevelStateMongoRepository.getStaffingLevelState(planningPeriodId, PlanningPeriodPhaseId, unitId);
@@ -619,7 +619,7 @@ public class PlanningPeriodService extends MongoBaseService {
         return true;
     }
 
-    private BigInteger getPlanningPeriodPhaseId(PlanningPeriod planningPeriod, Long unitId){
+    private BigInteger getPlanningPeriodPreviousPhaseId(PlanningPeriod planningPeriod, Long unitId){
         BigInteger planningPeriodPhaseId;
         List<Phase> phases=phaseMongoRepository.getPlanningPhasesByUnit(unitId);
         Phase planningPeriodphase=phases.stream().filter(phase -> phase.getId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
