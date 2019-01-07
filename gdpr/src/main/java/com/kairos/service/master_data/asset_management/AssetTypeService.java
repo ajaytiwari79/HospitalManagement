@@ -181,6 +181,7 @@ public class AssetTypeService extends MongoBaseService {
         assetTypeMD.getSubAssetTypes().forEach(subAssetType -> {
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             subAssetType.setName(subAssetTypeDto.getName());
+            if(!subAssetType.getRisks().isEmpty() && !subAssetTypeExistingRiskDtoCorrespondingToIds.isEmpty()){
             subAssetType.getRisks().forEach(subAssetTypeRisk -> {
                 BasicRiskDTO basicRiskDTO = subAssetTypeExistingRiskDtoCorrespondingToIds.get(subAssetTypeRisk.getId());
                 subAssetTypeRisk.setName(basicRiskDTO.getName());
@@ -189,6 +190,7 @@ public class AssetTypeService extends MongoBaseService {
                 subAssetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
                 subAssetTypeRisk.setAssetType(subAssetType);
             });
+            }
             subAssetTypeNewRiskDto.get(subAssetType.getId()).forEach( newRisk -> {
                 RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel() );
                 risk.setAssetType(subAssetType);
@@ -328,21 +330,21 @@ public class AssetTypeService extends MongoBaseService {
             }
         });
         assetTypeNewRiskDto.put(assetType.getId(), newRisks);
-
-        assetType.getRisks().forEach( assetTypeRisk -> {
-            BasicRiskDTO basicRiskDTO = existingRiskDtoCorrespondingToIds.get(assetTypeRisk.getId());
-            assetTypeRisk.setName(basicRiskDTO.getName());
-            assetTypeRisk.setDescription(basicRiskDTO.getDescription());
-            assetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
-            assetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-            assetTypeRisk.setAssetType(assetType);
-            assetTypeNewRiskDto.get(assetTypeRisk.getId()).forEach(newRisk -> {
-                RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-                risk.setAssetType(assetType);
-                assetType.getRisks().add(risk);
+        if(!assetType.getRisks().isEmpty() && ! existingRiskDtoCorrespondingToIds.isEmpty()) {
+            assetType.getRisks().forEach(assetTypeRisk -> {
+                BasicRiskDTO basicRiskDTO = existingRiskDtoCorrespondingToIds.get(assetTypeRisk.getId());
+                assetTypeRisk.setName(basicRiskDTO.getName());
+                assetTypeRisk.setDescription(basicRiskDTO.getDescription());
+                assetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
+                assetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
+                assetTypeRisk.setAssetType(assetType);
+                assetTypeNewRiskDto.get(assetTypeRisk.getId()).forEach(newRisk -> {
+                    RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
+                    risk.setAssetType(assetType);
+                    assetType.getRisks().add(risk);
+                });
             });
-        });
-
+        }
         return  assetType;
     }
 
