@@ -410,7 +410,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH(up)-[:"+HAS_ACCESS_GROUP+"]-(accessgroup:AccessGroup{deleted: false,enabled:true})-[r:"+HAS_ACCESS_OF_TABS+"{read:true}]->(accessPage:AccessPage{isModule:true,active:true}) where id(accessgroup)=id(accessgroup)\n" +
             "OPTIONAL MATCH (up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE customRel.accessGroupId=id(accessgroup) \n" +
             "OPTIONAL MATCH (accessPage) -[:"+SUB_PAGE+"]->(subPages:AccessPage{active:true,kpiEnabled:true})\n" +
-            "OPTIONAL MATCH (up)-[childCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(subPages) WHERE customRel.accessGroupId=id(accessgroup) \n" +
+            "OPTIONAL MATCH (up)-[childCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(subPages) WHERE childCustomRel.accessGroupId=id(accessgroup) \n" +
             "WITH accessPage,subPages,customRel,r,childCustomRel\n" +
             "RETURN accessPage.name as name,accessPage.moduleId as moduleId,\n" +
             "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,\n" +
