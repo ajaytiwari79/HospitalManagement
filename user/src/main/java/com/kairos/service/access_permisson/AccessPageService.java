@@ -418,6 +418,10 @@ public class AccessPageService {
     }
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
         Long userId=UserContext.getUserDetails().getId();
+        if(accessPageRepository.isHubMember(userId)){
+            Organization parentHub = accessPageRepository.fetchParentHub(userId);
+            unitId=parentHub.getId();
+        }
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
