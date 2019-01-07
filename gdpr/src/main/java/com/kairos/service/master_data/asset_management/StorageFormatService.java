@@ -101,7 +101,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return StorageFormat object fetch via given id
      * @throws DataNotFoundByIdException throw exception if StorageFormat not exist for given id
      */
-    public StorageFormatMD getStorageFormat(Long countryId, Integer id) {
+    public StorageFormatMD getStorageFormat(Long countryId, Long id) {
 
         StorageFormatMD exist = storageFormatMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -113,7 +113,7 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(Long countryId, Integer id) {
+    public Boolean deleteStorageFormat(Long countryId, Long id) {
         Integer resultCount = storageFormatMDRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Storage Format deleted successfully for id :: {}", id);
@@ -132,7 +132,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return StorageFormat updated object
      * @throws DuplicateDataException throw exception if data not exist for given id
      */
-    public StorageFormatDTO updateStorageFormat(Long countryId, Integer id, StorageFormatDTO storageFormatDTO) {
+    public StorageFormatDTO updateStorageFormat(Long countryId, Long id, StorageFormatDTO storageFormatDTO) {
         //TODO What actually this code is doing?
         StorageFormat storageFormat = storageFormatMongoRepository.findByNameAndCountryId(countryId, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {

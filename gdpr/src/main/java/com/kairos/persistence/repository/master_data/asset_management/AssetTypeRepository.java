@@ -17,21 +17,28 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface AssetTypeRepository extends JpaRepository<AssetTypeMD,Integer> {
+public interface AssetTypeRepository extends JpaRepository<AssetTypeMD,Long> {
 
     @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?2 and at.deleted = false and lower(at.name) = lower(?1) and subAssetType = ?3")
     AssetTypeMD findByNameAndCountryIdAndSubAssetType(String name,Long countryId, boolean hasSubAssetType);
 
+    @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.id =?1 and at.countryId = ?3 and at.deleted = false and lower(at.name) = lower(?2) and subAssetType = ?4")
+    AssetTypeMD findByIdAndNameAndCountryIdAndSubAssetType(Long id, String name,Long countryId, boolean hasSubAssetType);
+
 
     @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.id = ?1 and at.countryId = ?2 and at.deleted = ?3")
-    AssetTypeMD findByIdAndCountryIdAndDeleted(Integer id, Long countryId, boolean deleted);
+    AssetTypeMD findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
 
     @Transactional
     @Modifying
     @Query(value = "update DataDisposalMD set name = ?1 where id= ?2")
-    Integer updateDataDisposalName(String name, Integer id);
+    Integer updateDataDisposalName(String name, Long id);
 
     @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?1 and at.subAssetType = false and deleted = false")
     List<AssetTypeMD> getAllAssetTypes( Long countryId);
+
+
+    @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?1 and at.deleted = false and at.id = ?2 and subAssetType = ?3")
+    AssetTypeMD findByCountryIdAndId(Long countryId, Long id, boolean hasSubAssetType);
 
 }

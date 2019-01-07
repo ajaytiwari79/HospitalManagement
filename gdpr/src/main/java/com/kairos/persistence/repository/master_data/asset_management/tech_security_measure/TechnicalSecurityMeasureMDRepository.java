@@ -15,7 +15,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public interface TechnicalSecurityMeasureMDRepository extends JpaRepository<TechnicalSecurityMeasureMD, Integer> {
+public interface TechnicalSecurityMeasureMDRepository extends JpaRepository<TechnicalSecurityMeasureMD, Long> {
 
     @Query(value = "SELECT tsm FROM TechnicalSecurityMeasureMD tsm WHERE tsm.countryId = ?1 and tsm.deleted = ?2 and lower(tsm.name) IN ?3")
     List<TechnicalSecurityMeasureMD> findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> userNames);
@@ -23,16 +23,16 @@ public interface TechnicalSecurityMeasureMDRepository extends JpaRepository<Tech
     @Transactional
     @Modifying
     @Query(value = "update TechnicalSecurityMeasureMD set name = ?1 where id= ?2")
-    Integer updateTechnicalSecurityMeasureName(String name, Integer id);
+    Integer updateTechnicalSecurityMeasureName(String name, Long id);
 
 
     @Transactional
     @Modifying
     @Query(value = "update TechnicalSecurityMeasureMD set deleted = true where id = ?1 and countryId = ?2")
-    Integer deleteByIdAndCountryId(Integer id, Long countryId);
+    Integer deleteByIdAndCountryId(Long id, Long countryId);
 
     @Query(value = "SELECT tsm FROM TechnicalSecurityMeasureMD tsm WHERE tsm.id = ?1 and tsm.countryId = ?2 and tsm.deleted = ?3")
-    TechnicalSecurityMeasureMD findByIdAndCountryIdAndDeleted(Integer id, Long countryId, boolean deleted);
+    TechnicalSecurityMeasureMD findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
 
 
     @Query(value = "SELECT new com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO(tsm.id, tsm.name, tsm.organizationId, tsm.suggestedDataStatus, tsm.suggestedDate) FROM TechnicalSecurityMeasureMD tsm WHERE tsm.countryId = ?1 and tsm.deleted = false order by createdAt desc")

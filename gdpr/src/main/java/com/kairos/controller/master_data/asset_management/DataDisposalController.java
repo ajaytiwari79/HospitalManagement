@@ -49,7 +49,7 @@ public class DataDisposalController {
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable Integer dataDisposalId) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, dataDisposalId));
 
     }
@@ -65,14 +65,14 @@ public class DataDisposalController {
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable Integer dataDisposalId) {
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(countryId, dataDisposalId));
 
     }
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable Integer dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable Long dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, dataDisposalId, dataDisposalDTO));
     }
 

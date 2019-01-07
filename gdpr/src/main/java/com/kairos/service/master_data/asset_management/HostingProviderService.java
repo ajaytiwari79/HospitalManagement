@@ -103,7 +103,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return HostingProvider object fetch by id
      * @throws DataNotFoundByIdException if HostingProvider not exist for given id
      */
-    public HostingProviderMD getHostingProviderById(Long countryId, Integer id) {
+    public HostingProviderMD getHostingProviderById(Long countryId, Long id) {
 
         HostingProviderMD exist = hostingProviderMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -115,7 +115,7 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingProvider(Long countryId, Integer id) {
+    public Boolean deleteHostingProvider(Long countryId, Long id) {
 
         Integer resultCount = hostingProviderMDRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
@@ -135,7 +135,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return return updated HostingProvider object
      * @throws DuplicateDataException if HostingProvider exist with same name
      */
-    public HostingProviderDTO updateHostingProvider(Long countryId, Integer id, HostingProviderDTO hostingProviderDTO) {
+    public HostingProviderDTO updateHostingProvider(Long countryId, Long id, HostingProviderDTO hostingProviderDTO) {
         //TODO What actually this code is doing?
         HostingProvider hostingProvider = hostingProviderMongoRepository.findByName(countryId, hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {

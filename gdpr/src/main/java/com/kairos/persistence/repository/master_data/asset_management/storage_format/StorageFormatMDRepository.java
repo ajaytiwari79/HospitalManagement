@@ -14,7 +14,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public interface StorageFormatMDRepository extends JpaRepository<StorageFormatMD, Integer> {
+public interface StorageFormatMDRepository extends JpaRepository<StorageFormatMD, Long> {
 
     @Query(value = "SELECT sf FROM StorageFormatMD sf WHERE sf.countryId = ?1 and sf.deleted = ?2 and lower(sf.name) IN ?3")
     List<StorageFormatMD> findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> userNames);
@@ -22,16 +22,16 @@ public interface StorageFormatMDRepository extends JpaRepository<StorageFormatMD
     @Transactional
     @Modifying
     @Query(value = "update StorageFormatMD set name = ?1 where id= ?2")
-    Integer updateStorageFormatName(String name, Integer id);
+    Integer updateStorageFormatName(String name, Long id);
 
 
     @Transactional
     @Modifying
     @Query(value = "update StorageFormatMD set deleted = true where id = ?1 and countryId = ?2")
-    Integer deleteByIdAndCountryId(Integer id, Long countryId);
+    Integer deleteByIdAndCountryId(Long id, Long countryId);
 
     @Query(value = "SELECT sf FROM StorageFormatMD sf WHERE sf.id = ?1 and sf.countryId = ?2 and sf.deleted = ?3")
-    StorageFormatMD findByIdAndCountryIdAndDeleted(Integer id, Long countryId, boolean deleted);
+    StorageFormatMD findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
 
 
     @Query(value = "SELECT new com.kairos.response.dto.common.StorageFormatResponseDTO(sf.id, sf.name, sf.organizationId, sf.suggestedDataStatus, sf.suggestedDate )  FROM StorageFormatMD sf WHERE sf.countryId = ?1 and sf.deleted = false order by createdAt desc")

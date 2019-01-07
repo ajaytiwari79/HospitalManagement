@@ -50,7 +50,7 @@ public class HostingTypeController {
 
     @ApiOperation("get HostingType by id")
     @GetMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> getHostingType(@PathVariable Long countryId, @PathVariable Integer hostingTypeId) {
+    public ResponseEntity<Object> getHostingType(@PathVariable Long countryId, @PathVariable Long hostingTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(countryId, hostingTypeId));
     }
 
@@ -64,14 +64,14 @@ public class HostingTypeController {
 
     @ApiOperation("delete HostingType  by id")
     @DeleteMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> deleteHostingType(@PathVariable Long countryId, @PathVariable Integer hostingTypeId) {
+    public ResponseEntity<Object> deleteHostingType(@PathVariable Long countryId, @PathVariable Long hostingTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(countryId, hostingTypeId));
 
     }
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable Integer hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingType) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable Long hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, hostingTypeId, hostingType));
 
     }

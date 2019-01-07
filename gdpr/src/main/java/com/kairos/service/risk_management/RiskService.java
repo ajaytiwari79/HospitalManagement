@@ -52,7 +52,7 @@ public class RiskService extends MongoBaseService {
             riskDTOList.forEach(riskDTO -> {
                 if (Optional.ofNullable(riskDTO.getId()).isPresent()) {
                     existingRiskDTOS.add(riskDTO);
-                    existingRiskIds.add(riskDTO.getId());
+                    //existingRiskIds.add(riskDTO.getId());
                 } else {
                     newRisk.add(riskDTO);
                 }

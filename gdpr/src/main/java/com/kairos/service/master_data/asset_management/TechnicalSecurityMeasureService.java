@@ -102,7 +102,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return object of TechnicalSecurityMeasure
      * @throws DataNotFoundByIdException throw exception if TechnicalSecurityMeasure not exist for given id
      */
-    public TechnicalSecurityMeasureMD getTechnicalSecurityMeasure(Long countryId, Integer id) {
+    public TechnicalSecurityMeasureMD getTechnicalSecurityMeasure(Long countryId, Long id) {
 
         TechnicalSecurityMeasureMD exist = technicalSecurityMeasureMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -114,7 +114,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public Boolean deleteTechnicalSecurityMeasure(Long countryId,Integer id) {
+    public Boolean deleteTechnicalSecurityMeasure(Long countryId,Long id) {
 
         Integer resultCount = technicalSecurityMeasureMDRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
@@ -134,7 +134,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return TechnicalSecurityMeasure updated object
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
-    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Integer id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
+    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
         //TODO What actually this code is doing?
         TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {

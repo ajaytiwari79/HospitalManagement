@@ -95,7 +95,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return object of data disposal
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
-    public DataDisposalMD getDataDisposalById(Long countryId, Integer id) {
+    public DataDisposalMD getDataDisposalById(Long countryId, Long id) {
         DataDisposalMD exist = dataDisposalMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
@@ -116,7 +116,7 @@ public class DataDisposalService extends MongoBaseService {
         return true;
 
     }*/
-    public Boolean deleteDataDisposalById(Long countryId, Integer id) {
+    public Boolean deleteDataDisposalById(Long countryId, Long id) {
         Integer resultCount = dataDisposalMDRepository.deleteByIdAndCountryId(id, countryId);
        if (resultCount > 0) {
            LOGGER.info("Data Disposal deleted successfully for id :: {}", id);
@@ -154,7 +154,7 @@ public class DataDisposalService extends MongoBaseService {
         return dataDisposalDTO;
 
     }*/
-    public DataDisposalDTO updateDataDisposal(Long countryId, Integer id, DataDisposalDTO dataDisposalDTO) {
+    public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
         DataDisposal dataDisposal = dataDisposalMongoRepository.findByName(countryId, dataDisposalDTO.getName());

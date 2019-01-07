@@ -102,7 +102,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return HostingType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if HostingType not found for given id
      */
-    public HostingTypeMD getHostingType(Long countryId, Integer id) {
+    public HostingTypeMD getHostingType(Long countryId, Long id) {
 
         HostingTypeMD exist = hostingTypeMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -114,7 +114,7 @@ public class HostingTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingType(Long countryId, Integer id) {
+    public Boolean deleteHostingType(Long countryId, Long id) {
 
         Integer resultCount = hostingTypeMDRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
@@ -134,7 +134,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return HostingType updated object
      * @throws DuplicateDataException if HostingType already exist with same name
      */
-    public HostingTypeDTO updateHostingType(Long countryId, Integer id, HostingTypeDTO hostingTypeDTO) {
+    public HostingTypeDTO updateHostingType(Long countryId, Long id, HostingTypeDTO hostingTypeDTO) {
 
         //TODO What actually this code is doing?
         HostingType hostingType = hostingTypeMongoRepository.findByName(countryId, hostingTypeDTO.getName());

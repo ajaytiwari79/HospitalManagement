@@ -161,12 +161,14 @@ public class AssetService extends MongoBaseService {
             }
 
         }
-        Map<AssetType, List<Risk>> assetTypeMap = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, assetTypeRiskListMap);
+
+        //TODO need to resolve
+       /* Map<AssetType, List<Risk>> assetTypeMap = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, assetTypeRiskListMap);
         assetTypeMap.forEach((k, v) -> {
             if (CollectionUtils.isNotEmpty(v)) k.setRisks(v.stream().map(Risk::getId).collect(Collectors.toSet()));
             else k.setRisks(new HashSet<>());
 
-        });
+        });*/
         asset.setAssetSubTypeId(null);
         if (assetSubType != null) {
             assetType.getSubAssetTypes().add(assetTypeMongoRepository.save(assetSubType).getId());

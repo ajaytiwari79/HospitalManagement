@@ -47,7 +47,7 @@ public class AssetTypeController {
 
     @ApiOperation("get AssetType by id")
     @GetMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable Integer assetTypeId) {
+    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable Long assetTypeId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, assetTypeId));
 
@@ -71,7 +71,7 @@ public class AssetTypeController {
 
     @ApiOperation("update Asset type and Sub Asset ")
     @PutMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId, @Valid @RequestBody AssetTypeDTO assetType) {
+    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable Long assetTypeId, @Valid @RequestBody AssetTypeDTO assetType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(countryId, assetTypeId, assetType));
 
     }

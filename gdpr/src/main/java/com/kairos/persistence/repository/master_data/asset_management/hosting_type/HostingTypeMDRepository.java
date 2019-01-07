@@ -14,7 +14,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, Integer> {
+public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, Long> {
 
     @Query(value = "SELECT ht FROM HostingTypeMD ht WHERE ht.countryId = ?1 and ht.deleted = ?2 and lower(ht.name) IN ?3")
     List<HostingTypeMD> findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> userNames);
@@ -22,16 +22,16 @@ public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, In
     @Transactional
     @Modifying
     @Query(value = "update HostingTypeMD set name = ?1 where id= ?2")
-    Integer updateHostingTypeName(String name, Integer id);
+    Integer updateHostingTypeName(String name, Long id);
 
 
     @Transactional
     @Modifying
     @Query(value = "update HostingTypeMD set deleted = true where id = ?1 and countryId = ?2")
-    Integer deleteByIdAndCountryId(Integer id, Long countryId);
+    Integer deleteByIdAndCountryId(Long id, Long countryId);
 
     @Query(value = "SELECT ht FROM HostingTypeMD ht WHERE ht.id = ?1 and ht.countryId = ?2 and ht.deleted = ?3")
-    HostingTypeMD findByIdAndCountryIdAndDeleted(Integer id, Long countryId, boolean deleted);
+    HostingTypeMD findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
 
 
     @Query(value = "SELECT new com.kairos.response.dto.common.HostingTypeResponseDTO(ht.id, ht.name, ht.organizationId, ht.suggestedDataStatus, ht.suggestedDate )  FROM HostingTypeMD ht WHERE ht.countryId = ?1 and ht.deleted = false order by createdAt desc")

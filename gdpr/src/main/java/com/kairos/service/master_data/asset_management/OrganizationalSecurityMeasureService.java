@@ -104,7 +104,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return OrganizationalSecurityMeasure object fetch via id
      * @throws DataNotFoundByIdException throw exception if OrganizationalSecurityMeasure not exist for given id
      */
-    public OrganizationalSecurityMeasureMD getOrganizationalSecurityMeasure(Long countryId, Integer id) {
+    public OrganizationalSecurityMeasureMD getOrganizationalSecurityMeasure(Long countryId, Long id) {
 
         OrganizationalSecurityMeasureMD exist = organizationalSecurityMeasureMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -116,7 +116,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public Boolean deleteOrganizationalSecurityMeasure(Long countryId, Integer id) {
+    public Boolean deleteOrganizationalSecurityMeasure(Long countryId, Long id) {
         Integer resultCount = organizationalSecurityMeasureMDRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Organizational Security Measure deleted successfully for id :: {}", id);
@@ -135,7 +135,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return return updated OrganizationalSecurityMeasure object
      * @throws DuplicateDataException if OrganizationalSecurityMeasure not exist for given id
      */
-    public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, Integer id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
+    public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, Long id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
 
         //TODO What actually this code is doing?
         OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByName(countryId, securityMeasureDTO.getName());
