@@ -72,12 +72,22 @@ public class StaffFilterService {
     @Inject
     private AccessGroupRepository accessGroupRepository;
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId) {
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId,  Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        //TODO please Optimise these DB calls
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+        }
+        Organization parentOrganization = organization.isParentOrganization()? organization : organizationService.fetchParentOrganization(unitId);
+        Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
+        if (!Optional.ofNullable(countryId).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound");
+        }
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parentOrganization.getId());
 
         FiltersAndFavouriteFiltersDTO filtersAndFavouriteFiltersDTO = new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), unitId),
+                getAllFilters(moduleId, countryId, unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
         return filtersAndFavouriteFiltersDTO;
     }

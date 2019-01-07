@@ -880,8 +880,8 @@ public class AccessGroupService {
         return accessGroupForParentOrganizationCreation;
     }
 
-    // Method to fetch list of access group by Organization category ( Hub, Organization and Union)
-    public List<AccessGroupQueryResult> getOrganizationAccessGroupsForUnitCreation(Long organizationId) {
+    // Method to fetch list of Management access group of Organization
+    public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId) {
         return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, AccessGroupRole.MANAGEMENT.toString());
     }
 
