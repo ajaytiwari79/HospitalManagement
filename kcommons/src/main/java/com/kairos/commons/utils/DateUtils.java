@@ -812,7 +812,7 @@ public  class DateUtils {
     }
 
 
-    public static Double getMinutesFromTotalMilliSeconds(long totalMilliSeconds){
+    public static Double getHoursFromTotalMilliSeconds(long totalMilliSeconds){
         long seconds, minutes, hours;
         seconds = totalMilliSeconds / 1000;
         minutes = seconds / 60;
