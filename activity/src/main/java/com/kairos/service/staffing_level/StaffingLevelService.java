@@ -225,16 +225,13 @@ public class StaffingLevelService extends MongoBaseService {
        // boolean activitiesRankUpdate= staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()),staffingLevel.getId(),staffingLevel.getStaffingLevelSetting().getActivitiesRank());
         PresenceStaffingLevelDto presenceStaffingLevelDto= ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,PresenceStaffingLevelDto.class);
 
-        List<StaffingLevelTimeSlotDTO> list=presenceStaffingLevelDto.getPresenceStaffingLevelInterval().stream()
+        List<StaffingLevelTimeSlotDTO> presenceStaffingLevelIntervalList=presenceStaffingLevelDto.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList());
 
 
 
-        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(list);
-        //Collections.sort(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval(),Comparator.comparing(StaffingLevelTimeSlotDTO ::getSequence));
-       // presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().sort((a1,a2)->a1.getSequence().compareTo(a2.getSequence()));
+        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervalList);
 
-        //plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.UPDATE);
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.UPDATE);
         presenceStaffingLevelDTO.setUpdatedAt(staffingLevel.getUpdatedAt());
