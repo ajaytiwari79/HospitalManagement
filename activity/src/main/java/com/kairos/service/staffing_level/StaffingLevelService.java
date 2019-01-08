@@ -223,9 +223,17 @@ public class StaffingLevelService extends MongoBaseService {
         staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel);
         this.save(staffingLevel);
        // boolean activitiesRankUpdate= staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()),staffingLevel.getId(),staffingLevel.getStaffingLevelSetting().getActivitiesRank());
-        BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO);
-        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
-                .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
+        PresenceStaffingLevelDto presenceStaffingLevelDto= ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,PresenceStaffingLevelDto.class);
+
+        List<StaffingLevelTimeSlotDTO> list=presenceStaffingLevelDto.getPresenceStaffingLevelInterval().stream()
+                .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList());
+
+
+
+        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(list);
+        //Collections.sort(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval(),Comparator.comparing(StaffingLevelTimeSlotDTO ::getSequence));
+       // presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().sort((a1,a2)->a1.getSequence().compareTo(a2.getSequence()));
+
         //plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.UPDATE);
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.UPDATE);
