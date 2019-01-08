@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +10,14 @@ import java.util.List;
  * Created by vipul on 4/12/17.
  */
 public class StaffUploadBySheetQueryResult {
-    List<Staff> staffList = new ArrayList<>();
+    List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
     List<Integer> staffErrorList = new ArrayList<Integer>();
 
-    public List<Staff> getStaffList() {
+    public List<StaffPersonalDetailDTO> getStaffList() {
         return staffList;
     }
 
-    public void setStaffList(List<Staff> staffList) {
+    public void setStaffList(List<StaffPersonalDetailDTO> staffList) {
         this.staffList = staffList;
     }
 
@@ -31,8 +32,4 @@ public class StaffUploadBySheetQueryResult {
     public StaffUploadBySheetQueryResult() {
     }
 
-    public StaffUploadBySheetQueryResult(List<Staff> staffList, List<Integer> staffErrorList) {
-        this.staffList = staffList;
-        this.staffErrorList = staffErrorList;
-    }
 }
