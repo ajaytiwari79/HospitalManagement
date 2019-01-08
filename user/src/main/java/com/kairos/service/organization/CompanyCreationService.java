@@ -54,6 +54,7 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -574,7 +575,7 @@ public class CompanyCreationService {
         return unitType;
     }
 
-    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentId) throws InterruptedException, ExecutionException {
+    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId) throws InterruptedException, ExecutionException {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
@@ -585,28 +586,29 @@ public class CompanyCreationService {
         //or parent has any missing required details
 
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
-        if(parentId !=null) {
-            List<Organization> organizations = new ArrayList<>();
-            organizations.addAll(organization.getChildren());
-            organizations.add(organization);
-            validateBasicDetails(organizations, exceptionService);
+        List<Long> unitIds = null;
+        List<Organization> organizations = new ArrayList<>();
+        organizations.addAll(organization.getChildren());
+        organizations.add(organization);
+        validateBasicDetails(organizations, exceptionService);
 
-            List<Long> unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
+        if (parentOrgaziationId != null && CollectionUtils.isNotEmpty(organization.getChildren())) {
+            unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
             unitIds.add(organizationId);
             if (staffPersonalDetailDTOS.size() != unitIds.size()) {
                 exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
             }
-
             validateUserDetails(staffPersonalDetailDTOS, exceptionService);
-
-            List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
-            validateAddressDetails(organizationContactAddresses, exceptionService);
-
             organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         } else {
-            staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(Arrays.asList(organization.getId()), organizationId);
+            unitIds.add(organizationId);
+            staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         }
+
+        List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
+        validateAddressDetails(organizationContactAddresses, exceptionService);
+
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
         List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
@@ -619,7 +621,7 @@ public class CompanyCreationService {
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds,
                 countryId);
-        if (parentId == null) {
+        if (parentOrgaziationId == null) {
             CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
                     .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
             CompletableFuture.allOf(hasUpdated).join();
@@ -631,7 +633,7 @@ public class CompanyCreationService {
 
         } else {
             CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                    .createDefaultDataInUnit(parentId, Arrays.asList(organization), countryId, timeSlots);
+                    .createDefaultDataInUnit(parentOrgaziationId, Arrays.asList(organization), countryId, timeSlots);
             CompletableFuture.allOf(createdInUnit).join();
         }
 
