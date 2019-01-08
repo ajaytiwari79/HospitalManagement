@@ -23,4 +23,7 @@ public interface PlanningPeriodMongoRepository extends MongoBaseRepository<Plann
     @Query("{unitId:{$in:?0},startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<PlanningPeriod> findAllByUnitIdsAndBetweenDates(List<Long> unitIds,Date startDate,Date endDate);
 
+    @Query("{unitId:?0,startDate: {$lte: ?1},endDate:{$gte:?1}}")
+    PlanningPeriod findOneByUnitIdAndDate(Long unitId,Date startDate);
+
 }
