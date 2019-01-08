@@ -68,8 +68,7 @@ public class StaffingLevelUtil {
             int j=0;
             Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
             for(StaffingLevelActivity staffingLevelActivity:staffingLevelTimeSlotDTO.getStaffingLevelActivities()) {
-                StaffingLevelActivity staffingLevelActivityNew;
-                staffingLevelActivityNew = new StaffingLevelActivity(staffingLevelActivity.getActivityId(),staffingLevelActivity.getName(),
+                StaffingLevelActivity staffingLevelActivityNew = new StaffingLevelActivity(staffingLevelActivity.getActivityId(),staffingLevelActivity.getName(),
                         staffingLevelActivity.getMinNoOfStaff(),staffingLevelActivity.getMaxNoOfStaff());
                 if(staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
                     staffingLevelActivityNew.setAvailableNoOfStaff(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()).getAvailableNoOfStaff());
