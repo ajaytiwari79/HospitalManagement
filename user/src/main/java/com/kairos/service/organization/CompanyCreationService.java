@@ -586,7 +586,7 @@ public class CompanyCreationService {
         //or parent has any missing required details
 
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
-        List<Long> unitIds = null;
+        List<Long> unitIds = new ArrayList<>();
         List<Organization> organizations = new ArrayList<>();
         organizations.addAll(organization.getChildren());
         organizations.add(organization);
