@@ -346,19 +346,14 @@ public class CompanyCreationService {
                     if (userByCprNumberOrEmail != null) {
                         user=userByCprNumberOrEmail;
                         reinitializeUserManagerDto(unitManagerDTO,user);
-                        //user.setEmail(unitManagerDTO.getEmail());
-                    }
-                    else{
+                        userGraphRepository.save(user);
+                        staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
+                    } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
+                        userGraphRepository.save(user);
+                        staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
                     }
-                }
-
-                userGraphRepository.save(user);
-                if(parentOrganization) {
-                    staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
-                } else {
-                    staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                 }
             }
         }
