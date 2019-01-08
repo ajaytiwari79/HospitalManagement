@@ -11,9 +11,9 @@ public class OrgTypeSubTypeServiceCategoryVO {
     private Long id;
     private String name;
     private Long countryId;
-    private List<OrganizationSubType> organizationSubTypes;
-    private List<ServiceCategory> organizationServices;
-    private List<SubServiceCategory> organizationSubServices;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<ServiceCategoryDTO> organizationServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
     public Long getId() { return id; }
 
@@ -23,17 +23,17 @@ public class OrgTypeSubTypeServiceCategoryVO {
 
     public void setName(String name) { this.name = name; }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() { return organizationSubTypes; }
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() { return organizationSubTypeDTOS; }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
 
-    public List<ServiceCategory> getOrganizationServices() { return organizationServices; }
+    public List<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
 
-    public List<SubServiceCategory> getOrganizationSubServices() { return organizationSubServices; }
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     public Long getCountryId() { return countryId; }
 

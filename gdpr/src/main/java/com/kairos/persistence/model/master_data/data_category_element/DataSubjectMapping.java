@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -25,9 +25,9 @@ public class DataSubjectMapping extends MongoBaseEntity {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    private List<OrganizationType> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypeDTOS;
 
-    private List<OrganizationSubType> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
 
     private Set<BigInteger> dataCategories = new HashSet<>();
 
@@ -37,12 +37,12 @@ public class DataSubjectMapping extends MongoBaseEntity {
     public DataSubjectMapping() {
     }
 
-    public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
+    public DataSubjectMapping(String name, String description, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS,
                               Set<BigInteger> dataCategories) {
         this.name = name;
         this.description = description;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
+        this.organizationTypeDTOS = organizationTypeDTOS;
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
         this.dataCategories = dataCategories;
     }
 
@@ -91,20 +91,20 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
+        return organizationTypeDTOS;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
+        this.organizationTypeDTOS = organizationTypeDTOS;
     }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
+        return organizationSubTypeDTOS;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
     }
 
 

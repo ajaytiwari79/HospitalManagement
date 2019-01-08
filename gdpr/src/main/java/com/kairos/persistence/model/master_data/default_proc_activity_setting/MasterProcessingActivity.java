@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,10 +21,10 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     @NotBlank(message = "Name can't be empty")
     private String name;
     private String description;
-    private List<OrganizationType> organizationTypes;
-    private List<OrganizationSubType> organizationSubTypes;
-    private List<ServiceCategory> organizationServices;
-    private List<SubServiceCategory> organizationSubServices;
+    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<ServiceCategoryDTO> organizationServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
     private List<BigInteger> subProcessingActivityIds;
     private Long countryId;
     private List<BigInteger> risks=new ArrayList<>();
@@ -39,11 +39,11 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     }
 
 
-    public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus,List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
+    public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
         this.name = name;
         this.description = description;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
+        this.organizationTypeDTOS = organizationTypeDTOS;
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
@@ -100,29 +100,29 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     public MasterProcessingActivity setDescription(String description) { this.description = description; return this; }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
+        return organizationTypeDTOS;
     }
 
-    public MasterProcessingActivity setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes;  return this;}
+    public MasterProcessingActivity setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS;  return this;}
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
+        return organizationSubTypeDTOS;
     }
 
-    public MasterProcessingActivity setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; return this; }
+    public MasterProcessingActivity setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; return this; }
 
-    public List<ServiceCategory> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public MasterProcessingActivity setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices;  return this;}
+    public MasterProcessingActivity setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices;  return this;}
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public MasterProcessingActivity setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
+    public MasterProcessingActivity setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
 
     public List<BigInteger> getRisks() { return risks;}
 

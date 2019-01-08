@@ -393,7 +393,9 @@ public class AssetTypeService extends MongoBaseService {
             assetType.setSubAssetTypes(subAssetTypes.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }
         assetTypeMongoRepository.save(assetType);
-        assetTypeDTO.setId(assetType.getId());
+
+        //TODO
+        //assetTypeDTO.setId(assetType.getId());
         return assetTypeDTO;
     }
 

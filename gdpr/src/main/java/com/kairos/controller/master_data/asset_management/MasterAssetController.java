@@ -54,20 +54,19 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/master_asset/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id, @Validated @RequestBody MasterAssetDTO assetDTO) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable Long id, @Validated @RequestBody MasterAssetDTO assetDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(countryId, id, assetDTO));
     }
 
-
     @ApiOperation(value = "delete master asset")
     @DeleteMapping("/master_asset/delete/{id}")
-    public ResponseEntity<Object> deleteMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteMasterAsset(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.deleteMasterAsset(countryId, id));
     }
 
     @ApiOperation(value = "get master asset by id")
     @GetMapping("/master_asset/{id}")
-    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(countryId, id));
 
     }

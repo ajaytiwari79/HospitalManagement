@@ -11,7 +11,6 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
@@ -103,7 +102,7 @@ public class ClauseService extends MongoBaseService {
             } else {
                 MasterClauseDTO masterClauseDTO = (MasterClauseDTO) clauseDto;
                 clause.setOrganizationTypes(masterClauseDTO.getOrganizationTypes());
-                clause.setOrganizationSubTypes(masterClauseDTO.getOrganizationSubTypes());
+                clause.setOrganizationSubTypeDTOS(masterClauseDTO.getOrganizationSubTypeDTOS());
                 clause.setOrganizationServices(masterClauseDTO.getOrganizationServices());
                 clause.setOrganizationSubServices(masterClauseDTO.getOrganizationSubServices());
                 clause.setAccountTypes(masterClauseDTO.getAccountTypes());

@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.clause;
 
 
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -28,10 +28,10 @@ public class Clause extends MongoBaseEntity {
     private List<ClauseTag> tags = new ArrayList<>();
     @NotNull
     private String description;
-    private List<OrganizationType> organizationTypes;
-    private List<OrganizationSubType> organizationSubTypes;
-    private List<ServiceCategory> organizationServices;
-    private List<SubServiceCategory> organizationSubServices;
+    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<ServiceCategoryDTO> organizationServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
     private List<AccountTypeVO> accountTypes;
     private Long countryId;
     private List<Long> organizationList;
@@ -70,11 +70,11 @@ public class Clause extends MongoBaseEntity {
         this.templateTypes=templateTypes;
     }
 
-    public Clause(String title, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
+    public Clause(String title, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
         this.title = title;
         this.description = description;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
+        this.organizationTypeDTOS = organizationTypeDTOS;
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.countryId = countryId;
@@ -139,35 +139,35 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
+        return organizationTypeDTOS;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) {
+        this.organizationTypeDTOS = organizationTypeDTOS;
     }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
+        return organizationSubTypeDTOS;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
     }
 
-    public List<ServiceCategory> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

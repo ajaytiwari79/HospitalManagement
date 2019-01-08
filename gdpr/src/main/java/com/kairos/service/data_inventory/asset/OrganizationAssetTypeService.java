@@ -344,7 +344,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             assetType.setSubAssetTypes(subAssetTypes.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }
         assetTypeMongoRepository.save(assetType);
-        assetTypeBasicDTO.setId(assetType.getId());
+//        assetTypeBasicDTO.setId(assetType.getId());
         return (Map<String, AssetTypeBasicDTO>) new HashMap<>().put("new", assetTypeBasicDTO);
 
     }

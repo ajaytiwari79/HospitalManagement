@@ -137,24 +137,23 @@ public class DefaultDataInheritService extends MongoBaseService {
 
     public boolean copyMasterDataFromCountry(Long unitId, OrgTypeSubTypeServiceCategoryVO orgTypeSubTypeServiceCategoryVO) throws Exception {
 
-        Long countryId = orgTypeSubTypeServiceCategoryVO.getCountryId();
-        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
-        List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
-        List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
-        saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
-        copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
+        //Long countryId = orgTypeSubTypeServiceCategoryVO.getCountryId();
+        //OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId());
+               // orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
+                //orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
+               // orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
+        //List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
+        //List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
+        //saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
+        //copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
 
 
-        List<Callable<Boolean>> callables = new ArrayList<>();
-        Callable<Boolean> dataDispoaslTask = () -> {
+        //List<Callable<Boolean>> callables = new ArrayList<>();
+       /* Callable<Boolean> dataDispoaslTask = () -> {
             List<DataDisposalResponseDTO> dataDisposalResponseDTOS = dataDisposalMongoRepository.findAllByCountryId(countryId);
             saveDataDisposal(unitId, dataDisposalResponseDTOS);
             return true;
-        };
-        Callable<Boolean> hostingProviderTask = () -> {
+        };Callable<Boolean> hostingProviderTask = () -> {
             List<HostingProviderResponseDTO> hostingProviderDTOS = hostingProviderMongoRepository.findAllByCountryId(countryId);
             saveHostingProvider(unitId, hostingProviderDTOS);
             return true;
@@ -241,7 +240,7 @@ public class DefaultDataInheritService extends MongoBaseService {
             return true;
         };
 
-        callables.add(hostingProviderTask);
+        /*callables.add(hostingProviderTask);
         callables.add(dataDispoaslTask);
         callables.add(hostingTypeTask);
         callables.add(technicalSecurityMeasureTask);
@@ -258,7 +257,7 @@ public class DefaultDataInheritService extends MongoBaseService {
         callables.add(assetTask);
         callables.add(dataSubjectTask);
         callables.add(clauseTask);
-        asynchronousService.executeAsynchronously(callables);
+        asynchronousService.executeAsynchronously(callables);*/
         return true;
     }
 

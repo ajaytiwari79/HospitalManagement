@@ -3,10 +3,10 @@ package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
@@ -32,13 +32,13 @@ public class ClauseResponseDTO {
 
     private List<TemplateTypeResponseDTO> templateTypes;
 
-    private List<OrganizationType> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypeDTOS;
 
-    private List<OrganizationSubType> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
 
-    private List<ServiceCategory> organizationServices;
+    private List<ServiceCategoryDTO> organizationServices;
 
-    private List<SubServiceCategory> organizationSubServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
     private List<AccountTypeVO> accountTypes;
 
@@ -87,35 +87,35 @@ public class ClauseResponseDTO {
         this.description = description;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
+        return organizationTypeDTOS;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
+        this.organizationTypeDTOS = organizationTypeDTOS;
     }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
+        return organizationSubTypeDTOS;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
     }
 
-    public List<ServiceCategory> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 }

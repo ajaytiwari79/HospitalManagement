@@ -43,7 +43,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }
-        DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription(), dataSubjectMappingDto.getOrganizationTypes(), dataSubjectMappingDto.getOrganizationSubTypes()
+        DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription(), dataSubjectMappingDto.getOrganizationTypeDTOS(), dataSubjectMappingDto.getOrganizationSubTypeDTOS()
                 , dataSubjectMappingDto.getDataCategories());
         dataSubjectMapping.setCountryId(countryId);
         dataSubjectMappingRepository.save(dataSubjectMapping);
@@ -87,8 +87,8 @@ public class DataSubjectMappingService extends MongoBaseService {
         }
         dataSubject.setName(dataSubjectMappingDto.getName());
         dataSubject.setDescription(dataSubjectMappingDto.getDescription());
-        dataSubject.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
-        dataSubject.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
+        dataSubject.setOrganizationTypeDTOS(dataSubjectMappingDto.getOrganizationTypeDTOS());
+        dataSubject.setOrganizationSubTypeDTOS(dataSubjectMappingDto.getOrganizationSubTypeDTOS());
         dataSubject.setDataCategories(dataSubjectMappingDto.getDataCategories());
         dataSubjectMappingRepository.save(dataSubject);
         return dataSubjectMappingDto;

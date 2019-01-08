@@ -2,10 +2,10 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.KairosGdprApplication;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.service.master_data.asset_management.MasterAssetServiceTest;
@@ -56,10 +56,10 @@ public class MasterProcessingActivityServiceTest {
         MasterProcessingActivityDTO processingActivity = new MasterProcessingActivityDTO();
         processingActivity.setName("processing Activity");
         processingActivity.setDescription("Activity  description ");
-        processingActivity.setOrganizationSubTypes(new ArrayList<>(Arrays.asList(new OrganizationSubType(32l, "xsyz"))));
-        processingActivity.setOrganizationTypes(new ArrayList<>(Arrays.asList(new OrganizationType(32l, "xyz"))));
-        processingActivity.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategory(35l, "poiuy"))));
-        processingActivity.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategory(34l, "abc"))));
+        processingActivity.setOrganizationSubTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
+        processingActivity.setOrganizationTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
+        processingActivity.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategoryDTO(35l, "poiuy"))));
+        processingActivity.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategoryDTO(34l, "abc"))));
 
         HttpEntity<MasterProcessingActivityDTO> entity = new HttpEntity<>(processingActivity);
         ResponseEntity<Map> response = restTemplate.exchange(

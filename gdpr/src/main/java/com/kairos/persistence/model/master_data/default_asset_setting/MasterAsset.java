@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
 
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,10 +22,10 @@ public class MasterAsset extends MongoBaseEntity {
     private  String name;
     @NotBlank(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-    private List<OrganizationType> organizationTypes;
-    private List <OrganizationSubType> organizationSubTypes;
-    private List <ServiceCategory> organizationServices;
-    private List <SubServiceCategory> organizationSubServices;
+    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    private List <OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List <ServiceCategoryDTO> organizationServices;
+    private List <SubServiceCategoryDTO> organizationSubServices;
     private Long countryId;
     private BigInteger assetTypeId;
     private BigInteger assetSubTypeId;
@@ -33,13 +33,13 @@ public class MasterAsset extends MongoBaseEntity {
     private SuggestedDataStatus suggestedDataStatus;
 
 
-    public MasterAsset(String name, String description,Long countryId, List<OrganizationType> organizationTypes,
-                       List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices,SuggestedDataStatus suggestedDataStatus) {
+    public MasterAsset(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS,
+                       List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices, SuggestedDataStatus suggestedDataStatus) {
         this.name = name;
         this.description = description;
         this.countryId=countryId;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
+        this.organizationTypeDTOS = organizationTypeDTOS;
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
@@ -86,29 +86,29 @@ public class MasterAsset extends MongoBaseEntity {
 
     public MasterAsset setDescription(String description) { this.description = description;return this; }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
+        return organizationTypeDTOS;
     }
 
-    public MasterAsset setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; return this;}
+    public MasterAsset setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; return this;}
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
+        return organizationSubTypeDTOS;
     }
 
-    public MasterAsset setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes;return this; }
+    public MasterAsset setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS;return this; }
 
-    public List<ServiceCategory> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public MasterAsset setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; return this;}
+    public MasterAsset setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; return this;}
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public MasterAsset setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
+    public MasterAsset setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
 
 
     public MasterAsset() {

@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganizationType {
+public class OrganizationTypeDTO {
 
     @NotNull(message = "id can't be null")
     private Long id;
@@ -30,10 +30,10 @@ public class OrganizationType {
         this.name = name;
     }
 
-    public OrganizationType() {
+    public OrganizationTypeDTO() {
     }
 
-    public OrganizationType(@NotNull(message = "id can't be null") Long id, String name) {
+    public OrganizationTypeDTO(@NotNull(message = "id can't be null") Long id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -2,10 +2,10 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.KairosGdprApplication;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
@@ -60,10 +60,10 @@ public class MasterAssetServiceTest {
         MasterAssetDTO assetDTO = new MasterAssetDTO();
         assetDTO.setName("Unique name Asset");
         assetDTO.setDescription("asset abc description ");
-        assetDTO.setOrganizationSubTypes(new ArrayList<>(Arrays.asList(new OrganizationSubType(32l, "xsyz"))));
-        assetDTO.setOrganizationTypes(new ArrayList<>(Arrays.asList(new OrganizationType(32l, "xyz"))));
-        assetDTO.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategory(35l, "poiuy"))));
-        assetDTO.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategory(34l, "abc"))));
+        assetDTO.setOrganizationSubTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
+        assetDTO.setOrganizationTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
+        assetDTO.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategoryDTO(35l, "poiuy"))));
+        assetDTO.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategoryDTO(34l, "abc"))));
         assetDTO.setAssetTypeId(assetTypeId);
         assetDTO.setAssetSubTypes(new ArrayList<>(Arrays.asList(BigInteger.ONE, BigInteger.TEN)));
 

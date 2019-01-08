@@ -3,8 +3,8 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -21,9 +21,9 @@ public class DataSubjectMappingResponseDTO {
 
     private Long countryId;
 
-    private List<OrganizationType> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypeDTOS;
 
-    private List<OrganizationSubType> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
 
     private List<DataCategoryResponseDTO> dataCategories;
 
@@ -51,20 +51,20 @@ public class DataSubjectMappingResponseDTO {
         this.description = description;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
+        return organizationTypeDTOS;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
+        this.organizationTypeDTOS = organizationTypeDTOS;
     }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
+        return organizationSubTypeDTOS;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
+        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
     }
 
     public List<DataCategoryResponseDTO> getDataCategories() {

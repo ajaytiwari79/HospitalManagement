@@ -106,8 +106,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             policyAgreementTemplate.setOrganizationId(referenceId);
         } else {
             MasterAgreementTemplateDTO agreementTemplateDTO = (MasterAgreementTemplateDTO) policyAgreementTemplateDto;
-            policyAgreementTemplate.setOrganizationTypes(agreementTemplateDTO.getOrganizationTypes());
-            policyAgreementTemplate.setOrganizationSubTypes(agreementTemplateDTO.getOrganizationSubTypes());
+            policyAgreementTemplate.setOrganizationTypeDTOS(agreementTemplateDTO.getOrganizationTypeDTOS());
+            policyAgreementTemplate.setOrganizationSubTypeDTOS(agreementTemplateDTO.getOrganizationSubTypeDTOS());
             policyAgreementTemplate.setOrganizationServices(agreementTemplateDTO.getOrganizationServices());
             policyAgreementTemplate.setOrganizationSubServices(agreementTemplateDTO.getOrganizationSubServices());
             policyAgreementTemplate.setAccountTypes(agreementTemplateDTO.getAccountTypes());
@@ -178,8 +178,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         template.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
         if (!isUnitId) {
             MasterAgreementTemplateDTO agreementTemplateDTO = (MasterAgreementTemplateDTO) policyAgreementTemplateDto;
-            template.setOrganizationTypes(agreementTemplateDTO.getOrganizationTypes());
-            template.setOrganizationSubTypes(agreementTemplateDTO.getOrganizationSubTypes());
+            template.setOrganizationTypeDTOS(agreementTemplateDTO.getOrganizationTypeDTOS());
+            template.setOrganizationSubTypeDTOS(agreementTemplateDTO.getOrganizationSubTypeDTOS());
             template.setOrganizationServices(agreementTemplateDTO.getOrganizationServices());
             template.setOrganizationSubServices(agreementTemplateDTO.getOrganizationSubServices());
             template.setAccountTypes(agreementTemplateDTO.getAccountTypes());
@@ -205,10 +205,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
         OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO=null;
         if(!isUnitId) {
-            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
-                    template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
-                    template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
-                    template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
+            organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(template.getOrganizationTypeDTOS().stream().map(OrganizationTypeDTO::getId).collect(Collectors.toList()),
+                    template.getOrganizationSubTypeDTOS().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList()),
+                    template.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()),
+                    template.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
         }
         List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
         List<ClauseBasicResponseDTO> clauseListForTemplate =  new ArrayList<>();

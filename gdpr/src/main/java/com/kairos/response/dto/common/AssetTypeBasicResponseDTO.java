@@ -14,13 +14,19 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AssetTypeBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private Long organizationId;
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
     private Set<BigInteger> risks;
     private List<RiskBasicResponseDTO> riskList;
+
+    public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType) {
+        this.id = id;
+        this.name = name;
+        this.subAssetType = subAssetType;
+    }
 
     public Set<BigInteger> getRisks() { return risks; }
 
@@ -38,9 +44,9 @@ public class AssetTypeBasicResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

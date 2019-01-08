@@ -8,7 +8,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
-import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
@@ -74,8 +74,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (masterProcessingActivityRepository.findByName(countryId, masterProcessingActivityDto.getName()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
         }
-        MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, masterProcessingActivityDto.getOrganizationTypes()
-                , masterProcessingActivityDto.getOrganizationSubTypes(), masterProcessingActivityDto.getOrganizationServices(), masterProcessingActivityDto.getOrganizationSubServices());
+        MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, masterProcessingActivityDto.getOrganizationTypeDTOS()
+                , masterProcessingActivityDto.getOrganizationSubTypeDTOS(), masterProcessingActivityDto.getOrganizationServices(), masterProcessingActivityDto.getOrganizationSubServices());
         Map<String, Object> subProcessingActivity = new HashMap<>();
         if (Optional.ofNullable(masterProcessingActivityDto.getSubProcessingActivities()).isPresent() && !masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
             subProcessingActivity = createNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
@@ -112,8 +112,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
                 throw new DuplicateDataException("Duplicate Sub processing Activity " + activity.getName());
             }
             checkDuplicateInSubProcess.add(activity.getName());
-            MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(activity.getName(), activity.getDescription(), SuggestedDataStatus.APPROVED, parentProcessingActivity.getOrganizationTypes()
-                    , parentProcessingActivity.getOrganizationSubTypes(), parentProcessingActivity.getOrganizationServices(), parentProcessingActivity.getOrganizationSubServices());
+            MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(activity.getName(), activity.getDescription(), SuggestedDataStatus.APPROVED, parentProcessingActivity.getOrganizationTypeDTOS()
+                    , parentProcessingActivity.getOrganizationSubTypeDTOS(), parentProcessingActivity.getOrganizationServices(), parentProcessingActivity.getOrganizationSubServices());
             subProcessingActivity.setCountryId(countryId);
             subProcessingActivity.setSubProcess(true);
             subProcessingActivityList.add(subProcessingActivity);
@@ -156,8 +156,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
                 processingActivity.setHasSubProcessingActivity(true);
 
             }
-            processingActivity.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
-            processingActivity.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());
+            processingActivity.setOrganizationTypeDTOS(masterProcessingActivityDto.getOrganizationTypeDTOS());
+            processingActivity.setOrganizationSubTypeDTOS(masterProcessingActivityDto.getOrganizationSubTypeDTOS());
             processingActivity.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
             processingActivity.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationSubServices());
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
@@ -238,8 +238,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
             MasterProcessingActivityDTO subProcessDto = subProcessingActivityDTOList.get(subProcess.getId());
             subProcess.setName(subProcessDto.getName());
             subProcess.setDescription(parentProcessingActivity.getDescription());
-            subProcess.setOrganizationTypes(parentProcessingActivity.getOrganizationTypes());
-            subProcess.setOrganizationSubTypes(parentProcessingActivity.getOrganizationSubTypes());
+            subProcess.setOrganizationTypeDTOS(parentProcessingActivity.getOrganizationTypeDTOS());
+            subProcess.setOrganizationSubTypeDTOS(parentProcessingActivity.getOrganizationSubTypeDTOS());
             subProcess.setOrganizationServices(parentProcessingActivity.getOrganizationServices());
             subProcess.setOrganizationSubServices(parentProcessingActivity.getOrganizationSubServices());
         });
@@ -432,8 +432,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
     private MasterProcessingActivity buildSuggestedProcessingActivityAndSubProcessingActivity(Long countryId, ProcessingActivityDTO processingActivityDTO, OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO) {
         MasterProcessingActivity processingActivity = new MasterProcessingActivity(processingActivityDTO.getName(), processingActivityDTO.getDescription(), countryId, SuggestedDataStatus.PENDING, LocalDate.now());
         processingActivity.setOrganizationServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices())
-                .setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
-                .setOrganizationSubTypes(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypes())
+                .setOrganizationTypeDTOS(Arrays.asList(new OrganizationTypeDTO(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
+                .setOrganizationSubTypeDTOS(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS())
                 .setOrganizationSubServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices());
         return processingActivity;
     }

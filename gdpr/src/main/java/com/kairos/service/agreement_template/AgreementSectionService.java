@@ -387,8 +387,8 @@ public class AgreementSectionService extends MongoBaseService {
                 clause.setOrganizationId(referenceId);
             } else {
 
-                clause.setOrganizationTypes(policyAgreementTemplate.getOrganizationTypes());
-                clause.setOrganizationSubTypes(policyAgreementTemplate.getOrganizationSubTypes());
+                clause.setOrganizationTypes(policyAgreementTemplate.getOrganizationTypeDTOS());
+                clause.setOrganizationSubTypeDTOS(policyAgreementTemplate.getOrganizationSubTypeDTOS());
                 clause.setOrganizationServices(policyAgreementTemplate.getOrganizationServices());
                 clause.setOrganizationSubServices(policyAgreementTemplate.getOrganizationSubServices());
                 clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
@@ -457,8 +457,8 @@ public class AgreementSectionService extends MongoBaseService {
         if (isUnitd) {
             clause.setOrganizationId(referenceId);
         } else {
-            clause.setOrganizationTypes(policyAgreementTemplate.getOrganizationTypes());
-            clause.setOrganizationSubTypes(policyAgreementTemplate.getOrganizationSubTypes());
+            clause.setOrganizationTypes(policyAgreementTemplate.getOrganizationTypeDTOS());
+            clause.setOrganizationSubTypeDTOS(policyAgreementTemplate.getOrganizationSubTypeDTOS());
             clause.setOrganizationServices(policyAgreementTemplate.getOrganizationServices());
             clause.setOrganizationSubServices(policyAgreementTemplate.getOrganizationSubServices());
             clause.setCountryId(referenceId);

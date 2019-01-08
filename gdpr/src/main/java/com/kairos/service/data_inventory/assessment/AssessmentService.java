@@ -257,16 +257,16 @@ public class AssessmentService extends MongoBaseService {
 
 
     private QuestionnaireTemplate checkPreviousLaunchedAssetAssessment(Long unitId, AssetResponseDTO asset) {
-
-        QuestionnaireTemplate questionnaireTemplate;
-        if (asset.getAssetSubType() != null) {
+        //TODO commented due to id type change from Biginteger to Long
+        QuestionnaireTemplate questionnaireTemplate = null;
+       /* if (asset.getAssetSubType() != null) {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getAssetSubType().getId());
         } else {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetType().getId());
         }
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             questionnaireTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
-        }
+        }*/
 
         return questionnaireTemplate;
     }
@@ -289,11 +289,11 @@ public class AssessmentService extends MongoBaseService {
             if (CollectionUtils.isEmpty(riskIds)) {
                 exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
             }
-            if (asset.getAssetSubType().getId() != null)
+          /*  if (asset.getAssetSubType().getId() != null)
                 questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getAssetSubType().getId());
             else
                 questionnaireTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeId(unitId, asset.getAssetType().getId());
-
+*/
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
             if (CollectionUtils.isEmpty(((ProcessingActivityResponseDTO) entity).getRisks())) {
                 exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
