@@ -9,6 +9,7 @@ import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityMD;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationSubType;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationType;
 import com.kairos.persistence.model.master_data.default_asset_setting.ServiceCategory;
@@ -261,19 +262,25 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessing(Long countryId) {
-        return masterProcessingActivityRepository.getMasterProcessingActivityListWithSubProcessingActivity(countryId);
+        List<MasterProcessingActivityMD> masterProcessingActivities =  masterProcessingActivityMDRepository.findAllByCountryId(countryId);
+        List<MasterProcessingActivityResponseDTO> masterProcessingActivityResponseDTOS = new ArrayList<>();
+        for(MasterProcessingActivityMD masterProcessingActivity : masterProcessingActivities){
+            masterProcessingActivityResponseDTOS.add(prepareMasterProcessingActivityResponseDTO(masterProcessingActivity, new ArrayList<>()));
+        }
+        return masterProcessingActivityResponseDTOS;
 
     }
 
 
-    public Boolean deleteMasterProcessingActivity(Long countryId, BigInteger id) {
-        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryId(countryId, id);
-        if (processingActivity == null) {
-            throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
-
+    public Boolean deleteMasterProcessingActivity(Long countryId, Long id) {
+        Integer updateCount = masterProcessingActivityMDRepository.updateMasterProcessingActivity(countryId, id);
+        if(updateCount > 0){
+            LOGGER.info("Master Processing Activity is deleted successfully with id :: {}", id);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Processing Activity", id);
         }
-        delete(processingActivity);
         return true;
+
 
     }
 
@@ -284,34 +291,58 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param subProcessingActivityId
      * @return
      */
-    public boolean deleteSubProcessingActivity(Long countryId, BigInteger processingActivityId, BigInteger subProcessingActivityId) {
-        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryId(countryId, processingActivityId);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
+    public boolean deleteSubProcessingActivity(Long countryId, Long processingActivityId, Long subProcessingActivityId) {
+        Integer updateCount = masterProcessingActivityMDRepository.deleteSubProcessingActivityFromMasterProcessingActivity(countryId, processingActivityId, subProcessingActivityId);
+        if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
-        }
-        List<BigInteger> subProcessingActivityIdList = processingActivity.getSubProcessingActivityIds();
-        MasterProcessingActivity subProcessingActivity = masterProcessingActivityRepository.findByIdAndCountryId(countryId, subProcessingActivityId);
-        if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
-
-        } else {
-            subProcessingActivityIdList.remove(subProcessingActivityId);
-            processingActivity.setSubProcessingActivityIds(subProcessingActivityIdList);
-            masterProcessingActivityRepository.save(processingActivity);
-            delete(subProcessingActivity);
+        }else{
+            LOGGER.info("Sub processing Activity deleted successfully");
         }
         return true;
 
     }
 
 
-    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, BigInteger id) {
-        MasterProcessingActivityResponseDTO result = masterProcessingActivityRepository.getMasterProcessingActivityWithSubProcessingActivity(countryId, id);
-        if (!Optional.of(result).isPresent()) {
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, Long id) {
+        MasterProcessingActivityMD masterProcessingActivity = masterProcessingActivityMDRepository.getMasterAssetByCountryIdAndId(countryId, id);
+        if (!Optional.of(masterProcessingActivity).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
-        } else
-            return result;
+        }
+            return prepareMasterProcessingActivityResponseDTO(masterProcessingActivity, new ArrayList<>());
 
+    }
+
+    private MasterProcessingActivityResponseDTO  prepareMasterProcessingActivityResponseDTO(MasterProcessingActivityMD processingActivity, List<MasterProcessingActivityResponseDTO> masterSPAResponseDTO){
+        MasterProcessingActivityResponseDTO masterPAResponseDTO = new MasterProcessingActivityResponseDTO(processingActivity.getId(),processingActivity.getName(),processingActivity.getDescription(), processingActivity.getSuggestedDate(), processingActivity.getSuggestedDataStatus());
+        List<OrganizationTypeDTO> organizationTypeDTOS = new ArrayList<>();
+        List<OrganizationSubTypeDTO> organizationSubTypeDTOS = new ArrayList<>();
+        List<ServiceCategoryDTO> serviceCategories = new ArrayList<>();
+        List<SubServiceCategoryDTO> subServiceCategories = new ArrayList<>();
+        for(OrganizationType orgType : processingActivity.getOrganizationTypes()){
+            organizationTypeDTOS.add(new OrganizationTypeDTO(orgType.getId(), orgType.getName())) ;
+        }
+        for(OrganizationSubType orgSubType : processingActivity.getOrganizationSubTypes()){
+            organizationSubTypeDTOS.add(new OrganizationSubTypeDTO(orgSubType.getId(), orgSubType.getName())) ;
+        }
+        for(ServiceCategory category : processingActivity.getOrganizationServices()){
+            serviceCategories.add(new ServiceCategoryDTO(category.getId(), category.getName())) ;
+        }
+        for(SubServiceCategory subServiceCategory : processingActivity.getOrganizationSubServices()){
+            subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
+        }
+
+        masterPAResponseDTO.setOrganizationTypes(organizationTypeDTOS);
+        masterPAResponseDTO.setOrganizationSubTypes(organizationSubTypeDTOS);
+        masterPAResponseDTO.setOrganizationServices(serviceCategories);
+        masterPAResponseDTO.setOrganizationSubServices(subServiceCategories);
+        if(processingActivity.isHasSubProcessingActivity()) {
+            for (MasterProcessingActivityMD subProcessingActivity : processingActivity.getSubProcessingActivities()) {
+                masterSPAResponseDTO.add(prepareMasterProcessingActivityResponseDTO(subProcessingActivity, null));
+
+            }
+            masterPAResponseDTO.setSubProcessingActivities(masterSPAResponseDTO);
+        }
+        return masterPAResponseDTO;
     }
 
 

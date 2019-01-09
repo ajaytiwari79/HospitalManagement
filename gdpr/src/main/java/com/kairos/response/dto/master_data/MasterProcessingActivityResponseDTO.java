@@ -19,13 +19,13 @@ import java.util.List;
 public class MasterProcessingActivityResponseDTO {
 
     @NotNull
-    private BigInteger id;
+    private Long id;
     @NotBlank
     private String name;
     @NotBlank
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
     private List<MasterProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
@@ -33,13 +33,21 @@ public class MasterProcessingActivityResponseDTO {
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean hasSubProcessingActivity;
 
+    public MasterProcessingActivityResponseDTO(@NotNull Long id, @NotBlank String name, @NotBlank String description, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.suggestedDate = suggestedDate;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
     public Boolean getHasSubProcessingActivity() { return hasSubProcessingActivity; }
 
     public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) { this.hasSubProcessingActivity = hasSubProcessingActivity; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 
@@ -54,21 +62,37 @@ public class MasterProcessingActivityResponseDTO {
 
     public void setSubProcessingActivities(List<MasterProcessingActivityResponseDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypeDTOS; }
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
+        return organizationTypes;
+    }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; }
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() { return organizationSubTypeDTOS; }
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+        return organizationSubTypes;
+    }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
+    }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() { return organizationServices; }
+    public List<ServiceCategoryDTO> getOrganizationServices() {
+        return organizationServices;
+    }
 
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
+        this.organizationServices = organizationServices;
+    }
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() { return organizationSubServices; }
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
+        return organizationSubServices;
+    }
 
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
+    }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }
 

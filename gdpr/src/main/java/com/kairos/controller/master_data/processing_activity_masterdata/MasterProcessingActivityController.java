@@ -50,7 +50,7 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "delete MasterProcessingActivity")
     @DeleteMapping("/master_processing_activity/delete/{id}")
-    public ResponseEntity<Object> deleteMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteMasterProcessingActivity(countryId, id));
     }
 
@@ -64,7 +64,7 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "get MasterProcessingActivity by id")
     @GetMapping("/master_processing_activity/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, id));
     }
 
