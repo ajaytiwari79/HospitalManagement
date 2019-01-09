@@ -71,9 +71,9 @@ public class CounterDistService extends MongoBaseService {
         return kpiAccessPageDTOS;
     }
 
-    public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long refId, ConfLevel level) {
-        List<KPIAccessPageDTO> kpiAccessPageDTOSOfDashboard = counterRepository.getKPIAcceccPage(refId, level);
-        List<KPIAccessPageDTO> kpiAccessPageDTOS = genericIntegrationService.getKPIEnabledTabsForModuleForCountry(refId);
+    public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId,Long unitId, ConfLevel level) {
+        List<KPIAccessPageDTO> kpiAccessPageDTOSOfDashboard = counterRepository.getKPIAcceccPage(countryId, level);
+        List<KPIAccessPageDTO> kpiAccessPageDTOS = genericIntegrationService.getKPIEnabledTabsForModuleForUnit(unitId);
         setKPIAccessPage(kpiAccessPageDTOSOfDashboard, kpiAccessPageDTOS);
         return kpiAccessPageDTOS;
     }
@@ -82,6 +82,7 @@ public class CounterDistService extends MongoBaseService {
         if (kpiAccessPages.isEmpty() || kpiAccessPageDTOS.isEmpty()) return;
         Map<String, List<KPIAccessPageDTO>> accessPageMap = new HashMap<>();
         kpiAccessPages.stream().forEach(kpiAccessPageDTO -> {
+            kpiAccessPageDTO.getChild().forEach(kpiAccessPageDto->kpiAccessPageDto.setActive(true));
             accessPageMap.put(kpiAccessPageDTO.getModuleId(), kpiAccessPageDTO.getChild());
         });
         kpiAccessPageDTOS.stream().forEach(kpiAccessPageDTO -> {
