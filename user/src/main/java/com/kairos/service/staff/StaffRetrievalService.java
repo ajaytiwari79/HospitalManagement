@@ -260,7 +260,8 @@ public class StaffRetrievalService {
     }
 
     public List<StaffDTO> getStaffByUnit(Long unitId) {
-        List<Staff> staffs = staffGraphRepository.getAllStaffByUnitId(unitId);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        List<Staff> staffs = staffGraphRepository.getAllStaffByUnitId(organization.getId());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs, StaffDTO.class);
     }
 
