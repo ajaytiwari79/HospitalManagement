@@ -1184,7 +1184,7 @@ public class ShiftService extends MongoBaseService {
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
-        ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeZone,phaseMap,timeAttendanceGracePeriod, shifts, shiftStatesList);
+        ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeZone,phaseMap, shifts, shiftStatesList);
         List<TimeAndAttendanceDTO> timeAndAttendance=timeAndAttendanceRepository.findAllAttendanceByStaffIds(Arrays.asList(staffId),unitId,DateUtils.asDate(DateUtils.asLocalDate(shiftStartDate).minusDays(1)),shiftStartDate);
         return new CompactViewDTO(Arrays.asList(new DetailViewDTO(staffId,shiftDetailViewDTO,(CollectionUtils.isNotEmpty(timeAndAttendance))?timeAndAttendance.get(0).getAttendanceTimeSlot():new ArrayList<>())),reasonCodeDTOS);
     }
@@ -1365,7 +1365,7 @@ public class ShiftService extends MongoBaseService {
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         Map<Long, List<Shift>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
         Map<Long, List<ShiftState>> shiftStateMap = shiftStates.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
-        List<DetailViewDTO> shiftDetailViewDTOMap =staffIds.stream().map(staffId->new DetailViewDTO(staffId,getShiftDetailsOfStaff(timeZone,phaseMap,timeAttendanceGracePeriod, shiftsMap.getOrDefault(staffId, new ArrayList<>()), shiftStateMap.getOrDefault(staffId, new ArrayList<>())),staffsTimeAndAttendance.getOrDefault(staffId,new ArrayList<>()))).collect(Collectors.toList());
+        List<DetailViewDTO> shiftDetailViewDTOMap =staffIds.stream().map(staffId->new DetailViewDTO(staffId,getShiftDetailsOfStaff(timeZone,phaseMap, shiftsMap.getOrDefault(staffId, new ArrayList<>()), shiftStateMap.getOrDefault(staffId, new ArrayList<>())),staffsTimeAndAttendance.getOrDefault(staffId,new ArrayList<>()))).collect(Collectors.toList());
         return new CompactViewDTO(shiftDetailViewDTOMap, reasonCodeDTOS);
     }
 
