@@ -21,6 +21,14 @@ public class AccessorPartyResponseDTO {
 
     private LocalDate suggestedDate;
 
+    public AccessorPartyResponseDTO(Long id, String name, Long organizationId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
+        this.id = id;
+        this.name = name;
+        this.organizationId = organizationId;
+        this.suggestedDataStatus = suggestedDataStatus;
+        this.suggestedDate = suggestedDate;
+    }
+
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
     public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }

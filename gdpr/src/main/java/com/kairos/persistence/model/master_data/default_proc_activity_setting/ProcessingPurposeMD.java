@@ -1,18 +1,18 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
-import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.common.BaseEntity;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document
-public class DataSource extends  MongoBaseEntity {
+@Entity
+public class ProcessingPurposeMD extends BaseEntity {
 
 
-    @NotBlank(message = "Name can't be empty")
+    @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
     @Pattern(message = "Number and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -37,6 +37,7 @@ public class DataSource extends  MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
+
     public String getName() {
         return name.trim();
     }
@@ -45,16 +46,15 @@ public class DataSource extends  MongoBaseEntity {
         this.name = name;
     }
 
-    public DataSource(@NotBlank(message = "Name can't be empty")  String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+    public ProcessingPurposeMD(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
         this.name = name;
         this.countryId = countryId;
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
-    public DataSource(String name) {
+    public ProcessingPurposeMD(String name) {
         this.name = name;
     }
-
-    public DataSource() {
+    public ProcessingPurposeMD() {
     }
 }

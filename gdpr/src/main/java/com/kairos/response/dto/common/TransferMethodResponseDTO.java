@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class TransferMethodResponseDTO {
 
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -19,6 +19,14 @@ public class TransferMethodResponseDTO {
     private SuggestedDataStatus suggestedDataStatus;
 
     private LocalDate suggestedDate;
+
+    public TransferMethodResponseDTO(Long id, String name, Long organizationId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
+        this.id = id;
+        this.name = name;
+        this.organizationId = organizationId;
+        this.suggestedDataStatus = suggestedDataStatus;
+        this.suggestedDate = suggestedDate;
+    }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
@@ -32,9 +40,9 @@ public class TransferMethodResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

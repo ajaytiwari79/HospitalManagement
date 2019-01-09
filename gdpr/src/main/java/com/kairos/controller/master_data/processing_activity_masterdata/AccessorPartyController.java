@@ -50,7 +50,7 @@ public class AccessorPartyController {
 
     @ApiOperation("get AccessorParty by id")
     @GetMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger accessorPartyId) {
+    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId, @PathVariable Long accessorPartyId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId, accessorPartyId));
     }
 
@@ -63,20 +63,20 @@ public class AccessorPartyController {
 
     @ApiOperation("delete AccessorParty  by id")
     @DeleteMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger accessorPartyId) {
+    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long countryId, @PathVariable Long accessorPartyId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(countryId, accessorPartyId));
 
     }
 
     @ApiOperation("update AccessorParty by id")
     @PutMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable Long accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(countryId, accessorPartyId, accessorParty));
     }
 
     @ApiOperation("update Suggested status of Accessor Party")
     @PutMapping("/accessor_party")
-    public ResponseEntity<Object> updateSuggestedStatusOfAccessorParties(@PathVariable Long countryId, @RequestBody Set<BigInteger> accessorPartyIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfAccessorParties(@PathVariable Long countryId, @RequestBody Set<Long> accessorPartyIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(accessorPartyIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Accessor Party is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

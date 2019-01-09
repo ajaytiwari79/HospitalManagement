@@ -50,7 +50,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/legal_basis/{processingLegalBasisId}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger processingLegalBasisId) {
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long processingLegalBasisId) {
       return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, processingLegalBasisId));
     }
 
@@ -63,7 +63,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
     @DeleteMapping("/legal_basis/{processingLegalBasisId}")
-    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger processingLegalBasisId) {
+    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long processingLegalBasisId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(countryId, processingLegalBasisId));
 
     }
@@ -71,13 +71,13 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/legal_basis/{processingLegalBasisId}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger processingLegalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long processingLegalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
              return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, processingLegalBasisId, legalBasis));
     }
 
     @ApiOperation("update Suggested status of Processing Legal Basis")
     @PutMapping("/legal_basis")
-    public ResponseEntity<Object> updateSuggestedStatusOfProcessingLegalBasisList(@PathVariable Long countryId, @RequestBody Set<BigInteger> processingLegalBasisIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfProcessingLegalBasisList(@PathVariable Long countryId, @RequestBody Set<Long> processingLegalBasisIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(processingLegalBasisIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Legal Basis is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
