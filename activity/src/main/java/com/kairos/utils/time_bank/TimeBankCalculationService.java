@@ -37,6 +37,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -80,6 +81,7 @@ public class TimeBankCalculationService {
     private PayOutCalculationService payOutCalculationService;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private ExceptionService exceptionService;
 
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
 
@@ -210,10 +212,12 @@ public class TimeBankCalculationService {
      * @param unitPosition
      */
     public void calculateScheduleAndDurationHour(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
+        if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())){
+            exceptionService.invalidRequestException("activity.end_date.less_than.start_date",shiftActivity.getActivityName());
+        }
         int scheduledMinutes = 0;
         int duration = 0;
         int weeklyMinutes;
-
         switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 duration = shiftActivity.getDurationMinutes();
