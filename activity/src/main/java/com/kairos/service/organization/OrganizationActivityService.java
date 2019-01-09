@@ -385,7 +385,8 @@ public class OrganizationActivityService extends MongoBaseService {
         OrderAndActivityDTO orderAndActivityDTO = new OrderAndActivityDTO();
         orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
-        orderAndActivityDTO.setMinOpenShiftHours(unitSettingRepository.getMinOpenShiftHours(unitId).getOpenShiftPhaseSetting().getMinOpenShiftHours());
+        UnitSettingDTO unitSettingDTO = unitSettingRepository.getMinOpenShiftHours(unitId);
+        orderAndActivityDTO.setMinOpenShiftHours(unitSettingDTO!=null ? unitSettingDTO.getOpenShiftPhaseSetting().getMinOpenShiftHours() : null);
         orderAndActivityDTO.setCounters(counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT));
         return orderAndActivityDTO;
     }

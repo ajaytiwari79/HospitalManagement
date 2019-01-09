@@ -2,7 +2,7 @@ package com.kairos.service.expertise;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
+import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
@@ -51,7 +51,7 @@ public class ExpertiseUnitService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
         Long countryId=organization.isParentOrganization()?organization.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
-        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         List<ExpertiseQueryResult> expertises = new ArrayList<>();
         if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
             expertises = expertiseGraphRepository.findExpertiseByOrganizationServicesAndLevelForUnit(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());

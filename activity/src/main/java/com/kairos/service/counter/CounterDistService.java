@@ -98,7 +98,8 @@ public class CounterDistService extends MongoBaseService {
         }
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level);
         if (kpidtos.isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+            logger.info("KPI not found for Unit id "+refId);
+            //exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
         return kpidtos;
     }
