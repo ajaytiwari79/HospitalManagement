@@ -312,6 +312,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.absenceReasonCodeId' : 1,\n" +
                 "        'activities.reasonCodeId' : 1,\n" +
                 "        'activities.remarks' : 1,\n" +
+                "        'activities.backgroundColor' : 1,\n" +
                 "        'activities.activityName':1,\n" +
                 "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
                 "      }\n" +
