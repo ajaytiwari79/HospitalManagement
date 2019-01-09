@@ -95,5 +95,12 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.renewTimeBankOfShifts());
     }
 
+    @ApiOperation("Remove duplicate Timebank Entryies")
+    @DeleteMapping("/remove_duplicate_timebank")
+    public ResponseEntity<Map<String,Object>> deleteDuplicateEntry(){
+        timeBankService.deleteDuplicateEntry();
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
 
 }
