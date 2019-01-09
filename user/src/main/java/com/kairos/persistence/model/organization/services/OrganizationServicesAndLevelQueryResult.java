@@ -5,11 +5,11 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import java.util.List;
 
 @QueryResult
-public class organizationServicesAndLevelQueryResult {
+public class OrganizationServicesAndLevelQueryResult {
     private List<Long> servicesId;
     private Long levelId;
 
-    public organizationServicesAndLevelQueryResult() {
+    public OrganizationServicesAndLevelQueryResult() {
         //dc
     }
 
