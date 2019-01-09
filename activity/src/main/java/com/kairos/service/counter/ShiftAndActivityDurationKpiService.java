@@ -41,45 +41,45 @@ public class ShiftAndActivityDurationKpiService implements  CounterService {
 
     private List<CommonKpiDataUnit> calculateDurationOfShiftAndActivity(List<ShiftWithActivityDTO> shiftWithActivityDTOS,LocalDate startDate,LocalDate endDate) {
         List<CommonKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
-        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue=new ArrayList<>();
-
         if (CollectionUtils.isNotEmpty(shiftWithActivityDTOS)) {
-            Map<LocalDate,Integer> dateAndTotalDurationMinutesMap=new HashMap<>();
-            Map<String,Integer> activityNameAndTotalDurationMinutesMap=new HashMap<>();
             Map<String,String> activityNameAndColorCodeMap=new HashMap<>();
             Map<LocalDate, List<ShiftWithActivityDTO>> dateAndShiftWithActivityMap = shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(t -> asLocalDate(t.getStartDate()), Collectors.toList()));
             while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
+                Double shiftDurationMinutes=0.0;
+                List<ClusteredBarChartKpiDataUnit> subClusteredBarValue=new ArrayList<>();
+                Map<String,Integer> activityNameAndTotalDurationMinutesMap=new HashMap<>();
                 List<ShiftWithActivityDTO> shiftWithActivityDTO = dateAndShiftWithActivityMap.get(startDate);
                 if(CollectionUtils.isNotEmpty(shiftWithActivityDTO)) {
-                    shiftWithActivityDTO.forEach(shift -> {
+                    for (ShiftWithActivityDTO shift : shiftWithActivityDTO) {
                         shift.getActivities().forEach(activity -> {
                             int activityDuration = activityNameAndTotalDurationMinutesMap.getOrDefault(activity.getActivityName(),0);
                             activityNameAndTotalDurationMinutesMap.put(activity.getActivityName(), activityDuration + activity.getDurationMinutes());
                             activityNameAndColorCodeMap.putIfAbsent(activity.getActivityName(),activity.getBackgroundColor());
                         });
-                        int shiftDuration = dateAndTotalDurationMinutesMap.getOrDefault(asLocalDate(shift.getStartDate()),0);
-                        dateAndTotalDurationMinutesMap.put(asLocalDate(shift.getStartDate()), shiftDuration + shift.getDurationMinutes());
-                    });
+                        shiftDurationMinutes=shiftDurationMinutes+shift.getDurationMinutes();
+                    }
                 }
+                activityNameAndTotalDurationMinutesMap.keySet().forEach(s -> subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(s,activityNameAndColorCodeMap.get(s),DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(s)))));
+                clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(startDate.toString(),DateUtils.getHoursByMinutes(shiftDurationMinutes),subClusteredBarValue));
                 startDate = startDate.plusDays(1);
-
             }
-            activityNameAndTotalDurationMinutesMap.keySet().forEach(s -> subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(s,activityNameAndColorCodeMap.get(s),DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(s)))));
-            dateAndTotalDurationMinutesMap.keySet().forEach(s -> clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(s.toString(),DateUtils.getHoursByMinutes(dateAndTotalDurationMinutesMap.get(s)),subClusteredBarValue)));
         }
         return clusteredBarChartKpiDataUnits;
     }
 
     private List<CommonKpiDataUnit> getDurationOfShiftAndActivity(Long organizationId, Map<FilterType, List> filterBasedCriteria){
-        List<DayOfWeek> daysOfWeek=filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK)?filterBasedCriteria.get(FilterType.DAYS_OF_WEEK): Stream.of(DayOfWeek.values()).map(dayOfWeek -> DayOfWeek.valueOf(dayOfWeek.toString())).collect(Collectors.toList());
+        List<DayOfWeek> daysOfWeek=filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK)?KPIUtils.getDaysOfWeekOfString(filterBasedCriteria.get(FilterType.DAYS_OF_WEEK)): Stream.of(DayOfWeek.values()).map(dayOfWeek -> DayOfWeek.valueOf(dayOfWeek.toString())).collect(Collectors.toList());
         List<Long> staffIds=filterBasedCriteria.containsKey(FilterType.STAFF_IDS)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
         List<LocalDate> filterDates = filterBasedCriteria.containsKey(FilterType.TIME_INTERVAL)? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
-        List<BigInteger> activitiesIds = filterBasedCriteria.containsKey(FilterType.ACTIVITY_IDS)? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
+        List<BigInteger> activitiesIds = filterBasedCriteria.containsKey(FilterType.ACTIVITY_IDS)? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.ACTIVITY_IDS)):new ArrayList();
         List<Long> employmentTypes =filterBasedCriteria.containsKey(FilterType.EMPLOYMENT_TYPE)?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,new ArrayList<>(),employmentTypes,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         staffIds=staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
-        List<Integer> dayOfWeeksNo=daysOfWeek.stream().map(dayOfWeek -> dayOfWeek.getValue()).collect(Collectors.toList());
+        List<Integer> dayOfWeeksNo=new ArrayList<>();
+        daysOfWeek.forEach(dayOfWeek -> {
+           dayOfWeeksNo.add((dayOfWeek.getValue()<7)?dayOfWeek.getValue()+1:1);
+        });
         List<ShiftWithActivityDTO> shiftWithActivityDTOS=shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds,activitiesIds,dayOfWeeksNo,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         return calculateDurationOfShiftAndActivity(shiftWithActivityDTOS,filterDates.get(0),filterDates.get(1));
     }
