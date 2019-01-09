@@ -2,6 +2,7 @@ package com.kairos.utils.service_util;
 
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
@@ -55,9 +56,30 @@ public class StaffingLevelUtil {
     public static StaffingLevel updateStaffingLevels(BigInteger staffingLevelId, PresenceStaffingLevelDto presenceStaffingLevelDTO,
                                                      Long unitId, StaffingLevel staffingLevel){
 
-        BeanUtils.copyProperties(presenceStaffingLevelDTO,staffingLevel);
+        staffingLevel.setStaffingLevelSetting(presenceStaffingLevelDTO.getStaffingLevelSetting());
+        staffingLevel.setPhaseId(presenceStaffingLevelDTO.getPhaseId());
+        int i = 0;
+        for(StaffingLevelInterval staffingLevelInterval:staffingLevel.getPresenceStaffingLevelInterval()) {
+            StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO = presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(i);
+            staffingLevelInterval.setMinNoOfStaff(staffingLevelTimeSlotDTO.getMinNoOfStaff());
+            staffingLevelInterval.setMaxNoOfStaff(staffingLevelTimeSlotDTO.getMaxNoOfStaff());
+            staffingLevelInterval.setSequence(staffingLevelTimeSlotDTO.getSequence());
+            Map<BigInteger,StaffingLevelActivity> staffingLevelActivityMap = staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, v -> v));
+            Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
+            for(StaffingLevelActivity staffingLevelActivity:staffingLevelTimeSlotDTO.getStaffingLevelActivities()) {
+                StaffingLevelActivity staffingLevelActivityNew = new StaffingLevelActivity(staffingLevelActivity.getActivityId(),staffingLevelActivity.getName(),
+                        staffingLevelActivity.getMinNoOfStaff(),staffingLevelActivity.getMaxNoOfStaff());
+                if(staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
+                    staffingLevelActivityNew.setAvailableNoOfStaff(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()).getAvailableNoOfStaff());
+                }
+              staffingLevelActivities.add(staffingLevelActivityNew);
+            }
+            staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
+            i++;
+        }
         staffingLevel.setUnitId(unitId);
         staffingLevel.setId(staffingLevelId);
+
         return staffingLevel;
 
     }
