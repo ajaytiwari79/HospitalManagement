@@ -2,6 +2,7 @@ package com.kairos.dto.user.staff.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
@@ -69,6 +70,8 @@ public class UnitPositionDTO {
     private Long accessGroupId;
     private boolean mainUnitPosition;
     private float taxDeductionPercentage;
+    private ExpertiseResponseDTO expertise;
+
 
 
 
@@ -339,5 +342,13 @@ public class UnitPositionDTO {
 
     public void setTaxDeductionPercentage(float taxDeductionPercentage) {
         this.taxDeductionPercentage = taxDeductionPercentage;
+    }
+
+    public ExpertiseResponseDTO getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(ExpertiseResponseDTO expertise) {
+        this.expertise = expertise;
     }
 }
