@@ -118,8 +118,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
         CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false, countryDTO);
-        Long userId = UserContext.getUserDetails().getId();
-        ctaRuleTemplate.setLastModifiedBy(userId);
         ctaRuleTemplate.setCountryId(countryId);
         ctaRuleTemplate.setStaffFunctions(null);
         this.save(ctaRuleTemplate);
@@ -463,7 +461,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         CTARuleTemplate udpdateCtaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
         this.buildCTARuleTemplate(udpdateCtaRuleTemplate, ctaRuleTemplateDTO, true, countryDTO);
         udpdateCtaRuleTemplate.setId(ctaRuleTemplate.getId());
-        udpdateCtaRuleTemplate.setLastModifiedBy(UserContext.getUserDetails().getId());
         udpdateCtaRuleTemplate.setCountryId(countryId);
         this.save(udpdateCtaRuleTemplate);
         return ctaRuleTemplateDTO;
@@ -556,7 +553,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         costTimeAgreement.setUnitPositionId(unitPositionId);
         List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
-        costTimeAgreement.setCreatedBy(UserContext.getUserDetails().getId());
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         save(costTimeAgreement);
 

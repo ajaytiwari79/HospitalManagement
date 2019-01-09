@@ -10,6 +10,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -693,7 +694,15 @@ public class StaffRetrievalService {
     public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, Long unitPositionId, Long unitId) {
         StaffUnitPositionDetails unitPosition = null;
         if(Optional.ofNullable(unitPositionId).isPresent()) {
-            unitPosition = unitPositionService.findAppliedFunctionsAtUnitPosition(unitPositionId, shiftDate);
+            unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId);
+            List<AppliedFunctionDTO> appliedFunctionDTOS = new ArrayList<>();
+            for (AppliedFunctionDTO appliedFunctionDTO : unitPosition.getAppliedFunctions()) {
+                boolean valid = appliedFunctionDTO.getAppliedDates().stream().filter(localDate -> localDate.equals(shiftDate)).findAny().isPresent();
+                if(valid){
+                    appliedFunctionDTOS.add(appliedFunctionDTO);
+                }
+            }
+            unitPosition.setAppliedFunctions(appliedFunctionDTOS);
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO =null;
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId,ReasonCodeType.ABSENCE);
