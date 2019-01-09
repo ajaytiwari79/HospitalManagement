@@ -13,6 +13,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,10 +69,9 @@ public class ShiftTemplateService extends MongoBaseService {
         });
         save(individualShiftTemplates);
         Set<BigInteger> individualShiftTemplateIds= individualShiftTemplates.stream().map(i->i.getId()).collect(Collectors.toSet());
-        ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
+        ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId);
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
-        shiftTemplateDTO.setCreatedBy(shiftTemplate.getCreatedBy());
         shiftTemplateDTO.setUnitId(unitId);
         return shiftTemplateDTO;
     }
@@ -104,9 +104,7 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
-        ShiftTemplate existingShiftTemplate = shiftTemplate;
         shiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(shiftTemplateDTO,ShiftTemplate.class);
-        shiftTemplate.setCreatedBy(existingShiftTemplate.getCreatedBy());
        // ObjectMapperUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
         save(shiftTemplate);
         return shiftTemplateDTO;
@@ -167,6 +165,7 @@ public class ShiftTemplateService extends MongoBaseService {
 
     public ShiftWithViolatedInfoDTO createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
         List<ShiftDTO> shifts = new ArrayList<>();
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO=new ShiftWithViolatedInfoDTO();
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplate().getId());
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
@@ -176,6 +175,7 @@ public class ShiftTemplateService extends MongoBaseService {
             newShiftDTO.setId(null);
             newShiftDTO.setStaffId(shiftDTO.getStaffId());
             newShiftDTO.setUnitPositionId(shiftDTO.getUnitPositionId());
+            newShiftDTO.setShiftDate(shiftDTO.getShiftDate());
             List<ShiftActivityDTO> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
                 Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(),shiftTemplateActivity.getStartTime());
@@ -184,10 +184,13 @@ public class ShiftTemplateService extends MongoBaseService {
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
-            newShiftDTO = shiftService.createShift(unitId, newShiftDTO, "Organization",false).getShifts().get(0);
+            ShiftWithViolatedInfoDTO result=shiftService.createShift(unitId, newShiftDTO, "Organization",false);
+            if(CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())){
+                shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(result.getViolatedRules().getActivities());
+            }
             shifts.add(newShiftDTO);
         });
-        return new ShiftWithViolatedInfoDTO(shifts,new ViolatedRulesDTO());
+        return shiftWithViolatedInfoDTO;
     }
 
 

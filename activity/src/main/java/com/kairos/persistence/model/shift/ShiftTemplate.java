@@ -11,17 +11,15 @@ public class ShiftTemplate extends MongoBaseEntity {
     private String name;
     private Set<BigInteger> individualShiftTemplateIds;
     private Long unitId;
-    private Long createdBy;
 
     public ShiftTemplate() {
         //Default Constructor
     }
 
-    public ShiftTemplate(String name, Set<BigInteger> individualShiftTemplateIds, Long unitId, Long createdBy) {
+    public ShiftTemplate(String name, Set<BigInteger> individualShiftTemplateIds, Long unitId) {
         this.name = name;
         this.individualShiftTemplateIds = individualShiftTemplateIds;
         this.unitId = unitId;
-        this.createdBy = createdBy;
     }
 
     public String getName() {
@@ -48,11 +46,4 @@ public class ShiftTemplate extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 }

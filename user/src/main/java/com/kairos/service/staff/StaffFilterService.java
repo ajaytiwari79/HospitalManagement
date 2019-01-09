@@ -275,7 +275,7 @@ public class StaffFilterService {
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
-        staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
+        staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
         staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));

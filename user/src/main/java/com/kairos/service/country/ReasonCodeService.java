@@ -135,7 +135,7 @@ public class ReasonCodeService {
         return true;
     }
 
-   public void createDefalutDateForUnit(Organization organization,long countryId){
+   public void createDefalutDataForUnit(Organization organization, long countryId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
        createDefaultData(reasonCodeResponseDTO,organization);
    }

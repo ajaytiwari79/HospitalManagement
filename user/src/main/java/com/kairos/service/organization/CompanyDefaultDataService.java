@@ -54,8 +54,13 @@ public class CompanyDefaultDataService {
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) throws InterruptedException, ExecutionException {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
         units.forEach(unit -> {
+                orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
+                orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
+                orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
+
+                activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
                 asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
-                asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
+                //asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
                 asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForSubUnit(unit,parentId));
@@ -84,7 +89,7 @@ public class CompanyDefaultDataService {
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis()));
         orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId()));
-        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForUnit(organization,countryId));
+        asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForUnit(organization,countryId));
         asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,organization.getId()));
         futureList.forEach(data -> {
             try {
