@@ -56,8 +56,8 @@ public class MasterProcessingActivityServiceTest {
         MasterProcessingActivityDTO processingActivity = new MasterProcessingActivityDTO();
         processingActivity.setName("processing Activity");
         processingActivity.setDescription("Activity  description ");
-        processingActivity.setOrganizationSubTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
-        processingActivity.setOrganizationTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
+        processingActivity.setOrganizationSubTypes(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
+        processingActivity.setOrganizationTypes(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
         processingActivity.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategoryDTO(35l, "poiuy"))));
         processingActivity.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategoryDTO(34l, "abc"))));
 

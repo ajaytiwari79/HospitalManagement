@@ -22,10 +22,10 @@ public interface MasterAssetRepository extends JpaRepository<MasterAssetMD,Long>
     @Query(value = "Select MA from MasterAssetMD MA where MA.countryId = ?2 and lower(MA.name) = lower(?1) and MA.deleted = false")
     MasterAssetMD findByNameAndCountryId(String name, Long countryId);
 
-    @Query(value = "Select MA from MasterAssetMD MA where MA.countryId = ?1 and deleted = false")
+    @Query(value = "Select MA from MasterAssetMD MA where MA.countryId = ?1 and MA.deleted = false")
     List<MasterAssetMD> findAllByCountryId(Long countryId);
 
-    @Query(value = "Select MA from MasterAssetMD MA where MA.countryId = ?1 and MA.id = ?2 and deleted = false")
+    @Query(value = "Select MA from MasterAssetMD MA where MA.countryId = ?1 and MA.id = ?2 and MA.deleted = false")
     MasterAssetMD getMasterAssetByCountryIdAndId(Long countryId, Long id);
 
     @Transactional

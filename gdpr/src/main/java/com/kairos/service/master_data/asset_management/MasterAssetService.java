@@ -22,14 +22,12 @@ import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -97,11 +95,11 @@ public class MasterAssetService extends MongoBaseService {
         List<OrganizationSubType> organizationSubTypes = new ArrayList<>();
         List<ServiceCategory> serviceCategories = new ArrayList<>();
         List<SubServiceCategory> subServiceCategories = new ArrayList<>();
-        for(OrganizationTypeDTO organizationTypeDTO : masterAssetDto.getOrganizationTypeDTOS()){
+        for(OrganizationTypeDTO organizationTypeDTO : masterAssetDto.getOrganizationTypes()){
             OrganizationType orgType = new OrganizationType(organizationTypeDTO.getId(), organizationTypeDTO.getName());
             organizationTypes.add(orgType);
         }
-        for(OrganizationSubTypeDTO organizationSubTypeDTO : masterAssetDto.getOrganizationSubTypeDTOS()){
+        for(OrganizationSubTypeDTO organizationSubTypeDTO : masterAssetDto.getOrganizationSubTypes()){
             OrganizationSubType orgSubType = new OrganizationSubType(organizationSubTypeDTO.getId(), organizationSubTypeDTO.getName());
             organizationSubTypes.add(orgSubType);
         }

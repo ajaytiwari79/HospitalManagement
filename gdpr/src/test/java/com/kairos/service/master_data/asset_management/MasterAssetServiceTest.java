@@ -60,8 +60,8 @@ public class MasterAssetServiceTest {
         MasterAssetDTO assetDTO = new MasterAssetDTO();
         assetDTO.setName("Unique name Asset");
         assetDTO.setDescription("asset abc description ");
-        assetDTO.setOrganizationSubTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
-        assetDTO.setOrganizationTypeDTOS(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
+        assetDTO.setOrganizationSubTypes(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
+        assetDTO.setOrganizationTypes(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
         assetDTO.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategoryDTO(35l, "poiuy"))));
         assetDTO.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategoryDTO(34l, "abc"))));
         assetDTO.setAssetTypeId(assetTypeId);

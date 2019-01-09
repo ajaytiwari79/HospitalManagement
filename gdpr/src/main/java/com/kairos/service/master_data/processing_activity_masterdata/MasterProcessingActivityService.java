@@ -5,16 +5,19 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
-import com.kairos.dto.gdpr.BasicRiskDTO;
-import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationSubType;
+import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationType;
+import com.kairos.persistence.model.master_data.default_asset_setting.ServiceCategory;
+import com.kairos.persistence.model.master_data.default_asset_setting.SubServiceCategory;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivityMD;
 import com.kairos.persistence.model.risk_management.Risk;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityMDRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
@@ -62,6 +65,9 @@ public class MasterProcessingActivityService extends MongoBaseService {
     @Inject
     private GenericRestClient restClient;
 
+    @Inject
+    private MasterProcessingActivityMDRepository masterProcessingActivityMDRepository;
+
 
     /**
      * @param countryId
@@ -71,29 +77,60 @@ public class MasterProcessingActivityService extends MongoBaseService {
      */
     public MasterProcessingActivityDTO createMasterProcessingActivity(Long countryId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
-        if (masterProcessingActivityRepository.findByName(countryId, masterProcessingActivityDto.getName()) != null) {
+        if (masterProcessingActivityMDRepository.findByNameAndCountryId(masterProcessingActivityDto.getName(), countryId) != null) {
             exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
         }
-        MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, masterProcessingActivityDto.getOrganizationTypeDTOS()
-                , masterProcessingActivityDto.getOrganizationSubTypeDTOS(), masterProcessingActivityDto.getOrganizationServices(), masterProcessingActivityDto.getOrganizationSubServices());
-        Map<String, Object> subProcessingActivity = new HashMap<>();
+        MasterProcessingActivityMD masterProcessingActivity = new MasterProcessingActivityMD(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, countryId);
+        masterProcessingActivity = getMetadataOfMasterProcessingActivity(masterProcessingActivityDto, masterProcessingActivity);
+        masterProcessingActivity.setSubProcessActivity(false);
         if (Optional.ofNullable(masterProcessingActivityDto.getSubProcessingActivities()).isPresent() && !masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
-            subProcessingActivity = createNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
+            List<MasterProcessingActivityMD> subProcessingActivity = createNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivity);
             masterProcessingActivity.setHasSubProcessingActivity(true);
-            masterProcessingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
+            masterProcessingActivity.setSubProcessingActivities(subProcessingActivity);
         }
-        masterProcessingActivity.setCountryId(countryId);
         try {
-            masterProcessingActivity = masterProcessingActivityRepository.save(masterProcessingActivity);
-        } catch (MongoClientException e) {
-            masterProcessingActivityRepository.deleteAll((List<MasterProcessingActivity>) subProcessingActivity.get(PROCESSING_ACTIVITIES));
-            LOGGER.info(e.getMessage());
-            throw new MongoClientException(e.getMessage());
+            masterProcessingActivity = masterProcessingActivityMDRepository.save(masterProcessingActivity);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
         }
         masterProcessingActivityDto.setId(masterProcessingActivity.getId());
         return masterProcessingActivityDto;
+    }
+
+    /**
+     *  This method is used to fetch all the metadata related to master asset from DTO like organisationType,
+     *  organisationSubType, Service Category and Sub Service Category
+     *
+     * @param masterProcessingActivityDto
+     * @return
+     */
+    //TODO need to make common method for asset and processing activity and others
+    private MasterProcessingActivityMD getMetadataOfMasterProcessingActivity(MasterProcessingActivityDTO masterProcessingActivityDto, MasterProcessingActivityMD masterProcessingActivity){
+        List<OrganizationType> organizationTypes = new ArrayList<>();
+        List<OrganizationSubType> organizationSubTypes = new ArrayList<>();
+        List<ServiceCategory> serviceCategories = new ArrayList<>();
+        List<SubServiceCategory> subServiceCategories = new ArrayList<>();
+        for(OrganizationTypeDTO organizationTypeDTO : masterProcessingActivityDto.getOrganizationTypes()){
+            OrganizationType orgType = new OrganizationType(organizationTypeDTO.getId(), organizationTypeDTO.getName());
+            organizationTypes.add(orgType);
+        }
+        for(OrganizationSubTypeDTO organizationSubTypeDTO : masterProcessingActivityDto.getOrganizationSubTypes()){
+            OrganizationSubType orgSubType = new OrganizationSubType(organizationSubTypeDTO.getId(), organizationSubTypeDTO.getName());
+            organizationSubTypes.add(orgSubType);
+        }
+        for(ServiceCategoryDTO category : masterProcessingActivityDto.getOrganizationServices()){
+            ServiceCategory serviceCategory = new ServiceCategory(category.getId(), category.getName());
+            serviceCategories.add(serviceCategory);
+        }
+        for(SubServiceCategoryDTO subCategory : masterProcessingActivityDto.getOrganizationSubServices()){
+            SubServiceCategory subServiceCategory = new SubServiceCategory(subCategory.getId(), subCategory.getName());
+            subServiceCategories.add(subServiceCategory);
+        }
+        masterProcessingActivity.setOrganizationTypes(organizationTypes);
+        masterProcessingActivity.setOrganizationSubTypes(organizationSubTypes);
+        masterProcessingActivity.setOrganizationServices(serviceCategories);
+        masterProcessingActivity.setOrganizationSubServices(subServiceCategories);
+        return masterProcessingActivity;
     }
 
 
@@ -103,29 +140,23 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param parentProcessingActivity required to get organization types ,sub types and Services category and Sub Service Category list for sub processing activity
      * @return return map of Sub processing activities list and ids of sub processing activity
      */
-    public Map<String, Object> createNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
+    public List<MasterProcessingActivityMD> createNewSubProcessingActivity(Long countryId,
+                      List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityMD parentProcessingActivity) {
 
         List<String> checkDuplicateInSubProcess = new ArrayList<>();
-        List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
+        List<MasterProcessingActivityMD> subProcessingActivityList = new ArrayList<>();
         for (MasterProcessingActivityDTO activity : subProcessingActivities) {
             if (checkDuplicateInSubProcess.contains(activity.getName())) {
                 throw new DuplicateDataException("Duplicate Sub processing Activity " + activity.getName());
             }
             checkDuplicateInSubProcess.add(activity.getName());
-            MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(activity.getName(), activity.getDescription(), SuggestedDataStatus.APPROVED, parentProcessingActivity.getOrganizationTypeDTOS()
-                    , parentProcessingActivity.getOrganizationSubTypeDTOS(), parentProcessingActivity.getOrganizationServices(), parentProcessingActivity.getOrganizationSubServices());
-            subProcessingActivity.setCountryId(countryId);
-            subProcessingActivity.setSubProcess(true);
+            MasterProcessingActivityMD subProcessingActivity = new MasterProcessingActivityMD(activity.getName(), activity.getDescription(), SuggestedDataStatus.APPROVED, countryId);
+            subProcessingActivity.setSubProcessActivity(true);
+            subProcessingActivity.setMasterProcessingActivity(parentProcessingActivity);
+            subProcessingActivity = getMetadataOfMasterProcessingActivity(activity, subProcessingActivity);
             subProcessingActivityList.add(subProcessingActivity);
         }
-
-        subProcessingActivityList = masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivityList));
-        List<BigInteger> subProcessingActivityIds = new ArrayList<>();
-        subProcessingActivityList.forEach(o -> subProcessingActivityIds.add(o.getId()));
-        Map<String, Object> result = new HashMap<>();
-        result.put(IDS_LIST, subProcessingActivityIds);
-        result.put(PROCESSING_ACTIVITIES, subProcessingActivityList);
-        return result;
+       return subProcessingActivityList;
 
     }
 
@@ -139,36 +170,30 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param masterProcessingActivityDto contain list of existing(which need to be update) and new(for creating new sub process) Sub processing activities
      * @return master processing activity with sub processing activities list ids
      */
-    public MasterProcessingActivityDTO updateMasterProcessingActivityAndSubProcessingActivities(Long countryId, BigInteger id, MasterProcessingActivityDTO masterProcessingActivityDto) {
+    public MasterProcessingActivityDTO updateMasterProcessingActivityAndSubProcessingActivities(Long countryId, Long id, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
-        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByName(countryId, masterProcessingActivityDto.getName());
+        MasterProcessingActivityMD processingActivity = masterProcessingActivityMDRepository.findByNameAndCountryId(masterProcessingActivityDto.getName(), countryId);
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
             throw new DuplicateDataException("processing Activity with name Already Exist" + processingActivity.getName());
         }
-        processingActivity = masterProcessingActivityRepository.findByid(id);
+        processingActivity = masterProcessingActivityMDRepository.getOne(id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         } else {
-            Map<String, Object> subProcessingActivity;
-            if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
-                subProcessingActivity = updateExistingAndCreateNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
-                processingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
+            ;
+           if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
+               List<MasterProcessingActivityMD> subProcessingActivities = updateExistingAndCreateNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), processingActivity);
                 processingActivity.setHasSubProcessingActivity(true);
+                processingActivity.setSubProcessingActivities(subProcessingActivities);
 
             }
-            processingActivity.setOrganizationTypeDTOS(masterProcessingActivityDto.getOrganizationTypeDTOS());
-            processingActivity.setOrganizationSubTypeDTOS(masterProcessingActivityDto.getOrganizationSubTypeDTOS());
-            processingActivity.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
-            processingActivity.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationSubServices());
+            processingActivity = getMetadataOfMasterProcessingActivity(masterProcessingActivityDto, processingActivity);
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
             processingActivity.setName(masterProcessingActivityDto.getName());
             try {
-                masterProcessingActivityRepository.save(processingActivity);
+                masterProcessingActivityMDRepository.save(processingActivity);
 
-            } catch (MongoClientException e) {
-                LOGGER.info(e.getMessage());
-                throw new MongoClientException(e.getMessage());
-            } catch (Exception e) {
+            }catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
         }
@@ -182,7 +207,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return
      */
-    public Map<String, Object> updateExistingAndCreateNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
+    public List<MasterProcessingActivityMD> updateExistingAndCreateNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityMD parentProcessingActivity) {
 
         checkForDuplicacyInName(subProcessingActivities);
         List<MasterProcessingActivityDTO> updateSubProcessingActivities = new ArrayList<>();
@@ -195,22 +220,14 @@ public class MasterProcessingActivityService extends MongoBaseService {
             }
         });
 
-        Map<String, Object> updatedSubProcessingActivities = new HashMap<>();
-        List<BigInteger> subProcessingActivityIds = new ArrayList<>();
-        List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
+        List<MasterProcessingActivityMD> subProcessingActivityList = new ArrayList<>();
         if (!createNewSubProcessingActivities.isEmpty()) {
-            Map<String, Object> newSubProcessingActivities = createNewSubProcessingActivity(countryId, createNewSubProcessingActivities, parentProcessingActivity);
-            subProcessingActivityIds.addAll((List<BigInteger>) newSubProcessingActivities.get(IDS_LIST));
-            subProcessingActivityList.addAll((List<MasterProcessingActivity>) newSubProcessingActivities.get(PROCESSING_ACTIVITIES));
+            subProcessingActivityList.addAll(createNewSubProcessingActivity(countryId, createNewSubProcessingActivities, parentProcessingActivity));
         }
         if (!updateSubProcessingActivities.isEmpty()) {
-            Map<String, Object> updatedSubProcessingActivityList = updateSubProcessingActivities(countryId, updateSubProcessingActivities, parentProcessingActivity);
-            subProcessingActivityIds.addAll((Set<BigInteger>) updatedSubProcessingActivityList.get(IDS_LIST));
-            subProcessingActivityList.addAll((List<MasterProcessingActivity>) updatedSubProcessingActivityList.get(PROCESSING_ACTIVITIES));
+            subProcessingActivityList.addAll(updateSubProcessingActivities(countryId, updateSubProcessingActivities, parentProcessingActivity));
         }
-        updatedSubProcessingActivities.put(IDS_LIST, subProcessingActivityIds);
-        updatedSubProcessingActivities.put(PROCESSING_ACTIVITIES, subProcessingActivityList);
-        return updatedSubProcessingActivities;
+        return subProcessingActivityList;
 
     }
 
@@ -221,40 +238,24 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return map which contain list of ids and list of sub processing activities
      */
-    public Map<String, Object> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
+    public List<MasterProcessingActivityMD> updateSubProcessingActivities(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityMD parentProcessingActivity) {
 
 
-        Map<BigInteger, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
-        Set<BigInteger> subProcessingActivitiesIds = new HashSet<>();
-        List<String> subProcessingActivityNames = new ArrayList<>();
+        Map<Long, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
         subProcessingActivities.forEach(subProcess -> {
             subProcessingActivityDTOList.put(subProcess.getId(), subProcess);
-            subProcessingActivitiesIds.add(subProcess.getId());
-            subProcessingActivityNames.add(subProcess.getName());
         });
-        List<MasterProcessingActivity> subProcessingActivityList = masterProcessingActivityRepository.findAllMasterSubProcessingActivityByIds(countryId, subProcessingActivitiesIds);
+        List<MasterProcessingActivityMD> subProcessingActivityList = parentProcessingActivity.getSubProcessingActivities();
         subProcessingActivityList.forEach(subProcess -> {
-
             MasterProcessingActivityDTO subProcessDto = subProcessingActivityDTOList.get(subProcess.getId());
             subProcess.setName(subProcessDto.getName());
-            subProcess.setDescription(parentProcessingActivity.getDescription());
-            subProcess.setOrganizationTypeDTOS(parentProcessingActivity.getOrganizationTypeDTOS());
-            subProcess.setOrganizationSubTypeDTOS(parentProcessingActivity.getOrganizationSubTypeDTOS());
+            subProcess.setDescription(subProcessDto.getDescription());
+            subProcess.setOrganizationTypes(parentProcessingActivity.getOrganizationTypes());
+            subProcess.setOrganizationSubTypes(parentProcessingActivity.getOrganizationSubTypes());
             subProcess.setOrganizationServices(parentProcessingActivity.getOrganizationServices());
             subProcess.setOrganizationSubServices(parentProcessingActivity.getOrganizationSubServices());
         });
-        Map<String, Object> result = new HashMap<>();
-        try {
-            subProcessingActivityList = masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivityList));
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-            throw new RuntimeException(e.getMessage());
-
-        }
-
-        result.put(IDS_LIST, subProcessingActivitiesIds);
-        result.put(PROCESSING_ACTIVITIES, subProcessingActivityList);
-        return result;
+        return subProcessingActivityList;
 
     }
 

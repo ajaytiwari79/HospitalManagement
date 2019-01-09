@@ -24,13 +24,13 @@ public class MasterAssetMD extends BaseEntity {
     private List<OrganizationType> organizationTypes = new ArrayList<>();
 
     @ElementCollection
-    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();;
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
 
     @ElementCollection
-    private List <ServiceCategory> organizationServices = new ArrayList<>();;
+    private List <ServiceCategory> organizationServices = new ArrayList<>();
 
     @ElementCollection
-    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();;
+    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
 
     private Long countryId;
 

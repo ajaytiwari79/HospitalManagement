@@ -43,7 +43,7 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/master_processing_activity/update/{id}")
-    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody MasterProcessingActivityDTO processingActivityDto) {
+    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long id, @Valid @RequestBody MasterProcessingActivityDTO processingActivityDto) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivityAndSubProcessingActivities(countryId, id, processingActivityDto));
     }

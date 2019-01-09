@@ -10,14 +10,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
@@ -29,11 +28,11 @@ public class MasterProcessingActivityDTO {
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationTypeDTO> organizationTypeDTOS =new ArrayList<>();
+    private List<OrganizationTypeDTO> organizationTypes =new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS =new ArrayList<>();
+    private List<OrganizationSubTypeDTO> organizationSubTypes =new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
@@ -45,11 +44,11 @@ public class MasterProcessingActivityDTO {
 
     private List<MasterProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -77,20 +76,20 @@ public class MasterProcessingActivityDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
