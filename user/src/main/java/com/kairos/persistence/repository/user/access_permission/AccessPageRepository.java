@@ -120,8 +120,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "AND id(child)=id(ps.c) WITH r,r2,parentCustomRel,childCustomRel,ps\n" +
             "RETURN {name:ps.p.name,id:id(ps.p),\n" +
             "read:CASE WHEN parentCustomRel IS NULL THEN r.read ELSE parentCustomRel.read END ,\n" +
-            "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
-            "children:collect( DISTINCT {name:ps.c.name,id:id(ps.c),moduleId:ps.c.moduleId,\n" +
+            "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,sequence:ps.p.sequence,moduleId:ps.p.moduleId,\n" +
+            "children:collect( DISTINCT {name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,moduleId:ps.c.moduleId,\n" +
             "read:CASE WHEN childCustomRel IS NULL THEN r2.read ELSE childCustomRel.read END,\n" +
             "write:CASE WHEN childCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data\n"+
             " UNION\n" +
@@ -133,7 +133,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE customRel.accessGroupId={3}\n" +
             "RETURN {name:accessPage.name,id:id(accessPage),\n" +
             "read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END, write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,\n" +
-            "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
+            "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,sequence:accessPage.sequence,children:[]} as data")
     List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +

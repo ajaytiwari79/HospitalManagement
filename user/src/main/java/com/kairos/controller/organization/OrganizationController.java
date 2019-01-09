@@ -1452,7 +1452,7 @@ public class OrganizationController {
 
     }
     /**
-     *
+     *In this API Unit Id is the ID of the Organization in which new Unit is added.
      */
     @ApiOperation(value = "on board a unit ")
     @PostMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/on_boarding_done")

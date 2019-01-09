@@ -104,15 +104,23 @@ public class UnitService {
         return response;
     }
 
-    public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long unitId) throws InterruptedException, ExecutionException {
+    /**
+     *
+     * @param organizationBasicDTO
+     * @param parentOrgaziationId is the ID of the Organization in which new Unit is added.
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+    public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long parentOrgaziationId) throws InterruptedException, ExecutionException {
         if (organizationBasicDTO.getId() == null) {
-            companyCreationService.addNewUnit(organizationBasicDTO, unitId);
+            companyCreationService.addNewUnit(organizationBasicDTO, parentOrgaziationId);
 
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
-        Country country = organizationGraphRepository.getCountry(unitId);
-        companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), unitId);
+        Country country = organizationGraphRepository.getCountry(parentOrgaziationId);
+        companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), parentOrgaziationId);
         organizationBasicDTO.setBoardingCompleted(true);
         return organizationBasicDTO;
 

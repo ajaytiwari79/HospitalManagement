@@ -61,8 +61,8 @@ public class ShiftDetailsService extends MongoBaseService {
                     shiftActivityDTO.setReasonCode(reasonCodeDTOMap.get(shiftActivityDTO.getAbsenceReasonCodeId()));
                 }
                 shiftActivityDTO.setLocation(reasonCodeWrapper.getContactAddressData());
-                shiftActivityDTO.setWtaRuleViolations(wtaRuleViolationMap.get(shift.getId()));
             }
+            shift.setWtaRuleViolations(wtaRuleViolationMap.get(shift.getId()));
         }
     }
 
