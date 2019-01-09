@@ -527,4 +527,34 @@ public class TimeBankService extends MongoBaseService {
         shifts.forEach(shift -> shiftWithActivityDTOS.add(shiftService.convertIntoShiftWithActivity(shift, activityMap)));
         return shiftWithActivityDTOS;
     }
+
+    public void deleteDuplicateEntry(){
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllAndDeletedFalse();
+        Map<Long,TreeMap<LocalDate,DailyTimeBankEntry>> unitPositionIdAndDateMap = new TreeMap<>();
+        List<DailyTimeBankEntry> duplicateEntry = new ArrayList<>();
+        for (DailyTimeBankEntry dailyTimeBankEntry : dailyTimeBankEntries) {
+            if(unitPositionIdAndDateMap.containsKey(dailyTimeBankEntry.getUnitPositionId())){
+                Map<LocalDate,DailyTimeBankEntry> localDateDateMap = unitPositionIdAndDateMap.get(dailyTimeBankEntry.getUnitPositionId());
+                if(localDateDateMap.containsKey(dailyTimeBankEntry.getDate())){
+                    DailyTimeBankEntry dailyTimeBankEntry1 = localDateDateMap.get(dailyTimeBankEntry.getDate());
+                    if(dailyTimeBankEntry1.getUpdatedAt().after(dailyTimeBankEntry.getUpdatedAt())){
+                        duplicateEntry.add(dailyTimeBankEntry);
+                    }else {
+                        duplicateEntry.add(dailyTimeBankEntry1);
+                    }
+                }else {
+                    localDateDateMap.put(dailyTimeBankEntry.getDate(),dailyTimeBankEntry);
+                    logger.info("Date Map :"+localDateDateMap.size());
+                    logger.info("UnitPositionId Map :"+unitPositionIdAndDateMap.get(dailyTimeBankEntry.getUnitPositionId()).size());
+                }
+
+            }
+            else {
+                unitPositionIdAndDateMap.put(dailyTimeBankEntry.getUnitPositionId(),new TreeMap<>());
+            }
+        }
+        logger.info("Duplicate remove entry count is "+duplicateEntry.size());
+        timeBankRepository.deleteAll(duplicateEntry);
+    }
+
 }
