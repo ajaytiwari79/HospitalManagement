@@ -125,4 +125,9 @@ public class CurrentUserDetails {
     public void setLastSelectedOrganizationId(Long lastSelectedOrganizationId) {
         this.lastSelectedOrganizationId = lastSelectedOrganizationId;
     }
+
+    public String getFullName(){
+        return this.firstName+" "+this.lastName;
+    }
+
 }

@@ -400,7 +400,6 @@ public class ShiftService extends MongoBaseService {
                 shiftActivity.setActivityName(activityWrapper.getActivity().getName());
                 shiftActivity.setPlannedTimeId(addPlannedTimeInShift(staffAdditionalInfoDTO.getUnitId(), phaseListByDate.get(shiftActivity.getStartDate()).getId(), activityWrapperMap.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO));
             }
-            shift.setCreatedBy(UserContext.getUserDetails().getId());
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());
             shift.setScheduledMinutes(scheduledMinutes);
             shift.setDurationMinutes(durationMinutes);

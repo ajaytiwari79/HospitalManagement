@@ -131,13 +131,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 
     public int getDurationMinutes() {
         return durationMinutes;

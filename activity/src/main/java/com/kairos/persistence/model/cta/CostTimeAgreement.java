@@ -70,9 +70,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
         return description;
     }
 
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 
     public void setDescription(String description) {
         this.description = description;
@@ -166,11 +163,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
     public void setOrganizationSubType(OrganizationType organizationSubType) {
         this.organizationSubType = organizationSubType;
     }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
 
 
     public BigInteger getOrganizationParentId() {

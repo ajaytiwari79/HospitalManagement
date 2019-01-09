@@ -68,10 +68,9 @@ public class ShiftTemplateService extends MongoBaseService {
         });
         save(individualShiftTemplates);
         Set<BigInteger> individualShiftTemplateIds= individualShiftTemplates.stream().map(i->i.getId()).collect(Collectors.toSet());
-        ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
+        ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId);
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
-        shiftTemplateDTO.setCreatedBy(shiftTemplate.getCreatedBy());
         shiftTemplateDTO.setUnitId(unitId);
         return shiftTemplateDTO;
     }
@@ -104,9 +103,7 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
-        ShiftTemplate existingShiftTemplate = shiftTemplate;
         shiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(shiftTemplateDTO,ShiftTemplate.class);
-        shiftTemplate.setCreatedBy(existingShiftTemplate.getCreatedBy());
        // ObjectMapperUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
         save(shiftTemplate);
         return shiftTemplateDTO;

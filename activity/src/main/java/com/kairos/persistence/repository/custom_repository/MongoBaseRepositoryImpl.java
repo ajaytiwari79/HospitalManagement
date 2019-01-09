@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.custom_repository;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.MongoSequence;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -110,11 +111,11 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 				className = entity.getClass().getSuperclass().getSimpleName();
 			}
-			entity.setCreatedBy(UserContext.getUserDetails().getId());
+			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 			entity.setCreatedAt(DateUtils.getDate());
 			entity.setId(nextSequence(className));
 		}else {
-			entity.setLastModifiedBy(UserContext.getUserDetails().getId());
+			entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 		}
 		/**
 		 *  Set updatedAt time as current time
@@ -171,7 +172,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 						className = entity.getClass().getSuperclass().getSimpleName();
 					}
 					entity.setId(nextSequence(className));
-					entity.setCreatedBy(UserContext.getUserDetails().getId());
+					entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 					dbObject = new BasicDBObject();
 
                     /*
@@ -184,7 +185,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
                     * */
 					bulkWriteOperation.insert(dbObject);
 				}else {
-					entity.setLastModifiedBy(UserContext.getUserDetails().getId());
+					entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 					dbObject = new BasicDBObject();
 
                     /*

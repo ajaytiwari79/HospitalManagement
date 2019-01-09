@@ -304,16 +304,6 @@ public class CTARuleTemplate extends MongoBaseEntity {
         this.ruleTemplateType = ruleTemplateType;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        if (this.getId() != null)
-            throw new UnsupportedOperationException("can't modified this property");
-        this.createdBy = createdBy;
-    }
-
 
 
 

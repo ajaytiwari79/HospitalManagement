@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.dto.activity.common.UserInfo;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,24 +23,24 @@ public abstract class MongoBaseEntity {
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore
-    protected Long createdBy;
+    protected UserInfo createdBy;
     @JsonIgnore
-    protected Long lastModifiedBy;
+    protected UserInfo lastModifiedBy;
 
 
-    public Long getCreatedBy() {
+    public UserInfo getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(UserInfo createdBy) {
         this.createdBy = createdBy;
     }
 
-    public Long getLastModifiedBy() {
+    public UserInfo getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(Long lastModifiedBy) {
+    public void setLastModifiedBy(UserInfo lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
