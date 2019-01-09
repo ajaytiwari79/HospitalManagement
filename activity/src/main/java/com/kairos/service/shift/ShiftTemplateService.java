@@ -190,7 +190,6 @@ public class ShiftTemplateService extends MongoBaseService {
             if(CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())){
                 shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(result.getViolatedRules().getActivities());
             }
-
             shifts.add(newShiftDTO);
         });
         return shiftWithViolatedInfoDTO;
