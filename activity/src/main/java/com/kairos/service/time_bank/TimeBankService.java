@@ -481,8 +481,9 @@ public class TimeBankService extends MongoBaseService {
     }
 
     public void updateDailyTimeBankEntries(CopyShiftDTO copyShiftDTO, List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, Map<BigInteger, ActivityWrapper> activityMap, List<DayTypeDTO> dayTypeDTOS) {
-
-        LocalDate startDate =  copyShiftDTO.getStartDate();
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffUnitPosition,dayTypeDTOS);
+        saveTimeBanks(staffAdditionalInfoDTO,shifts);
+        /*LocalDate startDate =  copyShiftDTO.getStartDate();
         LocalDate endDate = copyShiftDTO.getEndDate();
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByUnitPositionIdAndBetweenDates(staffUnitPosition.getId(),DateUtils.asDate( startDate.minusDays(1)), DateUtils.asDate(endDate));
         Map<String, DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getUnitPositionId() + "" + k.getDate(), v -> v));
@@ -507,7 +508,7 @@ public class TimeBankService extends MongoBaseService {
             save(dailyTimeBankEntries);
             updateBonusHoursOfTimeBankInShiftAndSave(shiftWithActivityDTOS, shifts);
         }
-        // return dailyTimeBanks;
+        // return dailyTimeBanks;*/
 
     }
 
