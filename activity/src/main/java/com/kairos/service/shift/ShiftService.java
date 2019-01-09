@@ -115,6 +115,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
+import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.AppConstants.MULTIPLE_ACTIVITY;
@@ -1289,7 +1290,7 @@ public class ShiftService extends MongoBaseService {
     public void validateRealTimeShift(Long unitId,ShiftDTO shiftDTO,Map<String,Phase> phaseMap){
         String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
         ShiftState shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        Map<BigInteger,ShiftActivity> activityMap=shiftState.getActivities().stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
+        Map<BigInteger,ShiftActivity> activityMap=shiftState.getActivities().stream().filter(distinctByKey(a->a.getActivityId())).collect(Collectors.toMap(k->k.getActivityId(),v->v));
         boolean realtime=phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate());
         if(realtime){
             shiftDTO.getActivities().forEach(shiftActivity -> {
@@ -1302,7 +1303,7 @@ public class ShiftService extends MongoBaseService {
             });
         }
     }
-    private ShiftDetailViewDTO getShiftDetailsOfStaff(String timeZone,Map<String, Phase> phaseMap,TimeAttendanceGracePeriod timeAttendanceGracePeriod, List<Shift> shifts, List<ShiftState> shiftStatesList) {
+    private ShiftDetailViewDTO getShiftDetailsOfStaff(String timeZone,Map<String, Phase> phaseMap, List<Shift> shifts, List<ShiftState> shiftStatesList) {
         List<ShiftDTO> plannedShifts = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
         List<ShiftDTO> realTimeShift = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),ShiftDTO.class);
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList, ShiftDTO.class);

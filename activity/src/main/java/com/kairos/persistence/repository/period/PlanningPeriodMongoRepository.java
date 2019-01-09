@@ -14,16 +14,16 @@ import java.util.List;
  */
 public interface PlanningPeriodMongoRepository extends MongoBaseRepository<PlanningPeriod, BigInteger>, CustomPlanningPeriodMongoRepository{
 
-    @Query(value = "{ id:?0 ,unitId:?1 }")
+    @Query(value = "{deleted:false,id:?0 ,unitId:?1 }")
     PlanningPeriod findByIdAndUnitId(BigInteger id, Long unitId);
 
-    @Query("{unitId:?0,startDate: {$lt: ?2},endDate:{$gt:?1}}")
+    @Query("{deleted:false,unitId:?0,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<PlanningPeriod> findAllByUnitIdAndBetweenDates(Long unitId,Date startDate,Date endDate);
 
-    @Query("{unitId:{$in:?0},startDate: {$lt: ?2},endDate:{$gt:?1}}")
+    @Query("{deleted:false,unitId:{$in:?0},startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<PlanningPeriod> findAllByUnitIdsAndBetweenDates(List<Long> unitIds,Date startDate,Date endDate);
 
-    @Query("{unitId:?0,startDate: {$lte: ?1},endDate:{$gte:?1}}")
+    @Query("{deleted:false,unitId:?0,startDate: {$lte: ?1},endDate:{$gte:?1}}")
     PlanningPeriod findOneByUnitIdAndDate(Long unitId,Date startDate);
 
 }
