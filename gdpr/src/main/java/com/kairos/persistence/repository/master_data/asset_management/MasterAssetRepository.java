@@ -32,4 +32,9 @@ public interface MasterAssetRepository extends JpaRepository<MasterAssetMD,Long>
     @Modifying
     @Query(value = "update MasterAssetMD set deleted = true where countryId = ?1 and id = ?2 and deleted = false")
     Integer updateMasterAsset(Long countryId, Long id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update MasterAssetMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateMasterAssetStatus(Long countryId, Set<Long> ids);
 }

@@ -22,6 +22,7 @@ import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -321,11 +322,14 @@ public class MasterAssetService extends MongoBaseService {
      * @return
      * @description update status of asset (suggest by unit)
      */
-    public boolean updateSuggestedStatusOfMasterAsset(Long countryId, Set<BigInteger> assetIds, SuggestedDataStatus suggestedDataStatus) {
+    public boolean updateSuggestedStatusOfMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<MasterAsset> masterAssetList = masterAssetMongoRepository.findMasterAssetByCountryIdAndIds(countryId, assetIds);
-        masterAssetList.forEach(masterAsset -> masterAsset.setSuggestedDataStatus(suggestedDataStatus));
-        masterAssetMongoRepository.saveAll(getNextSequence(masterAssetList));
+        Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds);
+        if(updateCount > 0){
+            LOGGER.info("Master Assets are updated successfully with ids :: {}", assetIds);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", assetIds);
+        }
         return true;
     }
 
