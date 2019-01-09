@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 
 @Service
-public class ShiftAndActivityKpiService implements  CounterService {
+public class ShiftAndActivityDurationKpiService implements  CounterService {
 
     @Inject
     private GenericIntegrationService genericIntegrationService;

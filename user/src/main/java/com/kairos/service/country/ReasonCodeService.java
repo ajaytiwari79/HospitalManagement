@@ -140,7 +140,7 @@ public class ReasonCodeService {
        createDefaultData(reasonCodeResponseDTO,organization);
    }
 
-    public void createDefalutDateForSubUnit(Organization organization,long parentId){
+    public void createDefalutDataForSubUnit(Organization organization, long parentId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
         createDefaultData(reasonCodeResponseDTO,organization);
     }

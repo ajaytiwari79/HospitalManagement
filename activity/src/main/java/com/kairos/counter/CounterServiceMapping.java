@@ -46,7 +46,7 @@ public class CounterServiceMapping {
     }
 
     @Inject
-    public void durationOfShiftAndActivity(ShiftAndActivityKpiService shiftAndActivityKpiService) {
+    public void durationOfShiftAndActivity(ShiftAndActivityDurationKpiService shiftAndActivityKpiService) {
         logger.info("Enum mapping for Duration of shift and activity : "+this.counters);
         this.counters.put(CounterType.SHIFT_AND_ACTIVITY_DURATION, shiftAndActivityKpiService);
     }

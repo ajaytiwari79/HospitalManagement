@@ -982,6 +982,8 @@ public class StaffService {
         }
         employment.getUnitPermissions().add(unitPermission);
         employmentGraphRepository.save(employment);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())), organization.getId());
+
     }
 
     public void setUnitManagerAndEmployment(Organization organization, User user, Long accessGroupId) {
