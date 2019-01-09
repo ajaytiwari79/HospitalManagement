@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
@@ -635,6 +636,12 @@ public class CompanyCreationService {
             childQueryResults.add(childUnit);
         }
         organizationQueryResult.setChildren(childQueryResults);
+        Map<Long, Long> unitAndStaffIdMap=staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v.getStaff().getId()));
+        unitIds.stream().forEach(unitId->{
+            if(unitAndStaffIdMap.containsKey(unitId)) {
+                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
+            }
+        });
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
 
