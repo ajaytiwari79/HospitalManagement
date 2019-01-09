@@ -13,10 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -208,7 +205,7 @@ public class CTARuleTemplateDTO {
     }
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
-        this.phaseInfo = phaseInfo;
+        this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
     }
 
     public BudgetType getBudgetType() {
