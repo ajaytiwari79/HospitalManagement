@@ -10,22 +10,22 @@ MATCH (f:Function)
 set f.startDate=toString(date(datetime({epochmillis:f.startDate})));
 
 MATCH (f:Function) where exists(f.endDate)
-set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})));
 
 MATCH (f:TimeSlotSet)
-set f.startDate=toString(date(datetime({epochmillis:f.startDate})))
+set f.startDate=toString(date(datetime({epochmillis:f.startDate})));
 
 MATCH (f:TimeSlotSet) where exists(f.endDate)
-set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})));
 
 MATCH (n:ContactAddress) remove n.startDate
-remove n.endDate
+remove n.endDate;
 
 MATCH (f:User) where exists(f.dateOfBirth)
-set f.dateOfBirth=toString(date(datetime({epochmillis:f.dateOfBirth})))
+set f.dateOfBirth=toString(date(datetime({epochmillis:f.dateOfBirth})));
 
 MATCH (f:FunctionalPayment)
-set f.startDate=toString(date(datetime({epochmillis:f.startDate})))
+set f.startDate=toString(date(datetime({epochmillis:f.startDate})));
 
 MATCH (f:FunctionalPayment) where exists(f.endDate)
-set f.endDate=toString(date(datetime({epochmillis:f.endDate})))
+set f.endDate=toString(date(datetime({epochmillis:f.endDate})));

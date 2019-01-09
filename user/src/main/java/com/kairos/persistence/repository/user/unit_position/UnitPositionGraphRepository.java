@@ -290,13 +290,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
 @Query("OPTIONAL MATCH (organization:Organization)  WHERE id(organization)={0}\n" +
         "OPTIONAL MATCH (staff:Staff)  WHERE id(staff)={1}\n" +
-        "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true})-[:"+IN_UNIT+"]->(organization) \n" +
+        "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{published:true})-[:"+IN_UNIT+"]->(organization) " +
+        "WITH staff,organization,unitPosition " +
+        "MATCH(unitPosition)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise)\n" +
         "RETURN \n" +
         "CASE \n" +
         "WHEN organization IS NULL THEN \"organization\" \n" +
         "WHEN staff IS NULL THEN \"staff\"\n" +
         "WHEN unitPosition IS NULL THEN \"unitPosition\" \n" +
-        "ELSE COLLECT({id:id(unitPosition),startDate:unitPosition.startDate,endDate:unitPosition.endDate}) END ")
+        "ELSE COLLECT({id:id(unitPosition),startDate:unitPosition.startDate,endDate:unitPosition.endDate,expertise:{id:id(expertise), name:expertise.name}}) END ")
         Object  getUnitPositionsByUnitIdAndStaffId(Long unitId,Long staffId);
 
     @Query("MATCH(unitPosition:UnitPosition{published:true})-[unitPositionOrgRel:"+ IN_UNIT +"]-(organization:Organization) \n" +
