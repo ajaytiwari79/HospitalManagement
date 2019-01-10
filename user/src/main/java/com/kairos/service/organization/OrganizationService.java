@@ -1091,7 +1091,8 @@ public class OrganizationService {
     }
 
     public List<com.kairos.persistence.model.country.DayType> getAllDayTypeofOrganization(Long organizationId) {
-        Long countryId = organizationGraphRepository.getCountryId(organizationId);
+        Organization parentOrganization=fetchParentOrganization(organizationId);
+        Long countryId=organizationGraphRepository.getCountryId(parentOrganization.getId());
         return dayTypeService.getAllDayTypeByCountryId(countryId);
 
     }
