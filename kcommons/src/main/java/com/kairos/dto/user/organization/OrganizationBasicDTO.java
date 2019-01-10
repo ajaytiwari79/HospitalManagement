@@ -31,6 +31,7 @@ public class OrganizationBasicDTO {
     private UnitManagerDTO unitManager;  // Used in case of child organization only
     private Long unitTypeId;
     private boolean boardingCompleted;
+    private boolean workCenterUnit;
     public Long getId() {
         return id;
     }
@@ -169,6 +170,14 @@ public class OrganizationBasicDTO {
 
     public boolean isBoardingCompleted() {
         return boardingCompleted;
+    }
+
+    public boolean isWorkCenterUnit() {
+        return workCenterUnit;
+    }
+
+    public void setWorkCenterUnit(boolean workCenterUnit) {
+        this.workCenterUnit = workCenterUnit;
     }
 
     public void setBoardingCompleted(boolean boardingCompleted) {

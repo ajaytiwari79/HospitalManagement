@@ -257,7 +257,7 @@ public class Organization extends UserBaseEntity {
     public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
                         CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted,
-                        List<Group> groupList, List<Organization> children, UnitType unitType) {
+                        List<Group> groupList, List<Organization> children, UnitType unitType,boolean workCenterUnit) {
         this.name = name;
         this.description = description;
         this.isKairosHub = isPrekairos;
@@ -279,7 +279,7 @@ public class Organization extends UserBaseEntity {
         this.accountType = accountType;
         this.companyType = companyType;
         this.boardingCompleted = boardingCompleted;
-
+        this.workCenterUnit=workCenterUnit;
         this.groupList = groupList;
         this.children = children;
         this.unitType = unitType;
