@@ -43,6 +43,7 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     @Query("{unitPositionId:?0,deleted:false,date:?1}")
     DailyTimeBankEntry findByUnitPositionAndDate(Long unitPositionId, LocalDate startDate);
 
-
+    @Query("{deleted:false}")
+    List<DailyTimeBankEntry> findAllAndDeletedFalse();
 
 }
