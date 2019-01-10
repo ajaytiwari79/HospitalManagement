@@ -5,6 +5,7 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -107,30 +108,10 @@ public class MasterProcessingActivityService extends MongoBaseService {
      */
     //TODO need to make common method for asset and processing activity and others
     private MasterProcessingActivityMD getMetadataOfMasterProcessingActivity(MasterProcessingActivityDTO masterProcessingActivityDto, MasterProcessingActivityMD masterProcessingActivity){
-        List<OrganizationType> organizationTypes = new ArrayList<>();
-        List<OrganizationSubType> organizationSubTypes = new ArrayList<>();
-        List<ServiceCategory> serviceCategories = new ArrayList<>();
-        List<SubServiceCategory> subServiceCategories = new ArrayList<>();
-        for(OrganizationTypeDTO organizationTypeDTO : masterProcessingActivityDto.getOrganizationTypes()){
-            OrganizationType orgType = new OrganizationType(organizationTypeDTO.getId(), organizationTypeDTO.getName());
-            organizationTypes.add(orgType);
-        }
-        for(OrganizationSubTypeDTO organizationSubTypeDTO : masterProcessingActivityDto.getOrganizationSubTypes()){
-            OrganizationSubType orgSubType = new OrganizationSubType(organizationSubTypeDTO.getId(), organizationSubTypeDTO.getName());
-            organizationSubTypes.add(orgSubType);
-        }
-        for(ServiceCategoryDTO category : masterProcessingActivityDto.getOrganizationServices()){
-            ServiceCategory serviceCategory = new ServiceCategory(category.getId(), category.getName());
-            serviceCategories.add(serviceCategory);
-        }
-        for(SubServiceCategoryDTO subCategory : masterProcessingActivityDto.getOrganizationSubServices()){
-            SubServiceCategory subServiceCategory = new SubServiceCategory(subCategory.getId(), subCategory.getName());
-            subServiceCategories.add(subServiceCategory);
-        }
-        masterProcessingActivity.setOrganizationTypes(organizationTypes);
-        masterProcessingActivity.setOrganizationSubTypes(organizationSubTypes);
-        masterProcessingActivity.setOrganizationServices(serviceCategories);
-        masterProcessingActivity.setOrganizationSubServices(subServiceCategories);
+        masterProcessingActivity.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationTypes(), OrganizationType.class));
+        masterProcessingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationSubServices(), OrganizationSubType.class));
+        masterProcessingActivity.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationServices(), ServiceCategory.class));
+        masterProcessingActivity.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterProcessingActivityDto.getOrganizationSubServices(), SubServiceCategory.class));
         return masterProcessingActivity;
     }
 

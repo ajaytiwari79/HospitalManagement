@@ -4,6 +4,7 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
@@ -72,11 +73,7 @@ public class MasterAssetService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
         }
         MasterAssetMD masterAsset = new MasterAssetMD(masterAssetDto.getName(), masterAssetDto.getDescription(), countryId, SuggestedDataStatus.APPROVED);
-        Map<String, List> metaData = getMetadataOfMasterAsset(masterAssetDto);
-        masterAsset.setOrganizationTypes(metaData.get("organizationTypes"));
-        masterAsset.setOrganizationSubTypes(metaData.get("organizationSubTypes"));
-        masterAsset.setOrganizationServices(metaData.get("serviceCategories"));
-        masterAsset.setOrganizationSubServices(metaData.get("subServiceCategories"));
+        masterAsset = getMetadataOfMasterAsset(masterAssetDto, masterAsset);
         saveOrUpdateAssetType(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
         masterAssetDto.setId(masterAsset.getId());
@@ -90,33 +87,12 @@ public class MasterAssetService extends MongoBaseService {
      * @param masterAssetDto
      * @return
      */
-    private Map<String, List> getMetadataOfMasterAsset(MasterAssetDTO masterAssetDto){
-        List<OrganizationType> organizationTypes = new ArrayList<>();
-        List<OrganizationSubType> organizationSubTypes = new ArrayList<>();
-        List<ServiceCategory> serviceCategories = new ArrayList<>();
-        List<SubServiceCategory> subServiceCategories = new ArrayList<>();
-        for(OrganizationTypeDTO organizationTypeDTO : masterAssetDto.getOrganizationTypes()){
-            OrganizationType orgType = new OrganizationType(organizationTypeDTO.getId(), organizationTypeDTO.getName());
-            organizationTypes.add(orgType);
-        }
-        for(OrganizationSubTypeDTO organizationSubTypeDTO : masterAssetDto.getOrganizationSubTypes()){
-            OrganizationSubType orgSubType = new OrganizationSubType(organizationSubTypeDTO.getId(), organizationSubTypeDTO.getName());
-            organizationSubTypes.add(orgSubType);
-        }
-        for(ServiceCategoryDTO category : masterAssetDto.getOrganizationServices()){
-            ServiceCategory serviceCategory = new ServiceCategory(category.getId(), category.getName());
-            serviceCategories.add(serviceCategory);
-        }
-        for(SubServiceCategoryDTO subCategory : masterAssetDto.getOrganizationSubServices()){
-            SubServiceCategory subServiceCategory = new SubServiceCategory(subCategory.getId(), subCategory.getName());
-            subServiceCategories.add(subServiceCategory);
-        }
-        Map<String , List> metadata = new HashMap<>();
-        metadata.put("organisationType", organizationTypes);
-        metadata.put("organisationSubType", organizationSubTypes);
-        metadata.put("serviceCategory", serviceCategories);
-        metadata.put("subServiceCategory", subServiceCategories);
-        return metadata;
+    private MasterAssetMD getMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAssetMD masterAsset){
+        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationTypes(), OrganizationType.class));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationSubServices(), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationServices(), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssetDto.getOrganizationSubServices(), SubServiceCategory.class));
+        return masterAsset;
     }
 
     //TODO we can delete this method Refactored method is just define below this method with name "saveOrUpdateAssetType"
@@ -255,14 +231,10 @@ public class MasterAssetService extends MongoBaseService {
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        Map<String, List> metaData = getMetadataOfMasterAsset(masterAssetDto);
+        masterAsset = getMetadataOfMasterAsset(masterAssetDto, masterAsset);
         masterAsset = masterAssetRepository.getOne(id);
         masterAsset.setName(masterAssetDto.getName());
         masterAsset.setDescription(masterAssetDto.getDescription());
-        masterAsset.setOrganizationTypes(metaData.get("organizationTypes"));
-        masterAsset.setOrganizationSubTypes(metaData.get("organizationSubTypes"));
-        masterAsset.setOrganizationServices(metaData.get("serviceCategories"));
-        masterAsset.setOrganizationSubServices(metaData.get("subServiceCategories"));
         saveOrUpdateAssetType(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
         return masterAssetDto;

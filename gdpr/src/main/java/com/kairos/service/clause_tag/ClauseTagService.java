@@ -5,7 +5,9 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
+import com.kairos.persistence.model.clause_tag.ClauseTagMD;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -18,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ClauseTagService extends MongoBaseService {
@@ -33,6 +36,9 @@ public class ClauseTagService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private ClauseTagRepository clauseTagRepository;
 
     /**
      * @param countryId
@@ -111,10 +117,10 @@ public class ClauseTagService extends MongoBaseService {
      * @throws DuplicateDataException if tag with same name is present in tagList
      * @description method new create tags and if tag already exist with same name then simply add tag id to  existClauseTagIds which later add to clause ,
      */
-    public List<ClauseTag> saveClauseTagList(Long referenceId, boolean isUnitId, List<ClauseTagDTO> tagList) {
+    public List<ClauseTagMD> saveClauseTagList(Long referenceId, boolean isUnitId, List<ClauseTagDTO> tagList) {
 
-        List<ClauseTag> clauseTagList = new ArrayList<>();
-        List<BigInteger> existClauseTagIds = new ArrayList<>();
+        List<ClauseTagMD> clauseTagList = new ArrayList<>();
+        List<Long> existClauseTagIds = new ArrayList<>();
         Set<String> clauseTagsName = new HashSet<>();
         for (ClauseTagDTO tagDto : tagList) {
             if (tagDto.getId() == null) {
@@ -122,7 +128,7 @@ public class ClauseTagService extends MongoBaseService {
                     exceptionService.duplicateDataException("message.duplicate", "message.tag", tagDto.getName());
                 }
                 clauseTagsName.add(tagDto.getName());
-                ClauseTag clauseTag = new ClauseTag(tagDto.getName());
+                ClauseTagMD clauseTag = new ClauseTagMD(tagDto.getName());
                 if (isUnitId)
                     clauseTag.setOrganizationId(referenceId);
                 else
@@ -133,14 +139,16 @@ public class ClauseTagService extends MongoBaseService {
                 existClauseTagIds.add(tagDto.getId());
             }
         }
-        List<ClauseTag> previousClauseTags = isUnitId ? clauseTagMongoRepository.findByUnitIdAndTitles(referenceId, clauseTagsName) : clauseTagMongoRepository.findByCountryIdAndTitles(referenceId, clauseTagsName);
+        if(!clauseTagsName.isEmpty()){
+        Set<String> nameInLowerCase = clauseTagsName.stream().map(String::toLowerCase)
+                .collect(Collectors.toSet());
+        List<ClauseTagMD> previousClauseTags = isUnitId ? clauseTagRepository.findByUnitIdAndTitles(referenceId, nameInLowerCase) : clauseTagRepository.findByCountryIdAndTitles(referenceId, nameInLowerCase);
         if (CollectionUtils.isNotEmpty(previousClauseTags)) {
             exceptionService.duplicateDataException("message.duplicate", "message.tag", previousClauseTags.get(0).getName());
+        }}
+        if(!existClauseTagIds.isEmpty()) {
+            clauseTagList.addAll(clauseTagRepository.findAllClauseTagByIds(existClauseTagIds));
         }
-        if (CollectionUtils.isNotEmpty(clauseTagList)) {
-            clauseTagList = clauseTagMongoRepository.saveAll(getNextSequence(clauseTagList));
-        }
-        clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds( existClauseTagIds));
         return clauseTagList;
     }
 

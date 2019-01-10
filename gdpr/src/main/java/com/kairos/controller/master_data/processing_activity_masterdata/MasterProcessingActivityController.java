@@ -57,7 +57,7 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "delete MasterProcessingActivity")
     @DeleteMapping("/master_processing_activity/{id}/sub_processing_activity/{subProcessingActivityId}")
-    public ResponseEntity<Object> deleteSubProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @PathVariable BigInteger subProcessingActivityId) {
+    public ResponseEntity<Object> deleteSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long id, @PathVariable Long subProcessingActivityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteSubProcessingActivity(countryId, id, subProcessingActivityId));
     }
 

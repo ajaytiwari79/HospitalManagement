@@ -2,17 +2,13 @@ package com.kairos.dto.gdpr.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClauseTagDTO {
+public class TemplateTypeDTO {
 
     private Long id;
 
-    @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     public Long getId() {

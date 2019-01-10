@@ -51,20 +51,20 @@ public class ClauseController {
 
     @ApiOperation("get master clause by id")
     @GetMapping(COUNTRY_URL + "/clause/{id}")
-    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(countryId, id));
     }
 
 
     @ApiOperation("delete master  clause by id")
     @DeleteMapping(COUNTRY_URL + "/clause/{clauseId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteMasterClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteMasterClause(@PathVariable Long countryId, @PathVariable Long clauseId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(countryId, false, clauseId));
     }
 
     @ApiOperation("update master clause ")
     @PutMapping(COUNTRY_URL + "/clause/{clauseId}")
-    public ResponseEntity<ResponseDTO<MasterClauseDTO>> updateMasterClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody MasterClauseDTO clauseDto) {
+    public ResponseEntity<ResponseDTO<MasterClauseDTO>> updateMasterClause(@PathVariable Long countryId, @PathVariable Long clauseId, @Validated @RequestBody MasterClauseDTO clauseDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.updateClause(countryId, false, clauseId, clauseDto));
 
     }
@@ -86,7 +86,7 @@ public class ClauseController {
 
     @ApiOperation("update clause at  unit level")
     @PutMapping(UNIT_URL + "/clause/{clauseId}")
-    public ResponseEntity<ResponseDTO<ClauseDTO>> updateClause(@PathVariable Long unitId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto) {
+    public ResponseEntity<ResponseDTO<ClauseDTO>> updateClause(@PathVariable Long unitId, @PathVariable Long clauseId, @Validated @RequestBody ClauseDTO clauseDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.updateClause(unitId, true, clauseId, clauseDto));
     }
 
@@ -98,7 +98,7 @@ public class ClauseController {
 
     @ApiOperation("delete  clause by id")
     @DeleteMapping(UNIT_URL + "/clause/{clauseId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteClause(@PathVariable Long unitId, @PathVariable BigInteger clauseId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteClause(@PathVariable Long unitId, @PathVariable Long clauseId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, clauseService.deleteClauseById(unitId, true, clauseId));
     }
 

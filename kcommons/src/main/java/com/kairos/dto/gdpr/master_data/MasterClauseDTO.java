@@ -17,11 +17,11 @@ public class MasterClauseDTO extends ClauseDTO{
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationTypeDTO> organizationTypeDTOS =new ArrayList<>();
+    private List<OrganizationTypeDTO> organizationTypes =new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS =new ArrayList<>();
+    private List<OrganizationSubTypeDTO> organizationSubTypes =new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
@@ -42,15 +42,15 @@ public class MasterClauseDTO extends ClauseDTO{
     private List<Long> organizationList;
 
     public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; }
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypes = organizationTypeDTOS; }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
