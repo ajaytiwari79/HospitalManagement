@@ -269,8 +269,8 @@ public class ActivityDTO {
         return activityCanBeCopied;
     }
 
-    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
-        this.activityCanBeCopied = activityCanBeCopied;
+    public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
     }
 }
 
