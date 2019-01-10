@@ -1,7 +1,6 @@
 package com.kairos.service.time_bank;
 
 
-import com.google.common.collect.Sets;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -494,8 +493,9 @@ public class TimeBankService extends MongoBaseService {
     }
 
     public void updateDailyTimeBankEntries(CopyShiftDTO copyShiftDTO, List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, Map<BigInteger, ActivityWrapper> activityMap, List<DayTypeDTO> dayTypeDTOS) {
-
-        LocalDate startDate =  copyShiftDTO.getStartDate();
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffUnitPosition,dayTypeDTOS);
+        saveTimeBanks(staffAdditionalInfoDTO,shifts);
+        /*LocalDate startDate =  copyShiftDTO.getStartDate();
         LocalDate endDate = copyShiftDTO.getEndDate();
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(staffUnitPosition.getId(), asDate( startDate.minusDays(1)), asDate(endDate));
         Map<String, DailyTimeBankEntry> dailyTimeBankEntryAndUnitPositionMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getUnitPositionId() + "" + k.getDate(), v -> v));
@@ -520,7 +520,7 @@ public class TimeBankService extends MongoBaseService {
             save(dailyTimeBankEntries);
             updateBonusHoursOfTimeBankInShiftAndSave(shiftWithActivityDTOS, shifts);
         }
-        // return dailyTimeBanks;
+        // return dailyTimeBanks;*/
 
     }
 
@@ -609,6 +609,35 @@ public class TimeBankService extends MongoBaseService {
 
     private UnitPositionWithCtaDetailsDTO getUnitPositionDetailDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         return new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getId(),staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyHours(),staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(),staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(),staffAdditionalInfoDTO.getUnitPosition().getStaffId(),staffAdditionalInfoDTO.getUnitPosition().getStartDate(),staffAdditionalInfoDTO.getUnitPosition().getEndDate(),staffAdditionalInfoDTO.getUnitPosition().getPositionLines());
+    }
+
+    public void deleteDuplicateEntry(){
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllAndDeletedFalse();
+        Map<Long,TreeMap<LocalDate,DailyTimeBankEntry>> unitPositionIdAndDateMap = new TreeMap<>();
+        List<DailyTimeBankEntry> duplicateEntry = new ArrayList<>();
+        for (DailyTimeBankEntry dailyTimeBankEntry : dailyTimeBankEntries) {
+            if(unitPositionIdAndDateMap.containsKey(dailyTimeBankEntry.getUnitPositionId())){
+                Map<LocalDate,DailyTimeBankEntry> localDateDateMap = unitPositionIdAndDateMap.get(dailyTimeBankEntry.getUnitPositionId());
+                if(localDateDateMap.containsKey(dailyTimeBankEntry.getDate())){
+                    DailyTimeBankEntry dailyTimeBankEntry1 = localDateDateMap.get(dailyTimeBankEntry.getDate());
+                    if(dailyTimeBankEntry1.getUpdatedAt().after(dailyTimeBankEntry.getUpdatedAt())){
+                        duplicateEntry.add(dailyTimeBankEntry);
+                    }else {
+                        duplicateEntry.add(dailyTimeBankEntry1);
+                    }
+                }else {
+                    localDateDateMap.put(dailyTimeBankEntry.getDate(),dailyTimeBankEntry);
+                    logger.info("Date Map :"+localDateDateMap.size());
+                    logger.info("UnitPositionId Map :"+unitPositionIdAndDateMap.get(dailyTimeBankEntry.getUnitPositionId()).size());
+                }
+
+            }
+            else {
+                unitPositionIdAndDateMap.put(dailyTimeBankEntry.getUnitPositionId(),new TreeMap<>());
+            }
+        }
+        logger.info("Duplicate remove entry count is "+duplicateEntry.size());
+        timeBankRepository.deleteAll(duplicateEntry);
     }
 
 }

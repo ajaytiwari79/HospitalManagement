@@ -50,7 +50,7 @@ public class RestingHoursCalculationService implements CounterService {
                 totalrestingMinutes -= dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
             }
         }
-        return DateUtils.getMinutesFromTotalMilliSeconds(totalrestingMinutes);
+        return DateUtils.getHoursFromTotalMilliSeconds(totalrestingMinutes);
     }
 
     public Map<Long, Double> calculateRestingHours(List<Long> staffIds, Long organizationId, LocalDateTime startDate, LocalDateTime endDate) {
