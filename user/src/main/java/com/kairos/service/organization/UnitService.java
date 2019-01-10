@@ -17,12 +17,18 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Service
 @Transactional
@@ -51,6 +57,8 @@ public class UnitService {
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
     private CompanyCreationService companyCreationService;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {
@@ -132,10 +140,15 @@ public class UnitService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO();
-        orgTypeAndSubTypeDTO.setOrganizationTypeId(organization.getOrganizationType().getId());
-        orgTypeAndSubTypeDTO.setOrganizationTypeName(organization.getOrganizationType().getName());
-        orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
-        orgTypeAndSubTypeDTO.setOrganizationSubTypeName(organization.getOrganizationSubTypes().get(0).getName());
+        if(isNotNull(organization.getOrganizationType()) && isNotEmpty(organization.getOrganizationSubTypes())){
+            orgTypeAndSubTypeDTO.setOrganizationTypeId(organization.getOrganizationType().getId());
+            orgTypeAndSubTypeDTO.setOrganizationTypeName(organization.getOrganizationType().getName());
+            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
+            orgTypeAndSubTypeDTO.setOrganizationSubTypeName(organization.getOrganizationSubTypes().get(0).getName());
+        }else{
+            logger.info("Organization Type and Organization Sub Type is not present for "+organization.getName());
+        }
+
 
         OrganizationCommonDTO organizationCommonDTO;
         List<OrganizationCommonDTO> organizationCommonDTOS = new ArrayList<>();

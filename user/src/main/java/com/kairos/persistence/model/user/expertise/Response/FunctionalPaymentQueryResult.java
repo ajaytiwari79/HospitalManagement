@@ -18,9 +18,7 @@ import java.util.List;
 @QueryResult
 public class FunctionalPaymentQueryResult {
    private Long id;
-    @Convert(LocalDateConverter.class)
    private LocalDate startDate;
-    @Convert(LocalDateConverter.class)
    private LocalDate endDate;
    private List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrices;
    private Expertise expertise;

@@ -4,10 +4,9 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -22,10 +21,8 @@ public class PayTable extends UserBaseEntity {
     private String shortName;
     @Relationship(type = IN_ORGANIZATION_LEVEL)
     private Level level;
-    @DateLong
-    private Date startDateMillis;
-    @DateLong
-    private Date endDateMillis;
+    private LocalDate startDateMillis;
+    private LocalDate endDateMillis;
     private String paymentUnit;
     @Relationship(type = HAS_PAY_GRADE)
     private List<PayGrade> payGrades;
@@ -43,30 +40,19 @@ public class PayTable extends UserBaseEntity {
         //default constructor
     }
 
-    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis, String paymentUnit, boolean editable) {
-        this.name = name;
-        this.description = description;
-        this.shortName = shortName;
-        this.level = level;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.paymentUnit = paymentUnit;
-        this.editable=editable;
-    }
-
-    public Date getStartDateMillis() {
+    public LocalDate getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Date startDateMillis) {
+    public void setStartDateMillis(LocalDate startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public LocalDate getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(LocalDate endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -127,6 +113,16 @@ public class PayTable extends UserBaseEntity {
         this.payTable = payTable;
     }
 
+    public PayTable(String name, String shortName, String description, Level level, LocalDate startDateMillis, LocalDate endDateMillis, String paymentUnit, boolean editable) {
+        this.name = name;
+        this.description = description;
+        this.shortName = shortName;
+        this.level = level;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
+        this.editable = editable;
+    }
     public BigDecimal getPercentageValue() {
         return percentageValue;
     }

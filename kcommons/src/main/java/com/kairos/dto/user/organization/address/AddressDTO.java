@@ -31,7 +31,6 @@ public class AddressDTO {
     private boolean verifiedByVisitour;
     private long startDate;
     private long endDate;
-
     private String description;
     private Long municipalityId;
 
@@ -45,21 +44,6 @@ public class AddressDTO {
         this.description = description;
     }
 
-    public long getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(long startDate) {
-        this.startDate = startDate;
-    }
-
-    public long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(long endDate) {
-        this.endDate = endDate;
-    }
 
     public Long getTypeOfHouseId() {
         return typeOfHouseId;
@@ -232,5 +216,21 @@ public class AddressDTO {
     public Long getMunicipalityId() {
 
         return municipalityId;
+    }
+
+    public long getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(long startDate) {
+        this.startDate = startDate;
+    }
+
+    public long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
     }
 }

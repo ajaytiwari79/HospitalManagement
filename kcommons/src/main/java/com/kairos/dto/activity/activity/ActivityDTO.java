@@ -42,10 +42,10 @@ public class ActivityDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger parentId;
-    private PermissionsActivityTabDTO permissionsActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private List<Long> skills;
     private SkillActivityDTO skillActivityTab;
+    private boolean activityCanBeCopied;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -149,15 +149,6 @@ public class ActivityDTO {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
-    }
-
-    public PermissionsActivityTabDTO getPermissionsActivityTab() {
-        return permissionsActivityTab;
-    }
-
-
-    public void setPermissionsActivityTab(PermissionsActivityTabDTO permissionsActivityTab) {
-        this.permissionsActivityTab = permissionsActivityTab;
     }
 
     public List<BigInteger> getTags() {
@@ -272,6 +263,14 @@ public class ActivityDTO {
 
     public void setSkillActivityTab(SkillActivityDTO skillActivityTab) {
         this.skillActivityTab = skillActivityTab;
+    }
+
+    public boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied;
     }
 }
 

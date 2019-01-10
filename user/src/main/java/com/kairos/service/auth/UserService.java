@@ -375,13 +375,6 @@ public class UserService {
         return true;
     }
 
-    public UserOrganizationsDTO getLoggedInUserOrganizations() {
-        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
-        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
-        return userOrganizationsDTO;
-    }
 
     public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, List<Long> accessibleModules, boolean parentOrganization) {
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
@@ -442,9 +435,9 @@ public class UserService {
                 }
             }
             if(checkDayType){
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds,organizationId);
             } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId,organizationId);
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
@@ -461,10 +454,9 @@ public class UserService {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
-
-
             permissionData.setOrganizationPermissions(unitPermission);
         }
+        updateLastSelectedOrganizationId(organizationId);
         return permissionData;
     }
 
@@ -664,14 +656,9 @@ public class UserService {
         return permissionList;
     }
 
-    public Boolean updateLastSelectedChildAndParentId(OrganizationSelectionDTO organizationSelectionDTO) {
+    private Boolean updateLastSelectedOrganizationId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedParentOrgId()).isPresent()) {
-            currentUser.setLastSelectedParentOrgId(organizationSelectionDTO.getLastSelectedParentOrgId());
-        }
-        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()) {
-            currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
-        }
+        currentUser.setLastSelectedOrganizationId(organizationId);
         userGraphRepository.save(currentUser);
         return true;
     }
@@ -681,8 +668,6 @@ public class UserService {
         List<User> users = userGraphRepository.findAll();
 
         users.stream().forEach(user -> {
-            String cprNumber = user.getCprNumber();
-            Date dateOfBirth = Optional.ofNullable(user.getCprNumber()).isPresent() ? CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : DateUtils.getCurrentDate();
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });

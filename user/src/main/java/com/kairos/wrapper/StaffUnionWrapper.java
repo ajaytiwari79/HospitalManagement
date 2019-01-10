@@ -4,7 +4,6 @@ import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
-import com.kairos.persistence.model.user.position_code.PositionCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +11,14 @@ import java.util.List;
 /**
  * Created by vipul on 15/2/18.
  */
-public class PositionCodeUnionWrapper {
-    private List<PositionCode> positionCodes = new ArrayList<>();
+public class StaffUnionWrapper {
     private List<UnionResponseDTO> unions = new ArrayList<>();
     private List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
     private List<ReasonCodeResponseDTO> reasonCodes = new ArrayList<>();
     private List<StaffExperienceInExpertiseDTO> staffSelectedExpertise;
 
 
-    public PositionCodeUnionWrapper() {
-    }
-
-    public List<PositionCode> getPositionCodes() {
-        return positionCodes;
-    }
-
-    public void setPositionCodes(List<PositionCode> positionCodes) {
-        this.positionCodes = positionCodes;
+    public StaffUnionWrapper() {
     }
 
     public List<UnionResponseDTO> getUnions() {
@@ -64,9 +54,8 @@ public class PositionCodeUnionWrapper {
         this.staffSelectedExpertise = staffSelectedExpertise;
     }
 
-    public PositionCodeUnionWrapper(List<PositionCode> positionCodes, List<UnionResponseDTO> unions, List<OrganizationBasicResponse> organizationHierarchy,
-                                    List<ReasonCodeResponseDTO> reasonCodes, List<StaffExperienceInExpertiseDTO> staffSelectedExpertise) {
-        this.positionCodes = positionCodes;
+    public StaffUnionWrapper(List<UnionResponseDTO> unions, List<OrganizationBasicResponse> organizationHierarchy,
+                             List<ReasonCodeResponseDTO> reasonCodes, List<StaffExperienceInExpertiseDTO> staffSelectedExpertise) {
         this.unions = unions;
         this.organizationHierarchy = organizationHierarchy;
         this.reasonCodes = reasonCodes;

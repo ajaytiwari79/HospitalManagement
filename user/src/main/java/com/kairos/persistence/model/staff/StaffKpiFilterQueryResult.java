@@ -11,6 +11,8 @@ public class StaffKpiFilterQueryResult {
     private Long id;
     private String firstName;
     private String lastName;
+    private Long unitId;
+    private String unitName;
     private List<UnitPositionQueryResult> unitPosition;
 
     public StaffKpiFilterQueryResult() {
@@ -46,5 +48,21 @@ public class StaffKpiFilterQueryResult {
 
     public void setUnitPosition(List<UnitPositionQueryResult> unitPosition) {
         this.unitPosition = unitPosition;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 }

@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.Expertise;
-import com.kairos.persistence.model.wta.Organization;
 import com.kairos.persistence.model.wta.OrganizationType;
+import com.kairos.persistence.model.wta.WTAOrganization;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,15 +29,13 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private OrganizationType organizationSubType;
     private Long countryId;
     private BigInteger organizationParentId;
-    private Organization organization;
+    private WTAOrganization organization;
     private BigInteger parentId;
     private BigInteger parentCountryCTAId;
     private List<BigInteger> ruleTemplateIds =new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean disabled;
-    private Long createdBy;
-    private Long lastModifiedBy;
     private Long unitPositionId;
 
     public CostTimeAgreement() {
@@ -53,11 +50,11 @@ public class CostTimeAgreement extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-    public Organization getOrganization() {
+    public WTAOrganization getOrganization() {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(WTAOrganization organization) {
         this.organization = organization;
     }
 
@@ -73,9 +70,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
         return description;
     }
 
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 
     public void setDescription(String description) {
         this.description = description;
@@ -170,18 +164,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
         this.organizationSubType = organizationSubType;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-
-    public Long getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(Long lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
 
     public BigInteger getOrganizationParentId() {
         return organizationParentId;

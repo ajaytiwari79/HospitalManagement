@@ -8,7 +8,7 @@ import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.Expertise;
-import com.kairos.persistence.model.wta.Organization;
+import com.kairos.persistence.model.wta.WTAOrganization;
 import com.kairos.persistence.model.wta.OrganizationType;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -209,7 +209,7 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CostTimeAgreement.class);
         organisationCTA.setId(null);
         costTimeAgreementService.assignOrganisationActivitiesToRuleTemplate(collectiveTimeAgreementDTO.getRuleTemplates(),parentUnitActivityMap);
-        organisationCTA.setOrganization(new Organization(organization.getId(),organization.getName(),organization.getDescription()));
+        organisationCTA.setOrganization(new WTAOrganization(organization.getId(),organization.getName(),organization.getDescription()));
         organisationCTA.setParentCountryCTAId(costTimeAgreement.getId());
         buildCTA(unitPhaseIdsMap,organisationCTA, collectiveTimeAgreementDTO, false, false,ctaBasicDetailsDTO,phaseDefaultNameMap);
         return organisationCTA;

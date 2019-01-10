@@ -24,7 +24,6 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
-    private Long consecutiveDays;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -82,14 +81,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public Long getConsecutiveDays() {
-        return consecutiveDays;
-    }
-
-    public void setConsecutiveDays(Long consecutiveDays) {
-        this.consecutiveDays = consecutiveDays;
-    }
-
     public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description) {
         this.name=name;
         this.disabled=disabled;
@@ -134,7 +125,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         if (!super.equals(o)) return false;
         ConsecutiveRestPartOfDayWTATemplate that = (ConsecutiveRestPartOfDayWTATemplate) o;
         return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(consecutiveDays, that.consecutiveDays) &&
                 Objects.equals(partOfDays, that.partOfDays) &&
                 Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
                 Objects.equals(timeTypeIds, that.timeTypeIds) &&
@@ -144,6 +134,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), consecutiveDays, partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting);
+        return Objects.hash(super.hashCode(), partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting);
     }
 }

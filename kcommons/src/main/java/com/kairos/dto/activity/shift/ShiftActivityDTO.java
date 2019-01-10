@@ -50,6 +50,7 @@ public class ShiftActivityDTO {
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
+    private int plannedMinutes;
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
@@ -308,5 +309,13 @@ public class ShiftActivityDTO {
 
     public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
         this.timeBankCTADistributions = timeBankCTADistributions;
+    }
+
+    public int getPlannedMinutes() {
+        return plannedMinutes;
+    }
+
+    public void setPlannedMinutes(int plannedMinutes) {
+        this.plannedMinutes = plannedMinutes;
     }
 }

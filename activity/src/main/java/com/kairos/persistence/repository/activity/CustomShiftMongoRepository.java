@@ -12,6 +12,7 @@ import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +63,9 @@ public interface CustomShiftMongoRepository {
 
     List<CommonKpiDataUnit> findShiftsByKpiFilters(List<Long> staffIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
+    List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<BigInteger> activitiesIds, List<Integer>  dayOfWeeks, Date startDate, Date endDate);
+
     void updateRemarkInShiftActivity(BigInteger shiftActivityId,String remark);
+
     List<Shift> findAllShiftByIntervalAndUnitPositionId(Long unitPositionId, Date startDate, Date endDate);
 }

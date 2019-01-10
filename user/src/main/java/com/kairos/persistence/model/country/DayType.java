@@ -34,7 +34,7 @@ public class DayType  extends UserBaseEntity {
     private List<Day> validDays=new ArrayList<>();
     private boolean holidayType;
     private boolean isEnabled = true;
-    private boolean allowTimeSettings = false;
+    private boolean allowTimeSettings;
 
     // Constructor
     public DayType() {

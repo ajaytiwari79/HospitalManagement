@@ -7,6 +7,8 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,9 @@ public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
-    private long intervalLength;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
+    private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
 
 

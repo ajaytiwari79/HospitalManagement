@@ -21,24 +21,18 @@ public class TimeTypeDTO {
     private List<TimeTypeDTO> children = new ArrayList<>();
     private String backgroundColor;
     private TimeTypeEnum secondLevelType;
+    private boolean activityCanBeCopied;
 
     public TimeTypeDTO() {
     }
 
-    public TimeTypeDTO(String timeTypes) {
-        this.timeTypes = timeTypes;
 
-    }
 
     public TimeTypeDTO(String timeTypes, String backgroundColor) {
         this.timeTypes = timeTypes;
         this.backgroundColor = backgroundColor;
     }
 
-    public TimeTypeDTO(BigInteger id, String timeTypes) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-    }
 
     public TimeTypeDTO(BigInteger id, String timeTypes, BigInteger upperLevelTimeTypeId) {
         this.id = id;
@@ -46,12 +40,13 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor) {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,boolean activityCanBeCopied) {
         this.id = id;
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
         this.backgroundColor=backgroundColor;
+        this.activityCanBeCopied=activityCanBeCopied;
     }
 
     public TimeTypeEnum getSecondLevelType() {
@@ -125,5 +120,13 @@ public class TimeTypeDTO {
 
     public void setBackgroundColor(String backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+
+    public boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied;
     }
 }

@@ -417,8 +417,19 @@ public class AccessPageService {
         return kpiTabs;
     }
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
-        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId);
+        Long userId=UserContext.getUserDetails().getId();
+        if(accessPageRepository.isHubMember(userId)){
+            Organization parentHub = accessPageRepository.fetchParentHub(userId);
+            unitId=parentHub.getId();
+        }
+        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        for (KPIAccessPageDTO accessPage : kpiTabs) {
+            for (KPIAccessPageDTO kpiAccessPageDTO : accessPage.getChild()) {
+                kpiAccessPageDTO.setActive(kpiAccessPageDTO.isRead()||kpiAccessPageDTO.isWrite());
+            }
+            accessPage.setActive(accessPage.isRead()||accessPage.isWrite());
+        }
         return kpiTabs;
     }
 

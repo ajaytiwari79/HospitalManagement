@@ -75,6 +75,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
  * @author pradeep
@@ -623,48 +624,65 @@ public class ShiftValidatorService {
         return shiftQueryResultWithActivities;
     }
 
+    public static void validateRuleTemplate(int numberOfWeeks, LocalDate validationStartDate){
+        if (numberOfWeeks == 0 || validationStartDate == null) {
+            throwException("message.ruleTemplate.weeks.notNull");
+        }
+    }
+
+    public static void validateRuleTemplate(long intervalLength,String intervalUnit){
+        if (intervalLength == 0 || isEmpty(intervalUnit)) {
+            throwException("message.ruleTemplate.interval.notNull");
+        }
+    }
     public static DateTimeInterval getIntervalByRuleTemplates(ShiftWithActivityDTO shift, List<WTABaseRuleTemplate> wtaBaseRuleTemplates,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         DateTimeInterval interval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
         for (WTABaseRuleTemplate ruleTemplate : wtaBaseRuleTemplates) {
             switch (ruleTemplate.getWtaTemplateType()) {
                 case NUMBER_OF_PARTOFDAY:
                     NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = (NumberOfPartOfDayShiftsWTATemplate) ruleTemplate;
+                    validateRuleTemplate(numberOfPartOfDayShiftsWTATemplate.getIntervalLength(),numberOfPartOfDayShiftsWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, numberOfPartOfDayShiftsWTATemplate.getIntervalUnit(), numberOfPartOfDayShiftsWTATemplate.getIntervalLength()));
                     break;
                 case DAYS_OFF_IN_PERIOD:
                     DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = (DaysOffInPeriodWTATemplate) ruleTemplate;
+                    validateRuleTemplate(daysOffInPeriodWTATemplate.getIntervalLength(),daysOffInPeriodWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, daysOffInPeriodWTATemplate.getIntervalUnit(), daysOffInPeriodWTATemplate.getIntervalLength()));
 
                     break;
                 case AVERAGE_SHEDULED_TIME:
                     AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate) ruleTemplate;
+                    validateRuleTemplate(averageScheduledTimeWTATemplate.getIntervalLength(),averageScheduledTimeWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, averageScheduledTimeWTATemplate.getIntervalUnit(), averageScheduledTimeWTATemplate.getIntervalLength()));
                     break;
                 case VETO_AND_STOP_BRICKS:
                     VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) ruleTemplate;
+                    validateRuleTemplate(vetoAndStopBricksWTATemplate.getNumberOfWeeks(),vetoAndStopBricksWTATemplate.getValidationStartDate());
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift, vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate()));
 
                     break;
                 case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
                     NumberOfWeekendShiftsInPeriodWTATemplate numberOfWeekendShiftsInPeriodWTATemplate = (NumberOfWeekendShiftsInPeriodWTATemplate) ruleTemplate;
+                    validateRuleTemplate(numberOfWeekendShiftsInPeriodWTATemplate.getIntervalLength(),numberOfWeekendShiftsInPeriodWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, numberOfWeekendShiftsInPeriodWTATemplate.getIntervalUnit(), numberOfWeekendShiftsInPeriodWTATemplate.getIntervalLength()));
 
                     break;
                 case WEEKLY_REST_PERIOD:
                     RestPeriodInAnIntervalWTATemplate restPeriodInAnIntervalWTATemplate = (RestPeriodInAnIntervalWTATemplate) ruleTemplate;
+                    validateRuleTemplate(restPeriodInAnIntervalWTATemplate.getIntervalLength(),restPeriodInAnIntervalWTATemplate.getIntervalUnit());
                     DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(shift, restPeriodInAnIntervalWTATemplate.getIntervalUnit(), restPeriodInAnIntervalWTATemplate.getIntervalLength());
-                    //dateTimeInterval.setStart(dateTimeInterval.getStart().minusDays(1));
-                    //dateTimeInterval.setEnd(dateTimeInterval.getEnd().plusDays(1));
                     interval = interval.addInterval(dateTimeInterval);
 
                     break;
                 case SHORTEST_AND_AVERAGE_DAILY_REST:
                     ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) ruleTemplate;
+                    validateRuleTemplate(shortestAndAverageDailyRestWTATemplate.getIntervalLength(),shortestAndAverageDailyRestWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shortestAndAverageDailyRestWTATemplate.getIntervalUnit(), shortestAndAverageDailyRestWTATemplate.getIntervalLength()));
 
                     break;
                 case NUMBER_OF_SHIFTS_IN_INTERVAL:
                     ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate = (ShiftsInIntervalWTATemplate) ruleTemplate;
+                    validateRuleTemplate(shiftsInIntervalWTATemplate.getIntervalLength(),shiftsInIntervalWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, shiftsInIntervalWTATemplate.getIntervalUnit(), shiftsInIntervalWTATemplate.getIntervalLength()));
                     break;
                 case SENIOR_DAYS_PER_YEAR:
@@ -681,6 +699,7 @@ public class ShiftValidatorService {
                     break;
                 case CONSECUTIVE_WORKING_PARTOFDAY:
                     ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate = (ConsecutiveWorkWTATemplate) ruleTemplate;
+                    validateRuleTemplate(consecutiveWorkWTATemplate.getIntervalLength(),consecutiveWorkWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, consecutiveWorkWTATemplate.getIntervalUnit(), consecutiveWorkWTATemplate.getIntervalLength()));
                     break;
 

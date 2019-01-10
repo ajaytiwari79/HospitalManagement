@@ -7,7 +7,6 @@ import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
@@ -28,7 +27,6 @@ import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
@@ -92,7 +90,7 @@ public class UnitPositionCTAWTAService {
             if (selectedDate == null) {
                 selectedDate = DateUtils.getCurrentLocalDate();
             }
-            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), DateUtils.getLongFromLocalDate(selectedDate), appliedSeniorityLevel.getId(), unitId);
+            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate.toString(), appliedSeniorityLevel.getId(), unitId);
             seniorityLevel.setFunctions(functionDTOs);
         }
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
@@ -115,8 +113,7 @@ public class UnitPositionCTAWTAService {
         updateDTO.setId(wtaId);
         updateDTO.setUnitPositionEndDate(unitPosition.getEndDate());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
-        UnitPositionQueryResult unitPositionQueryResult = unitPositionService.getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
-        return unitPositionQueryResult;
+        return unitPositionService.getBasicDetails(unitPosition, wtaResponseDTO, unitPosition.getUnitPositionLines().get(0));
     }
     //  TODO Pradeep INCORRECT function NAME and working
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
@@ -152,7 +149,6 @@ public class UnitPositionCTAWTAService {
                 UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getUnitPositionId());
                 currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
                 currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
-                currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
             }
         });
         return ctaTableSettingWrapper;
@@ -171,7 +167,6 @@ public class UnitPositionCTAWTAService {
             if (unitPositionQueryResult != null) {
                 currentWTA.setUnitInfo(unitPositionQueryResult.getUnitInfo());
                 currentWTA.setUnitPositionId(unitPositionQueryResult.getId());
-                currentWTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(unitPositionQueryResult.getPositionCode(), PositionCodeDTO.class));
             }
         });
         return wtaWithTableSettings;
