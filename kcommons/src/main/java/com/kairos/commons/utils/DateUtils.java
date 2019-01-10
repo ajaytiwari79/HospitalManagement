@@ -828,23 +828,11 @@ public  class DateUtils {
     }
 
 
-    /**
-     * Case : localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-28 return true
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-27 return false
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-29 return true
-     */
-    public static boolean isEqualsAndAfter(LocalDate localDate,LocalDate localDateAfterAndEqual){
-        return localDate.equals(localDateAfterAndEqual) && localDateAfterAndEqual.isAfter(localDate);
+
+    public static boolean startDateIsEqualsOrBeforeEndDate(LocalDate startdate,LocalDate endDate){
+        return startdate.isBefore(endDate) || startdate.equals(endDate);
     }
 
-    /**
-     * Case : localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-28 return true
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-27 return true
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-29 return false
-     */
-    public static boolean isEqualsAndBefore(LocalDate localDate,LocalDate localDateAfterAndEqual){
-        return localDateAfterAndEqual.isBefore(localDate) || localDate.equals(localDateAfterAndEqual);
-    }
 
     public static Date plusDays(Date date,int plusDays){
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));
