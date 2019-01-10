@@ -45,7 +45,7 @@ public class ActivityDTO {
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private List<Long> skills;
     private SkillActivityDTO skillActivityTab;
-    private boolean activityCanBeCopied;
+    private Boolean activityCanBeCopied=false;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -265,7 +265,7 @@ public class ActivityDTO {
         this.skillActivityTab = skillActivityTab;
     }
 
-    public boolean isActivityCanBeCopied() {
+    public Boolean isActivityCanBeCopied() {
         return activityCanBeCopied;
     }
 
