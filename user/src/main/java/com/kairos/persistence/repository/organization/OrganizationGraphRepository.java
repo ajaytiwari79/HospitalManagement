@@ -628,12 +628,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
 
-    @Query("MATCH(o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*]->(s:Organization{isEnable:true,isKairosHub:false,union:false,workCenterUnit:true}) WHERE id(o)={0} \n" +
+    @Query("MATCH(o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*]->(s:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
             "RETURN s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
-    @Query("MATCH(o:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,workCenterUnit:true}) WHERE id(o)={0} \n"
-            + "MATCH(parentOrganization)-[:" + HAS_SUB_ORGANIZATION + "]-(units:Organization{isEnable:true,isKairosHub:false,union:false,workCenterUnit:true}) " +
+    @Query("MATCH(o:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n"
+            + "MATCH(parentOrganization)-[:" + HAS_SUB_ORGANIZATION + "]-(units:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
             " WITH parentOrganization ,COLLECT (units)  as data " +
             " RETURN parentOrganization as parent,data as childUnits")
     OrganizationHierarchyData getChildHierarchyByChildUnit(Long childUnitId);

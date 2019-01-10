@@ -218,7 +218,7 @@ public class Organization extends UserBaseEntity {
 
     private boolean boardingCompleted;
     private UnionState state;
-    private boolean workCenterUnit;
+    private boolean workcentre;
     private boolean gdprUnit;
     private BigInteger payRollTypeId;
     @Relationship(type = HAS_ACCOUNT_TYPE)
@@ -257,7 +257,7 @@ public class Organization extends UserBaseEntity {
     public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
                         CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted,
-                        List<Group> groupList, List<Organization> children, UnitType unitType,boolean workCenterUnit) {
+                        List<Group> groupList, List<Organization> children, UnitType unitType,boolean workcentre) {
         this.name = name;
         this.description = description;
         this.isKairosHub = isPrekairos;
@@ -279,7 +279,7 @@ public class Organization extends UserBaseEntity {
         this.accountType = accountType;
         this.companyType = companyType;
         this.boardingCompleted = boardingCompleted;
-        this.workCenterUnit=workCenterUnit;
+        this.workcentre = workcentre;
         this.groupList = groupList;
         this.children = children;
         this.unitType = unitType;
@@ -921,12 +921,12 @@ public class Organization extends UserBaseEntity {
         this.boardingCompleted = boardingCompleted;
     }
 
-    public boolean isWorkCenterUnit() {
-        return workCenterUnit;
+    public boolean isWorkcentre() {
+        return workcentre;
     }
 
-    public void setWorkCenterUnit(boolean workCenterUnit) {
-        this.workCenterUnit = workCenterUnit;
+    public void setWorkcentre(boolean workcentre) {
+        this.workcentre = workcentre;
     }
 
     public boolean isGdprUnit() {

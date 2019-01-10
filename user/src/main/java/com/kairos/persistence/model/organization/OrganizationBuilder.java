@@ -25,7 +25,7 @@ public class OrganizationBuilder {
     private AccountType accountType;
     private CompanyType companyType;
     private boolean boardingCompleted;
-    private boolean workCenterUnit;
+    private boolean workcentre;
     private String description;
     private boolean isPrekairos;
     private String desiredUrl;
@@ -86,8 +86,8 @@ public class OrganizationBuilder {
         return this;
     }
 
-    public OrganizationBuilder setWorkCenterUnit(boolean workCenterUnit) {
-        this.workCenterUnit = workCenterUnit;
+    public OrganizationBuilder setWorkcentre(boolean workcentre) {
+        this.workcentre = workcentre;
         return this;
     }
 
@@ -307,14 +307,14 @@ public class OrganizationBuilder {
         return unitType;
     }
 
-    public boolean isWorkCenterUnit() {
-        return workCenterUnit;
+    public boolean isWorkcentre() {
+        return workcentre;
     }
 
     public Organization createOrganization() {
         return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
-                parentOrganization, country,accountType,boardingCompleted,groupList,children,unitType,workCenterUnit);
+                parentOrganization, country,accountType,boardingCompleted,groupList,children,unitType, workcentre);
     }
 
 }
