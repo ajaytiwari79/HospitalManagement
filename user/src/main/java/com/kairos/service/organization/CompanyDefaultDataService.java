@@ -63,7 +63,7 @@ public class CompanyDefaultDataService {
                 //asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
-                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
+                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForSubUnit(unit,parentId));
                 asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,unit.getId()));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),

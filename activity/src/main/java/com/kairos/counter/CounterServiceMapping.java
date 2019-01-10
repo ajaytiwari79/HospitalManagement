@@ -23,26 +23,32 @@ public class CounterServiceMapping {
 
     @Inject
     public void setCounterService(RestingHoursCalculationService restingHoursCalculationService) {
-        this.counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, restingHoursCalculationService);
         logger.info("Enum mapping for resting hours: "+this.counters);
+        this.counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, restingHoursCalculationService);
     }
 
     @Inject
     public void calculatePlannedHours(PlannedHoursCalculationService plannedHoursCalculationService) {
-        this.counters.put(CounterType.PLANNED_HOURS, plannedHoursCalculationService);
         logger.info("Enum mapping for planned hours: "+this.counters);
+        this.counters.put(CounterType.PLANNED_HOURS, plannedHoursCalculationService);
     }
 
     @Inject
     public void calculateContractualAndPlannedHours(ContractualAndPlannedHoursCalculationService contractualAndPlannedHoursCalculationService) {
-        this.counters.put(CounterType.CONTRACTUAL_AND_PLANNED_HOURS, contractualAndPlannedHoursCalculationService);
         logger.info("Enum mapping for contractual and planned hours : "+this.counters);
+        this.counters.put(CounterType.CONTRACTUAL_AND_PLANNED_HOURS, contractualAndPlannedHoursCalculationService);
     }
 
     @Inject
     public void calculateTimeBankForUnit(TimeBankKpiCalculationService timeBankKpiCalculationService) {
-        this.counters.put(CounterType.TIMEBANK, timeBankKpiCalculationService);
         logger.info("Enum mapping for time bank for unit : "+this.counters);
+        this.counters.put(CounterType.TIMEBANK, timeBankKpiCalculationService);
+    }
+
+    @Inject
+    public void durationOfShiftAndActivity(ShiftAndActivityDurationKpiService shiftAndActivityKpiService) {
+        logger.info("Enum mapping for Duration of shift and activity : "+this.counters);
+        this.counters.put(CounterType.SHIFT_AND_ACTIVITY_DURATION, shiftAndActivityKpiService);
     }
 
     public CounterService getService(CounterType counterType){
