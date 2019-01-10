@@ -5,6 +5,9 @@ import java.util.List;
 public class KPIAccessPageDTO {
     private String name;
     private String moduleId;
+    private boolean read;
+    private boolean write;
+    private boolean active;
     private List<KPIAccessPageDTO> child;
 
     public KPIAccessPageDTO(){
@@ -38,5 +41,29 @@ public class KPIAccessPageDTO {
 
     public void setChild(List<KPIAccessPageDTO> child) {
         this.child = child;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public boolean isWrite() {
+        return write;
+    }
+
+    public void setWrite(boolean write) {
+        this.write = write;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

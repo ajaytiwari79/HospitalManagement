@@ -12,6 +12,8 @@ public class CurrentUserDetails {
     private Long countryId;
     private boolean hubMember;
     private Long languageId;
+    private Long lastSelectedOrganizationId;
+
 
     public boolean isPasswordUpdated() {
         return passwordUpdated;
@@ -115,5 +117,13 @@ public class CurrentUserDetails {
 
     public void setLanguageId(Long languageId) {
         this.languageId = languageId;
+    }
+
+    public Long getLastSelectedOrganizationId() {
+        return lastSelectedOrganizationId;
+    }
+
+    public void setLastSelectedOrganizationId(Long lastSelectedOrganizationId) {
+        this.lastSelectedOrganizationId = lastSelectedOrganizationId;
     }
 }
