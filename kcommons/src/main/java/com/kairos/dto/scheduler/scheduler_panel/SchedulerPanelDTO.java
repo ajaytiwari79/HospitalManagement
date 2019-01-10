@@ -1,5 +1,6 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class SchedulerPanelDTO {
 
@@ -36,6 +38,7 @@ public class SchedulerPanelDTO {
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
     private String timezone;
+    private Long oneTimeTriggerDateMillis;
 
 
 
@@ -148,7 +151,16 @@ public class SchedulerPanelDTO {
         this.integrationConfigurationId = integrationConfigurationId;
     }
 
+    public Long getOneTimeTriggerDateMillis() {
+        return oneTimeTriggerDateMillis;
+    }
 
+    public void setOneTimeTriggerDateMillis(Long oneTimeTriggerDateMillis) {
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+        if(this.oneTimeTrigger && Optional.ofNullable(oneTimeTriggerDateMillis).isPresent()){
+            this.oneTimeTriggerDate = DateUtils.getLocalDateTimeFromMillis(oneTimeTriggerDateMillis);
+        }
+    }
 
     /* public String getRunOnce() {
         return runOnce;

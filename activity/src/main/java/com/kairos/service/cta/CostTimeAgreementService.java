@@ -1,37 +1,40 @@
 package com.kairos.service.cta;
 
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.dto.activity.activity.TableConfiguration;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
-import com.kairos.enums.FixedValueType;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.enums.cta.*;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.cta.CTARuleTemplate;
-import com.kairos.persistence.model.cta.CostTimeAgreement;
-import com.kairos.persistence.model.wta.Organization;
-import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
-import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
-import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
-import com.kairos.rest_client.*;
-import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.RuleTemplateCategoryType;
+import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.cta.CTARuleTemplate;
+import com.kairos.persistence.model.cta.CostTimeAgreement;
+import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.wta.Organization;
+import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.table_settings.TableSettingService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
-import com.kairos.dto.activity.cta.CTATableSettingWrapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,11 +42,10 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.COPY_OF;
-import static com.kairos.enums.cta.CalculateValueType.FIXED_VALUE;
-import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 
 /**
@@ -68,12 +70,16 @@ public class CostTimeAgreementService extends MongoBaseService {
     @Inject
     private CountryCTAService countryCTAService;
     @Inject
-    private OrganizationRestClient organizationRestClient;
-    @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
     private TableSettingService tableSettingService;
-    @Inject private ActivityService activityService;
+    @Inject
+    private ActivityService activityService;
+    @Inject
+    private PhaseMongoRepository phaseMongoRepository;
+    @Inject
+    private TimeBankService timeBankService;
+
 
 
 
@@ -126,8 +132,13 @@ public class CostTimeAgreementService extends MongoBaseService {
     public void assignCountryCTAtoOrganisation(Long countryId, Long organizationSubTypeId,Long organizationId){
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
         List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp->Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
-        Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, Arrays.asList(organizationId));
+        List<Long> unitIds = Arrays.asList(organizationId);
+        Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
+         List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(countryId);
+         Map<BigInteger,PhaseDefaultName> phaseDefaultNameMap = countryPhase.stream().collect(Collectors.toMap(k->k.getId(),v->v.getPhaseEnum()));
+        Map<Long,Map<PhaseDefaultName,BigInteger>> unitsPhasesMap = getMapOfPhaseIdsAndUnitByParentIds(unitIds);
         List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(ctaResponseDTOS.size());
+        Map<PhaseDefaultName,BigInteger> organisationPhaseMap = unitsPhasesMap.get(organizationId);
         for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
             CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
             // Set activity Ids according to unit activity Ids
@@ -138,7 +149,13 @@ public class CostTimeAgreementService extends MongoBaseService {
             List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class);
             List<BigInteger> ruleTemplateIds = new ArrayList<>();
             if (!ruleTemplates.isEmpty()){
-                ruleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
+                ruleTemplates.forEach(ctaRuleTemplate -> {
+                    ctaRuleTemplate.setId(null);
+                    ctaRuleTemplate.getPhaseInfo().forEach(ctaRuleTemplatePhaseInfo -> {
+                        PhaseDefaultName phaseDefaultName = phaseDefaultNameMap.get(ctaRuleTemplatePhaseInfo.getPhaseId());
+                        ctaRuleTemplatePhaseInfo.setPhaseId(organisationPhaseMap.get(phaseDefaultName));
+                    });
+                });
                 save(ruleTemplates);
                 ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
             }
@@ -149,6 +166,17 @@ public class CostTimeAgreementService extends MongoBaseService {
             save(costTimeAgreements);
         }
 
+    }
+
+    public Map<Long, Map<PhaseDefaultName, BigInteger>> getMapOfPhaseIdsAndUnitByParentIds( List<Long> unitIds) {
+        List<Phase> unitPhases = phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(unitIds);
+        Map<Long,List<Phase>> phasesOrganizationMap = unitPhases.stream().collect(Collectors.groupingBy(k->k.getOrganizationId(),Collectors.toList()));
+        Map<Long, Map<PhaseDefaultName, BigInteger>> organizationPhasesMapWithParentCountryPhaseId = new HashMap<>();
+        phasesOrganizationMap.forEach((organisationId, phaseDTOS) -> {
+            Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = phaseDTOS.stream().collect(Collectors.toMap(k->k.getPhaseEnum(),v->v.getId()));
+            organizationPhasesMapWithParentCountryPhaseId.put(organisationId,parentPhasesAndUnitPhaseIdMap);
+        });
+        return organizationPhasesMapWithParentCountryPhaseId;
     }
 
     public void assignOrganisationActivitiesToRuleTemplate(List<CTARuleTemplateDTO> ruleTemplateDTOS,Map<Long, BigInteger> parentUnitActivityMap){
@@ -163,6 +191,7 @@ public class CostTimeAgreementService extends MongoBaseService {
                 });
                 ctaRuleTemplateDTO.setActivityIds(unitActivityIds);
             }
+
         });
     }
 
@@ -196,90 +225,6 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
 
-    /**
-     * @param countryId
-     * @param currencyId
-     * @param ruleTemplateCategoryId
-     * @return List<CTARuleTemplate>
-     */
-    private List<CTARuleTemplate> createDefaultRuleTemplate(Long countryId, Long currencyId, BigInteger ruleTemplateCategoryId) {
-        List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<>(10);
-        CompensationTable compensationTable = new CompensationTable(10);
-        FixedValue fixedValue = new FixedValue(10, currencyId, FixedValueType.PER_ACTIVITY);
-        CalculateValueAgainst calculateValueAgainst = new CalculateValueAgainst(FIXED_VALUE, 10.5f, fixedValue);
-        PlannedTimeWithFactor plannedTimeWithFactor = new PlannedTimeWithFactor(10, true, AccountType.DUTYTIME_ACCOUNT);
-        CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate("Working Evening Shifts",
-                "CTA rule for evening shift, from 17-23 o'clock.  For this organization/unit this is payroll type '210:  Evening compensation'",
-                "210:  Evening compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Working Night Shifts",
-                "CTA rule for night shift, from 23-07 o. clock.  For this organization/unit this is payroll type “212:  Night compensation”",
-                "212:  Night compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Working On a Saturday",
-                "CTA rule for Saturdays shift, from 08-24 o. clock. For this organization/unit this is payroll type " +
-                        "“214:  Saturday compensation”. If you are working from 00-07 on Saturday, you only gets evening " +
-                        "compensation",
-                "214:  Saturday compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Working On a Sunday",
-                "CTA rule for Saturdays shift, from 00-24 o. clock. For this organization/unit this is " +
-                        "payroll type “214:Saturday compensation”.All working time on Sundays gives compensation"
-                ,
-                "214:Saturday compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Working On a Full Public Holiday",
-                "CTA rule for full public holiday shift, from 00-24 o. clock.  For this organization/unit this is " +
-                        "payroll type “216:  public holiday compensation”. All working time on full PH gives " +
-                        "compensation",
-                "216:public holiday compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Working On a Half Public Holiday",
-                "CTA rule for full public holiday shift, from 12-24 o. clock. For this organization/unit" +
-                        " this is payroll type “218:  half public holiday compensation”.All working time on " +
-                        "half PH gives compensation",
-                "218: half public holiday compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Working Overtime",
-                "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
-                        " 50% overtime compensation”.",
-                "230:50% overtime compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-        ctaRuleTemplates.add(ctaRuleTemplate);
-        ctaRuleTemplate = new CTARuleTemplate("Working Extratime",
-                "CTA rule for extra time shift, from 00-24 o. clock.  For this organization/unit this is payroll type" +
-                        " “250:  extratime compensation”. ",
-                "250:  extratime compensation", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Late Notice Compensation",
-                "CTA rule for late notification on changes to working times.  If notice of change is done within 72 hours" +
-                        " before start of working day, then staff is entitled to at compensation of 105 kroner",
-                "", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-
-        ctaRuleTemplate = new CTARuleTemplate("Extra Dutyfree Day For Each Public Holiday",
-                "CTA rule for each public holiday.  Whenever there is a public holiday staff are entitled to an" +
-                        " extra day off, within 3 month or just compensated in the timebank.",
-                "", "xyz", ruleTemplateCategoryId, CalculationUnit.HOURS, compensationTable, calculateValueAgainst, ApprovalWorkFlow.NO_APPROVAL_NEEDED, BudgetType.ACTIVITY_COST, ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE, PlanningCategory.DEVIATION_FROM_PLANNED, plannedTimeWithFactor, countryId);
-
-        ctaRuleTemplates.add(ctaRuleTemplate);
-        return ctaRuleTemplates;
-    }
-
 
     public CTAResponseDTO getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
         UnitPositionDTO unitPosition = genericIntegrationService.getUnitPositionDTO(unitId,unitEmploymentPositionId);
@@ -304,7 +249,11 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
-        if (unitPosition.isPublished()) {
+        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
+        boolean calculativeValueChanged=checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,ctaDTO.getRuleTemplates());
+        // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
+        boolean isSameFutureDateCTA = oldCTA.getStartDate().isEqual(ctaDTO.getStartDate()) && (ctaDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || ctaDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        if (unitPosition.isPublished() && !isSameFutureDateCTA && calculativeValueChanged) {
             ctaDTO.setId(null);
             CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
@@ -333,6 +282,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             responseCTA.setParentId(oldCTA.getId());
             responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
             save(costTimeAgreement);
+            updateTimeBankByUnitPositionIdPerStaff(unitPositionId, ctaDTO.getStartDate(), ctaDTO.getEndDate(),unitId);
         } else {
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
             ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
@@ -342,6 +292,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             oldCTA.setStartDate(ctaDTO.getStartDate());
             oldCTA.setEndDate(ctaDTO.getEndDate());
             oldCTA.setDescription(ctaDTO.getDescription());
+            oldCTA.setName(ctaDTO.getName());
             save(oldCTA);
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
@@ -349,6 +300,29 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         unitPosition.setCostTimeAgreement(responseCTA);
         return unitPosition;
+    }
+
+    public boolean checkCalculativeValueChanged(List<CTARuleTemplate> ctaRuleTemplatesOfCTA, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
+        AtomicBoolean calculativeValueChange=new AtomicBoolean(false);
+        ctaRuleTemplateDTOS.forEach(currentRuleTemplateToBeLinkedDTO->{
+            CTARuleTemplate ctaRuleTemplate=ctaRuleTemplatesOfCTA.stream().filter(ruleTemplate -> ruleTemplate.getId().equals(currentRuleTemplateToBeLinkedDTO.getId())).findAny().orElse(null);
+            if (ctaRuleTemplate==null){ // this means  a new template is added now we need to check for date
+                calculativeValueChange.getAndSet(true);
+                return;
+            }
+            CTARuleTemplate currentRuleTemplateToBeLinked = ObjectMapperUtils.copyPropertiesByMapper(currentRuleTemplateToBeLinkedDTO, CTARuleTemplate.class);
+            if (!ctaRuleTemplate.equals(currentRuleTemplateToBeLinked)){
+                calculativeValueChange.getAndSet(true);
+                return;
+            }
+        });
+        return calculativeValueChange.get();
+    }
+
+    private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
+        Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = genericIntegrationService.verifyUnitEmploymentOfStaffByUnitPositionId(unitId,ctaStartDate, AppConstants.ORGANIZATION,unitPositionId,Collections.emptySet());
+        timeBankService.updateTimeBankOnUnitPositionModification(null,unitPositionId, DateUtils.asDate(ctaStartDate), endDate, staffAdditionalInfoDTO);
     }
 
     /**
@@ -586,6 +560,36 @@ public class CostTimeAgreementService extends MongoBaseService {
         save(costTimeAgreement);
 
         return costTimeAgreementRepository.getOneCtaById(costTimeAgreement.getId());
+    }
+
+
+    public void updateExistingPhaseIdOfCTA(){
+        List<CostTimeAgreement> costTimeAgreements = costTimeAgreementRepository.findAll();
+        List<Phase> countryPhase = phaseMongoRepository.findAllBycountryIdAndDeletedFalse(18712l);
+        Map<BigInteger,PhaseDefaultName> phaseDefaultNameMap = countryPhase.stream().collect(Collectors.toMap(k->k.getId(),v->v.getPhaseEnum()));
+        Map<Long,Map<PhaseDefaultName, BigInteger>> mapMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(costTimeAgreements)){
+            for (CostTimeAgreement costTimeAgreement : costTimeAgreements) {
+                List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(costTimeAgreement.getRuleTemplateIds());
+                if(costTimeAgreement.getOrganization()!=null){
+                    if(!mapMap.containsKey(costTimeAgreement.getOrganization().getId())){
+                        List<Phase> unitPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(costTimeAgreement.getOrganization().getId());
+                        Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = unitPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum(),v->v.getId()));
+                        mapMap.put(costTimeAgreement.getOrganization().getId(),parentPhasesAndUnitPhaseIdMap);
+                    }
+                    for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
+                        Map<PhaseDefaultName, BigInteger> parentPhasesAndUnitPhaseIdMap = mapMap.get(costTimeAgreement.getOrganization().getId());
+                        for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : ctaRuleTemplate.getPhaseInfo()) {
+                            BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseDefaultNameMap.get(ctaRuleTemplatePhaseInfo.getPhaseId()),ctaRuleTemplatePhaseInfo.getPhaseId());
+                            ctaRuleTemplatePhaseInfo.setPhaseId(phaseId);
+                        }
+                    }
+                    if(CollectionUtils.isNotEmpty(ctaRuleTemplates)) {
+                        ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
+                    }
+                }
+            }
+        }
     }
 
 }

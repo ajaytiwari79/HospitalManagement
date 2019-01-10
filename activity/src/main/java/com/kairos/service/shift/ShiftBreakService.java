@@ -128,8 +128,8 @@ public class ShiftBreakService {
         BreakAvailabilitySettings breakAvailabilitySettings=null;
         if (numberOfBreakRequired > 0) {
 
-             breakAvailabilitySettings =findCurrentBreakAvailability(mainShift.getActivities().get(0).getStartDate(), timeSlot, breakWTATemplate);
-                    // this must be break restriction settings
+            breakAvailabilitySettings =findCurrentBreakAvailability(mainShift.getActivities().get(0).getStartDate(), timeSlot, breakWTATemplate);
+            // this must be break restriction settings
             // with initial block and end block  we need to check start restriction and and end as well
 
             if (breakAvailabilitySettings == null) { // if availability is null then we are resetting it to zero means no restriction at all
@@ -353,7 +353,7 @@ public class ShiftBreakService {
 
     private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate, boolean breakShift,Long absenceReasonCodeId,Long allowedBreakDurationInMinute) {
         ShiftActivity childShift = new ShiftActivity(name, startDate, endDate, activityId, breakShift,absenceReasonCodeId,allowedBreakDurationInMinute);
-        childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
+        childShift.setStatus(Collections.singleton(ShiftStatus.REQUEST));
         return childShift;
     }
 

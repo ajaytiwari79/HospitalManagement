@@ -22,7 +22,8 @@ public class ActivityToSchedulerJobQueueListener {
     private ActivityToSchedulerQueueService activityToSchedulerQueueService;
     @Inject
     private ObjectMapper objectMapper;
-    @KafkaListener(topics=ACTIVITY_TO_SCHEDULER_JOB_QUEUE_TOPIC)
+    //Todo Yatharth uncomment this code when it kafka is ready
+    // @KafkaListener(topics=ACTIVITY_TO_SCHEDULER_JOB_QUEUE_TOPIC)
     public void processMessage(String message) {
         try {
             KairosScheduleJobDTO job = objectMapper.readValue(message,KairosScheduleJobDTO.class);

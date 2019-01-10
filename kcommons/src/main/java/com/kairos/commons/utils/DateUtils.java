@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
+import static javax.management.timer.Timer.ONE_HOUR;
 
 /**
  * Created by oodles on 1/2/17.
@@ -497,9 +498,6 @@ public  class DateUtils {
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
     }
-    public static DateTime getDateTimeByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
-        return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute());
-    }
 
     public static Date getDateByLocalDate(LocalDate localDate) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), 0, 0).toDate();
@@ -647,6 +645,10 @@ public  class DateUtils {
 
     public static Long getLongFromLocalDate(LocalDate date) {
         return (date == null) ? null : date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public static Long getLongFromLocalDateimeTime(LocalDateTime date) {
+        return (date == null) ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static LocalDate getDateFromEpoch(Long dateLong) {
@@ -800,4 +802,57 @@ public  class DateUtils {
 
         return asZoneDateTime(date).getMinute();
     }
+
+    public static LocalDate getStartDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    public static LocalDate getEndDateOfWeek(){
+        return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+    }
+
+    public static Double getMinutesFromTotalMilliSeconds(long totalMilliSeconds){
+        long seconds, minutes, hours;
+        seconds = totalMilliSeconds / 1000;
+        minutes = seconds / 60;
+        hours = minutes / 60;
+        minutes = minutes % 60;
+        return new Double(hours+"."+minutes);
+    }
+
+    public static Double getHoursByMinutes(double totalMinutes){
+        Integer hour  = (int) totalMinutes/(60);
+        Integer minutes = (int)totalMinutes % 60;
+        return new Double(hour+"."+minutes);
+    }
+
+    public static Date plusDays(Date date,int plusDays){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));
+    }
+
+    public static Date plusMonths(Date date,int plusMonths){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMonths(plusMonths));
+    }
+
+    public static Date plusWeeks(Date date,int plusWeeks){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusWeeks(plusWeeks));
+    }
+
+    public static Date plusHours(Date date,int plusHours){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusHours(plusHours));
+    }
+
+    public static Date plusMinutes(Date date,int plusMinutes){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMinutes(plusMinutes));
+    }
+
+    public static Date plusSeconds(Date date,int plusSeconds) {
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusSeconds(plusSeconds));
+    }
+
+    public static LocalDateTime getLocalDateTimeFromLocalDate(LocalDate localDate){
+        return localDate.atStartOfDay();
+
+    }
+
 }

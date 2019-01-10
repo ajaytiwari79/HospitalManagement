@@ -330,6 +330,8 @@ public class UnionService {
         sectorIdsToBeDeleted.removeAll(unionData.getSectorIds());
         if(!sectorIdsToBeDeleted.isEmpty()&&!union.isBoardingCompleted()) {
             organizationGraphRepository.deleteUnionSectorRelationShip(sectorIdsToBeDeleted,unionId);
+        }else if(!sectorIdsToBeDeleted.isEmpty()&&union.isBoardingCompleted()) {
+            exceptionService.unsupportedOperationException("message.sector.unlinked");
         }
 
         if(! sectorIDsCreated.isEmpty()) {

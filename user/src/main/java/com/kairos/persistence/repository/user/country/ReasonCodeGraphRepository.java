@@ -48,9 +48,9 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
     boolean findByUnitIdAndNameExcludingCurrent(Long unitId, Long reasonCodeId, String name, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (organization:Organization)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND id(reasonCode)= {1} return reasonCode")
-    ReasonCode findByUnitidAndReasonCode(long unitId, long reasonCodeId);
+    ReasonCode findByUnitIdAndReasonCode(long unitId, long reasonCodeId);
 
-    @Query("MATCH(reasonCode:ReasonCode{deleted:false}) WHERE id(reasonCode) IN {0} RETURN reasonCode")
+    @Query("MATCH(reasonCode:ReasonCode{deleted:false}) WHERE id(reasonCode) IN {0} RETURN  reasonCode")
     List<ReasonCode> findByIds(Set<Long> reasonCodeIds);
 
 

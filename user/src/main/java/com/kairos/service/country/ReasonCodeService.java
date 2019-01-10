@@ -96,7 +96,7 @@ public class ReasonCodeService {
             exceptionService.duplicateDataException("message.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
 
         }
-        ReasonCode reasonCode=reasonCodeGraphRepository.findByUnitidAndReasonCode(unitId,reasonCodeDTO.getId());
+        ReasonCode reasonCode=reasonCodeGraphRepository.findByUnitIdAndReasonCode(unitId,reasonCodeDTO.getId());
         if(!Optional.ofNullable(reasonCode).isPresent()){
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound",reasonCodeDTO.getId());
 
@@ -125,7 +125,7 @@ public class ReasonCodeService {
     }
 
     public boolean deleteReasonCodeForUnit(long unitId, long reasonCodeId){
-        ReasonCode reasonCode=reasonCodeGraphRepository.findByUnitidAndReasonCode(unitId,reasonCodeId);
+        ReasonCode reasonCode=reasonCodeGraphRepository.findByUnitIdAndReasonCode(unitId,reasonCodeId);
         if(!Optional.ofNullable(reasonCode).isPresent()){
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound",reasonCodeId);
 
@@ -135,7 +135,7 @@ public class ReasonCodeService {
         return true;
     }
 
-   public void createDefalutDateForUnit(Organization organization,long countryId){
+   public void createDefalutDataForUnit(Organization organization, long countryId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
        createDefaultData(reasonCodeResponseDTO,organization);
    }

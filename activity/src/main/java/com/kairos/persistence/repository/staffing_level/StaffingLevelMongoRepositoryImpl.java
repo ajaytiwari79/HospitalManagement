@@ -5,6 +5,7 @@ import com.kairos.service.staffing_level.StaffingLevelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -25,7 +26,8 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     }
 
     public List<StaffingLevel> getStaffingLevelsByUnitIdAndDate(Long unitId, Date startDate, Date endDate){
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("currentDate").gte(startDate).lte(endDate));
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("currentDate").gte(startDate).lte(endDate).and("deleted").is(false));
+        query.with(new Sort(Sort.Direction.ASC, "currentDate"));
         return mongoTemplate.find(query,StaffingLevel.class);
     }
 

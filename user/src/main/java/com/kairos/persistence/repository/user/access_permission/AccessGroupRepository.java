@@ -1,14 +1,11 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
-import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -42,16 +39,16 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "CASE\n" +
             "WHEN p IS NOT NULL\n" +
             "THEN p\n" +
-            "ELSE c END AS n")
+            "ELSE c END as n")
     AccessGroup findAccessGroupByName(long organizationId, String name);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
-            "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') RETURN accessGroup")
+    @Query("Match (organization:Organization) where id(organization)={0}\n" +
+            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') return accessGroup")
     List<AccessGroup> getAccessGroups(long unitId);
 
-    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) WHERE id(user) IN {0} \n"+
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user) IN {0} \n"+
             "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission) \n" +
-            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) RETURN DISTINCT\n" +
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) return DISTINCT\n" +
             "apoc.map.fromValues([id(staff), {role:ag.role,userId:id(user)}]) AS map")
     List<Map<String,Object>>  getUserAccessRoleByUserIds(List<Long> userIds);
 
@@ -118,14 +115,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(page) DELETE r")
     void removeAccessPageRelationshipForCountryAccessGroup(Long accessPageId, Long countryId, String organizationCategory);
 
-    @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n \n" +
-            "OPTIONAL MATCH (n)-[:SUB_PAGE*]->(subPage:AccessPage)  WITH collect(subPage)+collect(n) AS coll UNWIND coll AS pages WITH distinct pages WITH collect(pages) AS listOfPage \n" +
-            "MATCH (org:Organization)-[:"+BELONGS_TO+"]-(c:Country) WHERE id(c)={1} AND org.isKairosHub ={2} AND org.union={3} WITH org,listOfPage \n" +
-            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  WHERE childOrg.isKairosHub ={2} AND childOrg.union={3} WITH org+[childOrg] AS allOrg,listOfPage \n" +
-            "UNWIND listOfPage AS page\n" +
-            "UNWIND allOrg AS org \n" +
-            "MATCH (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
-            "CREATE UNIQUE (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:false, write:false}]->(page)")
+    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
+            "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
+            "Match (org:Organization)-[:"+BELONGS_TO+"]-(c:Country) where id(c)={1} AND org.isKairosHub ={2} AND org.union={3} with org,listOfPage \n" +
+            "OPTIONAL Match (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  where childOrg.isKairosHub ={2} AND childOrg.union={3} with org+[childOrg] as allOrg,listOfPage \n" +
+            "UNWIND listOfPage as page\n" +
+            "UNWIND allOrg as org \n" +
+            "Match (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(page)")
     void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("MATCH (n:AccessPage) WHERE id(n)={0} WITH n \n" +
@@ -337,6 +334,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (staff)-[:"+BELONGS_TO+"]-(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(org) WITH up,country  " +
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag) RETURN Collect(DISTINCT id(ag)) AS accessGroupIds ,id(country) AS countryId")
     StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long staffId, Long unitId);
+
 
     @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
             "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) WHERE id(accessGroup)={1}" +

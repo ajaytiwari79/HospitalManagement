@@ -332,7 +332,7 @@ public class StaffService {
         user.setPregnant(user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
         userGraphRepository.save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffRetrievalService.getSectorWiseExpertiseWithExperience(unitId,staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         return staffPersonalDetail;
     }
@@ -390,7 +390,7 @@ public class StaffService {
             exceptionService.actionNotPermittedException("error.access.expired", accessGroup.getName());
         }
 
-        List<Staff> staffList = new ArrayList<>();
+        List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
         List<Integer> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
@@ -505,8 +505,9 @@ public class StaffService {
                     ContactDetail contactDetail = extractContactDetailFromRow(row);
                     staff.setContactDetail(contactDetail);
                     staff.setContactAddress(contactAddress);
+                    User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        User user = userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row, 2)
+                        user = userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row, 2)
                                 , getStringValueOfIndexedCell(row, 28).toLowerCase()
                                 , getStringValueOfIndexedCell(row, 28).toLowerCase()
                         );
@@ -533,8 +534,12 @@ public class StaffService {
                         }
                         staff.setUser(user);
                     }
+
                     staffGraphRepository.save(staff);
-                    staffList.add(staff);
+                    StaffPersonalDetailDTO staffPersonalDetailDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetailDTO.class);
+                    staffPersonalDetailDTO.setGender(user.getGender());
+                    staffPersonalDetailDTO.setCprNumber(user.getCprNumber()); //Setting CPR-Number to get Age.
+                    staffList.add(staffPersonalDetailDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                         createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
                     }
@@ -1339,9 +1344,8 @@ public class StaffService {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId);
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            unitPositionDetails = new StaffUnitPositionDetails(unitId);
-
-            convertUnitPositionObject(unitPosition, unitPositionDetails);
+            unitPositionDetails = convertUnitPositionObject(unitPosition);
+            unitPositionDetails.setUnitId(unitId);
             List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
             unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
         }

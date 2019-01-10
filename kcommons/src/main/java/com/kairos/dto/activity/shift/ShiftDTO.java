@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by vipul on 30/8/17.
@@ -182,7 +183,7 @@ public class ShiftDTO {
 
     public void setActivities(List<ShiftActivityDTO> activities) {
         if (Optional.ofNullable(activities).isPresent()) {
-            activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+            activities = activities.stream().filter(shiftActivityDTO -> Optional.ofNullable(shiftActivityDTO.getStartDate()).isPresent()).sorted((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate())).collect(Collectors.toList());
         }
         this.activities = activities;
     }

@@ -117,6 +117,18 @@ public class ActivityIntegrationService {
         });
     }
 
+    public void updateTimeBankOnUnitPositionUpdation(BigInteger collectiveTimeAgreementId,Long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        BasicNameValuePair startDate = new BasicNameValuePair("unitPositionLineStartDate", unitPositionLineStartDate.toString());
+        BasicNameValuePair endDate = new BasicNameValuePair("unitPositionLineEndDate", unitPositionLineEndDate!=null?unitPositionLineEndDate.toString():null);
+        BasicNameValuePair ctaId = new BasicNameValuePair("ctaId", collectiveTimeAgreementId.toString());
+        List<NameValuePair> param = new ArrayList<>();
+        param.add(startDate);
+        param.add(endDate);
+        param.add(ctaId);
+        genericRestClient.publishRequest(staffAdditionalInfoDTO, staffAdditionalInfoDTO.getUnitId(), true, IntegrationOperation.UPDATE, "/timeBank/unit_position/{unitPositionId}/update_time_bank", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        },unitPositionId);
+    }
+
     public void createTimeTypes(Long countryId){
         restClientForSchedulerMessages.publish(null,countryId, false, IntegrationOperation.CREATE, "/timeType/default",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });

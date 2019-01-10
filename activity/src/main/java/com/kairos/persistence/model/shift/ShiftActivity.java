@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.shift;
 
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 
@@ -27,7 +27,7 @@ public class ShiftActivity {
     //used for adding absence type of activities.
     private Long absenceReasonCodeId;
     private String remarks;
-    //please don't use this id for any functionality this only for frontend
+    //please don't use this id for any functionality this on ly for frontend
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
@@ -37,8 +37,12 @@ public class ShiftActivity {
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private Long allowedBreakDurationInMinute;
+    private int timeBankCtaBonusMinutes;
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
+    }
 
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
 
     public ShiftActivity() {
     }
@@ -69,6 +73,7 @@ public class ShiftActivity {
         this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
         this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.breakReplaced=breakReplaced;
     }
     public ShiftActivity(BigInteger activityId, String activityName) {
@@ -76,6 +81,14 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
+
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
@@ -222,20 +235,20 @@ public class ShiftActivity {
         this.absenceReasonCodeId = absenceReasonCodeId;
     }
 
-    public List<TimeBankCTADistribution> getTimeBankCTADistributions() {
-        return timeBankCTADistributions;
-    }
-
-    public void setTimeBankCTADistributions(List<TimeBankCTADistribution> timeBankCTADistributions) {
-        this.timeBankCTADistributions = timeBankCTADistributions;
-    }
-
     public boolean isBreakReplaced() {
         return breakReplaced;
     }
 
     public void setBreakReplaced(boolean breakReplaced) {
         this.breakReplaced = breakReplaced;
+    }
+
+    public List<TimeBankCTADistribution> getTimeBankCTADistributions() {
+        return timeBankCTADistributions;
+    }
+
+    public void setTimeBankCTADistributions(List<TimeBankCTADistribution> timeBankCTADistributions) {
+        this.timeBankCTADistributions = timeBankCTADistributions;
     }
 
     public Long getAllowedBreakDurationInMinute() {

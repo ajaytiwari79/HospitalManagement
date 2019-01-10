@@ -117,7 +117,7 @@ public class CounterRepository {
     //KPI  CRUD
     public List<ApplicableKPI> getApplicableKPI(List<BigInteger> kpiIds, ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and(refQueryField).is(refId));
+        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level));
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
@@ -125,7 +125,7 @@ public class CounterRepository {
 
     public List<KPICategory> getKPICategoryByIds(List<BigInteger> categoryIds, ConfLevel level, Long refId){
         String queryField =  getRefQueryField(level);
-        Query query=new Query(Criteria.where("_id").in(categoryIds).and(queryField).is(refId));
+        Query query=new Query(Criteria.where("_id").in(categoryIds).and(queryField).is(refId).and("level").is(level));
         return mongoTemplate.find(query,KPICategory.class);
 
     }

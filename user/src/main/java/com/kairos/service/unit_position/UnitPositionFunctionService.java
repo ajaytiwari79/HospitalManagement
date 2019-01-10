@@ -55,7 +55,7 @@ public class UnitPositionFunctionService {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
 
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION,Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(DateUtils.asLocalDate(dateAsString), unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION,Collections.emptySet());
         activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
 
         return true;
@@ -64,9 +64,13 @@ public class UnitPositionFunctionService {
     public Long removeFunction(Long unitId,Long unitPositionId, Date appliedDate) {
         Long functionId = unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentData(DateUtils.asLocalDate(appliedDate),staffId , unitPositionId, unitId, ORGANIZATION,Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(DateUtils.asLocalDate(appliedDate),staffId , unitPositionId, unitId, ORGANIZATION,Collections.emptySet());
         activityIntegrationService.updateTimeBank(unitPositionId, DateUtils.asLocalDate(appliedDate), staffAdditionalInfoDTO);
         return functionId;
+    }
+
+    public Long removeFunctionOnDeleteShift(Long unitPositionId, Date appliedDate) {
+        return unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
     }
 
 

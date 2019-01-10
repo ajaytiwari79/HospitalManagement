@@ -11,7 +11,9 @@ import java.util.Map;
 public enum CounterSize {
     SIZE_1X1(1,1),
     SIZE_2X2(2,2),
+    SIZE_8X2(8,2),
     SIZE_3X3(1,2);
+
 
     private int height=0;
     private int width =0;

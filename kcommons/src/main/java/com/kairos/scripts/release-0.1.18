@@ -1,0 +1,16 @@
+// created by vipul use in shifts(activity)
+
+db.shifts.updateMany({"activities.status":"PUBLISHED"},{$set:{"activities.$[].status":["PUBLISH"]}})
+db.shifts.updateMany({"activities.status":"UNPUBLISHED"},{$set:{"activities.$[].status":["REQUEST"]}})
+db.shifts.updateMany({"activities.status":"FIXED"},{$set:{"activities.$[].status":["FIX"]}})
+db.shifts.updateMany({"activities.status":"LOCKED"},{$set:{"activities.$[].status":["LOCK"]}})
+db.shifts.updateMany({"activities.status":"UNLOCK"},{$set:{"activities.$[].status":["UNLOCK"]}})
+db.shifts.updateMany({"activities.status":"VALIDATED"},{$set:{"activities.$[].status":["VALIDATE"]}})
+db.shifts.updateMany({"activities.status":"REJECTED"},{$set:{"activities.$[].status":["REJECT"]}})
+db.shifts.updateMany({"activities.status":"APPROVED"},{$set:{"activities.$[].status":["APPROVE"]}})
+
+db.shiftState.updateMany({},{$set:{"activities.$[].status":["REQUEST"]}})
+
+db.phases.updateMany({},{$set:{status:["PUBLISH","UNPUBLISH","FIX","LOCK","UNLOCK","UNFIX","PENDING","REQUEST","VALIDATE","REJECT","APPROVE"]}})
+db.activities.updateMany({},{$set:{"phaseSettingsActivityTab.phaseTemplateValues.$[].activityShiftStatusSettings":[]}})
+db.individualShiftTemplate.updateMany({},{$set:{"activities.$[].status":["PUBLISH"]}})

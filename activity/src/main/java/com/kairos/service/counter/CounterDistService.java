@@ -3,9 +3,8 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.data.RawRepresentationData;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
@@ -201,7 +200,7 @@ public class CounterDistService extends MongoBaseService {
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
         filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
         filters.setUnitId(unitId);
-        Map<BigInteger, RawRepresentationData> data = counterDataService.generateKPIData(filters);
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filters,unitId);
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
         });
@@ -250,7 +249,12 @@ public class CounterDistService extends MongoBaseService {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
-        return counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(unitId,kpiIds),unitId);
+        tabKPIDTOS.forEach(tabKPIDTO -> {
+            tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
+        });
+        return tabKPIDTOS;
     }
 
     public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, Long countryId, Long unitId, Long staffId, ConfLevel level) {
@@ -518,6 +522,7 @@ public class CounterDistService extends MongoBaseService {
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(new ArrayList<>(subOrgTypeIds), new ArrayList<>());
         Map<Long,Set<BigInteger>> subOrgTypeOrKPIMap=orgTypeMappingDTOS.stream().collect(Collectors.groupingBy(OrgTypeMappingDTO::getOrgTypeId,Collectors.mapping(OrgTypeMappingDTO::getKpiId,Collectors.toSet())));
         Map<Long,Set<BigInteger>> unitIdOrKpiMap=new HashMap<>();
+        List<Long> unitIds=orgTypeDTOS.stream().map(orgTypeDTO -> orgTypeDTO.getUnitId()).collect(toList());
         orgTypeDTOS.forEach(orgTypeDTO -> {
             orgTypeDTO.getOrgTypeIds().forEach(subOrgType->{
                if(subOrgTypeOrKPIMap.get(subOrgType)!=null){
@@ -529,10 +534,9 @@ public class CounterDistService extends MongoBaseService {
                }
             });
         });
-        List<Long> unitIds=new ArrayList<>();
         unitIdOrKpiMap.entrySet().forEach(k->{
-            if(!unitIdOrKpiMap.get(k.getKey()).contains(orgTypeMappingDTO.getKpiId())){
-                unitIds.add(k.getKey());
+            if(unitIdOrKpiMap.get(k.getKey()).contains(orgTypeMappingDTO.getKpiId())){
+                unitIds.remove(k.getKey());
             }
         });
         if(!unitIds.isEmpty()) {
