@@ -21,7 +21,6 @@ import com.kairos.persistence.repository.solver_config.ConstraintRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -49,9 +48,6 @@ import static java.util.stream.Collectors.*;
 @Service
 public class VRPPlanningService extends MongoBaseService{
 
-
-    //@Inject private SolverConfigRepository solverConfigRepository;
-    @Inject private StaffRestClient staffRestClient;
     @Inject private GenericIntegrationService genericIntegrationService;
 
     @Inject private TaskService taskService;

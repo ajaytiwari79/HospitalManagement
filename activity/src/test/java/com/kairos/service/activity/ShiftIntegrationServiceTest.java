@@ -7,7 +7,6 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;

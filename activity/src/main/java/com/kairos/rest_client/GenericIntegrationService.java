@@ -61,6 +61,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.*;
 
 
@@ -454,7 +455,9 @@ public class GenericIntegrationService {
     public WTABasicDetailsDTO getWtaRelatedInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, Long organizationId, Long organizationTypeId, List<Long> unitIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("countryId", countryId.toString()));
-        queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
+        if(isNotNull(organizationId)) {
+            queryParamList.add(new BasicNameValuePair("organizationId", organizationId.toString()));
+        }
         queryParamList.add(new BasicNameValuePair("organizationTypeId", organizationTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("organizationSubTypeId", organizationSubTypeId.toString()));
         queryParamList.add(new BasicNameValuePair("expertiseId", expertiseId.toString()));

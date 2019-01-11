@@ -68,11 +68,9 @@ public class TaskTypeService extends MongoBaseService {
     @Inject
     private EnvConfig envConfig;
 
-    @Autowired private OrganizationRestClient organizationRestClient;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
-    @Autowired private GenericIntegrationService genericIntegrationService;
-
-    @Autowired
+    @Inject
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
 
 

@@ -73,7 +73,6 @@ import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriod
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
@@ -91,7 +90,6 @@ import com.kairos.service.wta.WTAService;
 import com.kairos.utils.ShiftValidatorService;
 import com.kairos.utils.event.ShiftNotificationEvent;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
-import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
@@ -138,8 +136,6 @@ public class ShiftService extends MongoBaseService {
     private ActivityMongoRepository activityRepository;
     @Inject
     private TimeAndAttendanceRepository timeAndAttendanceRepository;
-    @Inject
-    private StaffRestClient staffRestClient;
     @Inject
     private ApplicationContext applicationContext;
     @Inject

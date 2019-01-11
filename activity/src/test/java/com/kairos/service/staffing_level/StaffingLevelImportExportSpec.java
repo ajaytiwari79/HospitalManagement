@@ -1,6 +1,5 @@
 package com.kairos.service.staffing_level;
 
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
