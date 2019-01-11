@@ -200,7 +200,7 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-        List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByCountry(countryId);
+        List<ActivityTagDTO> activities = ObjectMapperUtils.copyPropertiesOfListByMapper(activityMongoRepository.findAllActivityByCountry(countryId),ActivityTagDTO.class);
         List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
         response.put("activityCategories", acivitityCategories);
