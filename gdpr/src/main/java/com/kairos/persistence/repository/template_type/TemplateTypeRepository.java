@@ -6,7 +6,7 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -23,6 +23,10 @@ public interface TemplateTypeRepository extends JpaRepository<TemplateTypeMD,Lon
 
     @Query(value = "Select TT from TemplateTypeMD TT where TT.id IN (?1) and TT.deleted = false")
     List<TemplateTypeMD> findAllById(List<Long> ids);
+
+    @Query(value = "Select TT from TemplateTypeMD TT where TT.countryId  = ?1 and TT.deleted = false order by TT.createdAt desc")
+    List<TemplateTypeMD> getAllTemplateType(Long countryId);
+
 
     /*@Query("{name:?0,deleted:false}")
     TemplateType findByTemplateName(String templateName);

@@ -10,6 +10,7 @@ import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
+import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.persistence.model.clause.ClauseMD;
@@ -190,7 +191,12 @@ public class ClauseService extends MongoBaseService {
     }
 
     public List<UnitLevelClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
-        return clauseMongoRepository.findAllClauseByUnitId(unitId);
+        List<UnitLevelClauseResponseDTO> clauseResponseDTOS =  new ArrayList<>();
+        List<ClauseMD> clauses = clauseRepository.findAllClauseByUnitId(unitId);
+        for(ClauseMD clause : clauses){
+            clauseResponseDTOS.add(prepareClauseResponseDTOForUnitLevel(clause));
+        }
+        return clauseResponseDTOS;
     }
 
 
@@ -206,6 +212,18 @@ public class ClauseService extends MongoBaseService {
         clauseResponseDTO.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationServices(), ServiceCategoryDTO.class));
         clauseResponseDTO.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubServices(), SubServiceCategoryDTO.class));
         clauseResponseDTO.setOrganizationSubTypeDTOS(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+        return clauseResponseDTO;
+    }
+
+    private UnitLevelClauseResponseDTO prepareClauseResponseDTOForUnitLevel(ClauseMD clause){
+        UnitLevelClauseResponseDTO clauseResponseDTO =  new UnitLevelClauseResponseDTO();
+        clauseResponseDTO.setId(clause.getId());
+        clauseResponseDTO.setTitle(clause.getTitle());
+        clauseResponseDTO.setTitleHtml(clause.getTitleHtml());
+        clauseResponseDTO.setDescription(clause.getDescription());
+        clauseResponseDTO.setDescriptionHtml(clause.getDescriptionHtml());
+        clauseResponseDTO.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getTags(), ClauseTagDTO.class));
+        clauseResponseDTO.setTemplateTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(clause.getTemplateTypes(), TemplateTypeResponseDTO.class));
         return clauseResponseDTO;
     }
 

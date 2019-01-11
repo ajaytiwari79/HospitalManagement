@@ -6,7 +6,9 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.custom_exception.DataNotExists;
 
 import com.kairos.persistence.model.template_type.TemplateType;
+import com.kairos.persistence.model.template_type.TemplateTypeMD;
 import com.kairos.persistence.repository.template_type.TemplateTypeMongoRepository;
+import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
@@ -26,7 +28,10 @@ public class TemplateTypeService extends MongoBaseService {
 
 
     @Inject
-    private TemplateTypeMongoRepository templateTypeRepository;
+    private TemplateTypeMongoRepository templateTypeMongoRepository;
+
+    @Inject
+    private TemplateTypeRepository templateTypeRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -60,7 +65,7 @@ public class TemplateTypeService extends MongoBaseService {
                 templateType1.setCountryId(countryId);
                 newDataTemplateList.add(templateType1);
             }
-            newDataTemplateList = templateTypeRepository.saveAll(getNextSequence(newDataTemplateList));
+            newDataTemplateList = templateTypeMongoRepository.saveAll(getNextSequence(newDataTemplateList));
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataTemplateList);
@@ -76,7 +81,7 @@ public class TemplateTypeService extends MongoBaseService {
      * @author vikash patwal
      */
     public TemplateType getTemplateByName(Long countryId, String templateName) {
-        TemplateType template = templateTypeRepository.findByTemplateNameAndIsDeleted(countryId, templateName);
+        TemplateType template = templateTypeMongoRepository.findByTemplateNameAndIsDeleted(countryId, templateName);
         if (java.util.Optional.ofNullable(template).isPresent()) {
             return template;
         } else
@@ -85,7 +90,7 @@ public class TemplateTypeService extends MongoBaseService {
 
 
     public TemplateType getTemplateById(BigInteger templateId, Long countryId) {
-        TemplateType template = templateTypeRepository.findByIdAndNonDeleted(templateId, countryId);
+        TemplateType template = templateTypeMongoRepository.findByIdAndNonDeleted(templateId, countryId);
         if (java.util.Optional.ofNullable(template).isPresent()) {
             return template;
         } else
@@ -94,7 +99,7 @@ public class TemplateTypeService extends MongoBaseService {
 
 
     public List<TemplateType> getTemplateByIdsList(List<BigInteger> templateIds, Long countryId) {
-        List<TemplateType> templates = templateTypeRepository.findTemplateTypeByIdsList(countryId, templateIds);
+        List<TemplateType> templates = templateTypeMongoRepository.findTemplateTypeByIdsList(countryId, templateIds);
         List<BigInteger> ids = new ArrayList<>();
         templates.forEach(templateType -> ids.add(templateType.getId()));
         templateIds.removeAll(ids);
@@ -117,13 +122,13 @@ public class TemplateTypeService extends MongoBaseService {
      */
     public TemplateType updateTemplateName(BigInteger id, Long countryId, TemplateType templateType) {
 
-        TemplateType previousTemplateType = templateTypeRepository.findByIdAndNameDeleted(templateType.getName(), countryId);
+        TemplateType previousTemplateType = templateTypeMongoRepository.findByIdAndNameDeleted(templateType.getName(), countryId);
         if (Optional.ofNullable(previousTemplateType).isPresent() && !id.equals(previousTemplateType.getId())) {
             throw new DuplicateDataException("template name exist for  " + templateType.getName());
         }
-        previousTemplateType = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
+        previousTemplateType = templateTypeMongoRepository.findByIdAndNonDeleted(id, countryId);
         previousTemplateType.setName(templateType.getName());
-        templateTypeRepository.save(previousTemplateType);
+        templateTypeMongoRepository.save(previousTemplateType);
         return previousTemplateType;
 
     }
@@ -136,7 +141,7 @@ public class TemplateTypeService extends MongoBaseService {
      * @author vikash patwal
      */
     public Boolean deleteTemplateType(BigInteger id, Long countryId) {
-        TemplateType templateType = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
+        TemplateType templateType = templateTypeMongoRepository.findByIdAndNonDeleted(id, countryId);
         if (!Optional.ofNullable(templateType).isPresent()) {
             throw new DataNotFoundByIdException("id not exist " + id);
         }
@@ -151,7 +156,7 @@ public class TemplateTypeService extends MongoBaseService {
      * @description this method is used for get all template type.
      * @author vikash patwal
      */
-    public List<TemplateType> getAllTemplateType(Long countryId) {
-        return templateTypeRepository.getAllTemplateType(countryId,new Sort(Sort.Direction.DESC,"createdAt"));
+    public List<TemplateTypeMD> getAllTemplateType(Long countryId) {
+        return templateTypeRepository.getAllTemplateType(countryId);
     }
 }

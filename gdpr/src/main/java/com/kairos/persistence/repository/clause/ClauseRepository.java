@@ -29,6 +29,9 @@ public interface ClauseRepository extends JpaRepository<ClauseMD, Long> {
     @Query(value = "Select c from ClauseMD c where c.countryId = ?1 and c.deleted = false")
     List<ClauseMD> findAllClauseByCountryId(Long countryId);
 
+    @Query(value = "Select c from ClauseMD c where c.organizationId = ?1 and c.deleted = false")
+    List<ClauseMD> findAllClauseByUnitId(Long unitId);
+
     @Query(value = "Select c from ClauseMD c where c.id = ?1 and c.countryId = ?2 and c.deleted = false")
     ClauseMD findByIdAndCountryId(Long id, Long countryId);
 

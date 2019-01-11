@@ -28,6 +28,15 @@ public interface ClauseTagRepository extends JpaRepository<ClauseTagMD,Long> {
     @Query(value = "Select CT from ClauseTagMD CT where CT.deleted=false and CT.defaultTag =  true")
     ClauseTagMD findDefaultTag();
 
+    @Query(value = "Select CT from ClauseTagMD CT where CT.countryId = ?1 and CT.deleted = false")
+    List<ClauseTagMD> findAllByCountryId(Long countryId);
+
+
+    @Query(value = "Select CT from ClauseTagMD CT where CT.organizationId = ?1 and CT.deleted = false")
+    List<ClauseTagMD> findAllClauseTagByUnitId(Long countryId);
+
+
+
     /*@Query("{countryId:?0,_id:?1,deleted:false}")
     ClauseTag findByIdAndNonDeleted(Long countryId, BigInteger id);
 

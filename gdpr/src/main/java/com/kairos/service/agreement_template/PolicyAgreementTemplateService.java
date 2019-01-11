@@ -14,10 +14,12 @@ import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.model.template_type.TemplateType;
+import com.kairos.persistence.model.template_type.TemplateTypeMD;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeMongoRepository;
+import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
@@ -71,7 +73,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private AWSBucketService awsBucketService;
 
     @Inject
-    private TemplateTypeMongoRepository templateTypeRepository;
+    private TemplateTypeRepository templateTypeRepository;
 
     @Inject
     private GenericRestClient genericRestClient;
@@ -333,9 +335,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
     //get country template by unitId
-    public List<TemplateType> getAllTemplateType(Long unitId) {
+    public List<TemplateTypeMD> getAllTemplateType(Long unitId) {
         Long countryId= genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() { });
-        return templateTypeRepository.getAllTemplateType(countryId,new Sort(Sort.Direction.DESC,"createdAt"));
+        return templateTypeRepository.getAllTemplateType(countryId);
     }
 
 

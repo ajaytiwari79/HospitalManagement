@@ -84,11 +84,11 @@ public class ProcessingActivityMD extends BaseEntity {
 
     public void setActive(boolean active) { this.active = active; }
 
-   /* public boolean isSubProcess() {
+   /* public boolean isSubProcessActivity() {
         return subProcess;
     }
 
-    public void setSubProcess(boolean subProcess) { this.subProcess = subProcess; }*/
+    public void setSubProcessActivity(boolean subProcess) { this.subProcess = subProcess; }*/
 
     public String getName() { return name; }
 

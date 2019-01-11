@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.master_data.data_category_element;
 
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,11 +20,11 @@ public interface DataElementMongoRepository extends MongoBaseRepository<DataElem
     DataElement findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{deleted:false,_id:?0}")
-    DataElementBasicResponseDTO getByIdAndNonDeleted( BigInteger id);
+    DataElement getByIdAndNonDeleted(BigInteger id);
 
 
     @Query("{deleted:false,countryId:?0}")
-    List<DataElementBasicResponseDTO> getAllDataElementByCountryId(Long countryId);
+    List<DataElement> getAllDataElementByCountryId(Long countryId);
 
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
@@ -36,11 +35,11 @@ public interface DataElementMongoRepository extends MongoBaseRepository<DataElem
 
 
     @Query("{deleted:false,organizationId:?0}")
-    List<DataElementBasicResponseDTO> getAllDataElementByUnitId(Long unitId);
+    List<DataElement> getAllDataElementByUnitId(Long unitId);
 
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
-    DataElementBasicResponseDTO getDataElementByUnitIdAndId( Long organizationId,BigInteger id);
+    DataElement getDataElementByUnitIdAndId(Long organizationId, BigInteger id);
 
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
