@@ -682,7 +682,7 @@ public class OrganizationService {
     }
 
 
-    public List<OrganizationBasicResponse> getOrganizationGdprAndWorkcenter(Long organizationId, Long countryId) {
+    public List<OrganizationBasicResponse> getOrganizationGdprAndWorkcenter(Long organizationId) {
 
         List<OrganizationBasicResponse> organizationQueryResult = organizationGraphRepository.getOrganizationGdprAndWorkCenter(organizationId);
         List<Long> unitIds = organizationQueryResult.stream().map(organizationBasicResponse -> organizationBasicResponse.getId()).collect(Collectors.toList());
