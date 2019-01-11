@@ -156,6 +156,7 @@ public class ShiftCopyService extends MongoBaseService {
 
         ShiftResponse shiftResponse;
         while (shiftCreationLastDate.isAfter(shiftCreationStartDate) || shiftCreationLastDate.equals(shiftCreationStartDate)) {
+            //
             ShiftResponseDTO shiftResponseDTO = shifts.get(counter);
             List<String> validationMessages = new ArrayList<>();
             for (Shift sourceShift : shiftResponseDTO.getShifts()) {

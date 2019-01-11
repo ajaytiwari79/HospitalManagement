@@ -20,9 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.VERSI
 public class FunctionalPayment extends UserBaseEntity {
     @Relationship(type = APPLICABLE_FOR_EXPERTISE)
     private Expertise expertise;
-    @Convert(LocalDateConverter.class)
     private LocalDate startDate;
-    @Convert(LocalDateConverter.class)
     private LocalDate endDate;
     private boolean published;
     private PaidOutFrequencyEnum paymentUnit;

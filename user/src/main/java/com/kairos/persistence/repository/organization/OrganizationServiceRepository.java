@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
+import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -72,7 +72,7 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}" +
             "optional match(o)-[:"+HAS_LEVEL+"]-(l:Level) " +
             "return collect(id(os)) as servicesId ,id(l) as levelId")
-    organizationServicesAndLevelQueryResult getOrganizationServiceIdsByOrganizationId(Long organizationId);
+    OrganizationServicesAndLevelQueryResult getOrganizationServiceIdsByOrganizationId(Long organizationId);
 
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true}) where id(organizationService) IN {0}" +
             " return organizationService")

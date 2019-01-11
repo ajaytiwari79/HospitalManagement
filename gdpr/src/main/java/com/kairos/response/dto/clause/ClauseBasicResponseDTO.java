@@ -2,6 +2,7 @@ package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
+import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

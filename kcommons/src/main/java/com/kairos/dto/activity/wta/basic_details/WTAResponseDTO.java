@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -42,7 +41,6 @@ public class WTAResponseDTO {
     private List<WTAResponseDTO> versions = new ArrayList<>();
     private List<TagDTO> tags;
     private Map<String, Object> unitInfo;
-    private PositionCodeDTO positionCode;
 
     public WTAResponseDTO() {
         //default
@@ -69,14 +67,6 @@ public class WTAResponseDTO {
 
     public void setUnitInfo(Map<String, Object> unitInfo) {
         this.unitInfo = unitInfo;
-    }
-
-    public PositionCodeDTO getPositionCode() {
-        return positionCode;
-    }
-
-    public void setPositionCode(PositionCodeDTO positionCode) {
-        this.positionCode = positionCode;
     }
 
     public List<WTAResponseDTO> getVersions() {

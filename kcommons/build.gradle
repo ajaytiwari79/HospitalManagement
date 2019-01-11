@@ -36,4 +36,13 @@ dependencies {
     //compile 'org.neo4j:neo4j:3.3.4'
 
 }
+sonarqube {
+    properties {
+        property "sonar.projectName", "commons"
+        property "sonar.projectKey", "kairos:commons"
+        property "sonar.sources", "src/main"
+        property "sonar.skip.tests", "true"
+        property "sonar.exclusions", "**/*test*/**"
+    }
+}
 

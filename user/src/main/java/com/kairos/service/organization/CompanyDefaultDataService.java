@@ -57,13 +57,14 @@ public class CompanyDefaultDataService {
                 orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
                 orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
                 orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
-
+                orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
+                orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
                 activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
                 asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
                 //asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
-                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDateForSubUnit(unit,parentId));
+                asynchronousService.executeInBackGround(() -> reasonCodeService.createDefalutDataForSubUnit(unit,parentId));
                 asynchronousService.executeInBackGround(()-> gdprIntegrationService.createDefaultDataForOrganization(countryId,unit.getId()));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),

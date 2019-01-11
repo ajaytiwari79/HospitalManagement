@@ -41,14 +41,24 @@ public class AbsenceStaffingLevelDto {
     }
 
     public AbsenceStaffingLevelDto(BigInteger id, BigInteger phaseId, Date currentDate, Integer weekCount) {
+        this.id = id;
+        this.phaseId = phaseId;
+        this.currentDate = currentDate;
+        this.weekCount = weekCount;
+    }
 
+
+    public AbsenceStaffingLevelDto(BigInteger id, @NotNull BigInteger phaseId, Date currentDate, Integer weekCount, int minNoOfStaff, int maxNoOfStaff, int absentNoOfStaff, Date updatedAt, Set<StaffingLevelActivity> staffingLevelActivities, Long unitId) {
         this.id = id;
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
+        this.absentNoOfStaff = absentNoOfStaff;
+        this.updatedAt = updatedAt;
         this.staffingLevelActivities = staffingLevelActivities;
+        this.unitId = unitId;
     }
 
     public BigInteger getId() {

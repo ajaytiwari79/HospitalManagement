@@ -37,7 +37,6 @@ public class AddressDTO {
     private boolean verifiedByVisitour;
     private long startDate;
     private long endDate;
-
     private String description;
     private Long municipalityId;
 
@@ -50,6 +49,10 @@ public class AddressDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getTypeOfHouseId() {
+        return typeOfHouseId;
     }
 
     public long getStartDate() {
@@ -66,10 +69,6 @@ public class AddressDTO {
 
     public void setEndDate(long endDate) {
         this.endDate = endDate;
-    }
-
-    public Long getTypeOfHouseId() {
-        return typeOfHouseId;
     }
 
     public void setTypeOfHouseId(Long typeOfHouseId) {

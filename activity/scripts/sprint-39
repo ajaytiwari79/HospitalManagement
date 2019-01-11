@@ -1,0 +1,124 @@
+
+db.time_Type.updateMany({},{$set:{"activityCanBeCopied":false}})
+
+db.shifts.updateMany({},{$set:{"activities.$[].timeBankCtaBonusMinutes":NumberInt(0),"activities.$[].timeBankCTADistributions":[]}})
+
+// run if not KPI in database
+db.getCollection('counter').insert({
+    "_id" : "16",
+    "type" : "PLANNED_HOURS",
+    "title" : "Planned Hours Of Staff",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_8X2"
+})
+
+
+db.getCollection('counter').insert({
+    "_id" : "17",
+    "type" : "CONTRACTUAL_AND_PLANNED_HOURS",
+    "title" : "Contractual And Planned Hours Of Staff",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR_LINE",
+    "size" : "SIZE_8X2"
+})
+
+db.getCollection('counter').insert({
+    "_id" : "18",
+    "type" : "TIMEBANK",
+    "title" : "TimeBank For Units",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_8X2"
+})
+
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$set":{"sequenceNumber" : 18}})
+
+db.getCollection('applicableKPI').insert({
+    "_id" : "172",
+    "activeKpiId" : "16",
+    "baseKpiId" : "16",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+})
+
+
+db.getCollection('applicableKPI').insert({
+    "_id" : "173",
+    "activeKpiId" : "17",
+    "baseKpiId" : "17",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+})
+
+db.getCollection('applicableKPI').insert({
+    "_id" : "174",
+    "activeKpiId" : "18",
+    "baseKpiId" : "18",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+})
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 174}})
+
+
+db.getCollection('counter').updateMany({},{"$set":{ "chart" : "BAR","size" : "SIZE_8X2"}})
+
+db.getCollection('counter').update({"_id":"17"},{"$set":{"chart":"BAR_LINE"}})
+
+
+
+
+
+//for dev
+db.getCollection('counter').insert({
+    "_id" : "19",nextsequence
+    "type" : "SHIFT_AND_ACTIVITY_DURATION",
+    "title" : "Duration Of Shift And Activity",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_8X2"
+})
+db.getCollection('applicableKPI').insert({
+    "_id" : "174",nextsequence
+    "activeKpiId" : "19",
+    "baseKpiId" : "19",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+})
+
+
+//update sequence of ApplicableKPISequence,applicableKPI

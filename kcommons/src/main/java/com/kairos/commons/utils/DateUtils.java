@@ -811,7 +811,8 @@ public  class DateUtils {
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
-    public static Double getMinutesFromTotalMilliSeconds(long totalMilliSeconds){
+
+    public static Double getHoursFromTotalMilliSeconds(long totalMilliSeconds){
         long seconds, minutes, hours;
         seconds = totalMilliSeconds / 1000;
         minutes = seconds / 60;
@@ -823,8 +824,15 @@ public  class DateUtils {
     public static Double getHoursByMinutes(double totalMinutes){
         Integer hour  = (int) totalMinutes/(60);
         Integer minutes = (int)totalMinutes % 60;
-        return new Double(hour+"."+minutes);
+        return new Double(hour+"."+Math.abs(minutes));
     }
+
+
+
+    public static boolean startDateIsEqualsOrBeforeEndDate(LocalDate startdate,LocalDate endDate){
+        return startdate.isBefore(endDate) || startdate.equals(endDate);
+    }
+
 
     public static Date plusDays(Date date,int plusDays){
         return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));

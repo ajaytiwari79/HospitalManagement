@@ -277,21 +277,6 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getSkillTabOfActivity(activityId));
     }
 
-    //Permissions
-
-   /* @ApiOperation("Update Permissions Tab of Activity")
-    @PutMapping(value = "/activity/permission_settings")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updatePermissionsTabOfActivity(@RequestBody PermissionsActivityTabDTO permissionsActivityTabDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePermissionsTabOfActivity(permissionsActivityTabDTO));
-    }*/
-
-    @ApiOperation("get Permissions Tab of Activity")
-    @GetMapping(value = "/activity/{activityId}/permission_settings")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getPermissionsTabOfActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getPermissionsTabOfActivity(activityId));
-    }
 
     //organization Mapping
 
@@ -415,5 +400,12 @@ public class ActivityController {
     public ResponseEntity<Map<String, Object>> getTimeZone(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,genericIntegrationService.getStaff(countryId,14098L));
 
+    }
+
+
+    @ApiOperation("Remove uploaded Attachments in Activity")
+    @DeleteMapping(value = "/activity/{activityId}/remove_uploaded_attachments")
+    ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
     }
 }

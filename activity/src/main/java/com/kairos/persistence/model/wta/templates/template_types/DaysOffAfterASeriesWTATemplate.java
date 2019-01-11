@@ -6,6 +6,8 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.util.Objects;
 
 
@@ -13,7 +15,9 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private int nightShiftSequence;
     private boolean restingTimeAllowed;

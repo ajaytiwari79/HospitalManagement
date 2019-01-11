@@ -39,7 +39,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private Long countryId;
 
-    private Organization organization;
+    private WTAOrganization organization;
 
     private List<BigInteger> ruleTemplateIds;
 
@@ -75,11 +75,11 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public Organization getOrganization() {
+    public WTAOrganization getOrganization() {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(WTAOrganization organization) {
         this.organization = organization;
     }
 
