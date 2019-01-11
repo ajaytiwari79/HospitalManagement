@@ -133,7 +133,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityTagDTO> findAllActivityByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
-                //lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 unwind("tags", true),
                 lookup("tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
@@ -144,7 +144,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
-                        //.first("timeType.activityCanBeCopied").as("activityCanBeCopied")
+                        .first("timeType.activityCanBeCopied").as("activityCanBeCopied")
                         .push("tags_data").as("tags")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
@@ -390,12 +390,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("organizationTypes").as("activity.organizationTypes").and("organizationSubTypes").as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
                         .and("employmentTypes").as("activity.employmentTypes").and("tags").as("activity.tags")
-                        .and("state").as("activity.state").and("unitId").as("activity.unitId").
-                        and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
+                        .and("state").as("activity.state").and("unitId").as("activity.unitId")
+                        .and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
                         .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
-                        .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab").
-                        and("compositeActivities").as("activity.compositeActivities")
+                        .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab")
+                        .and("compositeActivities").as("activity.compositeActivities")
                         .and("notesActivityTab").as("activity.notesActivityTab")
                         .and("communicationActivityTab").as("activity.communicationActivityTab")
                         .and("bonusActivityTab").as("activity.bonusActivityTab")
@@ -422,12 +422,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("organizationTypes").as("activity.organizationTypes").and("organizationSubTypes").as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
                         .and("employmentTypes").as("activity.employmentTypes").and("tags").as("activity.tags")
-                        .and("state").as("activity.state").and("unitId").as("activity.unitId").
-                        and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
+                        .and("state").as("activity.state").and("unitId").as("activity.unitId")
+                        .and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
                         .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
                         .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab").
-                        and("compositeActivities").as("activity.compositeActivities")
+                         and("compositeActivities").as("activity.compositeActivities")
                         .and("notesActivityTab").as("activity.notesActivityTab")
                         .and("communicationActivityTab").as("activity.communicationActivityTab")
                         .and("bonusActivityTab").as("activity.bonusActivityTab")
