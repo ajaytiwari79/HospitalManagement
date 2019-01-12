@@ -1,6 +1,8 @@
 package com.kairos.service.account_type;
 
 import com.kairos.KairosGdprApplication;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.enums.cta.AccountType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,12 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 
 
 @RunWith(SpringRunner.class)
@@ -58,7 +63,7 @@ public class AccountTypeServiceTest {
         ResponseEntity<RestTemplateResponseEnvelope<AccountType>> response = restTemplate.exchange(
                 baseUrl + "/account/" + createdId + "", HttpMethod.GET, null, typeReference);
         logger.info("response", response.getBody().getData());
-        Assert.assertEquals(response.getBody().getData().getId(), createdId);
+        Assert.assertEquals(response.getBody().getData(), createdId);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 

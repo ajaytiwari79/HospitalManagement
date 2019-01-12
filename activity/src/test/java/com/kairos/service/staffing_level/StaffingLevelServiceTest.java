@@ -31,6 +31,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -100,13 +101,17 @@ public class StaffingLevelServiceTest {
         //updatedShift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.NOON));
         shiftNotificationEvent.setPreviousStateShift(shift);
         shiftNotificationEvent.setShift(updatedShift);
-        StaffingLevel updatedStaffingLevel2=staffingLevelService.updateStaffingLevelAvailableStaffCountForUpdatedShift(updatedStaffingLevel1,shiftNotificationEvent);
-        updatedStaffingLevel2.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> {
-                    if(staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
-                        Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff());
+        Object[] array;
+        List<StaffingLevel> updatedStaffingLevel2=staffingLevelService.updateStaffingLevelAvailableStaffCountForUpdatedShift(Arrays.asList(updatedStaffingLevel1),shiftNotificationEvent);
+        updatedStaffingLevel2.forEach(staffingLevel->{
+            staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+                        if(staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
+                            Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff());
+                        }
                     }
-                }
-        );
+            );
+        });
+
     }
 
     @After

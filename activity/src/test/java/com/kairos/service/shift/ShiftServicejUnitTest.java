@@ -1,4 +1,4 @@
-package com.kairos.service.activity;
+package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -13,7 +13,6 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.service.shift.ShiftService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -138,7 +137,7 @@ public class ShiftServicejUnitTest {
         activity.setHaltBreak(false);
         activity.setBreakShift(false);
         Set<ShiftStatus> status=new HashSet<>();
-        status.add(ShiftStatus.UNPUBLISHED);
+        status.add(ShiftStatus.UNPUBLISH);
         activity.setStatus(status);
         activity.setStatus(new HashSet<>());
         activity1=new ShiftActivityDTO();
@@ -155,7 +154,7 @@ public class ShiftServicejUnitTest {
         activity1.setBackgroundColor("");
         activity1.setHaltBreak(false);
         activity1.setBreakShift(false);
-        status.add(ShiftStatus.UNPUBLISHED);
+        status.add(ShiftStatus.UNPUBLISH);
         activity1.setStatus(status);
         activity1.setStatus(new HashSet<>());
         shiftState=new ShiftState();
@@ -164,10 +163,8 @@ public class ShiftServicejUnitTest {
         shiftDTO.setId(BigInteger.valueOf(93));
         shiftDTO.setBid(0l);
         shiftDTO.setpId(0l);
-        shiftDTO.setBonusTimeBank(0);
         shiftDTO.setAmount(0);
         shiftDTO.setProbability(0);
-        shiftDTO.setAccumulatedTimeBankInMinutes(0);
         shiftDTO.setUnitId(958l);
         shiftDTO.setStaffId(834l);
         shiftDTO.setUnitPositionId(1136l);
