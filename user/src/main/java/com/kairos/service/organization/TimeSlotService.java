@@ -144,7 +144,7 @@ public class TimeSlotService {
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
         for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
 
-            if (timeSlotSetToValidate.getEndDate().compareTo(timeSlotSetDTO.getEndDate()) <= 0) {
+            if (timeSlotSetToValidate.getEndDate().isBefore(timeSlotSetDTO.getEndDate())) {
                 timeSlotSetToValidate.setDeleted(true);
                 timeSlotSetsToUpdate.add(timeSlotSetToValidate);
             } else {
