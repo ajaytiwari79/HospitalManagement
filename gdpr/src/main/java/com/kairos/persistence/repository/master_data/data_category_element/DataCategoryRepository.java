@@ -5,9 +5,11 @@ import com.kairos.persistence.model.master_data.data_category_element.DataCatego
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
@@ -38,20 +40,15 @@ public interface DataCategoryRepository extends JpaRepository<DataCategoryMD,Lon
     @Query("Select DC from DataCategoryMD DC where DC.id IN (?1) and DC.deleted = false")
     List<DataCategoryMD> getAllDataCategoriesByIds(Set<Long> ids);
 
-   /* DataCategory findByid(BigInteger id);
+    @Transactional
+    @Modifying
+    @Query("Update DataCategoryMD set deleted = true where id = ?1 and deleted =  false and organizationId = ?2")
+    Integer safelyDeleteDataCategory(Long id, Long refId);
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    DataCategory findByIdAndNonDeleted(Long countryId, BigInteger id);
-
-    @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
-    DataCategory findByCountryIdAndName(Long countryId, Long organizationId, String name);
-
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<DataCategory> findDataCategoryByIds(Long countryId, Set<BigInteger> ids);
-
-
-    @Query("{deleted:false,organizationId:?0,_id:?1}")
-    DataCategory findByUnitIdAndId(Long unitId, BigInteger id);*/
+    @Transactional
+    @Modifying
+    @Query("Update DataCategoryMD set deleted = true where id = ?1 and deleted =  false and countryId = ?2")
+    Integer safelyDeleteMasterDataCategory(Long id, Long refId);
 
 
 

@@ -41,4 +41,10 @@ public interface DataSubjectRepository extends JpaRepository<DataSubjectMappingM
 
     @Query(value = "Select DS from DataSubjectMappingMD DS where DS.organizationId = ?1 and DS.deleted = false Order By DS.createdAt desc")
     List<DataSubjectMappingMD> getAllDataSubjectByUnitId(Long unitId);
+
+    @Query(value = "select ds.name from data_subject_mappingmd ds Inner Join data_subject_mappingmd_data_categories dc  ON ds.id = dc.data_subject_mappingmd_id where ds.organization_id = ?1 and dc.data_categories_id = ?2", nativeQuery = true)
+    List<String> findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(Long unitId, Long id);
+
+    @Query(value = "select ds.name from data_subject_mappingmd ds Inner Join data_subject_mappingmd_data_categories dc  ON ds.id = dc.data_subject_mappingmd_id where ds.country_id = ?1 and dc.data_categories_id = ?2", nativeQuery = true)
+    List<String> findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(Long countryId, Long id);
 }

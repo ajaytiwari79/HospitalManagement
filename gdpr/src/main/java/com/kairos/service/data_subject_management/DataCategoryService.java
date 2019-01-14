@@ -2,19 +2,14 @@ package com.kairos.service.data_subject_management;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
-import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
-import com.kairos.persistence.model.master_data.data_category_element.DataCategoryMD;
-import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.persistence.model.master_data.data_category_element.DataElementMD;
-import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryRepository;
-import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
-import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
+import com.kairos.persistence.model.master_data.data_category_element.*;
+import com.kairos.persistence.repository.master_data.data_category_element.*;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -43,7 +38,7 @@ public class DataCategoryService extends MongoBaseService {
     private DataElementMongoRepository dataElementMongoRepository;
 
     @Inject
-    private DataSubjectMappingRepository dataSubjectMappingRepository;
+    private DataSubjectRepository dataSubjectRepository;
 
     @Inject
     private DataCategoryRepository dataCategoryRepository;
@@ -102,19 +97,20 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public boolean deleteDataCategoryById(Long refrenceId, boolean isUnitId, BigInteger dataCategoryId) {
+    public boolean deleteDataCategoryById(Long referenceId, boolean isUnitId, Long dataCategoryId) {
 
-        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(refrenceId, dataCategoryId)
-                : dataSubjectMappingRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(refrenceId, dataCategoryId);
+        List<String> dataSubjectLinkedWithDataCategory = isUnitId ? dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(referenceId, dataCategoryId)
+                : dataSubjectRepository.findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(referenceId, dataCategoryId);
         if (CollectionUtils.isNotEmpty(dataSubjectLinkedWithDataCategory)) {
-            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", dataSubjectLinkedWithDataCategory.stream().map(DataSubjectMappingBasicResponseDTO::getName).collect(Collectors.joining(",")));
+            exceptionService.invalidRequestException("message.cannot.delete.dataCategory", StringUtils.join(dataSubjectLinkedWithDataCategory , ","));
         }
-        DataCategory dataCategory = dataCategoryMongoRepository.findOne(dataCategoryId);
-        if (!Optional.ofNullable(dataCategory).isPresent()) {
+        Integer updateCount = 0;
+        updateCount = isUnitId ? dataCategoryRepository.safelyDeleteDataCategory(dataCategoryId, referenceId) : dataCategoryRepository.safelyDeleteMasterDataCategory(dataCategoryId, referenceId);
+        if(updateCount > 0){
+            LOGGER.info("Data Category with id :: {} deleted safely and successfully", dataCategoryId);
+        }else{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        dataCategoryMongoRepository.safeDeleteById(dataCategoryId);
-        dataElementMongoRepository.safeDeleteByIds(new HashSet<>(dataCategory.getDataElements()));
         return true;
 
     }
