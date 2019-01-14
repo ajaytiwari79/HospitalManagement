@@ -20,4 +20,7 @@ public interface PensionProviderRepository extends MongoBaseRepository<PensionPr
     PensionProviderDTO findByIdAndDeletedFalse(BigInteger id);
 
     List<PensionProviderDTO> findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(Long countryId);
+
+    PensionProviderDTO findByStaffIdAndDeletedFalse(Long staffId);
+
 }

@@ -5,8 +5,12 @@ package com.kairos.service.payroll;
  */
 
 import com.kairos.dto.activity.payroll.BankDTO;
+import com.kairos.dto.activity.payroll.PensionProviderDTO;
+import com.kairos.dto.activity.payroll.StaffBankDetailsDTO;
 import com.kairos.persistence.model.payroll.Bank;
 import com.kairos.persistence.repository.payroll.BankRepository;
+import com.kairos.persistence.repository.payroll.PensionProviderRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 @Service
 public class BankService extends MongoBaseService {
 
@@ -23,6 +29,9 @@ public class BankService extends MongoBaseService {
     private BankRepository bankRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject private PensionProviderRepository pensionProviderRepository;
+
 
     public BankDTO createBank(Long countryId,BankDTO bankDTO){
         Bank bank = bankRepository.findByNameOrAccountNumber(bankDTO.getName(),bankDTO.getInternationalAccountNumber(),bankDTO.getRegistrationNumber(),bankDTO.getSwiftCode());
@@ -76,4 +85,24 @@ public class BankService extends MongoBaseService {
         }
 
     }
+
+    public StaffBankDetailsDTO getBankDetailsOfStaff(Long staffId,Long organizationId){
+        Long countryId = genericIntegrationService.getCountryIdOfOrganization(organizationId);
+        List<BankDTO> bankDTOS = bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+        BankDTO staffOfficialBank = bankRepository.findByStaffIdAndDeletedfalse(staffId);
+        List<PensionProviderDTO> pensionProviderDTOS = pensionProviderRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+        PensionProviderDTO staffPensionProvider = pensionProviderRepository.findByStaffIdAndDeletedFalse(staffId);
+        return new StaffBankDetailsDTO(bankDTOS,staffOfficialBank,pensionProviderDTOS,staffPensionProvider);
+    }
+
+    public boolean linkBankDetailsForStaff(StaffBankDetailsDTO staffBankDetailsDTO){
+        if(isNotNull(staffBankDetailsDTO.getStaffOfficialBank())){
+
+        }
+        if (isNotNull(staffBankDetailsDTO.getStaffPensionProvider())){
+
+        }
+        return true;
+    }
+
 }

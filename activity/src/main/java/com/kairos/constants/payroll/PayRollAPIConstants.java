@@ -4,7 +4,7 @@ package com.kairos.constants.payroll;
  *
  */
 
-public class PayRollConstants {
+public class PayRollAPIConstants {
     //PayRoll
     public static final String PAYROLL="/payroll";
     public static final String DELETE_PAYROLL="/payroll/{payRollId}";
@@ -16,6 +16,7 @@ public class PayRollConstants {
     public static final String DELETE_BANK="/bank/{bankId}";
     public static final String UPDATE_BANK="/bank/{bankId}";
     public static final String GET_BANK_BY_ID="/bank/{bankId}";
+    public static final String STAFF_BANK_DETAILS="/staff/{staffId}/staff_bank_details";
 
     // Pension provider
     public static final String PENSION_PROVIDER="/pension_provider";

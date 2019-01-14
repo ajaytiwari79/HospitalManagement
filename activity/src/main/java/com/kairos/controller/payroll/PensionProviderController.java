@@ -5,7 +5,6 @@ package com.kairos.controller.payroll;
  */
 
 import com.kairos.dto.activity.payroll.PensionProviderDTO;
-import com.kairos.service.payroll.BankService;
 import com.kairos.service.payroll.PensionProviderService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +19,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.payroll.PayRollConstants.*;
+import static com.kairos.constants.payroll.PayRollAPIConstants.*;
 
 @RestController
 @RequestMapping(API_V1)

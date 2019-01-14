@@ -21,4 +21,7 @@ public interface BankRepository extends MongoBaseRepository<Bank,BigInteger>,Cus
     BankDTO findByIdAndDeletedFalse(BigInteger id);
 
     List<BankDTO> findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(Long countryId);
+
+    BankDTO findByStaffIdAndDeletedfalse(Long staffId);
+
 }

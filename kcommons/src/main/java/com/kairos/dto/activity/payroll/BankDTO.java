@@ -18,6 +18,10 @@ public class BankDTO {
     private String internationalAccountNumber;
     @NotBlank(message = "swiftCode.absent")
     private String swiftCode; //stands for Society for Worldwide Interbank Financial Telecommunication
+    private Long organizationId;
+    private Long staffId;
+    private Long accountNumber;
+
 
     public BankDTO() {
         //Default Constructor
@@ -69,5 +73,29 @@ public class BankDTO {
 
     public void setSwiftCode(String swiftCode) {
         this.swiftCode = swiftCode.trim();
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public Long getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(Long accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }
