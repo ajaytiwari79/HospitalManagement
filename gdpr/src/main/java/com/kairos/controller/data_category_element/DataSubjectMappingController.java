@@ -82,7 +82,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("Organization get data Subject with data Category and data elements by id ")
     @GetMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> getOrganizationDataSubjectWithDataCategoryAndElementsById(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> getOrganizationDataSubjectWithDataCategoryAndElementsById(@PathVariable Long unitId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectWithDataCategoryAndElementByUnitIdAndId(unitId, dataSubjectId));
     }
 
@@ -94,7 +94,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("organization, update data Subject ")
     @PutMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> updateOrganizationDataSubjectAndMapping(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
+    public ResponseEntity<Object> updateOrganizationDataSubjectAndMapping(@PathVariable Long unitId, @PathVariable Long dataSubjectId, @Valid @RequestBody DataSubjectDTO dataSubjectDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateOrganizationDataSubject(unitId, dataSubjectId, dataSubjectDTO));
     }
 

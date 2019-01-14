@@ -31,5 +31,14 @@ public interface DataSubjectRepository extends JpaRepository<DataSubjectMappingM
     DataSubjectMappingMD getDataSubjectByCountryIdAndId(Long countryId, Long id);
 
     @Query(value = "Select DS from DataSubjectMappingMD DS where DS.countryId = ?1 and DS.deleted = false Order By DS.createdAt desc")
-    List<DataSubjectMappingMD> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId);
+    List<DataSubjectMappingMD> getAllDataSubjectByCountryId(Long countryId);
+
+    @Query(value = "Select DS from DataSubjectMappingMD DS where DS.organizationId = ?1 and lower(DS.name) = lower(?2) and DS.deleted = false")
+    DataSubjectMappingMD findByNameAndUnitId(Long unitId, String name);
+
+    @Query(value = "Select DS from DataSubjectMappingMD DS where DS.organizationId = ?1 and DS.id = ?2 and DS.deleted =  false")
+    DataSubjectMappingMD getDataSubjectByUnitIdAndId(Long unit, Long id);
+
+    @Query(value = "Select DS from DataSubjectMappingMD DS where DS.organizationId = ?1 and DS.deleted = false Order By DS.createdAt desc")
+    List<DataSubjectMappingMD> getAllDataSubjectByUnitId(Long unitId);
 }

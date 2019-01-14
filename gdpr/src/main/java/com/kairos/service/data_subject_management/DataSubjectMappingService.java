@@ -23,18 +23,14 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DataSubjectMappingService extends MongoBaseService {
+public class DataSubjectMappingService {
 
 
     Logger LOGGER = LoggerFactory.getLogger(DataSubjectMappingService.class);
-
-    @Inject
-    private DataSubjectMappingRepository dataSubjectMappingRepository;
 
     @Inject
     private DataCategoryService dataCategoryService;
@@ -72,18 +68,20 @@ public class DataSubjectMappingService extends MongoBaseService {
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
-        DataSubjectMappingResponseDTO  dataSubjectMappingResponse =  prepareDataSubjectMappingResponseDTO(dataSubjectMapping);
+        DataSubjectMappingResponseDTO  dataSubjectMappingResponse =  prepareDataSubjectMappingResponseDTO(dataSubjectMapping, true);
         return dataSubjectMappingResponse;
     }
 
 
-    private DataSubjectMappingResponseDTO prepareDataSubjectMappingResponseDTO(DataSubjectMappingMD dataSubjectMapping){
+    private DataSubjectMappingResponseDTO prepareDataSubjectMappingResponseDTO(DataSubjectMappingMD dataSubjectMapping, boolean isMasterData){
         DataSubjectMappingResponseDTO  dataSubjectMappingResponse = new DataSubjectMappingResponseDTO();
         dataSubjectMappingResponse.setId(dataSubjectMapping.getId());
         dataSubjectMappingResponse.setName(dataSubjectMapping.getName());
         dataSubjectMappingResponse.setDescription(dataSubjectMapping.getDescription());
-        dataSubjectMappingResponse.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMapping.getOrganizationTypes(), OrganizationTypeDTO.class));
-        dataSubjectMappingResponse.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMapping.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+        if(isMasterData) {
+            dataSubjectMappingResponse.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMapping.getOrganizationTypes(), OrganizationTypeDTO.class));
+            dataSubjectMappingResponse.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMapping.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+        }
         dataSubjectMappingResponse.setDataCategories(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMapping.getDataCategories(), DataCategoryMD.class));
         return dataSubjectMappingResponse;
     }
@@ -94,9 +92,9 @@ public class DataSubjectMappingService extends MongoBaseService {
      */
     public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryByCountryId(Long countryId) {
         List<DataSubjectMappingResponseDTO> dataSubjectMappingResponseList = new ArrayList<>();
-        List<DataSubjectMappingMD> dataSubjectMappings =  dataSubjectRepository.getAllDataSubjectWithDataCategoryAndDataElementByCountryId(countryId);
+        List<DataSubjectMappingMD> dataSubjectMappings =  dataSubjectRepository.getAllDataSubjectByCountryId(countryId);
         for(DataSubjectMappingMD dataSubjectMapping : dataSubjectMappings){
-            dataSubjectMappingResponseList.add(prepareDataSubjectMappingResponseDTO(dataSubjectMapping));
+            dataSubjectMappingResponseList.add(prepareDataSubjectMappingResponseDTO(dataSubjectMapping , true));
         }
         return dataSubjectMappingResponseList;
     }
@@ -121,7 +119,6 @@ public class DataSubjectMappingService extends MongoBaseService {
         dataSubject.setDescription(dataSubjectMappingDto.getDescription());
         dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMappingDto.getOrganizationTypes(), OrganizationType.class));
         dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectMappingDto.getOrganizationSubTypes(), OrganizationSubType.class));
-        //dataSubject.setDataCategories(dataSubjectMappingDto.getDataCategories());
         dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectMappingDto.getDataCategories()));
         dataSubjectRepository.save(dataSubject);
         return dataSubjectMappingDto;
@@ -136,14 +133,14 @@ public class DataSubjectMappingService extends MongoBaseService {
     public DataSubjectDTO saveOrganizationDataSubject(Long unitId, DataSubjectDTO subjectDTO) {
 
 
-        DataSubjectMapping previousDataSubject = dataSubjectMappingRepository.findByNameAndUnitId(unitId, subjectDTO.getName());
+        DataSubjectMappingMD previousDataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, subjectDTO.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Data Subject", subjectDTO.getName());
         }
-       // DataSubjectMapping dataSubject = new DataSubjectMapping(subjectDTO.getName(), subjectDTO.getDescription(), subjectDTO.getDataCategories());
-       // dataSubject.setOrganizationId(unitId);
-       // dataSubjectMappingRepository.save(dataSubject);
-       // subjectDTO.setId(dataSubject.getId());
+        DataSubjectMappingMD dataSubject = new DataSubjectMappingMD(subjectDTO.getName(), subjectDTO.getDescription(), dataCategoryService.getAllDataCategoriesByIds(subjectDTO.getDataCategories()));
+        dataSubject.setOrganizationId(unitId);
+        dataSubjectRepository.save(dataSubject);
+        subjectDTO.setId(dataSubject.getId());
         return subjectDTO;
 
     }
@@ -155,7 +152,13 @@ public class DataSubjectMappingService extends MongoBaseService {
 
 
     public List<DataSubjectMappingResponseDTO> findOrganizationAllDataSubjectWithDataCategoryAndDataElements(Long unitId) {
-        return dataSubjectMappingRepository.getAllDataSubjectWithDataCategoryAndDataElementByUnitId(unitId);
+        List<DataSubjectMappingResponseDTO> dataSubjectMappingResponseDTOList = new ArrayList<>();
+        List<DataSubjectMappingMD> dataSubjects = dataSubjectRepository.getAllDataSubjectByUnitId(unitId);
+        for(DataSubjectMappingMD dataSubjectMapping : dataSubjects){
+            dataSubjectMappingResponseDTOList.add(prepareDataSubjectMappingResponseDTO(dataSubjectMapping , false));
+        }
+        return dataSubjectMappingResponseDTOList;
+
     }
 
 
@@ -164,28 +167,29 @@ public class DataSubjectMappingService extends MongoBaseService {
      * @param dataSubjectId
      * @param dataSubjectDTO
      */
-    public DataSubjectDTO updateOrganizationDataSubject(Long unitId, BigInteger dataSubjectId, DataSubjectDTO dataSubjectDTO) {
+    public DataSubjectDTO updateOrganizationDataSubject(Long unitId, Long dataSubjectId, DataSubjectDTO dataSubjectDTO) {
 
-        DataSubjectMapping dataSubject = dataSubjectMappingRepository.findByNameAndUnitId(unitId, dataSubjectDTO.getName());
+        DataSubjectMappingMD dataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, dataSubjectDTO.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Data Subject", dataSubject.getName());
         }
-        dataSubject = dataSubjectMappingRepository.findOne(dataSubjectId);
+        dataSubject = dataSubjectRepository.getOne(dataSubjectId);
         dataSubject.setName(dataSubjectDTO.getName());
-        //dataSubject.setDataCategories(dataSubjectDTO.getDataCategories());
+        dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectDTO.getDataCategories()));
         dataSubject.setDescription(dataSubjectDTO.getDescription());
-        dataSubjectMappingRepository.save(dataSubject);
+        dataSubjectRepository.save(dataSubject);
         return dataSubjectDTO;
 
     }
 
 
-    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndElementByUnitIdAndId(Long unitId, BigInteger datSubjectId) {
-        DataSubjectMappingResponseDTO dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectWithDataCategoryAndDataElementByUnitIdAndId(unitId, datSubjectId);
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndElementByUnitIdAndId(Long unitId, Long datSubjectId) {
+        DataSubjectMappingMD dataSubjectMapping = dataSubjectRepository.getDataSubjectByUnitIdAndId(unitId, datSubjectId);
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", datSubjectId);
         }
-        return dataSubjectMapping;
+
+        return prepareDataSubjectMappingResponseDTO(dataSubjectMapping, false);
     }
 
 
