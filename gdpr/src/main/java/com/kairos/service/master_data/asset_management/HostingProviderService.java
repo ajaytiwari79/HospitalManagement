@@ -142,7 +142,7 @@ public class HostingProviderService extends MongoBaseService {
      */
     public HostingProviderDTO updateHostingProvider(Long countryId, Long id, HostingProviderDTO hostingProviderDTO) {
         //TODO What actually this code is doing?
-        HostingProvider hostingProvider = hostingProviderMongoRepository.findByName(countryId, hostingProviderDTO.getName());
+        HostingProviderMD hostingProvider = hostingProviderMDRepository.findByCountryIdAndDeletedAndName(countryId, false,  hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;

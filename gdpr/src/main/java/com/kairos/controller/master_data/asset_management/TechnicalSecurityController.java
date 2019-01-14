@@ -42,7 +42,7 @@ public class TechnicalSecurityController {
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures.getRequestBody(), false));
 
     }
 

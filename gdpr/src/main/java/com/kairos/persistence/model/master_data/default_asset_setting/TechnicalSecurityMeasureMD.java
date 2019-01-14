@@ -55,6 +55,11 @@ public class TechnicalSecurityMeasureMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public TechnicalSecurityMeasureMD(@NotBlank(message = "Name can't be empty")String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public TechnicalSecurityMeasureMD() {
     }
 }

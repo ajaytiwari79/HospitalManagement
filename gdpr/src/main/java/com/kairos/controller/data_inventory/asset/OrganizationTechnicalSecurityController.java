@@ -43,7 +43,7 @@ public class OrganizationTechnicalSecurityController {
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
     @GetMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger techSecurityMeasureId) {
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long techSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(unitId, techSecurityMeasureId));
     }
 
@@ -63,7 +63,7 @@ public class OrganizationTechnicalSecurityController {
 
     @ApiOperation("update TechnicalSecurityMeasure by id")
     @PutMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
+    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(unitId, techSecurityMeasureId, securityMeasure));
 
     }

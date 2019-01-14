@@ -44,7 +44,7 @@ public class StorageFormatController {
     @ApiOperation("add StorageFormat")
     @PostMapping("/storage_format")
     public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(countryId, storageFormat.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(countryId, storageFormat.getRequestBody(), false));
 
     }
 
@@ -81,7 +81,7 @@ public class StorageFormatController {
 
     @ApiOperation("update Suggested status of Storage Format ")
     @PutMapping("/storage_format")
-    public ResponseEntity<Object> updateSuggestedStatusOfStorageFormats(@PathVariable Long countryId, @RequestBody Set<BigInteger> storageFormatIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfStorageFormats(@PathVariable Long countryId, @RequestBody Set<Long> storageFormatIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(storageFormatIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Storage Format is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

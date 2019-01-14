@@ -5,7 +5,9 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
+import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
@@ -47,6 +49,9 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
     @Inject
     private AssetMongoRepository assetMongoRepository;
 
+    @Inject
+    private TechnicalSecurityMeasureMDRepository technicalSecurityMeasureMDRepository;
+
 
     /**
      * @param
@@ -57,9 +62,9 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long organizationId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+    public Map<String, List<TechnicalSecurityMeasureMD>> createTechnicalSecurityMeasure(Long organizationId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
 
-        Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
+        Map<String, List<TechnicalSecurityMeasureMD>> result = new HashMap<>();
         Set<String> techSecurityMeasureNames = new HashSet<>();
         if (!technicalSecurityMeasureDTOS.isEmpty()) {
             for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
@@ -68,26 +73,26 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<TechnicalSecurityMeasure> existing = findMetaDataByNameAndUnitId(organizationId, techSecurityMeasureNames, TechnicalSecurityMeasure.class);
+            List<String> nameInLowerCase = techSecurityMeasureNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<TechnicalSecurityMeasureMD> existing = technicalSecurityMeasureMDRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
-            List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
+            List<TechnicalSecurityMeasureMD> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
+                    TechnicalSecurityMeasureMD newTechnicalSecurityMeasure = new TechnicalSecurityMeasureMD(name);
                     newTechnicalSecurityMeasure.setOrganizationId(organizationId);
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
-
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(newTechnicalMeasures));
+                newTechnicalMeasures = technicalSecurityMeasureMDRepository.saveAll(newTechnicalMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");
-
-
     }
 
 
@@ -97,7 +102,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return technicalSecurityMeasureMDRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
 
@@ -108,9 +113,9 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return object of TechnicalSecurityMeasure
      * @throws DataNotFoundByIdException throw exception if TechnicalSecurityMeasure not exist for given id
      */
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long organizationId, BigInteger id) {
+    public TechnicalSecurityMeasureMD getTechnicalSecurityMeasure(Long organizationId, Long id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByUnitIdAndId(organizationId, id);
+        TechnicalSecurityMeasureMD exist = technicalSecurityMeasureMDRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -139,31 +144,30 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return TechnicalSecurityMeasure updated object
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
-    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long organizationId, BigInteger id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByUnitIdAndName(organizationId, technicalSecurityMeasureDTO.getName());
+    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long organizationId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
+        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureMDRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Security Measure", technicalSecurityMeasure.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Technical Security Measure", technicalSecurityMeasure.getName());
         }
-        technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByid(id);
-        if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Security Measure", id);
+        Integer resultCount =  technicalSecurityMeasureMDRepository.updateTechnicalSecurityMeasureName(technicalSecurityMeasureDTO.getName(), id, organizationId);
+        if(resultCount <=0){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Format", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, technicalSecurityMeasureDTO.getName());
         }
-        technicalSecurityMeasure.setName(technicalSecurityMeasureDTO.getName());
-        technicalSecurityMeasureMongoRepository.save(technicalSecurityMeasure);
         return technicalSecurityMeasureDTO;
 
 
     }
 
 
-    public Map<String, List<TechnicalSecurityMeasure>> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long organizationId, List<TechnicalSecurityMeasureDTO> techSecurityMeasureDTOS) {
+    public Map<String, List<TechnicalSecurityMeasureMD>> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long organizationId, List<TechnicalSecurityMeasureDTO> techSecurityMeasureDTOS) {
 
-        Map<String, List<TechnicalSecurityMeasure>> result;
-        result = createTechnicalSecurityMeasure(organizationId, techSecurityMeasureDTOS);
-        List<TechnicalSecurityMeasure> masterTechnicalSecurityMeasureSuggestedByUnit = technicalSecurityMeasureService.saveSuggestedTechnicalSecurityMeasuresFromUnit(countryId, techSecurityMeasureDTOS);
+        Map<String, List<TechnicalSecurityMeasureMD>> result = createTechnicalSecurityMeasure(organizationId, techSecurityMeasureDTOS);
+        List<TechnicalSecurityMeasureMD> masterTechnicalSecurityMeasureSuggestedByUnit = technicalSecurityMeasureService.saveSuggestedTechnicalSecurityMeasuresFromUnit(countryId, techSecurityMeasureDTOS);
         if (!masterTechnicalSecurityMeasureSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterTechnicalSecurityMeasureSuggestedByUnit);
         }

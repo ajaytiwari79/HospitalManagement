@@ -18,7 +18,7 @@ import java.util.Set;
 public interface DataDisposalMDRepository extends JpaRepository<DataDisposalMD, Long> {
 
     @Query(value = "SELECT d FROM DataDisposalMD d WHERE d.countryId = ?1 and d.deleted = ?2 and lower(d.name) IN ?3")
-    List<DataDisposalMD> findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> name);
+    List<DataDisposalMD> findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> names);
 
     @Query(value = "SELECT d FROM DataDisposalMD d WHERE d.countryId = ?1 and d.deleted = ?2 and lower(d.name) = lower(?3)")
     DataDisposalMD findByCountryIdAndDeletedAndName(Long countryId, boolean deleted, String name);
@@ -50,7 +50,7 @@ public interface DataDisposalMDRepository extends JpaRepository<DataDisposalMD, 
     List<DataDisposalResponseDTO> findAllByCountryIdAndSortByCreatedDate(Long countryId);
 
     @Query(value = "SELECT d FROM DataDisposalMD d WHERE d.organizationId = ?1 and d.deleted = ?2 and lower(d.name) IN ?3")
-    List<DataDisposalMD> findByUnitIdAndDeletedAndNameIn(Long orgId, boolean deleted, List<String> userNames);
+    List<DataDisposalMD> findByUnitIdAndDeletedAndNameIn(Long orgId, boolean deleted, List<String> names);
 
     @Transactional
     @Modifying

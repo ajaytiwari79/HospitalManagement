@@ -42,7 +42,7 @@ public class OrganizationOrganizationalSecurityMeasureController {
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId) {
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
     }
 
@@ -63,7 +63,7 @@ public class OrganizationOrganizationalSecurityMeasureController {
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
+    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId, orgSecurityMeasure));
 
     }

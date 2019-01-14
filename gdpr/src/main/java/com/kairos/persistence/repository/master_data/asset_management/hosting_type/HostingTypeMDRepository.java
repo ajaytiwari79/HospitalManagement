@@ -22,7 +22,7 @@ public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, Lo
     List<HostingTypeMD> findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> userNames);
 
     @Query(value = "SELECT ht FROM HostingTypeMD ht WHERE ht.countryId = ?1 and ht.deleted = ?2 and lower(ht.name) = lower(?3)")
-    List<HostingTypeMD> findByCountryIdAndDeletedAndName(Long countryId, boolean deleted, String name);
+    HostingTypeMD findByCountryIdAndDeletedAndName(Long countryId, boolean deleted, String name);
 
 
     @Transactional
@@ -33,7 +33,7 @@ public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, Lo
     @Transactional
     @Modifying
     @Query(value = "update HostingTypeMD set suggestedDataStatus = ?3 where id= ?2 and countryId = ?1")
-    Integer updateMasterHostingTypeName(Long countryId, Set<Long> ids, SuggestedDataStatus status);
+    Integer updateMasterHostingTypeStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
     @Query(value = "SELECT ht FROM HostingTypeMD ht WHERE ht.id IN (?1) and ht.deleted = false")
     List<HostingTypeMD> findAllByIds( Set<Long> ids);
@@ -52,9 +52,6 @@ public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, Lo
     List<HostingTypeResponseDTO> findAllByCountryIdAndSortByCreatedDate(Long countryId);
 
 
-
-
-
     @Query(value = "SELECT ht FROM HostingTypeMD ht WHERE ht.organizationId = ?1 and ht.deleted = ?2 and lower(ht.name) IN ?3")
     List<HostingTypeMD> findByOrganizationIdAndDeletedAndNameIn(Long orgId, boolean deleted, List<String> name);
 
@@ -69,7 +66,7 @@ public interface HostingTypeMDRepository extends JpaRepository<HostingTypeMD, Lo
 
     @Transactional
     @Modifying
-    @Query(value = "update HostingTypeMD set suggestedDataStatus = ?3 where id= ?2 and organizationId = ?1")
+    @Query(value = "update HostingTypeMD set suggestedDataStatus = ?3 where id IN (?2) and organizationId = ?1")
     Integer updateHostingTypeStatus(Long orgId, Set<Long> ids, SuggestedDataStatus status);
 
     @Transactional

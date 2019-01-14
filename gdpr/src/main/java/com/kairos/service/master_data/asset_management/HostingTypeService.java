@@ -143,14 +143,14 @@ public class HostingTypeService extends MongoBaseService {
     public HostingTypeDTO updateHostingType(Long countryId, Long id, HostingTypeDTO hostingTypeDTO) {
 
         //TODO What actually this code is doing?
-        HostingType hostingType = hostingTypeMongoRepository.findByName(countryId, hostingTypeDTO.getName());
+        HostingTypeMD hostingType = hostingTypeMDRepository.findByCountryIdAndDeletedAndName(countryId, false, hostingTypeDTO.getName());
         if (Optional.ofNullable(hostingType).isPresent()) {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
             }
             throw new DuplicateDataException("data  exist for  " + hostingTypeDTO.getName());
         }
-        Integer resultCount =  hostingTypeMDRepository.updateHostingTypeName(hostingTypeDTO.getName(), id, countryId);
+        Integer resultCount =  hostingTypeMDRepository.updateMasterHostingTypeName(hostingTypeDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
         }else{
@@ -183,7 +183,7 @@ public class HostingTypeService extends MongoBaseService {
      */
     public List<HostingTypeMD> updateSuggestedStatusOfHostingTypes(Long countryId, Set<Long> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = hostingTypeMDRepository.updateHostingTypeStatus(countryId, hostingTypeIds, suggestedDataStatus);
+        Integer updateCount = hostingTypeMDRepository.updateMasterHostingTypeStatus(countryId, hostingTypeIds, suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingTypeIds);
         }else{

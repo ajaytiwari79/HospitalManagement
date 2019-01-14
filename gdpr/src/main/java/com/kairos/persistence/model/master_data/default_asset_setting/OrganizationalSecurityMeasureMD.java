@@ -55,6 +55,12 @@ public class OrganizationalSecurityMeasureMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public OrganizationalSecurityMeasureMD(@NotBlank(message = "Name can't be empty") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
+
     public OrganizationalSecurityMeasureMD() {
     }
 }

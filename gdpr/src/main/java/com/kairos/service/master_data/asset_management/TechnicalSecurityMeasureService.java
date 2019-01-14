@@ -51,7 +51,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<TechnicalSecurityMeasureMD>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+    public Map<String, List<TechnicalSecurityMeasureMD>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<TechnicalSecurityMeasureMD>> result = new HashMap<>();
         Set<String> techSecurityMeasureNames = new HashSet<>();
@@ -69,7 +69,13 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
             List<TechnicalSecurityMeasureMD> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasureMD newTechnicalSecurityMeasure = new TechnicalSecurityMeasureMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    TechnicalSecurityMeasureMD newTechnicalSecurityMeasure = new TechnicalSecurityMeasureMD(name,countryId);
+                    if(isSuggestion){
+                        newTechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newTechnicalSecurityMeasure.setSuggestedDate(LocalDate.now());
+                    }else{
+                        newTechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
@@ -136,14 +142,14 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
         //TODO What actually this code is doing?
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureMDRepository.findByCountryIdAndDeletedAndName(countryId, false, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
             throw new DuplicateDataException("data  exist for  " + technicalSecurityMeasureDTO.getName());
         }
-        Integer resultCount =  technicalSecurityMeasureMDRepository.updateTechnicalSecurityMeasureName(technicalSecurityMeasureDTO.getName(), id);
+        Integer resultCount =  technicalSecurityMeasureMDRepository.updateMasterTechnicalStorageMeasureName(technicalSecurityMeasureDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", id);
         }else{
@@ -160,28 +166,10 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @param technicalSecurityMeasureDTOS
      * @return
      */
-    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+    public List<TechnicalSecurityMeasureMD> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+        Map<String, List<TechnicalSecurityMeasureMD>> result = createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
+        return result.get(NEW_DATA_LIST);
 
-        Set<String> technicalSecurityMeasureNameList = new HashSet<>();
-        for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : technicalSecurityMeasureDTOS) {
-            technicalSecurityMeasureNameList.add(TechnicalSecurityMeasure.getName());
-        }
-        List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, technicalSecurityMeasureNameList, TechnicalSecurityMeasure.class);
-        technicalSecurityMeasureNameList = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, technicalSecurityMeasureNameList);
-        List<TechnicalSecurityMeasure> technicalSecurityMeasureList = new ArrayList<>();
-        if (!technicalSecurityMeasureNameList.isEmpty()) {
-            for (String name : technicalSecurityMeasureNameList) {
-
-                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name);
-                technicalSecurityMeasure.setCountryId(countryId);
-                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
-                technicalSecurityMeasureList.add(technicalSecurityMeasure);
-            }
-
-            technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(technicalSecurityMeasureList));
-        }
-        return technicalSecurityMeasureList;
     }
 
 
