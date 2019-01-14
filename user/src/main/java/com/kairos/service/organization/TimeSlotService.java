@@ -139,8 +139,8 @@ public class TimeSlotService {
             logger.error("Invalid time slot id " + timeSlotSetId);
             exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
         }
-        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate().toString(),
-                timeSlotSetDTO.getEndDate().toString(), timeSlotSet.getTimeSlotType());
+        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getStartDate().toString(),
+                timeSlotSetDTO.getEndDate()!=null?timeSlotSetDTO.getEndDate().toString():null, timeSlotSet.getTimeSlotType());
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
         for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
 
