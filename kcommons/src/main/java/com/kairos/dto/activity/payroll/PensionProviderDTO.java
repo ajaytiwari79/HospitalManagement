@@ -13,7 +13,6 @@ public class PensionProviderDTO {
     private String name;
     @NotBlank(message = "paymentNumber.absent")
     private String paymentNumber;
-    private boolean staffPensionProvider;
 
     public PensionProviderDTO() {
         //Default Constructor
@@ -43,11 +42,4 @@ public class PensionProviderDTO {
         this.paymentNumber = paymentNumber.trim();
     }
 
-    public boolean isStaffPensionProvider() {
-        return staffPensionProvider;
-    }
-
-    public void setStaffPensionProvider(boolean staffPensionProvider) {
-        this.staffPensionProvider = staffPensionProvider;
-    }
 }

@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.payroll;
 
+import javax.validation.constraints.Email;
 import java.math.BigInteger;
 
 /**
@@ -7,28 +8,19 @@ import java.math.BigInteger;
  * @date - 14/1/19
  */
 
-public class StaffBankDetailsDTO {
-
-    private Long staffId;
+public class OrganizationBankDetailsDTO {
+    private Long organizationId;
     private BigInteger bankId;
-    private Boolean useNemkontoAccount;
     private Long accountNumber;
+    @Email(message = "email.invalid.format")
+    private String email;
 
-
-    public Boolean getUseNemkontoAccount() {
-        return useNemkontoAccount;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setUseNemkontoAccount(Boolean useNemkontoAccount) {
-        this.useNemkontoAccount = useNemkontoAccount;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 
     public BigInteger getBankId() {
@@ -45,5 +37,13 @@ public class StaffBankDetailsDTO {
 
     public void setAccountNumber(Long accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

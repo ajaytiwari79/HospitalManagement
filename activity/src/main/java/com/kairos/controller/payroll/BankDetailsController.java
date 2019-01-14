@@ -5,6 +5,8 @@ package com.kairos.controller.payroll;
  */
 
 import com.kairos.dto.activity.payroll.BankDTO;
+import com.kairos.dto.activity.payroll.OrganizationBankDetailsDTO;
+import com.kairos.dto.activity.payroll.StaffBankAndPensionProviderDetailsDTO;
 import com.kairos.service.payroll.BankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -63,5 +65,23 @@ public class BankDetailsController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfStaff(staffId,organizationId));
     }
 
+
+    @ApiOperation("update Bank details of Staff")
+    @PutMapping(PARENT_ORGANIZATION_URL+STAFF_BANK_DETAILS)
+    public ResponseEntity<Map<String,Object>> updateBankDetailsOfStaff(@PathVariable Long staffId,@RequestBody StaffBankAndPensionProviderDetailsDTO staffBankAndPensionProviderDetailsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForStaff(staffId,staffBankAndPensionProviderDetailsDTO));
+    }
+
+    @ApiOperation("update Bank details of Organization")
+    @PutMapping(PARENT_ORGANIZATION_URL+ORGANIZATION_BANK_DETAILS)
+    public ResponseEntity<Map<String,Object>> updateBankDetailsOfOrganization(@PathVariable Long organizationId,@RequestBody OrganizationBankDetailsDTO organizationBankDetailsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForOrganization(organizationId,organizationBankDetailsDTO));
+    }
+
+    @ApiOperation("get Bank details of Organization")
+    @GetMapping(PARENT_ORGANIZATION_URL+ORGANIZATION_BANK_DETAILS)
+    public ResponseEntity<Map<String,Object>> getBankDetailsOfOrganization(@PathVariable Long organizationId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfOrganization(organizationId));
+    }
 
 }

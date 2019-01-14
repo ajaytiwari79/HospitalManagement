@@ -1,4 +1,7 @@
-package com.kairos.dto.activity.payroll;
+package com.kairos.persistence.model.payroll;
+
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
@@ -6,20 +9,19 @@ import java.math.BigInteger;
  * @author pradeep
  * @date - 14/1/19
  */
-
-public class StaffBankDetailsDTO {
-
+@Document
+public class StaffBankDetails extends MongoBaseEntity{
     private Long staffId;
     private BigInteger bankId;
-    private Boolean useNemkontoAccount;
+    private boolean useNemkontoAccount;
     private Long accountNumber;
 
 
-    public Boolean getUseNemkontoAccount() {
+    public boolean isUseNemkontoAccount() {
         return useNemkontoAccount;
     }
 
-    public void setUseNemkontoAccount(Boolean useNemkontoAccount) {
+    public void setUseNemkontoAccount(boolean useNemkontoAccount) {
         this.useNemkontoAccount = useNemkontoAccount;
     }
 
