@@ -13,7 +13,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataSubjectMappingResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -21,17 +21,17 @@ public class DataSubjectMappingResponseDTO {
 
     private Long countryId;
 
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
 
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     private List<DataCategoryResponseDTO> dataCategories;
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,20 +51,20 @@ public class DataSubjectMappingResponseDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) {
+        this.organizationTypes = organizationTypeDTOS;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
+        this.organizationSubTypes = organizationSubTypeDTOS;
     }
 
     public List<DataCategoryResponseDTO> getDataCategories() {

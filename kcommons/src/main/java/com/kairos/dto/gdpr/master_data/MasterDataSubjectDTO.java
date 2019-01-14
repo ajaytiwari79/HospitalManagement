@@ -17,17 +17,17 @@ public class MasterDataSubjectDTO extends DataSubjectDTO{
 
     @NotEmpty(message = "error.message.organizationType.not.Selected")
     @Valid
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
 
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
     @Valid
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() { return organizationTypeDTOS; }
+    public List<OrganizationTypeDTO> getOrganizationTypes() { return organizationTypes; }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; }
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() { return organizationSubTypeDTOS; }
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() { return organizationSubTypes; }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 }

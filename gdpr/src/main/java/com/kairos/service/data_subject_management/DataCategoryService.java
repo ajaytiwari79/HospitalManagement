@@ -169,4 +169,13 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
+    /**
+     * @param ids LIst of data category ids
+     * @return return list of Data Category with data Elements
+     */
+    public List<DataCategoryMD> getAllDataCategoriesByIds(Set<Long> ids) {
+        List<DataCategoryMD> dataCategories = dataCategoryRepository.getAllDataCategoriesByIds(ids);
+        return dataCategories;
+    }
+
 }

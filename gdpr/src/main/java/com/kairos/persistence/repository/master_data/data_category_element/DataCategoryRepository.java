@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 //@JaversSpringDataAuditable
@@ -33,6 +34,9 @@ public interface DataCategoryRepository extends JpaRepository<DataCategoryMD,Lon
 
     @Query("Select DC from DataCategoryMD DC where DC.organizationId = ?1 and DC.id = ?2 and DC.deleted = false")
     DataCategoryMD getDataCategoryByUnitIdAndId(Long unitId, Long id);
+
+    @Query("Select DC from DataCategoryMD DC where DC.id IN (?1) and DC.deleted = false")
+    List<DataCategoryMD> getAllDataCategoriesByIds(Set<Long> ids);
 
    /* DataCategory findByid(BigInteger id);
 

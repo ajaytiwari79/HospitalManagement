@@ -39,13 +39,13 @@ public class DataSubjectMappingController {
 
     @ApiOperation("delete data Subject mapping by id ")
     @DeleteMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> deleteDataSubjectAndMappingById(@PathVariable Long countryId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> deleteDataSubjectAndMappingById(@PathVariable Long countryId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.deleteDataSubjectById( dataSubjectId));
     }
 
     @ApiOperation("get data Subject mapping with data Category and data elements by id ")
     @GetMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementsById(@PathVariable Long countryId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementsById(@PathVariable Long countryId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithDataByCountryIdAndId(countryId, dataSubjectId));
     }
 
@@ -57,7 +57,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("update data Subject ")
     @PutMapping(COUNTRY_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable BigInteger dataSubjectId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectMappingDto) {
+    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long dataSubjectId, @Valid @RequestBody MasterDataSubjectDTO dataSubjectMappingDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateDataSubjectAndMapping(countryId, dataSubjectId, dataSubjectMappingDto));
     }
 
@@ -76,7 +76,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("organization, delete data Subject by id ")
     @DeleteMapping(UNIT_URL+"/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> deleteOrganizationDataSubjectById(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> deleteOrganizationDataSubjectById(@PathVariable Long unitId, @PathVariable Long dataSubjectId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.deleteDataSubjectById(dataSubjectId));
     }
 

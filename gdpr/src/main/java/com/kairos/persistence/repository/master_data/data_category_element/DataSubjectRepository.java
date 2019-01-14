@@ -7,9 +7,11 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -17,24 +19,17 @@ import java.util.List;
 @JaversSpringDataAuditable
 public interface DataSubjectRepository extends JpaRepository<DataSubjectMappingMD, Long>{
 
+    @Query(value = "Select DS from DataSubjectMappingMD DS where DS.countryId = ?1 and lower(DS.name) = lower(?2) and DS.deleted = false")
+    DataSubjectMappingMD findByCountryIdAndName(Long countryId, String name);
 
-    /*DataSubjectMapping findByid(BigInteger id);
+    @Transactional
+    @Modifying
+    @Query(value = "update DataSubjectMappingMD set deleted = true where id = ?1 and deleted = false")
+    Integer safeDeleteById(Long id);
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    DataSubjectMapping findByIdAndNonDeleted(Long countryId, BigInteger id);
+    @Query(value = "Select DS from DataSubjectMappingMD DS where DS.countryId = ?1 and DS.id = ?2 and DS.deleted =  false")
+    DataSubjectMappingMD getDataSubjectByCountryIdAndId(Long countryId, Long id);
 
-    @Query("{deleted:false,organizationId:?0,_id:?1}")
-    DataSubjectMapping findByUnitIdAndId(Long organizationId, BigInteger id);
-
-
-    @Query("{deleted:false,countryId:?0,dataCategories:?1}")
-    List<DataSubjectMappingBasicResponseDTO> findDataSubjectsLinkWithDataCategoryByCountryIdAndDataCategoryId(Long countryId, BigInteger dataCategoryId);
-
-    @Query("{deleted:false,organizationId:?0,dataCategories:?1}")
-    List<DataSubjectMappingBasicResponseDTO> findDataSubjectsLinkWithDataCategoryByUnitIdAndDataCategoryId(Long unitId, BigInteger dataCategoryId);*/
-
-
-
-
-
+    @Query(value = "Select DS from DataSubjectMappingMD DS where DS.countryId = ?1 and DS.deleted = false Order By DS.createdAt desc")
+    List<DataSubjectMappingMD> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId);
 }
