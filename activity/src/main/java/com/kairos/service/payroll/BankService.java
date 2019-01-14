@@ -104,9 +104,11 @@ public class BankService extends MongoBaseService {
 
     public boolean linkBankDetailsForStaff(Long staffId, StaffBankAndPensionProviderDetailsDTO staffBankDetailsDTO){
         if (isNotNull(staffBankDetailsDTO.getStaffOfficialBank())) {
-            Bank bank = bankRepository.getByIdAndDeletedFalse(staffBankDetailsDTO.getStaffOfficialBank().getBankId());
-            if(isNull(bank)){
-                exceptionService.dataNotFoundException("bank.not.found");
+            if(!staffBankDetailsDTO.getStaffOfficialBank().getUseNemkontoAccount()){
+                Bank bank = bankRepository.getByIdAndDeletedFalse(staffBankDetailsDTO.getStaffOfficialBank().getBankId());
+                if(isNull(bank)){
+                    exceptionService.dataNotFoundException("bank.not.found");
+                }
             }
             StaffBankDetails staffBank = staffBankDetailsRepository.findByStaffIdAndDeletedFalse(staffId);
             if (isNull(staffBank)) {

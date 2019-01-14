@@ -13,7 +13,7 @@ import java.math.BigInteger;
 public class StaffBankDetails extends MongoBaseEntity{
     private Long staffId;
     private BigInteger bankId;
-    private boolean useNemkontoAccount;
+    private boolean useNemkontoAccount; //it true so use Default account of this staff
     private Long accountNumber;
 
 
