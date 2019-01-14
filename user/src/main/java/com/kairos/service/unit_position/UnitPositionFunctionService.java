@@ -132,14 +132,13 @@ public class UnitPositionFunctionService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "unitPositionStaffRel");
         }
         List<UnitPositionLineFunctionQueryResult> hourlyCostByUnitPositionLines = unitPositionGraphRepository.getFunctionalHourlyCostByUnitPositionId(unitId, unitPositionId);
-        BigDecimal perDayHourOfFullTimeEmployee=new BigDecimal(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE);
-        BigDecimal leapYearConst=perDayHourOfFullTimeEmployee.multiply(new BigDecimal(LEAP_YEAR));
-        BigDecimal nonLeapYearConst=perDayHourOfFullTimeEmployee.multiply(new BigDecimal(NON_LEAP_YEAR));
+        BigDecimal leapYearConst=PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(LEAP_YEAR));
+        BigDecimal nonLeapYearConst=PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(NON_LEAP_YEAR));
         hourlyCostByUnitPositionLines = ObjectMapperUtils.copyPropertiesOfListByMapper(hourlyCostByUnitPositionLines, UnitPositionLineFunctionQueryResult.class);
         for (UnitPositionLineFunctionQueryResult unitPositionLineFunctionQueryResult : hourlyCostByUnitPositionLines) {
             BigDecimal hourlyCostCalculationFactor = unitPositionLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYearConst : nonLeapYearConst;
-            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(new BigDecimal(unitPositionLineFunctionQueryResult.getBasePayGradeAmount()).divide(hourlyCostCalculationFactor,3,RoundingMode.CEILING).floatValue());
-            unitPositionLineFunctionQueryResult.setHourlyCost(new BigDecimal(unitPositionLineFunctionQueryResult.getHourlyCost()).divide(hourlyCostCalculationFactor,3,RoundingMode.CEILING).floatValue() );
+            unitPositionLineFunctionQueryResult.setBasePayGradeAmount(unitPositionLineFunctionQueryResult.getBasePayGradeAmount().divide(hourlyCostCalculationFactor,3,RoundingMode.CEILING));
+            unitPositionLineFunctionQueryResult.setHourlyCost(unitPositionLineFunctionQueryResult.getHourlyCost().divide(hourlyCostCalculationFactor,3,RoundingMode.CEILING));
             List<FunctionDTO> functionList = unitPositionLineFunctionQueryResult.getFunctions();
             functionList = functionList.stream().filter(functionDTO -> functionDTO.getAmount()!=null).collect(Collectors.toList());
             for (FunctionDTO functionDTO : functionList) {

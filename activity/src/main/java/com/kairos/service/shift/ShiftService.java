@@ -1426,7 +1426,8 @@ public class ShiftService extends MongoBaseService {
         Map<Long,List<AttendanceTimeSlotDTO>> staffsTimeAndAttendance=(CollectionUtils.isNotEmpty(timeAndAttendance))?timeAndAttendance.stream().collect(Collectors.toMap(k->k.getStaffId(), v->v.getAttendanceTimeSlot())):new HashMap<>();
         List<Shift> shifts = shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds, shiftStartDate, endDate);
         List<ShiftState> shiftStates = shiftStateMongoRepository.getAllByStaffsByIdsBetweenDate(staffIds, shiftStartDate, endDate);
-        List<ShiftState> realTimeShiftStatesList= checkAndCreateRealtimeAndDraftState(shifts,shiftStates.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap);        shiftStates.addAll(realTimeShiftStatesList);
+        List<ShiftState> realTimeShiftStatesList= checkAndCreateRealtimeAndDraftState(shifts,shiftStates.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap);
+        shiftStates.addAll(realTimeShiftStatesList);
         List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
         List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
         Map<Long, List<Shift>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));

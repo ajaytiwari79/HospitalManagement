@@ -8,6 +8,7 @@ import com.kairos.enums.employment_type.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -37,7 +38,7 @@ public class UnitPositionDTO {
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
-    private float hourlyCost;
+    private BigDecimal hourlyCost;
     private Double salary;
     private Long employmentTypeId;
     @NotNull(message = "employmentTypeCategory can't be null")
@@ -90,7 +91,7 @@ public class UnitPositionDTO {
     }
 
     public UnitPositionDTO(Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                           float avgDailyWorkingHours, float hourlyCost, Double salary, Long employmentTypeId) {
+                           float avgDailyWorkingHours, BigDecimal hourlyCost, Double salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -181,11 +182,11 @@ public class UnitPositionDTO {
         this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
 
-    public float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 

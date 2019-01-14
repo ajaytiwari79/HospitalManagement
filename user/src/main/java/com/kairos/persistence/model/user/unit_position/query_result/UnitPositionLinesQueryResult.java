@@ -4,6 +4,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class UnitPositionLinesQueryResult {
     private Integer fullTimeWeeklyMinutes;
     private Double salary;
     private Integer totalWeeklyMinutes;
-    private Float hourlyCost;
+    private BigDecimal hourlyCost;
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
     private WTAResponseDTO workingTimeAgreement;
@@ -33,7 +34,7 @@ public class UnitPositionLinesQueryResult {
         //DC
     }
 
-    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel,Long unitPositionId) {
+    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, BigDecimal hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel,Long unitPositionId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -105,11 +106,11 @@ public class UnitPositionLinesQueryResult {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
-    public Float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(Float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 
