@@ -98,6 +98,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.util.*;
@@ -1347,7 +1348,7 @@ public class StaffService {
             unitPositionDetails = convertUnitPositionObject(unitPosition);
             unitPositionDetails.setUnitId(unitId);
             List<UnitPositionLinesQueryResult> data = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
-            unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : 0.0f);
+            unitPositionDetails.setHourlyCost(data.size() > 0 ? data.get(0).getHourlyCost() : new BigDecimal(0));
         }
         return unitPositionDetails;
     }

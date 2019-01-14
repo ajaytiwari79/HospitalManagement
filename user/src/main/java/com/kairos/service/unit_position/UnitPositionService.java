@@ -91,7 +91,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
-import static com.kairos.constants.AppConstants.STAFF;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertStaffUnitPositionObject;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
@@ -172,7 +172,7 @@ public class UnitPositionService {
     private TimeSlotGraphRepository timeSlotGraphRepository;
 
 
-    public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException, Exception {
+    public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws ExecutionException, Exception {
         Organization organization = organizationService.getOrganizationDetail(unitPositionDTO.getUnitId(), type);
         Organization parentOrganization=organization.isParentOrganization()?organization:organizationService.getParentOfOrganization(organization.getId());
 
@@ -533,7 +533,7 @@ public class UnitPositionService {
      * @param unitPositionLineEndDate
      * @param unitId
      */
-    public void updateTimeBank(BigInteger ctaId,long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate,Long unitId) {
+    private void updateTimeBank(BigInteger ctaId, long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate, Long unitId) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(unitPositionLineStartDate, unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
         activityIntegrationService.updateTimeBankOnUnitPositionUpdation(ctaId,unitPositionId, unitPositionLineStartDate, unitPositionLineEndDate, staffAdditionalInfoDTO);
     }
@@ -700,13 +700,13 @@ public class UnitPositionService {
 
         List<UnitPositionLinesQueryResult> hourlyCostPerLine = unitPositionGraphRepository.findFunctionalHourlyCost(unitPositionIds);
 
-        Map<Long, Float> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
+        Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
         Map<Long, List<UnitPositionLinesQueryResult>> positionLinesMap = positionLines.stream().collect(Collectors.groupingBy(UnitPositionLinesQueryResult::getUnitPositionId));
 
         unitPositionQueryResults.forEach(u -> {
             u.setPositionLines(positionLinesMap.get(u.getId()));
             u.getPositionLines().forEach(positionLine -> {
-                float hourlyCost = (float) (positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()) / (366 * 7.4) : hourlyCostMap.get(positionLine.getId()) / (365 * 7.4));
+                BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
                 positionLine.setHourlyCost(hourlyCost);
 
                 ctawtaWrapper.getCta().forEach(cta -> {
@@ -788,25 +788,17 @@ public class UnitPositionService {
         unitPositions.forEach(unitPosition -> {
             com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetail = convertUnitPositionObject(unitPosition);
             List<UnitPositionLinesQueryResult> unitPositionLinesQueryResults = unitPositionGraphRepository.findFunctionalHourlyCost(Arrays.asList(unitPosition.getId()));
-            Map<Long, Float> hourlyCostMap = unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
+            Map<Long, BigDecimal> hourlyCostMap = unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
 
             unitPositionDetail.setStaffId(unitPosition.getStaffId());
             unitPositionDetail.setCountryId(countryId);
             unitPositionDetail.setUnitTimeZone(organization.getTimeZone());
             UnitPositionLinesQueryResult unitPositionLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
-            float hourlyCost = (float) (unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()) / (366 * 7.4) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()) / (365 * 7.4));
+            BigDecimal hourlyCost = unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
             unitPositionDetail.setHourlyCost(hourlyCost);
             unitPositionDetailsList.add(unitPositionDetail);
         });
 
-        // convertUnitPositionObject(unitPosition, unitPositionDetails);
-//  com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-//        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());
-//        if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
-//            unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
-//            unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-//
-//        }
         return unitPositionDetailsList;
     }
 
@@ -818,7 +810,7 @@ public class UnitPositionService {
         if (unitPosition != null) {
             unitPositionDetails = convertUnitPositionObject(unitPosition);
             List<UnitPositionLinesQueryResult> unitPositionLinesQueryResults = unitPositionGraphRepository.findFunctionalHourlyCost(Arrays.asList(unitPositionId));
-            Map<Long, Float> hourlyCostMap = unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
+            Map<Long, BigDecimal> hourlyCostMap = unitPositionLinesQueryResults.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
             ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(),
                     unitPositionDetails.getEmploymentType().getId());
             if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
@@ -826,7 +818,7 @@ public class UnitPositionService {
                 unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
             }
             UnitPositionLinesQueryResult unitPositionLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
-            float hourlyCost = (float) (unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()) / (366 * 7.4) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()) / (365 * 7.4));
+            BigDecimal hourlyCost = unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
             unitPositionDetails.setHourlyCost(hourlyCost);
         }
         return unitPositionDetails;
@@ -851,11 +843,10 @@ public class UnitPositionService {
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
             endDate = DateUtils.getLocalDateFromString(timeCareEmploymentDTO.getEndDate());
         }
-        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(expertiseId, startDate, endDate, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, unitId, new Long(timeCareEmploymentDTO.getId()));
-        return unitPositionDTO;
+        return new UnitPositionDTO(expertiseId, startDate, endDate, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, unitId, new Long(timeCareEmploymentDTO.getId()));
     }
 
-    public boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId, Long expertiseId) throws Exception {
+    private boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId, Long expertiseId) throws Exception {
         Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
         if (organization == null) {
             exceptionService.dataNotFoundByIdException("message.unitposition.organization.externalid", unitExternalId);
@@ -917,7 +908,7 @@ public class UnitPositionService {
     }
 
 
-    public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) throws Exception {
+    private SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) {
 
         StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, currentExpertise.getId());
 
@@ -993,9 +984,7 @@ public class UnitPositionService {
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
-        List<StaffUnitPositionDetails> staffData =
-                staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId, System.currentTimeMillis());
-        return staffData;
+        return  staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId, System.currentTimeMillis());
     }
 
     /**

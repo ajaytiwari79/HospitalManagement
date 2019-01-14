@@ -8,6 +8,7 @@ import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.dto.user.employment.UnitPositionLinesDTO;
 import com.kairos.dto.user.staff.staff.Staff;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -45,7 +46,7 @@ public class StaffUnitPositionDetails {
     private BigInteger excludedPlannedTime;
     private BigInteger includedPlannedTime;
     private Long unitId;
-    private Float hourlyCost;
+    private BigDecimal hourlyCost;
     private Long functionId;
     private List<UnitPositionLinesDTO> positionLines;
 
@@ -237,11 +238,11 @@ public class StaffUnitPositionDetails {
         this.unitId = unitId;
     }
 
-    public Float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(Float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 
