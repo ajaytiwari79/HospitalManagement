@@ -276,7 +276,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "WITH  unitPosition,positionLine,payGrade,expertise,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost \n" +
             "OPTIONAL MATCH (positionLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) \n" +
             "WITH  unitPosition,positionLine,expertise,seniorityLevel,hourlyCost,function\n" +
-            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) where date(functionalPayment.startDate) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(functionalPayment.startDate))\n" +
+            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertise) where date(functionalPayment.startDate) <= date(positionLine.startDate) AND (functionalPayment.endDate IS NULL OR date(positionLine.startDate)<= date(functionalPayment.endDate))\n" +
             "WITH  unitPosition,positionLine,expertise,functionalPayment,seniorityLevel,function,hourlyCost\n" +
             "OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) \n" +
             "WITH  unitPosition,positionLine,expertise,fpm,seniorityLevel,function,functionalPayment,hourlyCost\n" +
