@@ -246,11 +246,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
-        List<CTARuleTemplate> ctaRuleTemplatesOfCTA=ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
-        boolean calculativeValueChanged=checkCalculativeValueChanged(ctaRuleTemplatesOfCTA,ctaDTO.getRuleTemplates());
-        // if both dates are -----> equal <---- and both are of future date so in this case we need to update in same
-        boolean isSameFutureDateCTA = oldCTA.getStartDate().isEqual(ctaDTO.getStartDate()) && (ctaDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || ctaDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
-        if (unitPosition.isPublished() && !isSameFutureDateCTA && calculativeValueChanged) {
+        if (unitPosition.isPublished()) {
             ctaDTO.setId(null);
             CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
@@ -301,22 +297,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         return unitPosition;
     }
 
-    public boolean checkCalculativeValueChanged(List<CTARuleTemplate> ctaRuleTemplatesOfCTA, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
-        AtomicBoolean calculativeValueChange=new AtomicBoolean(false);
-        ctaRuleTemplateDTOS.forEach(currentRuleTemplateToBeLinkedDTO->{
-            CTARuleTemplate ctaRuleTemplate=ctaRuleTemplatesOfCTA.stream().filter(ruleTemplate -> ruleTemplate.getId().equals(currentRuleTemplateToBeLinkedDTO.getId())).findAny().orElse(null);
-            if (ctaRuleTemplate==null){ // this means  a new template is added now we need to check for date
-                calculativeValueChange.getAndSet(true);
-                return;
-            }
-            CTARuleTemplate currentRuleTemplateToBeLinked = ObjectMapperUtils.copyPropertiesByMapper(currentRuleTemplateToBeLinkedDTO, CTARuleTemplate.class);
-            if (!ctaRuleTemplate.equals(currentRuleTemplateToBeLinked)){
-                calculativeValueChange.getAndSet(true);
-                return;
-            }
-        });
-        return calculativeValueChange.get();
-    }
 
     private void updateTimeBankByUnitPositionIdPerStaff(Long unitPositionId, LocalDate ctaStartDate, LocalDate ctaEndDate, Long unitId) {
         Date endDate=ctaEndDate!=null? DateUtils.asDate(ctaEndDate):null;

@@ -89,22 +89,23 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType=WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        DaysOffAfterASeriesWTATemplate that = (DaysOffAfterASeriesWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                nightShiftSequence == that.nightShiftSequence &&
-                restingTimeAllowed == that.restingTimeAllowed &&
-                restingTime == that.restingTime &&
-                Objects.equals(intervalUnit, that.intervalUnit);
-    }
 
     @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, nightShiftSequence, restingTimeAllowed, restingTime);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = (DaysOffAfterASeriesWTATemplate)wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == daysOffAfterASeriesWTATemplate){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(intervalLength == daysOffAfterASeriesWTATemplate.intervalLength &&
+                    nightShiftSequence == daysOffAfterASeriesWTATemplate.nightShiftSequence &&
+                    restingTimeAllowed == daysOffAfterASeriesWTATemplate.restingTimeAllowed &&
+                    restingTime == daysOffAfterASeriesWTATemplate.restingTime &&
+                    Objects.equals(intervalUnit, daysOffAfterASeriesWTATemplate.intervalUnit) && Objects.equals(this.phaseTemplateValues,daysOffAfterASeriesWTATemplate.phaseTemplateValues));
+        }
+        return isCalculatedValueChanged;
     }
+
+
 }

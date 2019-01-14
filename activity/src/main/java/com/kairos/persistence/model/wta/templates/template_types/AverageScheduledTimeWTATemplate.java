@@ -179,23 +179,22 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        AverageScheduledTimeWTATemplate that = (AverageScheduledTimeWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds) &&
-                Objects.equals(partOfDays, that.partOfDays) &&
-                minMaxSetting == that.minMaxSetting;
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate)wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == averageScheduledTimeWTATemplate){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(intervalLength == averageScheduledTimeWTATemplate.intervalLength &&
+                    Float.compare(averageScheduledTimeWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                    Objects.equals(intervalUnit, averageScheduledTimeWTATemplate.intervalUnit) &&
+                    Objects.equals(plannedTimeIds, averageScheduledTimeWTATemplate.plannedTimeIds) &&
+                    Objects.equals(timeTypeIds, averageScheduledTimeWTATemplate.timeTypeIds) &&
+                    Objects.equals(partOfDays, averageScheduledTimeWTATemplate.partOfDays) &&
+                    minMaxSetting == averageScheduledTimeWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,averageScheduledTimeWTATemplate.phaseTemplateValues));
+        }
+        return isCalculatedValueChanged;
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, plannedTimeIds, timeTypeIds, partOfDays, recommendedValue, minMaxSetting);
-    }
 }

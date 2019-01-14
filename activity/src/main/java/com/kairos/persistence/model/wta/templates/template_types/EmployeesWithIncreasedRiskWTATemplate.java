@@ -82,21 +82,19 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        EmployeesWithIncreasedRiskWTATemplate that = (EmployeesWithIncreasedRiskWTATemplate) o;
-        return belowAge == that.belowAge &&
-                aboveAge == that.aboveAge &&
-                pregnant == that.pregnant &&
-                restingTimeAllowed == that.restingTimeAllowed &&
-                restingTime == that.restingTime;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), belowAge, aboveAge, pregnant, restingTimeAllowed, restingTime);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate = (EmployeesWithIncreasedRiskWTATemplate)wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == employeesWithIncreasedRiskWTATemplate){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(belowAge == employeesWithIncreasedRiskWTATemplate.belowAge &&
+                    aboveAge == employeesWithIncreasedRiskWTATemplate.aboveAge &&
+                    pregnant == employeesWithIncreasedRiskWTATemplate.pregnant &&
+                    restingTimeAllowed == employeesWithIncreasedRiskWTATemplate.restingTimeAllowed &&
+                    restingTime == employeesWithIncreasedRiskWTATemplate.restingTime && Objects.equals(this.phaseTemplateValues,employeesWithIncreasedRiskWTATemplate.phaseTemplateValues));
+        }
+        return isCalculatedValueChanged;
     }
 }

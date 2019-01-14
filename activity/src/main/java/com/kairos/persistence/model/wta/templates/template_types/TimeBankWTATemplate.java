@@ -70,18 +70,17 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        TimeBankWTATemplate that = (TimeBankWTATemplate) o;
-        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                minMaxSetting == that.minMaxSetting;
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        TimeBankWTATemplate timeBankWTATemplate = (TimeBankWTATemplate) wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == timeBankWTATemplate){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(Float.compare(timeBankWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                    minMaxSetting == timeBankWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,timeBankWTATemplate.phaseTemplateValues));
+        }
+        return isCalculatedValueChanged;
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), recommendedValue, minMaxSetting);
-    }
 }

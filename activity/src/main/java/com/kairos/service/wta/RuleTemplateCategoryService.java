@@ -18,7 +18,6 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -52,8 +51,6 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     private CTARuleTemplateRepository ctaRuleTemplateRepository;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-    @Inject
-    private OrganizationRestClient organizationRestClient;
     @Autowired
     private ExceptionService excpExceptionService;
     @Inject

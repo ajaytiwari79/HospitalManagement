@@ -108,20 +108,19 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        DurationBetweenShiftsWTATemplate that = (DurationBetweenShiftsWTATemplate) o;
-        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds) &&
-                minMaxSetting == that.minMaxSetting;
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = (DurationBetweenShiftsWTATemplate)wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == durationBetweenShiftsWTATemplate){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(Float.compare(durationBetweenShiftsWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                    Objects.equals(plannedTimeIds, durationBetweenShiftsWTATemplate.plannedTimeIds) &&
+                    Objects.equals(timeTypeIds, durationBetweenShiftsWTATemplate.timeTypeIds) &&
+                    minMaxSetting == durationBetweenShiftsWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,durationBetweenShiftsWTATemplate.phaseTemplateValues));
+        }
+        return isCalculatedValueChanged;
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting);
-    }
 }

@@ -64,17 +64,16 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        WTAForCareDays that = (WTAForCareDays) o;
-        return Objects.equals(careDayCounts, that.careDayCounts);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        WTAForCareDays wtaForCareDays = (WTAForCareDays) wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == wtaForCareDays){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(Objects.equals(careDayCounts, wtaForCareDays.careDayCounts));
+        }
+        return isCalculatedValueChanged;
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), careDayCounts);
-    }
 }

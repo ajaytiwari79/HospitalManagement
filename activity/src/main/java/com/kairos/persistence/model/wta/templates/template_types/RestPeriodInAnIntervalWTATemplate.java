@@ -120,20 +120,19 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        RestPeriodInAnIntervalWTATemplate that = (RestPeriodInAnIntervalWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        RestPeriodInAnIntervalWTATemplate restPeriodInAnIntervalWTATemplate = (RestPeriodInAnIntervalWTATemplate) wtaBaseRuleTemplate;
+        boolean isCalculatedValueChanged;
+        if (this == restPeriodInAnIntervalWTATemplate){
+            isCalculatedValueChanged = true;
+        }
+        else {
+            isCalculatedValueChanged = !(intervalLength == restPeriodInAnIntervalWTATemplate.intervalLength &&
+                    Float.compare(restPeriodInAnIntervalWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                    Objects.equals(intervalUnit, restPeriodInAnIntervalWTATemplate.intervalUnit) &&
+                    Objects.equals(timeTypeIds, restPeriodInAnIntervalWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,restPeriodInAnIntervalWTATemplate.phaseTemplateValues));
+        }
+        return isCalculatedValueChanged;
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, recommendedValue, timeTypeIds);
-    }
 }

@@ -17,17 +17,17 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private Long unitPositionId;
     private Long staffId;
     //In minutes
-    private int totalTimeBankMin;
+    private int totalTimeBankMin; //It is Delta timebank
     private int contractualMin;
     private int scheduledMin;
     private int timeBankMinWithoutCta;
-    private int timeBankMinWithCta;
+    private int timeBankMinWithCta;      //It is the sum of timeBankCTADistributionList
     private long accumultedTimeBankMin;
     private LocalDate date;
     private List<TimeBankCTADistribution> timeBankCTADistributionList;
 
 
-    public DailyTimeBankEntry(Long unitPositionId, Long staffId, int unitWorkingDaysInWeek, LocalDate date) {
+    public DailyTimeBankEntry(Long unitPositionId, Long staffId, LocalDate date) {
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.date = date;
