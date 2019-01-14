@@ -1,13 +1,15 @@
 package com.kairos.persistence.model.payroll;
+
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigInteger;
+
 /*
  *Created By Pavan on 17/12/18
  *
  */
-
-import com.kairos.persistence.model.common.MongoBaseEntity;
-
-import java.math.BigInteger;
-
+@Document
 public class Bank extends MongoBaseEntity {
     private String name;
     private String description;
@@ -20,6 +22,7 @@ public class Bank extends MongoBaseEntity {
         //Default Constructor
     }
 
+
     public Bank(BigInteger id,String name, String description, String registrationNumber, String internationalAccountNumber, String swiftCode,Long countryId) {
         this.id=id;
         this.name = name;
@@ -30,9 +33,11 @@ public class Bank extends MongoBaseEntity {
         this.countryId=countryId;
     }
 
+
     public String getName() {
         return name;
     }
+
 
     public void setName(String name) {
         this.name = name;

@@ -1,16 +1,22 @@
-package com.kairos.persistence.model.payroll;/*
- *Created By Pavan on 19/12/18
- *
- */
+package com.kairos.persistence.model.payroll;
+
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
+
+/**Created By Pavan on 19/12/18
+ *
+ */
+@Document
 public class PensionProvider extends MongoBaseEntity {
     private String name;
     private String paymentNumber;
     private Long countryId;
+    private Long staffId;
+    private Long organizationId;
 
     public PensionProvider() {
         //Default Constructor
@@ -45,5 +51,21 @@ public class PensionProvider extends MongoBaseEntity {
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }
