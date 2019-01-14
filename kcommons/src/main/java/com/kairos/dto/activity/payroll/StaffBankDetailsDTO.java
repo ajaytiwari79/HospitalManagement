@@ -11,15 +11,15 @@ public class StaffBankDetailsDTO {
 
     private Long staffId;
     private BigInteger bankId;
-    private Boolean useNemkontoAccount;
+    private boolean useNemkontoAccount;
     private Long accountNumber;
 
 
-    public Boolean getUseNemkontoAccount() {
+    public boolean getUseNemkontoAccount() {
         return useNemkontoAccount;
     }
 
-    public void setUseNemkontoAccount(Boolean useNemkontoAccount) {
+    public void setUseNemkontoAccount(boolean useNemkontoAccount) {
         this.useNemkontoAccount = useNemkontoAccount;
     }
 
