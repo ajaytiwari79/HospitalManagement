@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.master_data.asset_management;
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAssetMD;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
@@ -35,6 +36,6 @@ public interface MasterAssetRepository extends JpaRepository<MasterAssetMD,Long>
 
     @Transactional
     @Modifying
-    @Query(value = "update MasterAssetMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
-    Integer updateMasterAssetStatus(Long countryId, Set<Long> ids);
+    @Query(value = "update MasterAssetMD set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateMasterAssetStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 }

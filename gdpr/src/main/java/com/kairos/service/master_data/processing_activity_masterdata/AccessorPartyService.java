@@ -183,7 +183,7 @@ public class AccessorPartyService extends MongoBaseService {
      */
     public List<AccessorPartyMD> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<Long> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = accessorPartyMDRepository.updateAccessorPartiesStatus(countryId, accessorPartyIds);
+        Integer updateCount = accessorPartyMDRepository.updateAccessorPartiesStatus(countryId, accessorPartyIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Accessor Parties are updated successfully with ids :: {}", accessorPartyIds);
         }else{

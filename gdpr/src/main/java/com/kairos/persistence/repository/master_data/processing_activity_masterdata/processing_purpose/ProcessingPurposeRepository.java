@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose;
 
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorPartyMD;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurposeMD;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurposeMD;
@@ -42,8 +43,8 @@ public interface ProcessingPurposeRepository extends JpaRepository<ProcessingPur
 
     @Transactional
     @Modifying
-    @Query(value = "update ProcessingPurposeMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
-    Integer updateProcessingPurposeStatus(Long countryId, Set<Long> ids);
+    @Query(value = "update ProcessingPurposeMD set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateProcessingPurposeStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
     @Query(value = "SELECT PP FROM ProcessingPurposeMD PP WHERE PP.id IN (?1) and PP.deleted = false")
     List<ProcessingPurposeMD> findAllByIds( Set<Long> ids);

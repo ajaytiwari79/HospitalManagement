@@ -52,7 +52,7 @@ public class HostingProviderService extends MongoBaseService {
      * and if exist then simply add  HostingProvider to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingProviderMD>> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+    public Map<String, List<HostingProviderMD>> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS, boolean isSuggestion) {
     //TODO still need to optimize we can get name of list in string from here
         Map<String, List<HostingProviderMD>> result = new HashMap<>();
         Set<String> hostingProviderNames = new HashSet<>();
@@ -69,8 +69,13 @@ public class HostingProviderService extends MongoBaseService {
             List<HostingProviderMD> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
                 for (String name : hostingProviderNames) {
-
-                    HostingProviderMD newHostingProvider = new HostingProviderMD(name, countryId, SuggestedDataStatus.APPROVED);
+                    HostingProviderMD newHostingProvider = new HostingProviderMD(name, countryId);
+                    if(isSuggestion){
+                        newHostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newHostingProvider.setSuggestedDate(LocalDate.now());
+                    }else {
+                        newHostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newHostingProviders.add(newHostingProvider);
                 }
 
@@ -144,7 +149,7 @@ public class HostingProviderService extends MongoBaseService {
             }
             throw new DuplicateDataException("data  exist for  " + hostingProviderDTO.getName());
         }
-        Integer resultCount =  hostingProviderMDRepository.updateHostingProviderName(hostingProviderDTO.getName(), id);
+        Integer resultCount =  hostingProviderMDRepository.updateMasterHostingProviderName(hostingProviderDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
         }else{
@@ -162,28 +167,9 @@ public class HostingProviderService extends MongoBaseService {
      * @return
      * @description method save Hosting provider suggested by unit
      */
-    public List<HostingProvider> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
-
-        Set<String> hostingProvidersName = new HashSet<>();
-        for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
-            hostingProvidersName.add(hostingProvider.getName());
-        }
-        List<HostingProvider> existingHostingProviders = findMetaDataByNamesAndCountryId(countryId, hostingProvidersName, HostingProvider.class);
-        hostingProvidersName = ComparisonUtils.getNameListForMetadata(existingHostingProviders, hostingProvidersName);
-        List<HostingProvider> hostingProviderList = new ArrayList<>();
-        if (!hostingProvidersName.isEmpty()) {
-            for (String name : hostingProvidersName) {
-
-                HostingProvider hostingProvider = new HostingProvider(name);
-                hostingProvider.setCountryId(countryId);
-                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                hostingProvider.setSuggestedDate(LocalDate.now());
-                hostingProviderList.add(hostingProvider);
-            }
-
-            hostingProviderList = hostingProviderMongoRepository.saveAll(getNextSequence(hostingProviderList));
-        }
-        return hostingProviderList;
+    public List<HostingProviderMD> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+        Map<String, List<HostingProviderMD>> result = createHostingProviders(countryId, hostingProviderDTOS, true);
+        return result.get(NEW_DATA_LIST);
     }
 
 
@@ -193,12 +179,15 @@ public class HostingProviderService extends MongoBaseService {
      * @param suggestedDataStatus - status to update
      * @return
      */
-    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, Set<BigInteger> hostingProviderIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<HostingProviderMD> updateSuggestedStatusOfHostingProviders(Long countryId, Set<Long> hostingProviderIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<HostingProvider> hostingProviderList = hostingProviderMongoRepository.getHostingProviderListByIds(countryId, hostingProviderIds);
-        hostingProviderList.forEach(hostingProvider -> hostingProvider.setSuggestedDataStatus(suggestedDataStatus));
-        hostingProviderMongoRepository.saveAll(getNextSequence(hostingProviderList));
-        return hostingProviderList;
+        Integer updateCount = hostingProviderMDRepository.updateDataDisposalStatus(countryId, hostingProviderIds, suggestedDataStatus);
+        if(updateCount > 0){
+            LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingProviderIds);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingProviderIds);
+        }
+        return hostingProviderMDRepository.findAllByIds(hostingProviderIds);
     }
 
 }

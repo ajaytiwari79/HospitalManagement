@@ -43,7 +43,7 @@ public class HostingTypeController {
     @ApiOperation("add HostingType")
     @PostMapping("/hosting_type")
     public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId, hostingTypeDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId, hostingTypeDTOs.getRequestBody(),false));
 
     }
 
@@ -78,7 +78,7 @@ public class HostingTypeController {
 
     @ApiOperation("update Suggested status of Hosting types")
     @PutMapping("/hosting_type")
-    public ResponseEntity<Object> updateSuggestedStatusOfHostingTypes(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfHostingTypes(@PathVariable Long countryId, @RequestBody Set<Long> hostingTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(hostingTypeIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Type is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

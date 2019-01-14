@@ -40,7 +40,7 @@ public class OrganizationDataDisposalController {
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(unitId, dataDisposalId));
     }
 
@@ -59,7 +59,7 @@ public class OrganizationDataDisposalController {
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(unitId, dataDisposalId, dataDisposalDTO));
 
     }

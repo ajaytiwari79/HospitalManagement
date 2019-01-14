@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source;
 
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSourceMD;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,8 +39,8 @@ public interface DataSourceRepository extends JpaRepository<DataSourceMD, Long> 
 
     @Transactional
     @Modifying
-    @Query(value = "update DataSourceMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
-    Integer updateDataSourceStatus(Long countryId, Set<Long> ids);
+    @Query(value = "update DataSourceMD set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateDataSourceStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
     @Query(value = "SELECT DS FROM DataSourceMD DS WHERE DS.id IN (?1) and DS.deleted = false")
     List<DataSourceMD> findAllByIds( Set<Long> ids);

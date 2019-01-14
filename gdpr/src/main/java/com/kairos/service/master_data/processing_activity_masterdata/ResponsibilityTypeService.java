@@ -191,7 +191,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
      */
     public List<ResponsibilityTypeMD> updateSuggestedStatusOfResponsibilityTypeList(Long countryId, Set<Long> responsibilityTypeIds , SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = responsibilityTypeRepository.updateResponsibilityTypeStatus(countryId, responsibilityTypeIds);
+        Integer updateCount = responsibilityTypeRepository.updateResponsibilityTypeStatus(countryId, responsibilityTypeIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Responsibility Types are updated successfully with ids :: {}", responsibilityTypeIds);
         }else{

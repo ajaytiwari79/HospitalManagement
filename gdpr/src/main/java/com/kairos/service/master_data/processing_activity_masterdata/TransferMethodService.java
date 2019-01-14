@@ -190,7 +190,7 @@ public class TransferMethodService extends MongoBaseService {
      */
     public List<TransferMethodMD> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<Long> transferMethodIds , SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = transferMethodRepository.updateTransferMethodStatus(countryId, transferMethodIds);
+        Integer updateCount = transferMethodRepository.updateTransferMethodStatus(countryId, transferMethodIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Transfer Methods are updated successfully with ids :: {}", transferMethodIds);
         }else{

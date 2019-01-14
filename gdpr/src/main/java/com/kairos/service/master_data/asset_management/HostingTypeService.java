@@ -53,7 +53,7 @@ public class HostingTypeService extends MongoBaseService {
      * and if exist then simply add  HostingType to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing HostingType using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingTypeMD>> createHostingType(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
+    public Map<String, List<HostingTypeMD>> createHostingType(Long countryId, List<HostingTypeDTO> hostingTypeDTOS, boolean isSuggestion) {
     //TODO still need to optimize we can get name of list in string from here
         Map<String, List<HostingTypeMD>> result = new HashMap<>();
         Set<String> hostingTypeNames = new HashSet<>();
@@ -70,7 +70,13 @@ public class HostingTypeService extends MongoBaseService {
             List<HostingTypeMD> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
                 for (String name : hostingTypeNames) {
-                    HostingTypeMD newHostingType = new HostingTypeMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    HostingTypeMD newHostingType = new HostingTypeMD(name, countryId);
+                    if(isSuggestion){
+                        newHostingType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newHostingType.setSuggestedDate(LocalDate.now());
+                    }else {
+                        newHostingType.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newHostingTypes.add(newHostingType);
                 }
                 newHostingTypes = hostingTypeMDRepository.saveAll(newHostingTypes);
@@ -144,7 +150,7 @@ public class HostingTypeService extends MongoBaseService {
             }
             throw new DuplicateDataException("data  exist for  " + hostingTypeDTO.getName());
         }
-        Integer resultCount =  hostingTypeMDRepository.updateHostingTypeName(hostingTypeDTO.getName(), id);
+        Integer resultCount =  hostingTypeMDRepository.updateHostingTypeName(hostingTypeDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
         }else{
@@ -162,28 +168,9 @@ public class HostingTypeService extends MongoBaseService {
      * @return
      * @description method save Hosting type suggested by unit
      */
-    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
-
-        Set<String> hostingTypeNameList = new HashSet<>();
-        for (HostingTypeDTO HostingType : hostingTypeDTOS) {
-            hostingTypeNameList.add(HostingType.getName());
-        }
-        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingTypeNameList, HostingType.class);
-        hostingTypeNameList = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingTypeNameList);
-        List<HostingType> hostingTypeList = new ArrayList<>();
-        if (!hostingTypeNameList.isEmpty()) {
-            for (String name : hostingTypeNameList) {
-
-                HostingType hostingType = new HostingType(name);
-                hostingType.setCountryId(countryId);
-                hostingType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                hostingType.setSuggestedDate(LocalDate.now());
-                hostingTypeList.add(hostingType);
-            }
-
-            hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
-        }
-        return hostingTypeList;
+    public List<HostingTypeMD> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
+        Map<String, List<HostingTypeMD>> result = createHostingType(countryId, hostingTypeDTOS, true);
+        return result.get(NEW_DATA_LIST);
     }
 
 
@@ -194,12 +181,15 @@ public class HostingTypeService extends MongoBaseService {
      * @param suggestedDataStatus
      * @return
      */
-    public List<HostingType> updateSuggestedStatusOfHostingTypes(Long countryId, Set<BigInteger> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<HostingTypeMD> updateSuggestedStatusOfHostingTypes(Long countryId, Set<Long> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<HostingType> hostingTypeList = hostingTypeMongoRepository.getHostingTypeListByIds(countryId, hostingTypeIds);
-        hostingTypeList.forEach(hostingType -> hostingType.setSuggestedDataStatus(suggestedDataStatus));
-        hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
-        return hostingTypeList;
+        Integer updateCount = hostingTypeMDRepository.updateHostingTypeStatus(countryId, hostingTypeIds, suggestedDataStatus);
+        if(updateCount > 0){
+            LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingTypeIds);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingTypeIds);
+        }
+        return hostingTypeMDRepository.findAllByIds(hostingTypeIds);
     }
 
 

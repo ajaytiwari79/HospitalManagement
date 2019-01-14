@@ -50,6 +50,11 @@ public class HostingTypeMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public HostingTypeMD(@NotBlank(message = "Name can't be empty") String name, Long countryId){
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public HostingTypeMD() {
     }
 

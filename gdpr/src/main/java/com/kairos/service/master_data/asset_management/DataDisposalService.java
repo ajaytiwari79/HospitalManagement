@@ -50,7 +50,7 @@ public class DataDisposalService extends MongoBaseService {
      * and if exist then simply add  data disposal to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
-    public Map<String, List<DataDisposalMD>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+    public Map<String, List<DataDisposalMD>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
 
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<DataDisposalMD>> result = new HashMap<>();
@@ -68,7 +68,13 @@ public class DataDisposalService extends MongoBaseService {
         List<DataDisposalMD> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposalMD newDataDisposal = new DataDisposalMD(name, countryId, SuggestedDataStatus.APPROVED);
+                DataDisposalMD newDataDisposal = new DataDisposalMD(name, countryId);
+                if(isSuggestion){
+                    newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    newDataDisposal.setSuggestedDate(LocalDate.now());
+                }else {
+                    newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                }
                 newDataDisposals.add(newDataDisposal);
             }
             newDataDisposals = dataDisposalMDRepository.saveAll(newDataDisposals);
@@ -157,14 +163,14 @@ public class DataDisposalService extends MongoBaseService {
     public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByName(countryId, dataDisposalDTO.getName());
+        DataDisposalMD dataDisposal = dataDisposalMDRepository.findByCountryIdAndDeletedAndName(countryId, false, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
         }
-        Integer resultCount =  dataDisposalMDRepository.updateDataDisposalName(dataDisposalDTO.getName(), id);
+        Integer resultCount =  dataDisposalMDRepository.updateMasterDataDisposalName(dataDisposalDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
         }else{
@@ -179,28 +185,9 @@ public class DataDisposalService extends MongoBaseService {
      * @return
      * @description method save data disposal suggested by unit
      */
-    public List<DataDisposal> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
-
-        Set<String> dataDisposalsNames = new HashSet<>();
-        for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
-            dataDisposalsNames.add(dataDisposal.getName());
-        }
-        List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
-        dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-        List<DataDisposal> dataDisposalList = new ArrayList<>();
-        if (!dataDisposalsNames.isEmpty()) {
-            for (String name : dataDisposalsNames) {
-
-                DataDisposal dataDisposal = new DataDisposal(name);
-                dataDisposal.setCountryId(countryId);
-                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                dataDisposal.setSuggestedDate(LocalDate.now());
-                dataDisposalList.add(dataDisposal);
-            }
-
-            dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalList));
-        }
-        return dataDisposalList;
+    public List<DataDisposalMD> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+        Map<String, List<DataDisposalMD>> result = createDataDisposal(countryId, dataDisposalDTOS, true);
+        return result.get(NEW_DATA_LIST);
     }
 
 
@@ -209,12 +196,15 @@ public class DataDisposalService extends MongoBaseService {
      * @param dataDisposalIds     - id of data disposal
      * @param suggestedDataStatus -status to update
      */
-    public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, Set<BigInteger> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<DataDisposalMD> updateSuggestedStatusOfDataDisposals(Long countryId, Set<Long> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<DataDisposal> dataDisposalList = dataDisposalMongoRepository.getDataDisposalListByIds(countryId, dataDisposalIds);
-        dataDisposalList.forEach(dataDisposal -> dataDisposal.setSuggestedDataStatus(suggestedDataStatus));
-        dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalList));
-        return dataDisposalList;
+        Integer updateCount = dataDisposalMDRepository.updateDataDisposalStatus(countryId, dataDisposalIds, suggestedDataStatus);
+        if(updateCount > 0){
+            LOGGER.info("Data Disposals are updated successfully with ids :: {}", dataDisposalIds);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", dataDisposalIds);
+        }
+        return dataDisposalMDRepository.findAllByIds(dataDisposalIds);
     }
 
 

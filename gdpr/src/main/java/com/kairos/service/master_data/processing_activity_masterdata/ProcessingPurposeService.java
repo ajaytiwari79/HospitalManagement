@@ -197,7 +197,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      */
     public List<ProcessingPurposeMD> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<Long> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = processingPurposeRepository.updateProcessingPurposeStatus(countryId, processingPurposeIds);
+        Integer updateCount = processingPurposeRepository.updateProcessingPurposeStatus(countryId, processingPurposeIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Processing Purposes are updated successfully with ids :: {}", processingPurposeIds);
         }else{

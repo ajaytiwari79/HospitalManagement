@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata;
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivityMD;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,8 +32,8 @@ public interface MasterProcessingActivityMDRepository extends JpaRepository<Mast
 
     @Transactional
     @Modifying
-    @Query(value = "update MasterProcessingActivityMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
-    Integer updateMasterMasterProcessingActivityStatus(Long countryId, Set<Long> ids);
+    @Query(value = "update MasterProcessingActivityMD set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateMasterMasterProcessingActivityStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
     @Transactional
     @Modifying

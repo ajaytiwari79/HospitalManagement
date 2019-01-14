@@ -198,7 +198,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      */
     public List<ProcessingLegalBasisMD> updateSuggestedStatusOfProcessingLegalBasisList(Long countryId, Set<Long> processingLegalBasisIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = processingLegalBasisRepository.updateProcessingLegalBasisStatus(countryId, processingLegalBasisIds);
+        Integer updateCount = processingLegalBasisRepository.updateProcessingLegalBasisStatus(countryId, processingLegalBasisIds, suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Legal Basis are updated successfully with ids :: {}", processingLegalBasisIds);
         }else{

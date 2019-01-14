@@ -294,7 +294,7 @@ public class MasterAssetService extends MongoBaseService {
      */
     public boolean updateSuggestedStatusOfMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds);
+        Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Master Assets are updated successfully with ids :: {}", assetIds);
         }else{

@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method;
 
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethodMD;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
@@ -39,8 +40,8 @@ public interface TransferMethodRepository extends JpaRepository<TransferMethodMD
 
     @Transactional
     @Modifying
-    @Query(value = "update TransferMethodMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
-    Integer updateTransferMethodStatus(Long countryId, Set<Long> ids);
+    @Query(value = "update TransferMethodMD set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateTransferMethodStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
     @Query(value = "SELECT TM FROM TransferMethodMD TM WHERE TM.id IN (?1) and TM.deleted = false")
     List<TransferMethodMD> findAllByIds( Set<Long> ids);

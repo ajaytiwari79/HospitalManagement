@@ -186,7 +186,7 @@ public class DataSourceService extends MongoBaseService {
      */
     public List<DataSourceMD> updateSuggestedStatusOfDataSourceList(Long countryId, Set<Long> dataSourceIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = dataSourceRepository.updateDataSourceStatus(countryId, dataSourceIds);
+        Integer updateCount = dataSourceRepository.updateDataSourceStatus(countryId, dataSourceIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Data Sources are updated successfully with ids :: {}", dataSourceIds);
         }else{

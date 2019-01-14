@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type;
 
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorPartyMD;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
@@ -41,8 +42,8 @@ public interface ResponsibilityTypeRepository extends JpaRepository<Responsibili
 
     @Transactional
     @Modifying
-    @Query(value = "update ResponsibilityTypeMD set deleted = true where countryId = ?1 and id IN (?2) and deleted = false")
-    Integer updateResponsibilityTypeStatus(Long countryId, Set<Long> ids);
+    @Query(value = "update ResponsibilityTypeMD set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateResponsibilityTypeStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
     @Query(value = "SELECT RT FROM ResponsibilityTypeMD RT WHERE RT.id IN (?1) and RT.deleted = false")
     List<ResponsibilityTypeMD> findAllByIds( Set<Long> ids);

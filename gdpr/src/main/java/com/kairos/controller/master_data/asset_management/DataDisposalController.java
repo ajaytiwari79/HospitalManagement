@@ -42,7 +42,7 @@ public class DataDisposalController {
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal")
     public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody(), false));
 
     }
 
@@ -78,7 +78,7 @@ public class DataDisposalController {
 
     @ApiOperation("update Suggested status of Data Disposal")
     @PutMapping("/data_disposal")
-    public ResponseEntity<Object> updateSuggestedStatusOfDataDisposals(@PathVariable Long countryId, @RequestBody Set<BigInteger> dataDisposalIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfDataDisposals(@PathVariable Long countryId, @RequestBody Set<Long> dataDisposalIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(dataDisposalIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Data Disposal is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
