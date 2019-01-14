@@ -585,9 +585,9 @@ public class OrganizationController {
  *
  * */
     @GetMapping(PARENT_ORGANIZATION_URL+"/parent/{orgId}/country/{countryId}/gdpr_workcenter")
-    public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
+                organizationService.getOrganizationGdprAndWorkcenter(orgId));
     }
 
     @GetMapping(PARENT_ORGANIZATION_URL+"/unit")

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ShiftTemplateRepository extends MongoBaseRepository<ShiftTemplate,BigInteger> {
 
-    @Query("{'deleted':false,'unitId':?0,'createdBy._id':?1}")
+    @Query("{'createdBy._id':?1,deleted:false,unitId:?0}")
     List<ShiftTemplate> findAllByUnitIdAndCreatedByAndDeletedFalse(Long unitId, Long createdBy);
     @Query("{deleted:false,id:?0}")
     ShiftTemplate findOneById(BigInteger id);

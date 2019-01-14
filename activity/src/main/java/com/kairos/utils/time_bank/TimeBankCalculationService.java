@@ -142,7 +142,7 @@ public class TimeBankCalculationService {
 
                                     } else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
                                         if (ruleTemplate.getStaffFunctions().contains(requiredFunctionId)) {
-                                            float value = unitPosition.getHourlyCost() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / unitPosition.getHourlyCost() * 60 : 0;
+                                            float value = unitPosition.getHourlyCost().intValue() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / unitPosition.getHourlyCost().intValue() * 60 : 0;
                                             ctaTimeBankMin += value;
                                             totalDailyTimebank += ctaTimeBankMin;
                                         }

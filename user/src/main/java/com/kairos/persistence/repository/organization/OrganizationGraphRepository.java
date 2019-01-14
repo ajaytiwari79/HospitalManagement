@@ -275,7 +275,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]-(ot:OrganizationType) WITH id(ot) as typeId,businessTypeIds,org,companyCategory,accountType,unitType\n" +
             "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]-(subType:OrganizationType) WITH  COLLECT(id(subType)) as subTypeIds,typeId,businessTypeIds,org,companyCategory,accountType,unitType\n" +
             "RETURN id(unitType) as unitTypeId,subTypeIds as subTypeId ,typeId as typeId ,id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
-            "id(accountType) as accountTypeId,org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
+            "id(accountType) as accountTypeId,org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId, org.workcentre as workcentre," +
             "org.companyUnitType as companyUnitType ORDER BY org.name ")
     List<OrganizationBasicResponse> getOrganizationGdprAndWorkCenter(Long organizationId);
 
@@ -632,7 +632,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
-    @Query("MATCH(o:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n"
+    @Query("MATCH(o:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
             + "MATCH(parentOrganization)-[:" + HAS_SUB_ORGANIZATION + "]-(units:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
             " WITH parentOrganization ,COLLECT (units)  as data " +
             " RETURN parentOrganization as parent,data as childUnits")

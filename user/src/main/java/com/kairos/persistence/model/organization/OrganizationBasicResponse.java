@@ -31,6 +31,7 @@ public class OrganizationBasicResponse {
     Map<String, Object> contactAddress;
     private StaffPersonalDetailDTO unitManager;
     private Long unitTypeId;
+    private boolean workcentre;
 
 
     public OrganizationBasicResponse() {
@@ -183,5 +184,13 @@ public class OrganizationBasicResponse {
 
     public void setUnitTypeId(Long unitTypeId) {
         this.unitTypeId = unitTypeId;
+    }
+
+    public boolean isWorkcentre() {
+        return workcentre;
+    }
+
+    public void setWorkcentre(boolean workcentre) {
+        this.workcentre = workcentre;
     }
 }

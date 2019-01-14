@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,8 +15,8 @@ import java.util.List;
 public class UnitPositionLineFunctionQueryResult {
 
     private LocalDate startDate;
-    private Float hourlyCost;
-    private Float basePayGradeAmount;
+    private BigDecimal hourlyCost;
+    private BigDecimal basePayGradeAmount;
     private List<FunctionDTO> functions;
 
     public LocalDate getStartDate() {
@@ -26,19 +27,19 @@ public class UnitPositionLineFunctionQueryResult {
         this.startDate = startDate;
     }
 
-    public Float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(Float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 
-    public Float getBasePayGradeAmount() {
+    public BigDecimal getBasePayGradeAmount() {
         return basePayGradeAmount;
     }
 
-    public void setBasePayGradeAmount(Float basePayGradeAmount) {
+    public void setBasePayGradeAmount(BigDecimal basePayGradeAmount) {
         this.basePayGradeAmount = basePayGradeAmount;
     }
 
