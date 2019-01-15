@@ -9,6 +9,8 @@ import com.kairos.persistence.model.master_data.default_asset_setting.DataDispos
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -33,13 +35,10 @@ public class DataDisposalService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalService.class);
 
     @Inject
-    private DataDisposalMongoRepository dataDisposalMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private DataDisposalMDRepository dataDisposalMDRepository;
+    private DataDisposalRepository dataDisposalRepository;
 
 
     /**
@@ -63,7 +62,7 @@ public class DataDisposalService extends MongoBaseService {
                 .collect(Collectors.toList());
 
         //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataDisposalMD> existing = dataDisposalMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+        List<DataDisposalMD> existing = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposalMD> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
@@ -77,7 +76,7 @@ public class DataDisposalService extends MongoBaseService {
                 }
                 newDataDisposals.add(newDataDisposal);
             }
-            newDataDisposals = dataDisposalMDRepository.saveAll(newDataDisposals);
+            newDataDisposals = dataDisposalRepository.saveAll(newDataDisposals);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataDisposals);
@@ -90,7 +89,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
-        return dataDisposalMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+        return dataDisposalRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -102,7 +101,7 @@ public class DataDisposalService extends MongoBaseService {
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
     public DataDisposalMD getDataDisposalById(Long countryId, Long id) {
-        DataDisposalMD exist = dataDisposalMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        DataDisposalMD exist = dataDisposalRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -111,19 +110,8 @@ public class DataDisposalService extends MongoBaseService {
         }
     }
 
-
-    /*public Boolean deleteDataDisposalById(Long countryId, BigInteger id) {
-
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(dataDisposal).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        }
-        delete(dataDisposal);
-        return true;
-
-    }*/
     public Boolean deleteDataDisposalById(Long countryId, Long id) {
-        Integer resultCount = dataDisposalMDRepository.deleteByIdAndCountryId(id, countryId);
+        Integer resultCount = dataDisposalRepository.deleteByIdAndCountryId(id, countryId);
        if (resultCount > 0) {
            LOGGER.info("Data Disposal deleted successfully for id :: {}", id);
        }else{
@@ -141,36 +129,17 @@ public class DataDisposalService extends MongoBaseService {
      * @return updated data disposal object
      * @throws DuplicateDataException if data disposal exist with same name then throw exception
      */
-    /*public DataDisposalDTO updateDataDisposal(Long countryId, BigInteger id, DataDisposalDTO dataDisposalDTO) {
-
-
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByName(countryId, dataDisposalDTO.getName());
-        if (Optional.ofNullable(dataDisposal).isPresent()) {
-            if (id.equals(dataDisposal.getId())) {
-                return dataDisposalDTO;
-            }
-            throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
-        }
-        dataDisposal = dataDisposalMongoRepository.findByid(id);
-        if (!Optional.ofNullable(dataDisposal).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
-        }
-        dataDisposal.setName(dataDisposalDTO.getName());
-        dataDisposalMongoRepository.save(dataDisposal);
-        return dataDisposalDTO;
-
-    }*/
     public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
-        DataDisposalMD dataDisposal = dataDisposalMDRepository.findByCountryIdAndDeletedAndName(countryId, false, dataDisposalDTO.getName());
+        DataDisposalMD dataDisposal = dataDisposalRepository.findByCountryIdAndDeletedAndName(countryId, false, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
         }
-        Integer resultCount =  dataDisposalMDRepository.updateMasterDataDisposalName(dataDisposalDTO.getName(), id, countryId);
+        Integer resultCount =  dataDisposalRepository.updateMasterMetadataName(dataDisposalDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
         }else{
@@ -198,13 +167,13 @@ public class DataDisposalService extends MongoBaseService {
      */
     public List<DataDisposalMD> updateSuggestedStatusOfDataDisposals(Long countryId, Set<Long> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = dataDisposalMDRepository.updateDataDisposalStatus(countryId, dataDisposalIds, suggestedDataStatus);
+        Integer updateCount = dataDisposalRepository.updateMetadataStatus(countryId, dataDisposalIds, suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Data Disposals are updated successfully with ids :: {}", dataDisposalIds);
         }else{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", dataDisposalIds);
         }
-        return dataDisposalMDRepository.findAllByIds(dataDisposalIds);
+        return dataDisposalRepository.findAllByIds(dataDisposalIds);
     }
 
 

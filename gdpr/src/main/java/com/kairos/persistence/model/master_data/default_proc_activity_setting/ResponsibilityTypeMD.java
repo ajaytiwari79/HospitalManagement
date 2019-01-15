@@ -52,6 +52,11 @@ public class ResponsibilityTypeMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public ResponsibilityTypeMD(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public ResponsibilityTypeMD(String name) {
         this.name = name;
     }

@@ -8,15 +8,13 @@ import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
-import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMDRepository;
-import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -34,13 +32,10 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TechnicalSecurityMeasureService.class);
 
     @Inject
-    private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private TechnicalSecurityMeasureMDRepository technicalSecurityMeasureMDRepository;
+    private TechnicalSecurityMeasureRepository technicalSecurityMeasureRepository;
 
     /**
      * @param countryId
@@ -63,7 +58,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TechnicalSecurityMeasureMD> existing = technicalSecurityMeasureMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<TechnicalSecurityMeasureMD> existing = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasureMD> newTechnicalMeasures = new ArrayList<>();
@@ -79,7 +74,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMDRepository.saveAll(newTechnicalMeasures);
+                newTechnicalMeasures = technicalSecurityMeasureRepository.saveAll(newTechnicalMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);
@@ -97,7 +92,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
-        return technicalSecurityMeasureMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+        return technicalSecurityMeasureRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -110,7 +105,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      */
     public TechnicalSecurityMeasureMD getTechnicalSecurityMeasure(Long countryId, Long id) {
 
-        TechnicalSecurityMeasureMD exist = technicalSecurityMeasureMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        TechnicalSecurityMeasureMD exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -122,7 +117,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public Boolean deleteTechnicalSecurityMeasure(Long countryId,Long id) {
 
-        Integer resultCount = technicalSecurityMeasureMDRepository.deleteByIdAndCountryId(id, countryId);
+        Integer resultCount = technicalSecurityMeasureRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Technical Security Measure deleted successfully for id :: {}", id);
         }else{
@@ -142,14 +137,14 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
         //TODO What actually this code is doing?
-        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureMDRepository.findByCountryIdAndDeletedAndName(countryId, false, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
             throw new DuplicateDataException("data  exist for  " + technicalSecurityMeasureDTO.getName());
         }
-        Integer resultCount =  technicalSecurityMeasureMDRepository.updateMasterTechnicalStorageMeasureName(technicalSecurityMeasureDTO.getName(), id, countryId);
+        Integer resultCount =  technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", id);
         }else{
@@ -180,11 +175,14 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @param suggestedDataStatus
      * @return
      */
-    public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<BigInteger> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<TechnicalSecurityMeasureMD> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<Long> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<TechnicalSecurityMeasure> securityMeasureList = technicalSecurityMeasureMongoRepository.getTechnicalSecurityMeasureListByIds(countryId, techSecurityMeasureIds);
-        securityMeasureList.forEach(securityMeasure-> securityMeasure.setSuggestedDataStatus(suggestedDataStatus));
-        technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(securityMeasureList));
-        return securityMeasureList;
+        Integer updateCount = technicalSecurityMeasureRepository.updateMetadataStatus(countryId, techSecurityMeasureIds, suggestedDataStatus);
+        if(updateCount > 0){
+            LOGGER.info("Technical Security Measures are updated successfully with ids :: {}", techSecurityMeasureIds);
+        }else{
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", techSecurityMeasureIds);
+        }
+        return technicalSecurityMeasureRepository.findAllByIds(techSecurityMeasureIds);
     }
 }

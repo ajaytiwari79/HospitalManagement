@@ -11,6 +11,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.HostingPro
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProviderMD;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -35,13 +36,10 @@ public class HostingProviderService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingProviderService.class);
 
     @Inject
-    private HostingProviderMongoRepository hostingProviderMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private HostingProviderMDRepository hostingProviderMDRepository;
+    private HostingProviderRepository hostingProviderRepository;
 
 
     /**
@@ -64,7 +62,7 @@ public class HostingProviderService extends MongoBaseService {
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<HostingProviderMD> existing = hostingProviderMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<HostingProviderMD> existing = hostingProviderRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProviderMD> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
@@ -79,7 +77,7 @@ public class HostingProviderService extends MongoBaseService {
                     newHostingProviders.add(newHostingProvider);
                 }
 
-                newHostingProviders = hostingProviderMDRepository.saveAll(newHostingProviders);
+                newHostingProviders = hostingProviderRepository.saveAll(newHostingProviders);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingProviders);
@@ -97,7 +95,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
-        return hostingProviderMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+        return hostingProviderRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -110,7 +108,7 @@ public class HostingProviderService extends MongoBaseService {
      */
     public HostingProviderMD getHostingProviderById(Long countryId, Long id) {
 
-        HostingProviderMD exist = hostingProviderMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        HostingProviderMD exist = hostingProviderRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -122,7 +120,7 @@ public class HostingProviderService extends MongoBaseService {
 
     public Boolean deleteHostingProvider(Long countryId, Long id) {
 
-        Integer resultCount = hostingProviderMDRepository.deleteByIdAndCountryId(id, countryId);
+        Integer resultCount = hostingProviderRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Hosting Provider deleted successfully for id :: {}", id);
         }else{
@@ -142,14 +140,14 @@ public class HostingProviderService extends MongoBaseService {
      */
     public HostingProviderDTO updateHostingProvider(Long countryId, Long id, HostingProviderDTO hostingProviderDTO) {
         //TODO What actually this code is doing?
-        HostingProviderMD hostingProvider = hostingProviderMDRepository.findByCountryIdAndDeletedAndName(countryId, false,  hostingProviderDTO.getName());
+        HostingProviderMD hostingProvider = hostingProviderRepository.findByCountryIdAndDeletedAndName(countryId, false,  hostingProviderDTO.getName());
         if (Optional.ofNullable(hostingProvider).isPresent()) {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
             throw new DuplicateDataException("data  exist for  " + hostingProviderDTO.getName());
         }
-        Integer resultCount =  hostingProviderMDRepository.updateMasterHostingProviderName(hostingProviderDTO.getName(), id, countryId);
+        Integer resultCount =  hostingProviderRepository.updateMasterMetadataName(hostingProviderDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
         }else{
@@ -181,13 +179,13 @@ public class HostingProviderService extends MongoBaseService {
      */
     public List<HostingProviderMD> updateSuggestedStatusOfHostingProviders(Long countryId, Set<Long> hostingProviderIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = hostingProviderMDRepository.updateDataDisposalStatus(countryId, hostingProviderIds, suggestedDataStatus);
+        Integer updateCount = hostingProviderRepository.updateMetadataStatus(countryId, hostingProviderIds, suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingProviderIds);
         }else{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingProviderIds);
         }
-        return hostingProviderMDRepository.findAllByIds(hostingProviderIds);
+        return hostingProviderRepository.findAllByIds(hostingProviderIds);
     }
 
 }

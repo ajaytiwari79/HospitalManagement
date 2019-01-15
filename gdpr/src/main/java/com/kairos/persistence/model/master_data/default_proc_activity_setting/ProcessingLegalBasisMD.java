@@ -52,6 +52,11 @@ public class ProcessingLegalBasisMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public ProcessingLegalBasisMD(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Number and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public ProcessingLegalBasisMD(String name) {
         this.name = name;
     }

@@ -4,11 +4,9 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormatMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMDRepository;
-import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -18,7 +16,6 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -36,7 +33,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationStorageFormatService.class);
 
     @Inject
-    private StorageFormatMDRepository storageFormatMDRepository;
+    private StorageFormatRepository storageFormatRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -68,7 +65,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
             List<String> nameInLowerCase = storageFormatNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<StorageFormatMD> existing = storageFormatMDRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            List<StorageFormatMD> existing = storageFormatRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormatMD> newStorageFormats = new ArrayList<>();
@@ -78,7 +75,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
                     newStorageFormat.setOrganizationId(organizationId);
                     newStorageFormats.add(newStorageFormat);
                 }
-                newStorageFormats = storageFormatMDRepository.saveAll(newStorageFormats);
+                newStorageFormats = storageFormatRepository.saveAll(newStorageFormats);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -96,7 +93,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMDRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+        return storageFormatRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
     /**
@@ -108,7 +105,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      */
     public StorageFormatMD getStorageFormat(Long organizationId, Long id) {
 
-        StorageFormatMD exist = storageFormatMDRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
+        StorageFormatMD exist = storageFormatRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -139,14 +136,14 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      */
     public StorageFormatDTO updateStorageFormat(Long organizationId, Long id, StorageFormatDTO storageFormatDTO) {
 
-        StorageFormatMD storageFormat = storageFormatMDRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, storageFormatDTO.getName());
+        StorageFormatMD storageFormat = storageFormatRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Storage Format", storageFormat.getName());
         }
-        Integer resultCount =  storageFormatMDRepository.updateStorageFormatName(storageFormatDTO.getName(), id, organizationId);
+        Integer resultCount =  storageFormatRepository.updateMetadataName(storageFormatDTO.getName(), id, organizationId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", id);
         }else{

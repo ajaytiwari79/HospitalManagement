@@ -34,9 +34,6 @@ public class ResponsibilityTypeService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponsibilityTypeService.class);
 
     @Inject
-    private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
@@ -52,7 +49,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
      * findByNamesList()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
-    public Map<String, List<ResponsibilityTypeMD>> createResponsibilityType(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public Map<String, List<ResponsibilityTypeMD>> createResponsibilityType(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<ResponsibilityTypeMD>> result = new HashMap<>();
         Set<String> responsibilityTypeNames = new HashSet<>();
@@ -69,7 +66,13 @@ public class ResponsibilityTypeService extends MongoBaseService {
             List<ResponsibilityTypeMD> newResponsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
-                    ResponsibilityTypeMD newResponsibilityType = new ResponsibilityTypeMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    ResponsibilityTypeMD newResponsibilityType = new ResponsibilityTypeMD(name,countryId);
+                    if(isSuggestion){
+                        newResponsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newResponsibilityType.setSuggestedDate(LocalDate.now());
+                    }else{
+                        newResponsibilityType.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newResponsibilityTypes.add(newResponsibilityType);
                 }
                 newResponsibilityTypes = responsibilityTypeRepository.saveAll(newResponsibilityTypes);
@@ -132,14 +135,14 @@ public class ResponsibilityTypeService extends MongoBaseService {
     public ResponsibilityTypeDTO updateResponsibilityType(Long countryId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityTypeMD responsibilityType = responsibilityTypeRepository.findByNameAndCountryId(responsibilityTypeDTO.getName(), countryId);
+        ResponsibilityTypeMD responsibilityType = responsibilityTypeRepository.findByCountryIdAndDeletedAndName(countryId, false, responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
             }
             throw new DuplicateDataException("data  exist for  " + responsibilityTypeDTO.getName());
         }
-        Integer resultCount =  responsibilityTypeRepository.updateResponsibilityTypeName(responsibilityTypeDTO.getName(), id);
+        Integer resultCount =  responsibilityTypeRepository.updateMasterMetadataName(responsibilityTypeDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", id);
         }else{
@@ -157,28 +160,9 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * @param responsibilityTypeDTOS - Responsibility type suggested by unit
      * @return
      */
-    public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
-
-        Set<String> responsibilityTypeNameList = new HashSet<>();
-        for (ResponsibilityTypeDTO ResponsibilityType : responsibilityTypeDTOS) {
-            responsibilityTypeNameList.add(ResponsibilityType.getName());
-        }
-        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilityTypeNameList, ResponsibilityType.class);
-        responsibilityTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilityTypeNameList);
-        List<ResponsibilityType> responsibilityTypeList = new ArrayList<>();
-        if (!responsibilityTypeNameList.isEmpty()) {
-            for (String name : responsibilityTypeNameList) {
-
-                ResponsibilityType responsibilityType = new ResponsibilityType(name);
-                responsibilityType.setCountryId(countryId);
-                responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                responsibilityType.setSuggestedDate(LocalDate.now());
-                responsibilityTypeList.add(responsibilityType);
-            }
-
-            responsibilityTypeMongoRepository.saveAll(getNextSequence(responsibilityTypeList));
-        }
-        return responsibilityTypeList;
+    public List<ResponsibilityTypeMD> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+        Map<String, List<ResponsibilityTypeMD>> result = createResponsibilityType(countryId, responsibilityTypeDTOS, true);
+        return result.get(NEW_DATA_LIST);
     }
 
 
@@ -191,7 +175,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
      */
     public List<ResponsibilityTypeMD> updateSuggestedStatusOfResponsibilityTypeList(Long countryId, Set<Long> responsibilityTypeIds , SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = responsibilityTypeRepository.updateResponsibilityTypeStatus(countryId, responsibilityTypeIds,suggestedDataStatus);
+        Integer updateCount = responsibilityTypeRepository.updateMetadataStatus(countryId, responsibilityTypeIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Responsibility Types are updated successfully with ids :: {}", responsibilityTypeIds);
         }else{

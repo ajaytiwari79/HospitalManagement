@@ -6,8 +6,9 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -35,7 +36,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationResponsibilityTypeService.class);
 
     @Inject
-    private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
+    private ResponsibilityTypeRepository responsibilityTypeRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -55,9 +56,9 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public Map<String, List<ResponsibilityTypeMD>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Map<String, List<ResponsibilityType>> result = new HashMap<>();
+        Map<String, List<ResponsibilityTypeMD>> result = new HashMap<>();
         Set<String> responsibilityTypeNames = new HashSet<>();
         if (!responsibilityTypeDTOS.isEmpty()) {
             for (ResponsibilityTypeDTO responsibilityType : responsibilityTypeDTOS) {
@@ -67,20 +68,20 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing = findMetaDataByNameAndUnitId(organizationId, responsibilityTypeNames, ResponsibilityType.class);
+            List<String> nameInLowerCase = responsibilityTypeNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<ResponsibilityTypeMD> existing = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
-            List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
+            List<ResponsibilityTypeMD> newResponsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
-
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
+                    ResponsibilityTypeMD newResponsibilityType = new ResponsibilityTypeMD(name);
                     newResponsibilityType.setOrganizationId(organizationId);
                     newResponsibilityTypes.add(newResponsibilityType);
-
                 }
-
-                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(getNextSequence(newResponsibilityTypes));
+                newResponsibilityTypes = responsibilityTypeRepository.saveAll(newResponsibilityTypes);
 
             }
             result.put(EXISTING_DATA_LIST, existing);
@@ -98,7 +99,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return responsibilityTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
     /**
@@ -107,9 +108,9 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return ResponsibilityType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
      */
-    public ResponsibilityType getResponsibilityType(Long organizationId, BigInteger id) {
+    public ResponsibilityTypeMD getResponsibilityType(Long organizationId, Long id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByUnitIdAndId(organizationId, id);
+        ResponsibilityTypeMD exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -125,7 +126,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
         if (!processingActivities.isEmpty()) {
                 exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        responsibilityTypeMongoRepository.safeDeleteById(responsibilityTypeId) ;
+        //responsibilityTypeRepository.safeDeleteById(responsibilityTypeId) ;
         return true;
     }
 
@@ -136,33 +137,32 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @param responsibilityTypeDTO
      * @return ResponsibilityType updated object
      */
-    public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, BigInteger id, ResponsibilityTypeDTO responsibilityTypeDTO) {
+    public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByUnitIdAndName(organizationId, responsibilityTypeDTO.getName());
+        ResponsibilityTypeMD responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Responsibility Type", responsibilityType.getName());
         }
-        responsibilityType = responsibilityTypeMongoRepository.findByid(id);
-        if (!Optional.ofNullable(responsibilityType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", id);
+        Integer resultCount =  responsibilityTypeRepository.updateMetadataName(responsibilityTypeDTO.getName(), id, organizationId);
+        if(resultCount <=0){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Typ", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, responsibilityTypeDTO.getName());
         }
-        responsibilityType.setName(responsibilityTypeDTO.getName());
-        responsibilityTypeMongoRepository.save(responsibilityType);
         return responsibilityTypeDTO;
 
 
     }
 
 
-    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public Map<String, List<ResponsibilityTypeMD>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Map<String, List<ResponsibilityType>> result;
-        result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
-        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
+        Map<String, List<ResponsibilityTypeMD>> result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
+        List<ResponsibilityTypeMD> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
         if (!masterResponsibilityTypeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterResponsibilityTypeSuggestedByUnit);
         }

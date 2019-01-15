@@ -52,6 +52,11 @@ public class ProcessingPurposeMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public ProcessingPurposeMD(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Number and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public ProcessingPurposeMD(String name) {
         this.name = name;
     }

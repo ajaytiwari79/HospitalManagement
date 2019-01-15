@@ -45,7 +45,7 @@ public class OrganizationDataSourceController {
 
     @ApiOperation("get dataSource by id")
     @GetMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> getDataSource(@PathVariable Long unitId, @PathVariable BigInteger dataSourceId) {
+    public ResponseEntity<Object> getDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -76,7 +76,7 @@ public class OrganizationDataSourceController {
 
     @ApiOperation("update dataSource by id")
     @PutMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable BigInteger dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 

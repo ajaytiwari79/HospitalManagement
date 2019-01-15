@@ -4,11 +4,10 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -19,7 +18,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -50,7 +48,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
     private AssetMongoRepository assetMongoRepository;
 
     @Inject
-    private TechnicalSecurityMeasureMDRepository technicalSecurityMeasureMDRepository;
+    private TechnicalSecurityMeasureRepository technicalSecurityMeasureRepository;
 
 
     /**
@@ -76,7 +74,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
             List<String> nameInLowerCase = techSecurityMeasureNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TechnicalSecurityMeasureMD> existing = technicalSecurityMeasureMDRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            List<TechnicalSecurityMeasureMD> existing = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasureMD> newTechnicalMeasures = new ArrayList<>();
@@ -86,7 +84,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
                     newTechnicalSecurityMeasure.setOrganizationId(organizationId);
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMDRepository.saveAll(newTechnicalMeasures);
+                newTechnicalMeasures = technicalSecurityMeasureRepository.saveAll(newTechnicalMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);
@@ -102,7 +100,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureMDRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
+        return technicalSecurityMeasureRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
 
@@ -115,7 +113,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      */
     public TechnicalSecurityMeasureMD getTechnicalSecurityMeasure(Long organizationId, Long id) {
 
-        TechnicalSecurityMeasureMD exist = technicalSecurityMeasureMDRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        TechnicalSecurityMeasureMD exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -145,14 +143,14 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long organizationId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
-        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureMDRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Technical Security Measure", technicalSecurityMeasure.getName());
         }
-        Integer resultCount =  technicalSecurityMeasureMDRepository.updateTechnicalSecurityMeasureName(technicalSecurityMeasureDTO.getName(), id, organizationId);
+        Integer resultCount =  technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, organizationId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Format", id);
         }else{

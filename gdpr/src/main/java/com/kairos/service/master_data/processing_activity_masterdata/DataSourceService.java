@@ -35,9 +35,6 @@ public class DataSourceService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceService.class);
 
     @Inject
-    private DataSourceMongoRepository dataSourceMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
@@ -52,7 +49,7 @@ public class DataSourceService extends MongoBaseService {
      * and if exist then simply add  DataSource to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public Map<String, List<DataSourceMD>> createDataSource(Long countryId, List<DataSourceDTO> dataSources) {
+    public Map<String, List<DataSourceMD>> createDataSource(Long countryId, List<DataSourceDTO> dataSources , boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<DataSourceMD>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
@@ -69,7 +66,13 @@ public class DataSourceService extends MongoBaseService {
             List<DataSourceMD> newDataSources = new ArrayList<>();
             if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {
-                    DataSourceMD newDataSource = new DataSourceMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    DataSourceMD newDataSource = new DataSourceMD(name,countryId);
+                if(isSuggestion){
+                    newDataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                    newDataSource.setSuggestedDate(LocalDate.now());
+                }else{
+                    newDataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                }
                     newDataSources.add(newDataSource);
 
                 }
@@ -128,14 +131,14 @@ public class DataSourceService extends MongoBaseService {
      */
     public DataSourceDTO updateDataSource(Long countryId, Long id, DataSourceDTO dataSourceDTO) {
 
-        DataSourceMD dataSource = dataSourceRepository.findByNameAndCountryId( dataSourceDTO.getName(), countryId);
+        DataSourceMD dataSource = dataSourceRepository.findByCountryIdAndDeletedAndName(countryId, false, dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataSourceDTO.getName());
         }
-        Integer resultCount =  dataSourceRepository.updateDataSourceName(dataSourceDTO.getName(), id);
+        Integer resultCount =  dataSourceRepository.updateMasterMetadataName(dataSourceDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
         }else{
@@ -152,28 +155,10 @@ public class DataSourceService extends MongoBaseService {
      * @param dataSourceDTOS
      * @return
      */
-    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
+    public List<DataSourceMD> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
 
-        Set<String> dataSourceNameList = new HashSet<>();
-        for (DataSourceDTO DataSource : dataSourceDTOS) {
-            dataSourceNameList.add(DataSource.getName());
-        }
-        List<DataSource> existingDataSources = findMetaDataByNamesAndCountryId(countryId, dataSourceNameList, DataSource.class);
-        dataSourceNameList = ComparisonUtils.getNameListForMetadata(existingDataSources, dataSourceNameList);
-        List<DataSource> dataSourceList = new ArrayList<>();
-        if (!dataSourceNameList.isEmpty()) {
-            for (String name : dataSourceNameList) {
-
-                DataSource dataSource = new DataSource(name);
-                dataSource.setCountryId(countryId);
-                dataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                dataSource.setSuggestedDate(LocalDate.now());
-                dataSourceList.add(dataSource);
-            }
-
-            dataSourceMongoRepository.saveAll(getNextSequence(dataSourceList));
-        }
-        return dataSourceList;
+        Map<String, List<DataSourceMD>> result = createDataSource(countryId, dataSourceDTOS, true);
+        return result.get(NEW_DATA_LIST);
     }
 
 
@@ -186,7 +171,7 @@ public class DataSourceService extends MongoBaseService {
      */
     public List<DataSourceMD> updateSuggestedStatusOfDataSourceList(Long countryId, Set<Long> dataSourceIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = dataSourceRepository.updateDataSourceStatus(countryId, dataSourceIds,suggestedDataStatus);
+        Integer updateCount = dataSourceRepository.updateMetadataStatus(countryId, dataSourceIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Data Sources are updated successfully with ids :: {}", dataSourceIds);
         }else{

@@ -44,7 +44,7 @@ public class OrganizationTransferMethodController {
 
     @ApiOperation("get transfer Method by id")
     @GetMapping("/transfer_method/{transferMethodId}")
-    public ResponseEntity<Object> getTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger transferMethodId) {
+    public ResponseEntity<Object> getTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -76,7 +76,7 @@ public class OrganizationTransferMethodController {
 
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/{transferMethodId}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

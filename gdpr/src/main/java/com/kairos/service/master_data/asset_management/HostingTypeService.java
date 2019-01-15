@@ -6,22 +6,17 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingTypeMD;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMDRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMDRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,13 +30,10 @@ public class HostingTypeService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingTypeService.class);
 
     @Inject
-    private HostingTypeMongoRepository hostingTypeMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private HostingTypeMDRepository hostingTypeMDRepository;
+    private HostingTypeRepository hostingTypeRepository;
 
 
     /**
@@ -65,7 +57,7 @@ public class HostingTypeService extends MongoBaseService {
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<HostingTypeMD> existing = hostingTypeMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<HostingTypeMD> existing = hostingTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingTypeMD> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
@@ -79,7 +71,7 @@ public class HostingTypeService extends MongoBaseService {
                     }
                     newHostingTypes.add(newHostingType);
                 }
-                newHostingTypes = hostingTypeMDRepository.saveAll(newHostingTypes);
+                newHostingTypes = hostingTypeRepository.saveAll(newHostingTypes);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingTypes);
@@ -97,7 +89,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
-        return hostingTypeMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+        return hostingTypeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
 
@@ -110,7 +102,7 @@ public class HostingTypeService extends MongoBaseService {
      */
     public HostingTypeMD getHostingType(Long countryId, Long id) {
 
-        HostingTypeMD exist = hostingTypeMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        HostingTypeMD exist = hostingTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -122,7 +114,7 @@ public class HostingTypeService extends MongoBaseService {
 
     public Boolean deleteHostingType(Long countryId, Long id) {
 
-        Integer resultCount = hostingTypeMDRepository.deleteByIdAndCountryId(id, countryId);
+        Integer resultCount = hostingTypeRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Hosting Type deleted successfully for id :: {}", id);
         }else{
@@ -143,14 +135,14 @@ public class HostingTypeService extends MongoBaseService {
     public HostingTypeDTO updateHostingType(Long countryId, Long id, HostingTypeDTO hostingTypeDTO) {
 
         //TODO What actually this code is doing?
-        HostingTypeMD hostingType = hostingTypeMDRepository.findByCountryIdAndDeletedAndName(countryId, false, hostingTypeDTO.getName());
+        HostingTypeMD hostingType = hostingTypeRepository.findByCountryIdAndDeletedAndName(countryId, false, hostingTypeDTO.getName());
         if (Optional.ofNullable(hostingType).isPresent()) {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
             }
             throw new DuplicateDataException("data  exist for  " + hostingTypeDTO.getName());
         }
-        Integer resultCount =  hostingTypeMDRepository.updateMasterHostingTypeName(hostingTypeDTO.getName(), id, countryId);
+        Integer resultCount =  hostingTypeRepository.updateMasterMetadataName(hostingTypeDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
         }else{
@@ -183,13 +175,13 @@ public class HostingTypeService extends MongoBaseService {
      */
     public List<HostingTypeMD> updateSuggestedStatusOfHostingTypes(Long countryId, Set<Long> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = hostingTypeMDRepository.updateMasterHostingTypeStatus(countryId, hostingTypeIds, suggestedDataStatus);
+        Integer updateCount = hostingTypeRepository.updateMetadataStatus(countryId, hostingTypeIds, suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Hosting providers are updated successfully with ids :: {}", hostingTypeIds);
         }else{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Providers", hostingTypeIds);
         }
-        return hostingTypeMDRepository.findAllByIds(hostingTypeIds);
+        return hostingTypeRepository.findAllByIds(hostingTypeIds);
     }
 
 

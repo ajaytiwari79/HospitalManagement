@@ -38,9 +38,6 @@ public class ProcessingPurposeService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPurposeService.class);
 
     @Inject
-    private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
-
-    @Inject
     private ProcessingPurposeRepository processingPurposeRepository;
 
     @Inject
@@ -56,7 +53,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurposeMD>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public Map<String, List<ProcessingPurposeMD>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<ProcessingPurposeMD>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
@@ -77,7 +74,13 @@ public class ProcessingPurposeService extends MongoBaseService {
             List<ProcessingPurposeMD> newProcessingPurposes = new ArrayList<>();
             if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
-                    ProcessingPurposeMD newProcessingPurpose = new ProcessingPurposeMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    ProcessingPurposeMD newProcessingPurpose = new ProcessingPurposeMD(name,countryId);
+                    if(isSuggestion){
+                        newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newProcessingPurpose.setSuggestedDate(LocalDate.now());
+                    }else{
+                        newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newProcessingPurposes.add(newProcessingPurpose);
                 }
                 newProcessingPurposes = processingPurposeRepository.saveAll(newProcessingPurposes);
@@ -139,14 +142,14 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return ProcessingPurpose updated object
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
-        ProcessingPurposeMD processingPurpose = processingPurposeRepository.findByNameAndCountryId(processingPurposeDTO.getName(), countryId);
+        ProcessingPurposeMD processingPurpose = processingPurposeRepository.findByCountryIdAndDeletedAndName( countryId, false, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
             throw new DuplicateDataException("data  exist for  " + processingPurposeDTO.getName());
         } else {
-            Integer resultCount =  processingPurposeRepository.updateProcessingPurposeName(processingPurposeDTO.getName(), id);
+            Integer resultCount =  processingPurposeRepository.updateMasterMetadataName(processingPurposeDTO.getName(), id, countryId);
             if(resultCount <=0){
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
             }else{
@@ -163,28 +166,10 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @param processingPurposeDTOS - processing purpose suggested by unit
      * @return
      */
-    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public List<ProcessingPurposeMD> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+        Map<String, List<ProcessingPurposeMD>> result = createProcessingPurpose(countryId, processingPurposeDTOS, true);
+        return result.get(NEW_DATA_LIST);
 
-        Set<String> processingPurposeNameList = new HashSet<>();
-        for (ProcessingPurposeDTO ProcessingPurpose : processingPurposeDTOS) {
-            processingPurposeNameList.add(ProcessingPurpose.getName());
-        }
-        List<ProcessingPurpose> existingProcessingPurposes = findMetaDataByNamesAndCountryId(countryId, processingPurposeNameList, ProcessingPurpose.class);
-        processingPurposeNameList = ComparisonUtils.getNameListForMetadata(existingProcessingPurposes, processingPurposeNameList);
-        List<ProcessingPurpose> processingPurposeList = new ArrayList<>();
-        if (!processingPurposeNameList.isEmpty()) {
-            for (String name : processingPurposeNameList) {
-
-                ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
-                processingPurpose.setCountryId(countryId);
-                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                processingPurpose.setSuggestedDate(LocalDate.now());
-                processingPurposeList.add(processingPurpose);
-            }
-
-             processingPurposeMongoRepository.saveAll(getNextSequence(processingPurposeList));
-        }
-        return processingPurposeList;
     }
 
 
@@ -197,7 +182,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      */
     public List<ProcessingPurposeMD> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<Long> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = processingPurposeRepository.updateProcessingPurposeStatus(countryId, processingPurposeIds,suggestedDataStatus);
+        Integer updateCount = processingPurposeRepository.updateMetadataStatus(countryId, processingPurposeIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Processing Purposes are updated successfully with ids :: {}", processingPurposeIds);
         }else{

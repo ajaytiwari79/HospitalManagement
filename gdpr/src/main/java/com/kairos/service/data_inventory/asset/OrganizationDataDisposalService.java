@@ -4,11 +4,9 @@ package com.kairos.service.data_inventory.asset;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMDRepository;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -18,7 +16,6 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -36,7 +33,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationDataDisposalService.class);
 
     @Inject
-    private DataDisposalMDRepository dataDisposalMDRepository;
+    private DataDisposalRepository dataDisposalRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -67,7 +64,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
         List<String> nameInLowerCase = dataDisposalsNames.stream().map(String::toLowerCase)
                 .collect(Collectors.toList());
         //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataDisposalMD> existing = dataDisposalMDRepository.findByUnitIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+        List<DataDisposalMD> existing = dataDisposalRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposalMD> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
@@ -77,7 +74,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
                 newDataDisposals.add(newDataDisposal);
             }
 
-            newDataDisposals = dataDisposalMDRepository.saveAll(newDataDisposals);
+            newDataDisposals = dataDisposalRepository.saveAll(newDataDisposals);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataDisposals);
@@ -90,7 +87,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long organizationId) {
-        return dataDisposalMDRepository.findAllByUnitIdAndSortByCreatedDate(organizationId);
+        return dataDisposalRepository.findAllByUnitIdAndSortByCreatedDate(organizationId);
     }
 
 
@@ -102,7 +99,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      */
     public DataDisposalMD getDataDisposalById(Long organizationId, Long id) {
 
-        DataDisposalMD exist = dataDisposalMDRepository.findByIdAndUnitIdAndDeleted(id, organizationId, false);
+        DataDisposalMD exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -116,7 +113,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
         List<AssetBasicResponseDTO> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
                 if (CollectionUtils.isNotEmpty(assetsLinkedWithDataDisposal)) {
                     exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", new StringBuilder(assetsLinkedWithDataDisposal.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
-        /*Integer resultCount = dataDisposalMDRepository.deleteByIdAndUnitId(dataDisposalId, unitId);
+        /*Integer resultCount = dataDisposalRepository.deleteByIdAndUnitId(dataDisposalId, unitId);
         if (resultCount > 0) {
             LOGGER.info("Data Disposal deleted successfully for id :: {}", dataDisposalId);
         }else{
@@ -138,14 +135,14 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     public DataDisposalDTO updateDataDisposal(Long organizationId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
-        DataDisposalMD dataDisposal = dataDisposalMDRepository.findByUnitIdAndDeletedAndName(organizationId, false, dataDisposalDTO.getName());
+        DataDisposalMD dataDisposal = dataDisposalRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
             throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
         }
-        Integer resultCount =  dataDisposalMDRepository.updateDataDisposalName(dataDisposalDTO.getName(), id, organizationId);
+        Integer resultCount =  dataDisposalRepository.updateMetadataName(dataDisposalDTO.getName(), id, organizationId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
         }else{

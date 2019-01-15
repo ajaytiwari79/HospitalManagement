@@ -46,7 +46,7 @@ public class OrganizationProcessingPurposeController {
 
     @ApiOperation("get processing purpose by id")
     @GetMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long unitId, @PathVariable BigInteger processingPurposeId) {
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long unitId, @PathVariable Long processingPurposeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -76,7 +76,7 @@ public class OrganizationProcessingPurposeController {
 
     @ApiOperation("update processing purpose by id")
     @PutMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long unitId, @PathVariable BigInteger processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long unitId, @PathVariable Long processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

@@ -57,6 +57,11 @@ public class AccessorPartyMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public AccessorPartyMD(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public AccessorPartyMD() {
     }
 }

@@ -77,7 +77,7 @@ public class TechnicalSecurityController {
 
     @ApiOperation("update Suggested status of Technical Security")
     @PutMapping("/technical_security")
-    public ResponseEntity<Object> updateSuggestedStatusOfTechnicalSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<BigInteger> techSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfTechnicalSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<Long> techSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(techSecurityMeasureIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Security Measure is Not Selected");
         }else   if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

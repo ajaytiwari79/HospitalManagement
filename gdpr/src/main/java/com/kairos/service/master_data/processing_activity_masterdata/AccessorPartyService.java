@@ -8,19 +8,17 @@ import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorPartyMD;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMDRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,13 +33,10 @@ public class AccessorPartyService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessorPartyService.class);
 
     @Inject
-    private AccessorPartyMongoRepository accessorPartyMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private AccessorPartyMDRepository accessorPartyMDRepository;
+    private AccessorPartyRepository accessorPartyRepository;
 
 
     /**
@@ -52,7 +47,7 @@ public class AccessorPartyService extends MongoBaseService {
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
-    public Map<String, List<AccessorPartyMD>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties) {
+    public Map<String, List<AccessorPartyMD>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<AccessorPartyMD>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
@@ -63,16 +58,22 @@ public class AccessorPartyService extends MongoBaseService {
             List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<AccessorPartyMD> existing = accessorPartyMDRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<AccessorPartyMD> existing = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorPartyMD> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorPartyMD newAccessorParty = new AccessorPartyMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    AccessorPartyMD newAccessorParty = new AccessorPartyMD(name,countryId);
+                    if(isSuggestion){
+                        newAccessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newAccessorParty.setSuggestedDate(LocalDate.now());
+                    }else{
+                        newAccessorParty.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMDRepository.saveAll(newAccessorPartyList);
+                newAccessorPartyList = accessorPartyRepository.saveAll(newAccessorPartyList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -85,7 +86,7 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
-        return accessorPartyMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+        return accessorPartyRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
     }
 
     /**
@@ -94,7 +95,7 @@ public class AccessorPartyService extends MongoBaseService {
      * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
     public AccessorPartyMD getAccessorParty(Long countryId, Long id) {
-        AccessorPartyMD exist = accessorPartyMDRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        AccessorPartyMD exist = accessorPartyRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -106,7 +107,7 @@ public class AccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(Long countryId, Long id) {
 
-        Integer resultCount = accessorPartyMDRepository.deleteByIdAndCountryId(id, countryId);
+        Integer resultCount = accessorPartyRepository.deleteByIdAndCountryId(id, countryId);
         if (resultCount > 0) {
             LOGGER.info("Accessor Party deleted successfully for id :: {}", id);
         }else{
@@ -124,14 +125,14 @@ public class AccessorPartyService extends MongoBaseService {
      */
     public AccessorPartyDTO updateAccessorParty(Long countryId, Long id, AccessorPartyDTO accessorPartyDTO) {
 
-        AccessorPartyMD accessorParty = accessorPartyMDRepository.findByNameAndCountryId(accessorPartyDTO.getName(), countryId);
+        AccessorPartyMD accessorParty = accessorPartyRepository.findByCountryIdAndDeletedAndName(countryId, false, accessorPartyDTO.getName() );
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
             }
             throw new DuplicateDataException("Name Already Exist");
         }
-        Integer resultCount =  accessorPartyMDRepository.updateAccessorPartyName(accessorPartyDTO.getName(), id);
+        Integer resultCount =  accessorPartyRepository.updateMasterMetadataName(accessorPartyDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", id);
         }else{
@@ -149,28 +150,10 @@ public class AccessorPartyService extends MongoBaseService {
      * @param accessorPartyDTOS
      * @return
      */
-    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
+    public List<AccessorPartyMD> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
-        Set<String> accessorPartyNameList = new HashSet<>();
-        for (AccessorPartyDTO AccessorParty : accessorPartyDTOS) {
-            accessorPartyNameList.add(AccessorParty.getName());
-        }
-        List<AccessorParty> existingAccessorParties = findMetaDataByNamesAndCountryId(countryId, accessorPartyNameList, AccessorParty.class);
-        accessorPartyNameList = ComparisonUtils.getNameListForMetadata(existingAccessorParties, accessorPartyNameList);
-        List<AccessorParty> accessorPartyList = new ArrayList<>();
-        if (!accessorPartyNameList.isEmpty()) {
-            for (String name : accessorPartyNameList) {
-
-                AccessorParty accessorParty = new AccessorParty(name);
-                accessorParty.setCountryId(countryId);
-                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                accessorParty.setSuggestedDate(LocalDate.now());
-                accessorPartyList.add(accessorParty);
-            }
-
-           accessorPartyMongoRepository.saveAll(getNextSequence(accessorPartyList));
-        }
-        return accessorPartyList;
+        Map<String, List<AccessorPartyMD>> result = createAccessorParty(countryId, accessorPartyDTOS, true);
+        return result.get(NEW_DATA_LIST);
     }
 
 
@@ -183,13 +166,13 @@ public class AccessorPartyService extends MongoBaseService {
      */
     public List<AccessorPartyMD> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<Long> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = accessorPartyMDRepository.updateAccessorPartiesStatus(countryId, accessorPartyIds,suggestedDataStatus);
+        Integer updateCount = accessorPartyRepository.updateMetadataStatus(countryId, accessorPartyIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Accessor Parties are updated successfully with ids :: {}", accessorPartyIds);
         }else{
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyIds);
         }
-        return accessorPartyMDRepository.findAllByIds(accessorPartyIds);
+        return accessorPartyRepository.findAllByIds(accessorPartyIds);
     }
 
 }

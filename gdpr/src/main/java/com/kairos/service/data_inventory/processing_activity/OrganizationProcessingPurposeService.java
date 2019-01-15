@@ -6,8 +6,9 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurposeMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -34,7 +35,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationProcessingPurposeService.class);
 
     @Inject
-    private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
+    private ProcessingPurposeRepository processingPurposeRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -54,27 +55,30 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public Map<String, List<ProcessingPurposeMD>> createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
-        Map<String, List<ProcessingPurpose>> result = new HashMap<>();
+        Map<String, List<ProcessingPurposeMD>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
         if (!processingPurposeDTOS.isEmpty()) {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 processingPurposesNames.add(processingPurpose.getName());
             }
-            List<ProcessingPurpose> existing = findMetaDataByNameAndUnitId(organizationId, processingPurposesNames, ProcessingPurpose.class);
+            List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<ProcessingPurposeMD> existing = processingPurposeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
-            List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
+            List<ProcessingPurposeMD> newProcessingPurposes = new ArrayList<>();
             if (processingPurposesNames.size() != 0) {
                 for (String name : processingPurposesNames) {
 
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name);
+                    ProcessingPurposeMD newProcessingPurpose = new ProcessingPurposeMD(name);
                     newProcessingPurpose.setOrganizationId(organizationId);
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(getNextSequence(newProcessingPurposes));
+                newProcessingPurposes = processingPurposeRepository.saveAll(newProcessingPurposes);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
@@ -91,7 +95,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return processingPurposeRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
     /**
@@ -100,9 +104,9 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return ProcessingPurpose object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
-    public ProcessingPurpose getProcessingPurpose(Long organizationId, BigInteger id) {
+    public ProcessingPurposeMD getProcessingPurpose(Long organizationId, Long id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByUnitIdAndId(organizationId, id);
+        ProcessingPurposeMD exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId,false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -118,7 +122,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
         if (!processingActivities.isEmpty()) {
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        processingPurposeMongoRepository.safeDeleteById(processingPurposeId);
+        //processingPurposeRepository.safeDeleteById(processingPurposeId);
         return true;
     }
 
@@ -129,30 +133,29 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @param processingPurposeDTO
      * @return ProcessingPurpose updated object
      */
-    public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, BigInteger id, ProcessingPurposeDTO processingPurposeDTO) {
+    public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
 
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByUnitIdAndName(organizationId, processingPurposeDTO.getName());
+        ProcessingPurposeMD processingPurpose = processingPurposeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Processing Purpose", processingPurpose.getName());
         }
-        processingPurpose = processingPurposeMongoRepository.findByid(id);
-        if (!Optional.ofNullable(processingPurpose).isPresent()) {
+        Integer resultCount =  processingPurposeRepository.updateMetadataName(processingPurposeDTO.getName(), id, organizationId);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, processingPurposeDTO.getName());
         }
-        processingPurpose.setName(processingPurposeDTO.getName());
-        processingPurposeMongoRepository.save(processingPurpose);
         return processingPurposeDTO;
 
     }
 
-    public Map<String, List<ProcessingPurpose>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+    public Map<String, List<ProcessingPurposeMD>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
-        Map<String, List<ProcessingPurpose>> result;
-        result = createProcessingPurpose(organizationId, processingPurposeDTOS);
-        List<ProcessingPurpose> masterProcessingPurposeSuggestedByUnit = processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, processingPurposeDTOS);
+        Map<String, List<ProcessingPurposeMD>> result = createProcessingPurpose(organizationId, processingPurposeDTOS);
+        List<ProcessingPurposeMD> masterProcessingPurposeSuggestedByUnit = processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, processingPurposeDTOS);
         if (!masterProcessingPurposeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterProcessingPurposeSuggestedByUnit);
         }

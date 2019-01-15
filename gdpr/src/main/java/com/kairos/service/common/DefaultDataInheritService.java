@@ -2,7 +2,6 @@ package com.kairos.service.common;
 
 
 import com.kairos.dto.gdpr.*;
-import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
@@ -43,14 +42,11 @@ import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRep
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
-import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
@@ -64,7 +60,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 @Service
@@ -354,11 +349,11 @@ public class DefaultDataInheritService extends MongoBaseService {
                 dataCategory.setOrganizationId(unitId);
                 List<DataElement> dataElementList = new ArrayList<>();
                 if (CollectionUtils.isNotEmpty(dataCategoryDTO.getDataElements())) {
-                    for (DataElementBasicResponseDTO dataElementBasicResponseDTO : dataCategoryDTO.getDataElements()) {
+                   /* for (DataElementMD dataElementBasicResponseDTO : dataCategoryDTO.getDataElements()) {
                         DataElement dataElement = new DataElement(dataElementBasicResponseDTO.getName());
                         dataElement.setOrganizationId(unitId);
                         dataElementList.add(dataElement);
-                    }
+                    }*/
                 }
                 dataCategoryAndDataElementListMap.put(dataCategory, dataElementList);
             }

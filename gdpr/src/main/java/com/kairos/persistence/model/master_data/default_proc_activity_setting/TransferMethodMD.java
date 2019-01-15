@@ -55,6 +55,11 @@ public class TransferMethodMD extends BaseEntity {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public TransferMethodMD(@NotBlank(message = "Name can't be empty") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public TransferMethodMD(String name) {
         this.name = name;
     }

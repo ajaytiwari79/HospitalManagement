@@ -36,9 +36,6 @@ public class TransferMethodService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodService.class);
 
     @Inject
-    private TransferMethodMongoRepository transferMethodMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
@@ -54,7 +51,7 @@ public class TransferMethodService extends MongoBaseService {
      * and if exist then simply add  TransferMethod to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
-    public Map<String, List<TransferMethodMD>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+    public Map<String, List<TransferMethodMD>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
         Map<String, List<TransferMethodMD>> result = new HashMap<>();
         Set<String> transferMethodNames = new HashSet<>();
@@ -71,7 +68,13 @@ public class TransferMethodService extends MongoBaseService {
             List<TransferMethodMD> newTransferMethods = new ArrayList<>();
             if (!transferMethodNames.isEmpty()) {
                 for (String name : transferMethodNames) {
-                    TransferMethodMD newTransferMethod = new TransferMethodMD(name,countryId,SuggestedDataStatus.APPROVED);
+                    TransferMethodMD newTransferMethod = new TransferMethodMD(name,countryId);
+                    if(isSuggestion){
+                        newTransferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                        newTransferMethod.setSuggestedDate(LocalDate.now());
+                    }else{
+                        newTransferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVED);
+                    }
                     newTransferMethods.add(newTransferMethod);
                 }
                 newTransferMethods = transferMethodRepository.saveAll(newTransferMethods);
@@ -133,14 +136,14 @@ public class TransferMethodService extends MongoBaseService {
      */
     public TransferMethodDTO updateTransferMethod(Long countryId, Long id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethodMD transferMethod = transferMethodRepository.findByNameAndCountryId(transferMethodDTO.getName(), countryId);
+        TransferMethodMD transferMethod = transferMethodRepository.findByCountryIdAndDeletedAndName(countryId, false, transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
             }
             throw new DuplicateDataException("data  exist for  " + transferMethodDTO.getName());
         }
-        Integer resultCount =  transferMethodRepository.updateTransferMethodName(transferMethodDTO.getName(), id);
+        Integer resultCount =  transferMethodRepository.updateMasterMetadataName(transferMethodDTO.getName(), id, countryId);
         if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
         }else{
@@ -156,28 +159,10 @@ public class TransferMethodService extends MongoBaseService {
      * @param transferMethodDTOS - transfer method suggested by unit
      * @return
      */
-    public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+    public List<TransferMethodMD> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+        Map<String, List<TransferMethodMD>> result = createTransferMethod(countryId, transferMethodDTOS, true);
+        return result.get(NEW_DATA_LIST);
 
-        Set<String> transferMethodNameList = new HashSet<>();
-        for (TransferMethodDTO TransferMethod : transferMethodDTOS) {
-            transferMethodNameList.add(TransferMethod.getName());
-        }
-        List<TransferMethod> existingTransferMethods = findMetaDataByNamesAndCountryId(countryId, transferMethodNameList, TransferMethod.class);
-        transferMethodNameList = ComparisonUtils.getNameListForMetadata(existingTransferMethods, transferMethodNameList);
-        List<TransferMethod> transferMethodList = new ArrayList<>();
-        if (!transferMethodNameList.isEmpty()) {
-            for (String name : transferMethodNameList) {
-
-                TransferMethod transferMethod = new TransferMethod(name);
-                transferMethod.setCountryId(countryId);
-                transferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
-                transferMethod.setSuggestedDate(LocalDate.now());
-                transferMethodList.add(transferMethod);
-            }
-
-             transferMethodMongoRepository.saveAll(getNextSequence(transferMethodList));
-        }
-        return transferMethodList;
     }
 
 
@@ -190,7 +175,7 @@ public class TransferMethodService extends MongoBaseService {
      */
     public List<TransferMethodMD> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<Long> transferMethodIds , SuggestedDataStatus suggestedDataStatus) {
 
-        Integer updateCount = transferMethodRepository.updateTransferMethodStatus(countryId, transferMethodIds,suggestedDataStatus);
+        Integer updateCount = transferMethodRepository.updateMetadataStatus(countryId, transferMethodIds,suggestedDataStatus);
         if(updateCount > 0){
             LOGGER.info("Transfer Methods are updated successfully with ids :: {}", transferMethodIds);
         }else{
