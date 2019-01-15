@@ -16,10 +16,10 @@ import com.kairos.commons.utils.DateTimeInterval;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class PayOutCalculationServiceTest {
+public class PayOutCalculationServiceUnitTest {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(PayOutCalculationServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(PayOutCalculationServiceUnitTest.class);
 
     @InjectMocks
     PayOutCalculationService payOutCalculationService;

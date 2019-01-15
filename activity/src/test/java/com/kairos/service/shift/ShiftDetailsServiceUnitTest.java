@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ShiftDetailsServiceTest {
+public class ShiftDetailsServiceUnitTest {
 
     @Mock
     private ShiftMongoRepository shiftMongoRepository;

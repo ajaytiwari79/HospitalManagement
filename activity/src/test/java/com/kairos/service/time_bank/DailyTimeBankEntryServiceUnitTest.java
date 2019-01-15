@@ -18,9 +18,9 @@ import javax.inject.Inject;
 import java.util.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DailyTimeBankEntryServiceTest {
+public class DailyTimeBankEntryServiceUnitTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DailyTimeBankEntryServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(DailyTimeBankEntryServiceUnitTest.class);
 
     @Inject
     TimeBankCalculationService timeBankCalculationService;

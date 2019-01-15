@@ -1,11 +1,11 @@
-package com.kairos.service.pay_out;
+package com.kairos.service.time_bank;
 
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.dto.activity.pay_out.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.commons.utils.DateUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.Interval;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
+import org.joda.time.*;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,40 +14,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PayOutServiceTest {
+public class DailyTimeBankServiceUnitTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(PayOutServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(DailyTimeBankServiceUnitTest.class);
 
     @Inject
-    PayOutCalculationService payOutCalculationService;
+    TimeBankCalculationService timeBankCalculationService;
 
     @InjectMocks
-    PayOutService payOutService;
+    TimeBankService timeBankService;
 
 
     List<Shift> shiftList = new ArrayList<>(3);
     Interval interval = null;
 
 
-    /*@Test
-    public void getPayOut(){
 
-        DateTime startDateTime = new DateTime().withTimeAtStartOfDay();
-        DateTime endDateTime = new DateTime().plusDays(7).withTimeAtStartOfDay();
-        int days = (int)new Duration(startDateTime,endDateTime).getStandardDays()+1;
-        Long startMillis = new Date().getTime();
-
-        //payOutService.setPayOutCalculationService(new PayOutCalculationService());
-        List<CalculatedPayOutByDateDTO> payOuts = payOutService.getPayOutFromCurrentDateByUEP(145l);
-        payOuts.forEach(ct->{
-            logger.info("date "+ct.getDate()+" - "+ct.getPayOutMin());
-        });
-        logger.info("endTime "+(new Date().getTime()-startMillis));
-    }*/
 
     @Test
     public void getIntervals(){
@@ -93,7 +78,7 @@ public class PayOutServiceTest {
     }
 
     @Test
-    public void getIntervalByDateOverviewPayOut(){
+    public void getIntervalByDateOverviewTimebank(){
         int year  = 2018;
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
         DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();

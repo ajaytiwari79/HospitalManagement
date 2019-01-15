@@ -28,7 +28,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExpertiseNightWorkerSettingServiceTest {
+public class ExpertiseNightWorkerSettingServiceUnitTest {
 
     @InjectMocks
     ExpertiseNightWorkerSettingService expertiseNightWorkerSettingService;

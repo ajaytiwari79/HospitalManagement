@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
  * Created by vipul on 2/11/17.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ArrayUtilTest {
+public class ArrayUtilUnitTest {
     @InjectMocks
     ArrayUtil arrayUtil;
 

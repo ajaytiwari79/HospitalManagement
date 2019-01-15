@@ -12,7 +12,7 @@ import spock.lang.Specification
 
 import static org.mockito.Mockito.when;
 
-class PayGroupAreaServiceSpec extends Specification {
+class PayGroupAreaServiceSpecUnitTest extends Specification {
 
     @InjectMocks
     private PayGroupAreaService payGroupAreaService;

@@ -20,7 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StaffingLevelImportExportSpec {
+public class StaffingLevelImportExportUnitTest {
 
     @InjectMocks
     StaffingLevelService staffingLevelService;

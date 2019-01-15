@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * Created by vipul on 2/2/18.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class UnitPositionServiceTest {
+public class UnitPositionServiceUnitTest {
     @InjectMocks
     UnitPositionService unitPositionService;
     static List<UnitPosition> unitPositions = new ArrayList<UnitPosition>();

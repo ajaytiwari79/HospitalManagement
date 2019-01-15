@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
  * Created by pavan on 14/2/18.
  */
 @RunWith(MockitoJUnitRunner.class)
-    public class CPRUtilTest {
+    public class CPRUtilUnitTest {
     @InjectMocks
     CPRUtil cprUtil;
 

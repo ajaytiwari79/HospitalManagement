@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StaffingLevelServiceTest {
+public class StaffingLevelServiceUnitTest {
     @InjectMocks
     private StaffingLevelService staffingLevelService;
 
