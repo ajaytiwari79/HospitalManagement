@@ -247,6 +247,7 @@ public class OrganizationActivityService extends MongoBaseService {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
+        activityCopied.setCountryParentId(activity.getCountryParentId()==null?activity.getId():activity.getCountryParentId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
