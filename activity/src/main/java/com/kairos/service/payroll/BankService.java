@@ -116,6 +116,7 @@ public class BankService extends MongoBaseService {
             }
             staffBank.setAccountNumber(staffBankDetailsDTO.getStaffOfficialBank().getAccountNumber());
             staffBank.setStaffId(staffId);
+            staffBank.setUseNemkontoAccount(staffBankDetailsDTO.getStaffOfficialBank().getUseNemkontoAccount());
             staffBank.setBankId(staffBankDetailsDTO.getStaffOfficialBank().getBankId());
             staffBankDetailsRepository.save(staffBank);
         }
