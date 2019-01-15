@@ -9,7 +9,7 @@ public class ShiftRequestPhasePlanningSolutionServiceTest {
     static final Logger logger = LoggerFactory.getLogger(ShiftRequestPhasePlanningSolutionServiceTest.class);
     @Test
     public void getDataFromKairos() throws Exception {
-        ShiftRequestPhasePlanningSolutionService solutionService = new ShiftRequestPhasePlanningSolutionService();
+       // ShiftRequestPhasePlanningSolutionService solutionService = new ShiftRequestPhasePlanningSolutionService();
        // solutionService.getDataFromKairos(145l,new Date(),new Date());
         logger.info("complete");
     }
