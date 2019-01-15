@@ -58,4 +58,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     void setEndDateToWTAOfUnitPosition(Long unitPositionId, LocalDate endDate);
 
+    boolean wtaExistsByUnitPositionIdAndDates(Long unitPositionId,Date startDate,Date endDate);
+
 }

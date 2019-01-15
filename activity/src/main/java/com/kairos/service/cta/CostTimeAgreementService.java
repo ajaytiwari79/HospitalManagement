@@ -248,20 +248,14 @@ public class CostTimeAgreementService extends MongoBaseService {
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
         if (unitPosition.isPublished()) {
-            if(ctaDTO.getStartDate().equals(asLocalDate(oldCTA.getCreatedAt()))){
-                responseCTA = updateUnitPositionCTA(oldCTA,ctaDTO);
+            boolean isCalculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
+            if (ctaDTO.getStartDate().equals(oldCTA.getStartDate()) || !isCalculatedValueChanged) {
+                responseCTA = updateUnitPositionCTA(oldCTA, ctaDTO);
+            } else {
+                responseCTA = updateUnitPositionCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
             }
-            else {
-                boolean isCalculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(),ctaDTO.getRuleTemplates());
-                if(isCalculatedValueChanged){
-                    responseCTA = updateUnitPositionCTAWhenCalculatedValueChanged(oldCTA,ctaDTO);
-                }
-                else {
-                    responseCTA = updateUnitPositionCTA(oldCTA,ctaDTO);
-                }
-            }
-            updateTimeBankByUnitPositionIdPerStaff(unitPositionId, ctaDTO.getStartDate(), ctaDTO.getEndDate(),unitId);
-        } else {
+            updateTimeBankByUnitPositionIdPerStaff(unitPositionId, ctaDTO.getStartDate(), ctaDTO.getEndDate(), unitId);
+        }else {
             responseCTA = updateUnitPositionCTA(oldCTA,ctaDTO);
         }
         unitPosition.setCostTimeAgreement(responseCTA);
@@ -297,11 +291,11 @@ public class CostTimeAgreementService extends MongoBaseService {
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         }
-        costTimeAgreement.setId(oldCTA.getId());
+        //costTimeAgreement.setId(oldCTA.getId());
         oldCTA.setId(null);
         oldCTA.setDisabled(true);
         oldCTA.setEndDate(ctaDTO.getStartDate().minusDays(1));
-        this.save(oldCTA);
+        costTimeAgreementRepository.save(oldCTA);
         costTimeAgreement.setParentId(oldCTA.getId());
         costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());
         costTimeAgreement.setExpertise(oldCTA.getExpertise());
@@ -310,12 +304,17 @@ public class CostTimeAgreementService extends MongoBaseService {
         costTimeAgreement.setOrganization(oldCTA.getOrganization());
         costTimeAgreement.setUnitPositionId(oldCTA.getUnitPositionId());
         costTimeAgreement.setDescription(ctaDTO.getDescription());
+        costTimeAgreementRepository.save(costTimeAgreement);
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
         CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,oldCTA.getUnitPositionId(),costTimeAgreement.getDescription());
         responseCTA.setParentId(oldCTA.getId());
         responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
-        save(costTimeAgreement);
+        CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA,CTAResponseDTO.class);
+        List<CTARuleTemplate> existingCtaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
+        List<CTARuleTemplateDTO> existingCtaRuleTemplatesDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(existingCtaRuleTemplates, CTARuleTemplateDTO.class);
+        versionCTA.setRuleTemplates(existingCtaRuleTemplatesDTOS);
+        responseCTA.setVersions(Arrays.asList(versionCTA));
         return responseCTA;
     }
 
@@ -591,20 +590,25 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     private boolean isCalculatedValueChanged(List<BigInteger> ruleTemplateIds,List<CTARuleTemplateDTO> ctaRuleTemplateDTOS){
-        List<CTARuleTemplate> existingCtaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(ruleTemplateIds);
-        Map<BigInteger,CTARuleTemplate> ctaRuleTemplateMap = existingCtaRuleTemplates.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-        List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplateDTOS, CTARuleTemplate.class);
-        boolean isCalculatedValueChanged = false;
-        if(ctaRuleTemplates.size()!=existingCtaRuleTemplates.size()){
-            isCalculatedValueChanged = true;
-        }else {
-            for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
-                if(ctaRuleTemplateMap.containsKey(ctaRuleTemplate.getId())){
 
+        boolean isCalculatedValueChanged = false;
+        if(ctaRuleTemplateDTOS.size()==ruleTemplateIds.size()){
+            List<CTARuleTemplate> existingCtaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(ruleTemplateIds);
+            Map<BigInteger,CTARuleTemplate> existingCtaRuleTemplateMap = existingCtaRuleTemplates.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+            List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplateDTOS, CTARuleTemplate.class);
+            for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
+                if(existingCtaRuleTemplateMap.containsKey(ctaRuleTemplate.getId())){
+                    CTARuleTemplate existingCTARuletemplate = existingCtaRuleTemplateMap.get(ctaRuleTemplate.getId());
+                    isCalculatedValueChanged = ctaRuleTemplate.isCalculatedValueChanged(existingCTARuletemplate);
                 }else {
                     isCalculatedValueChanged = true;
                 }
+                if(isCalculatedValueChanged){
+                    break;
+                }
             }
+        }else {
+            isCalculatedValueChanged = true;
         }
         return isCalculatedValueChanged;
     }
