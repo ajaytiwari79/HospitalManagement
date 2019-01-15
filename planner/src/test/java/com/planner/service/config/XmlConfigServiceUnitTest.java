@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-public class XmlConfigServiceTest {
+public class XmlConfigServiceUnitTest {
 
 
     @Test
