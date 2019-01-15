@@ -1,6 +1,6 @@
 package com.planner.service.shiftPlanningService;
 
-public class ShiftPlanningServiceTest {
+public class ShiftPlanningServiceUnitTest {
 
    /* @Test
     public void getRecomendationShiftPlanningDTOAsJson(){

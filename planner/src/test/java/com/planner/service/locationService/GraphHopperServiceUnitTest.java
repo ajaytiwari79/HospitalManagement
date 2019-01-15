@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 //@RunWith(BlockJUnit4ClassRunner.class)
 //@RunWith(MockitoJUnitRunner.class)
-public class GraphHopperServiceTest {
+public class GraphHopperServiceUnitTest {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 

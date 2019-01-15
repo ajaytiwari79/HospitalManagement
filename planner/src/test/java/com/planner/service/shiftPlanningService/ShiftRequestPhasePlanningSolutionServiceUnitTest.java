@@ -4,9 +4,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ShiftRequestPhasePlanningSolutionServiceTest {
+public class ShiftRequestPhasePlanningSolutionServiceUnitTest {
 
-    static final Logger logger = LoggerFactory.getLogger(ShiftRequestPhasePlanningSolutionServiceTest.class);
+    static final Logger logger = LoggerFactory.getLogger(ShiftRequestPhasePlanningSolutionServiceUnitTest.class);
     @Test
     public void getDataFromKairos() throws Exception {
        // ShiftRequestPhasePlanningSolutionService solutionService = new ShiftRequestPhasePlanningSolutionService();
