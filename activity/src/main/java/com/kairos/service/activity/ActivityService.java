@@ -872,6 +872,7 @@ public class ActivityService extends MongoBaseService {
                 List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
+                activity.setCountryParentId(countryActivity.getId());
                 activity.setUnitId(unitId);
                 activity.setParentActivity(false);
                 activity.setOrganizationTypes(null);
