@@ -41,7 +41,7 @@ public class AssetController {
 
     @ApiOperation(value = "delete  asset by Id")
     @DeleteMapping("/asset/{assetId}")
-    public ResponseEntity<Object> deleteAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
+    public ResponseEntity<Object> deleteAssetById(@PathVariable Long unitId, @PathVariable Long assetId) {
         Map<String, Object> result = assetService.deleteAssetById(unitId, assetId);
         if ((boolean) result.get(IS_SUCCESS)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, result);
@@ -59,7 +59,7 @@ public class AssetController {
 
     @ApiOperation(value = "Get Asset With meta data by Id")
     @GetMapping("/asset/{assetId}")
-    public ResponseEntity<Object> getAssetWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
+    public ResponseEntity<Object> getAssetWithMetaDataById(@PathVariable Long unitId, @PathVariable Long assetId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetWithRelatedDataAndRiskByUnitIdAndId(unitId, assetId));
     }

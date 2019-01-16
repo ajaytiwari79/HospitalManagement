@@ -64,4 +64,8 @@ public abstract  class BaseEntity {
         this.deleted = deleted;
     }
 
+    public void delete(){
+        this.deleted = true;
+    }
+
 }

@@ -111,4 +111,17 @@ public class AssetTypeMD extends BaseEntity {
 
     public AssetTypeMD() {
     }
+
+    @Override
+    public void delete() {
+        this.setDeleted(true);
+        this.getRisks().forEach( assetTypeRisk -> {
+            assetTypeRisk.delete();
+        });
+        if(!this.getSubAssetTypes().isEmpty()) {
+            this.getSubAssetTypes().forEach(subAssetType -> {
+                subAssetType.delete();
+            });
+        }
+    }
 }
