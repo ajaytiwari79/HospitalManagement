@@ -1,18 +1,16 @@
 package com.kairos.service.organization;
 
 
-import com.kairos.dto.user.organization.*;
-import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
@@ -21,8 +19,8 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -392,28 +390,18 @@ public class CompanyCreationService {
     }
 
     private void setOrganizationTypeAndSubTypeInOrganization(Organization organization, OrganizationBasicDTO organizationBasicDTO, Organization parentOrganization) {
-        if (organization.getOrganizationType() != null && !organization.getOrganizationType().getId().equals(organizationBasicDTO.getTypeId())) {
-            Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(organizationBasicDTO.getTypeId());
-            organization.setOrganizationType(organizationType.get());
-        } else {
-            Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(organizationBasicDTO.getTypeId());
-            organization.setOrganizationType(organizationType.get());
-        }
+        Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(organizationBasicDTO.getTypeId());
+        organization.setOrganizationType(organizationType.get());
         if (parentOrganization != null) {
             organization.setOrganizationType(parentOrganization.getOrganizationType());
             organization.setAccountType(parentOrganization.getAccountType());
         }
-        List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
-
-        if (organization.isParentOrganization()) {
-            if (organizationBasicDTO.getLevelId() != null) {
+        if (organization.isParentOrganization() && organizationBasicDTO.getLevelId() != null) {
                 Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
                 organization.setLevel(level);
-            }
         }
-
+        List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
         organization.setOrganizationSubTypes(organizationSubTypes);
-
     }
 
     public OrganizationTypeAndSubType getOrganizationTypeAndSubTypeByUnitId(Long unitId) {
