@@ -132,7 +132,10 @@ public class OrganizationHierarchyService {
             }
             ids.add(id);
         }
-        resultQueryResults.add(treeStructureService.getTreeStructure(list));
+        for (QueryResult queryResult : list) {
+            resultQueryResults.add(treeStructureService.getTreeStructure(Arrays.asList(queryResult)));
+        }
+        //resultQueryResults.add(treeStructureService.getTreeStructure(list));
         return resultQueryResults;
     }
 
