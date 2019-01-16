@@ -44,7 +44,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 
@@ -268,6 +270,12 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     private CTAResponseDTO updateUnitPositionCTA(CostTimeAgreement costTimeAgreement,CollectiveTimeAgreementDTO ctaDTO){
+        if(!ctaDTO.getStartDate().equals(costTimeAgreement.getStartDate())){
+            boolean ctaExists = costTimeAgreementRepository.ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(costTimeAgreement.getId(),costTimeAgreement.getUnitPositionId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
+            if(ctaExists){
+                exceptionService.duplicateDataException("error.cta.invalid",ctaDTO.getStartDate(),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): "");
+            }
+        }
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
         ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
         if(CollectionUtils.isNotEmpty(ctaRuleTemplates)){
@@ -287,6 +295,12 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     private CTAResponseDTO updateUnitPositionCTAWhenCalculatedValueChanged(CostTimeAgreement oldCTA,CollectiveTimeAgreementDTO ctaDTO){
+        if(!ctaDTO.getStartDate().equals(oldCTA.getStartDate())){
+            boolean ctaExists = costTimeAgreementRepository.ctaExistsByUnitPositionIdAndDates(oldCTA.getUnitPositionId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
+            if(ctaExists){
+                exceptionService.duplicateDataException("error.cta.invalid",ctaDTO.getStartDate(),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): "");
+            }
+        }
         ctaDTO.setId(null);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
@@ -296,10 +310,12 @@ public class CostTimeAgreementService extends MongoBaseService {
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         }
-        //costTimeAgreement.setId(oldCTA.getId());
+        costTimeAgreement.setId(oldCTA.getId());
         oldCTA.setId(null);
         oldCTA.setDisabled(true);
-        oldCTA.setEndDate(ctaDTO.getStartDate().minusDays(1));
+        if(oldCTA.getStartDate().isBefore(ctaDTO.getStartDate())) {
+            oldCTA.setEndDate(ctaDTO.getStartDate().minusDays(1));
+        }
         costTimeAgreementRepository.save(oldCTA);
         costTimeAgreement.setParentId(oldCTA.getId());
         costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());

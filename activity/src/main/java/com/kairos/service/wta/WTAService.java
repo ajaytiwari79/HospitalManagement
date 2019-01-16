@@ -569,6 +569,12 @@ public class WTAService extends MongoBaseService {
     }
 
     private WTAResponseDTO updateWTAOfUnpublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+        if(!updateDTO.getStartDate().equals(oldWta.getStartDate())){
+            boolean wtaExists = wtaRepository.wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(oldWta.getId(),oldWta.getUnitPositionId(),asDate(updateDTO.getStartDate()),isNotNull(updateDTO.getEndDate()) ? asDate(updateDTO.getEndDate()): null);
+            if(wtaExists){
+                exceptionService.duplicateDataException("error.wta.invalid",updateDTO.getStartDate(),isNotNull(updateDTO.getEndDate()) ? asDate(updateDTO.getEndDate()): "");
+            }
+        }
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
@@ -714,6 +720,12 @@ public class WTAService extends MongoBaseService {
     }
 
     private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto) {
+        if(!wtadto.getStartDate().equals(oldWta.getStartDate())){
+            boolean wtaExists = wtaRepository.wtaExistsByUnitPositionIdAndDates(oldWta.getUnitPositionId(),asDate(wtadto.getStartDate()),isNotNull(wtadto.getEndDate()) ? asDate(wtadto.getEndDate()): null);
+            if(wtaExists){
+                exceptionService.duplicateDataException("error.wta.invalid",wtadto.getStartDate(),isNotNull(wtadto.getEndDate()) ? wtadto.getEndDate() : "");
+            }
+        }
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = null;
         WTAResponseDTO wtaResponseDTO;
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
@@ -733,7 +745,9 @@ public class WTAService extends MongoBaseService {
             newWta.setStartDate(asDate(wtadto.getStartDate()));
             newWta.setEndDate(wtadto.getEndDate() != null ? asDate(wtadto.getEndDate()) : null);
             newWta.setRuleTemplateIds(null);
-            oldWta.setEndDate(asDate(wtadto.getStartDate().minusDays(1)));
+            if(asLocalDate(oldWta.getStartDate()).isBefore(wtadto.getStartDate())) {
+                oldWta.setEndDate(asDate(wtadto.getStartDate().minusDays(1)));
+            }
             oldWta.setId(null);
             if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
                 wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
