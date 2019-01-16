@@ -558,8 +558,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
-
-        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId,unitId);
+        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.notfound");
@@ -567,27 +566,27 @@ public class UnionService {
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
-
         List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
         if (organization.isParentOrganization()) {
             organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(organization.getId());
-            OrganizationBasicResponse currentOrganization = new OrganizationBasicResponse(organization.getId(), organization.getName());
-            organizationHierarchy.add(currentOrganization);
-
+            /*
+            ////Can create Unit Position for WorkCentre only
+            if (organization.isWorkcentre()) {
+                OrganizationBasicResponse currentOrganization = new OrganizationBasicResponse(organization.getId(), organization.getName());
+                organizationHierarchy.add(currentOrganization);
+            }*/
         } else {
             OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(organization.getId());
-            logger.debug(data.getParent().getId() + "" + data.getParent().getName());
-
-            OrganizationBasicResponse parentOrganization = new OrganizationBasicResponse(data.getParent().getId(), data.getParent().getName());
-            organizationHierarchy.add(parentOrganization);
+                /*
+                //Can create Unit Position for WorkCentre only
+                OrganizationBasicResponse parentOrganization = new OrganizationBasicResponse(data.getParent().getId(), data.getParent().getName());
+                organizationHierarchy.add(parentOrganization);*/
             Iterator itr = data.getChildUnits().listIterator();
             while (itr.hasNext()) {
                 Organization thisOrganization = (Organization) itr.next();
                 organizationHierarchy.add(new OrganizationBasicResponse(thisOrganization.getId(), thisOrganization.getName()));
             }
-            logger.info(data.toString());
         }
-
         List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
