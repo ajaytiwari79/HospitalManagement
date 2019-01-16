@@ -47,8 +47,6 @@ public class StaffingLevelServiceUnitTest {
     @Mock
     private EnvConfig envConfig;
     @Mock
-    private OrganizationRestClient organizationRestClient;
-    @Mock
     ActivityMongoRepository activityMongoRepository;
     StaffingLevel staffingLevel=null;
 

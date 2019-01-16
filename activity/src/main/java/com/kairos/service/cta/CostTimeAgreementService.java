@@ -127,6 +127,12 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationSubTypeId
+     * @param organizationId
+     */
     public void assignCountryCTAtoOrganisation(Long countryId, Long organizationSubTypeId,Long organizationId){
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getAllCTAByOrganizationSubType(countryId, organizationSubTypeId);
         List<BigInteger> activityIds = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ruleTemp->Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
@@ -189,7 +195,6 @@ public class CostTimeAgreementService extends MongoBaseService {
                 });
                 ctaRuleTemplateDTO.setActivityIds(unitActivityIds);
             }
-
         });
     }
 

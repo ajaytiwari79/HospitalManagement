@@ -53,9 +53,6 @@ public class ShiftIntegrationServiceTest {
     @Autowired
     TestRestTemplate testRestTemplate;
     @Mock
-    private OrganizationRestClient organizationRestClient;
-
-    @Mock
     private ActivityMongoRepository activityMongoRepository;
     @Mock
     private ActivityCategoryRepository activityCategoryRepository;

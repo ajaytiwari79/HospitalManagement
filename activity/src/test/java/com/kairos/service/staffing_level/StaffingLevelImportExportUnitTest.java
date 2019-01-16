@@ -33,8 +33,6 @@ public class StaffingLevelImportExportUnitTest {
     @Mock
     private EnvConfig envConfig;
     @Mock
-    private OrganizationRestClient organizationRestClient;
-    @Mock
     private ActivityMongoRepository activityTypeMongoRepository;
 
 

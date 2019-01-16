@@ -25,11 +25,10 @@ public class PhaseServiceUnitTest {
     private static final Logger logger = LoggerFactory.getLogger(PhaseServiceUnitTest.class);
     @Mock
     private PhaseMongoRepository phaseMongoRepository;
-    @Mock
-    private OrganizationRestClient organizationRestClient;
 
     @InjectMocks
     private PhaseService phaseService;
+
     ArrayList<Phase> phases = new ArrayList();
 
 
