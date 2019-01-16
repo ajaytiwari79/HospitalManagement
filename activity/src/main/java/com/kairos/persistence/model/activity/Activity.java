@@ -56,6 +56,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
     private LocationActivityTab locationActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
 
@@ -326,6 +327,14 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
+    }
+
+    public BigInteger getCountryParentId() {
+        return countryParentId;
+    }
+
+    public void setCountryParentId(BigInteger countryParentId) {
+        this.countryParentId = countryParentId;
     }
 
     @Override

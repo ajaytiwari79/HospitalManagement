@@ -173,9 +173,13 @@ public class OrganizationActivityService extends MongoBaseService {
         return retrieveBasicDetails(activityCopied);
     }
 
-    public ActivityDTO retrieveBasicDetails(Activity activity) {
+    private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         BeanUtils.copyProperties(activity, activityDTO);
+        Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType.isPresent()){
+            activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
+        }
         return activityDTO;
 
     }
@@ -244,6 +248,7 @@ public class OrganizationActivityService extends MongoBaseService {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
+        activityCopied.setCountryParentId(activity.getCountryParentId()==null?activity.getId():activity.getCountryParentId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
