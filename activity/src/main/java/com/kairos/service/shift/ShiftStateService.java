@@ -43,9 +43,9 @@ public class ShiftStateService {
     private MongoSequenceRepository mongoSequenceRepository;
 
     public boolean createShiftState(Long unitId, Date startDate, Date endDate){
-//        if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
-//            exceptionService.actionNotPermittedException("past.date.allowed");
-//        }
+        if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
+            exceptionService.actionNotPermittedException("past.date.allowed");
+        }
         List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
         createShiftState(shifts,false,unitId);
         return true;
