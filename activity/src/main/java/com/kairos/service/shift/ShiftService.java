@@ -1198,14 +1198,18 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setShiftId(shiftDTO.getId());
         }
         BigInteger shiftStateId = shiftDTO.getId();
+        BigInteger shiftStatePhaseId = shiftDTO.getShiftStatePhaseId();
         shiftDTO.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = updateShift( shiftDTO, type,true);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
+            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
+            shiftDTO.setShiftStatePhaseId(shiftStatePhaseId);
             ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
             if (shiftState != null) {
                 shiftDTO.setId(shiftState.getId());
                 shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
                 shiftDTO.setValidated(shiftState.getValidated());
+                shiftDTO.setShiftId(shiftState.getShiftId());
                 shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
             } else {
                 shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
@@ -1237,6 +1241,7 @@ public class ShiftService extends MongoBaseService {
         BigInteger shiftStateId = shiftDTO.getId();
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = updateShift(shiftDTO, type, true);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
+            shiftDTO = shiftWithViolatedInfoDTO.getShifts().get(0);
             shiftState = shiftStateMongoRepository.findOne(shiftStateId);
             if (shiftState == null) {
                 Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
@@ -1249,6 +1254,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
                 shiftDTO.setValidated(shiftState.getValidated());
                 shiftDTO.setShiftStatePhaseId(shiftState.getShiftStatePhaseId());
+                shiftDTO.setShiftId(shiftState.getShiftId());
                 shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
 
             } else {
