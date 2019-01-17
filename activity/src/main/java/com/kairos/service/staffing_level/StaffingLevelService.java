@@ -932,6 +932,11 @@ public class StaffingLevelService extends MongoBaseService {
 
         int currentAvailableStaffCount = 0;
         for(int currentIndex = lowerLimit;currentIndex<=upperLimit;currentIndex++) {
+            if(currentIndex >= staffingLevel.getPresenceStaffingLevelInterval().size()){
+                logger.info("index value is "+currentIndex+" and size is "+staffingLevel.getPresenceStaffingLevelInterval().size());
+                continue;
+            }
+            //TODO yatharth please verify properly current index sometime greater or equal to size of staffingLevel.getPresenceStaffingLevelInterval()
             currentAvailableStaffCount = staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getAvailableNoOfStaff();
             if(deleted) {
                 staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).setAvailableNoOfStaff(--currentAvailableStaffCount);
