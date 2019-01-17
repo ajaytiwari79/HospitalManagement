@@ -575,7 +575,7 @@ public class CompanyCreationService {
         organizations.add(organization);
         validateBasicDetails(organizations, exceptionService);
 
-        if (parentOrgaziationId != null && CollectionUtils.isNotEmpty(organization.getChildren())) {
+        if (organization.isParentOrganization() && CollectionUtils.isNotEmpty(organization.getChildren())) {
             unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
             unitIds.add(organizationId);
