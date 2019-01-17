@@ -296,7 +296,7 @@ public class CostTimeAgreementService extends MongoBaseService {
 
     private CTAResponseDTO updateUnitPositionCTAWhenCalculatedValueChanged(CostTimeAgreement oldCTA,CollectiveTimeAgreementDTO ctaDTO){
         if(!ctaDTO.getStartDate().equals(oldCTA.getStartDate())){
-            boolean ctaExists = costTimeAgreementRepository.ctaExistsByUnitPositionIdAndDates(oldCTA.getUnitPositionId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
+            boolean ctaExists = costTimeAgreementRepository.ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(oldCTA.getId(),oldCTA.getUnitPositionId(),asDate(ctaDTO.getStartDate()),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): null);
             if(ctaExists){
                 exceptionService.duplicateDataException("error.cta.invalid",ctaDTO.getStartDate(),isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()): "");
             }
@@ -313,7 +313,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         costTimeAgreement.setId(oldCTA.getId());
         oldCTA.setId(null);
         oldCTA.setDisabled(true);
-        if(oldCTA.getStartDate().isBefore(ctaDTO.getStartDate())) {
+        if(oldCTA.getStartDate().isBefore(ctaDTO.getStartDate()) || (isNotNull(oldCTA.getEndDate()) && oldCTA.getEndDate().equals(ctaDTO.getEndDate()))) {
             oldCTA.setEndDate(ctaDTO.getStartDate().minusDays(1));
         }
         costTimeAgreementRepository.save(oldCTA);

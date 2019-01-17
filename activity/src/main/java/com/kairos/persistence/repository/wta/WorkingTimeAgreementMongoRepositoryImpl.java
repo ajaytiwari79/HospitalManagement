@@ -272,7 +272,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public boolean wtaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger wtaId,Long unitPositionId, Date startDate, Date endDate){
         Criteria endDateCriteria = isNotNull(endDate) ? Criteria.where("endDate").exists(false).and("startDate").lte(endDate) : Criteria.where("endDate").exists(false);
-        Criteria criteria = Criteria.where("deleted").is(false).and("id").is(wtaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
+        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(wtaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
     }
 

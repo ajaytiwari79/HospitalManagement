@@ -207,7 +207,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public boolean ctaExistsByUnitPositionIdAndDatesAndNotEqualToId(BigInteger ctaId,Long unitPositionId, Date startDate, Date endDate) {
         Criteria endDateCriteria = isNotNull(endDate) ? Criteria.where("endDate").exists(false).and("startDate").lte(endDate) : Criteria.where("endDate").exists(false);
-        Criteria criteria = Criteria.where("deleted").is(false).and("id").is(ctaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
+        Criteria criteria = Criteria.where("deleted").is(false).and("id").ne(ctaId).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
     }
 
