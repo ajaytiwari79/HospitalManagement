@@ -344,7 +344,7 @@ public class ShiftService extends MongoBaseService {
             shiftViolatedRules.setShift(mainShift);
             save(shiftViolatedRules);
             activityWrapperMap.put(activityWrapper.getActivity().getId(), activityWrapper);
-           // shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
+            shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
 
         }
         shiftWithViolatedInfoDTO.setShifts(Arrays.asList(shiftDTO));
