@@ -65,6 +65,7 @@ public class ShiftDTO {
     private long accumulatedTimeBankMinutes;
     private int plannedMinutes;
     private boolean multipleActivity;
+    private BigInteger planningPeriodId;
 
     public ShiftDTO() {
         //default Const
@@ -316,22 +317,6 @@ public class ShiftDTO {
         return shiftQueryResult;
     }*/
 
-    @Override
-    public String toString() {
-        return "ShiftDTO{" +
-                "id=" + id +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", bid=" + bid +
-                ", pId=" + pId +
-                ", amount=" + amount +
-                ", probability=" + probability +
-                ", remarks='" + remarks + '\'' +
-                ", unitId=" + unitId +
-                ", staffId=" + staffId +
-                '}';
-    }
-
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
@@ -415,5 +400,29 @@ public class ShiftDTO {
 
     public void setPlannedMinutes(int plannedMinutes) {
         this.plannedMinutes = plannedMinutes;
+    }
+
+    public BigInteger getPlanningPeriodId() {
+        return planningPeriodId;
+    }
+
+    public void setPlanningPeriodId(BigInteger planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
+    }
+
+    @Override
+    public String toString() {
+        return "ShiftDTO{" +
+                "id=" + id +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", bid=" + bid +
+                ", pId=" + pId +
+                ", amount=" + amount +
+                ", probability=" + probability +
+                ", remarks='" + remarks + '\'' +
+                ", unitId=" + unitId +
+                ", staffId=" + staffId +
+                '}';
     }
 }

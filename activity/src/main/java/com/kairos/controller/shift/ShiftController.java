@@ -83,7 +83,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long organizationId, @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift( shiftDTO, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift( shiftDTO, type,false));
     }
 
     @ApiOperation("delete a Shift of a staff")
@@ -193,7 +193,7 @@ public class ShiftController {
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
     public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam Boolean validatedByStaff){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShift(unitId,shiftDTO,type,validatedByStaff));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShiftByTandA(unitId,shiftDTO,type,validatedByStaff));
     }
 
 

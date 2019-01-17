@@ -43,9 +43,9 @@ public class ShiftStateService {
     private MongoSequenceRepository mongoSequenceRepository;
 
     public boolean createShiftState(Long unitId, Date startDate, Date endDate){
-        if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
-            exceptionService.actionNotPermittedException("past.date.allowed");
-        }
+//        if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
+//            exceptionService.actionNotPermittedException("past.date.allowed");
+//        }
         List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
         createShiftState(shifts,false,unitId);
         return true;
@@ -78,6 +78,8 @@ public class ShiftStateService {
                 realtimeShiftState.setId(null);
                 realtimeShiftState.setShiftId(shift.getId());
                 realtimeShiftState.setShiftStatePhaseId(phaseId);
+                realtimeShiftState.setStartDate(realtimeShiftState.getActivities().get(0).getStartDate());
+                realtimeShiftState.setEndDate(realtimeShiftState.getActivities().get(realtimeShiftState.getActivities().size()-1).getEndDate());
                 realtimeShiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 realtimeShiftStates.add(realtimeShiftState);
             }
@@ -94,6 +96,8 @@ public class ShiftStateService {
                 draftShiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
                 draftShiftState.setId(null);
                 draftShiftState.setShiftId(shift.getId());
+                draftShiftState.setStartDate(draftShiftState.getActivities().get(0).getStartDate());
+                draftShiftState.setEndDate(draftShiftState.getActivities().get(draftShiftState.getActivities().size()-1).getEndDate());
                 draftShiftState.setShiftStatePhaseId(phaseId);
                 draftShiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 draftShiftStates.add(draftShiftState);

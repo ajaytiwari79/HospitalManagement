@@ -49,6 +49,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.exception.ExceptionService;
@@ -108,6 +109,7 @@ public class ShiftValidatorService {
     @Inject
     private PhaseSettingsRepository phaseSettingsRepository;
     @Inject private PhaseMongoRepository phaseMongoRepository;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
     private static ExceptionService exceptionService;
 
@@ -118,6 +120,7 @@ public class ShiftValidatorService {
 
 
     public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, ShiftDTO staffShiftDTO) {
+        String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
         DateTimeInterval graceInterval = null;
         Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         if (validatedByStaff) {
@@ -128,7 +131,7 @@ public class ShiftValidatorService {
             }
             graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         }
-        if (!graceInterval.contains(DateUtils.getDate())) {
+        if (!graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone))) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
     }
