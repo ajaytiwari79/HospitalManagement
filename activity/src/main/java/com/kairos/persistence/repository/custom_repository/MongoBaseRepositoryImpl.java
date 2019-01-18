@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.util.Assert;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
@@ -96,7 +97,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	}
 
 	@Override
-	public <S extends T> S save(S entity) {
+	public <S extends T> S save(@Valid S entity) {
 		Assert.notNull(entity, "Entity must not be null!");
 		/**
 		 *  Get class name for sequence class
@@ -127,7 +128,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
 
-	public <T extends MongoBaseEntity> List<T> saveEntities(List<T> entities){
+	public <T extends MongoBaseEntity> List<T> saveEntities(@Valid List<T> entities){
 		Assert.notNull(entities, "Entity must not be null!");
 		Assert.notEmpty(entities, "Entity must not be Empty!");
 
