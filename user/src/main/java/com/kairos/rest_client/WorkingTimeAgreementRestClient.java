@@ -1,10 +1,13 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,6 +37,8 @@ public class WorkingTimeAgreementRestClient {
 
     @Inject
     private RestTemplate restTemplate;
+    @Inject private
+    ExceptionService exceptionService;
 
     public CTAWTAWrapper getWTAByExpertise(Long expertiseId) {
         String baseUrl = getBaseUrl(true);
@@ -134,6 +139,7 @@ public class WorkingTimeAgreementRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());
             throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
     }
@@ -153,14 +159,15 @@ public class WorkingTimeAgreementRestClient {
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
-                throw new RuntimeException(response.getMessage());
+                exceptionService.exceptionWithoutConvertInRestClient(response.getMessage());
             }
         } catch (HttpClientErrorException e) {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.JsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
+        return null;
     }
 
     public Boolean makeDefaultDateForOrganization(List<Long> subTypeIds, Long unitId, Long countryId) {

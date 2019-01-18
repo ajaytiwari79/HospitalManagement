@@ -82,9 +82,8 @@ public class VisitatorService{
     @Autowired
     TasksMergingService tasksMergingService;
 
-    @Autowired
-    OrganizationRestClient organizationRestClient;
-    @Autowired
+
+    @Inject
     GenericIntegrationService genericIntegrationService;
 
     @Inject

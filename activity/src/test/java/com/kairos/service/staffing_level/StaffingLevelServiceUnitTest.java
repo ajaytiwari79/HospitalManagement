@@ -4,7 +4,6 @@ package com.kairos.service.staffing_level;
  *
  */
 
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
@@ -47,8 +46,6 @@ public class StaffingLevelServiceUnitTest {
     private PhaseService phaseService;
     @Mock
     private EnvConfig envConfig;
-    @Mock
-    private OrganizationRestClient organizationRestClient;
     @Mock
     ActivityMongoRepository activityMongoRepository;
     StaffingLevel staffingLevel=null;

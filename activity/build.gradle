@@ -85,7 +85,9 @@ dependencies {
     compile (('org.springframework.kafka:spring-kafka:2.1.7.RELEASE'))
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
-    //compile('org.springframework.boot:spring-boot-starter-webflux')
+    
+    //this is for hot swaping in intelij
+    compile('org.springframework.boot:spring-boot-devtools')
 
 
 }

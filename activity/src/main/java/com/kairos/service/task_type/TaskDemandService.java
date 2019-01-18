@@ -14,7 +14,6 @@ import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositor
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.dto.user.organization.Shifts;

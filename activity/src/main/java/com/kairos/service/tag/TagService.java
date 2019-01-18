@@ -6,7 +6,6 @@ import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -29,10 +28,7 @@ public class TagService extends MongoBaseService {
     private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
 
     @Autowired
-    GenericIntegrationService genericIntegrationService;
-
-    @Autowired
-    OrganizationRestClient organizationRestClient;
+    private GenericIntegrationService genericIntegrationService;
 
     @Autowired
     TagMongoRepository tagMongoRepository;

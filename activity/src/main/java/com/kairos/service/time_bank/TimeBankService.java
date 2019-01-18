@@ -333,7 +333,7 @@ public class TimeBankService extends MongoBaseService {
      * @return
      * @Desc to update Time Bank after applying function in Unit position
      */
-    public boolean updateTimeBank(Long unitPositionId, Date startDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public boolean updateTimeBankOnFunctionChange(Long unitPositionId, Date startDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Date endDate = asDate(DateUtils.asZoneDateTime(startDate).plusMinutes(ONE_DAY_MINUTES));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate);
         if (ctaResponseDTO == null) {

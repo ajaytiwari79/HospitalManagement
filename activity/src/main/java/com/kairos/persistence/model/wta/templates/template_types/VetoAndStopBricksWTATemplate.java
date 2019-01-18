@@ -126,21 +126,13 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        VetoAndStopBricksWTATemplate that = (VetoAndStopBricksWTATemplate) o;
-        return numberOfWeeks == that.numberOfWeeks &&
-                Float.compare(that.totalBlockingPoints, totalBlockingPoints) == 0 &&
-                Objects.equals(validationStartDate, that.validationStartDate) &&
-                Objects.equals(vetoActivityId, that.vetoActivityId) &&
-                Objects.equals(stopBrickActivityId, that.stopBrickActivityId);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) wtaBaseRuleTemplate;
+        return (this != vetoAndStopBricksWTATemplate) && !(numberOfWeeks == vetoAndStopBricksWTATemplate.numberOfWeeks &&
+                Float.compare(vetoAndStopBricksWTATemplate.totalBlockingPoints, totalBlockingPoints) == 0 &&
+                Objects.equals(validationStartDate, vetoAndStopBricksWTATemplate.validationStartDate) &&
+                Objects.equals(vetoActivityId, vetoAndStopBricksWTATemplate.vetoActivityId) &&
+                Objects.equals(stopBrickActivityId, vetoAndStopBricksWTATemplate.stopBrickActivityId));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), numberOfWeeks, validationStartDate, vetoActivityId, stopBrickActivityId, totalBlockingPoints);
-    }
 }
