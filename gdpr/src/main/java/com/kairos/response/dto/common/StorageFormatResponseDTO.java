@@ -27,6 +27,7 @@ public class StorageFormatResponseDTO {
         this.suggestedDate = suggestedDate;
     }
 
+
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
     public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
@@ -46,4 +47,7 @@ public class StorageFormatResponseDTO {
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
+
+    public StorageFormatResponseDTO() {
+    }
 }

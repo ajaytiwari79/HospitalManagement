@@ -188,7 +188,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @param risks - Risks of asset-type or Sub asset-type
      * @return List<OrganizationLevelRiskDTO> - List of RiskResponse DTO.
      */
-    private List<OrganizationLevelRiskDTO> buildAssetTypeRisksResponse(List<RiskMD> risks) {
+    public List<OrganizationLevelRiskDTO> buildAssetTypeRisksResponse(List<RiskMD> risks) {
         List<OrganizationLevelRiskDTO> riskBasicResponseDTOS = new ArrayList<>();
         for (RiskMD assetTypeRisk : risks) {
             OrganizationLevelRiskDTO riskBasicResponseDTO = new OrganizationLevelRiskDTO();

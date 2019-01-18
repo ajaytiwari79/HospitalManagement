@@ -65,5 +65,9 @@ public class TransferMethodMD extends BaseEntity {
     }
     public TransferMethodMD() {
     }
+
+    public TransferMethodMD(Long id ) {
+        this.id = id;
+    }
 }
 

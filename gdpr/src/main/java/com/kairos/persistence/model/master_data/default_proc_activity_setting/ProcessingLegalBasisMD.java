@@ -62,4 +62,8 @@ public class ProcessingLegalBasisMD extends BaseEntity {
     }
     public ProcessingLegalBasisMD() {
     }
+
+    public ProcessingLegalBasisMD(Long id ) {
+        this.id = id;
+    }
 }

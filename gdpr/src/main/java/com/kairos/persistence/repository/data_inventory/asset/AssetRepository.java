@@ -15,6 +15,12 @@ public interface AssetRepository extends CustomGenericRepository<AssetMD> {
 
     @Query(value = "Select name from AssetMD where organizationId = ?1 and deleted = false and (assetType.id  = ?2 OR subAssetType.id = ?2)")
     List<String> findAllAssetLinkedWithAssetType(Long orgId, Long assetTypeId);
+
+
+    @Query(value = "Select asset from #{#entityName} asset WHERE asset.organizationId = ?1 and asset.deleted = false and asset.active =  true")
+    List<AssetMD> findAllActiveAssetByOrganizationId(Long orgId);
+
+
     /*@Query("{organizationId:?0,_id:?1,deleted:false}")
     Asset findByIdAndNonDeleted(Long organizationId, BigInteger id);
 

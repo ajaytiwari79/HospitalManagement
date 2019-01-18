@@ -67,6 +67,10 @@ public class AssetMD extends BaseEntity {
     public AssetMD() {
     }
 
+    public AssetMD(Long id ) {
+        this.id = id;
+    }
+
     public AssetMD(String name, String description, String hostingLocation, ManagingOrganization managingDepartment, Staff assetOwner) {
         this.name = name;
         this.description = description;

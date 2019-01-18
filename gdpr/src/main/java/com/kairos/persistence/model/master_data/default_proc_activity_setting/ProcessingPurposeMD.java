@@ -62,4 +62,8 @@ public class ProcessingPurposeMD extends BaseEntity {
     }
     public ProcessingPurposeMD() {
     }
+
+    public ProcessingPurposeMD(Long id){
+        this.id = id;
+    }
 }

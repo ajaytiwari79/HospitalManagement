@@ -4,22 +4,21 @@ package com.kairos.persistence.model.data_inventory.processing_activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.javers.core.metamodel.annotation.ValueObject;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ValueObject
-public class ProcessingActivityRelatedDataSubject {
+public class ProcessingActivityRelatedDataElements {
 
 
     @NotNull
     private Long id;
 
-    @NotNull
+    @NotEmpty
     private String name;
-
-    private List<ProcessingActivityRelatedDataCategory> dataCategories;
 
     public Long getId() {
         return id;
@@ -27,14 +26,6 @@ public class ProcessingActivityRelatedDataSubject {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<ProcessingActivityRelatedDataCategory> getDataCategories() {
-        return dataCategories;
-    }
-
-    public void setDataCategories(List<ProcessingActivityRelatedDataCategory> dataCategories) {
-        this.dataCategories = dataCategories;
     }
 
     public String getName() {
@@ -45,6 +36,11 @@ public class ProcessingActivityRelatedDataSubject {
         this.name = name;
     }
 
-    public ProcessingActivityRelatedDataSubject() {
+    public ProcessingActivityRelatedDataElements(@NotNull Long id, @NotEmpty String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public ProcessingActivityRelatedDataElements() {
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 
 @Repository
-@JaversSpringDataAuditable
+//@JaversSpringDataAuditable
 public interface RiskRepository extends CustomGenericRepository<RiskMD> {
 
     @Query(value = "Select risk from RiskMD risk where risk.id = ?1 and risk.organizationId = ?2 and risk.assetType.id = ?3 and risk.deleted = false")

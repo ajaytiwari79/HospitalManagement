@@ -62,6 +62,9 @@ public class RiskMD extends BaseEntity {
         this.riskLevel = riskLevel;
     }
 
+    public RiskMD(Long id){
+        this.id= id;
+    }
 
     public String getName() {
         return name;

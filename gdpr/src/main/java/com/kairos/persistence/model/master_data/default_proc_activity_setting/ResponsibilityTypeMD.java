@@ -62,4 +62,8 @@ public class ResponsibilityTypeMD extends BaseEntity {
     }
     public ResponsibilityTypeMD() {
     }
+
+    public ResponsibilityTypeMD(Long id) {
+        this.id = id;
+    }
 }

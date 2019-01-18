@@ -3,7 +3,7 @@ package com.kairos.response.dto.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.ManagingOrganization;
+import com.kairos.persistence.model.embeddables.ManagingOrganization;
 
 import java.math.BigInteger;
 
@@ -11,7 +11,7 @@ import java.math.BigInteger;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -23,9 +23,9 @@ public class AssetBasicResponseDTO {
 
     private boolean active;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id;
+    public void setId(Long id) { this.id = id;
     }
     public String getName() { return name; }
 

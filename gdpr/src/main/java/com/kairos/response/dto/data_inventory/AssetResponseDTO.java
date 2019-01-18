@@ -4,9 +4,9 @@ package com.kairos.response.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.dto.gdpr.ManagingOrganization;
-import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.gdpr.AssetAssessor;
+import com.kairos.persistence.model.embeddables.ManagingOrganization;
+import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.response.dto.common.*;
 
 import java.math.BigInteger;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private String description;
     private String hostingLocation;
@@ -34,7 +34,6 @@ public class AssetResponseDTO {
     private Integer dataRetentionPeriod;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
-    private RiskSeverity risk;
     private boolean active;
     private AssetAssessor assetAssessor;
     private boolean suggested;
@@ -56,11 +55,11 @@ public class AssetResponseDTO {
         this.assetAssessor = assetAssessor;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -190,14 +189,6 @@ public class AssetResponseDTO {
 
     public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) {
         this.maxDataSubjectVolume = maxDataSubjectVolume;
-    }
-
-    public RiskSeverity getRisk() {
-        return risk;
-    }
-
-    public void setRisk(RiskSeverity risk) {
-        this.risk = risk;
     }
 
     public boolean isActive() {

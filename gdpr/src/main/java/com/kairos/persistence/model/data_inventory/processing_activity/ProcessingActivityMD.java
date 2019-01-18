@@ -1,24 +1,17 @@
 package com.kairos.persistence.model.data_inventory.processing_activity;
 
 
-import com.kairos.dto.gdpr.ManagingOrganization;
-import com.kairos.dto.gdpr.Staff;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.data_inventory.asset.AssetMD;
+import com.kairos.persistence.model.embeddables.ManagingOrganization;
+import com.kairos.persistence.model.embeddables.Staff;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class ProcessingActivityMD extends BaseEntity {
@@ -27,17 +20,44 @@ public class ProcessingActivityMD extends BaseEntity {
     private String name;
     @NotBlank(message = "Description can't be empty")
     private String description;
-    //private ManagingOrganization managingDepartment;
-    //private Staff processOwner;
-   /* private List<ProcessingActivityRelatedDataSubject> dataSubjects = new ArrayList<>();
-    private List<BigInteger> linkedAssets = new ArrayList<>();
-    private List<BigInteger> processingPurposes;
-    private List<BigInteger> dataSources;
-    private List<BigInteger> transferMethods;
-    private List<BigInteger> accessorParties;
-    private List<BigInteger> processingLegalBasis;
-    private List<BigInteger> subProcessingActivities = new ArrayList<>();*/
-    /*private BigInteger responsibilityType;
+
+    @Embedded
+    private ManagingOrganization managingDepartment;
+
+    @Embedded
+    private Staff processOwner;
+
+    Long countryId;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ProcessingPurposeMD> processingPurposes  = new ArrayList<>();
+
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<DataSourceMD> dataSources  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<TransferMethodMD> transferMethods  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<AccessorPartyMD> accessorParties  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ProcessingLegalBasisMD> processingLegalBasis  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<AssetMD> linkedAssets  = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="processingActivity_id")
+    private ProcessingActivityMD processingActivity;
+
+    @OneToMany(mappedBy = "processingActivity", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+    private List<ProcessingActivityMD> subProcessingActivities  = new ArrayList<>();
+
+    @OneToOne
+    ResponsibilityTypeMD responsibilityType;
+
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
@@ -45,10 +65,14 @@ public class ProcessingActivityMD extends BaseEntity {
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
 
-    private boolean subProcess;
-*/
+    private boolean subProcessingActivity;
 
-    private boolean active = true;
+    @OneToMany(cascade = CascadeType.PERSIST)
+    private List<RelatedDataSubject> dataSubjects = new ArrayList<>();
+
+
+   private boolean active = true;
+
     @OneToMany(mappedBy = "processingActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RiskMD> risks  = new ArrayList<RiskMD>();
     private boolean suggested;
@@ -56,12 +80,11 @@ public class ProcessingActivityMD extends BaseEntity {
     public ProcessingActivityMD() {
     }
 
-    /*public ProcessingActivityMD(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
+    public ProcessingActivityMD(String name, String description) {
         this.name = name;
         this.description = description;
-        this.managingDepartment = managingDepartment;
-        this.processOwner = processOwner;
-    }*/
+
+    }
 
     public ProcessingActivityMD(String name, String description, boolean active) {
         this.name = name;
@@ -73,22 +96,18 @@ public class ProcessingActivityMD extends BaseEntity {
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
-    /*public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
-    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
+    public List<RelatedDataSubject> getDataSubjects() {
+        return dataSubjects;
+    }
 
-    public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
+    public void setDataSubjects(List<RelatedDataSubject> dataSubjects) {
+        this.dataSubjects = dataSubjects;
+    }
 
-    public void setSubProcessingActivities(List<BigInteger> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
-*/
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
 
-   /* public boolean isSubProcessActivity() {
-        return subProcess;
-    }
-
-    public void setSubProcessActivity(boolean subProcess) { this.subProcess = subProcess; }*/
 
     public String getName() { return name; }
 
@@ -98,65 +117,157 @@ public class ProcessingActivityMD extends BaseEntity {
 
     public void setDescription(String description) { this.description = description; }
 
-    /*public ManagingOrganization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() {
+        return managingDepartment;
+    }
 
-    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) {
+        this.managingDepartment = managingDepartment;
+    }
 
-    public Staff getProcessOwner() { return processOwner; }
+    public Staff getProcessOwner() {
+        return processOwner;
+    }
 
-    public void setProcessOwner(Staff processOwner) { this.processOwner = processOwner; }
+    public void setProcessOwner(Staff processOwner) {
+        this.processOwner = processOwner;
+    }
 
-   /* public List<BigInteger> getProcessingPurposes() { return processingPurposes; }
+    public List<ProcessingPurposeMD> getProcessingPurposes() {
+        return processingPurposes;
+    }
 
-    public void setProcessingPurposes(List<BigInteger> processingPurposes) { this.processingPurposes = processingPurposes; }
+    public void setProcessingPurposes(List<ProcessingPurposeMD> processingPurposes) {
+        this.processingPurposes = processingPurposes;
+    }
 
-    public List<BigInteger> getDataSources() { return dataSources; }
+    public List<DataSourceMD> getDataSources() {
+        return dataSources;
+    }
 
-    public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
+    public void setDataSources(List<DataSourceMD> dataSources) {
+        this.dataSources = dataSources;
+    }
 
-    public Integer getControllerContactInfo() { return controllerContactInfo; }
+    public List<TransferMethodMD> getTransferMethods() {
+        return transferMethods;
+    }
 
-    public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
+    public void setTransferMethods(List<TransferMethodMD> transferMethods) {
+        this.transferMethods = transferMethods;
+    }
 
-    public Integer getDpoContactInfo() { return dpoContactInfo; }
+    public List<AccessorPartyMD> getAccessorParties() {
+        return accessorParties;
+    }
 
-    public void setDpoContactInfo(Integer dpoContactInfo) { this.dpoContactInfo = dpoContactInfo; }
+    public void setAccessorParties(List<AccessorPartyMD> accessorParties) {
+        this.accessorParties = accessorParties;
+    }
 
-    public Integer getJointControllerContactInfo() { return jointControllerContactInfo; }
+    public List<ProcessingLegalBasisMD> getProcessingLegalBasis() {
+        return processingLegalBasis;
+    }
 
-    public void setJointControllerContactInfo(Integer jointControllerContactInfo) { this.jointControllerContactInfo = jointControllerContactInfo; }
+    public void setProcessingLegalBasis(List<ProcessingLegalBasisMD> processingLegalBasis) {
+        this.processingLegalBasis = processingLegalBasis;
+    }
 
-    public Long getMinDataSubjectVolume() { return minDataSubjectVolume; }
+    public List<AssetMD> getLinkedAssets() {
+        return linkedAssets;
+    }
 
-    public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
+    public void setLinkedAssets(List<AssetMD> linkedAssets) {
+        this.linkedAssets = linkedAssets;
+    }
 
-    public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
+    public ProcessingActivityMD getProcessingActivity() {
+        return processingActivity;
+    }
 
-    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) { this.maxDataSubjectVolume = maxDataSubjectVolume; }
+    public void setProcessingActivity(ProcessingActivityMD processingActivity) {
+        this.processingActivity = processingActivity;
+    }
 
-    public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
+    public List<ProcessingActivityMD> getSubProcessingActivities() {
+        return subProcessingActivities;
+    }
 
-    public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }*/
+    public void setSubProcessingActivities(List<ProcessingActivityMD> subProcessingActivities) {
+        this.subProcessingActivities = subProcessingActivities;
+    }
 
-    //public List<BigInteger> getAccessorParties() { return accessorParties; }
+    public ResponsibilityTypeMD getResponsibilityType() {
+        return responsibilityType;
+    }
 
-    //public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
+    public void setResponsibilityType(ResponsibilityTypeMD responsibilityType) {
+        this.responsibilityType = responsibilityType;
+    }
 
-    /*public List<BigInteger> getTransferMethods() { return transferMethods; }
+    public Integer getControllerContactInfo() {
+        return controllerContactInfo;
+    }
 
-    public void setTransferMethods(List<BigInteger> transferMethods) { this.transferMethods = transferMethods; }
+    public void setControllerContactInfo(Integer controllerContactInfo) {
+        this.controllerContactInfo = controllerContactInfo;
+    }
 
-    public BigInteger getResponsibilityType() { return responsibilityType; }
+    public Integer getDpoContactInfo() {
+        return dpoContactInfo;
+    }
 
-    public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
+    public void setDpoContactInfo(Integer dpoContactInfo) {
+        this.dpoContactInfo = dpoContactInfo;
+    }
 
-    public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
+    public Integer getJointControllerContactInfo() {
+        return jointControllerContactInfo;
+    }
 
-    public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
+    public void setJointControllerContactInfo(Integer jointControllerContactInfo) {
+        this.jointControllerContactInfo = jointControllerContactInfo;
+    }
 
-    public List<BigInteger> getLinkedAssets() { return linkedAssets; }
+    public Long getMinDataSubjectVolume() {
+        return minDataSubjectVolume;
+    }
 
-    public void setLinkedAssets(List<BigInteger> linkedAssets) { this.linkedAssets = linkedAssets; }*/
+    public void setMinDataSubjectVolume(Long minDataSubjectVolume) {
+        this.minDataSubjectVolume = minDataSubjectVolume;
+    }
+
+    public Long getMaxDataSubjectVolume() {
+        return maxDataSubjectVolume;
+    }
+
+    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) {
+        this.maxDataSubjectVolume = maxDataSubjectVolume;
+    }
+
+    public Integer getDataRetentionPeriod() {
+        return dataRetentionPeriod;
+    }
+
+    public void setDataRetentionPeriod(Integer dataRetentionPeriod) {
+        this.dataRetentionPeriod = dataRetentionPeriod;
+    }
+
+    public boolean isSubProcessingActivity() {
+        return subProcessingActivity;
+    }
+
+    public void setSubProcessingActivity(boolean subProcessingActivity) {
+        this.subProcessingActivity = subProcessingActivity;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public List<RiskMD> getRisks() {
         return risks;
@@ -164,5 +275,20 @@ public class ProcessingActivityMD extends BaseEntity {
 
     public void setRisks(List<RiskMD> risks) {
         this.risks = risks;
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.setDeleted(true);
+        this.getRisks().forEach( processingActivityRisk -> {
+            processingActivityRisk.delete();
+        });
+        if(!this.getSubProcessingActivities().isEmpty()) {
+            this.getSubProcessingActivities().forEach(subProcessingActivity -> {
+                subProcessingActivity.delete();
+            });
+        }
+
     }
 }

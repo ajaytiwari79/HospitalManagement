@@ -2,6 +2,7 @@ package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
@@ -20,12 +21,22 @@ public class AssetTypeBasicResponseDTO {
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
     private Set<BigInteger> risks;
-    private List<RiskBasicResponseDTO> riskList;
+    private List<OrganizationLevelRiskDTO> riskList;
 
     public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType) {
         this.id = id;
         this.name = name;
         this.subAssetType = subAssetType;
+    }
+
+    public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType, List<OrganizationLevelRiskDTO> riskList) {
+        this.id = id;
+        this.name = name;
+        this.subAssetType = subAssetType;
+        this.riskList = riskList;
+    }
+
+    public AssetTypeBasicResponseDTO() {
     }
 
     public Set<BigInteger> getRisks() { return risks; }
@@ -52,7 +63,7 @@ public class AssetTypeBasicResponseDTO {
 
     public void setName(String name) { this.name = name; }
 
-    public List<RiskBasicResponseDTO> getRiskList() { return riskList; }
+    public List<OrganizationLevelRiskDTO> getRiskList() { return riskList; }
 
-    public void setRiskList(List<RiskBasicResponseDTO> riskList) { this.riskList = riskList; }
+    public void setRiskList(List<OrganizationLevelRiskDTO> riskList) { this.riskList = riskList; }
 }

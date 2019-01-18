@@ -1,5 +1,6 @@
 package com.kairos.service.data_inventory.asset;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.RiskSeverity;
@@ -23,7 +24,7 @@ import com.kairos.persistence.repository.master_data.asset_management.org_securi
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
-import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
+import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -102,18 +103,7 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private RiskService riskService;
-    @Inject
-    private OrganizationHostingTypeService organizationHostingTypeService;
-    @Inject
-    private OrganizationHostingProviderService organizationHostingProviderService;
-    @Inject
-    private OrganizationStorageFormatService organizationStorageFormatService;
-    @Inject
-    private OrganizationDataDisposalService organizationDataDisposalService;
-    @Inject
-    private OrganizationTechnicalSecurityMeasureService organizationTechnicalSecurityMeasureService;
-    @Inject
-    private OrganizationOrganizationalSecurityMeasureService organizationOrganizationalSecurityMeasureService;
+
     @Inject
     private OrganizationAssetTypeService organizationAssetTypeService;
 
@@ -168,7 +158,7 @@ public class AssetService extends MongoBaseService {
 
     private void saveAssetTypeSubTypeAndRisk(Long unitId, AssetMD asset, AssetDTO assetDTO) {
         AssetTypeMD assetType;
-        AssetTypeMD assetSubType;
+        AssetTypeMD assetSubType = null;
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.getOne(assetDTO.getAssetType().getId());
             assetType = linkRiskWithAssetTypeAndSubType(assetType,assetDTO.getAssetType().getRisks());
@@ -199,25 +189,11 @@ public class AssetService extends MongoBaseService {
             }
 
         }
-
-        //TODO need to resolve
-       /* Map<AssetType, List<Risk>> assetTypeMap = riskService.saveRiskAtCountryLevelOrOrganizationLevel(unitId, true, assetTypeRiskListMap);
-        assetTypeMap.forEach((k, v) -> {
-            if (CollectionUtils.isNotEmpty(v)) k.setRisks(v.stream().map(Risk::getId).collect(Collectors.toSet()));
-            else k.setRisks(new HashSet<>());
-
-        });*/
-
-       //TODO
-      /*  asset.setAssetSubTypeId(null);
-        if (assetSubType != null) {
-            assetType.getSubAssetTypes().add(assetTypeRepository.save(assetSubType).getId());
-            asset.setAssetSubTypeId(assetSubType.getId());
-        }
-        */
         assetTypeRepository.save(assetType);
         asset.setAssetType(assetType);
-        //asset.setSubAssetType(assetSubType);
+        if(assetSubType != null){
+        asset.setSubAssetType(assetSubType);
+        }
 
 
     }
@@ -270,13 +246,13 @@ public class AssetService extends MongoBaseService {
      * @return
      * @description method updated active status of Asset
      */
-    public boolean updateStatusOfAsset(Long unitId, BigInteger assetId, boolean active) {
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+    public boolean updateStatusOfAsset(Long unitId, Long assetId, boolean active) {
+        AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId, unitId, false);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
         asset.setActive(active);
-       assetMongoRepository.save(asset);
+       assetRepository.save(asset);
         return true;
     }
 
@@ -288,16 +264,46 @@ public class AssetService extends MongoBaseService {
      * @return method return Asset with Meta Data (storage format ,data Disposal, hosting type and etc)
      */
     public AssetResponseDTO getAssetWithRelatedDataAndRiskByUnitIdAndId(Long unitId, Long id) {
-        AssetResponseDTO asset = null; //assetMongoRepository.getAssetWithRiskAndRelatedProcessingActivitiesById(unitId, id);
+        AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted( id, unitId, false);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
-        if (!Optional.ofNullable(asset.getProcessingActivities().get(0).getId()).isPresent()) {
+
+        AssetResponseDTO assetResponseDTO = prepareAssetResponseData(asset, false);
+        /*if (!Optional.ofNullable(asset.getProcessingActivities().get(0).getId()).isPresent()) {
             asset.getProcessingActivities().clear();
-        }
-        return asset;
+        }*/
+        return assetResponseDTO;
     }
 
+
+    private AssetResponseDTO prepareAssetResponseData(AssetMD asset, boolean isBasicDataOnly){
+        AssetResponseDTO assetResponseDTO = new AssetResponseDTO();
+        assetResponseDTO.setId(asset.getId());
+        assetResponseDTO.setName(asset.getName());
+        assetResponseDTO.setDescription(asset.getDescription());
+        assetResponseDTO.setHostingLocation(asset.getHostingLocation());
+        assetResponseDTO.setActive(asset.isActive());
+        assetResponseDTO.setManagingDepartment(asset.getManagingDepartment());
+        if(!isBasicDataOnly) {
+            assetResponseDTO.setDataRetentionPeriod(asset.getDataRetentionPeriod());
+            assetResponseDTO.setSuggested(asset.isSuggested());
+            assetResponseDTO.setAssetOwner(asset.getAssetOwner());
+            assetResponseDTO.setAssetAssessor(asset.getAssetAssessor());
+            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+            assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
+            assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
+            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+            assetResponseDTO.setHostingProvider(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingProvider(), HostingProviderResponseDTO.class));
+            assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
+            assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));
+            assetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(asset.getAssetType().getId(), asset.getAssetType().getName(), asset.getAssetType().isSubAssetType(), organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getAssetType().getRisks())));
+            //assetResponseDTO.setAssetSubType(new AssetTypeBasicResponseDTO(asset.getSubAssetType().getId(),asset.getSubAssetType().getName(),asset.getSubAssetType().isSubAssetType(),organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getSubAssetType().getRisks())));
+        }
+        return assetResponseDTO;
+
+
+    }
 
     /**
      * @param
@@ -305,7 +311,12 @@ public class AssetService extends MongoBaseService {
      * @return return list Of Asset With Meta Data
      */
     public List<AssetResponseDTO> getAllAssetByUnitId(Long unitId) {
-       return assetMongoRepository.findAllByUnitId(unitId);
+        List<AssetResponseDTO> assetResponseDTOS =  new ArrayList<>();
+        List<AssetMD> assets = assetRepository.findAllByOrganizationId(unitId);
+        assets.forEach( asset -> {
+            assetResponseDTOS.add(prepareAssetResponseData(asset, false));
+        });
+        return assetResponseDTOS;
     }
 
 
@@ -326,8 +337,13 @@ public class AssetService extends MongoBaseService {
     }
 
 
-    public List<AssetBasicResponseDTO> getAllActiveAsset(Long unitId) {
-        return assetMongoRepository.getAllAssetWithBasicDetailByStatus(unitId, true);
+    public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
+        List<AssetMD> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);
+        List<AssetResponseDTO> assetResponseDTOS =  new ArrayList<>();
+        activeAssets.forEach( asset -> {
+            assetResponseDTOS.add(prepareAssetResponseData(asset, true));
+        });
+        return assetResponseDTOS;
     }
 
     /**
@@ -400,12 +416,12 @@ public class AssetService extends MongoBaseService {
      */
     public Map<String, Object> getAssetMetaData(Long unitId){
         Map<String, Object> assetMetaDataMap=new HashMap<>();
-        assetMetaDataMap.put("hostingTypeList",organizationHostingTypeService.getAllHostingType(unitId));
-        assetMetaDataMap.put("hostingProviderList",organizationHostingProviderService.getAllHostingProvider(unitId));
-        assetMetaDataMap.put("storageFormatList",organizationStorageFormatService.getAllStorageFormat(unitId));
-        assetMetaDataMap.put("dataDisposalList",organizationDataDisposalService.getAllDataDisposal(unitId));
-        assetMetaDataMap.put("technicalSecurityMeasureList",organizationTechnicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
-        assetMetaDataMap.put("organizationalSecurityMeasureList",organizationOrganizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
+        assetMetaDataMap.put("hostingTypeList",hostingTypeRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        assetMetaDataMap.put("hostingProviderList",hostingProviderRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        assetMetaDataMap.put("storageFormatList",storageFormatRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        assetMetaDataMap.put("dataDisposalList",dataDisposalRepository.findAllByUnitIdAndSortByCreatedDate(unitId));
+        assetMetaDataMap.put("technicalSecurityMeasureList",technicalSecurityMeasureRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
+        assetMetaDataMap.put("organizationalSecurityMeasureList",organizationalSecurityMeasureRepository.findAllByOrganizationIdAndSortByCreatedDate(unitId));
         assetMetaDataMap.put("organizationAssetTypeList",organizationAssetTypeService.getAllAssetType(unitId));
         assetMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return assetMetaDataMap;

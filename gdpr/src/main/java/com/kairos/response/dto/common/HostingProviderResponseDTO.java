@@ -47,4 +47,7 @@ public class HostingProviderResponseDTO {
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
+
+    public HostingProviderResponseDTO() {
+    }
 }

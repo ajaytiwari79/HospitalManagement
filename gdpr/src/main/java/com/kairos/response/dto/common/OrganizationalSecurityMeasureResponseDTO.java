@@ -28,6 +28,9 @@ public class OrganizationalSecurityMeasureResponseDTO {
         this.suggestedDate = suggestedDate;
     }
 
+    public OrganizationalSecurityMeasureResponseDTO() {
+    }
+
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
     public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }

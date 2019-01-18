@@ -64,4 +64,8 @@ public class AccessorPartyMD extends BaseEntity {
 
     public AccessorPartyMD() {
     }
+
+    public AccessorPartyMD(Long id ) {
+        this.id = id;
+    }
 }

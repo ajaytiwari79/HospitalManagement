@@ -29,6 +29,9 @@ public class TechnicalSecurityMeasureResponseDTO {
         this.suggestedDate = suggestedDate;
     }
 
+    public TechnicalSecurityMeasureResponseDTO() {
+    }
+
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
     public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }

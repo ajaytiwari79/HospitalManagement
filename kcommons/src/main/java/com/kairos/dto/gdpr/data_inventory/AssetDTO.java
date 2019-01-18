@@ -22,7 +22,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetDTO {
 
-    private BigInteger id;
+    private Long id;
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
@@ -34,13 +34,13 @@ public class AssetDTO {
     private ManagingOrganization managingDepartment;
     @NotNull(message = "error.message.assetOwner.notNull")
     private Staff assetOwner;
-    private List<BigInteger> storageFormats;
-    private List<BigInteger> orgSecurityMeasures;
-    private List<BigInteger> technicalSecurityMeasures;
-    private BigInteger processingActivity;
-    private BigInteger hostingProvider;
-    private BigInteger hostingType;
-    private BigInteger dataDisposal;
+    private Set<Long> storageFormats;
+    private Set<Long> orgSecurityMeasures;
+    private Set<Long> technicalSecurityMeasures;
+    private Long processingActivity;
+    private Long hostingProvider;
+    private Long hostingType;
+    private Long dataDisposal;
 
     private Integer dataRetentionPeriod;
     private Long minDataSubjectVolume;
@@ -63,9 +63,9 @@ public class AssetDTO {
 
     public AssetAssessor getAssetAssessor() { return assetAssessor; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
     public String getName() { return name.trim(); }
 
@@ -77,19 +77,19 @@ public class AssetDTO {
 
     public Staff getAssetOwner() { return assetOwner; }
 
-    public List<BigInteger> getStorageFormats() { return storageFormats; }
+    public Set<Long> getStorageFormats() { return storageFormats; }
 
-    public List<BigInteger> getOrgSecurityMeasures() { return orgSecurityMeasures; }
+    public Set<Long> getOrgSecurityMeasures() { return orgSecurityMeasures; }
 
-    public List<BigInteger> getTechnicalSecurityMeasures() { return technicalSecurityMeasures; }
+    public Set<Long> getTechnicalSecurityMeasures() { return technicalSecurityMeasures; }
 
-    public BigInteger getProcessingActivity() { return processingActivity; }
+    public Long getProcessingActivity() { return processingActivity; }
 
-    public BigInteger getHostingProvider() { return hostingProvider; }
+    public Long getHostingProvider() { return hostingProvider; }
 
-    public BigInteger getHostingType() { return hostingType; }
+    public Long getHostingType() { return hostingType; }
 
-    public BigInteger getDataDisposal() { return dataDisposal; }
+    public Long getDataDisposal() { return dataDisposal; }
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
@@ -111,18 +111,18 @@ public class AssetDTO {
 
     public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
 
-    public void setStorageFormats(List<BigInteger> storageFormats) { this.storageFormats = storageFormats; }
+    public void setStorageFormats(Set<Long> storageFormats) { this.storageFormats = storageFormats; }
 
-    public void setOrgSecurityMeasures(List<BigInteger> orgSecurityMeasures) { this.orgSecurityMeasures = orgSecurityMeasures; }
+    public void setOrgSecurityMeasures(Set<Long> orgSecurityMeasures) { this.orgSecurityMeasures = orgSecurityMeasures; }
 
-    public void setTechnicalSecurityMeasures(List<BigInteger> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
+    public void setTechnicalSecurityMeasures(Set<Long> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
 
-    public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
+    public void setProcessingActivity(Long processingActivity) { this.processingActivity = processingActivity; }
 
-    public void setHostingProvider(BigInteger hostingProvider) { this.hostingProvider = hostingProvider; }
+    public void setHostingProvider(Long hostingProvider) { this.hostingProvider = hostingProvider; }
 
-    public void setHostingType(BigInteger hostingType) { this.hostingType = hostingType; }
-    public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
+    public void setHostingType(Long hostingType) { this.hostingType = hostingType; }
+    public void setDataDisposal(Long dataDisposal) { this.dataDisposal = dataDisposal; }
 
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
 

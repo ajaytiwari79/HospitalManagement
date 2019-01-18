@@ -52,7 +52,7 @@ public class AssetController {
 
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/asset/{assetId}/status")
-    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestParam(value = "active", required = true) boolean active) {
+    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable Long assetId, @RequestParam(value = "active", required = true) boolean active) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateStatusOfAsset(unitId, assetId, active));
     }
 

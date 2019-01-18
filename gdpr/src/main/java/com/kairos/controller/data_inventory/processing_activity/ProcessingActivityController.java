@@ -43,14 +43,14 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "delete  Processing Activity by Id")
     @DeleteMapping("/processing_activity/delete/{processingActivityId}")
-    public ResponseEntity<Object> deleteProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+    public ResponseEntity<Object> deleteProcessingActivityById(@PathVariable Long unitId, @PathVariable Long processingActivityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteProcessingActivity(unitId, processingActivityId));
     }
 
     @ApiOperation(value = "delete  Sub Processing Activity ")
     @DeleteMapping("/processing_activity/{processingActivityId}/subProcess/{subProcessId}")
-    public ResponseEntity<Object> deleteSubProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger subProcessId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteSubProcessingActivity(unitId, processingActivityId, subProcessId));
+    public ResponseEntity<Object> deleteSubProcessingActivityById(@PathVariable Long unitId, @PathVariable Long processingActivityId, @PathVariable Long subProcessingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteSubProcessingActivity(unitId, processingActivityId, subProcessingActivityId));
     }
 
     @ApiOperation(value = "Get All Processing activity With meta data ")
@@ -62,7 +62,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "update Processing activity  detail")
     @PutMapping("/processing_activity/update/{id}")
-    public ResponseEntity<Object> updateProcessingActivityDetail(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
+    public ResponseEntity<Object> updateProcessingActivityDetail(@PathVariable Long unitId, @PathVariable Long id, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
@@ -90,7 +90,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/status")
-    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestParam boolean active) {
+    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId, @RequestParam boolean active) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
@@ -111,7 +111,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
     @GetMapping("/processing_activity/{processingActivityId}/data_subject")
-    public ResponseEntity<Object> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+    public ResponseEntity<Object> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }

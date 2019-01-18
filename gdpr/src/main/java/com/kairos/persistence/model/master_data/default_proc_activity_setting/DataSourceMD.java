@@ -61,4 +61,8 @@ public class DataSourceMD extends BaseEntity {
 
     public DataSourceMD() {
     }
+
+    public DataSourceMD(Long id) {
+        this.id = id;
+    }
 }
