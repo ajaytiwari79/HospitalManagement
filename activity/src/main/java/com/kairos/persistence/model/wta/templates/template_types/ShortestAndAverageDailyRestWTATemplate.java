@@ -152,18 +152,11 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == shortestAndAverageDailyRestWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(intervalLength == shortestAndAverageDailyRestWTATemplate.intervalLength &&
-                    Float.compare(shortestAndAverageDailyRestWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(intervalUnit, shortestAndAverageDailyRestWTATemplate.intervalUnit) &&
-                    Objects.equals(plannedTimeIds, shortestAndAverageDailyRestWTATemplate.plannedTimeIds) &&
-                    Objects.equals(timeTypeIds, shortestAndAverageDailyRestWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,shortestAndAverageDailyRestWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != shortestAndAverageDailyRestWTATemplate) && !(intervalLength == shortestAndAverageDailyRestWTATemplate.intervalLength &&
+                Float.compare(shortestAndAverageDailyRestWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, shortestAndAverageDailyRestWTATemplate.intervalUnit) &&
+                Objects.equals(plannedTimeIds, shortestAndAverageDailyRestWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, shortestAndAverageDailyRestWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,shortestAndAverageDailyRestWTATemplate.phaseTemplateValues));
     }
 
 

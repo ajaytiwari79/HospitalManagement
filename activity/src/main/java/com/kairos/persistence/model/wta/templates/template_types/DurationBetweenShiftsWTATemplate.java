@@ -110,17 +110,10 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = (DurationBetweenShiftsWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == durationBetweenShiftsWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(Float.compare(durationBetweenShiftsWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(plannedTimeIds, durationBetweenShiftsWTATemplate.plannedTimeIds) &&
-                    Objects.equals(timeTypeIds, durationBetweenShiftsWTATemplate.timeTypeIds) &&
-                    minMaxSetting == durationBetweenShiftsWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,durationBetweenShiftsWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != durationBetweenShiftsWTATemplate) && !(Float.compare(durationBetweenShiftsWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(plannedTimeIds, durationBetweenShiftsWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, durationBetweenShiftsWTATemplate.timeTypeIds) &&
+                minMaxSetting == durationBetweenShiftsWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,durationBetweenShiftsWTATemplate.phaseTemplateValues));
     }
 
 }

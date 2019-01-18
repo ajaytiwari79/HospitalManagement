@@ -271,31 +271,27 @@ public class CTARuleTemplate extends MongoBaseEntity {
 
 
     public boolean isCalculatedValueChanged(CTARuleTemplate ctaRuleTemplate){
-        boolean isCalculatedValueChanged = false;
-        if (ctaRuleTemplate != null) {
-            isCalculatedValueChanged = !(disabled == ctaRuleTemplate.disabled &&
-                    calculateScheduledHours == ctaRuleTemplate.calculateScheduledHours &&
-                    Objects.equals(payrollType, ctaRuleTemplate.payrollType) &&
-                    Objects.equals(payrollSystem, ctaRuleTemplate.payrollSystem) &&
-                    calculationUnit == ctaRuleTemplate.calculationUnit &&
-                    Objects.equals(compensationTable, ctaRuleTemplate.compensationTable) &&
-                    Objects.equals(calculateValueAgainst, ctaRuleTemplate.calculateValueAgainst) &&
-                    approvalWorkFlow == ctaRuleTemplate.approvalWorkFlow &&
-                    Objects.equals(phaseInfo, ctaRuleTemplate.phaseInfo) &&
-                    budgetType == ctaRuleTemplate.budgetType &&
-                    Objects.equals(calculateValueIfPlanned, ctaRuleTemplate.calculateValueIfPlanned) &&
-                    Objects.equals(employmentTypes, ctaRuleTemplate.employmentTypes) &&
-                    planningCategory == ctaRuleTemplate.planningCategory &&
-                    Objects.equals(staffFunctions, ctaRuleTemplate.staffFunctions) &&
-                    Objects.equals(plannedTimeWithFactor, ctaRuleTemplate.plannedTimeWithFactor) &&
-                    activityTypeForCostCalculation == ctaRuleTemplate.activityTypeForCostCalculation &&
-                    Objects.equals(activityIds, ctaRuleTemplate.activityIds) &&
-                    Objects.equals(timeTypeIds, ctaRuleTemplate.timeTypeIds) &&
-                    Objects.equals(plannedTimeIds, ctaRuleTemplate.plannedTimeIds) &&
-                    Objects.equals(dayTypeIds, ctaRuleTemplate.dayTypeIds) &&
-                    calculationFor == ctaRuleTemplate.calculationFor);
-        }
-        return isCalculatedValueChanged;
+        return (this!=ctaRuleTemplate) && !(disabled == ctaRuleTemplate.disabled &&
+                calculateScheduledHours == ctaRuleTemplate.calculateScheduledHours &&
+                Objects.equals(payrollType, ctaRuleTemplate.payrollType) &&
+                Objects.equals(payrollSystem, ctaRuleTemplate.payrollSystem) &&
+                calculationUnit == ctaRuleTemplate.calculationUnit &&
+                Objects.equals(compensationTable, ctaRuleTemplate.compensationTable) &&
+                Objects.equals(calculateValueAgainst, ctaRuleTemplate.calculateValueAgainst) &&
+                approvalWorkFlow == ctaRuleTemplate.approvalWorkFlow &&
+                Objects.equals(phaseInfo, ctaRuleTemplate.phaseInfo) &&
+                budgetType == ctaRuleTemplate.budgetType &&
+                Objects.equals(calculateValueIfPlanned, ctaRuleTemplate.calculateValueIfPlanned) &&
+                Objects.equals(employmentTypes, ctaRuleTemplate.employmentTypes) &&
+                planningCategory == ctaRuleTemplate.planningCategory &&
+                Objects.equals(staffFunctions, ctaRuleTemplate.staffFunctions) &&
+                Objects.equals(plannedTimeWithFactor, ctaRuleTemplate.plannedTimeWithFactor) &&
+                activityTypeForCostCalculation == ctaRuleTemplate.activityTypeForCostCalculation &&
+                Objects.equals(activityIds, ctaRuleTemplate.activityIds) &&
+                Objects.equals(timeTypeIds, ctaRuleTemplate.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, ctaRuleTemplate.plannedTimeIds) &&
+                Objects.equals(dayTypeIds, ctaRuleTemplate.dayTypeIds) &&
+                calculationFor == ctaRuleTemplate.calculationFor);
     }
 }
 

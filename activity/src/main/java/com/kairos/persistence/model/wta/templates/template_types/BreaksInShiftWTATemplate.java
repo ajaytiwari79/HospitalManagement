@@ -63,15 +63,8 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         BreaksInShiftWTATemplate breaksInShiftWTATemplate = (BreaksInShiftWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == breaksInShiftWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(Objects.equals(breakTemplateValues, breaksInShiftWTATemplate.breakTemplateValues) &&
-                    Objects.equals(timeTypeIds, breaksInShiftWTATemplate.timeTypeIds) &&
-                    Objects.equals(plannedTimeIds, breaksInShiftWTATemplate.plannedTimeIds));
-        }
-        return isCalculatedValueChanged;
+        return (this != breaksInShiftWTATemplate) && !(Objects.equals(breakTemplateValues, breaksInShiftWTATemplate.breakTemplateValues) &&
+                Objects.equals(timeTypeIds, breaksInShiftWTATemplate.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, breaksInShiftWTATemplate.plannedTimeIds));
     }
 }

@@ -93,18 +93,11 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = (DaysOffAfterASeriesWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == daysOffAfterASeriesWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(intervalLength == daysOffAfterASeriesWTATemplate.intervalLength &&
-                    nightShiftSequence == daysOffAfterASeriesWTATemplate.nightShiftSequence &&
-                    restingTimeAllowed == daysOffAfterASeriesWTATemplate.restingTimeAllowed &&
-                    restingTime == daysOffAfterASeriesWTATemplate.restingTime &&
-                    Objects.equals(intervalUnit, daysOffAfterASeriesWTATemplate.intervalUnit) && Objects.equals(this.phaseTemplateValues,daysOffAfterASeriesWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != daysOffAfterASeriesWTATemplate) && !(intervalLength == daysOffAfterASeriesWTATemplate.intervalLength &&
+                nightShiftSequence == daysOffAfterASeriesWTATemplate.nightShiftSequence &&
+                restingTimeAllowed == daysOffAfterASeriesWTATemplate.restingTimeAllowed &&
+                restingTime == daysOffAfterASeriesWTATemplate.restingTime &&
+                Objects.equals(intervalUnit, daysOffAfterASeriesWTATemplate.intervalUnit) && Objects.equals(this.phaseTemplateValues,daysOffAfterASeriesWTATemplate.phaseTemplateValues));
     }
 
 

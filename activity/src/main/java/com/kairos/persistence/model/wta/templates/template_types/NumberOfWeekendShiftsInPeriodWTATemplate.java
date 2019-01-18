@@ -232,23 +232,16 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         NumberOfWeekendShiftsInPeriodWTATemplate numberOfWeekendShiftsInPeriodWTATemplate = (NumberOfWeekendShiftsInPeriodWTATemplate) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == numberOfWeekendShiftsInPeriodWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(intervalLength == numberOfWeekendShiftsInPeriodWTATemplate.intervalLength &&
-                    restingTimeAllowed == numberOfWeekendShiftsInPeriodWTATemplate.restingTimeAllowed &&
-                    restingTime == numberOfWeekendShiftsInPeriodWTATemplate.restingTime &&
-                    Float.compare(numberOfWeekendShiftsInPeriodWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(fromDayOfWeek, numberOfWeekendShiftsInPeriodWTATemplate.fromDayOfWeek) &&
-                    Objects.equals(fromTime, numberOfWeekendShiftsInPeriodWTATemplate.fromTime) &&
-                    Objects.equals(toTime, numberOfWeekendShiftsInPeriodWTATemplate.toTime) &&
-                    Objects.equals(toDayOfWeek, numberOfWeekendShiftsInPeriodWTATemplate.toDayOfWeek) &&
-                    Objects.equals(intervalUnit, numberOfWeekendShiftsInPeriodWTATemplate.intervalUnit) &&
-                    minMaxSetting == numberOfWeekendShiftsInPeriodWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,numberOfWeekendShiftsInPeriodWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != numberOfWeekendShiftsInPeriodWTATemplate) && !(intervalLength == numberOfWeekendShiftsInPeriodWTATemplate.intervalLength &&
+                restingTimeAllowed == numberOfWeekendShiftsInPeriodWTATemplate.restingTimeAllowed &&
+                restingTime == numberOfWeekendShiftsInPeriodWTATemplate.restingTime &&
+                Float.compare(numberOfWeekendShiftsInPeriodWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(fromDayOfWeek, numberOfWeekendShiftsInPeriodWTATemplate.fromDayOfWeek) &&
+                Objects.equals(fromTime, numberOfWeekendShiftsInPeriodWTATemplate.fromTime) &&
+                Objects.equals(toTime, numberOfWeekendShiftsInPeriodWTATemplate.toTime) &&
+                Objects.equals(toDayOfWeek, numberOfWeekendShiftsInPeriodWTATemplate.toDayOfWeek) &&
+                Objects.equals(intervalUnit, numberOfWeekendShiftsInPeriodWTATemplate.intervalUnit) &&
+                minMaxSetting == numberOfWeekendShiftsInPeriodWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,numberOfWeekendShiftsInPeriodWTATemplate.phaseTemplateValues));
     }
 
 }

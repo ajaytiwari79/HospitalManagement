@@ -166,18 +166,11 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = (DaysOffInPeriodWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == daysOffInPeriodWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(intervalLength == daysOffInPeriodWTATemplate.intervalLength &&
-                    restingTimeAllowed == daysOffInPeriodWTATemplate.restingTimeAllowed &&
-                    restingTime == daysOffInPeriodWTATemplate.restingTime &&
-                    Float.compare(daysOffInPeriodWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(intervalUnit, daysOffInPeriodWTATemplate.intervalUnit) &&
-                    minMaxSetting == daysOffInPeriodWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,daysOffInPeriodWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != daysOffInPeriodWTATemplate) && !(intervalLength == daysOffInPeriodWTATemplate.intervalLength &&
+                restingTimeAllowed == daysOffInPeriodWTATemplate.restingTimeAllowed &&
+                restingTime == daysOffInPeriodWTATemplate.restingTime &&
+                Float.compare(daysOffInPeriodWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, daysOffInPeriodWTATemplate.intervalUnit) &&
+                minMaxSetting == daysOffInPeriodWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,daysOffInPeriodWTATemplate.phaseTemplateValues));
     }
 }

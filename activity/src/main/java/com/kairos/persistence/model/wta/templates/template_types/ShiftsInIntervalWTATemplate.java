@@ -140,20 +140,13 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate = (ShiftsInIntervalWTATemplate) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == shiftsInIntervalWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(intervalLength == shiftsInIntervalWTATemplate.intervalLength &&
-                    Float.compare(shiftsInIntervalWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(intervalUnit, shiftsInIntervalWTATemplate.intervalUnit) &&
-                    Objects.equals(timeTypeIds, shiftsInIntervalWTATemplate.timeTypeIds) &&
-                    Objects.equals(plannedTimeIds, shiftsInIntervalWTATemplate.plannedTimeIds) &&
-                    Objects.equals(partOfDays, shiftsInIntervalWTATemplate.partOfDays) &&
-                    minMaxSetting == shiftsInIntervalWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,shiftsInIntervalWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != shiftsInIntervalWTATemplate) && !(intervalLength == shiftsInIntervalWTATemplate.intervalLength &&
+                Float.compare(shiftsInIntervalWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, shiftsInIntervalWTATemplate.intervalUnit) &&
+                Objects.equals(timeTypeIds, shiftsInIntervalWTATemplate.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, shiftsInIntervalWTATemplate.plannedTimeIds) &&
+                Objects.equals(partOfDays, shiftsInIntervalWTATemplate.partOfDays) &&
+                minMaxSetting == shiftsInIntervalWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,shiftsInIntervalWTATemplate.phaseTemplateValues));
     }
 
 }

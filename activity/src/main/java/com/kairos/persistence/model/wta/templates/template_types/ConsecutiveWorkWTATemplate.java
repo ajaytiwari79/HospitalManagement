@@ -143,20 +143,13 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate = (ConsecutiveWorkWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == consecutiveWorkWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(Float.compare(consecutiveWorkWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    intervalLength == consecutiveWorkWTATemplate.intervalLength &&
-                    Objects.equals(partOfDays, consecutiveWorkWTATemplate.partOfDays) &&
-                    Objects.equals(plannedTimeIds, consecutiveWorkWTATemplate.plannedTimeIds) &&
-                    Objects.equals(timeTypeIds, consecutiveWorkWTATemplate.timeTypeIds) &&
-                    minMaxSetting == consecutiveWorkWTATemplate.minMaxSetting &&
-                    Objects.equals(intervalUnit, consecutiveWorkWTATemplate.intervalUnit) && Objects.equals(this.phaseTemplateValues,consecutiveWorkWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != consecutiveWorkWTATemplate) && !(Float.compare(consecutiveWorkWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                intervalLength == consecutiveWorkWTATemplate.intervalLength &&
+                Objects.equals(partOfDays, consecutiveWorkWTATemplate.partOfDays) &&
+                Objects.equals(plannedTimeIds, consecutiveWorkWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, consecutiveWorkWTATemplate.timeTypeIds) &&
+                minMaxSetting == consecutiveWorkWTATemplate.minMaxSetting &&
+                Objects.equals(intervalUnit, consecutiveWorkWTATemplate.intervalUnit) && Objects.equals(this.phaseTemplateValues,consecutiveWorkWTATemplate.phaseTemplateValues));
     }
 
 }

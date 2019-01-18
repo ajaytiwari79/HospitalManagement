@@ -127,18 +127,11 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         ShiftLengthWTATemplate shiftLengthWTATemplate = (ShiftLengthWTATemplate) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == shiftLengthWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(timeLimit == shiftLengthWTATemplate.timeLimit &&
-                    Float.compare(shiftLengthWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(dayTypeIds, shiftLengthWTATemplate.dayTypeIds) &&
-                    Objects.equals(timeTypeIds, shiftLengthWTATemplate.timeTypeIds) &&
-                    Objects.equals(partOfDays, shiftLengthWTATemplate.partOfDays) &&
-                    minMaxSetting == shiftLengthWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,shiftLengthWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != shiftLengthWTATemplate) && !(timeLimit == shiftLengthWTATemplate.timeLimit &&
+                Float.compare(shiftLengthWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(dayTypeIds, shiftLengthWTATemplate.dayTypeIds) &&
+                Objects.equals(timeTypeIds, shiftLengthWTATemplate.timeTypeIds) &&
+                Objects.equals(partOfDays, shiftLengthWTATemplate.partOfDays) &&
+                minMaxSetting == shiftLengthWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,shiftLengthWTATemplate.phaseTemplateValues));
     }
 }

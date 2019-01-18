@@ -128,18 +128,11 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == vetoAndStopBricksWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(numberOfWeeks == vetoAndStopBricksWTATemplate.numberOfWeeks &&
-                    Float.compare(vetoAndStopBricksWTATemplate.totalBlockingPoints, totalBlockingPoints) == 0 &&
-                    Objects.equals(validationStartDate, vetoAndStopBricksWTATemplate.validationStartDate) &&
-                    Objects.equals(vetoActivityId, vetoAndStopBricksWTATemplate.vetoActivityId) &&
-                    Objects.equals(stopBrickActivityId, vetoAndStopBricksWTATemplate.stopBrickActivityId));
-        }
-        return isCalculatedValueChanged;
+        return (this != vetoAndStopBricksWTATemplate) && !(numberOfWeeks == vetoAndStopBricksWTATemplate.numberOfWeeks &&
+                Float.compare(vetoAndStopBricksWTATemplate.totalBlockingPoints, totalBlockingPoints) == 0 &&
+                Objects.equals(validationStartDate, vetoAndStopBricksWTATemplate.validationStartDate) &&
+                Objects.equals(vetoActivityId, vetoAndStopBricksWTATemplate.vetoActivityId) &&
+                Objects.equals(stopBrickActivityId, vetoAndStopBricksWTATemplate.stopBrickActivityId));
     }
 
 }

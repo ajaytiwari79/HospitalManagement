@@ -84,17 +84,10 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate = (EmployeesWithIncreasedRiskWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == employeesWithIncreasedRiskWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(belowAge == employeesWithIncreasedRiskWTATemplate.belowAge &&
-                    aboveAge == employeesWithIncreasedRiskWTATemplate.aboveAge &&
-                    pregnant == employeesWithIncreasedRiskWTATemplate.pregnant &&
-                    restingTimeAllowed == employeesWithIncreasedRiskWTATemplate.restingTimeAllowed &&
-                    restingTime == employeesWithIncreasedRiskWTATemplate.restingTime && Objects.equals(this.phaseTemplateValues,employeesWithIncreasedRiskWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != employeesWithIncreasedRiskWTATemplate) && !(belowAge == employeesWithIncreasedRiskWTATemplate.belowAge &&
+                aboveAge == employeesWithIncreasedRiskWTATemplate.aboveAge &&
+                pregnant == employeesWithIncreasedRiskWTATemplate.pregnant &&
+                restingTimeAllowed == employeesWithIncreasedRiskWTATemplate.restingTimeAllowed &&
+                restingTime == employeesWithIncreasedRiskWTATemplate.restingTime && Objects.equals(this.phaseTemplateValues,employeesWithIncreasedRiskWTATemplate.phaseTemplateValues));
     }
 }

@@ -102,18 +102,11 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate = (NoOfSequenceShiftWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == noOfSequenceShiftWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(restingTimeAllowed == noOfSequenceShiftWTATemplate.restingTimeAllowed &&
-                    restingTime == noOfSequenceShiftWTATemplate.restingTime &&
-                    sequenceShiftFrom == noOfSequenceShiftWTATemplate.sequenceShiftFrom &&
-                    sequenceShiftTo == noOfSequenceShiftWTATemplate.sequenceShiftTo &&
-                    Objects.equals(timeTypeIds, noOfSequenceShiftWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,noOfSequenceShiftWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != noOfSequenceShiftWTATemplate) && !(restingTimeAllowed == noOfSequenceShiftWTATemplate.restingTimeAllowed &&
+                restingTime == noOfSequenceShiftWTATemplate.restingTime &&
+                sequenceShiftFrom == noOfSequenceShiftWTATemplate.sequenceShiftFrom &&
+                sequenceShiftTo == noOfSequenceShiftWTATemplate.sequenceShiftTo &&
+                Objects.equals(timeTypeIds, noOfSequenceShiftWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,noOfSequenceShiftWTATemplate.phaseTemplateValues));
     }
 
 }

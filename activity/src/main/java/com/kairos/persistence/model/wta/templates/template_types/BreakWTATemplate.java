@@ -48,15 +48,8 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         BreakWTATemplate breakWTATemplate = (BreakWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == breakWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(breakGapMinutes == breakWTATemplate.breakGapMinutes &&
-                    Objects.equals(breakAvailability, breakWTATemplate.breakAvailability));
-        }
-        return isCalculatedValueChanged;
+        return (this != breakWTATemplate) && !(breakGapMinutes == breakWTATemplate.breakGapMinutes &&
+                Objects.equals(breakAvailability, breakWTATemplate.breakAvailability));
     }
 
 }

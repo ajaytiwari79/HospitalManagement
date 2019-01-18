@@ -66,14 +66,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         WTAForCareDays wtaForCareDays = (WTAForCareDays) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == wtaForCareDays){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(Objects.equals(careDayCounts, wtaForCareDays.careDayCounts));
-        }
-        return isCalculatedValueChanged;
+        return (this != wtaForCareDays) && !(Objects.equals(careDayCounts, wtaForCareDays.careDayCounts));
     }
 
 }

@@ -72,15 +72,8 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         TimeBankWTATemplate timeBankWTATemplate = (TimeBankWTATemplate) wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == timeBankWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(Float.compare(timeBankWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    minMaxSetting == timeBankWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,timeBankWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != timeBankWTATemplate) && !(Float.compare(timeBankWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                minMaxSetting == timeBankWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,timeBankWTATemplate.phaseTemplateValues));
     }
 
 }

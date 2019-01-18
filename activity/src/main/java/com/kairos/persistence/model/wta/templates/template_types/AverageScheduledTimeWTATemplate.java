@@ -181,20 +181,13 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate)wtaBaseRuleTemplate;
-        boolean isCalculatedValueChanged;
-        if (this == averageScheduledTimeWTATemplate){
-            isCalculatedValueChanged = true;
-        }
-        else {
-            isCalculatedValueChanged = !(intervalLength == averageScheduledTimeWTATemplate.intervalLength &&
-                    Float.compare(averageScheduledTimeWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                    Objects.equals(intervalUnit, averageScheduledTimeWTATemplate.intervalUnit) &&
-                    Objects.equals(plannedTimeIds, averageScheduledTimeWTATemplate.plannedTimeIds) &&
-                    Objects.equals(timeTypeIds, averageScheduledTimeWTATemplate.timeTypeIds) &&
-                    Objects.equals(partOfDays, averageScheduledTimeWTATemplate.partOfDays) &&
-                    minMaxSetting == averageScheduledTimeWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,averageScheduledTimeWTATemplate.phaseTemplateValues));
-        }
-        return isCalculatedValueChanged;
+        return (this != averageScheduledTimeWTATemplate) && !(intervalLength == averageScheduledTimeWTATemplate.intervalLength &&
+                Float.compare(averageScheduledTimeWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, averageScheduledTimeWTATemplate.intervalUnit) &&
+                Objects.equals(plannedTimeIds, averageScheduledTimeWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, averageScheduledTimeWTATemplate.timeTypeIds) &&
+                Objects.equals(partOfDays, averageScheduledTimeWTATemplate.partOfDays) &&
+                minMaxSetting == averageScheduledTimeWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,averageScheduledTimeWTATemplate.phaseTemplateValues));
     }
 
 }
