@@ -3,6 +3,8 @@ package com.kairos.dto.activity.cta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.FixedValueType;
 
+import java.util.Objects;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FixedValue {
     private float amount;
@@ -52,5 +54,19 @@ public class FixedValue {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FixedValue)) return false;
+        FixedValue that = (FixedValue) o;
+        return Float.compare(that.amount, amount) == 0 &&
+                Objects.equals(currency, that.currency) &&
+                Objects.equals(currencyId, that.currencyId) &&
+                type == that.type;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currency, currencyId, type);
+    }
 }

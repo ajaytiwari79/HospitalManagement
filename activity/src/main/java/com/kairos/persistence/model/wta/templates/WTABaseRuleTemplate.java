@@ -30,7 +30,6 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
-    transient protected boolean calculativeValueChange;
 
     public WTABaseRuleTemplate(){}
 
@@ -128,24 +127,10 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.managementCanIgnoreCounter = managementCanIgnoreCounter;
     }
 
-    public boolean isCalculativeValueChange() {
-        return calculativeValueChange;
-    }
-
-    public void setCalculativeValueChange(boolean calculativeValueChange) {
-        this.calculativeValueChange = calculativeValueChange;
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        return false;
     }
 
 
-    public boolean equals(WTABaseRuleTemplateDTO o) {
-        if (o == null) return false;
-        return disabled == o.isDisabled() &&
-                Objects.equals(phaseTemplateValues, o.getPhaseTemplateValues()) &&
-                Objects.equals(staffCanIgnoreCounter, o.getStaffCanIgnoreCounter()) &&
-                Objects.equals(managementCanIgnoreCounter, o.getManagementCanIgnoreCounter());
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(disabled, wtaTemplateType, phaseTemplateValues, staffCanIgnoreCounter, managementCanIgnoreCounter);
-    }
+
 }

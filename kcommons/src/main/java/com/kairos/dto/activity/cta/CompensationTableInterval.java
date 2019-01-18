@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 
 public class CompensationTableInterval {
@@ -14,16 +15,6 @@ public class CompensationTableInterval {
     private float value;
     private CompensationMeasurementType compensationMeasurementType;
 
-    public CompensationTableInterval() {
-        //default constructor
-    }
-
-    public CompensationTableInterval(LocalTime from, LocalTime to, float value, CompensationMeasurementType compensationMeasurementType) {
-        this.from = from;
-        this.to = to;
-        this.value = value;
-        this.setCompensationMeasurementType(CompensationMeasurementType.MINUTES);
-    }
 
     public LocalTime getFrom() {
         return from;
@@ -60,25 +51,17 @@ public class CompensationTableInterval {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-
         if (!(o instanceof CompensationTableInterval)) return false;
-
         CompensationTableInterval that = (CompensationTableInterval) o;
-
-        return new EqualsBuilder()
-                .append(value, that.value)
-                .append(from, that.from)
-                .append(to, that.to)
-                .isEquals();
+        return Float.compare(that.value, value) == 0 &&
+                Objects.equals(from, that.from) &&
+                Objects.equals(to, that.to) &&
+                compensationMeasurementType == that.compensationMeasurementType;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(from)
-                .append(to)
-                .append(value)
-                .toHashCode();
+        return Objects.hash(from, to, value, compensationMeasurementType);
     }
 
     @Override

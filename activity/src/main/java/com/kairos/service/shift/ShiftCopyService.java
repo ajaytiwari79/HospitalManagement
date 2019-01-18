@@ -256,7 +256,7 @@ public class ShiftCopyService extends MongoBaseService {
                 Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
                 Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, currentActivityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes());
                 if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
-                    timeBankCalculationService.calculateScheduleAndDurationHour(shiftActivity, currentActivityWrapper.getActivity(), staffUnitPosition);
+                    timeBankCalculationService.calculateScheduledAndDurationMinutes(shiftActivity, currentActivityWrapper.getActivity(), staffUnitPosition);
                     scheduledMinutes += shiftActivity.getScheduledMinutes();
                     durationMinutes += shiftActivity.getDurationMinutes();
                 }

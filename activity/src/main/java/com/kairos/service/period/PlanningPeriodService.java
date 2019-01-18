@@ -74,8 +74,6 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private OrganizationRestClient organizationRestClient;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private ShiftStateMongoRepository shiftStateMongoRepository;
@@ -568,7 +566,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 shiftState.setShiftStatePhaseId(currentPhaseId);
                 shiftState.setId(null);
                 Long unitPositionId = shift.getUnitPositionId();
-                if (!unitPositionWithShiftDateFunctionIdMap.isEmpty() && !unitPositionWithShiftDateFunctionIdMap.get(unitPositionId).isEmpty()) {
+                if (!unitPositionWithShiftDateFunctionIdMap.isEmpty() && unitPositionWithShiftDateFunctionIdMap.containsKey(unitPositionId)) {
                     Map<Long, Set<LocalDate>> functionIdWithDates = unitPositionWithShiftDateFunctionIdMap.get(unitPositionId);
                     for (Long functionId : functionIdWithDates.keySet()) {
                         Set<LocalDate> datesByFunctionId = functionIdWithDates.get(functionId);

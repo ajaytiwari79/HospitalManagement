@@ -100,21 +100,13 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        NoOfSequenceShiftWTATemplate that = (NoOfSequenceShiftWTATemplate) o;
-        return restingTimeAllowed == that.restingTimeAllowed &&
-                restingTime == that.restingTime &&
-                sequenceShiftFrom == that.sequenceShiftFrom &&
-                sequenceShiftTo == that.sequenceShiftTo &&
-                Objects.equals(timeTypeIds, that.timeTypeIds);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate = (NoOfSequenceShiftWTATemplate)wtaBaseRuleTemplate;
+        return (this != noOfSequenceShiftWTATemplate) && !(restingTimeAllowed == noOfSequenceShiftWTATemplate.restingTimeAllowed &&
+                restingTime == noOfSequenceShiftWTATemplate.restingTime &&
+                sequenceShiftFrom == noOfSequenceShiftWTATemplate.sequenceShiftFrom &&
+                sequenceShiftTo == noOfSequenceShiftWTATemplate.sequenceShiftTo &&
+                Objects.equals(timeTypeIds, noOfSequenceShiftWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,noOfSequenceShiftWTATemplate.phaseTemplateValues));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), restingTimeAllowed, restingTime, sequenceShiftFrom, sequenceShiftTo, timeTypeIds);
-    }
 }

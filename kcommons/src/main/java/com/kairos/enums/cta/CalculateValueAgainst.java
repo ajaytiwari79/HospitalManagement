@@ -9,15 +9,6 @@ public class CalculateValueAgainst{
     private float scale;
     private FixedValue fixedValue;
 
-    public CalculateValueAgainst() {
-        //default constractor
-    }
-
-    public CalculateValueAgainst(CalculateValueType calculateValueType, float scale, FixedValue fixedValue) {
-        this.calculateValue = calculateValueType;
-        this.scale = scale;
-        this.fixedValue = fixedValue;
-    }
 
     public CalculateValueType getCalculateValue() {
         return calculateValue;
@@ -46,7 +37,7 @@ public class CalculateValueAgainst{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof CalculateValueAgainst)) return false;
         CalculateValueAgainst that = (CalculateValueAgainst) o;
         return Float.compare(that.scale, scale) == 0 &&
                 calculateValue == that.calculateValue &&
@@ -55,7 +46,6 @@ public class CalculateValueAgainst{
 
     @Override
     public int hashCode() {
-
         return Objects.hash(calculateValue, scale, fixedValue);
     }
 }

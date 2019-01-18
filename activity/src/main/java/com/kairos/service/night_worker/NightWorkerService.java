@@ -12,7 +12,6 @@ import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository
 import com.kairos.persistence.repository.night_worker.StaffQuestionnaireMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.rule_validator.Specification;

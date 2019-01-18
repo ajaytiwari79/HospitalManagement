@@ -1,11 +1,9 @@
 package com.kairos.service.phase;
 
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
@@ -14,12 +12,10 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
 /**

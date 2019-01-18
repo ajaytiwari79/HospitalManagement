@@ -9,6 +9,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pavan on 20/4/18.
@@ -57,5 +58,13 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
 
     public void setBreakTemplateValues(List<BreakTemplateValue> breakTemplateValues) {
         this.breakTemplateValues = breakTemplateValues;
+    }
+
+    @Override
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        BreaksInShiftWTATemplate breaksInShiftWTATemplate = (BreaksInShiftWTATemplate)wtaBaseRuleTemplate;
+        return (this != breaksInShiftWTATemplate) && !(Objects.equals(breakTemplateValues, breaksInShiftWTATemplate.breakTemplateValues) &&
+                Objects.equals(timeTypeIds, breaksInShiftWTATemplate.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, breaksInShiftWTATemplate.plannedTimeIds));
     }
 }
