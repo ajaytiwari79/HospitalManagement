@@ -384,7 +384,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Map<String, Object>> getGeneralTabMetaData(long countryId);
 
     @Query("MATCH (n:Organization) WHERE id(n)={0}\n" +
-            "MATCH (n)-[:" + TYPE_OF + "]->(orgType:OrganizationType) WITH id(orgType) as orgId,n\n" +
+            "OPTIONAL MATCH (n)-[:" + TYPE_OF + "]->(orgType:OrganizationType) WITH id(orgType) as orgId,n\n" +
             "OPTIONAL MATCH (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(distinct id(subType)) as subTypeId,orgId,n\n" +
             "OPTIONAL MATCH (n)-[:" + BUSINESS_TYPE + "]->(businessType:BusinessType) WITH subTypeId,orgId,n,COLLECT(distinct id(businessType)) as businessTypeId\n" +
             "MATCH (n)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH subTypeId,orgId,n,businessTypeId,municipality\n" +
