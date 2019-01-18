@@ -256,7 +256,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         CTAResponseDTO responseCTA;
         if (unitPosition.isPublished()) {
             boolean isCalculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
-            if (ctaDTO.getStartDate().equals(oldCTA.getStartDate()) || !isCalculatedValueChanged) {
+            if (ctaDTO.getStartDate().isBefore(oldCTA.getStartDate()) || ctaDTO.getStartDate().equals(oldCTA.getStartDate()) || !isCalculatedValueChanged) {
                 responseCTA = updateUnitPositionCTA(oldCTA, ctaDTO);
             } else {
                 responseCTA = updateUnitPositionCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);

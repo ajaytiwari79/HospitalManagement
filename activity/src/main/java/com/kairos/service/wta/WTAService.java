@@ -732,7 +732,7 @@ public class WTAService extends MongoBaseService {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
         }
         boolean isCalculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta, wtaBaseRuleTemplates);
-        if (wtadto.getStartDate().equals(asLocalDate(oldWta.getStartDate())) || !isCalculatedValueChanged) {
+        if (wtadto.getStartDate().isBefore(asLocalDate(oldWta.getStartDate())) || wtadto.getStartDate().equals(asLocalDate(oldWta.getStartDate())) || !isCalculatedValueChanged) {
             updateWTAOfUnpublishedUnitPosition(oldWta, wtadto);
             oldWta.setStartDate(asDate(wtadto.getStartDate()));
             wtaRepository.save(oldWta);
