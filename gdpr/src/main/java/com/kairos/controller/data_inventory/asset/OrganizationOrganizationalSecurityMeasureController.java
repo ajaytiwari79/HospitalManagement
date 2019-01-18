@@ -56,7 +56,7 @@ public class OrganizationOrganizationalSecurityMeasureController {
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
     @DeleteMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId) {
+    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
 
     }

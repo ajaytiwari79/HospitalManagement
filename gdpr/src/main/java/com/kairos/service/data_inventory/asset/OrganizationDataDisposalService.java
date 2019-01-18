@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
@@ -14,6 +15,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
     @Inject
     private DataDisposalService dataDisposalService;
@@ -109,18 +111,17 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataDisposalById(Long unitId, BigInteger dataDisposalId) {
-        List<AssetBasicResponseDTO> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
-                if (CollectionUtils.isNotEmpty(assetsLinkedWithDataDisposal)) {
-                    exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", new StringBuilder(assetsLinkedWithDataDisposal.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
-        /*Integer resultCount = dataDisposalRepository.deleteByIdAndUnitId(dataDisposalId, unitId);
+    public Boolean deleteDataDisposalById(Long unitId, Long dataDisposalId) {
+        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
+        if (CollectionUtils.isNotEmpty(assetNames)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
+        }
+        Integer resultCount = dataDisposalRepository.deleteByIdAndOrganizationId(dataDisposalId, unitId);
         if (resultCount > 0) {
             LOGGER.info("Data Disposal deleted successfully for id :: {}", dataDisposalId);
         }else{
             throw new DataNotFoundByIdException("No data found");
-        }*/
-
-                }
+        }
         return true;
     }
 

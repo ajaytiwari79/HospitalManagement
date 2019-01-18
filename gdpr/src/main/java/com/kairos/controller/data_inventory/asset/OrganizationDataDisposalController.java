@@ -53,7 +53,7 @@ public class OrganizationDataDisposalController {
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger dataDisposalId) {
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long unitId, @PathVariable Long dataDisposalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(unitId, dataDisposalId));
     }
 

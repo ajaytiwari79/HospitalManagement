@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormatMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
@@ -14,6 +15,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     private StorageFormatService storageFormatService;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
 
     /**
@@ -115,13 +117,13 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(Long unitId, BigInteger storageFormatId) {
+    public Boolean deleteStorageFormat(Long unitId, Long storageFormatId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithStorageFormat)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", new StringBuilder(assetsLinkedWithStorageFormat.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+       List<String> assetsLinked = assetRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
+        if (CollectionUtils.isNotEmpty(assetsLinked)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", StringUtils.join(assetsLinked, ','));
         }
-       // storageFormatMongoRepository.safeDeleteById(storageFormatId);
+        storageFormatRepository.deleteByIdAndOrganizationId(storageFormatId, unitId);
         return true;
     }
 
@@ -162,6 +164,10 @@ public class OrganizationStorageFormatService extends MongoBaseService {
             result.put("SuggestedData", masterStorageFormatSuggestedByUnit);
         }
         return result;
+    }
+
+    public List<StorageFormatMD> getAllOrganizationalStorageFormatByIds(Set<Long> ids){
+        return storageFormatRepository.findAllByIds(ids);
     }
 
 }

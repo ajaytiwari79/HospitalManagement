@@ -56,7 +56,7 @@ public class OrganizationTechnicalSecurityController {
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
     @DeleteMapping("/technical_security/{techSecurityMeasureId}")
-    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger techSecurityMeasureId) {
+    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long techSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(unitId, techSecurityMeasureId));
 
     }

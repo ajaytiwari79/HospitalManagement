@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
@@ -45,7 +46,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
 
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
     @Inject
     private TechnicalSecurityMeasureRepository technicalSecurityMeasureRepository;
@@ -123,14 +124,14 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
     }
 
 
-    public Boolean deleteTechnicalSecurityMeasure(Long unitId, BigInteger techSecurityMeasureId) {
+    public Boolean deleteTechnicalSecurityMeasure(Long unitId, Long techSecurityMeasureId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithTechnicalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithTechnicalSecurityMeasure)) {
+        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
+        if (CollectionUtils.isNotEmpty(assetsLinked)) {
 
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", new StringBuilder(assetsLinkedWithTechnicalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", StringUtils.join(assetsLinked, ','));
         }
-        technicalSecurityMeasureMongoRepository.safeDeleteById(techSecurityMeasureId);
+        technicalSecurityMeasureRepository.deleteByIdAndOrganizationId(techSecurityMeasureId, unitId);
         return true;
     }
 
@@ -170,6 +171,10 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
             result.put("SuggestedData", masterTechnicalSecurityMeasureSuggestedByUnit);
         }
         return result;
+    }
+
+    public List<TechnicalSecurityMeasureMD> getAllTechnicalSecurityMeasureByIds(Set<Long> ids){
+        return technicalSecurityMeasureRepository.findAllByIds(ids);
     }
 
 

@@ -57,7 +57,7 @@ public class OrganizationStorageFormatController {
 
     @ApiOperation("delete StorageFormat  by id")
     @DeleteMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
+    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(unitId, storageFormatId));
 
     }

@@ -20,6 +20,18 @@ public interface AssetRepository extends CustomGenericRepository<AssetMD> {
     @Query(value = "Select asset from #{#entityName} asset WHERE asset.organizationId = ?1 and asset.deleted = false and asset.active =  true")
     List<AssetMD> findAllActiveAssetByOrganizationId(Long orgId);
 
+    @Query(value = "Select name from AssetMD where organizationId = ?1 and dataDisposal.id = ?2 and deleted = false")
+    List<String> findAllAssetLinkedWithDataDisposal(Long orgId, Long disposalId);
+
+    @Query(value = "Select AT.name from assetmd AT INNER JOIN assetmd_org_security_measures OSM ON AT.id = OSM.assetmd_id where AT.organization_id = ?1 and OSM.org_security_measures_id = ?2 and AT.deleted = false", nativeQuery = true)
+    List<String> findAllAssetLinkedWithOrganizationalSecurityMeasure(Long orgId, Long securityMeasureId);
+
+    @Query(value = "Select AT.name from assetmd AT INNER JOIN assetmd_storage_formats SF ON AT.id = SF.assetmd_id where AT.organization_id = ?1 and SF.storage_formats_id = ?2 and AT.deleted = false", nativeQuery = true)
+    List<String> findAllAssetLinkedWithStorageFormat(Long orgId, Long storageId);
+
+    @Query(value = "Select AT.name from assetmd AT INNER JOIN assetmd_technical_security_measures TSM ON AT.id = TSM.assetmd_id where AT.organization_id = ?1 and TSM.technical_security_measures_id = ?2 and AT.deleted = false", nativeQuery = true)
+    List<String>findAllAssetLinkedWithTechnicalSecurityMeasure(Long orgId, Long technicalSecurityMeasureId);
+
 
     /*@Query("{organizationId:?0,_id:?1,deleted:false}")
     Asset findByIdAndNonDeleted(Long organizationId, BigInteger id);

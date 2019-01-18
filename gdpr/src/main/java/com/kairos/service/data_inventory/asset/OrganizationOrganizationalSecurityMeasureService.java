@@ -7,6 +7,7 @@ import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasureMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
@@ -17,6 +18,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -46,7 +48,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
     private OrganizationalSecurityMeasureService organizationalSecurityMeasureService;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
     @Inject
     private OrganizationalSecurityMeasureRepository organizationalSecurityMeasureRepository;
@@ -123,13 +125,13 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
     }
 
 
-    public Boolean deleteOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId) {
+    public Boolean deleteOrganizationalSecurityMeasure(Long unitId, Long orgSecurityMeasureId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithOrganizationalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithOrganizationalSecurityMeasure)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", new StringBuilder(assetsLinkedWithOrganizationalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+        List<String> assetsLinked = assetRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
+        if (CollectionUtils.isNotEmpty(assetsLinked)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", StringUtils.join(assetsLinked, ','));
         }
-        organizationalSecurityMeasureMongoRepository.safeDeleteById(orgSecurityMeasureId);
+        organizationalSecurityMeasureRepository.deleteByIdAndOrganizationId(orgSecurityMeasureId, unitId);
         return true;
 
     }
@@ -171,6 +173,10 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
             result.put("SuggestedData", masterOrganizationalSecurityMeasureSuggestedByUnit);
         }
         return result;
+    }
+
+    public List<OrganizationalSecurityMeasureMD> getAllOrganizationalSecurityMeasureByIds(Set<Long> ids){
+        return organizationalSecurityMeasureRepository.findAllByIds(ids);
     }
 
 }
