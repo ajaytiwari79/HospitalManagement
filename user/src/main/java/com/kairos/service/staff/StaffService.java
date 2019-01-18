@@ -1320,7 +1320,7 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
         if (allStaffRequired) {
             Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
             // unit is parent so fetching all staff from itself
@@ -1517,10 +1517,8 @@ public class StaffService {
 
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
-        staffList.forEach(staff -> {
-            addStaffInChatServer(staff);
-            staffGraphRepository.save(staff);
-        });
+        staffList.forEach(this::addStaffInChatServer);
+        staffGraphRepository.saveAll(staffList);
         return true;
     }
 

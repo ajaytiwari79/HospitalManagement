@@ -45,6 +45,7 @@ import java.util.*;
 
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 
 
 /**
@@ -102,6 +103,9 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_SUB_ORGANIZATION)
     private List<Organization> children = new ArrayList<>();
+
+    @Relationship(type = BELONGS_TO_HUB)
+    private Organization hub;
 
 
     @Relationship(type = TYPE_OF)
@@ -324,23 +328,6 @@ public class Organization extends UserBaseEntity {
         this.name = name;
     }
 
-    public Organization(String name, OrganizationSetting organizationSetting, OrganizationLevel organizationLevel, List<Group> groupList) {
-        this.name = name;
-        this.organizationSetting = organizationSetting;
-        this.organizationLevel = organizationLevel;
-        this.groupList = groupList;
-    }
-
-    public Organization(String name, String email, ContactDetail contact, ContactAddress contactAddress, OrganizationLevel organizationLevel, Country country, String childLevel) {
-        this.name = name;
-        this.email = email;
-        this.contactDetail = contact;
-        this.contactAddress = contactAddress;
-        this.organizationLevel = organizationLevel;
-        this.country = country;
-        this.childLevel = childLevel;
-    }
-
     public String getDescription() {
 
         return description;
@@ -559,27 +546,6 @@ public class Organization extends UserBaseEntity {
     public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
-
-    public Map<String, Object> retrieveOrganizationUnitDetails() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", this.id);
-        map.put("name", this.name);
-        map.put("description", this.description);
-        //    map.put("type", this.organizationType.getName());
-        map.put("externalId", this.externalId);
-        map.put("kairosStatus", this.kairosStatus);
-
-        if (this.contactAddress != null) {
-            map.put("type", this.contactAddress.getStreet());
-            map.put("type", this.contactAddress.getHouseNumber());
-            //        map.put("zipCode", this.zipCode.getZipCode());
-//        map.put("zipCodeName", this.zipCode.getZipCode());
-
-        }
-
-        return map;
-    }
-
 
     public ContactAddress getBillingAddress() {
         return billingAddress;
@@ -983,5 +949,13 @@ public class Organization extends UserBaseEntity {
 
     public void setSectors(List<Sector> sectors) {
         this.sectors = sectors;
+    }
+
+    public Organization getHub() {
+        return hub;
+    }
+
+    public void setHub(Organization hub) {
+        this.hub = hub;
     }
 }
