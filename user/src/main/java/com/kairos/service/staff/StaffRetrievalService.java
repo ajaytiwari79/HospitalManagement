@@ -696,13 +696,15 @@ public class StaffRetrievalService {
         StaffUnitPositionDetails unitPosition = null;
         if(Optional.ofNullable(unitPositionId).isPresent()) {
             unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId);
-            List<AppliedFunctionDTO> appliedFunctionDTOS = new ArrayList<>();
-            for (AppliedFunctionDTO appliedFunctionDTO : unitPosition.getAppliedFunctions()) {
+
+            List<AppliedFunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getAppliedFunctions(),AppliedFunctionDTO.class);
+            appliedFunctionDTOS.removeIf(localDate -> !localDate.equals(shiftDate));
+            /*for (AppliedFunctionDTO appliedFunctionDTO : ) {
                 boolean valid = appliedFunctionDTO.getAppliedDates().stream().filter(localDate -> localDate.equals(shiftDate)).findAny().isPresent();
                 if(valid){
                     appliedFunctionDTOS.add(appliedFunctionDTO);
                 }
-            }
+            }*/
             unitPosition.setAppliedFunctions(appliedFunctionDTOS);
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO =null;

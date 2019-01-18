@@ -60,6 +60,7 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.BONUS_HOURS;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
@@ -920,7 +921,7 @@ public class TimeBankCalculationService {
                     totalScheduledMin += children.stream().mapToInt(c -> c.getTotalMin()).sum();
                 }
 
-                if (shifts != null && !shifts.isEmpty()) {
+                if (isCollectionNotEmpty(shifts)) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                             if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
