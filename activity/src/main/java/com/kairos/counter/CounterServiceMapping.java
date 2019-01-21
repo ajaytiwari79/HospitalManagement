@@ -51,6 +51,13 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.SHIFT_AND_ACTIVITY_DURATION, shiftAndActivityKpiService);
     }
 
+    @Inject
+    public void calculateWeekDayAndWeekEndHours(WeekDayAndWeekEndHoursKpiService weekDayAndWeekEndHoursKpiService) {
+        logger.info("Enum mapping for calculate WeekDay And WeekEnd Hours : "+this.counters);
+        this.counters.put(CounterType.WEEKDAY_AND_WEEKEND_HOURS, weekDayAndWeekEndHoursKpiService);
+    }
+
+
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);
     }

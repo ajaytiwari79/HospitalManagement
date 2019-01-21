@@ -9,6 +9,7 @@ public enum CounterType {
     AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY("Average Resting Hours Per Presence Day"),
     SCHEDULED_HOURS_NET("Scheduled Hours-Net"),
     PLANNED_HOURS("Planned Hours"),
+    WEEKDAY_AND_WEEKEND_HOURS("WeekDay And WeekEnd Hours Of Staff"),
     SHIFT_AND_ACTIVITY_DURATION("Duration Of Shift And Activity"),
     CONTRACTUAL_AND_PLANNED_HOURS("Contractual And Planned Hours Of Staff"),
     TIMEBANK("TimeBank For Units"),
