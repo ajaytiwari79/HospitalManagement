@@ -2,7 +2,6 @@ package com.kairos.persistence.model.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.equipment.Equipment;
@@ -13,11 +12,10 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.resources.Vehicle;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -37,14 +35,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Country extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Country.name.notEmpty")
-    @NotNull(message = "error.Country.name.notnull")
+    @NotBlank(message = "error.Country.name.notEmpty")
     private String name;
 
     private boolean isEnabled = true;
 
-    @NotEmpty(message = "error.Country.code.notEmpty")
-    @NotNull(message = "error.Country.code.notnull")
+    @NotBlank(message = "error.Country.code.notEmpty")
     private String code;
 
     public String getCode() {
@@ -57,8 +53,6 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = HAS_HOLIDAY)
     private List<CountryHolidayCalender> countryHolidayCalenderList;
-
-
 
 
     @Relationship(type = COUNTRY_HAS_TAG)
@@ -122,14 +116,6 @@ public class Country extends UserBaseEntity {
         this.countryHolidayCalenderList = countryHolidayCalenderList;
     }
 
-//    public List<OrganizationType> getOrganizationType() {
-//        return organizationTypeList;
-//    }
-//
-//    public void setOrganizationType(List<OrganizationType> organizationTypeList) {
-//        this.organizationTypeList = organizationTypeList;
-//    }
-
     public boolean isEnabled() {
         return isEnabled;
     }
@@ -181,36 +167,6 @@ public class Country extends UserBaseEntity {
         this.resources = resourceList;
     }
 
-
-    public Map<String, Object> retrieveGeneralDetails() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", this.id);
-        map.put("name", this.name);
-        return map;
-    }
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id", this.id);
-        map.put("name", this.name);
-        map.put("code", this.code);
-        map.put("lastModificationDate", this.getLastModificationDate());
-        map.put("creationDate", this.getCreationDate());
-        map.put("googleCalendarCode", this.getGoogleCalendarCode());
-        return map;
-    }
-
-    @Override
-    public String toString() {
-        return "{Country={" +
-                "name='" + name + '\'' +
-                ", isEnabled=" + isEnabled +
-                ", code='" + code + '\'' +
-                '}' +
-                '}';
-    }
-
-
     public List<RelationType> getRelationTypes() {
         return relationTypes;
     }
@@ -257,5 +213,26 @@ public class Country extends UserBaseEntity {
 
     public void setPayRollTypeIds(Set<BigInteger> payRollTypeIds) {
         this.payRollTypeIds = payRollTypeIds;
+    }
+
+    public Map<String, Object> retrieveDetails() {
+        Map<String, Object> map = new HashMap();
+        map.put("id", this.id);
+        map.put("name", this.name);
+        map.put("code", this.code);
+        map.put("lastModificationDate", this.getLastModificationDate());
+        map.put("creationDate", this.getCreationDate());
+        map.put("googleCalendarCode", this.getGoogleCalendarCode());
+        return map;
+    }
+
+    @Override
+    public String toString() {
+        return "{Country={" +
+                "name='" + name + '\'' +
+                ", isEnabled=" + isEnabled +
+                ", code='" + code + '\'' +
+                '}' +
+                '}';
     }
 }

@@ -52,7 +52,7 @@ public class ReasonCodeService {
     public ReasonCodeDTO createReasonCodeForUnit(long unitId,ReasonCodeDTO reasonCodeDTO){
         Organization organization = organizationGraphRepository.findOne(unitId);
         if(!Optional.ofNullable(organization).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
         }
         boolean isAlreadyExists=reasonCodeGraphRepository.findByUnitIdAndNameExcludingCurrent(unitId,-1L,"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isAlreadyExists){

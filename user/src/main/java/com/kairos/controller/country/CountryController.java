@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
@@ -375,15 +376,15 @@ public class CountryController {
     @ApiOperation(value = "Add DayType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addDayType(@PathVariable long countryId, @Validated @RequestBody DayType dayType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.createDayType(dayType, countryId));
+    public ResponseEntity<Map<String, Object>> addDayType(@PathVariable long countryId, @Validated @RequestBody DayTypeDTO dayTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.createDayType(dayTypeDTO, countryId));
     }
 
     @ApiOperation(value = "Update DayType")
     @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateDayType(@Validated @RequestBody DayType dayType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateDayType(dayType));
+    public ResponseEntity<Map<String, Object>> updateDayType(@Validated @RequestBody DayTypeDTO dayTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateDayType(dayTypeDTO));
     }
 
     @ApiOperation(value = "Delete DayType by dayTypeId")

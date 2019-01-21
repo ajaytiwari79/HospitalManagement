@@ -90,7 +90,7 @@ public class StaffFilterService {
         }
         Long countryId = organizationGraphRepository.getCountryId(organization.getId());
         if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 

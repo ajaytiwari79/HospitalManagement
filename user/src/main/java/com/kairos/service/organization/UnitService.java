@@ -86,7 +86,7 @@ public class UnitService {
         Organization parentOrganization = organization.isParentOrganization()? organization : organizationService.fetchParentOrganization(organizationId);
         Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
         if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
 
         Map<String, Object> response = new HashMap<>(2);
