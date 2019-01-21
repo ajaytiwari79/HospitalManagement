@@ -147,3 +147,12 @@ def spockReports() {
     set( [ 'com.athaydes.spockframework.report.showCodeBlocks': true,
            'com.athaydes.spockframework.report.outputDir': 'target/spock-reports' ] )
 }
+sonarqube {
+    properties {
+        property "sonar.projectName", "user"
+        property "sonar.projectKey", "kairos:user"
+        property "sonar.sources", "src/main"
+        property "sonar.skip.tests", "true"
+        property "sonar.exclusions", "**/*test*/**"
+    }
+}

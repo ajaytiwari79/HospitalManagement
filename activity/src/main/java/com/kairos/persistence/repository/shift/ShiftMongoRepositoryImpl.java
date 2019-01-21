@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -60,7 +61,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("unitPositionId").is(unitPositionId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId)
-                        .and("startDate").gte(startDate).lte(endDate))
+                        .and("startDate").gte(startDate).lte(endDate)),
+                sort(Sort.DEFAULT_DIRECTION,"startDate")
                 //graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts")
                 );
         AggregationResults<ShiftDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class);
@@ -182,7 +184,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId)
                         .and("startDate").gte(startDate).and("endDate").lte(endDate)),
                 //graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts"),
-                sort(Sort.Direction.ASC, "startDate"));
+                sort(Sort.DEFAULT_DIRECTION, "startDate"));
         AggregationResults<ShiftDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class);
         return result.getMappedResults();
     }
@@ -418,6 +420,28 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         AggregationResults<BasicChartKpiDateUnit> result = mongoTemplate.aggregate(aggregation, Shift.class, BasicChartKpiDateUnit.class);
         return result.getMappedResults().stream().map(a->(CommonKpiDataUnit)a).collect(Collectors.toList());
     }
+
+    @Override
+    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
+        Criteria criteria=Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("disabled").is(false)
+                .and("startDate").gte(startDate).lte(endDate);
+        List<AggregationOperation> aggregationOperation=new ArrayList<AggregationOperation>();
+        aggregationOperation.add(new MatchOperation(criteria));
+        aggregationOperation.add(unwind("activities"));
+        if(CollectionUtils.isNotEmpty(activitiesIds)){
+            aggregationOperation.add(match(Criteria.where("activities.activityId").in(activitiesIds)));
+        }
+        aggregationOperation.add(lookup("activities","activities.activityId","_id","activity"));
+        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityKpiProjection()));
+        if(CollectionUtils.isNotEmpty(dayOfWeeks)){
+            aggregationOperation.add(match(Criteria.where("dayOfWeek").in(dayOfWeeks)));
+        }
+        aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByShiftAndActivity())));
+        Aggregation aggregation=Aggregation.newAggregation(aggregationOperation);
+        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
+        return result.getMappedResults();
+    }
+
     public static Document shiftWithActivityProjection(){
         String project = "{  \n" +
                 "      '$project':{  \n" +
@@ -439,6 +463,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'scheduledMinutes' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
                 "    'unitPositionId' : 1,\n" +
+                " 'dayOfWeek': { '$dayOfWeek': '$startDate' }\n"+
                 "\t'status':1,\n" +
                 "\t'activities.bid' : 1,\n" +
                 "\t'activities.id' : 1,\n" +
@@ -462,9 +487,38 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return Document.parse(project);
     }
 
+    public static Document shiftWithActivityKpiProjection(){
+        String project = "{  \n" +
+                "      '$project':{  \n" +
+                "         '_id' : 1,\n" +
+                "    'name' : 1,\n" +
+                "    'durationMinutes' : 1,\n" +
+                "    'startDate' : 1,\n" +
+                "    'endDate' : 1,\n" +
+                " 'dayOfWeek': { '$dayOfWeek': '$startDate' }\n"+
+                "\t'activities.id' : 1,\n" +
+                "        'activities.activityId' : 1,\n"+
+                "        'activities.durationMinutes' : 1,\n"+
+                "        'activities.activityName':1,\n" +
+                "        'activities.backgroundColor':{  \n" +
+                "            '$arrayElemAt':[  \n" +
+                "               '$activity.generalActivityTab.backgroundColor',\n" +
+                "               0\n" +
+                "            ]\n" +
+                "         }\n" +
+                "      }\n" +
+                "   }";
+        return Document.parse(project);
+    }
+
     private String groupByForPlannedHours(){
         return "{'$group':{'_id':'$staffId' \n" +
                 "'plannedHours':{ '$sum': {'$add':['$activities.timeBankCtaBonusMinutes','$activities.scheduledMinutes']}}}}";
+    }
+
+    private String groupByShiftAndActivity(){
+        return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
+                "'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'}'activities':{'$addToSet':'$activities'}}}";
     }
     private String projectionOfShift(){
         return  "{'$project' : { 'refId' : '$_id' ,'value':'$plannedHours'} }";

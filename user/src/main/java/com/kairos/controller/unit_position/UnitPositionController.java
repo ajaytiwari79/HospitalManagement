@@ -2,7 +2,7 @@ package com.kairos.controller.unit_position;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.service.staff.EmploymentService;
+import com.kairos.service.organization.UnionService;
 import com.kairos.service.unit_position.UnitPositionCTAWTAService;
 import com.kairos.service.unit_position.UnitPositionFunctionService;
 import com.kairos.service.unit_position.UnitPositionJobService;
@@ -44,6 +44,7 @@ public class UnitPositionController {
     private UnitPositionJobService unitPositionJobService;
     @Inject private UnitPositionFunctionService unitPositionFunctionService;
     @Inject private UnitPositionCTAWTAService unitPositionCTAWTAService;
+    @Inject private UnionService unionService;
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
@@ -179,5 +180,13 @@ public class UnitPositionController {
     @GetMapping(value = "/staff/{staffId}/unit_positions/{unitPositionId}/hourly_cost")
     public ResponseEntity<Map<String, Object>> getPositionLinesWithHourlyCost(@PathVariable Long unitId, @PathVariable Long staffId,@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionFunctionService.getPositionLinesWithHourlyCost(unitId, staffId,unitPositionId));
+    }
+
+    @RequestMapping(value = "/unit_position/default_data", method = RequestMethod.GET)
+    @ApiOperation("Get All default data for unit employment  by organization ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitPositionDefaultData(@PathVariable Long unitId, @RequestParam("type") String type, @RequestParam("staffId") Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                unionService.getUnitPositionDefaultData(unitId, type, staffId));
     }
 }

@@ -45,16 +45,16 @@ public class TimeBankController {
 
     */
 
-    @GetMapping(value = "/unit_position/{unitEmploymentId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    @GetMapping(value = "/unit_position/{unitPositionId}/")
+    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getAdvanceViewTimeBank
-                (unitId,unitEmploymentId,query,startDate,endDate));
+                (unitId,unitPositionId,query,startDate,endDate));
     }
 
-    @GetMapping(value = "overview/unit_position/{unitEmploymentId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam Integer year) {
+    @GetMapping(value = "overview/unit_position/{unitPositionId}/")
+    public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long unitPositionId, @RequestParam Integer year) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getOverviewTimeBank
-                (unitId,unitEmploymentId,year));
+                (unitId,unitPositionId,year));
     }
 
     @GetMapping(value = "visual_view/unit_position/{unitPositionId}")

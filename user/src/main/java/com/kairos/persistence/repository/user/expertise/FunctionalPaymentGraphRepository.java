@@ -8,9 +8,8 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -48,7 +47,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
     @Query("MATCH(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) \n" +
             "WHERE id(childFunctionalPayment)={0} AND id(functionalPayment)={1}\n" +
             " set functionalPayment.hasDraftCopy=false set functionalPayment.endDate={2} detach delete relation")
-    void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, Long endDate);
+    void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, String endDate);
 
     @Query("MATCH(parent:Expertise)-[:VERSION_OF]-(child:Expertise) WHERE id(parent)={0} AND id(child)={1}\n" +
             "MATCH(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +
@@ -76,11 +75,11 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
     @Query("MATCH(payTable:PayTable)-[:"+HAS_PAY_GRADE+"]-(payGrade:PayGrade)<-[:"+HAS_BASE_PAY_GRADE+"]-(seniorityLevel:SeniorityLevel)<-[:"+FOR_SENIORITY_LEVEL+"]-(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function)\n" +
             "MATCH(slf)<-[:"+SENIORITY_LEVEL_FUNCTIONS+"]-(fpm:FunctionalPaymentMatrix)<-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]-(functionalPayment:FunctionalPayment)\n" +
             "WHERE id(payTable)={0} AND  \n" +
-            "({2} IS NULL AND (functionalPayment.endDateMillis IS NULL OR functionalPayment.endDateMillis > {1}))\n" +
+            "({2} IS NULL AND (functionalPayment.endDateMillis IS NULL OR date(functionalPayment.endDateMillis) > DATE({1})))\n" +
             "OR \n" +
-            "({2} IS NOT NULL AND  ({1} < functionalPayment.endDateMillis OR {2}>functionalPayment.startDateMillis))\n" +
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < date(functionalPayment.endDateMillis) OR DATE({2})>date(functionalPayment.startDateMillis)))\n" +
             "RETURN functionalPayment")
-    List<FunctionalPayment> findAllActiveByPayTableId(Long payTableId,Long startDate,Long endDate);
+    List<FunctionalPayment> findAllActiveByPayTableId(Long payTableId,String startDate,String endDate);
 
     @Query("MATCH(functionalPayment:FunctionalPayment) WHERE id(functionalPayment) IN {0} " +
             "MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function:Function) "+

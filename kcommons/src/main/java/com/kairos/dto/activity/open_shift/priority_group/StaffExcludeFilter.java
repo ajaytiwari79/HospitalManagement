@@ -25,26 +25,6 @@ public class StaffExcludeFilter {
         //Default Constructor
     }
 
-    public StaffExcludeFilter(boolean blockedForOpenShift, Integer numberOfShiftAssigned, Integer numberOfPendingRequest, Integer unitExperienceInWeek, Integer minTimeBank, Integer minRestingTimeBeforeShiftStart,
-                              Integer minRestingTimeAfterShiftEnd, Integer maxPlannedTime, Integer maxDeltaWeeklyTimeBankPerWeek, boolean personalEntriesFoundFromPrivateCalender, Integer lastWorkingDaysInUnit,
-                              Integer lastWorkingDaysWithActivity, Integer minRemainingTimeLeftInActivityPlanningPeriod, boolean negativeAvailabilityInCalender, boolean veto, boolean stopBricks) {
-        this.numberOfShiftAssigned = numberOfShiftAssigned;
-        this.numberOfPendingRequest = numberOfPendingRequest;
-        this.unitExperienceInWeek = unitExperienceInWeek;
-        this.minTimeBank = minTimeBank;
-        this.minRestingTimeBeforeShiftStart = minRestingTimeBeforeShiftStart;
-        this.minRestingTimeAfterShiftEnd = minRestingTimeAfterShiftEnd;
-        this.maxPlannedTime = maxPlannedTime;
-        this.maxDeltaWeeklyTimeBankPerWeek = maxDeltaWeeklyTimeBankPerWeek;
-        this.personalEntriesFoundFromPrivateCalender = personalEntriesFoundFromPrivateCalender;
-        this.lastWorkingDaysInUnit = lastWorkingDaysInUnit;
-        this.lastWorkingDaysWithActivity = lastWorkingDaysWithActivity;
-        this.minRemainingTimeLeftInActivityPlanningPeriod = minRemainingTimeLeftInActivityPlanningPeriod;
-        this.negativeAvailabilityInCalender = negativeAvailabilityInCalender;
-        this.veto = veto;
-        this.stopBricks = stopBricks;
-        }
-
         public Integer getNumberOfShiftAssigned() {
         return numberOfShiftAssigned;
     }

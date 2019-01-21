@@ -59,7 +59,7 @@ public class OrganizationActivityController {
     @GetMapping(value = "/activity_with_selected")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityByUnitId(@PathVariable Long unitId, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllActivityByUnitAndDeleted(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllActivityByUnit(unitId));
     }
 
     @ApiOperation("Update icon  in Activity")
@@ -232,21 +232,6 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getBonusTabOfActivity(activityId));
     }
 
-    //Permissions
-
-   /* @ApiOperation("Update Permissions Tab of Activity")
-    @PutMapping(value = "/activity/permission_settings")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updatePermissionsTabOfActivity(@RequestBody PermissionsActivityTabDTO permissionsActivityTabDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePermissionsTabOfActivity(permissionsActivityTabDTO));
-    }*/
-
-    @ApiOperation("get Permissions Tab of Activity")
-    @GetMapping(value = "/activity/{activityId}/permission_settings")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getPermissionsTabOfActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getPermissionsTabOfActivity(activityId));
-    }
     // skills
 
     @ApiOperation("update Skill tab of activity Type")
@@ -364,6 +349,12 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationActivityService.createDefaultDataForOrganization(unitId, orgTypeAndSubTypeDTO));
+    }
+
+    @ApiOperation("Remove uploaded Attachments in Activity")
+    @DeleteMapping(value = "/activity/{activityId}/remove_uploaded_attachments")
+    ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
     }
 
 }

@@ -10,6 +10,8 @@ public class OrgTypeAndSubTypeDTO {
     private List<Long> subTypeId; // same as above but its list We will change
     private Long countryId;
     private Long parentOrganizationId;
+    private boolean workcentre;
+    private boolean isParentOrganization;
 
     public OrgTypeAndSubTypeDTO() {
         //Default Constructor
@@ -26,10 +28,11 @@ public class OrgTypeAndSubTypeDTO {
         this.countryId = countryId;
     }
 
-    public OrgTypeAndSubTypeDTO(Long organizationTypeId, List<Long> subTypeId, Long countryId) {
+    public OrgTypeAndSubTypeDTO(Long organizationTypeId, List<Long> subTypeId, Long countryId,boolean isParentOrganization) {
         this.organizationTypeId = organizationTypeId;
         this.subTypeId = subTypeId;
         this.countryId = countryId;
+        this.isParentOrganization=isParentOrganization;
     }
 
     public Long getOrganizationTypeId() {
@@ -86,5 +89,21 @@ public class OrgTypeAndSubTypeDTO {
 
     public void setOrganizationSubTypeName(String organizationSubTypeName) {
         this.organizationSubTypeName = organizationSubTypeName;
+    }
+
+    public boolean isWorkcentre() {
+        return workcentre;
+    }
+
+    public void setWorkcentre(boolean workcentre) {
+        this.workcentre = workcentre;
+    }
+
+    public boolean isParentOrganization() {
+        return isParentOrganization;
+    }
+
+    public void setParentOrganization(boolean parentOrganization) {
+        isParentOrganization = parentOrganization;
     }
 }

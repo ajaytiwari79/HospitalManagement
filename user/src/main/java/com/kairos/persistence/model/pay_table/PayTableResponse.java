@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.Level;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -18,8 +19,8 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
     private Long id;
     private String name;
     private String shortName;
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private LocalDate startDateMillis;
+    private LocalDate endDateMillis;
     private String paymentUnit;
     private Level level;
     private List<PayGrade> payGrades;
@@ -55,19 +56,19 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.shortName = shortName;
     }
 
-    public Long getStartDateMillis() {
+    public LocalDate getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
+    public void setStartDateMillis(LocalDate startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDateMillis() {
+    public LocalDate getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
+    public void setEndDateMillis(LocalDate endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -111,7 +112,7 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.editable = editable;
     }
 
-    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Long endDateMillis, Boolean published, String paymentUnit, Boolean editable) {
+    public PayTableResponse(String name, String shortName, String description, LocalDate startDateMillis, LocalDate endDateMillis, Boolean published, String paymentUnit, Boolean editable) {
         this.name = name;
         this.published = published;
         this.description = description;
@@ -140,7 +141,7 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
 
     @Override
     public int compareTo(PayTableResponse payTableResponse) {
-        Long compareQuantity = ((PayTableResponse) payTableResponse).getStartDateMillis();
+        LocalDate compareQuantity = ((PayTableResponse) payTableResponse).getStartDateMillis();
         //ascending order
         return this.getStartDateMillis().compareTo(compareQuantity);
     }

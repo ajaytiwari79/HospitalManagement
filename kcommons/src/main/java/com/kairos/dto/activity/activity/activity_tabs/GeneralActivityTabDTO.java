@@ -40,7 +40,7 @@ public class GeneralActivityTabDTO {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;
-    private boolean eligibleForCopy;
+    private boolean activityCanBeCopied;
 
     public GeneralActivityTabDTO() {
         // dc
@@ -110,17 +110,6 @@ public class GeneralActivityTabDTO {
     public void setModifiedDocumentName(String modifiedDocumentName) {
         this.modifiedDocumentName = modifiedDocumentName;
     }
-
-    public boolean isEligibleForCopy() {
-        return eligibleForCopy;
-    }
-
-    public void setEligibleForCopy(boolean eligibleForCopy) {
-        this.eligibleForCopy = eligibleForCopy;
-    }
-
-
-
 
     public String getUltraShortName() {
         return ultraShortName;
@@ -268,6 +257,14 @@ public class GeneralActivityTabDTO {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied;
     }
 
     @Override

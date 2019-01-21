@@ -5,27 +5,37 @@ import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.union.*;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBasicResponse;
+import com.kairos.persistence.model.organization.OrganizationHierarchyData;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
 import com.kairos.persistence.model.organization.union.*;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.union.LocationGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.FormatUtil;
+import com.kairos.wrapper.StaffUnionWrapper;
 import io.jsonwebtoken.lang.Assert;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -63,6 +73,12 @@ public class UnionService {
     private LocationGraphRepository locationGraphRepository;
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
+    @Inject private OrganizationService organizationService;
+    @Inject private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
 
     public UnionQueryWrapper getAllUnionOfCountry(Long countryId) {
@@ -395,50 +411,6 @@ public class UnionService {
         Assert.notNull(addressDTO.getMunicipalityId(),exceptionService.convertMessage("message.municipality.null"));
         return true;
     }
-   /* public ContactAddress updateAddress(ContactAddress address, ContactAddressDTO addressDTO, ZipCode zipCode, Municipality municipality) {
-
-        boolean municipalityUpdated;
-        boolean zipCodeUpdated;
-        if(Optional.ofNullable(municipality).isPresent()) {
-            municipalityUpdated= !municipality.getId().equals(addressDTO.getMunicipalityId());
-        }
-
-        if(Optional.ofNullable(zipCode).isPresent()) {
-            zipCodeUpdated = !zipCode.getId().equals(addressDTO.getZipCodeId());
-        }
-        Long addressIdDb = address.getId();
-        Long zipCodeIdDb = zipCode.getId();
-        Long municipalityIdDb= municipality.getId();;
-        ZipCodeMunicipalityQueryResult zipCodeMunicipalityQueryResult = null;
-        ContactAddress updatedAddress = new ContactAddress(addressDTO.getHouseNumber(), addressDTO.getProvince(),addressDTO.getStreet(),
-                addressDTO.getCity(),addressDTO.getRegionName());
-        updatedAddress.setId(address.getId());
-
-        if(zipCodeUpdated||municipalityUpdated) {
-            zipCodeMunicipalityQueryResult = zipCodeGraphRepository.getZipCodeAndMunicipalityById(addressDTO.getZipCodeId(),
-                    addressDTO.getMunicipalityId());
-            if(!Optional.ofNullable(zipCodeMunicipalityQueryResult).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.zipCodemunicipality.notFound");
-            }
-        }
-        if(zipCodeUpdated&&municipalityUpdated) {
-
-            zipCodeGraphRepository.deleteAddressAndZipCodeMunicipalityRelation(addressIdDb,zipCodeIdDb,municipalityIdDb);
-            updatedAddress.setZipCode(zipCodeMunicipalityQueryResult.getZipCode());
-            updatedAddress.setMunicipality(zipCodeMunicipalityQueryResult.getMunicipality());
-        }
-        else if(zipCodeUpdated) {
-
-            zipCodeGraphRepository.deleteAddressZipcodeRelation(addressIdDb,zipCodeIdDb);
-            updatedAddress.setZipCode(zipCodeMunicipalityQueryResult.getZipCode());
-
-        }
-        else if(municipalityUpdated) {
-            zipCodeGraphRepository.deleteAddressMunicipalityRelation(addressIdDb,municipalityIdDb);
-            updatedAddress.setMunicipality(zipCodeMunicipalityQueryResult.getMunicipality());
-        }
-        return updatedAddress;
-    }*/
 
 
     /**
@@ -578,5 +550,44 @@ public class UnionService {
 
             locationDTOS.add(new LocationDTO(location.getId(),location.getName(),contactAddressDTO,municipalitiesLocation));
         }
+    }
+
+    public StaffUnionWrapper getUnitPositionDefaultData(Long unitId, String type, Long staffId) {
+        Optional<Staff> staff = staffGraphRepository.findById(staffId);
+        if (!staff.isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+
+        }
+        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
+        Organization organization = organizationService.getOrganizationDetail(unitId, type);
+        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.notfound");
+
+        }
+        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
+        List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
+        if (organization.isParentOrganization()) {
+            organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(organization.getId());
+            /*
+            ////Can create Unit Position for WorkCentre only
+            if (organization.isWorkcentre()) {
+                OrganizationBasicResponse currentOrganization = new OrganizationBasicResponse(organization.getId(), organization.getName());
+                organizationHierarchy.add(currentOrganization);
+            }*/
+        } else {
+            OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(organization.getId());
+                /*
+                //Can create Unit Position for WorkCentre only
+                OrganizationBasicResponse parentOrganization = new OrganizationBasicResponse(data.getParent().getId(), data.getParent().getName());
+                organizationHierarchy.add(parentOrganization);*/
+            Iterator itr = data.getChildUnits().listIterator();
+            while (itr.hasNext()) {
+                Organization thisOrganization = (Organization) itr.next();
+                organizationHierarchy.add(new OrganizationBasicResponse(thisOrganization.getId(), thisOrganization.getName()));
+            }
+        }
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
+        return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
 }

@@ -31,13 +31,12 @@ public class EmploymentType extends UserBaseEntity {
     //Added By Pavan
     private boolean editableAtUnitPosition;
     private Short weeklyMinutes;
-    private boolean markMainEmployment;
 
     public EmploymentType() {
         //Default Constructor
     }
 
-    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtUnitPosition, boolean markMainEmployment) {
+    public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtUnitPosition) {
         this.id=id;
         this.name = name;
         this.description = description;
@@ -47,7 +46,6 @@ public class EmploymentType extends UserBaseEntity {
         this.employmentCategories = employmentCategories;
         this.paymentFrequency = paymentFrequency;
         this.editableAtUnitPosition = editableAtUnitPosition;
-        this.markMainEmployment = markMainEmployment;
     }
 
     public String getName() {
@@ -120,13 +118,5 @@ public class EmploymentType extends UserBaseEntity {
 
     public void setWeeklyMinutes(Short weeklyMinutes) {
         this.weeklyMinutes = weeklyMinutes;
-    }
-
-    public boolean isMarkMainEmployment() {
-        return markMainEmployment;
-    }
-
-    public void setMarkMainEmployment(boolean markMainEmployment) {
-        this.markMainEmployment = markMainEmployment;
     }
 }

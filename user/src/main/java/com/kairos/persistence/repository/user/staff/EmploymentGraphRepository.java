@@ -42,7 +42,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "case when unitPermission is NOT null then COLLECT(distinct unitPermission) else[] end as unitPermissions")
     List<ExpiredEmploymentsQueryResult> findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(List<Long> employmentIds);
 
-
     @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(employment:Employment) where id(staff) = {0} optional Match(employment)-[:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode)  return employment, reasonCode")
     EmploymentReasonCodeQueryResult findEmploymentreasonCodeByStaff(Long staffId);
 

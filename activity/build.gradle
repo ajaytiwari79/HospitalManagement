@@ -90,6 +90,16 @@ dependencies {
 
 }
 
+sonarqube {
+    properties {
+        property "sonar.projectName", "activity"
+        property "sonar.projectKey", "kairos:activity"
+        property "sonar.sources", "src/main"
+        property "sonar.skip.tests", "true"
+        property "sonar.exclusions", "**/*test*/**"
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

@@ -30,12 +30,12 @@ public class ActivityTagDTO {
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
-    private PermissionsActivityTab permissionsActivityTab;
     private LocalDate startDate;
     private LocalDate endDate;
     private TimeCalculationActivityTab timeCalculationActivityTab;
     private List<Long> dayTypes= new ArrayList<>();
     private RulesActivityTab rulesActivityTab;
+    private Boolean activityCanBeCopied=false;
 
     private Long parentId;
     private ActivityStateEnum state;
@@ -165,13 +165,7 @@ public class ActivityTagDTO {
         this.state = state;
     }
 
-    public PermissionsActivityTab getPermissionsActivityTab() {
-        return permissionsActivityTab;
-    }
 
-    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
-        this.permissionsActivityTab = permissionsActivityTab;
-    }
 
     public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
         return balanceSettingsActivityTab;
@@ -195,6 +189,14 @@ public class ActivityTagDTO {
 
     public void setRulesActivityTab(RulesActivityTab rulesActivityTab) {
         this.rulesActivityTab = rulesActivityTab;
+    }
+
+    public Boolean isActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
+        this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

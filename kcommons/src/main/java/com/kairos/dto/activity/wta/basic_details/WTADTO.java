@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateUtils;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -26,7 +28,8 @@ public class WTADTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long expiryDate;
-    @NotNull(message = "error.RuleTemplate.description.notnull")
+    @NotEmpty(message = "message.wta-base-rule-template.null-list")
+    @Valid
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;

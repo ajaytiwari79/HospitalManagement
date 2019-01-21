@@ -1,6 +1,7 @@
 package com.kairos.service.pay_table;
 
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
@@ -34,11 +35,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.management.timer.Timer.ONE_DAY;
 
 /**
@@ -75,7 +78,7 @@ public class PayTableService {
     private final Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
-    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
+    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, LocalDate startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
@@ -84,19 +87,19 @@ public class PayTableService {
 
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
         List<FunctionDTO> functions = functionGraphRepository.getFunctionsByOrganizationLevel(organizationLevelId);
-        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate);
+        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate.toString());
         PayTableResponse payTable = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
             for (PayTableResponse currentPayTable : payTableQueryResults) {
                 if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
-                        (new DateTime(currentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(currentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
-                        && (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                        (currentPayTable.getEndDateMillis().isAfter(startDate) || currentPayTable.getEndDateMillis().isEqual(startDate))
+                        && (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
                     payTable = currentPayTable;
                     break;
                 }
                 if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
-                        (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                        (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
                     payTable = currentPayTable;
                     break;
                 }
@@ -137,20 +140,20 @@ public class PayTableService {
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), payTableDTO.getPaymentUnit(), true);
         payTableGraphRepository.save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis(), payTable.getEndDateMillis() , payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
         return payTableResponse;
     }
 
 
-    private void validatePayLevel(PayTableResponse payTableToValidate, Date startDateMillis, Date endDateMillis) {
+    private void validatePayLevel(PayTableResponse payTableToValidate, LocalDate startDateMillis, LocalDate endDateMillis) {
         if (payTableToValidate.getEndDateMillis() != null) {
-            logger.info("new  startDate{}", new DateTime(startDateMillis).toLocalDate() + "  End date " + new DateTime(payTableToValidate.getEndDateMillis()).toLocalDate());
-            Days days = Days.daysBetween(new DateTime(startDateMillis).toLocalDate(), new DateTime(payTableToValidate.getEndDateMillis()).toLocalDate());
+            logger.info("new  startDate{}", startDateMillis + "  End date " + endDateMillis);
+            long days = DAYS.between(startDateMillis, payTableToValidate.getEndDateMillis());
             logger.info("difference in days" + days);
-            if (days.getDays() != -1) {
-                exceptionService.actionNotPermittedException("message.startdate.allowed", new DateTime(payTableToValidate.getEndDateMillis() + ONE_DAY));
+            if (days != -1) {
+                exceptionService.actionNotPermittedException("message.startdate.allowed",new DateTime(payTableToValidate.getEndDateMillis().plusDays(1)));
 
             }
         } else {
@@ -162,7 +165,7 @@ public class PayTableService {
     private void prepareDates(PayTable payTable, PayTableUpdateDTO payTableDTO) {
         if (!payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
             // The start date is modified Now We need to compare is it less than today
-            if (new DateTime(payTableDTO.getStartDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
+            if (payTableDTO.getStartDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
                 exceptionService.actionNotPermittedException("message.startdate.lessthan");
 
             }
@@ -177,7 +180,7 @@ public class PayTableService {
 
         // If already not present now its present    Previous its absent
         else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
-            if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
+            if (payTableDTO.getEndDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
                 exceptionService.actionNotPermittedException("message.endtdate.lessthan");
 
             }
@@ -187,7 +190,7 @@ public class PayTableService {
         // If already present and still present // NOw checking are they same or different
         else if (Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
             if (!payTable.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {//The end date is modified Now We need to compare is it less than today
-                if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
+                if (payTableDTO.getEndDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
                     exceptionService.actionNotPermittedException("message.endtdate.lessthan");
 
                 }
@@ -224,7 +227,7 @@ public class PayTableService {
         payTable.setPaymentUnit(payTableDTO.getPaymentUnit());
         prepareDates(payTable, payTableDTO);
         payTableGraphRepository.save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis(), payTable.getEndDateMillis(), payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
     }
@@ -515,8 +518,8 @@ public class PayTableService {
         return payGradeResponses;
     }
 
-    public List<PayTable> publishPayTable(Long payTableId, Long publishedDateMillis) {
-//        if(publishedDateMillis<DateUtils.getCurrentMillis()){
+    public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
+//        if(publishedDate.isBefore(LocalDate.now())){
 //            exceptionService.actionNotPermittedException("message.startdate.lessthan");
 //        }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
@@ -534,22 +537,28 @@ public class PayTableService {
         List<PayTable> response = new ArrayList<>();
 
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
-        logger.debug(new DateTime(payTable.getStartDateMillis()).toLocalDate() + "----" + (new DateTime(publishedDateMillis).toLocalDate()));
+        logger.debug(payTable.getStartDateMillis() + "----" + publishedDate);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
-            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDateMillis - ONE_DAY);
-            parentPayTable.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+            LocalDate endDate;
+            if(DateUtils.getLocalDate().equals(publishedDate)) {
+                endDate=publishedDate;
+            }else {
+                endDate=publishedDate.minusDays(1);
+            }
+            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), endDate.toString());
+            validatePayTableToPublish(payTableId,publishedDate);
+            parentPayTable.setEndDateMillis(endDate);
             parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
 
-        } else if (!new DateTime(payTable.getStartDateMillis()).toLocalDate().equals(new DateTime(publishedDateMillis).toLocalDate())) {
+        } else if (!payTable.getStartDateMillis().equals(publishedDate)) {
             exceptionService.actionNotPermittedException("message.paytable.published.samedate");
 
         }
         payTable.setPayTable(null);
         payTable.setPublished(true);
-        payTable.setStartDateMillis(new Date(publishedDateMillis));
-
+        payTable.setStartDateMillis(publishedDate);
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
         if(payTable.getPercentageValue()!=null && parentPayTable!=null){
@@ -562,7 +571,6 @@ public class PayTableService {
 
 
     public List<PayTableResponse> getPayTablesByOrganizationLevel(Long organizationLevelId) {
-
         return payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
     }
@@ -611,5 +619,9 @@ public class PayTableService {
 
     }
 
-
+    private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate){
+         if(payTableGraphRepository.existsByDate(payTableId,publishedDate.toString())){
+           exceptionService.actionNotPermittedException("published_pay_table.exists",publishedDate);
+        }
+    }
 }
