@@ -685,9 +685,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
 
     @Query("MATCH (org:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(org)={0} \n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]->(accountType:AccountType) WITH companyCategory,accountType, org\n" +
-            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org,hub \n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]->(accountType:AccountType) WITH companyCategory,accountType, org,hub \n" +
+            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType,hub \n" +
             "RETURN id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
             "org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
             "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId, id(hub) as hubId ")
