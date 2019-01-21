@@ -32,6 +32,8 @@ public class OrganizationBasicDTO {
     private Long unitTypeId;
     private boolean boardingCompleted;
     private boolean workcentre;
+    private Long hubId;
+
     public Long getId() {
         return id;
     }
@@ -182,5 +184,13 @@ public class OrganizationBasicDTO {
 
     public void setBoardingCompleted(boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
+    }
+
+    public Long getHubId() {
+        return hubId;
+    }
+
+    public void setHubId(Long hubId) {
+        this.hubId = hubId;
     }
 }

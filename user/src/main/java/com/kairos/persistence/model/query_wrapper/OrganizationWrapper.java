@@ -2,6 +2,7 @@ package com.kairos.persistence.model.query_wrapper;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.organization.group.GroupWrapper;
+import com.kairos.enums.OrganizationLevel;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class OrganizationWrapper {
     private List<OrganizationWrapper> children;
     private List<GroupWrapper> groups;
     private boolean isKairosHub;
+    private OrganizationLevel organizationLevel;
 
     public boolean isKairosHub() {
         return isKairosHub;
@@ -75,5 +77,13 @@ public class OrganizationWrapper {
 
     public void setGroups(List<GroupWrapper> groups) {
         this.groups = groups;
+    }
+
+    public OrganizationLevel getOrganizationLevel() {
+        return organizationLevel;
+    }
+
+    public void setOrganizationLevel(OrganizationLevel organizationLevel) {
+        this.organizationLevel = organizationLevel;
     }
 }
