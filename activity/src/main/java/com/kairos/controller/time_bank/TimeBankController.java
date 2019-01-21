@@ -66,7 +66,7 @@ public class TimeBankController {
     @ApiOperation("Update time bank after applying function")
     @PutMapping("/update_time_bank")
     public ResponseEntity<Map<String,Object>> updateTimeBank(@RequestParam Long unitPositionId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBank(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.updateTimeBankOnFunctionChange(unitPositionId,shiftStartDate,staffAdditionalInfoDTO));
     }
 
     @ApiOperation("Update time bank after modification of unitPositionLine")

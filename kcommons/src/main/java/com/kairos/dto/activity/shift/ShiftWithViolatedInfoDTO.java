@@ -2,6 +2,7 @@ package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
  */
 
 public class ShiftWithViolatedInfoDTO {
+    @Valid
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
 

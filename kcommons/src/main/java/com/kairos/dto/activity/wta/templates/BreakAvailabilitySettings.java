@@ -53,14 +53,15 @@ public class BreakAvailabilitySettings {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof BreakAvailabilitySettings)) return false;
         BreakAvailabilitySettings that = (BreakAvailabilitySettings) o;
-        return timeSlot == that.timeSlot;
+        return startAfterMinutes == that.startAfterMinutes &&
+                endBeforeMinutes == that.endBeforeMinutes &&
+                timeSlot == that.timeSlot;
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(timeSlot);
+        return Objects.hash(timeSlot, startAfterMinutes, endBeforeMinutes);
     }
 }

@@ -13,7 +13,6 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;

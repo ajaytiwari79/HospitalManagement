@@ -32,7 +32,6 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.ActivityUtil;
@@ -81,8 +80,6 @@ public class OrganizationActivityService extends MongoBaseService {
 
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private OrganizationRestClient organizationRestClient;
     @Inject
     private ActivityService activityService;
     @Inject
