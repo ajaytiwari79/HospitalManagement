@@ -32,7 +32,7 @@ public interface DayTypeGraphRepository extends Neo4jBaseRepository<DayType,Long
     @Query("Match (dayType:DayType{isEnabled:true}) where id(dayType) in {0} return dayType")
     List<DayType> getDayTypes(Set<Long> dayTypeIds);
 
-    @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(dayType:DayType {isEnabled:true}) where id(country)={0} AND id(dayType)<>{3} AND (dayType.name =~{1} OR dayType.code={2}) " +
+    @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(dayType:DayType {isEnabled:true}) WHERE id(country)={0} AND id(dayType)<>{3} AND (dayType.name =~{1} OR dayType.code={2}) " +
             " WITH count(dayType) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean dayTypeExistInCountryByNameOrCode(Long countryId, String name, int code, Long currentDayTypeId);
