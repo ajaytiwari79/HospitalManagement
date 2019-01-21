@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -110,11 +109,18 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getDayTypesAndEmploymentTypesAtUnit(unitId,false));
     }
 
-    @RequestMapping(value =COUNTRY_URL+"/staff_by_employment_type", method = RequestMethod.POST)
+    @RequestMapping(value =COUNTRY_URL+"/staff_by_kpi_filter", method = RequestMethod.POST)
     @ApiOperation("get staff by employment type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffByEmploymentType (@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getStaffByEmploymentTypeAndUnitId(staffEmploymentTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getStaffByKpiFilter(staffEmploymentTypeDTO));
+    }
+
+    @RequestMapping(value =COUNTRY_URL+"/kpi_default_data", method = RequestMethod.POST)
+    @ApiOperation("get staff by employment type")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getKpiDefaultData(@PathVariable Long countryId ,@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiDefaultDate(countryId,staffEmploymentTypeDTO));
     }
 
 
