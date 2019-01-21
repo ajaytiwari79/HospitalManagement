@@ -166,14 +166,12 @@ public class CompanyCreationService {
         organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
         Organization hubToBeLinked=organizationGraphRepository.findOne(orgDetails.getHubId(),0);
         if (hubToBeLinked==null){
-            exceptionService.actionNotPermittedException("No Any Hub found by provide Id");
+            exceptionService.dataNotFoundByIdException("message.hub.notFound",orgDetails.getHubId());
         }
         organizationGraphRepository.save(organization);
 
         //Linking organization to the selected hub
         organizationGraphRepository.linkOrganizationToHub(organization.getId(),hubToBeLinked.getId());
-
-
         orgDetails.setId(organization.getId());
         orgDetails.setKairosCompanyId(kairosCompanyId);
         return orgDetails;

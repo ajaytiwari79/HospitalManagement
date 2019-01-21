@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.UnionState;
 import com.kairos.enums.time_slot.TimeSlotMode;
@@ -28,8 +30,6 @@ import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeReso
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.utils.ZoneIdStringConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
@@ -41,11 +41,12 @@ import org.neo4j.ogm.annotation.typeconversion.EnumString;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 
 
 /**
