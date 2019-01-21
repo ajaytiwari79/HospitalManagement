@@ -760,7 +760,7 @@ public class AccessGroupService {
      * @Desc This api is used to fetch all access group by account type id in country.
      */
     public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId,String accessGroupRole) {
-        List<String> accessGroupRoles =isNotNull(accessGroupRole)?Arrays.asList(accessGroupRole):Arrays.asList(AccessGroupRole.MANAGEMENT.toString(),AccessGroupRole.STAFF.toString());
+        List<String> accessGroupRoles = isNotNull(accessGroupRole) ? Arrays.asList(accessGroupRole) : Arrays.asList(AccessGroupRole.MANAGEMENT.toString(), AccessGroupRole.STAFF.toString());
         return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId,accessGroupRoles);
     }
 
