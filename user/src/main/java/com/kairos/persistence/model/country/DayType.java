@@ -40,6 +40,18 @@ public class DayType  extends UserBaseEntity {
     public DayType() {
     }
 
+    public DayType(@NotBlank(message = "error.DayType.name.notEmpty") String name, @NotNull int code, String description, String colorCode, Country country, List<Day> validDays, boolean holidayType, boolean isEnabled, boolean allowTimeSettings) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.colorCode = colorCode;
+        this.country = country;
+        this.validDays = validDays;
+        this.holidayType = holidayType;
+        this.isEnabled = isEnabled;
+        this.allowTimeSettings = allowTimeSettings;
+    }
+
     public String getColorCode() {
         return colorCode;
     }
@@ -112,21 +124,4 @@ public class DayType  extends UserBaseEntity {
         this.holidayType = holidayType;
     }
 
-
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("description",this.description);
-        map.put("country",this.country.getName());
-        map.put("code",this.code);
-        map.put("colorCode",this.colorCode);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        map.put("allowTimeSettings",this.isAllowTimeSettings());
-        map.put("holidayType",this.isHolidayType());
-        map.put("validDays",this.getValidDays());
-        return map;
-    }
 }

@@ -146,8 +146,7 @@ public class CountryService {
      * @return
      */
     public Map<String, Object> updateCountry(Country country) {
-        String name = "(?i)" + country.getName();
-        List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry(name, country.getId());
+        List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry("(?i)" +country.getName(), country.getId());
         if (!duplicateCountryList.isEmpty()) {
             exceptionService.duplicateDataException("message.country.name.duplicate");
 
