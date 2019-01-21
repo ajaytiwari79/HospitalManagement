@@ -168,8 +168,12 @@ public class CompanyCreationService {
         if (hubToBeLinked==null){
             exceptionService.actionNotPermittedException("No Any Hub found by provide Id");
         }
-        organization.setHub(hubToBeLinked);
+        //organization.setHub(hubToBeLinked);
         organizationGraphRepository.save(organization);
+
+        //Linking organization to the selected hub
+        organizationGraphRepository.linkOrganizationToHub(organization.getId(),hubToBeLinked.getId());
+
 
         orgDetails.setId(organization.getId());
         orgDetails.setKairosCompanyId(kairosCompanyId);
