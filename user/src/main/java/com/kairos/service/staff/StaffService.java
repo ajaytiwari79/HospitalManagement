@@ -1321,7 +1321,7 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS=new ArrayList<>();
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
         if (allStaffRequired) {
             Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
             // unit is parent so fetching all staff from itself
