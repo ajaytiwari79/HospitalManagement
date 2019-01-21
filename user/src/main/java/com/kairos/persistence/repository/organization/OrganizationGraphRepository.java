@@ -776,8 +776,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(organization:Organization) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
     List<OrganizationWrapper> getAllHubByCountryId(Long countryId);
 
-    @Query("MATCH(organization:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) RETURN id(hub)")
-    Long getHubId(Long organizationId);
+    @Query("MATCH(organization:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(organization)={0}  RETURN id(hub)")
+    Long getHubIdByOrganizationId(Long organizationId);
 
 
 }

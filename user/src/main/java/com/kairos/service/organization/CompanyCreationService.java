@@ -640,7 +640,7 @@ public class CompanyCreationService {
                 activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
             }
         });
-        organizationQueryResult.setHubId(organizationGraphRepository.getHubId(organizationId));
+        organizationQueryResult.setHubId(organizationGraphRepository.getHubIdByOrganizationId(organizationId));
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
 
