@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -683,13 +684,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
 
 
-    @Query("MATCH (org:Organization) WHERE id(org)={0} \n" +
+    @Query("MATCH (org:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(org)={0} \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
             "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]->(accountType:AccountType) WITH companyCategory,accountType, org\n" +
             "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType\n" +
             "RETURN id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
             "org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
-            "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId")
+            "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId, id(hub) as hubId ")
     OrganizationBasicResponse getOrganizationDetailsById(Long organizationId);
 
     @Query("MATCH (organization:Organization) WHERE id(organization) IN {0} " +
@@ -769,8 +770,14 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 
     @Query("MATCH(organization:Organization),(hub:Organization) WHERE id(organization)={0} AND id(hub)={1} " +
-            "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]-(organization)  ")
+            "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]->(organization)  ")
     void linkOrganizationToHub(Long organizationId,Long hubId);
+
+    @Query("MATCH(organization:Organization) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
+    List<OrganizationWrapper> getAllHubByCountryId(Long countryId);
+
+    @Query("MATCH(organization:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) RETURN id(hub)")
+    Long getHubId(Long organizationId);
 
 
 }

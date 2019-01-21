@@ -1,2 +1,11 @@
 // Neo4j
 MATCH(pl:UnitPositionLine) set pl.hourlyCost=toString(pl.hourlyCost);
+
+MATCH(parentOrg:Organization) where parentOrg.isParentOrganization=true AND parentOrg.organizationLevel='CITY'
+MATCH(c:Organization) where c.organizationLevel='COUNTRY'
+CREATE UNIQUE(c)-[:HAS_SUB_ORGANIZATION]-(parentOrg);
+
+MATCH(region:Organization)-[r:HAS_SUB_ORGANIZATION]->(parentOrg:Organization) where parentOrg.isParentOrganization=true AND parentOrg.organizationLevel='CITY' AND region.organizationLevel='REGION'
+DETACH DELETE r;
+
+MATCH(region:Organization) where region.organizationLevel='REGION' DETACH delete region;

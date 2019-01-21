@@ -104,10 +104,6 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_SUB_ORGANIZATION)
     private List<Organization> children = new ArrayList<>();
 
-    @Relationship(type = BELONGS_TO_HUB)
-    private Organization hub;
-
-
     @Relationship(type = TYPE_OF)
     private OrganizationType organizationType;
 
@@ -951,11 +947,4 @@ public class Organization extends UserBaseEntity {
         this.sectors = sectors;
     }
 
-    public Organization getHub() {
-        return hub;
-    }
-
-    public void setHub(Organization hub) {
-        this.hub = hub;
-    }
 }
