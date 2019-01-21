@@ -471,15 +471,15 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     }
 
     //dashboard tab
-    public List<KPIDashboard> getKPIDashboardByIds(List<BigInteger> dashboardIds, ConfLevel level, Long refId){
+    public List<KPIDashboard> getKPIDashboardByIds(List<String> dashboardIds, ConfLevel level, Long refId){
         String queryField =getRefQueryField(level);
-        Query query=new Query(Criteria.where("_id").in(dashboardIds).and(queryField).is(refId));
+        Query query=new Query(Criteria.where("moduleId").in(dashboardIds).and(queryField).is(refId));
         return mongoTemplate.find(query,KPIDashboard.class);
     }
 
-    public List<KPIDashboardDTO> getKPIDashboard(List<BigInteger> dashBoardIds, ConfLevel level, Long refId){
+    public List<KPIDashboardDTO> getKPIDashboard(List<String> dashBoardIds, ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
-        Criteria matchCriteria = dashBoardIds == null ? Criteria.where(refQueryField).is(refId).and("level").is(level) : Criteria.where("_id").in(dashBoardIds).and(refQueryField).is(refId).and("level").is(level);
+        Criteria matchCriteria = dashBoardIds == null ? Criteria.where(refQueryField).is(refId).and("level").is(level) : Criteria.where("moduleId").in(dashBoardIds).and(refQueryField).is(refId).and("level").is(level);
         Query query=new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
     }

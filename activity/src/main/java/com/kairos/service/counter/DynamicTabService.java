@@ -35,8 +35,7 @@ public class DynamicTabService extends MongoBaseService {
             AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
             refId=accessGroupPermissionCounterDTO.getStaffId();
         }
-        List<KPIDashboardDTO> kpiDashboardDTOS=counterRepository.getKPIDashboard(null,level,refId);
-        return kpiDashboardDTOS;
+        return  counterRepository.getKPIDashboard(null,level,refId);
     }
 
     public List<KPIDashboardDTO> addDashboardTabToRef(Long unitId, Long countryId, List<KPIDashboardDTO> kpiDashboardDTOS, ConfLevel level) {
@@ -107,14 +106,14 @@ public class DynamicTabService extends MongoBaseService {
         List<KPIDashboardDTO> deletableDashboardTab = getExistingDashboardTab(dashboardTabs.getDeleteDashboardTab(), level, refId);
         List<KPIDashboardDTO> existingDashboardTab = getExistingDashboardTab(dashboardTabs.getUpdateDashboardTab(), level, refId);
         List<KPIDashboard> kpiDashboards=modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
-        List<BigInteger> deletableCategoryIds = deletableDashboardTab.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
+        List<String> deletableCategoryIds = deletableDashboardTab.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getModuleId()).collect(Collectors.toList());
        // counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
-        counterRepository.removeAll("id", deletableCategoryIds, KPIDashboard.class);
+        counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
     private List<KPIDashboardDTO> getExistingDashboardTab(List<KPIDashboardDTO> dashboardTabs, ConfLevel level, Long refId){
         if(dashboardTabs.isEmpty()) return new ArrayList<>();
-        List<BigInteger> dashboardIds = dashboardTabs.stream().map(KPIDashboardDTO::getId).collect(Collectors.toList());
+        List<String> dashboardIds = dashboardTabs.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<KPIDashboardDTO> dashboardDTOs = counterRepository.getKPIDashboard(dashboardIds, level, refId);
         if(dashboardTabs.size() != dashboardDTOs.size()){
             exceptionService.invalidOperationException("error.kpi.invalidData");
@@ -125,11 +124,11 @@ public class DynamicTabService extends MongoBaseService {
         if(existingAssignmentDTOs.isEmpty()){
             return new ArrayList<>();
         }
-        Map<BigInteger, KPIDashboardDTO> dashboardDTOMapById = changedDashboardTabs.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
-        List<BigInteger> categoriesIds = changedDashboardTabs.stream().map(kpiDashboardDTO  -> kpiDashboardDTO.getId()).collect(Collectors.toList());
+        Map<String, KPIDashboardDTO> dashboardDTOMapById = changedDashboardTabs.parallelStream().collect(Collectors.toMap(KPIDashboardDTO::getModuleId, kPICategoryDTO -> kPICategoryDTO));
+        List<String> categoriesIds = changedDashboardTabs.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<KPIDashboard> kpiDashboards = counterRepository.getKPIDashboardByIds(categoriesIds, level, refId);
         for( KPIDashboard kpiDashboard : kpiDashboards){
-            KPIDashboardDTO kpiDashboardDTO = dashboardDTOMapById.get(kpiDashboard.getId());
+            KPIDashboardDTO kpiDashboardDTO = dashboardDTOMapById.get(kpiDashboard.getModuleId());
             if(!kpiDashboardDTO.getName().equals(kpiDashboard.getName())){
                 kpiDashboard.setName(kpiDashboardDTO.getName());
             }
