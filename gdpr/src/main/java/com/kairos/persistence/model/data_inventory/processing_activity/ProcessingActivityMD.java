@@ -73,7 +73,7 @@ public class ProcessingActivityMD extends BaseEntity {
 
    private boolean active = true;
 
-    @OneToMany(mappedBy = "processingActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RiskMD> risks  = new ArrayList<RiskMD>();
     private boolean suggested;
 

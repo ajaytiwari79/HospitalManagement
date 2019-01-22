@@ -4,9 +4,13 @@ package com.kairos.response.dto.common;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.enums.RiskSeverity;
+import com.kairos.persistence.model.risk_management.RiskMD;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
+import com.kairos.response.dto.master_data.AssetTypeDTO;
 
+import javax.persistence.ConstructorResult;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -23,7 +27,7 @@ public class RiskResponseDTO {
     private int daysToReminderBefore;
     private RiskSeverity riskLevel;
     private Staff riskOwner;
-    private AssetTypeBasicResponseDTO assetType;
+    private AssetTypeDTO assetType;
     private ProcessingActivityBasicDTO processingActivity;
 
 
@@ -63,12 +67,50 @@ public class RiskResponseDTO {
 
     public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
 
-    public AssetTypeBasicResponseDTO getAssetType() { return assetType; }
+    public AssetTypeDTO getAssetType() { return assetType; }
 
-    public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType;}
+    public void setAssetType(AssetTypeDTO assetType) { this.assetType = assetType;}
 
 
     public ProcessingActivityBasicDTO getProcessingActivity() { return processingActivity; }
 
     public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
+
+    public RiskResponseDTO(BigInteger id, String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, RiskSeverity riskLevel, AssetTypeDTO assetType, ProcessingActivityBasicDTO processingActivity) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.isReminderActive = isReminderActive;
+        this.daysToReminderBefore = daysToReminderBefore;
+        this.riskLevel = riskLevel;
+        this.assetType = assetType;
+        this.processingActivity = processingActivity;
+    }
+
+    public RiskResponseDTO(BigInteger id, String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore, RiskSeverity riskLevel, String processingActivityName, BigInteger processingActivityId, boolean isSubProcessing) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.isReminderActive = isReminderActive;
+        this.daysToReminderBefore = daysToReminderBefore;
+        this.riskLevel = riskLevel;
+        this.processingActivity = new ProcessingActivityBasicDTO(processingActivityId, processingActivityName,isSubProcessing);
+    }
+
+    public RiskResponseDTO(BigInteger id ,String name, String description, String riskRecommendation, boolean isReminderActive, int daysToReminderBefore,/*, int riskLevel*/ String processingActivityName, BigInteger processingActivityId, boolean isSubProcessing){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.isReminderActive = isReminderActive;
+        this.daysToReminderBefore = daysToReminderBefore;
+        //this.riskLevel = RiskSeverity.valueOf(riskLevel);
+         this.processingActivity = new ProcessingActivityBasicDTO(processingActivityId, processingActivityName,isSubProcessing);
+    }
+
+    public RiskResponseDTO(){
+
+    }
 }

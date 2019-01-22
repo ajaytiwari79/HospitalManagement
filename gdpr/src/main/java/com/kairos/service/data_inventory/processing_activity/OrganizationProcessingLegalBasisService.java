@@ -9,6 +9,7 @@ import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasisMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -16,6 +17,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -44,7 +46,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
 
     /**
      * @param organizationId
@@ -112,13 +114,13 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingLegalBasis(Long unitId, BigInteger legalBasisId) {
+    public Boolean deleteProcessingLegalBasis(Long unitId, Long legalBasisId) {
 
-        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Legal basis", StringUtils.join(processingActivities, ','));
         }
-        //processingLegalBasisRepository.safeDeleteById(legalBasisId);
+        processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, unitId);
         return true;
     }
 

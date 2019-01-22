@@ -8,6 +8,7 @@ import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -46,6 +47,9 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     @Inject
     private ProcessingActivityMongoRepository processingActivityMongoRepository;
+
+    @Inject
+    private ProcessingActivityRepository processingActivityRepository;
 
 
     /**
@@ -120,13 +124,13 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteResponsibilityType(Long unitId, BigInteger responsibilityTypeId) {
+    public Boolean deleteResponsibilityType(Long unitId, Long responsibilityTypeId) {
 
-        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
-                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", StringUtils.join(processingActivities, ','));
         }
-        //responsibilityTypeRepository.safeDeleteById(responsibilityTypeId) ;
+        responsibilityTypeRepository.deleteByIdAndOrganizationId(responsibilityTypeId, unitId);
         return true;
     }
 

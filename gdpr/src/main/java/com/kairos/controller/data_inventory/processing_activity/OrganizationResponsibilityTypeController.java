@@ -66,7 +66,7 @@ public class OrganizationResponsibilityTypeController {
 
     @ApiOperation("delete ResponsibilityType  by id")
     @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
-    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger responsibilityTypeId) {
+    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long unitId, @PathVariable Long responsibilityTypeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

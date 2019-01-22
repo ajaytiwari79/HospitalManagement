@@ -20,11 +20,11 @@ public class MasterAgreementTemplateDTO extends AgreementTemplateDTO{
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationTypeDTO> organizationTypeDTOS = new ArrayList<>();
+    private List<OrganizationTypeDTO> organizationTypes = new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS = new ArrayList<>();
+    private List<OrganizationSubTypeDTO> organizationSubTypes = new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
@@ -39,17 +39,17 @@ public class MasterAgreementTemplateDTO extends AgreementTemplateDTO{
     @NotEmpty(message = "error.message.accountType.not.Selected")
     private List<AccountTypeVO> accountTypes=new ArrayList<>();
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; }
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;

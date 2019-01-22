@@ -66,7 +66,7 @@ public class OrganizationTransferMethodController {
 
     @ApiOperation("delete transfer Method by id")
     @DeleteMapping("/transfer_method/{transferMethodId}")
-    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger transferMethodId) {
+    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long unitId, @PathVariable Long transferMethodId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

@@ -75,7 +75,7 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("update master agreement template basic details")
     @PutMapping(COUNTRY_URL+"/agreement_template/{agreementTemplateId}")
-    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @Validated @RequestBody MasterAgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long countryId, @PathVariable Long agreementTemplateId, @Validated @RequestBody MasterAgreementTemplateDTO agreementTemplateDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(countryId,false, agreementTemplateId, agreementTemplateDto));
 
     }
@@ -132,7 +132,7 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("update  agreement template basic details , unit level ")
     @PutMapping(UNIT_URL+"/agreement_template/{agreementTemplateId}")
-    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> updateAgreementTemplate(@PathVariable Long unitId, @PathVariable BigInteger agreementTemplateId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> updateAgreementTemplate(@PathVariable Long unitId, @PathVariable Long agreementTemplateId, @Validated @RequestBody AgreementTemplateDTO agreementTemplateDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(unitId,true, agreementTemplateId, agreementTemplateDto));
 
     }

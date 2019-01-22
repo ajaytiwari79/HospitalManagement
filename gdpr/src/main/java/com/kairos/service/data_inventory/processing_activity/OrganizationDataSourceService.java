@@ -9,6 +9,7 @@ import com.kairos.dto.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSourceMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -16,6 +17,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -46,7 +48,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
     private DataSourceService dataSourceService;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
 
 
     /**
@@ -115,13 +117,13 @@ public class OrganizationDataSourceService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataSource(Long unitId, BigInteger dataSourceId) {
+    public Boolean deleteDataSource(Long unitId, Long dataSourceId) {
 
-        List<ProcessingActivityBasicDTO>  processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
+        List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource",new StringBuilder(processingActivitiesLinkedWithDataSource.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
         }
-       //dataSourceRepository.safeDeleteById(dataSourceId);
+       dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, unitId);
         return true;
     }
 

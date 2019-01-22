@@ -9,13 +9,13 @@ import java.math.BigInteger;
 public class ClauseCkEditorVO {
 
 
-    private BigInteger id;
+    private Long id;
     private String titleHtml;
     private String descriptionHtml;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getTitleHtml() { return titleHtml; }
 
@@ -25,7 +25,7 @@ public class ClauseCkEditorVO {
 
     public void setDescriptionHtml(String descriptionHtml) { this.descriptionHtml = descriptionHtml; }
 
-    public ClauseCkEditorVO(BigInteger id, String titleHtml, String descriptionHtml) {
+    public ClauseCkEditorVO(Long id, String titleHtml, String descriptionHtml) {
         this.id = id;
         this.titleHtml = titleHtml;
         this.descriptionHtml = descriptionHtml;

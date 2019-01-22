@@ -98,7 +98,6 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         }
         for (OrganizationLevelRiskDTO assetTypeRisk : assetTypeDto.getRisks()) {
             RiskMD risk = new RiskMD(assetTypeRisk.getName(), assetTypeRisk.getDescription(), assetTypeRisk.getRiskRecommendation(), assetTypeRisk.getRiskLevel());
-            risk.setAssetType(assetType);
             assetTypeRisks.add(risk);
         }
         assetType.setRisks(assetTypeRisks);
@@ -122,7 +121,6 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             assetSubType.setHasSubAsset(false);
             for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
                 RiskMD risk = new RiskMD(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel());
-                risk.setAssetType(assetSubType);
                 subAssetRisks.add(risk);
             }
             assetSubType.setRisks(subAssetRisks);
@@ -283,10 +281,8 @@ public class OrganizationAssetTypeService extends MongoBaseService {
                 assetTypeRisk.setDescription(basicRiskDTO.getDescription());
                 assetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
                 assetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-                assetTypeRisk.setAssetType(assetType);
                 assetTypeNewRiskDto.get(assetTypeRisk.getId()).forEach(newRisk -> {
                     RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-                    risk.setAssetType(assetType);
                     assetType.getRisks().add(risk);
                 });
             });
@@ -324,7 +320,6 @@ public class OrganizationAssetTypeService extends MongoBaseService {
                 assetSubType.setAssetType(assetTypeMD);
                 for (OrganizationLevelRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks()) {
                     RiskMD risk = new RiskMD(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel());
-                    risk.setAssetType(assetSubType);
                     subAssetRisks.add(risk);
                 }
                 assetSubType.setRisks(subAssetRisks);
@@ -343,12 +338,10 @@ public class OrganizationAssetTypeService extends MongoBaseService {
                     subAssetTypeRisk.setDescription(basicRiskDTO.getDescription());
                     subAssetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
                     subAssetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-                    subAssetTypeRisk.setAssetType(subAssetType);
                 });
             }
             subAssetTypeNewRiskDto.get(subAssetType.getId()).forEach(newRisk -> {
                 RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-                risk.setAssetType(subAssetType);
                 subAssetType.getRisks().add(risk);
             });
             subAssetTypes.add(subAssetType);
@@ -406,24 +399,14 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @description - Remove risk id from asset type and soft deleted risk
      */
     public boolean unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(Long unitId, Long assetTypeId, Long riskId) {
-
-        Integer updateCount = riskRepository.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(riskId, assetTypeId,unitId);
+        //TODO
+        /*Integer updateCount = riskRepository.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(riskId, assetTypeId,unitId);
         if (updateCount <= 0) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetTypeId);
         }else{
             LOGGER.info("Data updated successfully.");
-        }
-        /*List<RiskMD> risks = assetType.getRisks();
-        RiskMD risk = risks.stream().filter(riskMD -> riskId.equals(riskMD.getId())).findAny().orElse(null);
-        if(!risks.isEmpty()){
-            risks.remove(risk);
-        };
-        if(risk != null) {
-            risk.delete();
-            riskRepository.save(risk);
-        }
-        assetType.setRisks(risks);
-        assetTypeRepository.save(assetType);*/
+        }*/
+
         return true;
     }
 

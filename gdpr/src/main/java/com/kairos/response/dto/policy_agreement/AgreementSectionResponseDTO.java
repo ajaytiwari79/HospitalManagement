@@ -14,15 +14,15 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
-    private List<BigInteger> clauseIdOrderedIndex;
+    /*private List<BigInteger> clauseIdOrderedIndex;
     private List<ClauseBasicResponseDTO> clauses;
-    private List<ClauseCkEditorVO> clauseCkEditorVOS;
+    private List<ClauseCkEditorVO> clauseCkEditorVOS;*/
     private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
@@ -33,15 +33,16 @@ public class AgreementSectionResponseDTO {
         this.orderedIndex = orderedIndex;
     }
 
-    public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
+    /*public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
 
     public void setClauseIdOrderedIndex(List<BigInteger> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }
 
-    public BigInteger getId() {
+    */
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -53,13 +54,13 @@ public class AgreementSectionResponseDTO {
         this.subSections = subSections;
     }
 
-    public List<ClauseBasicResponseDTO> getClauses() {
+    /*public List<ClauseBasicResponseDTO> getClauses() {
         return clauses;
     }
 
     public void setClauses(List<ClauseBasicResponseDTO> clauses) {
         this.clauses = clauses;
-    }
+    }*/
 
     public String getTitle() {
         return title;
@@ -69,10 +70,10 @@ public class AgreementSectionResponseDTO {
         this.title = title;
     }
 
-    public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+   /* public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
 
     public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
-
+*/
     public String getTitleHtml() { return titleHtml; }
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }

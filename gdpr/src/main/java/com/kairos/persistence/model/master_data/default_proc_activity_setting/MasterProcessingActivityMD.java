@@ -3,7 +3,10 @@ package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.master_data.default_asset_setting.*;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
 import com.kairos.persistence.model.risk_management.RiskMD;
 
 import javax.persistence.*;
@@ -31,7 +34,7 @@ public class MasterProcessingActivityMD extends BaseEntity {
     @ElementCollection
     private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
 
-    @OneToMany(mappedBy = "processingActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RiskMD> risks  = new ArrayList<RiskMD>();
 
     @ManyToOne

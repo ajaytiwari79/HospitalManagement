@@ -1,21 +1,16 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationSubType;
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationType;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class DataSubjectMappingMD extends BaseEntity {

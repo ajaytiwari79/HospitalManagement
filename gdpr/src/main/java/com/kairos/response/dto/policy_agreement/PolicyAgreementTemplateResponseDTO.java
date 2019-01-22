@@ -15,15 +15,15 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyAgreementTemplateResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private String description;
     private List<AccountTypeVO> accountTypes;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
-    private List<BigInteger> sections;
+    private List<AgreementSectionResponseDTO> sections;
 
     private TemplateTypeResponseDTO templateType;
 
@@ -35,11 +35,11 @@ public class PolicyAgreementTemplateResponseDTO {
         this.templateType = templateType;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -63,24 +63,24 @@ public class PolicyAgreementTemplateResponseDTO {
 
     public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 
-    public List<BigInteger> getSections() { return sections; }
+    public List<AgreementSectionResponseDTO> getSections() { return sections; }
 
-    public void setSections(List<BigInteger> sections) { this.sections = sections; }
+    public void setSections(List<AgreementSectionResponseDTO> sections) { this.sections = sections; }
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {

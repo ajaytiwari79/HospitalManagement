@@ -5,24 +5,20 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorPartyMD;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +38,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
 
     @Inject
     private AccessorPartyRepository accessorPartyRepository;
@@ -109,13 +105,13 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
+    public Boolean deleteAccessorParty(Long unitId, Long accessorPartyId) {
 
-        List<ProcessingActivityBasicDTO> processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        List<String> processingActivitiesLinkedWithAccessorParty = processingActivityRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", new StringBuilder(processingActivitiesLinkedWithAccessorParty.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
         }
-        //accessorPartyRepository.safeDeleteById(accessorPartyId);
+        accessorPartyRepository.deleteByIdAndOrganizationId(accessorPartyId, unitId);
         return true;
     }
 

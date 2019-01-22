@@ -82,25 +82,12 @@ public class AssetTypeService extends MongoBaseService {
             assetType.setHasSubAsset(true);
             assetType.setSubAssetTypes(subAssetTypeList);
         }
-        for(BasicRiskDTO assetTypeRisk : assetTypeDto.getRisks())
+       /* for(BasicRiskDTO assetTypeRisk : assetTypeDto.getRisks())
         {
             RiskMD risk = new RiskMD(assetTypeRisk.getName(), assetTypeRisk.getDescription(), assetTypeRisk.getRiskRecommendation(), assetTypeRisk.getRiskLevel());
-            risk.setAssetType(assetType);
             assetTypeRisks.add(risk);
-        }
-        /*Map<AssetTypeMD, List<RiskMD>> riskIdsCorrespondingToAssetAndSubAssetType;
-        if (CollectionUtils.isNotEmpty(riskRelatedToAssetTypeAndSubAssetType.entrySet().stream().map(Map.Entry::getValue).flatMap(List::stream).collect(Collectors.toList()))) {
-            riskIdsCorrespondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskRelatedToAssetTypeAndSubAssetType);
-            for (AssetTypeMD subAssetType : subAssetTypeList) {
-                subAssetType.setRisks(riskIdsCorrespondingToAssetAndSubAssetType.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toSet()));
-            }
-            if (riskIdsCorrespondingToAssetAndSubAssetType.containsKey(assetType))
-                assetType.setRisks(riskIdsCorrespondingToAssetAndSubAssetType.get(assetType).stream().map(Risk::getId).collect(Collectors.toSet()));
-        }
-        if (!subAssetTypeList.isEmpty()) {
-            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-            assetType.setSubAssetTypes(subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toSet()));
         }*/
+        assetTypeRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(assetTypeDto.getRisks(), RiskMD.class);
         assetType.setRisks(assetTypeRisks);
         assetTypeRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
@@ -121,12 +108,14 @@ public class AssetTypeService extends MongoBaseService {
             AssetTypeMD assetSubType = new AssetTypeMD(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
             assetSubType.setSubAssetType(true);
             assetSubType.setAssetType(assetTypeMD);
-            for(BasicRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks())
+           /* for(BasicRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks())
             {
                 RiskMD risk = new RiskMD(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel() );
                 risk.setAssetType(assetSubType);
                 subAssetRisks.add(risk);
-            }
+            }*/
+            subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), RiskMD.class);
+            assetSubType.setRisks(subAssetRisks);
             assetSubType.setRisks(subAssetRisks);
             subAssetTypes.add(assetSubType);
         }
@@ -146,7 +135,6 @@ public class AssetTypeService extends MongoBaseService {
         Map<Long, BasicRiskDTO> subAssetTypeExistingRiskDtoCorrespondingToIds = new HashMap<>();
         Map<Long, List<BasicRiskDTO>> subAssetTypeNewRiskDto = new HashMap<>();
         List<AssetTypeMD> subAssetTypes = new ArrayList<>();
-        List<RiskMD> subAssetRisks = new ArrayList<>();
         subAssetTypesDto.forEach(subAssetTypeDto -> {
             if (Optional.ofNullable(subAssetTypeDto.getId()).isPresent()) {
                 subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
@@ -162,12 +150,13 @@ public class AssetTypeService extends MongoBaseService {
                 AssetTypeMD assetSubType = new AssetTypeMD(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
                 assetSubType.setSubAssetType(true);
                 assetSubType.setAssetType(assetTypeMD);
-                for(BasicRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks())
+               /* for(BasicRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks())
                 {
                     RiskMD risk = new RiskMD(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel() );
                     risk.setAssetType(assetSubType);
                     subAssetRisks.add(risk);
-                }
+                }*/
+                List<RiskMD>  subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), RiskMD.class);
                 assetSubType.setRisks(subAssetRisks);
                 subAssetTypes.add(assetSubType);
             }
@@ -184,12 +173,12 @@ public class AssetTypeService extends MongoBaseService {
                 subAssetTypeRisk.setDescription(basicRiskDTO.getDescription());
                 subAssetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
                 subAssetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-                subAssetTypeRisk.setAssetType(subAssetType);
+               // subAssetTypeRisk.setAssetType(subAssetType);
             });
             }
             subAssetTypeNewRiskDto.get(subAssetType.getId()).forEach( newRisk -> {
                 RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel() );
-                risk.setAssetType(subAssetType);
+               // risk.setAssetType(subAssetType);
                 subAssetType.getRisks().add(risk);
             });
             subAssetTypes.add(subAssetType);
@@ -334,10 +323,10 @@ public class AssetTypeService extends MongoBaseService {
                 assetTypeRisk.setDescription(basicRiskDTO.getDescription());
                 assetTypeRisk.setRiskRecommendation(basicRiskDTO.getRiskRecommendation());
                 assetTypeRisk.setRiskLevel(basicRiskDTO.getRiskLevel());
-                assetTypeRisk.setAssetType(assetType);
+               // assetTypeRisk.setAssetType(assetType);
                 assetTypeNewRiskDto.get(assetTypeRisk.getId()).forEach(newRisk -> {
                     RiskMD risk = new RiskMD(newRisk.getName(), newRisk.getDescription(), newRisk.getRiskRecommendation(), newRisk.getRiskLevel());
-                    risk.setAssetType(assetType);
+                    //risk.setAssetType(assetType);
                     assetType.getRisks().add(risk);
                 });
             });

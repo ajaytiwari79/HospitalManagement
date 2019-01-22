@@ -30,14 +30,14 @@ public class AssetTypeMD extends BaseEntity {
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
 
-    @OneToMany(mappedBy = "assetType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RiskMD> risks  = new ArrayList<RiskMD>();
 
     @ManyToOne
     @JoinColumn(name="assetType_id")
     private AssetTypeMD assetType;
 
-    @OneToMany(mappedBy="assetType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AssetTypeMD> subAssetTypes=new ArrayList<AssetTypeMD>();
 
 

@@ -8,19 +8,40 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessingActivityBasicDTO {
 
-    private BigInteger id;
-    private String name;
-    private boolean subProcess;
+    private BigInteger processingActivityId;
+    private String processingActivityName;
+    private boolean subProcessingActivity;
 
-    public boolean isSubProcess() { return subProcess; }
+    public BigInteger getProcessingActivityId() {
+        return processingActivityId;
+    }
 
-    public void setSubProcess(boolean subProcess) { this.subProcess = subProcess; }
+    public void setProcessingActivityId(BigInteger processingActivityId) {
+        this.processingActivityId = processingActivityId;
+    }
 
-    public BigInteger getId() { return id; }
+    public String getProcessingActivityName() {
+        return processingActivityName;
+    }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setProcessingActivityName(String processingActivityName) {
+        this.processingActivityName = processingActivityName;
+    }
 
-    public String getName() { return name; }
+    public boolean isSubProcessingActivity() {
+        return subProcessingActivity;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public void setSubProcessingActivity(boolean subProcessingActivity) {
+        this.subProcessingActivity = subProcessingActivity;
+    }
+
+    public ProcessingActivityBasicDTO() {
+    }
+
+    public ProcessingActivityBasicDTO(BigInteger processingActivityId, String processingActivityName, boolean subProcessingActivity) {
+        this.processingActivityId = processingActivityId;
+        this.processingActivityName = processingActivityName;
+        this.subProcessingActivity = subProcessingActivity;
+    }
 }

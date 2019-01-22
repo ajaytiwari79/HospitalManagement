@@ -65,7 +65,7 @@ public class OrganizationDataSourceController {
 
     @ApiOperation("delete dataSource  by id")
     @DeleteMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> deleteDataSource(@PathVariable Long unitId, @PathVariable BigInteger dataSourceId) {
+    public ResponseEntity<Object> deleteDataSource(@PathVariable Long unitId, @PathVariable Long dataSourceId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 

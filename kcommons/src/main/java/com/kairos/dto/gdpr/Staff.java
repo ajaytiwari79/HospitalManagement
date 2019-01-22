@@ -12,16 +12,17 @@ import java.util.Objects;
 public class Staff {
 
     @NotNull
-    private Long id;
+    private Long staffId;
+
 
     private String lastName;
 
     @NotBlank(message = "Staff Name can't be empty ")
     private String firstName;
 
-    public Long getId() { return id; }
+    public Long getId() { return staffId; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) { this.staffId = id; }
 
 
     public String getLastName() {
@@ -37,7 +38,7 @@ public class Staff {
     public void setFirstName(String firstName) { this.firstName = firstName; }
 
     public Staff(Long id,String lastName, String firstName) {
-        this.id = id;
+        this.staffId = id;
         this.lastName = lastName;
         this.firstName = firstName;
     }
@@ -47,7 +48,7 @@ public class Staff {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Staff staff = (Staff) o;
-        return Objects.equals(id, staff.id) &&
+        return Objects.equals(staffId, staff.staffId) &&
                 Objects.equals(lastName, staff.lastName) &&
                 Objects.equals(firstName, staff.firstName);
     }
@@ -55,7 +56,7 @@ public class Staff {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, lastName, firstName);
+        return Objects.hash(staffId, lastName, firstName);
     }
 
     public Staff() {

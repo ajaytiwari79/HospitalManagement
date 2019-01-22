@@ -5,7 +5,9 @@ import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
+import com.kairos.persistence.repository.risk_management.RiskDaoImpl;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
+import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.RiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -30,6 +32,11 @@ public class RiskService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private RiskRepository riskRepository;
+
+    @Inject
+    private RiskDaoImpl riskDaoImpl;
 
     /**
      * @param <E>                  E here represent List of RISK DTO which extends Basic RISK DTO   {basic risk DTO is used at countryLevel and Organization RISK DTO used at organization level}
@@ -150,7 +157,7 @@ public class RiskService extends MongoBaseService {
 
 
     public List<RiskResponseDTO> getAllRiskByUnitId(Long unitId) {
-        return riskMongoRepository.getAllRiskByUnitId(unitId);
+        return riskDaoImpl.getAllRiskOfOrganizationId(unitId);
     }
 
     /**

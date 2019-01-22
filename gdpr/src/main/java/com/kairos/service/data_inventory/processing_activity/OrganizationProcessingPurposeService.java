@@ -8,6 +8,7 @@ import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurposeMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
@@ -15,6 +16,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -44,7 +46,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
     private ProcessingPurposeService processingPurposeService;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
 
 
     /**
@@ -116,13 +118,13 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingPurpose(Long unitId, BigInteger processingPurposeId) {
+    public Boolean deleteProcessingPurpose(Long unitId, Long processingPurposeId) {
 
-        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", StringUtils.join(processingActivities,','));
         }
-        //processingPurposeRepository.safeDeleteById(processingPurposeId);
+        processingPurposeRepository.deleteByIdAndOrganizationId(processingPurposeId, unitId);
         return true;
     }
 

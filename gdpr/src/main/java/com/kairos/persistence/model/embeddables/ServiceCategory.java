@@ -1,9 +1,8 @@
-package com.kairos.persistence.model.master_data.default_asset_setting;
+package com.kairos.persistence.model.embeddables;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.inject.Inject;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class SubServiceCategory {
+public class ServiceCategory {
 
     @NotNull(message = "id can't be null")
     private Long id;
@@ -35,10 +34,10 @@ public class SubServiceCategory {
         this.name = name;
     }
 
-    public SubServiceCategory() {
+    public ServiceCategory() {
     }
 
-    public SubServiceCategory(@NotNull(message = "id can't be null") Long id, String name) {
+    public ServiceCategory(@NotNull(message = "id can't be null") Long id, String name) {
         this.id = id;
         this.name = name;
     }

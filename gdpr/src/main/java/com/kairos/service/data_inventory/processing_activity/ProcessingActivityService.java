@@ -163,9 +163,6 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivityRisk.setDescription(organizationLevelRiskDTO.getDescription());*/
             risks.add(ObjectMapperUtils.copyPropertiesByMapper(organizationLevelRiskDTO, RiskMD.class));
         });
-        risks.forEach( risk ->{
-            risk.setProcessingActivity(processingActivity);
-        });
         return risks;
     }
 

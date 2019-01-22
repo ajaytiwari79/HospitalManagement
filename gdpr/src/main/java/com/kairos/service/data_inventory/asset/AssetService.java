@@ -203,7 +203,6 @@ public class AssetService extends MongoBaseService {
         risks.forEach( risk ->{
             if (!Optional.ofNullable(risk.getId()).isPresent()) {
                 RiskMD assetTypeRisk = new RiskMD(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
-                assetTypeRisk.setAssetType(assetType);
                 assetTypeRisks.add(assetTypeRisk);
             }else{
                 RiskMD  existingRisk = riskRepository.getOne(risk.getId());

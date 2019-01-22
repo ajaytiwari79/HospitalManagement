@@ -63,7 +63,7 @@ public class OrganizationProcessingLegalBasisController {
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
     @DeleteMapping("/legal_basis/{legalBasisId}")
-    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long unitId, @PathVariable BigInteger legalBasisId) {
+    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long unitId, @PathVariable Long legalBasisId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

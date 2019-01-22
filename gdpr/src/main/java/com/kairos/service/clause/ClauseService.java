@@ -11,13 +11,10 @@ import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
-import com.kairos.persistence.model.clause.Clause;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.persistence.model.clause.ClauseMD;
-import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.clause_tag.ClauseTagMD;
-import com.kairos.persistence.model.master_data.default_asset_setting.*;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivityMD;
+import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
@@ -28,7 +25,6 @@ import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
@@ -40,9 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service

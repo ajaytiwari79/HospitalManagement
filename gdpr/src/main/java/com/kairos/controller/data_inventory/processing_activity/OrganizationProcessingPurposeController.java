@@ -66,7 +66,7 @@ public class OrganizationProcessingPurposeController {
 
     @ApiOperation("delete processing purpose by id")
     @DeleteMapping("/processing_purpose/{processingPurposeId}")
-    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long unitId, @PathVariable BigInteger processingPurposeId) {
+    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long unitId, @PathVariable Long processingPurposeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

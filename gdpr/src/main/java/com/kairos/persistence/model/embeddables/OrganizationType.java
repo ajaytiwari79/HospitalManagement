@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.master_data.default_asset_setting;
+package com.kairos.persistence.model.embeddables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

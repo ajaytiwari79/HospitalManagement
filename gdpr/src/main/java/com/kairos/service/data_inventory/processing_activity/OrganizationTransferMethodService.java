@@ -8,6 +8,7 @@ import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethodMD;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
@@ -46,7 +47,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
     private TransferMethodService transferMethodService;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
 
     /**
      * @param organizationId
@@ -118,13 +119,13 @@ public class OrganizationTransferMethodService extends MongoBaseService {
     }
 
 
-    public Boolean deleteTransferMethod(Long unitId, BigInteger transferMethodId) {
+    public Boolean deleteTransferMethod(Long unitId, Long transferMethodId) {
 
-        List<ProcessingActivityBasicDTO> processingActivitiesLinkedWithTransferMethod = processingActivityMongoRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
+        List<String> processingActivitiesLinkedWithTransferMethod = processingActivityRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", new StringBuilder(processingActivitiesLinkedWithTransferMethod.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", StringUtils.join(processingActivitiesLinkedWithTransferMethod, ','));
         }
-        //transferMethodRepository.safeDeleteById(transferMethodId);
+        transferMethodRepository.deleteByIdAndOrganizationId(transferMethodId, unitId);
         return true;
     }
 

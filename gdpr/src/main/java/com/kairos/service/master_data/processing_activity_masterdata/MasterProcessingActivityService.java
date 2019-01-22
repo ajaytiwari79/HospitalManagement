@@ -10,11 +10,10 @@ import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityMD;
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationSubType;
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationType;
-import com.kairos.persistence.model.master_data.default_asset_setting.ServiceCategory;
-import com.kairos.persistence.model.master_data.default_asset_setting.SubServiceCategory;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivityMD;
@@ -28,7 +27,6 @@ import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
-import com.mongodb.MongoClientException;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +38,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-
-import static com.kairos.constants.AppConstant.IDS_LIST;
-import static com.kairos.constants.AppConstant.PROCESSING_ACTIVITIES;
 
 
 @Service
@@ -162,8 +156,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         } else {
-            ;
-           if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
+            if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                List<MasterProcessingActivityMD> subProcessingActivities = updateExistingAndCreateNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), processingActivity);
                 processingActivity.setHasSubProcessingActivity(true);
                 processingActivity.setSubProcessingActivities(subProcessingActivities);

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.master_data.default_asset_setting;
+package com.kairos.persistence.model.embeddables;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,12 +10,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class ServiceCategory {
+public class OrganizationSubType {
 
     @NotNull(message = "id can't be null")
     private Long id;
 
-    @NotBlank(message = "name can't be null or empty")
+    @NotBlank(message = "Name can't be empty")
     private String name;
 
     public Long getId() {
@@ -34,10 +34,10 @@ public class ServiceCategory {
         this.name = name;
     }
 
-    public ServiceCategory() {
+    public OrganizationSubType() {
     }
 
-    public ServiceCategory(@NotNull(message = "id can't be null") Long id, String name) {
+    public OrganizationSubType(@NotNull(message = "id can't be null") Long id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -19,6 +19,8 @@ public class AssetTypeBasicDTO {
     @Valid
     private List<AssetTypeBasicDTO> subAssetTypes = new ArrayList<>();
 
+    private Boolean subAssetType;
+
 
     public Long getId() { return id; }
 
@@ -31,4 +33,12 @@ public class AssetTypeBasicDTO {
     public List<AssetTypeBasicDTO> getSubAssetTypes() { return subAssetTypes; }
 
     public void setSubAssetTypes(List<AssetTypeBasicDTO> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
+
+    public Boolean getSubAssetType() {
+        return subAssetType;
+    }
+
+    public void setSubAssetType(Boolean subAssetType) {
+        this.subAssetType = subAssetType;
+    }
 }

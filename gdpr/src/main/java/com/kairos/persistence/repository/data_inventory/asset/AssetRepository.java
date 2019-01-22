@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.data_inventory.asset;
 
 import com.kairos.persistence.model.data_inventory.asset.AssetMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
-;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 

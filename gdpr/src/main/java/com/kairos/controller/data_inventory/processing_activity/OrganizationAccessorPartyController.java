@@ -65,7 +65,7 @@ public class OrganizationAccessorPartyController {
 
     @ApiOperation("delete AccessorParty  by id")
     @DeleteMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId) {
+    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable Long accessorPartyId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 

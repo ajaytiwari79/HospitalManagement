@@ -1,27 +1,16 @@
 package com.kairos.persistence.model.clause;
 
 
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.dto.gdpr.ServiceCategoryDTO;
-import com.kairos.dto.gdpr.SubServiceCategoryDTO;
-import com.kairos.dto.gdpr.master_data.AccountTypeVO;
-import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.clause_tag.ClauseTagMD;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.master_data.default_asset_setting.*;
-import com.kairos.persistence.model.template_type.TemplateType;
+import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
-import org.hibernate.annotations.Cascade;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
