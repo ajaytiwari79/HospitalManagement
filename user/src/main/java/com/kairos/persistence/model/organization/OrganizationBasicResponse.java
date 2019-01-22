@@ -32,6 +32,7 @@ public class OrganizationBasicResponse {
     private StaffPersonalDetailDTO unitManager;
     private Long unitTypeId;
     private boolean workcentre;
+    private Long hubId;
 
 
     public OrganizationBasicResponse() {
@@ -192,5 +193,13 @@ public class OrganizationBasicResponse {
 
     public void setWorkcentre(boolean workcentre) {
         this.workcentre = workcentre;
+    }
+
+    public Long getHubId() {
+        return hubId;
+    }
+
+    public void setHubId(Long hubId) {
+        this.hubId = hubId;
     }
 }

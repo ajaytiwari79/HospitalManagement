@@ -50,7 +50,7 @@ public class WeekDayAndWeekEndHoursKpiService implements CounterService {
             DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()),startTime)),DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getEndDate()),endTime)));
             DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
             if(days.stream().anyMatch(day -> day.toString().equals(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()).getDayOfWeek().toString()))){
-                totalHours+=dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
+                totalHours+=(dateTimeInterval.overlap(shiftInterval))!=null?dateTimeInterval.overlap(shiftInterval).getMilliSeconds():0;
             }
         }
         return DateUtils.getHoursFromTotalMilliSeconds(totalHours);
@@ -65,7 +65,7 @@ public class WeekDayAndWeekEndHoursKpiService implements CounterService {
                 if(staffIdAndTotalHours.containsKey(staffId)&&staffShiftMapping.containsKey(staffId)) {
                     staffIdAndTotalHours.get(staffId).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDaysMap.get(dayTypeId).get(0).toString(),dayTypeIdAndColorCode.get(dayTypeId),getTotalHoursOfDayType(staffShiftMapping.get(staffId), startDate, endDate, daysTypeIdAndDaysMap.get(dayTypeId))));
                 }else{
-                    staffIdAndTotalHours.put(staffId,clusteredBarChartKpiDataUnits);
+                    staffIdAndTotalHours.put(staffId,new ArrayList<>());
                 }
             });
         });
@@ -104,6 +104,7 @@ public class WeekDayAndWeekEndHoursKpiService implements CounterService {
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, new ArrayList<>(), dayOfWeeksNo, DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
+        staffIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId()).distinct().collect(Collectors.toList());
         Map<Long, String> staffIdAndNameMap = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         Map<Long,List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours=getTotalHoursOfTimeSlot(staffIds,shiftWithActivityDTOS,LocalTime.of(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getStartHour(),defaultKpiDataDTO.getTimeSlotDTOS().get(0).getStartMinute()),LocalTime.of(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getEndHour(),defaultKpiDataDTO.getTimeSlotDTOS().get(0).getEndMinute()),dayTypeIds,daysTypeIdAndDaysMap,dayTypeIdAndColorCode);
         staffIdAndTotalHours.keySet().forEach(s->kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(s),0d,staffIdAndTotalHours.get(s))));

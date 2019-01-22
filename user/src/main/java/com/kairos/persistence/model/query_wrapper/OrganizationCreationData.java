@@ -34,6 +34,7 @@ public class OrganizationCreationData {
     private Map<String, List<AccessGroupQueryResult>> accessGroups;
     private List<AccountType> accountTypes= new ArrayList<>();
     private List<UnitType> unitTypes= new ArrayList<>();
+    private List<OrganizationWrapper> hubList;
 
     public List<Level> getLevels() {
         return levels;
@@ -124,4 +125,11 @@ public class OrganizationCreationData {
         this.unitTypes = unitTypes;
     }
 
+    public List<OrganizationWrapper> getHubList() {
+        return hubList;
+    }
+
+    public void setHubList(List<OrganizationWrapper> hubList) {
+        this.hubList = hubList;
+    }
 }

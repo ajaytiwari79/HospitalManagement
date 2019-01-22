@@ -164,8 +164,14 @@ public class CompanyCreationService {
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
+        Organization hubToBeLinked=organizationGraphRepository.findOne(orgDetails.getHubId(),0);
+        if (hubToBeLinked==null){
+            exceptionService.dataNotFoundByIdException("message.hub.notFound",orgDetails.getHubId());
+        }
         organizationGraphRepository.save(organization);
 
+        //Linking organization to the selected hub
+        organizationGraphRepository.linkOrganizationToHub(organization.getId(),hubToBeLinked.getId());
         orgDetails.setId(organization.getId());
         orgDetails.setKairosCompanyId(kairosCompanyId);
         return orgDetails;
@@ -634,6 +640,7 @@ public class CompanyCreationService {
                 activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
             }
         });
+        organizationQueryResult.setHubId(organizationGraphRepository.getHubIdByOrganizationId(organizationId));
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
 

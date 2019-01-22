@@ -50,8 +50,8 @@ public class AccountTypeController {
 
     @ApiOperation(value = "account type by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String,Object>> getAccountTypeById(@PathVariable Long countryId, @PathVariable Long id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountTypeById(countryId, id));
+    public ResponseEntity<Map<String,Object>> getAccountTypeById(@PathVariable Long id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountTypeById(id));
 
     }
 
@@ -65,8 +65,8 @@ public class AccountTypeController {
 
     @ApiOperation(value = "delete account type by id ")
     @DeleteMapping(value = "/delete/{id}")
-    public ResponseEntity<Map<String,Object>> deleteAccountTypeById(@PathVariable Long countryId, @PathVariable Long id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.deleteAccountTypeById(countryId, id));
+    public ResponseEntity<Map<String,Object>> deleteAccountTypeById(@PathVariable Long id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.deleteAccountTypeById( id ));
 
     }
 
