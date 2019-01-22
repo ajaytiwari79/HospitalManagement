@@ -598,7 +598,7 @@ public class StaffRetrievalService {
      * @return
      */
     public StaffAdditionalInfoDTO getStaffEmploymentDataByUnitPositionId(LocalDate startDate, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds){
-        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndUnitPositionId(organizationId, unitPositionId);
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndUnitPositionId(unitPositionId);
         if(isNull(staffAdditionalInfoQueryResult)){
             exceptionService.dataNotFoundByIdException("message.staff.unit.permission.notfound");
         }
