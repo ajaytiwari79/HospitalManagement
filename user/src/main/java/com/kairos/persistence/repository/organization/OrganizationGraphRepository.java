@@ -270,12 +270,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH (organization:Organization)-[:" + HAS_SUB_ORGANIZATION + "]->(org:Organization{union:false,deleted:false}) WHERE id(organization)={0}  \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]-(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_UNIT_TYPE + "]-(unitType:UnitType) WITH companyCategory, org,unitType\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]-(accountType:AccountType) WITH companyCategory,accountType, org,unitType\n" +
-            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType,unitType\n" +
-            "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]-(ot:OrganizationType) WITH id(ot) as typeId,businessTypeIds,org,companyCategory,accountType,unitType\n" +
-            "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]-(subType:OrganizationType) WITH  COLLECT(id(subType)) as subTypeIds,typeId,businessTypeIds,org,companyCategory,accountType,unitType\n" +
-            "RETURN id(unitType) as unitTypeId,subTypeIds as subTypeId ,typeId as typeId ,id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
+            "OPTIONAL Match (org)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) WITH companyCategory, org, level \n"+
+            "OPTIONAL MATCH (org)-[:" + HAS_UNIT_TYPE + "]-(unitType:UnitType) WITH companyCategory, org,unitType, level\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]-(accountType:AccountType) WITH companyCategory,accountType, org,unitType, level\n" +
+            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType,unitType, level\n" +
+            "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]-(ot:OrganizationType) WITH id(ot) as typeId,businessTypeIds,org,companyCategory,accountType,unitType, level\n" +
+            "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]-(subType:OrganizationType) WITH  COLLECT(id(subType)) as subTypeIds,typeId,businessTypeIds,org,companyCategory,accountType,unitType, level\n" +
+            "RETURN id(unitType) as unitTypeId,subTypeIds as subTypeId ,typeId as typeId ,id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId, id(level) as levelId, businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
             "id(accountType) as accountTypeId,org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId, org.workcentre as workcentre," +
             "org.companyUnitType as companyUnitType ORDER BY org.name ")
     List<OrganizationBasicResponse> getOrganizationGdprAndWorkCenter(Long organizationId);
