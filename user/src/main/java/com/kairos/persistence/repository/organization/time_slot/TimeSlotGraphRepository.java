@@ -57,9 +57,9 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
             "RETURN id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime ORDER BY  r.startHour")
     List<TimeSlotWrapper> getShiftPlanningTimeSlotsByUnit(Long unitId,   TimeSlotType timeSlotType);
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)IN {0} AND org.timeSlotMode=timeSlotSet.timeSlotMode" +
-            " AND timeSlotSet.timeSlotType ={1} with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
-            "MATCH (timeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
+    @Query("MATCH (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org) IN {0} AND org.timeSlotMode=timeSlotSet.timeSlotMode" +
+            " AND timeSlotSet.timeSlotType ={1} with org, timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            "MATCH (timeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) with  org, timeSlot order by timeSlot.startHour,r\n" +
             "RETURN id(org) as unitId,id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime ORDER BY  r.startHour")
     List<TimeSlotWrapper> getShiftPlanningTimeSlotsByUnitIds(List<Long> unitId,   TimeSlotType timeSlotType);
 

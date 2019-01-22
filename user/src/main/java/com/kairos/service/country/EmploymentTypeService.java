@@ -279,11 +279,12 @@ public class EmploymentTypeService {
     }
 
 
-    public DefaultKpiDataDTO getKpiDefaultDate(Long countryId, StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+    public DefaultKpiDataDTO getKpiDefaultDate(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         Organization organization=organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterDTO>  staffKpiFilterDTOS= ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(),organization.isParentOrganization()), StaffKpiFilterDTO.class);
         List<DayTypeDTO> dayTypeDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeGraphRepository.findByCountryId(countryId),DayTypeDTO.class);
-        List<Long> unitIds= ObjectUtils.isNotNull(staffEmploymentTypeDTO.getUnitIds())?staffEmploymentTypeDTO.getUnitIds(): Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
+        List<Long> unitIds= ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds())?staffEmploymentTypeDTO.getUnitIds(): Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
         List<TimeSlotDTO> timeSlotSetDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING),TimeSlotDTO.class);
         return  new DefaultKpiDataDTO(staffKpiFilterDTOS,dayTypeDTOS,timeSlotSetDTOS);
     }

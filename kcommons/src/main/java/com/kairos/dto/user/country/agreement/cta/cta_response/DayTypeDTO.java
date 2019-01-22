@@ -8,6 +8,7 @@ import java.util.List;
 public class DayTypeDTO {
    private Long id;
    private String name;
+    private String colorCode;
    private List<Day> validDays=new ArrayList<>();
     private List<CountryHolidayCalenderDTO> countryHolidayCalenderData;
     private boolean holidayType;
@@ -78,5 +79,13 @@ public class DayTypeDTO {
 
     public void setHolidayType(boolean holidayType) {
         this.holidayType = holidayType;
+    }
+
+    public String getColorCode() {
+        return colorCode;
+    }
+
+    public void setColorCode(String colorCode) {
+        this.colorCode = colorCode;
     }
 }

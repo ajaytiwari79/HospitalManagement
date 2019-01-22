@@ -119,8 +119,8 @@ public class CountryEmploymentTypeController {
     @RequestMapping(value =COUNTRY_URL+"/kpi_default_data", method = RequestMethod.POST)
     @ApiOperation("get staff by employment type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getKpiDefaultData(@PathVariable Long countryId ,@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiDefaultDate(countryId,staffEmploymentTypeDTO));
+    public ResponseEntity<Map<String, Object>> getKpiDefaultData(@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiDefaultDate(staffEmploymentTypeDTO));
     }
 
 
