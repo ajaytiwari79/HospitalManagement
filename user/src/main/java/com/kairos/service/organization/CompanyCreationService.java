@@ -402,7 +402,7 @@ public class CompanyCreationService {
             organization.setOrganizationType(parentOrganization.getOrganizationType());
             organization.setAccountType(parentOrganization.getAccountType());
         }
-        if (organization.isParentOrganization() && organizationBasicDTO.getLevelId() != null) {
+        if (organizationBasicDTO.getLevelId() != null) {
                 Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
                 organization.setLevel(level);
         }

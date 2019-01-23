@@ -33,6 +33,7 @@ public class OrganizationBasicResponse {
     private Long unitTypeId;
     private boolean workcentre;
     private Long hubId;
+    private Long levelId;
 
 
     public OrganizationBasicResponse() {
@@ -201,5 +202,13 @@ public class OrganizationBasicResponse {
 
     public void setHubId(Long hubId) {
         this.hubId = hubId;
+    }
+
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
     }
 }
