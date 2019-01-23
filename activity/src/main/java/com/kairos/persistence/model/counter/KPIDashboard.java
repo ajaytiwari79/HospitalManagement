@@ -11,8 +11,14 @@ public class KPIDashboard extends MongoBaseEntity{
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private boolean enable=true;
 
-    public KPIDashboard(String parentModuleId,String moduleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public KPIDashboard() {
+    }
+
+
+
+    public KPIDashboard(String parentModuleId, String moduleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level) {
         this.parentModuleId = parentModuleId;
         this.moduleId=moduleId;
         this.name = name;
@@ -77,5 +83,13 @@ public class KPIDashboard extends MongoBaseEntity{
 
     public void setLevel(ConfLevel level) {
         this.level = level;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }

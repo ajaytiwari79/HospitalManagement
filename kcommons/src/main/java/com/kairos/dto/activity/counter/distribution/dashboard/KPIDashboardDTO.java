@@ -13,6 +13,7 @@ public class KPIDashboardDTO {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private boolean enable=true;
 
 //    public BigInteger getId() {
 //        return id;
@@ -76,5 +77,13 @@ public class KPIDashboardDTO {
 
     public void setLevel(ConfLevel level) {
         this.level = level;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }

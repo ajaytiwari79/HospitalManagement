@@ -167,7 +167,6 @@ public class CounterDistService extends MongoBaseService {
             countryId = genericIntegrationService.getCountryId(refId);
         }
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIIdsByTabIds(moduleId, refId, countryId, level);
-        List<TabKPIDTO> tabKPIDTOSResult = filterTabKpiDate(tabKPIDTOS);
         if (tabKPIDTOS == null || tabKPIDTOS.isEmpty()) return new ArrayList<>();
         return tabKPIDTOS.stream().map(tabKPIDTO -> new BigInteger(tabKPIDTO.getKpi().getId().toString())).collect(Collectors.toList());
     }
@@ -242,7 +241,7 @@ public class CounterDistService extends MongoBaseService {
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         List<String> tabIds = tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
         List<BigInteger> kpiIds = tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(toList());
-        Map<String, Map<BigInteger, BigInteger>> tabKpiMap = setTabKPIEntries(tabIds, kpiIds, entriesToSave, null, null, accessGroupPermissionCounterDTO.getStaffId(), level, accessGroupPermissionCounterDTO.getCountryAdmin());
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap = setTabKPIEntries(tabIds, kpiIds, entriesToSave, null, unitId, accessGroupPermissionCounterDTO.getStaffId(), level, accessGroupPermissionCounterDTO.getCountryAdmin());
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             if (tabKpiMap.get(tabKPIMappingDTO.getTabId()).get(tabKPIMappingDTO.getKpiId()) == null) {
                 entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(), tabKPIMappingDTO.getKpiId(), null, unitId, accessGroupPermissionCounterDTO.getStaffId(), level, tabKPIMappingDTO.getPosition(), KPIValidity.BASIC, LocationType.FIX, calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX)));
@@ -283,7 +282,7 @@ public class CounterDistService extends MongoBaseService {
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabIds, kpiIds, refId, level);
         if (!isCountryAdmin) {
-            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds, refId, level);
+            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIOfStaffByKPIId(kpiIds, refId, level,unitId);
             if (kpiIds.size() != applicableKPIS.size()) {
                 exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
             }
@@ -569,11 +568,6 @@ public class CounterDistService extends MongoBaseService {
         });
         List<DashboardKPIConf> dashboardKPIConfToSave=new ArrayList<>();
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, unitId);
-        Map<String,String> dashboardsNameMap=new HashMap<>();
-        Map<String,String> dashboardsOldAndNewIds=new HashMap<>();
-        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
-            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
-        });
         List<KPIDashboard> kpiDashboardsTosave=new ArrayList<>();
         defaultKPISettingDTO.getStaffIds().forEach(staffId->{
             List<KPIDashboard>  kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,staffId,ConfLevel.STAFF)).collect(Collectors.toList());
@@ -582,10 +576,7 @@ public class CounterDistService extends MongoBaseService {
         if(!kpiDashboardsTosave.isEmpty()){
             save(kpiDashboardsTosave);
         }
-        kpiDashboardsTosave.stream().forEach(kpiDashboard  -> {
-            dashboardsOldAndNewIds.put(dashboardsNameMap.get(kpiDashboard.getName()),kpiDashboard.getModuleId());
-        });
-        List<String> oldDashboardsIds=kpiDashboardDTOS.stream().map(kpiDashboardDTO  -> kpiDashboardDTO.getModuleId()).collect(Collectors.toList());
+        List<String> oldDashboardsIds=kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds,oldDashboardsIds,unitId,ConfLevel.UNIT);
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, unitId, ConfLevel.UNIT);
@@ -595,7 +586,7 @@ public class CounterDistService extends MongoBaseService {
                     tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, unitId, staffId, ConfLevel.STAFF, tabKPIConfKPI.getPosition(), KPIValidity.BASIC, LocationType.FIX, calculatePriority(ConfLevel.STAFF, KPIValidity.BASIC, LocationType.FIX)));
                 });
                 dashboardKPIConfList.stream().forEach(dashboardKPIConf  -> {
-                    dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getModuleId()),dashboardKPIConf.getModuleId(),null,unitId,staffId,ConfLevel.STAFF,dashboardKPIConf.getPosition()));
+                    dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardKPIConf.getModuleId(),null,unitId,staffId,ConfLevel.STAFF,dashboardKPIConf.getPosition()));
                 });
             });
         }
@@ -605,11 +596,16 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void createDefaultKpiSetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
+        if (Optional.ofNullable(defaultKPISettingDTO.getParentUnitId()).isPresent()) {
+            createTabs(defaultKPISettingDTO.getParentUnitId(),ConfLevel.UNIT,unitId);
+        } else {
+            createTabs(defaultKPISettingDTO.getCountryId(),ConfLevel.COUNTRY,unitId);
+        }
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defaultKPISettingDTO.getOrgTypeIds(), new ArrayList<>());
         if (orgTypeMappingDTOS.isEmpty()) {
             return;
         }
-        List<BigInteger> applicableKpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
+        List<BigInteger> applicableKpiIds = orgTypeMappingDTOS.stream().map(OrgTypeMappingDTO::getKpiId).collect(Collectors.toList());
         if (Optional.ofNullable(defaultKPISettingDTO.getParentUnitId()).isPresent()) {
             setDefaultSettingUnit(defaultKPISettingDTO, applicableKpiIds, unitId, ConfLevel.UNIT);
         } else {
@@ -661,26 +657,22 @@ public class CounterDistService extends MongoBaseService {
             categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(), categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId()), null, unitId, ConfLevel.UNIT));
         });
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
-        Map<String,BigInteger> dashboardsNameMap=new HashMap<>();
-        Map<BigInteger,BigInteger> dashboardsOldAndNewIds=new HashMap<>();
-        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
-            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
-        });
-        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT)).collect(Collectors.toList());
-        if(!kpiDashboards.isEmpty()){
-            save(kpiDashboards);
-        }
-        kpiDashboards.stream().forEach(kpiDashboard -> {
-            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
-        });
-        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
-        kpiDashboards.stream().forEach(kpiDashboard  -> {
-            dashboardsOldAndNewIds.put(dashboardsNameMap.get(kpiDashboard.getName()),kpiDashboard.getId());
-        });
-        List<BigInteger> oldDashboardsIds=kpiDashboardDTOS.stream().map(kpiDashboardDTO  -> kpiDashboardDTO.getId()).collect(Collectors.toList());
+//        Map<String,String> dashboardsNameMap=new HashMap<>();
+//        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
+//            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
+//        });
+//        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT)).collect(Collectors.toList());
+//        if(!kpiDashboards.isEmpty()){
+//            save(kpiDashboards);
+//        }
+//        kpiDashboards.stream().forEach(kpiDashboard -> {
+//            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
+//        });
+//        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
+        List<String> oldDashboardsIds=kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds,oldDashboardsIds,refId,level);
         dashboardKPIConfList.stream().forEach(dashboardKPIConf  -> {
-            dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getDashboardId()),dashboardKPIConf.getModuleId(),null,unitId,null,ConfLevel.UNIT,dashboardKPIConf.getPosition()));
+            dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardKPIConf.getModuleId(),null,unitId,null,ConfLevel.UNIT,dashboardKPIConf.getPosition()));
         });
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         applicableKpiIds.forEach(kpiId -> {
@@ -696,9 +688,9 @@ public class CounterDistService extends MongoBaseService {
         if (!categoryKPIConfToSave.isEmpty()) {
             save(categoryKPIConfToSave);
         }
-//        if(!dashboardKPIConfToSave.isEmpty()) {
-//            save(dashboardKPIConfToSave);
-//        }
+        if(!dashboardKPIConfToSave.isEmpty()) {
+            save(dashboardKPIConfToSave);
+        }
         if (!tabKPIConfKPIEntries.isEmpty()) {
             save(tabKPIConfKPIEntries);
         }
@@ -707,6 +699,22 @@ public class CounterDistService extends MongoBaseService {
 
     private String createModuleId(BigInteger id, String parentModuleId) {
         return parentModuleId + "_" + id;
+    }
+
+    private void createTabs(Long refId,ConfLevel level,Long unitId){
+        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
+//        Map<String,String> dashboardsNameMap=new HashMap<>();
+//        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
+//            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
+//        });
+        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT)).collect(Collectors.toList());
+        if(!kpiDashboards.isEmpty()){
+            save(kpiDashboards);
+        }
+        kpiDashboards.stream().forEach(kpiDashboard -> {
+            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
+        });
+        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
     }
 }
 

@@ -9,6 +9,7 @@ public class KPIAccessPageDTO {
     private boolean write;
     private boolean active;
     private List<KPIAccessPageDTO> child;
+    private boolean enable;
 
     public KPIAccessPageDTO(){
 
@@ -65,5 +66,13 @@ public class KPIAccessPageDTO {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }
