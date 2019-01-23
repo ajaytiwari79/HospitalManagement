@@ -1185,7 +1185,7 @@ public class StaffService {
 
         String body = "Hi,\n\n" + "You are assigned as an unit manager and to get access in KairosPlanning.\n" + "Your username " + unitManagerDTO.getEmail() + " and password is " + password + "\n\n Thanks";
         String subject = "You are a unit manager at KairosPlanning";
-        mailService.sendPlainMail(unitManagerDTO.getEmail(), body, subject);
+        mailService.sendPlainMailWithSendGrid(unitManagerDTO.getEmail(), body, subject);
     }
 
     public List<Staff> getUploadedStaffByOrganizationId(Long organizationId) {

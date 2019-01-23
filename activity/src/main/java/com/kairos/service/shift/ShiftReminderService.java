@@ -2,9 +2,7 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
-import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -15,9 +13,13 @@ import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.SchedulerServiceRestClient;
+import com.kairos.rest_client.UserRestClientForScheduler;
 import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
 import com.kairos.service.MongoBaseService;
 import org.slf4j.Logger;
@@ -125,7 +127,7 @@ public class ShiftReminderService extends MongoBaseService {
 
         String content = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
                 shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
-        mailService.sendPlainMail(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
+        mailService.sendPlainMailWithSendGrid(staffDTO.getEmail(), content, SHIFT_NOTIFICATION);
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {

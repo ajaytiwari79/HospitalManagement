@@ -1,23 +1,23 @@
 package com.kairos.service.priority_group;
 
 import com.kairos.commons.service.mail.MailService;
-import com.kairos.dto.activity.counter.enums.ModuleType;
-import com.kairos.dto.activity.counter.configuration.CounterDTO;
-import com.kairos.constants.AppConstants;
-import com.kairos.persistence.model.open_shift.OpenShiftNotification;
-import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
-import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.persistence.model.priority_group.*;
-import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
-import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
-import com.kairos.service.MongoBaseService;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.persistence.model.open_shift.OpenShiftNotification;
+import com.kairos.persistence.model.priority_group.PriorityGroup;
+import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
+import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -26,12 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.Optional;
-
-import static com.kairos.constants.AppConstants.SEND_GRID_API_KEY;
 
 @Service
 @Transactional
@@ -232,7 +230,7 @@ public class PriorityGroupService extends MongoBaseService {
 
                 mailService.sendPlainMailWithSendGrid(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
                         staffUnitPositionQueryResult.getAccumulatedTimeBank(),staffUnitPositionQueryResult.getDeltaWeeklytimeBank(),
-                        staffUnitPositionQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT,SEND_GRID_API_KEY);
+                        staffUnitPositionQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT);
                 openShiftNotification = new OpenShiftNotification(entry.getKey(),staffUnitPositionQueryResult.getStaffId());
                 openShiftNotifications.add(openShiftNotification);
             }

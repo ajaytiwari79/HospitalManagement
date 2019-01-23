@@ -22,6 +22,8 @@ import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
 
+import static com.kairos.constants.AppConstants.SEND_GRID_API_KEY;
+
 //import javax.validation.constraints.Email;
 
 
@@ -38,34 +40,12 @@ public class MailService {
     JavaMailSender javaMailSender;
 
 
-
-
-
-    public boolean sendPlainMail(String receiver,String body, String subject) {
-        try {
-            logger.info("Sending email to::" + receiver);
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-            helper.setFrom("info@nordicplanning.dk");
-            helper.setTo(receiver);
-            helper.setSubject(subject);
-            helper.setBcc("vipul.pandey@oodlestechnologies.com");
-            helper.setText(body);
-            javaMailSender.send(mimeMessage);
-            logger.info("Email sent");
-        } catch (Exception e){
-            logger.info("exception occured {}",e);
-            return false;
-        }
-        return false;
-    }
-
-    public void sendPlainMailWithSendGrid(String receiver, String body, String subject,String sendGridApiKey) {
+    public void sendPlainMailWithSendGrid(String receiver, String body, String subject) {
        Email from=new Email("no-reply@kairosplanning.com");
        Email to=new Email(receiver);
        Content content=new Content("text/plain",body);
        Mail mail=new Mail(from,subject,to,content);
-       SendGrid sg = new SendGrid(sendGridApiKey);
+       SendGrid sg = new SendGrid(SEND_GRID_API_KEY);
         Request request = new Request();
         try {
             request.setMethod(Method.POST);

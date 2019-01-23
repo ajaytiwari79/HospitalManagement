@@ -702,7 +702,7 @@ public class UserService {
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
         }
         String token = tokenService.createForgotPasswordToken(currentUser);
-        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT,config.getSendGridApiKey());
+        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT);
         return true;
     }
 

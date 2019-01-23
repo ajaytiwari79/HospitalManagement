@@ -391,7 +391,7 @@ public class SkillService {
         skill.setEnabled(false);
         skill.setSkillStatus(Skill.SkillStatus.PENDING);
         skillGraphRepository.save(skill);
-        mailService.sendPlainMail(ADMIN_EMAIL, "Request for create new skill", "Skill creation request");
+        mailService.sendPlainMailWithSendGrid(ADMIN_EMAIL, "Request for create new skill", "Skill creation request");
         return true;
     }
 
