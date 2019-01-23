@@ -63,10 +63,10 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
             "WHERE id(tag)={0} AND id(org) = {1} AND tag.deleted={2} return tag")
     Tag getOrganizationTag(long tagId, long orgId,  boolean isDeleted);
 
-    // DONE
+    //FIXME
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag)={0} AND id(country) = {1} \n" +
-            "SET tag.name={2}, tag.lastModificationDate={3} return tag")
+            "WHERE id(tag)={0} AND id(country) = {1} with tag, tag {.*} as snapshot\n" +
+            "SET tag.name={2}, tag.lastModificationDate={3} return snapshot")
     Tag updateCountryTag(Long tagId, Long countryId, String name, long lastModificationDate);
 
     // DONE
