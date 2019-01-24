@@ -15,7 +15,7 @@ import java.util.Set;
 @NoRepositoryBean
 public interface CustomGenericRepository<T extends BaseEntity> extends JpaRepository<T, Long> {
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.countryId = ?1 and hp.deleted = ?2 and lower(hp.name) IN ?3")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = ?2 and lower(EN.name) IN ?3")
     List<T>  findByCountryIdAndDeletedAndNameIn(Long countryId, boolean deleted, List<String> userNames);
 
     @Transactional
@@ -29,16 +29,16 @@ public interface CustomGenericRepository<T extends BaseEntity> extends JpaReposi
     @Query(value = "update #{#entityName} set deleted = true where id = ?1 and countryId = ?2")
     Integer deleteByIdAndCountryId(Long id, Long countryId);
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.id = ?1 and hp.countryId = ?2 and hp.deleted = ?3")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.id = ?1 and EN.countryId = ?2 and EN.deleted = ?3")
     T findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
     
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.countryId = ?1 and hp.deleted = ?2 and lower(hp.name) = lower(?3)")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = ?2 and lower(EN.name) = lower(?3)")
     T findByCountryIdAndDeletedAndName(Long countryId, boolean deleted, String name);
 
 
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.organizationId = ?1 and hp.deleted = ?2 and lower(hp.name) IN ?3")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = ?2 and lower(EN.name) IN ?3")
     List<T> findByOrganizationIdAndDeletedAndNameIn(Long orgId, boolean deleted, List<String> name);
 
     @Transactional
@@ -57,20 +57,20 @@ public interface CustomGenericRepository<T extends BaseEntity> extends JpaReposi
     @Query(value = "update #{#entityName} set deleted = true where id = ?1 and organizationId = ?2")
     Integer deleteByIdAndOrganizationId(Long id, Long orgId);
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.id = ?1 and hp.organizationId = ?2 and hp.deleted = ?3")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.id = ?1 and EN.organizationId = ?2 and EN.deleted = ?3")
     T findByIdAndOrganizationIdAndDeleted(Long id, Long orgId, boolean deleted);
 
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.organizationId = ?1 and hp.deleted = ?2 and lower(hp.name) = lower(?3)")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = ?2 and lower(EN.name) = lower(?3)")
     T findByOrganizationIdAndDeletedAndName(Long orgId, boolean deleted, String name);
 
-    @Query(value = "SELECT hp FROM #{#entityName} hp WHERE hp.id IN (?1) and hp.deleted = false")
+    @Query(value = "SELECT EN FROM #{#entityName} EN WHERE EN.id IN (?1) and EN.deleted = false")
     List<T>  findAllByIds( Set<Long> ids);
 
-    @Query(value = "Select hp from #{#entityName} hp WHERE hp.organizationId = ?1 and hp.deleted = false")
+    @Query(value = "Select EN from #{#entityName} EN WHERE EN.organizationId = ?1 and EN.deleted = false")
     List<T> findAllByOrganizationId(Long orgId);
 
-    @Query(value = "Select hp from #{#entityName} hp WHERE hp.countryId = ?1 and hp.deleted = false")
+    @Query(value = "Select EN from #{#entityName} EN WHERE EN.countryId = ?1 and EN.deleted = false")
     List<T> findAllByCountryId(Long countryId);
 
 

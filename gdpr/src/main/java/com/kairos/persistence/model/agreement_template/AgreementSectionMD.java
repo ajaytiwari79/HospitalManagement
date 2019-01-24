@@ -24,10 +24,11 @@ public class AgreementSectionMD extends BaseEntity {
     private String titleHtml;
     private boolean subSection;
     // clause id are saved in order way
-   /* private List<Integer> clauseIdOrderedIndex=new ArrayList<>();
+   /* private List<Integer> clauseIdOrderedIndex=new ArrayList<>();*/
 
     @OrderColumn
-    private Set<ClauseCkEditorVO> clauseCkEditorVOS=new HashSet<>();*/
+    @ElementCollection
+    private List<ClauseCkEditorVO> clauses=new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "agreementSection")
     private List<AgreementSectionMD> subSections=new ArrayList<>();
@@ -80,9 +81,13 @@ public class AgreementSectionMD extends BaseEntity {
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }
 
-    /*public Set<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+    public List<ClauseCkEditorVO> getClauses() {
+        return clauses;
+    }
 
-    public void setClauseCkEditorVOS(Set<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }*/
+    public void setClauses(List<ClauseCkEditorVO> clauses) {
+        this.clauses = clauses;
+    }
 
     public AgreementSectionMD(){ }
 
@@ -93,5 +98,19 @@ public class AgreementSectionMD extends BaseEntity {
         this.orderedIndex=orderedIndex;
         this.subSection=subSection;
         this.titleHtml=titleHtml;
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.getClauses().forEach( clause -> {
+            clause.setDeleted(false);
+        });
+        this.subSections.forEach( subSection -> {
+            subSection.delete();
+            subSection.getClauses().forEach( subSectionclause -> {
+                subSectionclause.setDeleted(false);
+            });
+        });
     }
 }

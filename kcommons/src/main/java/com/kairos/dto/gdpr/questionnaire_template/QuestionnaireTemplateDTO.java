@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -28,7 +29,8 @@ public class QuestionnaireTemplateDTO {
     private boolean defaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
     private QuestionnaireTemplateType riskAssociatedEntity;
-    private List sections=new ArrayList<>();
+    @Valid
+    private List<QuestionnaireSectionDTO> sections=new ArrayList<>();
 
     public BigInteger getAssetSubType() { return assetSubType; }
 

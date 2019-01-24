@@ -15,7 +15,7 @@ import java.util.List;
 public class AgreementSectionDTO {
 
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String title;
@@ -34,11 +34,11 @@ public class AgreementSectionDTO {
         this.subSections = subSections;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -20,9 +20,9 @@ public class AgreementSectionResponseDTO {
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
-    /*private List<BigInteger> clauseIdOrderedIndex;
-    private List<ClauseBasicResponseDTO> clauses;
-    private List<ClauseCkEditorVO> clauseCkEditorVOS;*/
+    //private List<BigInteger> clauseIdOrderedIndex;
+    //private List<ClauseBasicResponseDTO> clauses;
+    private List<ClauseCkEditorVO> clauses;
     private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
@@ -70,10 +70,14 @@ public class AgreementSectionResponseDTO {
         this.title = title;
     }
 
-   /* public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+    public List<ClauseCkEditorVO> getClauses() {
+        return clauses;
+    }
 
-    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
-*/
+    public void setClauses(List<ClauseCkEditorVO> clauses) {
+        this.clauses = clauses;
+    }
+
     public String getTitleHtml() { return titleHtml; }
 
     public void setTitleHtml(String titleHtml) { this.titleHtml = titleHtml; }

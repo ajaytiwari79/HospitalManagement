@@ -17,7 +17,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String title;
     private String titleHtml;
     private String description;
@@ -25,11 +25,11 @@ public class ClauseBasicResponseDTO {
     private List<ClauseTagDTO> tags = new ArrayList<>();
     private boolean linkedWithOtherTemplate;
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

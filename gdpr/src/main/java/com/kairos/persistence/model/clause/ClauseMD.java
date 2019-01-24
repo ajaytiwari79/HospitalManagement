@@ -7,12 +7,14 @@ import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
 import org.springframework.data.annotation.Transient;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -21,7 +23,6 @@ public class ClauseMD extends BaseEntity {
     @NotBlank
     private String title;
 
-    @NotEmpty
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ClauseTagMD> tags  = new ArrayList<>();
 
@@ -57,6 +58,9 @@ public class ClauseMD extends BaseEntity {
     private String titleHtml;
     @Transient
     private String descriptionHtml;
+
+    @Nullable
+    private UUID tempClauseId;
 
 
 
@@ -211,5 +215,13 @@ public class ClauseMD extends BaseEntity {
 
     public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
+    }
+
+    public UUID getTempClauseId() {
+        return tempClauseId;
+    }
+
+    public void setTempClauseId(UUID tempClauseId) {
+        this.tempClauseId = tempClauseId;
     }
 }

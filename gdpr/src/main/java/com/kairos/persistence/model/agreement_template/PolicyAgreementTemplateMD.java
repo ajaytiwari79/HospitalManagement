@@ -172,4 +172,12 @@ public class PolicyAgreementTemplateMD extends BaseEntity {
     public void setCoverPageData(CoverPage coverPageData) {
         this.coverPageData = coverPageData;
     }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.getAgreementSections().forEach( agreementSection -> {
+            agreementSection.delete();
+        });
+    }
 }
