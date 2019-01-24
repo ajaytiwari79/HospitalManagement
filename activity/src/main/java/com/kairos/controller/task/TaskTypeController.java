@@ -721,7 +721,7 @@ public class TaskTypeController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable long subServiceId,
                                                                          @RequestBody Map<String, Object> data, @RequestParam("type") String type) throws CloneNotSupportedException {
-        String taskTypeId = data.get("taskTypeId") + "";
+        String taskTypeId = data.get("taskTyp/task_types/getAllAvlSkilleId") + "";
         boolean isSelected = (boolean) data.get("isSelected");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 taskTypeService.updateTaskType(unitId, subServiceId, taskTypeId, isSelected, type));
