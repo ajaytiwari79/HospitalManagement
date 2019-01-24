@@ -233,23 +233,24 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         }
         List<UnitLevelClauseResponseDTO> clauseListForUnitLevelTemplate = new ArrayList<>();
         List<ClauseBasicResponseDTO> clauseListForTemplate =  new ArrayList<>();
-        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = null;
+        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(template.getAgreementSections(),AgreementSectionResponseDTO.class);
         if(isUnitId){
             clauseListForUnitLevelTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByUnitId(referenceId), UnitLevelClauseResponseDTO.class);
-            agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByOrganizationIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class) ;
+            //agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByOrganizationIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class) ;
         }else{
             clauseListForTemplate = ObjectMapperUtils.copyPropertiesOfListByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds,serviceCategoryIds,subServiceCategoryIds, template.getTemplateType().getId()),ClauseBasicResponseDTO.class);
-            agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByCountryIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class);
+            //agreementSectionResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(policyAgreementRepository.getAllAgreementSectionsAndSubSectionByCountryIdAndAgreementTemplateId(referenceId, agreementTemplateId),AgreementSectionResponseDTO.class);
         }
+
         //List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(referenceId, isUnitId, agreementTemplateId);
         /*agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
                     Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS = agreementSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
                     sortClauseOfAgreementSectionAndSubSectionInResponseDTO(clauseBasicResponseDTOS, agreementSectionResponseDTO);
-                    if (!Optional.ofNullable(agreementSectionResponseDTO.getSubSections().get(0).getId()).isPresent()) {
-                        agreementSectionResponseDTO.getSubSections().clear();
+                    if (!Optional.ofNullable(agreementSectionResponseDTO.getAgreementSubSections().get(0).getId()).isPresent()) {
+                        agreementSectionResponseDTO.getAgreementSubSections().clear();
                     } else {
-                        agreementSectionResponseDTO.getSubSections().forEach(agreementSubSectionResponseDTO -> {
+                        agreementSectionResponseDTO.getAgreementSubSections().forEach(agreementSubSectionResponseDTO -> {
                             Map<BigInteger, ClauseBasicResponseDTO> subSectionClauseBasicResponseDTOS = agreementSubSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
                             sortClauseOfAgreementSectionAndSubSectionInResponseDTO(subSectionClauseBasicResponseDTOS, agreementSubSectionResponseDTO);
                         });
@@ -266,7 +267,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         agreementTemplateResponse.setClauseListForUnitLevelTemplate(clauseListForUnitLevelTemplate);
         agreementTemplateResponse.setClauseListForTemplate(clauseListForTemplate);
         agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
-        agreementTemplateResponse.setSections(agreementSectionResponseDTOS);
+        agreementTemplateResponse.setAgreementSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
         agreementTemplateResponse.setCoverPageData(ObjectMapperUtils.copyPropertiesByMapper(template.getCoverPageData(), CoverPageVO.class));
         agreementTemplateResponse.setSignatureComponentAdded(template.isSignatureComponentAdded());

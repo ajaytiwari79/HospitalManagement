@@ -6,8 +6,6 @@ import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,14 +22,14 @@ public class AgreementSectionDTO {
     @Valid
     private List<ClauseBasicDTO> clauses = new ArrayList<>();
     @Valid
-    private List<AgreementSectionDTO> subSections = new ArrayList<>();
+    private List<AgreementSectionDTO> agreementSubSections = new ArrayList<>();
 
-    public List<AgreementSectionDTO> getSubSections() {
-        return subSections;
+    public List<AgreementSectionDTO> getAgreementSubSections() {
+        return agreementSubSections;
     }
 
-    public void setSubSections(List<AgreementSectionDTO> subSections) {
-        this.subSections = subSections;
+    public void setAgreementSubSections(List<AgreementSectionDTO> agreementSubSections) {
+        this.agreementSubSections = agreementSubSections;
     }
 
     public Long getId() {

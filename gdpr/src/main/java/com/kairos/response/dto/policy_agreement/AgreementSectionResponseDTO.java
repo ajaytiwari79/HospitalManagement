@@ -3,10 +3,8 @@ package com.kairos.response.dto.policy_agreement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class AgreementSectionResponseDTO {
     //private List<BigInteger> clauseIdOrderedIndex;
     //private List<ClauseBasicResponseDTO> clauses;
     private List<ClauseCkEditorVO> clauses;
-    private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
+    private List<AgreementSectionResponseDTO> agreementSubSections =new ArrayList<>();
 
     public Integer getOrderedIndex() {
         return orderedIndex;
@@ -46,12 +44,12 @@ public class AgreementSectionResponseDTO {
         this.id = id;
     }
 
-    public List<AgreementSectionResponseDTO> getSubSections() {
-        return subSections;
+    public List<AgreementSectionResponseDTO> getAgreementSubSections() {
+        return agreementSubSections;
     }
 
-    public void setSubSections(List<AgreementSectionResponseDTO> subSections) {
-        this.subSections = subSections;
+    public void setAgreementSubSections(List<AgreementSectionResponseDTO> agreementSubSections) {
+        this.agreementSubSections = agreementSubSections;
     }
 
     /*public List<ClauseBasicResponseDTO> getClauses() {

@@ -111,7 +111,7 @@ public class AgreementSectionService extends MongoBaseService {
          List<ClauseBasicDTO> list= new ArrayList();
         sectionDTOList.forEach( section -> {
             List<ClauseBasicDTO> clauses   = section.getClauses().stream().filter( c -> c.getId() == null).collect(Collectors.toList());
-            clauses.addAll(findNewClauses(section.getSubSections()));
+            clauses.addAll(findNewClauses(section.getAgreementSubSections()));
             list.addAll(clauses);
         });
         return list;
@@ -122,7 +122,7 @@ public class AgreementSectionService extends MongoBaseService {
             section.getClauses().forEach( clause -> {
                 clause.setId(clauseData.get(clause.getTempClauseId()));
             });
-            mapClauseIdToEmbeddedClausesOfSectionDTO(section.getSubSections(),clauseData);
+            mapClauseIdToEmbeddedClausesOfSectionDTO(section.getAgreementSubSections(),clauseData);
         });
     }
 
@@ -192,7 +192,7 @@ public class AgreementSectionService extends MongoBaseService {
             if (isUnitId) agreementSection.setOrganizationId(referenceId);
             else agreementSection.setCountryId(referenceId);
             List<AgreementSection> subSectionList = new ArrayList<>();
-            for (AgreementSectionDTO subSectionDTO : agreementSectionDTO.getSubSections()) {
+            for (AgreementSectionDTO subSectionDTO : agreementSectionDTO.getAgreementSubSections()) {
                 AgreementSection subSection = new AgreementSection(subSectionDTO.getTitle(), subSectionDTO.getOrderedIndex(), true, subSectionDTO.getTitleHtml());
                 if (isUnitId) subSection.setOrganizationId(referenceId);
                 else subSection.setCountryId(referenceId);
@@ -253,9 +253,9 @@ public class AgreementSectionService extends MongoBaseService {
                 List<AgreementSection> subSectionListCoresspondingToAgreementSection = new ArrayList<>();
                 agreementSectionIdList.add(agreementSectionDTO.getId());
                 agreementSectionDTOMap.put(agreementSectionDTO.getId(), agreementSectionDTO);
-                if (CollectionUtils.isNotEmpty(agreementSectionDTO.getSubSections())) {
+                if (CollectionUtils.isNotEmpty(agreementSectionDTO.getAgreementSubSections())) {
                     List<Long> subSectionIdList = new ArrayList<>();
-                    for (AgreementSectionDTO agreementSubSectionDTO : agreementSectionDTO.getSubSections()) {
+                    for (AgreementSectionDTO agreementSubSectionDTO : agreementSectionDTO.getAgreementSubSections()) {
                         if (Optional.ofNullable(agreementSubSectionDTO.getId()).isPresent()) {
                             subSectionIdList.add(agreementSubSectionDTO.getId());
                             agreementSectionDTOMap.put(agreementSubSectionDTO.getId(), agreementSubSectionDTO);
@@ -553,9 +553,9 @@ public class AgreementSectionService extends MongoBaseService {
                 exceptionService.duplicateDataException("message.duplicate", "message.agreement.section", agreementSectionDTO.getTitle());
             } else if (CollectionUtils.isNotEmpty(agreementSectionDTO.getClauses())) {
                 checkDuplicateClauseInAgreementSection(agreementSectionDTO.getClauses(), clauseTitles, agreementSectionDTO.getTitle());
-            } else if (Optional.ofNullable(agreementSectionDTO.getSubSections()).isPresent()) {
-                checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementSectionDTO.getSubSections());
-                /*agreementSectionDTO.getSubSections().forEach(agreementSubSectionDTO -> {
+            } else if (Optional.ofNullable(agreementSectionDTO.getAgreementSubSections()).isPresent()) {
+                checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementSectionDTO.getAgreementSubSections());
+                /*agreementSectionDTO.getAgreementSubSections().forEach(agreementSubSectionDTO -> {
                     if (titles.contains(agreementSubSectionDTO.getTitle().toLowerCase())) {
                         exceptionService.duplicateDataException("message.duplicate", "message.agreement.subSection", agreementSubSectionDTO.getTitle());
                     }

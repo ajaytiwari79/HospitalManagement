@@ -3,17 +3,12 @@ package com.kairos.persistence.model.agreement_template;
 
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class AgreementSectionMD extends BaseEntity {
@@ -21,17 +16,17 @@ public class AgreementSectionMD extends BaseEntity {
 
     @NotBlank(message = "Section Title cannot be empty")
     private String title;
+
     private String titleHtml;
-    private boolean subSection;
-    // clause id are saved in order way
-   /* private List<Integer> clauseIdOrderedIndex=new ArrayList<>();*/
+
+    private boolean isAgreementSubSection;
 
     @OrderColumn
     @ElementCollection
     private List<ClauseCkEditorVO> clauses=new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "agreementSection")
-    private List<AgreementSectionMD> subSections=new ArrayList<>();
+    private List<AgreementSectionMD> agreementSubSections =new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "agreementSection_id")
@@ -41,9 +36,9 @@ public class AgreementSectionMD extends BaseEntity {
     private Long countryId;
 
 
-    public boolean isSubSection() { return subSection; }
+    public boolean isAgreementSubSection() { return isAgreementSubSection; }
 
-    public void setSubSection(boolean subSection) { this.subSection = subSection; }
+    public void setAgreementSubSection(boolean agreementSubSection) { this.isAgreementSubSection = agreementSubSection; }
 
     public Long getCountryId() { return countryId; }
 
@@ -51,12 +46,12 @@ public class AgreementSectionMD extends BaseEntity {
 
     public void setTitle(String title) { this.title = title; }
 
-    public List<AgreementSectionMD> getSubSections() {
-        return subSections;
+    public List<AgreementSectionMD> getAgreementSubSections() {
+        return agreementSubSections;
     }
 
-    public void setSubSections(List<AgreementSectionMD> subSections) {
-        this.subSections = subSections;
+    public void setAgreementSubSections(List<AgreementSectionMD> agreementSubSections) {
+        this.agreementSubSections = agreementSubSections;
     }
 
     public AgreementSectionMD getAgreementSection() {
@@ -68,10 +63,6 @@ public class AgreementSectionMD extends BaseEntity {
     }
 
     public void setCountryId(Long countryId) { this.countryId = countryId; }
-
-  /*  public List<Integer> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
-
-    public void setClauseIdOrderedIndex(List<Integer> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }*/
 
     public Integer getOrderedIndex() { return orderedIndex; }
 
@@ -92,11 +83,11 @@ public class AgreementSectionMD extends BaseEntity {
     public AgreementSectionMD(){ }
 
 
-    public AgreementSectionMD(@NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex, boolean subSection, String titleHtml)
+    public AgreementSectionMD(@NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex, boolean isAgreementSubSection, String titleHtml)
     {
         this.title=title;
         this.orderedIndex=orderedIndex;
-        this.subSection=subSection;
+        this.isAgreementSubSection = isAgreementSubSection;
         this.titleHtml=titleHtml;
     }
 
@@ -106,7 +97,7 @@ public class AgreementSectionMD extends BaseEntity {
         this.getClauses().forEach( clause -> {
             clause.setDeleted(false);
         });
-        this.subSections.forEach( subSection -> {
+        this.agreementSubSections.forEach(subSection -> {
             subSection.delete();
             subSection.getClauses().forEach( subSectionclause -> {
                 subSectionclause.setDeleted(false);

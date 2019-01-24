@@ -23,6 +23,7 @@ public class PolicyAgreementTemplateMD extends BaseEntity {
     private List<AccountType> accountTypes;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderColumn
     private List<AgreementSectionMD> agreementSections=new ArrayList<>();
 
     @ElementCollection
