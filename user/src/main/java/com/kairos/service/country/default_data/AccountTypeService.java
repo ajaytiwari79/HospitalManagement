@@ -33,7 +33,7 @@ public class AccountTypeService {
     public AccountTypeDTO createAccountType(Long countryId, AccountTypeDTO accountTypeDTO) {
         Optional<Country> country = countryGraphRepository.findById(countryId, 0);
         if (!country.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
 
         Boolean exists = accountTypeRepository.checkAccountTypeExistInCountry(countryId, "(?i)" + accountTypeDTO.getName(), -1L);
@@ -70,7 +70,7 @@ public class AccountTypeService {
     }
 
 
-    public AccountType getAccountTypeById(Long countryId, Long id) {
+    public AccountType getAccountTypeById(Long id) {
 
         Optional<AccountType> accountType = accountTypeRepository.findById(id);
         if (!accountType.isPresent()) {
@@ -96,7 +96,7 @@ public class AccountTypeService {
     }
 
 
-    public Boolean deleteAccountTypeById(Long countryId, Long id) {
+    public Boolean deleteAccountTypeById( Long id) {
         Optional<AccountType> accountType = accountTypeRepository.findById(id, 0);
         if (!accountType.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unitType.notFound", id);

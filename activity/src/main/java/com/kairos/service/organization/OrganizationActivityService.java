@@ -32,7 +32,6 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.ActivityUtil;
@@ -81,8 +80,6 @@ public class OrganizationActivityService extends MongoBaseService {
 
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private OrganizationRestClient organizationRestClient;
     @Inject
     private ActivityService activityService;
     @Inject
@@ -176,9 +173,13 @@ public class OrganizationActivityService extends MongoBaseService {
         return retrieveBasicDetails(activityCopied);
     }
 
-    public ActivityDTO retrieveBasicDetails(Activity activity) {
+    private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         BeanUtils.copyProperties(activity, activityDTO);
+        Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType.isPresent()){
+            activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
+        }
         return activityDTO;
 
     }
@@ -247,6 +248,7 @@ public class OrganizationActivityService extends MongoBaseService {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
+        activityCopied.setCountryParentId(activity.getCountryParentId()==null?activity.getId():activity.getCountryParentId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);

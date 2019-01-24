@@ -5,11 +5,13 @@ package com.kairos.persistence.model.payroll;
  */
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
+@Document
 public class PayRoll extends MongoBaseEntity {
     private String name;
     private int code;

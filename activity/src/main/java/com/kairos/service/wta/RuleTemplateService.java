@@ -21,7 +21,6 @@ import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
@@ -49,6 +48,7 @@ import static com.kairos.constants.AppConstants.WEEKS;
 @Transactional
 @Service
 public class RuleTemplateService extends MongoBaseService {
+    private static final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Autowired
@@ -59,9 +59,7 @@ public class RuleTemplateService extends MongoBaseService {
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-    @Inject
-    private OrganizationRestClient organizationRestClient;
-    private final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
+
     @Autowired
     private ExceptionService exceptionService;
 

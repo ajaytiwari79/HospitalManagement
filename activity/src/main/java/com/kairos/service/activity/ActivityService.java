@@ -415,9 +415,11 @@ public class ActivityService extends MongoBaseService {
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
             Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
-            CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.orElseGet(CompositeActivity::new);
-            compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
-            compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
+            if(optionalCompositeActivity.isPresent()){
+                CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.get();
+                compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
+                compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
+            }
         }
         if (!activityMatched.isEmpty()) {
             save(activityMatched);
@@ -872,6 +874,7 @@ public class ActivityService extends MongoBaseService {
                 List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
+                activity.setCountryParentId(countryActivity.getId());
                 activity.setUnitId(unitId);
                 activity.setParentActivity(false);
                 activity.setOrganizationTypes(null);

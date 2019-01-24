@@ -41,7 +41,6 @@ public class WTABuilderService extends MongoBaseService {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         for (WTABaseRuleTemplateDTO ruleTemplate : WTARuleTemplateDTOS) {
             wtaBaseRuleTemplates.add(copyRuleTemplate(ruleTemplate, ignoreId));
-
         }
         return wtaBaseRuleTemplates;
     }
@@ -218,7 +217,7 @@ public class WTABuilderService extends MongoBaseService {
 
     }
 
-    public WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+    /*public WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
 
         boolean sameFutureDateWTA=DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
@@ -276,7 +275,7 @@ public class WTABuilderService extends MongoBaseService {
             }
         }
         return ruleTemplates;
-    }
+    }*/
 
 
 }

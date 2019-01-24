@@ -6,7 +6,6 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.commons.utils.DateUtils;

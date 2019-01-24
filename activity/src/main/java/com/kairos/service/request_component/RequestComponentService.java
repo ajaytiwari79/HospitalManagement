@@ -4,8 +4,6 @@ import com.kairos.dto.activity.response.RequestComponent;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.RequestType;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity_stream.NotificationService;
 import org.slf4j.Logger;
@@ -28,8 +26,6 @@ public class RequestComponentService extends MongoBaseService {
 
     @Inject
     private NotificationService notificationService;
-    @Inject
-    private OrganizationRestClient organizationRestClient;
     @Inject
     private GenericIntegrationService genericIntegrationService;
 

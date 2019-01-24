@@ -492,13 +492,6 @@ public class ClientController {
     }
 
 
-    // Check Mail
-    @RequestMapping(method = RequestMethod.GET, value = "/test")
-    @ApiOperation("Delete task exception")
-    public ResponseEntity<Map<String, Object>> checkinEmail() throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                mailService.sendPlainMail("mohit.sharma@oodlestechnologies.com", "test", "test"));
-    }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")
     @ApiOperation("update client from excel sheet")

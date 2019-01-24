@@ -13,6 +13,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class OrganizationHierarchyService {
     private TreeStructureService treeStructureService;
     @Inject
     UserGraphRepository userGraphRepository;
+    @Inject
+    private AccessPageService accessPageService;
 
     public QueryResult generateHierarchyMinimum(long parentOrganizationId) {
         List<Map<String, Object>> units = organizationGraphRepository.getSubOrgHierarchy(parentOrganizationId);
@@ -132,7 +135,14 @@ public class OrganizationHierarchyService {
             }
             ids.add(id);
         }
-        resultQueryResults.add(treeStructureService.getTreeStructure(list));
+
+        if (accessPageService.isHubMember(UserContext.getUserDetails().getId())) {
+            resultQueryResults.add(treeStructureService.getTreeStructure(list));
+        } else {
+            for (QueryResult queryResult : list) {
+                resultQueryResults.add(treeStructureService.getTreeStructure(Arrays.asList(queryResult)));
+            }
+        }
         return resultQueryResults;
     }
 

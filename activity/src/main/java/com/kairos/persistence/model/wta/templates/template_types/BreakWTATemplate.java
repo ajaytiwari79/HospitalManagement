@@ -19,11 +19,6 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
     private short breakGapMinutes;
     private Set<BreakAvailabilitySettings> breakAvailability;
 
-    public BreakWTATemplate(short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {
-        this.breakGapMinutes = breakGapMinutes;
-        this.breakAvailability = breakAvailability;
-    }
-
     public BreakWTATemplate(String name, String description, short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {
         super(name, description);
         this.breakGapMinutes = breakGapMinutes;
@@ -51,18 +46,10 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        BreakWTATemplate that = (BreakWTATemplate) o;
-        return breakGapMinutes == that.breakGapMinutes &&
-                Objects.equals(breakAvailability, that.breakAvailability);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        BreakWTATemplate breakWTATemplate = (BreakWTATemplate)wtaBaseRuleTemplate;
+        return (this != breakWTATemplate) && !(breakGapMinutes == breakWTATemplate.breakGapMinutes &&
+                Objects.equals(breakAvailability, breakWTATemplate.breakAvailability));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), breakGapMinutes, breakAvailability);
-    }
 }

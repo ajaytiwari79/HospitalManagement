@@ -319,7 +319,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH(slf)-[rel: "+HAS_FUNCTIONAL_AMOUNT +"]-(function)   \n" +
             "WITH  positionLine,COLLECT(DISTINCT {id:id(function),amount:rel.amount,name:function.name}) AS functions,basePayGradeAmount, sum(toInteger(rel.amount)) as totalCostOfFunctions\n" +
             "RETURN  \n" +
-            "positionLine.startDate AS startDate,basePayGradeAmount AS basePayGradeAmount,functions,toString(basePayGradeAmount+totalCostOfFunctions) AS hourlyCost ")
+            "positionLine.startDate AS startDate,toString(basePayGradeAmount) AS basePayGradeAmount,functions,toString(basePayGradeAmount+totalCostOfFunctions) AS hourlyCost ")
     List<UnitPositionLineFunctionQueryResult> getFunctionalHourlyCostByUnitPositionId(Long unitId, Long unitPositionId);
 
     @Query("OPTIONAL MATCH(organization:Organization) WHERE id(organization)={0}\n" +

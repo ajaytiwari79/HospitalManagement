@@ -84,6 +84,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 
 /*
@@ -597,7 +598,10 @@ public class StaffRetrievalService {
      * @return
      */
     public StaffAdditionalInfoDTO getStaffEmploymentDataByUnitPositionId(LocalDate startDate, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds){
-        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndUnitPositionId(organizationId, unitPositionId);
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndUnitPositionId(unitPositionId);
+        if(isNull(staffAdditionalInfoQueryResult)){
+            exceptionService.dataNotFoundByIdException("message.staff.unit.permission.notfound");
+        }
         return getStaffEmploymentData(startDate,staffAdditionalInfoQueryResult, unitPositionId, organizationId, type, reasonCodeIds);
     }
 
@@ -613,6 +617,9 @@ public class StaffRetrievalService {
      */
     public StaffAdditionalInfoDTO getStaffEmploymentDataByUnitPositionIdAndStaffId(LocalDate startDate, long staffId, Long unitPositionId, long organizationId, String type, Set<Long> reasonCodeIds){
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organizationId, staffId);
+        if(isNull(staffAdditionalInfoQueryResult)){
+            exceptionService.dataNotFoundByIdException("message.staff.unit.permission.notfound");
+        }
         return getStaffEmploymentData(startDate,staffAdditionalInfoQueryResult, unitPositionId, organizationId, type, reasonCodeIds);
     }
 
@@ -696,13 +703,15 @@ public class StaffRetrievalService {
         StaffUnitPositionDetails unitPosition = null;
         if(Optional.ofNullable(unitPositionId).isPresent()) {
             unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId);
-            List<AppliedFunctionDTO> appliedFunctionDTOS = new ArrayList<>();
-            for (AppliedFunctionDTO appliedFunctionDTO : unitPosition.getAppliedFunctions()) {
+
+            List<AppliedFunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition.getAppliedFunctions(),AppliedFunctionDTO.class);
+            appliedFunctionDTOS.removeIf(localDate -> !localDate.equals(shiftDate));
+            /*for (AppliedFunctionDTO appliedFunctionDTO : ) {
                 boolean valid = appliedFunctionDTO.getAppliedDates().stream().filter(localDate -> localDate.equals(shiftDate)).findAny().isPresent();
                 if(valid){
                     appliedFunctionDTOS.add(appliedFunctionDTO);
                 }
-            }
+            }*/
             unitPosition.setAppliedFunctions(appliedFunctionDTOS);
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO =null;

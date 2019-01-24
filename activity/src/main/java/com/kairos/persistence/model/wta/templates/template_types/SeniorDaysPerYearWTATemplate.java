@@ -119,23 +119,17 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        SeniorDaysPerYearWTATemplate that = (SeniorDaysPerYearWTATemplate) o;
-        return borrowLeave == that.borrowLeave &&
-                carryForwardLeave == that.carryForwardLeave &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(ageRange, that.ageRange) &&
-                Objects.equals(activityIds, that.activityIds) &&
-                cutOffIntervalUnit == that.cutOffIntervalUnit;
-    }
 
     @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), ageRange, activityIds, borrowLeave, carryForwardLeave, cutOffIntervalUnit, recommendedValue);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate;
+        return (this != seniorDaysPerYearWTATemplate) && !(borrowLeave == seniorDaysPerYearWTATemplate.borrowLeave &&
+                carryForwardLeave == seniorDaysPerYearWTATemplate.carryForwardLeave &&
+                Float.compare(seniorDaysPerYearWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(ageRange, seniorDaysPerYearWTATemplate.ageRange) &&
+                Objects.equals(activityIds, seniorDaysPerYearWTATemplate.activityIds) &&
+                cutOffIntervalUnit == seniorDaysPerYearWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues,seniorDaysPerYearWTATemplate.phaseTemplateValues));
     }
+
+
 }

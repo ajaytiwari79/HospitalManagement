@@ -1309,7 +1309,7 @@ public class OrganizationController {
     @GetMapping(PARENT_ORGANIZATION_URL+"/WTARelatedInfo")
     @ApiOperation("get  Wta related info")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId,@RequestParam(required = false)  List<Long> unitIds) {
+    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam(required = false) Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId,@RequestParam(required = false)  List<Long> unitIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId, unitIds));
     }
