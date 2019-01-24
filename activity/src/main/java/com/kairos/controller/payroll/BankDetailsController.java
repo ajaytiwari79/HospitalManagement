@@ -60,26 +60,26 @@ public class BankDetailsController {
 
 
     @ApiOperation("get Bank details of Staff")
-    @GetMapping(PARENT_ORGANIZATION_URL+STAFF_BANK_DETAILS)
+    @GetMapping(STAFF_BANK_DETAILS)
     public ResponseEntity<Map<String,Object>> getBankDetailsOfStaff(@PathVariable Long organizationId,@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfStaff(staffId,organizationId));
     }
 
 
     @ApiOperation("update Bank details of Staff")
-    @PutMapping(PARENT_ORGANIZATION_URL+STAFF_BANK_DETAILS)
+    @PutMapping(STAFF_BANK_DETAILS)
     public ResponseEntity<Map<String,Object>> updateBankDetailsOfStaff(@PathVariable Long staffId,@RequestBody StaffBankAndPensionProviderDetailsDTO staffBankAndPensionProviderDetailsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForStaff(staffId,staffBankAndPensionProviderDetailsDTO));
     }
 
     @ApiOperation("update Bank details of Organization")
-    @PutMapping(PARENT_ORGANIZATION_URL+ORGANIZATION_BANK_DETAILS)
+    @PutMapping(ORGANIZATION_BANK_DETAILS)
     public ResponseEntity<Map<String,Object>> updateBankDetailsOfOrganization(@PathVariable Long organizationId,@RequestBody OrganizationBankDetailsDTO organizationBankDetailsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForOrganization(organizationId,organizationBankDetailsDTO));
     }
 
     @ApiOperation("get Bank details of Organization")
-    @GetMapping(PARENT_ORGANIZATION_URL+ORGANIZATION_BANK_DETAILS)
+    @GetMapping(ORGANIZATION_BANK_DETAILS)
     public ResponseEntity<Map<String,Object>> getBankDetailsOfOrganization(@PathVariable Long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfOrganization(organizationId));
     }
