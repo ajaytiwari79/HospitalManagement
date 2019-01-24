@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,14 +44,19 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
 
-    private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, LocalTime startTime, LocalTime endTime, List<Day> days) {
+    private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Day> days) {
         Long totalHours=0l;
         //TODO  when remove Everyday from day enum then remove if statement and use dayOfWeek of java
         if(days.get(0).equals(Day.EVERYDAY)){
             days.addAll(newHashSet(Day.values()));
         }
+        LocalTime startTime=LocalTime.of(timeSlotDTO.getStartHour(), timeSlotDTO.getStartMinute());
+        LocalTime endTime=LocalTime.of(timeSlotDTO.getEndHour(), timeSlotDTO.getEndMinute());
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
-            DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()), startTime)), DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getEndDate()), endTime)));
+            DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()), startTime)), DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()), endTime)));
+            if(AppConstants.NIGHT.equals(timeSlotDTO.getName())){
+                dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()), startTime)), DateUtils.getLongFromLocalDateimeTime(LocalDateTime.of(DateUtils.asLocalDate(shiftWithActivityDTO.getEndDate()), endTime)));
+            }
             DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
             if (days.stream().anyMatch(day -> day.toString().equals(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()).getDayOfWeek().toString()))) {
                 totalHours += (dateTimeInterval.overlap(shiftInterval)) != null ? dateTimeInterval.overlap(shiftInterval).getMilliSeconds() : 0;
@@ -61,13 +65,14 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         return DateUtils.getHoursFromTotalMilliSeconds(totalHours);
     }
 
-    private Map<Long, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlot(List<Long> staffIds, List<ShiftWithActivityDTO> shiftWithActivityDTOS, LocalTime startDate, LocalTime endDate, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap) {
+
+    private Map<Long, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlot(List<Long> staffIds, List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap) {
         Map<Long, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = new HashMap<>();
         Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shiftWithActivityDTOS.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
         staffIds.forEach(staffId -> {
             staffIdAndTotalHours.put(staffId, new ArrayList<>());
             dayTypeIds.forEach(dayTypeId -> {
-                    staffIdAndTotalHours.get(staffId).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDayTypeMap.get(dayTypeId).getName(), daysTypeIdAndDayTypeMap.get(dayTypeId).getColorCode(), getTotalHoursOfDayType(staffShiftMapping.get(staffId), startDate, endDate, daysTypeIdAndDayTypeMap.get(dayTypeId).getValidDays())));
+                staffIdAndTotalHours.get(staffId).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDayTypeMap.get(dayTypeId).getName(), daysTypeIdAndDayTypeMap.get(dayTypeId).getColorCode(), getTotalHoursOfDayType(staffShiftMapping.get(staffId),timeSlotDTO, daysTypeIdAndDayTypeMap.get(dayTypeId).getValidDays())));
             });
         });
         return staffIdAndTotalHours;
@@ -91,7 +96,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         if (!ObjectUtils.isCollectionEmpty(dayTypeIds)) {
             dayTypeIds.forEach(daysTypeId -> {
                 daysTypeIdAndDayTypeMap.get(daysTypeId).getValidDays().forEach(day -> {
-                 //TODO if remove Everyday from day enum then remove if statement and use dayOfWeek of java
+                    //TODO if remove Everyday from day enum then remove if statement and use dayOfWeek of java
                     if (day.equals(Day.EVERYDAY)) {
                         daysOfWeek.addAll(newHashSet(DayOfWeek.values()));
                     } else {
@@ -108,9 +113,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         Map<Long, String> staffIdAndNameMap = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         //TODO change start time and end time when use filter currently we only take day time
         TimeSlotDTO timeSlotDTO=defaultKpiDataDTO.getTimeSlotDTOS().stream().filter(timeSlotDto->timeSlotIds.contains(timeSlotDto.getId())).findFirst().get();
-        LocalTime startTime=LocalTime.of(timeSlotDTO.getStartHour(), timeSlotDTO.getStartMinute());
-        LocalTime endTime=LocalTime.of(timeSlotDTO.getEndHour(), timeSlotDTO.getEndMinute());
-        Map<Long, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = getTotalHoursOfTimeSlot(staffIds, shiftWithActivityDTOS, startTime, endTime, dayTypeIds, daysTypeIdAndDayTypeMap);
+        Map<Long, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = getTotalHoursOfTimeSlot(staffIds, shiftWithActivityDTOS,timeSlotDTO, dayTypeIds, daysTypeIdAndDayTypeMap);
         staffIdAndTotalHours.keySet().forEach(s -> kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(s), 0d, staffIdAndTotalHours.get(s))));
         return kpiDataUnits;
     }
