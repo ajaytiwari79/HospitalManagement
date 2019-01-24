@@ -15,9 +15,8 @@ public class KPIDashboard extends MongoBaseEntity{
     private boolean defaultTab;
 
     public KPIDashboard() {
+        //Default Constructor
     }
-
-
 
     public KPIDashboard(String parentModuleId, String moduleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level,boolean defaultTab) {
         this.parentModuleId = parentModuleId;
