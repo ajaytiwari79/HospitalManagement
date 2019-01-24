@@ -508,7 +508,13 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     public List<ApplicableKPI> getKPIOfStaffByKPIId(List<BigInteger> kpiIds, Long refId, ConfLevel level,Long unitId){
         String refQueryField = getRefQueryField(level);
-        Query query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds).and("level").is(level).and("unitId").is(unitId));
+        Query query;
+        if(ConfLevel.STAFF.equals(level)){
+             query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds).and("level").is(level).and("unitId").is(unitId));
+        }
+        else {
+             query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds).and("level").is(level));
+        }
         return mongoTemplate.find(query,ApplicableKPI.class);
     }
 
