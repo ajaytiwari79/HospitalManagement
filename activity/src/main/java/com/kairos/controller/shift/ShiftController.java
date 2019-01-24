@@ -108,21 +108,6 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
     }
 
-    /*// sub shifts workflow
-    @ApiOperation("add a sub shift for a staff")
-    @PutMapping(value = "/sub-shift")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSubShift(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift(unitId, shiftDTO, type));
-    }*/
-
-    /*@ApiOperation("update a sub shifts for a staff")
-    @PutMapping(value = "/sub-shifts")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSubShifts(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody List<ShiftDTO> shiftDTOS) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts(unitId, shiftDTOS, type));
-    }*/
-
     @ApiOperation("update status of shifts")
     @PutMapping(value = "/shift/update_status")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
