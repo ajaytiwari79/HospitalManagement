@@ -63,7 +63,7 @@ public class DynamicTabService extends MongoBaseService {
         verifyForDashboardTabAvailability(names, unitId, staffId, countryId, level);
         List<KPIDashboard> kpiDashboards = new ArrayList<>();
         kpiDashboardDTOS.stream().forEach(kpiDashboardDTO -> {
-            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), countryId, unitId, staffId, level));
+            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), countryId, unitId, staffId, level,kpiDashboardDTO.isDefaultTab()));
         });
         save(kpiDashboards);
         kpiDashboards.stream().forEach(kpiDashboard -> {
@@ -168,13 +168,17 @@ public class DynamicTabService extends MongoBaseService {
         kpiDashboards.forEach(kpiDashboard -> {
             List<KPIDashboard> kpiDashboardList=new ArrayList<>();
             staffIds.forEach(staff->{
-                kpiDashboardList.add(new KPIDashboard(kpiDashboard.getParentModuleId(),kpiDashboard.getModuleId(),kpiDashboard.getName(),kpiDashboard.getCountryId(),kpiDashboard.getUnitId(),staff,ConfLevel.STAFF));
+                kpiDashboardList.add(new KPIDashboard(kpiDashboard.getParentModuleId(),kpiDashboard.getModuleId(),kpiDashboard.getName(),kpiDashboard.getCountryId(),kpiDashboard.getUnitId(),staff,ConfLevel.STAFF,kpiDashboard.isDefaultTab()));
             });
             dashboards.addAll(kpiDashboardList);
         });
         if(CollectionUtils.isNotEmpty(dashboards)){
             save(dashboards);
         }
+        dashboards.stream().forEach(kpiDashboard -> {
+            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
+        });
+        if(!kpiDashboards.isEmpty()) save(dashboards);
     }
 
 

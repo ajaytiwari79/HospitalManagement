@@ -570,7 +570,7 @@ public class CounterDistService extends MongoBaseService {
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, unitId);
         List<KPIDashboard> kpiDashboardsTosave=new ArrayList<>();
         defaultKPISettingDTO.getStaffIds().forEach(staffId->{
-            List<KPIDashboard>  kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,staffId,ConfLevel.STAFF)).collect(Collectors.toList());
+            List<KPIDashboard>  kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,staffId,ConfLevel.STAFF,dashboard.isDefaultTab())).collect(Collectors.toList());
             kpiDashboardsTosave.addAll(kpiDashboards);
         });
         if(!kpiDashboardsTosave.isEmpty()){
@@ -707,7 +707,7 @@ public class CounterDistService extends MongoBaseService {
 //        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
 //            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
 //        });
-        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT)).collect(Collectors.toList());
+        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT,false)).collect(Collectors.toList());
         if(!kpiDashboards.isEmpty()){
             save(kpiDashboards);
         }

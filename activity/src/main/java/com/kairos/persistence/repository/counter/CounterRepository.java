@@ -473,7 +473,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
     //dashboard tab
     public List<KPIDashboard> getKPIDashboardByIds(List<String> dashboardIds, ConfLevel level, Long refId){
         String queryField =getRefQueryField(level);
-        Query query=new Query(Criteria.where("moduleId").in(dashboardIds).and(queryField).is(refId));
+        Query query=new Query(Criteria.where("moduleId").in(dashboardIds).and(queryField).is(refId).and("level").is(level));
         return mongoTemplate.find(query,KPIDashboard.class);
     }
 
@@ -489,7 +489,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
        Aggregation aggregation=Aggregation.newAggregation(
             Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
             Aggregation.group("parentModuleId").push("$$ROOT").as("child"),
-            Aggregation.project().and("$_id").as("moduleId").and("child").as("child")//.and("enable").as("enable")
+            Aggregation.project().and("$_id").as("moduleId").and("child").as("child").and("child.enable").as("enable").and("child.defaultTab").as("defaultTab")
        );
        AggregationResults<KPIAccessPageDTO> results=mongoTemplate.aggregate(aggregation,KPIDashboard.class,KPIAccessPageDTO.class);
        return results.getMappedResults();

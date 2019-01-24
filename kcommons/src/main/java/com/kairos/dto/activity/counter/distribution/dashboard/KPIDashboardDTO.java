@@ -14,6 +14,9 @@ public class KPIDashboardDTO {
     private Long staffId;
     private ConfLevel level;
     private boolean enable=true;
+    private boolean active=true;
+    private boolean defaultTab;
+
 
 //    public BigInteger getId() {
 //        return id;
@@ -85,5 +88,21 @@ public class KPIDashboardDTO {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isDefaultTab() {
+        return defaultTab;
+    }
+
+    public void setDefaultTab(boolean defaultTab) {
+        this.defaultTab = defaultTab;
     }
 }

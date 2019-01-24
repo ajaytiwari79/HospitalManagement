@@ -10,6 +10,7 @@ public class KPIAccessPageDTO {
     private boolean active;
     private List<KPIAccessPageDTO> child;
     private boolean enable;
+    private boolean defaultTab;
 
     public KPIAccessPageDTO(){
 
@@ -74,5 +75,13 @@ public class KPIAccessPageDTO {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    public boolean isDefaultTab() {
+        return defaultTab;
+    }
+
+    public void setDefaultTab(boolean defaultTab) {
+        this.defaultTab = defaultTab;
     }
 }

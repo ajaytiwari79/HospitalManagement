@@ -12,13 +12,14 @@ public class KPIDashboard extends MongoBaseEntity{
     private Long staffId;
     private ConfLevel level;
     private boolean enable=true;
+    private boolean defaultTab;
 
     public KPIDashboard() {
     }
 
 
 
-    public KPIDashboard(String parentModuleId, String moduleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public KPIDashboard(String parentModuleId, String moduleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level,boolean defaultTab) {
         this.parentModuleId = parentModuleId;
         this.moduleId=moduleId;
         this.name = name;
@@ -26,6 +27,7 @@ public class KPIDashboard extends MongoBaseEntity{
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+        this.defaultTab=defaultTab;
     }
 
 
@@ -91,5 +93,13 @@ public class KPIDashboard extends MongoBaseEntity{
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    public boolean isDefaultTab() {
+        return defaultTab;
+    }
+
+    public void setDefaultTab(boolean defaultTab) {
+        this.defaultTab = defaultTab;
     }
 }
