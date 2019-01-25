@@ -73,8 +73,8 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/swagger-resources/**/**");
         web.ignoring().antMatchers("/swagger-ui.html");
         web.ignoring().antMatchers("/v2/api-docs");
-        web.ignoring().antMatchers("/api/v1/organization/{organizationId}/ids");
-        web.ignoring().antMatchers("/api/v1/organization/{organizationId}/unit/{unitId}/WithoutAuth");
+        web.ignoring().antMatchers("/api/v1/ids");
+        web.ignoring().antMatchers("/api/v1/unit/{unitId}/WithoutAuth");
         web.ignoring().antMatchers("/api/v1/time_care/**");
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_GRANTS);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN);
@@ -84,7 +84,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(API_TIME_SLOTS_NAME);
         //web.ignoring().antMatchers(API_V1+SCHEDULER_EXECUTE_JOB);
         web.ignoring().antMatchers(API_KMD_CARE_TIME_SLOTS);
-        web.ignoring().antMatchers("/api/v1/organization/{organizationId}/unit/{unitId}/client/client_ids_by_unitIds");
+        web.ignoring().antMatchers("/api/v1/unit/{unitId}/client/client_ids_by_unitIds");
 
 
         web.ignoring().antMatchers("/api/v1/login");
