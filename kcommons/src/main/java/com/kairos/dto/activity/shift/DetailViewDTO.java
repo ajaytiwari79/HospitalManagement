@@ -14,7 +14,7 @@ import java.util.List;
 public class DetailViewDTO {
     private Long staffId;
     private ShiftDetailViewDTO shifts;
-    List<AttendanceTimeSlotDTO> attendanceTimeSlot;
+    private List<AttendanceTimeSlotDTO> attendanceTimeSlot;
     public DetailViewDTO() {
     }
 
