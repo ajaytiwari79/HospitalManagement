@@ -147,13 +147,12 @@ public class TimeSlotService {
 
                 if (timeSlotSetToValidate.getEndDate().isBefore(timeSlotSetDTO.getEndDate())) {
                     timeSlotSetToValidate.setDeleted(true);
-                    timeSlotSetsToUpdate.add(timeSlotSetToValidate);
                 } else {
                     LocalDate dateAsLocalDate = timeSlotSetDTO.getEndDate();
                     timeSlotSetToValidate.setStartDate(dateAsLocalDate.plusDays(1));
-                    timeSlotSetsToUpdate.add(timeSlotSetToValidate);
                     break;
                 }
+                timeSlotSetsToUpdate.add(timeSlotSetToValidate);
             }
             timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
             timeSlotSet.setName(timeSlotSetDTO.getName());

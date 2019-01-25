@@ -44,7 +44,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
 
     // use for calculate hours of given days of daytype
     private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Day> days) {
-        Long totalHours = 0l;
+        Long totalMilliSeconds = 0l;
         //TODO  when remove Everyday from day enum then remove if statement and use dayOfWeek of java
         if (days.get(0).equals(Day.EVERYDAY)) {
             days.addAll(newHashSet(Day.values()));
@@ -58,10 +58,10 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
             }
             DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
             if (days.stream().anyMatch(day -> day.toString().equals(DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate()).getDayOfWeek().toString()))) {
-                totalHours += (dateTimeInterval.overlap(shiftInterval)) != null ? dateTimeInterval.overlap(shiftInterval).getMilliSeconds() : 0;
+                totalMilliSeconds += (dateTimeInterval.overlap(shiftInterval)) != null ? dateTimeInterval.overlap(shiftInterval).getMilliSeconds() : 0;
             }
         }
-        return DateUtils.getHoursFromTotalMilliSeconds(totalHours);
+        return DateUtils.getHoursFromTotalMilliSeconds(totalMilliSeconds);
     }
 
     //use for return hours of timeslot
