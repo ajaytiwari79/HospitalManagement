@@ -88,6 +88,8 @@ public class DayTypeService {
                     exceptionService.duplicateDataException("message.dayType.name.code.exist");
                 }
             }
+            dayType.setName(dayTypeDTO.getName());
+            dayType.setCode(dayTypeDTO.getCode());
             dayType.setColorCode(dayTypeDTO.getColorCode());
             dayType.setDescription(dayTypeDTO.getDescription());
             dayType.setAllowTimeSettings(dayTypeDTO.isAllowTimeSettings());
