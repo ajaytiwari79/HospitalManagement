@@ -703,10 +703,6 @@ public class CounterDistService extends MongoBaseService {
 
     private void createTabs(Long refId,ConfLevel level,Long unitId){
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
-//        Map<String,String> dashboardsNameMap=new HashMap<>();
-//        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
-//            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
-//        });
         List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.UNIT,false)).collect(Collectors.toList());
         if(!kpiDashboards.isEmpty()){
             save(kpiDashboards);
