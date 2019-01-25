@@ -211,8 +211,6 @@ public class AppConstants {
     public static final short MULTIPLE_ACTIVITY = 1;
 
     //for use timeslot in timeslot kpi
-    public static final String DAY = "Day";
-    public static final String EVENING = "Evening";
     public static final String NIGHT = "Night";
 
 }
