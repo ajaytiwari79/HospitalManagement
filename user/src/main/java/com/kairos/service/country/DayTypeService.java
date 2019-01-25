@@ -81,9 +81,12 @@ public class DayTypeService {
     public DayTypeDTO updateDayType(DayTypeDTO dayTypeDTO) {
         DayType dayType = dayTypeGraphRepository.findOne(dayTypeDTO.getId());
         if (dayType != null) {
-            Boolean dayTypeExists = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
-            if (dayTypeExists) {
-                exceptionService.duplicateDataException("message.dayType.name.code.exist");
+            //If there's a change in DayType name or in DayType then only verify existing DayTypes
+            if (!dayTypeDTO.getName().equalsIgnoreCase(dayType.getName()) || dayTypeDTO.getCode() != dayType.getCode()) {
+                Boolean dayTypeExists = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
+                if (dayTypeExists) {
+                    exceptionService.duplicateDataException("message.dayType.name.code.exist");
+                }
             }
             dayType.setName(dayTypeDTO.getName());
             dayType.setCode(dayTypeDTO.getCode());
