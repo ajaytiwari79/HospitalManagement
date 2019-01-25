@@ -675,6 +675,7 @@ public class OrganizationService {
         organizationCreationData.setCompanyTypes(CompanyType.getListOfCompanyType());
         organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
         organizationCreationData.setAccessGroups(accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
+        organizationCreationData.setHubList(organizationGraphRepository.getAllHubByCountryId(countryId));
 
         data.put("globalData", organizationCreationData);
         data.put("organization", organizationQueryResult);

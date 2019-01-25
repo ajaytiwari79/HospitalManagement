@@ -1,6 +1,5 @@
 package com.kairos.service.phase;
 
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.commons.utils.DateUtils;
@@ -26,11 +25,10 @@ public class PhaseServiceUnitTest {
     private static final Logger logger = LoggerFactory.getLogger(PhaseServiceUnitTest.class);
     @Mock
     private PhaseMongoRepository phaseMongoRepository;
-    @Mock
-    private OrganizationRestClient organizationRestClient;
 
     @InjectMocks
     private PhaseService phaseService;
+
     ArrayList<Phase> phases = new ArrayList();
 
 

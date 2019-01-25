@@ -153,7 +153,8 @@ public final class ApiConstants {
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
 
     // /staff_by_employment_type
-    public static final String STAFF_BY_EMPLOYMENT_TYPE="/staff_by_employment_type";
+    public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";
+    public static final String KPI_DEFAULT_DATA = "/kpi_default_data";
 
     //Scheduler
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";

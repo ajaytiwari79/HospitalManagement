@@ -26,6 +26,7 @@ public class QueryResult {
     private String timeZone;
     private Boolean union;
     private OrganizationLevel organizationLevel;
+    private Long hubId;
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
@@ -154,5 +155,13 @@ public class QueryResult {
 
     public void setOrganizationLevel(OrganizationLevel organizationLevel) {
         this.organizationLevel = organizationLevel;
+    }
+
+    public Long getHubId() {
+        return hubId;
+    }
+
+    public void setHubId(Long hubId) {
+        this.hubId = hubId;
     }
 }

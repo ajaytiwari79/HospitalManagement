@@ -250,7 +250,7 @@ public class AppConstants {
 
 
     //constants for hourly Cost calculation
-    public static final float PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = 7.4f;
+    public static final BigDecimal PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE = new BigDecimal(7.4);
     public static final int LEAP_YEAR = 366;
     public static final int NON_LEAP_YEAR = 365;
     public static final short ONE_WEEK_MINUTES=10080;

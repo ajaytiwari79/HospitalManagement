@@ -51,6 +51,13 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.SHIFT_AND_ACTIVITY_DURATION, shiftAndActivityKpiService);
     }
 
+    @Inject
+    public void calculateDayTypeAndTimeSlotHours(DayTypeAndTimeSlotKpiService dayTypeAndTimeSlotKpiService) {
+        logger.info("Enum mapping for calculate daytype And timeslot Hours : "+this.counters);
+        this.counters.put(CounterType.DAYTYPE_AND_TIMESLOT, dayTypeAndTimeSlotKpiService);
+    }
+
+
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);
     }

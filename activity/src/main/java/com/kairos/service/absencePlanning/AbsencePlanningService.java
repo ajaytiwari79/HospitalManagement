@@ -76,11 +76,6 @@ public class AbsencePlanningService {
     private TaskService taskService;
     @Inject
     private ExceptionService exceptionService;
-
-     @Autowired
-    private StaffRestClient staffRestClient;
-     @Autowired
-    private OrganizationRestClient organizationRestClient;
      @Autowired
     private GenericIntegrationService genericIntegrationService;
 

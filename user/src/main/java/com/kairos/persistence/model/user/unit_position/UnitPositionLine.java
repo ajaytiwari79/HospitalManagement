@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class UnitPositionLine extends UserBaseEntity {
     private int fullTimeWeeklyMinutes;  // Its coming from expertise
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;       // same from expertise
-    private float hourlyCost;          // payGroupArea
+    private BigDecimal hourlyCost;          // payGroupArea
 
     public UnitPositionLine() {
         // DC
@@ -75,11 +76,11 @@ public class UnitPositionLine extends UserBaseEntity {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 
@@ -130,7 +131,7 @@ public class UnitPositionLine extends UserBaseEntity {
          private int fullTimeWeeklyMinutes;
          private float avgDailyWorkingHours;
          private int workingDaysInWeek;
-         private float hourlyCost;
+         private BigDecimal hourlyCost;
 
          public UnitPositionLineBuilder setSeniorityLevel(SeniorityLevel seniorityLevel) {
              this.seniorityLevel = seniorityLevel;
@@ -172,7 +173,7 @@ public class UnitPositionLine extends UserBaseEntity {
              return this;
          }
 
-         public UnitPositionLineBuilder setHourlyCost(float hourlyCost) {
+         public UnitPositionLineBuilder setHourlyCost(BigDecimal hourlyCost) {
              this.hourlyCost = hourlyCost;
              return this;
          }

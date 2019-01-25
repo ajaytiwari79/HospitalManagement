@@ -13,12 +13,10 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_ID;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.payroll.PayRollConstants.*;
+import static com.kairos.constants.payroll.PayRollAPIConstants.*;
 
 /*
  *Created By Pavan on 14/12/18

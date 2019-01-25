@@ -201,20 +201,9 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         return disabled;
     }
 
-    public WorkingTimeAgreement(BigInteger id, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Date startDate, Date endDate, Date expiryDate) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.expiryDate = expiryDate;
-    }
 
     public WorkingTimeAgreement() {
         //default
-    }
-    public WorkingTimeAgreement basicDetails() {
-        return new WorkingTimeAgreement(this.id, this.name, this.description, this.startDate, this.endDate, this.expiryDate);
     }
 
 

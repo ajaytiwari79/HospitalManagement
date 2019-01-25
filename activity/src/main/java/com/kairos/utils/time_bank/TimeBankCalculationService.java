@@ -102,7 +102,7 @@ public class TimeBankCalculationService {
                 functionId= appliedFunctionDTO.get().getId();
             }
             Long requiredFunctionId=unitPosition.getFunctionId()!=null?unitPosition.getFunctionId():functionId;
-            dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(), unitPosition.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate())));
+            dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(),  DateUtils.asLocalDate(interval.getStart().toDate())));
             int totalDailyTimebank = 0;
             int dailyScheduledMin = 0;
             int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(shifts.get(0).getStartDate()),unitPosition.getPositionLines());
@@ -143,7 +143,7 @@ public class TimeBankCalculationService {
 
                                     } else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
                                         if (ruleTemplate.getStaffFunctions().contains(requiredFunctionId)) {
-                                            float value = unitPosition.getHourlyCost() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / unitPosition.getHourlyCost() * 60 : 0;
+                                            float value = unitPosition.getHourlyCost().intValue() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / unitPosition.getHourlyCost().intValue() * 60 : 0;
                                             ctaTimeBankMin += value;
                                             totalDailyTimebank += ctaTimeBankMin;
                                         }
@@ -212,7 +212,7 @@ public class TimeBankCalculationService {
      * @param activity
      * @param unitPosition
      */
-    public void calculateScheduleAndDurationHour(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
+    public void calculateScheduledAndDurationMinutes(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
         if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())){
             exceptionService.invalidRequestException("activity.end_date.less_than.start_date",shiftActivity.getActivityName());
         }
