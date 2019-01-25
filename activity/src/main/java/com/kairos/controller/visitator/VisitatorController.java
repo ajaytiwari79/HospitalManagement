@@ -57,9 +57,9 @@ public class VisitatorController {
     @ApiOperation("Get Unit Visitation Info")
     @RequestMapping(value = "/unit_visitation",method = RequestMethod.GET)
    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getUnitVisitationInfo(@PathVariable long organizationId,@PathVariable long unitId){
+    public ResponseEntity<Map<String, Object>> getUnitVisitationInfo(@PathVariable long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,
-                visitatorService.getUnitVisitationInfo(organizationId, unitId));
+                visitatorService.getUnitVisitationInfo( unitId));
 
     }
 

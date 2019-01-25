@@ -29,14 +29,14 @@ public class StaffFilterController {
     @Inject
     private StaffFilterService filterService;
 
-    @RequestMapping(value = "/filter", method = RequestMethod.POST)
+    @RequestMapping(value = UNIT_URL+"/filter", method = RequestMethod.POST)
     @ApiOperation("To add favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addFavouriteFilter(@RequestBody StaffFilterDTO staffFilterDTO,@PathVariable Long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.addFavouriteFilter(organizationId, staffFilterDTO));
     }
 
-    @RequestMapping(value = "/filter/{filterId}", method = RequestMethod.PUT)
+    @RequestMapping(value = UNIT_URL+"/filter/{filterId}", method = RequestMethod.PUT)
     @ApiOperation("To update favourite filters ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId, @RequestBody StaffFilterDTO staffFilterDTO) {
@@ -46,11 +46,11 @@ public class StaffFilterController {
     @RequestMapping(value = UNIT_URL+"/all_filter/{moduleId}", method = RequestMethod.GET)
     @ApiOperation("To get all and favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllAndFavouriteFilters(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable String moduleId) {
+    public ResponseEntity<Map<String, Object>> getAllAndFavouriteFilters( @PathVariable long unitId, @PathVariable String moduleId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllAndFavouriteFilters(moduleId,  unitId));
     }
 
-    @RequestMapping(value = "/filter/{filterId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = UNIT_URL+"/filter/{filterId}", method = RequestMethod.DELETE)
     @ApiOperation("To delete favourite filters ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId) {

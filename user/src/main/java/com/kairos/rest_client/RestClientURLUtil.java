@@ -40,7 +40,7 @@ public class RestClientURLUtil {
             String baseUrl=new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
             return baseUrl;
         }else{
-            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl=new StringBuilder(userServiceUrl).toString();
             return baseUrl;
         }
     }
@@ -51,11 +51,11 @@ public class RestClientURLUtil {
             return baseUrl;
         }else {
             if(hasUnitInUrl){
-                String baseUrl=new StringBuilder(userServiceUrl+"organization/")
-                        .append(Optional.ofNullable(UserContext.getOrgId()).isPresent()?UserContext.getOrgId():"24").append("/unit/").append((Optional.ofNullable(id).isPresent()?id:UserContext.getUnitId())).toString();
+                String baseUrl=new StringBuilder(userServiceUrl)
+                        .append("/unit/").append((Optional.ofNullable(id).isPresent()?id:UserContext.getUnitId())).toString();
                 return baseUrl;
             }else{
-                String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(Optional.ofNullable(UserContext.getOrgId()).isPresent()?UserContext.getOrgId():"24").append("/country/").append(id).toString();
+                String baseUrl=new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
                 return baseUrl;
             }
         }

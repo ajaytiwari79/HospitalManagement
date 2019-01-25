@@ -130,7 +130,7 @@ public class CompanyCreationService {
     private TreeStructureService treeStructureService;
 
 
-    public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
+    public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);

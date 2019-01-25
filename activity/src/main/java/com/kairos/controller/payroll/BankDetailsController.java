@@ -60,9 +60,9 @@ public class BankDetailsController {
 
 
     @ApiOperation("get Bank details of Staff")
-    @GetMapping(STAFF_BANK_DETAILS)
-    public ResponseEntity<Map<String,Object>> getBankDetailsOfStaff(@PathVariable Long organizationId,@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfStaff(staffId,organizationId));
+    @GetMapping(UNIT_URL + STAFF_BANK_DETAILS)
+    public ResponseEntity<Map<String,Object>> getBankDetailsOfStaff(@PathVariable Long unitId,@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfStaff(staffId,unitId));
     }
 
 
@@ -73,15 +73,15 @@ public class BankDetailsController {
     }
 
     @ApiOperation("update Bank details of Organization")
-    @PutMapping(ORGANIZATION_BANK_DETAILS)
-    public ResponseEntity<Map<String,Object>> updateBankDetailsOfOrganization(@PathVariable Long organizationId,@RequestBody OrganizationBankDetailsDTO organizationBankDetailsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForOrganization(organizationId,organizationBankDetailsDTO));
+    @PutMapping(UNIT_URL+ORGANIZATION_BANK_DETAILS)
+    public ResponseEntity<Map<String,Object>> updateBankDetailsOfOrganization(@PathVariable Long unitId,@RequestBody OrganizationBankDetailsDTO organizationBankDetailsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForOrganization(unitId,organizationBankDetailsDTO));
     }
 
     @ApiOperation("get Bank details of Organization")
-    @GetMapping(ORGANIZATION_BANK_DETAILS)
-    public ResponseEntity<Map<String,Object>> getBankDetailsOfOrganization(@PathVariable Long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfOrganization(organizationId));
+    @GetMapping(UNIT_URL+ORGANIZATION_BANK_DETAILS)
+    public ResponseEntity<Map<String,Object>> getBankDetailsOfOrganization(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfOrganization(unitId));
     }
 
 }

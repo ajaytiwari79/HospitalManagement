@@ -581,12 +581,12 @@ public class TaskTypeController {
     }
 
     // Selected
-    @RequestMapping(value = "/organization/{organizationId}/sub_service/{subServiceId}/task_types", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/sub_service/{subServiceId}/task_types", method = RequestMethod.GET)
     @ApiOperation("Get Selected Tasks in SubService of Organization")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTaskTypesOfOrganizations(@PathVariable long organizationId, @PathVariable long subServiceId) {
+    public ResponseEntity<Map<String, Object>> getTaskTypesOfOrganizations(@PathVariable long unitId, @PathVariable long subServiceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                taskTypeService.getTaskTypesOfOrganizations(organizationId, subServiceId));
+                taskTypeService.getTaskTypesOfOrganizations(unitId, subServiceId));
     }
 
 

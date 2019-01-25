@@ -98,7 +98,7 @@ public class OrganizationServiceController {
 
     @RequestMapping(value = "/organization_service", method = RequestMethod.GET)
     @ApiOperation("Find all organization_service")
-    public ResponseEntity<Map<String, Object>> getAllOrganizationService(@PathVariable Long organizationId, @PathVariable Long countryId) {
+    public ResponseEntity<Map<String, Object>> getAllOrganizationService(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getAllOrganizationService(countryId));
     }
 
