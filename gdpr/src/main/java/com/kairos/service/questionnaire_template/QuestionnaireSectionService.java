@@ -69,14 +69,15 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
 
     /**
-     * @param countryId
+     * @param organizationCountryId
      * @param templateId                    questionnaire template id ,required to fetch
      * @param masterQuestionnaireSectionDto contains list of sections ,And section contain list of questions
      * @return add sections ids to questionnaire template and return questionnaire template
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
-    public QuestionnaireTemplateResponseDTO addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto) {
-        QuestionnaireTemplateMD questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, countryId, false);
+    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long organizationCountryId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto, boolean isMaster) {
+        QuestionnaireTemplateMD questionnaireTemplate = isMaster ? questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, organizationCountryId, false) :
+                questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(templateId, organizationCountryId, false);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
@@ -86,7 +87,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
         //List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto.getSections(), questionnaireTemplate.getTemplateType());
        // questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateRepository.save(questionnaireTemplate);
-        return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(countryId, questionnaireTemplate.getId(),true);
+        return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(organizationCountryId, questionnaireTemplate.getId(),true);
 
     }
 
@@ -146,42 +147,20 @@ public class QuestionnaireSectionService extends MongoBaseService {
     }
 
     /**
-     * @param countryId
+     * @param organizationCountryId
      * @param templateId
      * @param questionnaireSectionId
      * @return
      * @description soft delete section and remove section id from template
      */
-    public boolean deleteMasterQuestionnaireSection(Long countryId, Long templateId, Long questionnaireSectionId) {
-        QuestionnaireSectionMD questionnaireSection = questionnaireSectionMDRepository.findByIdAndDeleted( questionnaireSectionId,false);
+    public boolean deleteQuestionnaireSectionFromTemplate(Long organizationCountryId, Long templateId, Long questionnaireSectionId, boolean isMaster) {
+        QuestionnaireSectionMD questionnaireSection =  questionnaireSectionMDRepository.findByIdAndDeleted( questionnaireSectionId,false);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  section", templateId);
         }
         questionnaireSection.delete();
         questionnaireTemplateRepository.removeSectionFromQuestionnaireTemplate(templateId, questionnaireSectionId);
         return true;
-    }
-
-
-    /**
-     * @param unitId
-     * @param questionnaireTemplateId
-     * @param questionnaireSectionDTO
-     * @return
-     */
-    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(Long unitId, Long questionnaireTemplateId, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {
-
-        QuestionnaireTemplateMD questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId, false);
-        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template", questionnaireTemplateId);
-        }
-        //checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(unitId, questionnaireTemplateId, questionnaireTemplate, questionnaireSectionDTO);
-        checkForDuplicacyInTitleOfSectionsAndQuestionTitle(questionnaireSectionDTO.getSections());
-        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(unitId, true, questionnaireSectionDTO.getSections(), questionnaireTemplate.getTemplateType());
-        //questionnaireTemplate.setSections(sectionIdList);
-        questionnaireTemplate.setTemplateStatus(questionnaireSectionDTO.getTemplateStatus());
-        questionnaireTemplateRepository.save(questionnaireTemplate);
-        return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(unitId, questionnaireTemplate.getId(), false);
     }
 
     private void checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {
@@ -260,17 +239,6 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
         }
     }
-
-    public boolean deleteQuestionnaireSectionByUnitId(Long unitId, BigInteger templateId, BigInteger questionnaireSectionId) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByUnitIdAndId(unitId, templateId);
-        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
-        }
-        questionnaireTemplate.getSections().remove(questionnaireSectionId);
-        questionnaireSectionRepository.safeDeleteById(questionnaireSectionId);
-        return true;
-    }
-
 
     private void checkForDuplicacyInTitleOfSectionsAndQuestionTitle(List<QuestionnaireSectionDTO> questionnaireSectionDTOs) {
         List<String> titles = new ArrayList<>();
