@@ -100,6 +100,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -119,6 +120,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.AppConstants.MULTIPLE_ACTIVITY;
 import static com.kairos.enums.shift.ShiftStatus.*;
+import static com.kairos.enums.shift.ViewType.INDIVIDUAL;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -667,19 +669,19 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long week, Long unitPositionId, String type) {
+    public ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate,Long unitPositionId) {
         Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap();
         List<ReasonCodeDTO> reasonCodeDTOS;
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
         if(Optional.ofNullable(unitPositionId).isPresent()){
             staffAdditionalInfoDTO = genericIntegrationService.verifyUnitPositionAndFindFunctionsAfterDate(startDate, staffId, unitPositionId);
-            reasonCodeDTOS = staffAdditionalInfoDTO.getReasonCodes();
             if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId, type);
+                exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId);
             }
             if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
                 exceptionService.actionNotPermittedException("message.unit.position", startDate.toString());
             }
+            reasonCodeDTOS = staffAdditionalInfoDTO.getReasonCodes();
             List<AppliedFunctionDTO> appliedFunctionDTOs = null;
             if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
                 appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
@@ -707,7 +709,6 @@ public class ShiftService extends MongoBaseService {
                 endDate = DateUtils.getLocalDate();
             }
         }
-        Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap = new HashMap<>();
         List<ShiftDTO> shifts;
         if(Optional.ofNullable(unitPositionId).isPresent()){
             shifts = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate.plusDays(1)), unitId);
@@ -1453,5 +1454,11 @@ public class ShiftService extends MongoBaseService {
             }
         }
         return activityShiftStatusSettings;
+    }
+
+    public ResponseEntity<Map<String, Object>> getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long unitPositionId, ViewType viewType){
+        if(INDIVIDUAL.equals(viewType)){
+            return getShiftByStaffId(unitId,staffId, startDate, endDate,unitPositionId);
+        }
     }
 }
