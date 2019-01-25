@@ -2,9 +2,6 @@ package com.kairos.persistence.repository.risk_management;
 
 
 import com.kairos.response.dto.common.RiskResponseDTO;
-import com.kairos.response.dto.common.riskresponseDTO;
-import org.hibernate.transform.AliasToBeanResultTransformer;
-import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;

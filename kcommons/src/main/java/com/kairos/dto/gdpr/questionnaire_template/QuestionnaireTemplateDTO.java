@@ -9,14 +9,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionnaireTemplateDTO {
 
-    private BigInteger id;
+    private Long id;
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
@@ -24,21 +23,21 @@ public class QuestionnaireTemplateDTO {
     private String description;
     @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
-    private BigInteger assetType;
-    private BigInteger assetSubType;
+    private Long assetType;
+    private Long assetSubType;
     private boolean defaultAssetTemplate;
     private QuestionnaireTemplateStatus templateStatus;
     private QuestionnaireTemplateType riskAssociatedEntity;
     @Valid
     private List<QuestionnaireSectionDTO> sections=new ArrayList<>();
 
-    public BigInteger getAssetSubType() { return assetSubType; }
+    public Long getAssetSubType() { return assetSubType; }
 
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 
     public void setRiskAssociatedEntity(QuestionnaireTemplateType riskAssociatedEntity) { this.riskAssociatedEntity = riskAssociatedEntity; }
 
-    public void setAssetSubType(BigInteger assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(Long assetSubType) { this.assetSubType = assetSubType; }
 
     public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
 
@@ -68,13 +67,13 @@ public class QuestionnaireTemplateDTO {
 
     public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
 
-    public BigInteger getAssetType() { return assetType; }
+    public Long getAssetType() { return assetType; }
 
-    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
+    public void setAssetType(Long assetType) { this.assetType = assetType; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public QuestionnaireTemplateDTO setId(BigInteger id) { this.id = id;return this;}
+    public QuestionnaireTemplateDTO setId(Long id) { this.id = id;return this;}
 
     public List getSections() { return sections; }
 

@@ -4,15 +4,13 @@ package com.kairos.persistence.model.questionnaire_template;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,18 +19,27 @@ public class QuestionnaireTemplateMD extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
+
     @NotBlank(message = "Description cannot be empty")
     private String description;
-    @NotBlank(message = "Template type cannot be empty ")
+
+    @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
+
     @OneToOne
     private AssetTypeMD assetType;
+
     @OneToOne
     private AssetTypeMD assetSubType;
+
     private Long countryId;
-    private boolean defaultAssetTemplate;
+
+    private boolean isDefaultAssetTemplate;
+
     private QuestionnaireTemplateStatus templateStatus;
+
     private QuestionnaireTemplateType riskAssociatedEntity;
+
     @OneToMany
     private List<QuestionnaireSectionMD> sections=new ArrayList<>();
 
@@ -99,10 +106,18 @@ public class QuestionnaireTemplateMD extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
+    public boolean isDefaultAssetTemplate() { return isDefaultAssetTemplate; }
 
-    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.isDefaultAssetTemplate = defaultAssetTemplate; }
 
     public QuestionnaireTemplateMD() {
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.getSections().forEach( section -> {
+            section.delete();
+        });
     }
 }

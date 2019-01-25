@@ -67,5 +67,9 @@ public interface AssetTypeRepository extends JpaRepository<AssetTypeMD,Long> {
     AssetTypeMD findByIdAndOrganizationIdAndAssetTypeAndDeleted(Long id, Long assetTypeId, Long orgId);
 
 
+    @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?3 and at.deleted = false and at.id = ?1 and at.assetType.id = ?2 and at.subAssetType = true")
+    AssetTypeMD findByIdAndCountryIdAndAssetTypeAndDeleted(Long id, Long assetTypeId, Long countryId);
+
+
 
 }

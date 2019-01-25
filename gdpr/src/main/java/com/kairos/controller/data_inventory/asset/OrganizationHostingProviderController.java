@@ -58,7 +58,7 @@ public class OrganizationHostingProviderController {
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/hosting_provider/{hostingProviderId}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable Long hostingProviderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, hostingProviderId));
 
     }

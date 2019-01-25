@@ -11,7 +11,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionnaireSectionResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "name.cannot.be.empty.or.null")
     private String title;
@@ -19,11 +19,11 @@ public class QuestionnaireSectionResponseDTO {
     private List<QuestionBasicResponseDTO> questions=new ArrayList<>();
 
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

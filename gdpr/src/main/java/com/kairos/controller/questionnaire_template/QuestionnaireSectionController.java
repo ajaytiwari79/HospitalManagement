@@ -31,7 +31,7 @@ public class QuestionnaireSectionController {
 
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping(COUNTRY_URL + "/questionnaire_template/{templateId}/section")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
 
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
             return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
@@ -49,7 +49,7 @@ public class QuestionnaireSectionController {
 
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping(UNIT_URL + "/questionnaire_template/{templateId}/section")
-    public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
+    public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long unitId, @PathVariable Long templateId, @Validated @RequestBody QuestionnaireTemplateSectionDTO questionnaireSectionsDto) {
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
             return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
         }

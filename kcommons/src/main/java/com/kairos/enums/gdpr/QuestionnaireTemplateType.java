@@ -10,5 +10,15 @@ public  enum QuestionnaireTemplateType
         this.value = value;
     }
 
+    public static QuestionnaireTemplateType getQuestionnaireTemplateType(final String value) {
+
+        for (QuestionnaireTemplateType templateType : QuestionnaireTemplateType.values()) {
+            if (value.equals(templateType.toString())) {
+                return templateType;
+            }
+        }
+        return null;
+    }
+
 
 }

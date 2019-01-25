@@ -5,12 +5,15 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProviderMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,7 +43,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     private HostingProviderService hostingProviderService;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
 
     /**
@@ -113,14 +116,19 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingProvider(Long unitId, BigInteger hostingProviderId) {
-
-      /*  List<AssetBasicResponseDTO> assetsLinkedWithHostingProvider = assetMongoRepository.findAllAssetLinkedWithHostingProvider(unitId, hostingProviderId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingProvider)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", new StringBuilder(assetsLinkedWithHostingProvider.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+    public Boolean deleteHostingProvider(Long unitId, Long hostingProviderId) {
+        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, hostingProviderId);
+        if (CollectionUtils.isNotEmpty(assetNames)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
         }
-        hostingProviderMongoRepository.safeDeleteById(hostingProviderId)*/;
+        Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, unitId);
+        if (resultCount > 0) {
+            LOGGER.info("Hosting provider deleted successfully for id :: {}", hostingProviderId);
+        }else{
+            throw new DataNotFoundByIdException("No data found");
+        }
         return true;
+
     }
 
 

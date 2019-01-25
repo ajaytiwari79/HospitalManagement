@@ -23,7 +23,7 @@ version = "$projectVersion-SNAPSHOT"
 
 sourceCompatibility = 1.8
 mainClassName = 'com.kairos.KairosGdprApplication'
-
+applicationDefaultJvmArgs = ["-Xms512m", "-Xmx1536m"]
 repositories {
     mavenCentral()
     jcenter()

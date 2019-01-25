@@ -9,11 +9,13 @@ import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -36,6 +38,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
     @Inject
     private QuestionnaireSectionRepository questionnaireSectionRepository;
+
+    @Inject
+    private QuestionnaireTemplateRepository questionnaireTemplateRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -68,17 +73,17 @@ public class QuestionnaireSectionService extends MongoBaseService {
      * @return add sections ids to questionnaire template and return questionnaire template
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
-    public QuestionnaireTemplateResponseDTO addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, BigInteger templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByCountryIdAndId(countryId, templateId);
+    public QuestionnaireTemplateResponseDTO addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto) {
+        QuestionnaireTemplateMD questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, countryId, false);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
 
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(masterQuestionnaireSectionDto.getSections());
         List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto.getSections(), questionnaireTemplate.getTemplateType());
-        questionnaireTemplate.setSections(sectionIdList);
-        questionnaireTemplateMongoRepository.save(questionnaireTemplate);
-        return questionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, questionnaireTemplate.getId());
+       // questionnaireTemplate.setSections(sectionIdList);
+        questionnaireTemplateRepository.save(questionnaireTemplate);
+        return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(countryId, questionnaireTemplate.getId(),true);
 
     }
 
@@ -161,19 +166,19 @@ public class QuestionnaireSectionService extends MongoBaseService {
      * @param questionnaireSectionDTO
      * @return
      */
-    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {
+    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(Long unitId, Long questionnaireTemplateId, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {
 
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByUnitIdAndId(unitId, questionnaireTemplateId);
+        QuestionnaireTemplateMD questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId, false);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template", questionnaireTemplateId);
         }
-        checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(unitId, questionnaireTemplateId, questionnaireTemplate, questionnaireSectionDTO);
+        //checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(unitId, questionnaireTemplateId, questionnaireTemplate, questionnaireSectionDTO);
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(questionnaireSectionDTO.getSections());
         List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(unitId, true, questionnaireSectionDTO.getSections(), questionnaireTemplate.getTemplateType());
-        questionnaireTemplate.setSections(sectionIdList);
+        //questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplate.setTemplateStatus(questionnaireSectionDTO.getTemplateStatus());
-        questionnaireTemplateMongoRepository.save(questionnaireTemplate);
-        return questionnaireTemplateService.getQuestionnaireTemplateWithSectionByUnitIdAndId(unitId, questionnaireTemplate.getId());
+        questionnaireTemplateRepository.save(questionnaireTemplate);
+        return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(unitId, questionnaireTemplate.getId(), false);
     }
 
     private void checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {

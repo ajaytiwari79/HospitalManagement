@@ -5,6 +5,7 @@ import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.math.BigInteger;
@@ -15,7 +16,8 @@ import java.util.List;
 public class QuestionnaireSectionMD extends BaseEntity {
 
     private String title;
-    @OneToMany
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<QuestionMD> questions=new ArrayList<>();
     private Long countryId;
 
