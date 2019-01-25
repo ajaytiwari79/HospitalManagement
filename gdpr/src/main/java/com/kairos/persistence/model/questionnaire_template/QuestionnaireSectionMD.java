@@ -59,4 +59,11 @@ public class QuestionnaireSectionMD extends BaseEntity {
     }
 
 
+    @Override
+    public void delete() {
+        super.delete();
+        this.questions.forEach(question -> {
+            question.delete();
+        });
+    }
 }

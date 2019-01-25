@@ -1,6 +1,7 @@
 package com.kairos.service.questionnaire_template;
 
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
@@ -8,14 +9,12 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionMD;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
+import com.kairos.persistence.repository.questionnaire_template.*;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -38,6 +37,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
     @Inject
     private QuestionnaireSectionRepository questionnaireSectionRepository;
+
+    @Inject
+    private QuestionnaireSectionMDRepository questionnaireSectionMDRepository;
 
     @Inject
     private QuestionnaireTemplateRepository questionnaireTemplateRepository;
@@ -80,7 +82,8 @@ public class QuestionnaireSectionService extends MongoBaseService {
         }
 
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(masterQuestionnaireSectionDto.getSections());
-        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto.getSections(), questionnaireTemplate.getTemplateType());
+        questionnaireTemplate.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(masterQuestionnaireSectionDto.getSections(), QuestionnaireSectionMD.class));
+        //List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto.getSections(), questionnaireTemplate.getTemplateType());
        // questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateRepository.save(questionnaireTemplate);
         return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(countryId, questionnaireTemplate.getId(),true);
@@ -98,7 +101,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
         for (QuestionnaireSectionDTO questionnaireSectionDTO : questionnaireSectionDTOS) {
             if (Optional.ofNullable(questionnaireSectionDTO.getId()).isPresent()) {
-                questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
+                //questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
             } else {
                 QuestionnaireSection questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO, referenceId, isReferenceIdUnitId);
                 newQuestionnaireSections.add(questionnaireSection);
@@ -149,13 +152,13 @@ public class QuestionnaireSectionService extends MongoBaseService {
      * @return
      * @description soft delete section and remove section id from template
      */
-    public boolean deleteMasterQuestionnaireSection(Long countryId, BigInteger templateId, BigInteger questionnaireSectionId) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByCountryIdAndId(countryId, templateId);
-        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
+    public boolean deleteMasterQuestionnaireSection(Long countryId, Long templateId, Long questionnaireSectionId) {
+        QuestionnaireSectionMD questionnaireSection = questionnaireSectionMDRepository.findByIdAndDeleted( questionnaireSectionId,false);
+        if (!Optional.ofNullable(questionnaireSection).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  section", templateId);
         }
-        questionnaireTemplate.getSections().remove(questionnaireSectionId);
-        questionnaireSectionRepository.safeDeleteById(questionnaireSectionId);
+        questionnaireSection.delete();
+        questionnaireTemplateRepository.removeSectionFromQuestionnaireTemplate(templateId, questionnaireSectionId);
         return true;
     }
 

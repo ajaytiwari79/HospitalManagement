@@ -6,6 +6,7 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -40,7 +41,7 @@ public class QuestionnaireTemplateMD extends BaseEntity {
 
     private QuestionnaireTemplateType riskAssociatedEntity;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<QuestionnaireSectionMD> sections=new ArrayList<>();
 
     public QuestionnaireTemplateMD(String name, Long countryId, String description) {

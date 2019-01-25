@@ -8,9 +8,11 @@ import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -51,5 +53,10 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
 
     @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.id = ?2 and QT.deleted = false")
     QuestionnaireTemplateMD getQuestionnaireTemplateWithSectionsByOrganizationId(Long orgId, Long questionnaireTemplateId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from questionnaire_templatemd_sections where questionnaire_templatemd_id = ?1 and sections_id = ?2", nativeQuery = true)
+    Integer removeSectionFromQuestionnaireTemplate(Long templateId, Long sectionId);
 
 }
