@@ -52,8 +52,8 @@ public class CounterServiceMapping {
     }
 
     @Inject
-    public void calculateWeekDayAndWeekEndHours(DayTypeAndTimeSlotKpiService dayTypeAndTimeSlotKpiService) {
-        logger.info("Enum mapping for calculate WeekDay And WeekEnd Hours : "+this.counters);
+    public void calculateDayTypeAndTimeSlotHours(DayTypeAndTimeSlotKpiService dayTypeAndTimeSlotKpiService) {
+        logger.info("Enum mapping for calculate daytype And timeslot Hours : "+this.counters);
         this.counters.put(CounterType.DAYTYPE_AND_TIMESLOT, dayTypeAndTimeSlotKpiService);
     }
 
