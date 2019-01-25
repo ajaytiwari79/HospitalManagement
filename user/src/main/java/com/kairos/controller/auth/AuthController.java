@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
-
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**
@@ -178,9 +178,9 @@ public class AuthController {
     }
 
 
-    @RequestMapping(value =  "/user/permissions", method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(organizationId));
+    @RequestMapping(value =  UNIT_URL+"/user/permissions", method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(unitId));
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
 

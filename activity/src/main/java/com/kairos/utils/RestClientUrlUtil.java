@@ -73,7 +73,7 @@ public class RestClientUrlUtil {
                 break;
             case COUNTRY:baseUrl = new StringBuilder(userServiceUrl ).append("/country/").append(id).toString();
                 break;
-            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
+            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl ).toString();
                 break;
             case COUNTRY_WITHOUT_PARENT_ORG:
                 baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
