@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DayTypeDTO {
+
     private Long id;
     @NotBlank(message = "error.DayType.name.notEmpty")
     private String name;
@@ -82,6 +83,7 @@ public class DayTypeDTO {
         this.holidayType = holidayType;
     }
 
+
     public String getDescription() {
         return description;
     }
@@ -105,6 +107,7 @@ public class DayTypeDTO {
     public void setCode(int code) {
         this.code = code;
     }
+
 
     public String getColorCode() {
         return colorCode;

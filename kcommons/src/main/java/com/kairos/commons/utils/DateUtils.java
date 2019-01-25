@@ -863,6 +863,11 @@ public  class DateUtils {
 
     }
 
+    public static LocalDateTime getLocalDateTimeFromLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
+        return LocalDateTime.of(localDate,localTime);
+
+    }
+
     public static Date getDateFromTimeZone(String timeZone){
        return new Date(Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime());
     }
