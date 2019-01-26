@@ -81,7 +81,8 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
 
         }
-        return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
+        tag.setName(tagDTO.getName());
+        return tagGraphRepository.save(tag);
     }
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
@@ -182,7 +183,10 @@ public class TagService {
             exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
 
         }
-        return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
+        tag.setName(tagDTO.getName());
+        tagGraphRepository.save(tag);
+        return tag;
+        //return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
 
     public Boolean deleteOrganizationTag(Long orgId, Long tagId, String type){

@@ -57,6 +57,7 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type, false));
     }
 
+    //Done
     @ApiOperation("Get Shift of a staff")
     @GetMapping(value = "/shift/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -100,6 +101,7 @@ public class ShiftController {
     }
 
 
+    //Done
     @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
     @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -113,13 +115,14 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftCopyService.copyShifts(unitId, copyShiftDTO));
     }
 
+    //Done
     @ApiOperation("Get Shift of a staff based upon expertise")
     @GetMapping(value = "/shifts/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftOfStaffByExpertiseId(@PathVariable Long staffId, @PathVariable Long unitId,
                                                                             @RequestParam Long expertiseId,
-                                                                            @RequestParam(value = "startDate", required = false) String startDate,
-                                                                            @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+                                                                            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                                            @RequestParam(value = "endDate", required = false) LocalDate endDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, startDate, endDate, expertiseId));
     }
 
@@ -197,30 +200,24 @@ public class ShiftController {
     }
 
     @ApiOperation("create shift state")
-    @GetMapping("/shift/create_state")
+    @PostMapping("/shift/create_state")
     public ResponseEntity<Map<String, Object>> createShiftState(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStateService.createShiftState(unitId, startDate, endDate));
     }
 
-    @ApiOperation("Get Shift of a staff")
-    @GetMapping(value = "/shift/staff/{staffId}")
+    @ApiOperation("Get shifts by staff/unit/expertise/date ")
+    @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long staffId, @PathVariable Long unitId,
+    public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
                                                                     @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
                                                                     @RequestParam(value = "startDate", required = false)
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                                                    @RequestParam(value = "endDate", required = false)
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                                                                    @RequestParam("viewType") ViewType viewType,
-                                                                    @RequestParam(value = "includeOpenShifts",required = false)  boolean includeOpenShifts) {
-        if(INDIVIDUAL.equals(viewType)){
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId));
-        }
-        if(includeOpenShifts){
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), viewType));
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId,viewType));
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam("viewType") ViewType viewType,
+                                                                    @RequestParam(value = "includeOpenShifts",required = false)  boolean includeOpenShifts,
+                                                                    @RequestParam(value = "staffId",required = false) Long staffId,
+                                                                    @RequestParam(value = "expertiseId",required = false) Long expertiseId,
+                                                                    @RequestParam(value = "includeShiftState",required = false)  boolean includeShiftState) throws ParseException{
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId,viewType,includeOpenShifts,expertiseId,includeShiftState));
     }
 
 }

@@ -19,6 +19,8 @@ public class TimeSlotWrapper {
     private int endMinute;
     private boolean shiftStartTime = false;
     private String name;
+    //for kpi use
+    private Long unitId;
 
     public String getName() {
         return name;
@@ -74,5 +76,13 @@ public class TimeSlotWrapper {
 
     public void setShiftStartTime(boolean shiftStartTime) {
         this.shiftStartTime = shiftStartTime;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

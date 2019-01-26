@@ -944,13 +944,12 @@ public class UnitPositionService {
     /**
      * @param unitId
      * @param staffId
-     * @param dateInMillis
      * @param expertiseId
      * @return
      * @Desc This method is used to veify the unit position of staff while copy shift
      */
-    public Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long dateInMillis, Long expertiseId) {
-        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId, DateUtils.getLocalDate(dateInMillis));
+    public Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId) {
+        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId);
     }
 
     public Map<Long, Long> getUnitPositionExpertiseMap(Long unitId) {
