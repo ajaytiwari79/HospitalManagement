@@ -6,7 +6,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -25,11 +25,12 @@ public class TimeTypeService extends MongoBaseService {
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
-    private ActivityMongoRepositoryImpl activityMongoRepository;
+    private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private ActivityCategoryService activityCategoryService;
+
 
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
@@ -39,6 +40,9 @@ public class TimeTypeService extends MongoBaseService {
             exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
         }
         BigInteger upperLevelTimeTypeId=timeTypeDTOs.get(0).getUpperLevelTimeTypeId();
+        if(activityMongoRepository.existsByTimeTypeId(upperLevelTimeTypeId)){
+            exceptionService.actionNotPermittedException("activity already exists witht his time type");
+        }
         TimeType upperTimeType=timeTypeMongoRepository.findOneById(upperLevelTimeTypeId);
         timeTypeDTOs.forEach(timeTypeDTO -> {
             TimeType timeType;
@@ -223,7 +227,6 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public boolean deleteTimeType(BigInteger timeTypeId, Long countryId) {
-
         List<Activity> activity = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
         if (activity.isEmpty() && timeTypes.isEmpty()) {
