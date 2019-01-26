@@ -282,7 +282,7 @@ public class CounterDistService extends MongoBaseService {
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabIds, kpiIds, refId, level);
         if (!isCountryAdmin) {
-            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIOfStaffByKPIId(kpiIds, refId, level,unitId);
+            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds, refId, level);
             if (kpiIds.size() != applicableKPIS.size()) {
                 exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
             }
