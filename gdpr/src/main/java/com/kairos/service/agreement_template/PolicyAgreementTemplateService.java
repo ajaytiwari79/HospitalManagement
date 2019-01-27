@@ -3,7 +3,6 @@ package com.kairos.service.agreement_template;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.*;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;

@@ -7,18 +7,15 @@ import com.kairos.config.codec.BigIntegerCodecProvider;
 import com.kairos.config.codec.BigIntegerTransformer;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.utils.user_context.UserContext;
 import com.mongodb.*;
 import org.bson.BSON;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.context.annotation.Bean;
@@ -30,9 +27,7 @@ import org.springframework.core.annotation.Order;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Configuration
 @EnableAspectJAutoProxy

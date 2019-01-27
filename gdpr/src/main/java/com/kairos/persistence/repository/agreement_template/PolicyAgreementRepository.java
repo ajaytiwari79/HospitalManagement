@@ -2,11 +2,9 @@ package com.kairos.persistence.repository.agreement_template;
 
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplateMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @Repository

@@ -1,10 +1,7 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
 
-import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMappingMD;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
 import java.util.List;
 
 @Repository

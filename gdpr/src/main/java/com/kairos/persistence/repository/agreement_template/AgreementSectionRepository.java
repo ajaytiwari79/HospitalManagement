@@ -2,15 +2,12 @@ package com.kairos.persistence.repository.agreement_template;
 
 
 import com.kairos.persistence.model.agreement_template.AgreementSectionMD;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
-import java.util.List;
 
 
 @Repository

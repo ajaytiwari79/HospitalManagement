@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.gdpr.QuestionType;
 
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

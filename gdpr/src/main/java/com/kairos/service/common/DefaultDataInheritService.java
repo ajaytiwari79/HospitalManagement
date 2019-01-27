@@ -215,7 +215,7 @@ public class DefaultDataInheritService extends MongoBaseService {
             return true;
         };
         Callable<Boolean> questionniareTemplateTask = () -> {
-            List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllMasterQuestionnaireTemplateWithSection(countryId);
+            List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(countryId);
             copyQuestionnaireTemplateFromCountry(unitId, questionnaireTemplateDTOS);
             return true;
         };
@@ -264,13 +264,13 @@ public class DefaultDataInheritService extends MongoBaseService {
                 Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
                 asset.setOrganizationId(unitId);
                 AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
-                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
+//                asset.setAssetTypeId(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
                 if (Optional.of(masterAssetDTO.getAssetSubType()).isPresent()) {
-                    asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getAssetSubType().getName().toLowerCase().trim()));
+                   // asset.setAssetSubTypeId(globalAssetTypeAndSubAssetTypeMap.get(masterAssetDTO.getAssetSubType().getName().toLowerCase().trim()));
                 }
                 assets.add(asset);
             }
-            assetMongoRepository.saveAll(getNextSequence(assets));
+           // assetMongoRepository.saveAll(getNextSequence(assets));
         }
     }
 

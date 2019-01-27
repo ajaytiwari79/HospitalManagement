@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,7 +8,6 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

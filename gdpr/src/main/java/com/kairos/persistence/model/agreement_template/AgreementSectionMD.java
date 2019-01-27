@@ -99,8 +99,8 @@ public class AgreementSectionMD extends BaseEntity {
         });
         this.agreementSubSections.forEach(subSection -> {
             subSection.delete();
-            subSection.getClauses().forEach( subSectionclause -> {
-                subSectionclause.setDeleted(false);
+            subSection.getClauses().forEach( subSectionClause -> {
+                subSectionClause.setDeleted(false);
             });
         });
     }

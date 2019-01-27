@@ -2,8 +2,6 @@ package com.kairos.persistence.model.data_inventory.processing_activity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.BaseEntity;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;

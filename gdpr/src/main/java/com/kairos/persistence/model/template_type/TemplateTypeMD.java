@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.template_type;
 
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;

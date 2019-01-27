@@ -6,7 +6,6 @@ import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 

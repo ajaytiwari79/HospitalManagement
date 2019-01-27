@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

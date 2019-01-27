@@ -1,19 +1,14 @@
 package com.kairos.persistence.repository.master_data.asset_management;
 
 
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
-import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 //@JaversSpringDataAuditable

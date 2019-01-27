@@ -5,12 +5,10 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.TechnicalSecurityMeasureService;
@@ -22,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 

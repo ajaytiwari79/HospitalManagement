@@ -3,17 +3,13 @@ package com.kairos.persistence.repository.questionnaire_template;
 
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
 import java.util.List;
 
 @Repository

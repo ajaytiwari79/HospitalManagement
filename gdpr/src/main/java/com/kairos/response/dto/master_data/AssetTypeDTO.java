@@ -2,12 +2,9 @@ package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetTypeDTO {

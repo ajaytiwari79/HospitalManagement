@@ -1,15 +1,11 @@
 package com.kairos.persistence.repository.template_type;
 
-import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**

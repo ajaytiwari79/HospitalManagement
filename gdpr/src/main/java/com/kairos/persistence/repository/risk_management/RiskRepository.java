@@ -1,21 +1,10 @@
 package com.kairos.persistence.repository.risk_management;
 
-import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
-import com.kairos.response.dto.common.RiskResponseDTO;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Entity;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQuery;
-import javax.transaction.Transactional;
-import java.math.BigInteger;
 import java.util.List;
 
 

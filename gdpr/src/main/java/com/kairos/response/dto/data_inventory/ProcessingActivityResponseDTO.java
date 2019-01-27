@@ -6,12 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
-import com.kairos.dto.gdpr.master_data.DataSubjectDTO;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

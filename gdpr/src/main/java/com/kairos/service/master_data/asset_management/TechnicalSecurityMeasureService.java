@@ -6,7 +6,6 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;

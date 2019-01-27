@@ -2,8 +2,6 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataElementBasicResponseDTO {

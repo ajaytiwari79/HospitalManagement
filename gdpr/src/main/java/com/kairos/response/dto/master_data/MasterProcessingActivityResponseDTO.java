@@ -10,7 +10,6 @@ import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

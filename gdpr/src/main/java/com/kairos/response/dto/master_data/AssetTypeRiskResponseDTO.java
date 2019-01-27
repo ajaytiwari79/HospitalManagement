@@ -6,7 +6,6 @@ import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

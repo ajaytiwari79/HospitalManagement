@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

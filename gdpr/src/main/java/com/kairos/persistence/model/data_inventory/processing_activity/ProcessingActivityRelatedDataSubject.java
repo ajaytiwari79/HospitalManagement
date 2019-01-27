@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.javers.core.metamodel.annotation.ValueObject;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

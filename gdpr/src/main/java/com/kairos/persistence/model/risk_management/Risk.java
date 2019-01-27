@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.risk_management;
 
-import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.time.LocalDate;
 
 @Document
 public class Risk extends MongoBaseEntity {

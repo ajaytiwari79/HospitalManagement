@@ -5,7 +5,6 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @Repository

@@ -1,18 +1,13 @@
 package com.kairos.persistence.repository.master_data.asset_management.tech_security_measure;
 
 
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface TechnicalSecurityMeasureRepository extends CustomGenericRepository<TechnicalSecurityMeasureMD> {

@@ -2,20 +2,14 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity

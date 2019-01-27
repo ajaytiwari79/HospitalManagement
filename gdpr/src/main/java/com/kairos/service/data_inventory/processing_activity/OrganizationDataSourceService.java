@@ -6,13 +6,10 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.DataSourceDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSourceMD;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
@@ -20,11 +17,9 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 

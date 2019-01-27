@@ -8,7 +8,6 @@ import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.asset.AssetMD;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.risk_management.RiskMD;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
@@ -25,9 +24,7 @@ import com.kairos.persistence.repository.master_data.asset_management.storage_fo
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;

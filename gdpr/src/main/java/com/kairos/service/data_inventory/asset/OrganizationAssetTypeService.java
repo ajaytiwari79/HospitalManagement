@@ -8,7 +8,6 @@ import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
-import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.model.risk_management.RiskMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
@@ -16,10 +15,7 @@ import com.kairos.persistence.repository.master_data.asset_management.AssetTypeM
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
-import com.kairos.response.dto.common.RiskBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
-import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
@@ -34,7 +30,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class OrganizationAssetTypeService extends MongoBaseService {

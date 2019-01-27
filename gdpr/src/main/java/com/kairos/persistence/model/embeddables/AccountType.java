@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.embeddables;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 

@@ -2,16 +2,10 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity

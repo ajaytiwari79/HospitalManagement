@@ -4,7 +4,6 @@ package com.kairos.controller.data_category_element;
 import com.kairos.dto.gdpr.master_data.DataElementDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.service.data_subject_management.DataElementService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

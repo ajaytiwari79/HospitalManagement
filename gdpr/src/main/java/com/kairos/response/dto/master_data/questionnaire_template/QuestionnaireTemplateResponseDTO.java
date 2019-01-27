@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

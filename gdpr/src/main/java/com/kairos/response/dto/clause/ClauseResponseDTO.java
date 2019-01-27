@@ -8,14 +8,11 @@ import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
-import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
-import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.clause_tag.ClauseTagMD;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

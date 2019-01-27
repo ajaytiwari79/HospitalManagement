@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.master_data.asset_management.org_secur
 
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasureMD;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;

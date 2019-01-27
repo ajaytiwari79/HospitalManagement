@@ -2,9 +2,7 @@ package com.kairos.persistence.repository.master_data.asset_management.hosting_t
 
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingTypeMD;
-import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

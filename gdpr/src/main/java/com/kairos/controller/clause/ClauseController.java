@@ -4,7 +4,6 @@ package com.kairos.controller.clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.service.clause.ClauseService;
@@ -19,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.ApiConstant.*;

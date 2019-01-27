@@ -2,7 +2,7 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
+
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;

@@ -1,12 +1,9 @@
 package com.kairos.persistence.model.clause_tag;
 
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
-import java.util.prefs.BackingStoreException;
 
 
 @Entity

@@ -36,7 +36,6 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
-import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
@@ -54,7 +53,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class AssessmentService extends MongoBaseService {
@@ -745,7 +743,7 @@ public class AssessmentService extends MongoBaseService {
         List<AssessmentAnswerValueObject> riskAssessmentAnswer = new ArrayList<>();
         for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
             for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                riskAssessmentAnswer.add(new AssessmentAnswerValueObject(questionBasicDTO.getId(), null, null, questionBasicDTO.getQuestionType()));
+                //riskAssessmentAnswer.add(new AssessmentAnswerValueObject(questionBasicDTO.getId(), null, null, questionBasicDTO.getQuestionType()));
             }
         }
         assessment.setAssessmentAnswers(riskAssessmentAnswer);
@@ -760,7 +758,7 @@ public class AssessmentService extends MongoBaseService {
 
         AssetAttributeName assetAttributeName = AssetAttributeName.valueOf(questionBasicDTO.getAttributeName());
         switch (assetAttributeName) {
-            case NAME:
+       /*     case NAME:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getName(), questionBasicDTO.getQuestionType());
             case DESCRIPTION:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDescription(), questionBasicDTO.getQuestionType());
@@ -787,7 +785,7 @@ public class AssessmentService extends MongoBaseService {
             case ASSET_OWNER:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetOwner(), questionBasicDTO.getQuestionType());
             case DATA_RETENTION_PERIOD:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod(), questionBasicDTO.getQuestionType());*/
             default:
                 return null;
         }
@@ -798,7 +796,7 @@ public class AssessmentService extends MongoBaseService {
 
         ProcessingActivityAttributeName processingActivityAttributeName = ProcessingActivityAttributeName.valueOf(questionBasicDTO.getAttributeName());
         switch (processingActivityAttributeName) {
-            case NAME:
+           /* case NAME:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getName(), questionBasicDTO.getQuestionType());
             case DESCRIPTION:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getDescription(), questionBasicDTO.getQuestionType());
@@ -829,7 +827,7 @@ public class AssessmentService extends MongoBaseService {
             case MIN_DATA_SUBJECT_VOLUME:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getMinDataSubjectVolume(), questionBasicDTO.getQuestionType());
             case JOINT_CONTROLLER_CONTACT_INFO:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getJointControllerContactInfo(), questionBasicDTO.getQuestionType());
+                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getJointControllerContactInfo(), questionBasicDTO.getQuestionType());*/
             default:
                 return null;
         }

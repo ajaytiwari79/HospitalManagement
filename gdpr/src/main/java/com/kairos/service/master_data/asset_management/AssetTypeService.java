@@ -1,8 +1,6 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.BasicRiskDTO;
@@ -12,7 +10,6 @@ import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
-import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.model.risk_management.RiskMD;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;

@@ -5,13 +5,11 @@ import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 

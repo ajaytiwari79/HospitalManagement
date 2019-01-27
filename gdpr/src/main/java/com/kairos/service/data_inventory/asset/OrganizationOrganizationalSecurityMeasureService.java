@@ -4,15 +4,11 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasureMD;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
-import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMDRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
@@ -21,11 +17,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 

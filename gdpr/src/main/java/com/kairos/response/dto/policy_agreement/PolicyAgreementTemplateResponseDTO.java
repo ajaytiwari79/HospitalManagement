@@ -9,7 +9,6 @@ import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

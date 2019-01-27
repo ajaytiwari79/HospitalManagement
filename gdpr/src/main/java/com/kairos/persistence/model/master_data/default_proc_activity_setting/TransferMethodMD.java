@@ -3,8 +3,6 @@ package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;

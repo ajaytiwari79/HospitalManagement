@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.annotation.Nullable;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.Null;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

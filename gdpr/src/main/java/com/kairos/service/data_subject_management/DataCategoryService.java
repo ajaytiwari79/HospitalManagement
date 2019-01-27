@@ -5,7 +5,6 @@ import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.persistence.model.master_data.data_category_element.*;
 import com.kairos.persistence.repository.master_data.data_category_element.*;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -15,9 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service

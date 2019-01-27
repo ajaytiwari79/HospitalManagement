@@ -4,7 +4,6 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingProviderMD;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 

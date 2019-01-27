@@ -1,18 +1,11 @@
 package com.kairos.persistence.repository.clause;
 
-import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.ClauseMD;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 
 @Repository

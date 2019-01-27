@@ -3,7 +3,6 @@ package com.kairos.response.dto.common;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 
 
