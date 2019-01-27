@@ -9,7 +9,6 @@ import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.math.BigInteger;
 import java.util.*;
 
 
@@ -76,7 +74,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
         if (Optional.ofNullable(previousMasterTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Master Questionnaire template", templateDto.getName());
         }
-        //validateQuestionnaireTemplateDTOByTemplateTypeCriteria(countryId, templateDto);
+        validateQuestionnaireTemplateDTOByTemplateTypeCriteria(countryId, templateDto);
         QuestionnaireTemplateMD questionnaireTemplate = new QuestionnaireTemplateMD(templateDto.getName(), countryId, templateDto.getDescription());
         addTemplateTypeToQuestionnaireTemplate(countryId, false, questionnaireTemplate, templateDto);
         questionnaireTemplateRepository.save(questionnaireTemplate);
@@ -92,24 +90,24 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      */
     private void validateQuestionnaireTemplateDTOByTemplateTypeCriteria(Long countryId, QuestionnaireTemplateDTO templateDto) {
         QuestionnaireTemplateType questionnaireTemplateType = templateDto.getTemplateType();
-        QuestionnaireTemplate previousMasterTemplate = null;
+        QuestionnaireTemplateMD previousMasterTemplate = null;
         switch (questionnaireTemplateType) {
             case ASSET_TYPE:
                 if (!templateDto.isDefaultAssetTemplate()) {
-                    //previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubType(countryId, templateDto);
+                    previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubType(countryId, templateDto);
                 } else {
-                    previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndCountryId(countryId, questionnaireTemplateType, true);
+                    previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByCountryIdAndTemplateTypeAndDefaultAssetTemplate(countryId, questionnaireTemplateType, true);
                 }
                 break;
             case RISK:
                 if (QuestionnaireTemplateType.ASSET_TYPE.equals(templateDto.getRiskAssociatedEntity())) {
-                    //previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubType(countryId, templateDto);
+                    previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubType(countryId, templateDto);
                 } else {
-                    previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndCountryId(countryId, questionnaireTemplateType, templateDto.getRiskAssociatedEntity());
+                    previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndCountryId( questionnaireTemplateType, templateDto.getRiskAssociatedEntity(),countryId);
                 }
                 break;
             default:
-                previousMasterTemplate = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(questionnaireTemplateType,countryId);
+                previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(countryId, questionnaireTemplateType);
                 break;
         }
         if (previousMasterTemplate != null) {
@@ -126,9 +124,9 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     private QuestionnaireTemplateMD getQuestionnaireTemplateByAssetTypeOrSubType(Long countryId, QuestionnaireTemplateDTO templateDto) {
         QuestionnaireTemplateMD previousMasterTemplate = null;
         if (templateDto.getAssetSubType() != null) {
-            //previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByCountryId(countryId, templateDto.getAssetType(), templateDto.getAssetSubType(),templateDto.getTemplateType());
+            previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeAndCountryId(templateDto.getTemplateType(), templateDto.getAssetType(), templateDto.getAssetSubType(),countryId);
         } else {
-            //previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByCountryId(countryId, templateDto.getAssetType(),templateDto.getTemplateType());
+            previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndAndCountryId(templateDto.getTemplateType(), templateDto.getAssetType(),countryId);
         }
         return previousMasterTemplate;
     }
@@ -384,24 +382,24 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      */
     private void validateQuestionnaireTemplateDTOByTemplateTypeCriteriaForUnit(Long unitId, QuestionnaireTemplateDTO templateDto) {
         QuestionnaireTemplateType questionnaireTemplateType = templateDto.getTemplateType();
-        QuestionnaireTemplate previousMasterTemplate;
+        QuestionnaireTemplateMD previousMasterTemplate;
         switch (questionnaireTemplateType) {
             case ASSET_TYPE:
                 if (!templateDto.isDefaultAssetTemplate()) {
                     previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(unitId, templateDto);
                 } else {
-                    previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndOrganizationId(unitId, questionnaireTemplateType, true);
+                    previousMasterTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndOrganizationId(questionnaireTemplateType, true, unitId, QuestionnaireTemplateStatus.PUBLISHED);
                 }
                 break;
             case RISK:
                 if (QuestionnaireTemplateType.ASSET_TYPE.equals(templateDto.getRiskAssociatedEntity())) {
                     previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(unitId, templateDto);
                 } else {
-                    previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndOrganizationId(unitId, questionnaireTemplateType, templateDto.getRiskAssociatedEntity());
+                    previousMasterTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndOrganizationId(questionnaireTemplateType, templateDto.getRiskAssociatedEntity(),unitId, QuestionnaireTemplateStatus.PUBLISHED);
                 }
                 break;
             default:
-                previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(unitId,questionnaireTemplateType);
+                previousMasterTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(unitId,questionnaireTemplateType, QuestionnaireTemplateStatus.PUBLISHED);
                 break;
         }
         if (previousMasterTemplate != null) {
@@ -415,13 +413,13 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      * @param templateDto
      * @return
      */
-    private QuestionnaireTemplate getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(Long unitId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplate previousMasterTemplate = null;
-        /*if (templateDto.getAssetSubType() != null) {
-            previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeByOrganizationId(unitId, templateDto.getAssetType(), templateDto.getAssetSubType(),templateDto.getTemplateType());
+    private QuestionnaireTemplateMD getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(Long unitId, QuestionnaireTemplateDTO templateDto) {
+        QuestionnaireTemplateMD previousMasterTemplate = null;
+        if (templateDto.getAssetSubType() != null) {
+            previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeAndOrganizationId(templateDto.getTemplateType(),templateDto.getAssetType(), templateDto.getAssetSubType(), unitId);
         } else {
-            previousMasterTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndAssetTypeAndByOrganizationId(unitId, templateDto.getAssetType(),templateDto.getTemplateType());
-        }*/
+            previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndAndOrganizationId(templateDto.getTemplateType(), templateDto.getAssetType(),unitId);
+        }
         return previousMasterTemplate;
     }
 

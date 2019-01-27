@@ -7,9 +7,11 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -20,19 +22,11 @@ public interface QuestionnaireSectionMDRepository extends JpaRepository<Question
 
     @Query(value = "SELECT qs FROM QuestionnaireSectionMD qs WHERE qs.id = ?1 and qs.deleted = ?2")
     QuestionnaireSectionMD findByIdAndDeleted(Long id,  boolean deleted);
-    /*@Query("{countryId:?0,_id:?1,deleted:false}")
-    QuestionnaireSection findByCountryIdAndId(Long countryId, BigInteger id);
 
-    @Query("{organizationId:?0,_id:?1,deleted:false}")
-    QuestionnaireSection findQuestionnaireSectionByUnitIdAndId(Long unitId, BigInteger questionnaireSectionId);
-
-    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<QuestionnaireSection> findSectionByCountryIdAndIds(Long countryId, Set<BigInteger> ids);
-
-    @Query("{organizationId:?0,_id:{$in:?1},deleted:false}")
-    List<QuestionnaireSection> findSectionByUnitIdAndIds(Long countryId, Set<BigInteger> ids);
-
-    QuestionnaireSection findByid(BigInteger id);*/
+    @Modifying
+    @Transactional
+    @Query(value = "delete from questionnaire_sectionmd_questions where questionnaire_sectionmd_id = ?1 and questions_id =?2", nativeQuery = true)
+    Integer unlinkQuestionFromQuestionnaireSection(Long sectionId, Long questionId);
 
 
 }

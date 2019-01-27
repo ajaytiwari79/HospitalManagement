@@ -6,8 +6,12 @@ import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
 import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionMD;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionMD;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionMDRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -17,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,7 +38,10 @@ public class QuestionService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private QuestionnaireSectionRepository questionnaireSectionRepository;
+    private QuestionnaireSectionMDRepository questionnaireSectionRepository;
+
+    @Inject
+    private QuestionRepository questionRepository;
 
 
     /**
@@ -134,19 +142,23 @@ public class QuestionService extends MongoBaseService {
      * @return
      * @description deleted question by id ,and also remove id of question from questionnaire section.
      */
-    public boolean deleteMasterQuestion(Long countryId, BigInteger questionId, BigInteger sectionId) {
-        QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByCountryIdAndId(countryId, sectionId);
-        if (!Optional.ofNullable(questionnaireSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Section", sectionId);
+    public boolean deleteQuestionOfQuestionnaireSection(Long countryId, Long questionId, Long sectionId) {
+        QuestionMD question = questionRepository.findQuestionByIdAndSectionId( questionId,sectionId);
+        if (!Optional.ofNullable(question).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Question", sectionId);
         }
-        questionnaireSection.getQuestions().remove(questionId);
-        questionnaireSectionRepository.save(questionnaireSection);
-        questionMongoRepository.safeDeleteById(questionId);
+        try{
+        question.delete();
+        questionnaireSectionRepository.unlinkQuestionFromQuestionnaireSection(sectionId, questionId);
+        questionRepository.save(question);
+        }catch (EntityNotFoundException ene){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Question", questionId);
+        }
         return true;
     }
 
 
-    public boolean deleteQuestionOfQuestionnaireSectionOfUnit(Long unitId, BigInteger questionId, BigInteger sectionId) {
+    /*public boolean deleteQuestionOfQuestionnaireSectionOfUnit(Long unitId, BigInteger questionId, BigInteger sectionId) {
         QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findQuestionnaireSectionByUnitIdAndId(unitId, sectionId);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Section", sectionId);
@@ -155,11 +167,11 @@ public class QuestionService extends MongoBaseService {
         questionnaireSectionRepository.save(questionnaireSection);
         questionMongoRepository.safeDeleteById(questionId);
         return true;
-    }
+    }*/
 
 
-    public List<Question> getAllMasterQuestion(Long countryId) {
-        return questionMongoRepository.getAllMasterQuestion(countryId);
+    public List<QuestionMD> getAllMasterQuestion(Long countryId) {
+        return questionRepository.getAllMasterQuestion(countryId);
 
     }
 
