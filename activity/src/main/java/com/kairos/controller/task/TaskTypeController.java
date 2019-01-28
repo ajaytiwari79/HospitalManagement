@@ -37,8 +37,8 @@ import static com.kairos.constants.ApiConstants.*;
  * Created by prabjot on 5/10/16.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(value = API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(value = API_V1)
 public class TaskTypeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTypeController.class);

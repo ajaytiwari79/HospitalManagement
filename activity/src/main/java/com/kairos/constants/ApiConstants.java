@@ -5,19 +5,19 @@ package com.kairos.constants;
  */
 public final class ApiConstants {
 
-    public static final String API_V1 = "/api/v1";
+    //public static final String API_V1 = "/api/v1";
     //public static final String PARENT_ORGANIZATION_URL = "/organization/{organizationId}";
     public static final String UNIT_URL = "/unit/{unitId}";
     public static final String STAFF_URL = "/staff";
     public static final String ORGANIZATION_UNIT_URL =   UNIT_URL;
     public static final String COUNTRY_URL = "/country/{countryId}";
-    public static final String API_ORGANIZATION_URL = API_V1 ;
-    public static final String API_ORGANIZATION_UNIT_URL = API_ORGANIZATION_URL + UNIT_URL;
+    public static final String API_V1 = "/api/v1";
+    public static final String API_ORGANIZATION_UNIT_URL = API_V1 + UNIT_URL;
     public static final String API_CONTROL_PANEL_SETTINGS_URL = "/control_panel/settings";
-    public static final String API_CONTROL_PANEL_URL = API_ORGANIZATION_URL + UNIT_URL + API_CONTROL_PANEL_SETTINGS_URL;
-    public static final String API_ABSENCE_PLANNING_URL = API_ORGANIZATION_URL + UNIT_URL + "/absence_planning";
-    public static final String API_INTEGRATION_URL = API_ORGANIZATION_URL + UNIT_URL + "/integration";
-    public static final String API_NOTIFICATION_URL = API_ORGANIZATION_URL + "/notification";
+    public static final String API_CONTROL_PANEL_URL = API_V1 + UNIT_URL + API_CONTROL_PANEL_SETTINGS_URL;
+    public static final String API_ABSENCE_PLANNING_URL = API_V1 + UNIT_URL + "/absence_planning";
+    public static final String API_INTEGRATION_URL = API_V1 + UNIT_URL + "/integration";
+    public static final String API_NOTIFICATION_URL = API_V1 + "/notification";
     public static final String WS_URL = "ws://localhost:8090" + API_V1 + "/kairos/ws";
     public static final String API_REQUEST_COMPONENT_URL = API_V1  + "/resourceComponent";
     public static final String API_ORGANIZATION_COUNTRY_URL = API_V1  + COUNTRY_URL;

@@ -8,12 +8,11 @@ public class ApiConstants {
     public static final String SOLVER_CONFIG_URL ="/solver_config";
     public static final String PLANNING_PROBLEM_URL ="/planning_problem";
     public static final String CONSTRAINT_URL ="/constraint";
-    public static final String API_ORGANIZATION_URL =  API_V1 ;
-    public static final String API_ORGANIZATION_UNIT_URL = API_ORGANIZATION_URL + UNIT_URL;
+    public static final String API_ORGANIZATION_UNIT_URL = API_V1 + UNIT_URL;
     public static final String API_UNIT_URL = API_V1  + UNIT_URL;
     public static final String SHIFTPLANNING = "/shift_planning";
-    public static final String API_PARENT_ORGANIZATION_COUNTRY_URL=API_ORGANIZATION_URL+COUNTRY_URL;
-    public static final String API_PARENT_ORGANIZATION_UNIT_URL=API_ORGANIZATION_URL+UNIT_URL;
+    public static final String API_PARENT_ORGANIZATION_COUNTRY_URL=API_V1+COUNTRY_URL;
+    public static final String API_PARENT_ORGANIZATION_UNIT_URL=API_V1+UNIT_URL;
     public static final String API_PARENT_ORGANIZATION_COUNTRY_SOLVER_CONFIG_URL=API_PARENT_ORGANIZATION_COUNTRY_URL+SOLVER_CONFIG_URL;
     public static final String API_PARENT_ORGANIZATION_UNIT_SOLVER_CONFIG_URL=API_PARENT_ORGANIZATION_UNIT_URL+SOLVER_CONFIG_URL;
     public static final String API_PARENT_ORGANIZATION_COUNTRY_PLANNING_PROBLEM_URL=API_PARENT_ORGANIZATION_COUNTRY_URL+PLANNING_PROBLEM_URL;

@@ -17,8 +17,8 @@ import java.util.Map;
 import static com.kairos.constants.ApiConstants.*;
 
 @RestController
-@Api(API_ORGANIZATION_URL)
-@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_V1)
+@RequestMapping(API_V1)
 public class OpenShiftRuleTemplateController {
     @Inject
     OpenShiftRuleTemplateService openShiftRuleTemplateService;

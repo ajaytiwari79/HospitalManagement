@@ -24,8 +24,8 @@ import static com.kairos.constants.ApiConstants.*;
  * Created by prerna on 20/11/17.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 public class TagController {
 
     private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
