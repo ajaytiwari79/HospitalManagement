@@ -1414,14 +1414,18 @@ public class ShiftService extends MongoBaseService {
         Object object=null;
         endDate=endDate==null?null:endDate.plusDays(1);
         if (INDIVIDUAL.equals(viewType)) {
+            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
             object = getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId);
         } else if (includeOpenShifts) {
+            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
             object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), viewType);
         } else if (expertiseId != null) {
+            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
             object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId);
         } else if (includeShiftState) {
+            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
             if (staffId != null) {
-                object = getDetailedAndCompactViewData(Collections.singletonList(staffId), staffId, DateUtils.asDate(startDate));
+                object = getDetailedAndCompactViewData(Collections.singletonList(staffId), unitId, DateUtils.asDate(startDate));
             } else {
                 object = getDetailedAndCompactViewData(new ArrayList<>(),unitId, DateUtils.asDate(startDate));
             }

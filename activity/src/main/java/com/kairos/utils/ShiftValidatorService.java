@@ -23,6 +23,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
+import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -77,6 +78,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.enums.shift.ViewType.INDIVIDUAL;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -971,4 +973,22 @@ public class ShiftValidatorService {
         }
     }
 
-}
+    /**
+     *
+     * @param staffId it is required for getting shift by staffId(individual view) or by expertise Id
+     * @param endDate it is required for getting shifts along with open shifts
+     * @param viewType
+     * @param includeOpenShifts
+     * @param expertiseId
+     */
+    public void validateApiParams(Long staffId,  LocalDate endDate, ViewType viewType,
+                                  boolean includeOpenShifts, Long expertiseId){
+        if (INDIVIDUAL.equals(viewType) && staffId==null) {
+                exceptionService.actionNotPermittedException("staff_id.null");
+        } else if (includeOpenShifts && endDate ==null) {
+                exceptionService.actionNotPermittedException("endDate.null");
+        } else if (expertiseId != null && (staffId==null || endDate==null)) {
+                exceptionService.actionNotPermittedException("staff_id.end_date.null");
+        }
+        }
+    }

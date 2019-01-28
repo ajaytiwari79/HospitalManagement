@@ -165,13 +165,13 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
                                                                     @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
-                                                                    @RequestParam(value = "startDate", required = false)
+                                                                    @RequestParam(value = "startDate")
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam("viewType") ViewType viewType,
                                                                     @RequestParam(value = "includeOpenShifts",required = false)  boolean includeOpenShifts,
                                                                     @RequestParam(value = "staffId",required = false) Long staffId,
                                                                     @RequestParam(value = "expertiseId",required = false) Long expertiseId,
-                                                                    @RequestParam(value = "includeShiftState",required = false)  boolean includeShiftState) throws ParseException{
+                                                                    @RequestParam(value = "includeShiftState",required = false)  boolean includeShiftState){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId,viewType,includeOpenShifts,expertiseId,includeShiftState));
     }
 
