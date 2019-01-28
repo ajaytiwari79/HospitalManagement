@@ -12,8 +12,6 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
-import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
@@ -41,11 +39,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
-import com.kairos.persistence.model.unit_settings.PhaseSettings;
-import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
@@ -100,20 +94,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -1138,26 +1127,6 @@ public class ShiftService extends MongoBaseService {
         return activityShiftStatusSettings != null && staffAccessGroupDTO != null && CollectionUtils.containsAny(activityShiftStatusSettings.getAccessGroupIds(), staffAccessGroupDTO.getAccessGroupIds());
     }
 
-
-    public CompactViewDTO getDetailViewInfo(Long unitId, Long staffId, Date shiftStartDate) {
-        String timeZone=genericIntegrationService.getTimeZoneByUnitId(unitId);
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<String, Phase> phaseMap = phases.stream().collect(Collectors.toMap(p->p.getPhaseEnum().toString(), Function.identity()));
-        Date endDate = DateUtils.asDate(DateUtils.asZoneDateTime(shiftStartDate).plusDays(1));
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationBystaffId(staffId, shiftStartDate, endDate);
-        shifts.forEach(shift -> shift.setDurationMinutes((int) shift.getInterval().getMinutes()));
-        List<ShiftState> shiftStatesList=shiftStateMongoRepository.getAllByStaffsByIdsBetweenDate(shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList()),shiftStartDate,endDate);
-        List<ShiftState> realTimeShiftStatesList= checkAndCreateRealtimeAndDraftState(shifts,shiftStatesList.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()),phaseMap);
-        shiftStatesList.addAll(realTimeShiftStatesList);
-        shiftStatesList.forEach(shiftState -> shiftState.setDurationMinutes((int) shiftState.getInterval().getMinutes()));
-        List<org.apache.http.NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("reasonCodeType", ReasonCodeType.ABSENCE.toString()));
-        List<ReasonCodeDTO> reasonCodeDTOS = genericIntegrationService.getReasonCodeDTOList(unitId, requestParam);
-        ShiftDetailViewDTO shiftDetailViewDTO = getShiftDetailsOfStaff(timeZone,phaseMap, shifts, shiftStatesList);
-        List<TimeAndAttendanceDTO> timeAndAttendance=timeAndAttendanceRepository.findAllAttendanceByStaffIds(Arrays.asList(staffId),unitId,DateUtils.asDate(DateUtils.asLocalDate(shiftStartDate).minusDays(1)),shiftStartDate);
-        return new CompactViewDTO(Arrays.asList(new DetailViewDTO(staffId,shiftDetailViewDTO,(CollectionUtils.isNotEmpty(timeAndAttendance))?timeAndAttendance.get(0).getAttendanceTimeSlot():new ArrayList<>())),reasonCodeDTOS);
-    }
-
-
     public List<ShiftState> checkAndCreateRealtimeAndDraftState(List<Shift> shifts, List<ShiftState> shiftStates, Map<String, Phase> phaseMap) {
         List<ShiftState> newShiftStates = new ArrayList<>();
         newShiftStates = shiftStateService.createRealTimeShiftState(newShiftStates, shiftStates, shifts, phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
@@ -1340,7 +1309,7 @@ public class ShiftService extends MongoBaseService {
         return shiftWithActivityDTO;
     }
 
-    public CompactViewDTO getCompactViewDetails(List<Long> staffIds,Long unitId, Date shiftStartDate) {
+    public CompactViewDTO getDetailedAndCompactViewData(List<Long> staffIds, Long unitId, Date shiftStartDate) {
         if(staffIds.isEmpty()){
             List<StaffDTO> staffResponseDTOS = genericIntegrationService.getStaffListByUnit();
             staffIds = staffResponseDTOS.stream().map(s -> s.getId()).collect(Collectors.toList());
@@ -1452,10 +1421,9 @@ public class ShiftService extends MongoBaseService {
             object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId);
         } else if (includeShiftState) {
             if (staffId != null) {
-                //object = getDetailViewInfo(unitId, staffId, DateUtils.asDate(startDate));
-                object = getCompactViewDetails(Collections.singletonList(staffId), staffId, DateUtils.asDate(startDate));
+                object = getDetailedAndCompactViewData(Collections.singletonList(staffId), staffId, DateUtils.asDate(startDate));
             } else {
-                object = getCompactViewDetails(new ArrayList<>(),unitId, DateUtils.asDate(startDate));
+                object = getDetailedAndCompactViewData(new ArrayList<>(),unitId, DateUtils.asDate(startDate));
             }
 
         }

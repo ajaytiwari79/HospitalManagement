@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.enums.shift.ViewType.INDIVIDUAL;
 
 
 /**
@@ -58,20 +57,6 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type, false));
     }
 
-    //Done
-    @ApiOperation("Get Shift of a staff")
-    @GetMapping(value = "/shift/staff/{staffId}")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getShiftByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,
-                                                                 @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
-                                                                 @RequestParam(value = "startDate", required = false)
-                                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                                                 @RequestParam(value = "endDate", required = false)
-                                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId));
-    }
-
 
     @ApiOperation("save Shift after validation")
     @PostMapping(value = "/shift/validated")
@@ -101,30 +86,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateStatusOfShifts(unitId, shiftPublishDTO));
     }
 
-
-    //Done
-    @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
-    @GetMapping(value = "/shifts")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, @RequestParam(required = false) ViewType viewType){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, startDate, endDate, viewType));
-    }
-
     @ApiOperation("copy shifts from 1 employee to others")
     @PutMapping(value = "/copy_shifts")
     public ResponseEntity<Map<String, Object>> copyShifts(@PathVariable long unitId, @RequestBody @Valid CopyShiftDTO copyShiftDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftCopyService.copyShifts(unitId, copyShiftDTO));
-    }
-
-    //Done
-    @ApiOperation("Get Shift of a staff based upon expertise")
-    @GetMapping(value = "/shifts/staff/{staffId}")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getShiftOfStaffByExpertiseId(@PathVariable Long staffId, @PathVariable Long unitId,
-                                                                            @RequestParam Long expertiseId,
-                                                                            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                                            @RequestParam(value = "endDate", required = false) LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId));
     }
 
     @ApiOperation("create shift using template")
@@ -160,11 +125,6 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftSickService.createSicknessShiftsOfStaff(unitId, activityId, staffId, duration));
     }
 
-    @ApiOperation("shifts details by date")
-    @GetMapping("/shift/details_by_date")
-    public ResponseEntity<Map<String, Object>> getShiftsDetailsByDate(@PathVariable Long unitId, @RequestParam Long staffId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getDetailViewInfo(unitId, staffId, shiftStartDate));
-    }
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
@@ -177,12 +137,6 @@ public class ShiftController {
     @PostMapping("/shift/validate_shift_by_details_view")
     public ResponseEntity<Map<String, Object>> validateShiftByDetailsView(@PathVariable Long unitId, @RequestParam String type, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam Boolean validatedByStaff) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.validateShift(shiftDTO, validatedByStaff, unitId, type));
-    }
-
-    @ApiOperation("shifts details by date")
-    @GetMapping("/shift/compact_view_details_by_date")
-    public ResponseEntity<Map<String, Object>> getShiftsDetailsForCompactViewByDate(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getCompactViewDetails(new ArrayList<>(),unitId, shiftStartDate));
     }
 
     @ApiOperation("get a Shift detail by id")
