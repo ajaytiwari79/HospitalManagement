@@ -215,6 +215,12 @@ public class UnitPositionService {
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaWrapper.getWta().get(0), unitPosition.getUnitPositionLines().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(ctawtaWrapper.getCta().get(0));
         unitPositionQueryResult.getPositionLines().get(0).setWorkingTimeAgreement(ctawtaWrapper.getWta().get(0));
+        List<UnitPositionLinesQueryResult> hourlyCostPerLine= unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPosition.getId()));
+        Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
+        unitPositionQueryResult.getPositionLines().forEach(positionLine->{
+            BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
+            positionLine.setHourlyCost(hourlyCost);
+        });
         return new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
     }
 
@@ -521,6 +527,12 @@ public class UnitPositionService {
         if (unitPositionDTO.getEndDate() != null) {
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, unitPositionDTO.getEndDate(), unitPositionDTO.getStaffId());
         }
+        List<UnitPositionLinesQueryResult> hourlyCostPerLine= unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPositionQueryResult.getId()));
+        Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
+        unitPositionQueryResult.getPositionLines().forEach(positionLine->{
+            BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
+            positionLine.setHourlyCost(hourlyCost);
+        });
         //plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
         return new PositionWrapper(unitPositionQueryResult, employmentQueryResult);
 
