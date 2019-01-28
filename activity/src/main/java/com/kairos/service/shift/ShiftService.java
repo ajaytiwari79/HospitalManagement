@@ -1181,7 +1181,7 @@ public class ShiftService extends MongoBaseService {
     public List<ShiftState> checkAndCreateRealtimeAndDraftState(List<Shift> shifts, List<ShiftState> shiftStates, Map<String, Phase> phaseMap){
         List<ShiftState> newShiftStates=new ArrayList<>();
         newShiftStates=shiftStateService.createRealTimeShiftState(newShiftStates,shiftStates,shifts,phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        newShiftStates.addAll(shiftStateService.createDraftShiftState(newShiftStates,shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
+        newShiftStates.addAll(shiftStateService.createDraftShiftState(new ArrayList<>(),shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
         if(!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
         return newShiftStates;
 
