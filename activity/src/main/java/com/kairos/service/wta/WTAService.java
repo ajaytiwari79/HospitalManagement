@@ -238,8 +238,8 @@ public class WTAService extends MongoBaseService {
 
 
     public WTAResponseDTO updateWtaOfCountry(Long countryId, BigInteger wtaId, WTADTO updateDTO) {
-
-        if (asLocalDate(updateDTO.getStartDateMillis()).isBefore(getLocalDate())) {
+        //TODO Yasir adding 1 day for Hot Fix, we are going to replace datemilis to local date
+        if (asLocalDate(updateDTO.getStartDateMillis()).plusDays(1).isBefore(getLocalDate())) {
             exceptionService.actionNotPermittedException("message.wta.start-current-date");
         }
         WorkingTimeAgreement workingTimeAgreement = wtaRepository.getWtaByNameExcludingCurrent(updateDTO.getName(), countryId, wtaId, updateDTO.getOrganizationType(), updateDTO.getOrganizationSubType());
