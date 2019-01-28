@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.questionnaire_template;
 
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.CustomGenericRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -83,4 +84,18 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
     @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.templateType = ?2 and  QT.templateStatus = ?3  and QT.deleted = false")
     QuestionnaireTemplateMD findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(Long orgId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus status);
 
+    @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.assetType.id = ?2 and QT.assetSubType.id = ?3 and QT.templateType = ?4  and QT.templateStatus = ?5 and QT.riskAssociatedEntity = ?6 and QT.deleted = false")
+    QuestionnaireTemplateMD findPublishedRiskTemplateByUnitIdAndAssetTypeAndSubAssetTypeAndTemplateType(Long orgId, Long assetTypeId, Long subAssetTypeId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus status, QuestionnaireTemplateType riskAssociatedEntity);
+
+    @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.assetType.id = ?2 and QT.templateType = ?3  and QT.riskAssociatedEntity = ?4 and QT.templateStatus = ?5  and QT.deleted = false")
+    QuestionnaireTemplateMD findPublishedRiskTemplateByUnitIdAndAssetTypeAndTemplateType(Long orgId, Long assetTypeId,QuestionnaireTemplateType templateType, QuestionnaireTemplateType riskAssociatedEntity, QuestionnaireTemplateStatus status);
+
+    @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.templateType = ?2  and QT.riskAssociatedEntity = ?3 and QT.templateStatus = ?4  and QT.deleted = false")
+    QuestionnaireTemplateMD findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitIdAndTemplateTypeStatus(Long orgId,QuestionnaireTemplateType templateType, QuestionnaireTemplateType riskAssociatedEntity, QuestionnaireTemplateStatus status);
+
+    @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.templateType = ?2 and QT.templateStatus = ?3  and QT.deleted = false")
+    QuestionnaireTemplateMD getQuestionnaireTemplateByTemplateTypeAndUnitId(QuestionnaireTemplateType templateType, Long orgId,QuestionnaireTemplateStatus status);
+
+    @Query(value = "Select QT from QuestionnaireTemplateMD QT where QT.organizationId = ?1 and QT.riskAssociatedEntity = ?2 and QT.templateType = ?3 and QT.templateStatus = ?4 and QT.deleted = false")
+    QuestionnaireTemplateMD findPublishedQuestionnaireTemplateByProcessingActivityAndByUnitId(Long orgId, QuestionnaireTemplateType riskAssociatedEntity, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus);
 }

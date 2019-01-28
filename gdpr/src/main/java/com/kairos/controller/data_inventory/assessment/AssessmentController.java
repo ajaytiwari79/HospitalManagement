@@ -39,7 +39,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "launch assessment for Asset")
     @PostMapping( "/assessment/asset/{assetId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForAsset(@PathVariable Long unitId, @PathVariable Long assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForAsset(unitId,  assetId, assessmentDTO));
 
     }
@@ -47,7 +47,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "launch assessment for processing activity")
     @PostMapping( "/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
+    public ResponseEntity<ResponseDTO<AssessmentDTO>> launchAssessmentForProcessingActivity(@PathVariable Long unitId, @PathVariable Long processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO,@RequestParam boolean subProcessingActivity) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.launchAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO,subProcessingActivity));
 
     }

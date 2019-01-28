@@ -10,7 +10,7 @@ public class ProcessingActivityBasicDTO {
 
     private BigInteger processingActivityId;
     private String processingActivityName;
-    private boolean subProcessingActivity;
+    private boolean isSubProcessingActivity;
 
     public BigInteger getProcessingActivityId() {
         return processingActivityId;
@@ -29,11 +29,11 @@ public class ProcessingActivityBasicDTO {
     }
 
     public boolean isSubProcessingActivity() {
-        return subProcessingActivity;
+        return isSubProcessingActivity;
     }
 
     public void setSubProcessingActivity(boolean subProcessingActivity) {
-        this.subProcessingActivity = subProcessingActivity;
+        isSubProcessingActivity = subProcessingActivity;
     }
 
     public ProcessingActivityBasicDTO() {
@@ -42,6 +42,6 @@ public class ProcessingActivityBasicDTO {
     public ProcessingActivityBasicDTO(BigInteger processingActivityId, String processingActivityName, boolean subProcessingActivity) {
         this.processingActivityId = processingActivityId;
         this.processingActivityName = processingActivityName;
-        this.subProcessingActivity = subProcessingActivity;
+        this.isSubProcessingActivity = subProcessingActivity;
     }
 }

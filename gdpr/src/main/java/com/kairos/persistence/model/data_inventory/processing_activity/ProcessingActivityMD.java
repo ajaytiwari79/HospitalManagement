@@ -65,7 +65,7 @@ public class ProcessingActivityMD extends BaseEntity {
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
 
-    private boolean subProcessingActivity;
+    private boolean isSubProcessingActivity;
 
     @OneToMany(cascade = CascadeType.PERSIST)
     private List<RelatedDataSubject> dataSubjects = new ArrayList<>();
@@ -254,11 +254,11 @@ public class ProcessingActivityMD extends BaseEntity {
     }
 
     public boolean isSubProcessingActivity() {
-        return subProcessingActivity;
+        return isSubProcessingActivity;
     }
 
     public void setSubProcessingActivity(boolean subProcessingActivity) {
-        this.subProcessingActivity = subProcessingActivity;
+        this.isSubProcessingActivity = subProcessingActivity;
     }
 
     public Long getCountryId() {

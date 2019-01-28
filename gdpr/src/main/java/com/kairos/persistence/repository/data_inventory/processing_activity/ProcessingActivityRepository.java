@@ -17,13 +17,16 @@ public interface ProcessingActivityRepository extends CustomGenericRepository<Pr
     @Query(value = "Select PA from ProcessingActivityMD PA where PA.organizationId = ?1 and PA.id IN (?2) and PA.deleted = false")
     List<ProcessingActivityMD> findSubProcessingActivitiesByIdsAndOrganisationId(Long orgId, Set<Long> ids);
 
-    @Query(value = "Select PA from ProcessingActivityMD PA where PA.id = ?1 and PA.organizationId = ?2 and PA.processingActivity.id = ?3 and PA.deleted = false and PA.subProcessingActivity = true")
+    @Query(value = "Select PA from ProcessingActivityMD PA where PA.id = ?1 and PA.organizationId = ?2 and PA.processingActivity.id = ?3 and PA.deleted = false and PA.isSubProcessingActivity = true")
     ProcessingActivityMD findByIdAndOrganizationIdAndProcessingActivityId(Long id, Long orgId, Long parentId);
 
     @Modifying
     @Transactional
-    @Query(value = "Update ProcessingActivityMD PA set PA.deleted = false, PA.processingActivity = null where PA.id = ?1 and PA.organizationId = ?2 and PA.processingActivity.id = ?3 and PA.deleted = false and PA.subProcessingActivity = true")
+    @Query(value = "Update ProcessingActivityMD PA set PA.deleted = false, PA.processingActivity = null where PA.id = ?1 and PA.organizationId = ?2 and PA.processingActivity.id = ?3 and PA.deleted = false and PA.isSubProcessingActivity = true")
     Integer unlinkSubProcessingActivityFromProcessingActivity(Long id, Long orgId, Long parentId);
+
+    @Query(value = "SELECT PA FROM ProcessingActivityMD PA WHERE PA.id = ?1 and PA.organizationId = ?2 and PA.isSubProcessingActivity = ?3 and PA.deleted = false")
+    ProcessingActivityMD findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(Long id, Long orgId, boolean isSubProcessingActivity);
 
     @Modifying
     @Transactional
