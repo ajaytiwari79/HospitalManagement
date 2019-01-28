@@ -22,26 +22,17 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
-
     User findByUserNameIgnoreCase(String userName);
 
     User findOne(Long id);
 
-    @Query("MATCH (u:User) WHERE u.timeCareExternalId={0} OR u.userName={1} OR u.email={2}  RETURN u ")
-    User findByTimeCareExternalIdOrUserNameOrEmail(String timeCareExternalId,String userName,String email);
-
     @Query("MATCH (n:User) WHERE n.cprNumber={0}  RETURN n ")
     User findUserByCprNumber(String cprNumber);
 
-
-
     List<User> findAll();
-
-    User findByOtp(int otp);
 
     @Query("MATCH(u:User { accessToken: {0} })SET u.accessToken = NULL RETURN u")
     User findAndRemoveAccessToken(String accessToken);
-
 
     User findByAccessToken(String accessToken);
 
@@ -85,13 +76,8 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (ag)<-[:HAS_ACCESS_GROUP]-(up:UnitPermission)<-[:HAS_UNIT_PERMISSIONS]-(e:Employment)-[:BELONGS_TO]->(s:Staff)-[r:BELONGS_TO]-(u)  RETURN COUNT(u)>0")
     Boolean checkIfUserIsCountryAdmin(Long userId, String accessGroupName);
 
-    @Query("Match (u:User) WHERE id(u)={0} " +
-            "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return id(c)")
-    Long  getCountryOfUser(Long userId);
-
     @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage) LIMIT 1")
     Long getUserSelectedLanguageId(Long userId);
-
 
     // This is used to get the very first user of the organization
     @Query("Match (org:Organization) where id(org)={0}" +
@@ -121,9 +107,6 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             " Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "return user LIMIT 1 " )
     User getUserOfOrganization(Long unitId);
-
-    @Query("MATCH (user:User) WHERE user.cprNumber={0}  RETURN user ")
-    User findByCprNumber(String cprNumber);
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={1} OR user.email=~{0} ) AND id(user)<>{2} RETURN count(user) ")
     byte validateUserEmailAndCPRExceptCurrentUser(String email, String cprNumber, Long userId);

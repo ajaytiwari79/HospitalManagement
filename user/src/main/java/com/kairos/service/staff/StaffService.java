@@ -95,19 +95,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.unit_position.UnitPositionUtility.convertUnitPositionObject;
 import static com.kairos.utils.FileUtil.createDirectory;
@@ -392,8 +396,8 @@ public class StaffService {
             exceptionService.actionNotPermittedException("error.access.expired", accessGroup.getName());
         }
 
-        List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
-        List<Integer> staffErrorList = new ArrayList<>();
+        List<StaffDTO> staffList = new ArrayList<>();
+        List<StaffDTO> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
@@ -455,11 +459,8 @@ public class StaffService {
                 exceptionService.internalServerError("error.sheet.add.crpnumber");
 
             }
-
             // TODO get CountryId
             SystemLanguage defaultSystemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
-
-            logger.info("Sheet has rows");
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 if (String.valueOf(row.getCell(0)) == null || String.valueOf(row.getCell(0)).isEmpty()) {
@@ -467,9 +468,7 @@ public class StaffService {
                 }
                 if (row.getCell(0) == null) {
                     logger.info("No more rows");
-                    if (staffList.size() != 0) {
-                        break;
-                    }
+                    break;
                 }
                 // Skip headers
                 if (row.getRowNum() == 0) {
@@ -479,15 +478,16 @@ public class StaffService {
                 int[] mandatoryCellColumnIndexs = {2, 8, 19, 20, 21, 23, 41};
                 boolean isPerStaffMandatoryFieldsExists = validateStaffData(row, mandatoryCellColumnIndexs);
                 if (!isPerStaffMandatoryFieldsExists) {
-                    logger.info(" This row is missing some mandatory field so skipping this {}", row.getRowNum());
-                    staffErrorList.add(row.getRowNum());
-
+                    Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
+                    StaffDTO staffDTO = new StaffDTO(getStringValueOfIndexedCell(row, 20),getStringValueOfIndexedCell(row, 21), new BigInteger(cprNumberLong.toString()), getStringValueOfIndexedCell(row, 28).toLowerCase(),"Some of the mandatory fields are missing");
+                    staffErrorList.add(staffDTO);
                 } else {
                     String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId, externalIdValueAsString);
-                        staffErrorList.add(row.getRowNum());
+                        Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
+                        StaffDTO staffDTO = new StaffDTO(getStringValueOfIndexedCell(row, 20), getStringValueOfIndexedCell(row, 21), new BigInteger(cprNumberLong.toString()), getStringValueOfIndexedCell(row, 28).toLowerCase(),"Duplicate External Id");
+                        staffErrorList.add(staffDTO);
                         continue;
                     }
                     Staff staff = new Staff();
@@ -509,10 +509,7 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        user = userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row, 2)
-                                , getStringValueOfIndexedCell(row, 28).toLowerCase()
-                                , getStringValueOfIndexedCell(row, 28).toLowerCase()
-                        );
+                        user = userGraphRepository.findByEmail(getStringValueOfIndexedCell(row, 28).toLowerCase());
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
@@ -523,7 +520,6 @@ public class StaffService {
                             user.setCprNumber(cprNumberLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
-                            user.setTimeCareExternalId(externalIdValueAsString);
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
@@ -536,19 +532,19 @@ public class StaffService {
                         }
                         staff.setUser(user);
                     }
-
                     staffGraphRepository.save(staff);
-                    StaffPersonalDetailDTO staffPersonalDetailDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetailDTO.class);
-                    staffPersonalDetailDTO.setGender(user.getGender());
-                    staffPersonalDetailDTO.setCprNumber(user.getCprNumber()); //Setting CPR-Number to get Age.
-                    staffList.add(staffPersonalDetailDTO);
+                    StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
+                    staffDTO.setGender(user.getGender());
+                    staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
+                    staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                         createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
                     }
-
                 }
             }
-            activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())), unitId);
+            if(isCollectionNotEmpty(staffList)) {
+                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())), unitId);
+            }
             return staffUploadBySheetQueryResult;
         } catch (IOException e) {
             e.printStackTrace();
