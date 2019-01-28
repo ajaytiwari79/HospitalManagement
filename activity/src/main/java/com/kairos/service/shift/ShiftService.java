@@ -605,8 +605,6 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.invalidRequestException("message.shift.date.startandend", shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
             }
         }
-        List<Activity> activityList = activities.stream().map(ActivityWrapper::getActivity).collect(Collectors.toList());
-        organizationActivityService.verifyBreakAllowedOfActivities(activities.get(0).getActivity().getRulesActivityTab().isBreakAllowed(), activityList);
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionIdAndDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(shift.getActivities(), shiftDTO.getActivities());
         // Validating Shift to eligibility
