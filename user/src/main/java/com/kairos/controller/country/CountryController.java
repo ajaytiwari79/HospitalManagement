@@ -56,8 +56,8 @@ import static com.kairos.constants.ApiConstants.*;
  * 1.Calls Country Service
  * 2. Call for CRUD operation on Country
  */
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 @RestController
 public class CountryController {
 

@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 
@@ -27,8 +27,8 @@ import static com.kairos.constants.ApiConstants.COUNTRY_URL;
  * Created by oodles on 22/12/16.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL+"/region")
-@Api(API_ORGANIZATION_URL+COUNTRY_URL+"/region")
+@RequestMapping(API_V1 +COUNTRY_URL+"/region")
+@Api(API_V1 +COUNTRY_URL+"/region")
 public class RegionController {
 
     @Inject

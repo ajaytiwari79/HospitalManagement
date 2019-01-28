@@ -8,7 +8,6 @@ import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
-import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -71,7 +70,7 @@ import static com.kairos.constants.ApiConstants.*;
 @RestController
 
 @RequestMapping(API_V1)
-@Api(API_ORGANIZATION_URL)
+@Api(API_V1)
 public class OrganizationController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
