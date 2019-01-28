@@ -719,7 +719,7 @@ public class TaskTypeController {
     @ApiOperation(value = "Add/ Remove TaskType to Organization")
     @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable long subServiceId,
+    public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long unitId, @PathVariable long subServiceId,
                                                                          @RequestBody Map<String, Object> data, @RequestParam("type") String type) throws CloneNotSupportedException {
         String taskTypeId = data.get("taskTyp/task_types/getAllAvlSkilleId") + "";
         boolean isSelected = (boolean) data.get("isSelected");

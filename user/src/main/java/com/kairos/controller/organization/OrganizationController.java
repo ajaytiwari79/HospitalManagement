@@ -590,15 +590,15 @@ public class OrganizationController {
                 organizationService.getOrganizationGdprAndWorkcenter(orgId));
     }
 
-    @GetMapping(UNIT_URL+"/unit")
-    @ApiOperation("get child units of parent organization")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getChildUnits(@PathVariable long unitId, @RequestParam(value = "moduleId") String moduleId,
-                                                             @RequestParam(value = "userId") long userId) {
-
-        //TODO there is hardcoded module id,later will get from url @prabjot
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.getChildUnits(unitId, userId, moduleId));
-    }
+//    @GetMapping(UNIT_URL+"/unit")
+//    @ApiOperation("get child units of parent organization")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getChildUnits(@PathVariable long unitId, @RequestParam(value = "moduleId") String moduleId,
+//                                                             @RequestParam(value = "userId") long userId) {
+//
+//        //TODO there is hardcoded module id,later will get from url @prabjot
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.getChildUnits(unitId, userId, moduleId));
+//    }
     @GetMapping(UNIT_URL+"/resources")
     @ApiOperation("Get Organization Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1464,17 +1464,17 @@ public class OrganizationController {
 
 
     @ApiOperation(value = "Get Filter For Organization Hierarchy ")
-    @PostMapping ("/organization_flow/hierarchy/filter")
-    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationByFilter(@PathVariable long organizationId,@RequestBody OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
+    @PostMapping (UNIT_URL+"/organization_flow/hierarchy/filter")
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationByFilter(@PathVariable long unitId,@RequestBody OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationHierarchyService.generateOrganizationHierarchyByFilter(organizationId,organizationHierarchyFilterDTO));
+                organizationHierarchyService.generateOrganizationHierarchyByFilter(unitId,organizationHierarchyFilterDTO));
     }
 
     @ApiOperation(value = "Get Organization Hierarchy By Filter")
-    @GetMapping ("/organization_flow/hierarchy/filter_available")
-    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyFilters(@PathVariable long organizationId) {
+    @GetMapping (UNIT_URL+"/organization_flow/hierarchy/filter_available")
+    public ResponseEntity<Map<String, Object>> getOrganizationHierarchyFilters(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationHierarchyService.getOrganizationHierarchyFilters(organizationId));
+                organizationHierarchyService.getOrganizationHierarchyFilters(unitId));
     }
     @ApiOperation(value = "Get eligible  units for create/copy CTA and WTA")
     @GetMapping(value = UNIT_URL + "/eligible_units")

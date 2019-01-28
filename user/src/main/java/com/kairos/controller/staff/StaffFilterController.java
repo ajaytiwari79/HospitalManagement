@@ -32,15 +32,15 @@ public class StaffFilterController {
     @RequestMapping(value = UNIT_URL+"/filter", method = RequestMethod.POST)
     @ApiOperation("To add favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addFavouriteFilter(@RequestBody StaffFilterDTO staffFilterDTO,@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.addFavouriteFilter(organizationId, staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> addFavouriteFilter(@RequestBody StaffFilterDTO staffFilterDTO,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.addFavouriteFilter(unitId, staffFilterDTO));
     }
 
     @RequestMapping(value = UNIT_URL+"/filter/{filterId}", method = RequestMethod.PUT)
     @ApiOperation("To update favourite filters ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId, @RequestBody StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.updateFavouriteFilter(filterId, organizationId, staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> updateFavouriteFilter(@PathVariable Long filterId,@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.updateFavouriteFilter(filterId, unitId, staffFilterDTO));
     }
 
     @RequestMapping(value = UNIT_URL+"/all_filter/{moduleId}", method = RequestMethod.GET)
@@ -53,8 +53,8 @@ public class StaffFilterController {
     @RequestMapping(value = UNIT_URL+"/filter/{filterId}", method = RequestMethod.DELETE)
     @ApiOperation("To delete favourite filters ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.deleteFavouriteFilter(filterId, organizationId));
+    public ResponseEntity<Map<String, Object>> deleteFavouriteFilter(@PathVariable Long filterId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.deleteFavouriteFilter(filterId, unitId));
     }
 
     @RequestMapping(value = UNIT_URL+"/staff_list_with_filter", method = RequestMethod.POST)
