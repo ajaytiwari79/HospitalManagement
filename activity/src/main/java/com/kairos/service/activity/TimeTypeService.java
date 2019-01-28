@@ -41,7 +41,7 @@ public class TimeTypeService extends MongoBaseService {
         }
         BigInteger upperLevelTimeTypeId=timeTypeDTOs.get(0).getUpperLevelTimeTypeId();
         if(activityMongoRepository.existsByTimeTypeId(upperLevelTimeTypeId)){
-            exceptionService.actionNotPermittedException("activity already exists witht his time type");
+            exceptionService.actionNotPermittedException("activity.already.exists.time_type");
         }
         TimeType upperTimeType=timeTypeMongoRepository.findOneById(upperLevelTimeTypeId);
         timeTypeDTOs.forEach(timeTypeDTO -> {
