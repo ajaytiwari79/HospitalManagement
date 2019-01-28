@@ -118,7 +118,7 @@ public class WTAService extends MongoBaseService {
 
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
         if (isNotNull(wtaDTO.getEndDate())) {
-            if (wtaDTO.getStartDate().isBefore(wtaDTO.getEndDate())) {
+            if (wtaDTO.getStartDate().isAfter(wtaDTO.getEndDate())) {
                 exceptionService.invalidRequestException("message.wta.start-end-date");
             }
             wta.setEndDate(wtaDTO.getEndDate());
@@ -257,8 +257,6 @@ public class WTAService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.organization.subtype.update", updateDTO.getOrganizationSubType());
         }
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        logger.info("Its a future date wo we don't need to create we need to update in same");
-        boolean sameFutureDateWTA = oldWta.getStartDate().isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
         if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
             for (WTABaseRuleTemplateDTO ruleTemplateDTO : updateDTO.getRuleTemplates()) {
                 ruleTemplates.add(wtaBuilderService.copyRuleTemplate(ruleTemplateDTO, true));
@@ -266,10 +264,12 @@ public class WTAService extends MongoBaseService {
             wtaBaseRuleTemplateGraphRepository.saveEntities(ruleTemplates);
             oldWta.setRuleTemplateIds(ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList()));
         }
-        if (!sameFutureDateWTA) { // since calculative values are changed and dates are not same so we need to make a new copy
+        boolean sameFutureDateWTA = oldWta.getStartDate().isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        if (!sameFutureDateWTA) {
+            logger.info("Its a future date so we don't need to create we need to update in same");// since calculative values are changed and dates are not same so we need to make a new copy
             oldWta.setStartDate(updateDTO.getStartDate());
-            oldWta.setEndDate(updateDTO.getEndDate());
         }
+        oldWta.setEndDate(updateDTO.getEndDate());
         // This is may be not used as We cant change expertise
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
             if (!Optional.ofNullable(wtaBasicDetailsDTO.getExpertiseResponse()).isPresent()) {
