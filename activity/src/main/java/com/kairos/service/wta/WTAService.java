@@ -117,15 +117,11 @@ public class WTAService extends MongoBaseService {
         }
 
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
-        Date startDate = (isNull(wtaDTO.getStartDate())? DateUtils.getCurrentDate() : DateUtils.asDate(wtaDTO.getStartDate()));
-        startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS));
         if (isNotNull(wtaDTO.getEndDate())) {
-            if (startDate.before(DateUtils.asDate(wtaDTO.getEndDate()))) {
+            if (wtaDTO.getStartDate().isBefore(wtaDTO.getEndDate())) {
                 exceptionService.invalidRequestException("message.wta.start-end-date");
             }
-            Date endDate = DateUtils.asDate(wtaDTO.getEndDate());
-            endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
-            wta.setEndDate(endDate);
+            wta.setEndDate(wtaDTO.getEndDate());
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), referenceId, null, wtaDTO.getOrganizationType(), wtaDTO.getUnitIds());
         if (creatingFromCountry) {
@@ -134,7 +130,7 @@ public class WTAService extends MongoBaseService {
             }
             wta.setCountryId(referenceId);
         }
-        wta.setStartDate(startDate);
+        wta.setStartDate(wtaDTO.getStartDate());
         if (isCollectionNotEmpty(wtaDTO.getTags())) {
             List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA);
             wta.setTags(tags.stream().map(t -> t.getId()).collect(Collectors.toList()));
@@ -149,8 +145,6 @@ public class WTAService extends MongoBaseService {
 
         }
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
-        wtaResponseDTO.setStartDate(DateUtils.asLocalDate(wta.getStartDate()));
-        wtaResponseDTO.setEndDate(DateUtils.asLocalDate(wta.getEndDate()));
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         if (creatingFromCountry) {
             save(wta);
@@ -230,14 +224,11 @@ public class WTAService extends MongoBaseService {
         wta.setExpertise(new Expertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription()));
         wta.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
         wta.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
-
-
         return wta;
     }
 
 
     public WTAResponseDTO updateWtaOfCountry(Long countryId, BigInteger wtaId, WTADTO updateDTO) {
-
         if (updateDTO.getStartDate().isBefore(getLocalDate())) {
             exceptionService.actionNotPermittedException("message.wta.start-current-date");
         }
@@ -252,9 +243,8 @@ public class WTAService extends MongoBaseService {
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = genericIntegrationService.getWtaRelatedInfo(updateDTO.getExpertiseId(), updateDTO.getOrganizationSubType(), countryId, null, updateDTO.getOrganizationType(), Collections.EMPTY_LIST);
         WTAResponseDTO wtaResponseDTO = prepareWtaWhileUpdate(oldWta, updateDTO, wtaBasicDetailsDTO);
-
-        wtaResponseDTO.setStartDate(DateUtils.asLocalDate(oldWta.getStartDate()));
-        wtaResponseDTO.setEndDate(DateUtils.asLocalDate(oldWta.getEndDate()));
+        wtaResponseDTO.setStartDate(oldWta.getStartDate());
+        wtaResponseDTO.setEndDate(oldWta.getEndDate());
         return wtaResponseDTO;
     }
 
@@ -268,7 +258,7 @@ public class WTAService extends MongoBaseService {
         }
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         logger.info("Its a future date wo we don't need to create we need to update in same");
-        boolean sameFutureDateWTA = DateUtils.getLocalDateFromDate(oldWta.getStartDate()).isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
+        boolean sameFutureDateWTA = oldWta.getStartDate().isEqual(updateDTO.getStartDate()) && (updateDTO.getStartDate().isAfter(DateUtils.getCurrentLocalDate()) || updateDTO.getStartDate().isEqual(DateUtils.getCurrentLocalDate()));
         if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
             for (WTABaseRuleTemplateDTO ruleTemplateDTO : updateDTO.getRuleTemplates()) {
                 ruleTemplates.add(wtaBuilderService.copyRuleTemplate(ruleTemplateDTO, true));
@@ -277,10 +267,8 @@ public class WTAService extends MongoBaseService {
             oldWta.setRuleTemplateIds(ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList()));
         }
         if (!sameFutureDateWTA) { // since calculative values are changed and dates are not same so we need to make a new copy
-            oldWta.setStartDate(DateUtils.asDate(updateDTO.getStartDate()));
-            if (updateDTO.getEndDate() != null) {
-                oldWta.setEndDate(DateUtils.asDate(updateDTO.getEndDate()));
-            }
+            oldWta.setStartDate(updateDTO.getStartDate());
+            oldWta.setEndDate(updateDTO.getEndDate());
         }
         // This is may be not used as We cant change expertise
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
@@ -335,8 +323,6 @@ public class WTAService extends MongoBaseService {
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
-            wtaResponseDTO.setStartDate(DateUtils.asLocalDate(wta.getStartDate()));
-            wtaResponseDTO.setEndDate(DateUtils.asLocalDate(wta.getEndDate()));
             wtaResponseDTOS.add(wtaResponseDTO);
         });
 
@@ -386,7 +372,7 @@ public class WTAService extends MongoBaseService {
         }
         if (checked) {
             List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateGraphRepository.findAllByIdIn(wta.getRuleTemplateIds());
-            WTADTO wtadto = new WTADTO(COPY_OF + wta.getName(), wta.getDescription(), wta.getExpertise().getId(), DateUtils.asLocalDate(wta.getStartDate()), wta.getEndDate() == null ? null : DateUtils.asLocalDate(wta.getEndDate()), wtaBaseRuleTemplates, wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getId());
+            WTADTO wtadto = new WTADTO(COPY_OF + wta.getName(), wta.getDescription(), wta.getExpertise().getId(), wta.getStartDate(), wta.getEndDate() == null ? null : wta.getEndDate(), wtaBaseRuleTemplates, wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getId());
             WTAResponseDTO wtaResponseDTO = createWta(wta.getCountryId(), wtadto, true, true);
             map.put("wta", wtaResponseDTO);
             map.put("ruleTemplate", wtaResponseDTO.getRuleTemplates());
@@ -491,12 +477,10 @@ public class WTAService extends MongoBaseService {
             workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
         }
         workingTimeAgreement.setUnitPositionId(unitPositionId);
-        Date startDate = startLocalDate != null ? asDate(startLocalDate) : DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(wtaQueryResultDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
         if (wtaQueryResultDTO.getEndDate() != null) {
-            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(wtaQueryResultDTO.getEndDate()).truncatedTo(ChronoUnit.DAYS));
-            workingTimeAgreement.setEndDate(endDate);
+            workingTimeAgreement.setEndDate(wtaQueryResultDTO.getEndDate());
         }
-        workingTimeAgreement.setStartDate(startDate);
+        workingTimeAgreement.setStartDate(wtaQueryResultDTO.getStartDate());
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentId(wtaQueryResultDTO.getId());
@@ -556,7 +540,9 @@ public class WTAService extends MongoBaseService {
             wtaRepository.save(oldWta.get());
         }
         wtaResponseDTO.setStartDate(wtadto.getStartDate());
-        wtaResponseDTO.setEndDate(wtadto.getEndDate());
+        if(isNotNull(wtadto.getEndDate())) {
+            wtaResponseDTO.setEndDate(wtadto.getEndDate());
+        }
         return wtaResponseDTO;
     }
 
@@ -576,11 +562,10 @@ public class WTAService extends MongoBaseService {
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
             oldWta.setRuleTemplateIds(ruleTemplatesIds);
         }
-        oldWta.setEndDate(isNotNull(updateDTO.getEndDate()) ? asDate(updateDTO.getEndDate()) : null);
+        oldWta.setEndDate(isNotNull(updateDTO.getEndDate()) ?updateDTO.getEndDate() : null);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
-        wtaResponseDTO.setStartDate(DateUtils.asLocalDate(oldWta.getStartDate()));
-        wtaResponseDTO.setEndDate(DateUtils.asLocalDate(oldWta.getEndDate()));
+
         return wtaResponseDTO;
     }
 
@@ -722,9 +707,9 @@ public class WTAService extends MongoBaseService {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
         }
         boolean isCalculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta, wtaBaseRuleTemplates);
-        if (wtadto.getStartDate().isBefore(asLocalDate(oldWta.getStartDate())) || wtadto.getStartDate().equals(asLocalDate(oldWta.getStartDate())) || !isCalculatedValueChanged) {
+        if (wtadto.getStartDate().isBefore(oldWta.getStartDate())|| wtadto.getStartDate().equals(oldWta.getStartDate()) || !isCalculatedValueChanged) {
             updateWTAOfUnpublishedUnitPosition(oldWta, wtadto);
-            oldWta.setStartDate(asDate(wtadto.getStartDate()));
+            oldWta.setStartDate(wtadto.getStartDate());
             wtaRepository.save(oldWta);
             wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         } else {
@@ -732,12 +717,12 @@ public class WTAService extends MongoBaseService {
             newWta.setDescription(wtadto.getDescription());
             newWta.setName(wtadto.getName());
             newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
-            newWta.setStartDate(asDate(wtadto.getStartDate()));
-            newWta.setEndDate(wtadto.getEndDate() != null ? asDate(wtadto.getEndDate()) : null);
+            newWta.setStartDate(wtadto.getStartDate());
+            newWta.setEndDate(wtadto.getEndDate() != null ? wtadto.getEndDate() : null);
             newWta.setRuleTemplateIds(null);
             oldWta.setDisabled(true);
-            if(asLocalDate(oldWta.getStartDate()).isBefore(wtadto.getStartDate()) || (isNotNull(oldWta.getEndDate()) && oldWta.getEndDate().equals(wtadto.getEndDate()))) {
-                oldWta.setEndDate(asDate(wtadto.getStartDate().minusDays(1)));
+            if(oldWta.getStartDate().isBefore(wtadto.getStartDate()) || (isNotNull(oldWta.getEndDate()) && oldWta.getEndDate().equals(wtadto.getEndDate()))) {
+                oldWta.setEndDate(wtadto.getStartDate().minusDays(1));
             }
             oldWta.setId(null);
             if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {

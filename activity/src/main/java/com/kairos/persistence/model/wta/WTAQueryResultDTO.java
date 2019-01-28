@@ -9,6 +9,7 @@ import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,8 +30,8 @@ public class WTAQueryResultDTO {
     private BigInteger countryParentWTA;
 
     private BigInteger organizationParentId; // wta id of parent organization and this must not be changable
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long expiryDate;
     private String name;
     private String description;
@@ -101,19 +102,19 @@ public class WTAQueryResultDTO {
         this.parentId = parentId;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
