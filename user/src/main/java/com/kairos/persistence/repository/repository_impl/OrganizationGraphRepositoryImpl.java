@@ -54,34 +54,42 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
-                    " MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
-                    "WHERE id(employmentType) IN {employmentTypeIds}  ";
+            matchRelationshipQueryForStaff += " MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) " +
+                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
+                    "WITH staff, user, positionLine,unitPos,exp " +
+                    "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
+                    "WHERE id(employmentType) IN {employmentTypeIds}  " +
+                    "WITH staff, empRelation,user,employmentType, CASE WHEN unitPos IS NULL THEN [] ELSE\n" +
+                    "COLLECT({id:id(unitPos),startDate:unitPos.startDate,endDate:unitPos.endDate,expertise:{id:id(exp),name:exp.name},employmentType:{id:id(employmentType),name:employmentType.name}}) END as employments";
         } else {
-            matchRelationshipQueryForStaff += " OPTIONAL MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
-                    " with staff, user, positionLine OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  ";
+            matchRelationshipQueryForStaff += " OPTIONAL MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) " +
+                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
+                    "WITH staff, user, positionLine,unitPos,exp " +
+                    "OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
+                    "WITH staff, user,employmentType,empRelation, CASE WHEN unitPos IS NULL THEN [] ELSE\n" +
+                    "COLLECT({id:id(unitPos),startDate:unitPos.startDate,endDate:unitPos.endDate,expertise:{id:id(exp),name:exp.name},employmentType:{id:id(employmentType),name:employmentType.name}}) END as employments";
         }
 
-        matchRelationshipQueryForStaff += " with staff, user, " +
+        matchRelationshipQueryForStaff += " WITH employments,staff, user, " +
                 "CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name,employmentTypeCategory:empRelation.employmentTypeCategory}) END as employmentList ";
 
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
                     "WHERE id(expertise) IN {expertiseIds} ";
         } else {
-            matchRelationshipQueryForStaff += " with staff,user,employmentList  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
         }
 
-        matchRelationshipQueryForStaff += " with staff, user, employmentList, " +
+        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, " +
                 "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList";
 
         if (Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff, user, employmentList,expertiseList  Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds}  ";
+            matchRelationshipQueryForStaff += " with staff,employments, user, employmentList,expertiseList  Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds}  ";
 
         } else {
-            matchRelationshipQueryForStaff += " with staff, user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) ";
+            matchRelationshipQueryForStaff += " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) ";
         }
-        matchRelationshipQueryForStaff += " with engineerType, staff, user, employmentList, expertiseList";
+        matchRelationshipQueryForStaff += " with engineerType,employments, staff, user, employmentList, expertiseList";
         return matchRelationshipQueryForStaff;
     }
 
@@ -134,9 +142,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         query += getMatchQueryForRelationshipOfStaffByFilters(filters);
 
-        query += " WITH engineerType, staff, user,expertiseList,employmentList Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) ";
+        query += " WITH engineerType, staff,employments, user,expertiseList,employmentList Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) ";
 
-        query += " return distinct {id:id(staff), expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
+        query += " RETURN distinct {id:id(staff), employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
                 "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
                 "age:duration.between(date(user.dateOfBirth),date()).years," +
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId, access_token:staff.access_token," +

@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -122,8 +123,8 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> getShiftOfStaffByExpertiseId(@PathVariable Long staffId, @PathVariable Long unitId,
                                                                             @RequestParam Long expertiseId,
                                                                             @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                                            @RequestParam(value = "endDate", required = false) LocalDate endDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, startDate, endDate, expertiseId));
+                                                                            @RequestParam(value = "endDate", required = false) LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId));
     }
 
     @ApiOperation("create shift using template")
@@ -181,7 +182,7 @@ public class ShiftController {
     @ApiOperation("shifts details by date")
     @GetMapping("/shift/compact_view_details_by_date")
     public ResponseEntity<Map<String, Object>> getShiftsDetailsForCompactViewByDate(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getCompactViewDetails(unitId, shiftStartDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getCompactViewDetails(new ArrayList<>(),unitId, shiftStartDate));
     }
 
     @ApiOperation("get a Shift detail by id")
@@ -206,7 +207,7 @@ public class ShiftController {
     }
 
     @ApiOperation("Get shifts by staff/unit/expertise/date ")
-    @GetMapping(value = "/shifts")
+    @GetMapping(value = "/shifts/all")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
                                                                     @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
