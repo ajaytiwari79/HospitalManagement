@@ -167,9 +167,12 @@ public class DynamicTabService extends MongoBaseService {
 
     private void createTabsForStaff(List<KPIDashboard> kpiDashboards,List<Long> staffIds){
         List<KPIDashboard> dashboards=new ArrayList<>();
+        List<KPIDashboardDTO> dashboardDTOList=counterRepository.getKPIDashboardsOfStaffs(ConfLevel.STAFF,staffIds);
+        Map<String,KPIDashboardDTO> nameAndKPIDashBoardMap=dashboardDTOList.stream().collect(Collectors.toMap(k->k.getName().trim().toLowerCase()+k.getStaffId(),v->v,(first,second)->second));
         kpiDashboards.forEach(kpiDashboard -> {
             List<KPIDashboard> kpiDashboardList=new ArrayList<>();
             staffIds.forEach(staff->{
+                if(!nameAndKPIDashBoardMap.containsKey(kpiDashboard.getName().trim().toLowerCase()+staff))
                 kpiDashboardList.add(new KPIDashboard(kpiDashboard.getParentModuleId(),kpiDashboard.getModuleId(),kpiDashboard.getName(),kpiDashboard.getCountryId(),kpiDashboard.getUnitId(),staff,ConfLevel.STAFF,kpiDashboard.isDefaultTab()));
             });
             dashboards.addAll(kpiDashboardList);
