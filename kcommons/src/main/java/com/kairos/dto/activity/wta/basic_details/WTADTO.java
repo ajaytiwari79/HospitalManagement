@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateUtils;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -21,12 +23,11 @@ public class WTADTO {
     private String name;
     private String description;
     private long expertiseId;
-    private long startDateMillis;
-    private Long endDateMillis;
     private LocalDate startDate;
     private LocalDate endDate;
     private Long expiryDate;
-    @NotNull(message = "error.RuleTemplate.description.notnull")
+    @NotEmpty(message = "message.wta-base-rule-template.null-list")
+    @Valid
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;
@@ -38,12 +39,12 @@ public class WTADTO {
         //default cons
     }
 
-    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, @NotNull(message = "error.RuleTemplate.description.notnull") List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
+    public WTADTO(String name, String description, long expertiseId, LocalDate startDate, LocalDate endDate, @NotNull(message = "error.RuleTemplate.description.notnull") List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
         this.name = name;
         this.description = description;
         this.expertiseId = expertiseId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.ruleTemplates = ruleTemplates;
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
@@ -58,7 +59,7 @@ public class WTADTO {
     }
 
     public LocalDate getStartDate() {
-        return Optional.ofNullable(startDate).orElse(DateUtils.getLocalDate( this.startDateMillis));
+        return startDate;
     }
 
     public void setStartDate(LocalDate startDate) {
@@ -95,22 +96,6 @@ public class WTADTO {
 
     public void setExpertiseId(long expertiseId) {
         this.expertiseId = expertiseId;
-    }
-
-    public long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -176,8 +161,8 @@ public class WTADTO {
         sb.append("name='").append(name).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", expertiseId=").append(expertiseId);
-        sb.append(", startDateMillis=").append(startDateMillis);
-        sb.append(", endDateMillis=").append(endDateMillis);
+        sb.append(", startDate=").append(startDate);
+        sb.append(", endDate=").append(endDate);
         sb.append(", expiryDate=").append(expiryDate);
         sb.append(", ruleTemplates=").append(ruleTemplates);
         sb.append(", organizationType=").append(organizationType);

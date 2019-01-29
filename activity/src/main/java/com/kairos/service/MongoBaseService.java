@@ -1,8 +1,10 @@
 package com.kairos.service;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
@@ -13,6 +15,7 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +36,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
-    public <T extends MongoBaseEntity> T save(T entity){
+    public <T extends MongoBaseEntity> T save(@Valid T entity){
 
         Assert.notNull(entity, "Entity must not be null!");
         /**
@@ -50,7 +53,10 @@ public class MongoBaseService {
                 className = entity.getClass().getSuperclass().getSimpleName();
             }
             entity.setCreatedAt(DateUtils.getDate());
+            entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
             entity.setId(mongoSequenceRepository.nextSequence(className));
+        }else {
+            entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
         }
         /**
          *  Set updatedAt time as current time
@@ -60,7 +66,7 @@ public class MongoBaseService {
         return entity;
     }
 
-    public <T extends MongoBaseEntity> List<T> save(List<T> entities){
+    public <T extends MongoBaseEntity> List<T> save(@Valid List<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
@@ -105,7 +111,7 @@ public class MongoBaseService {
                         className = entity.getClass().getSuperclass().getSimpleName();
                     }
                     entity.setId(mongoSequenceRepository.nextSequence(className));
-
+                    entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
                     dbObject = new BasicDBObject();
 
                     /*
@@ -118,7 +124,7 @@ public class MongoBaseService {
                     * */
                     bulkWriteOperation.insert(dbObject);
                 }else {
-
+                    entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
                     dbObject = new BasicDBObject();
 
                     /*
@@ -155,7 +161,7 @@ public class MongoBaseService {
         }
     }
 
-    public <T extends MongoBaseEntity> Set<T> save(Set<T> entities){
+    public <T extends MongoBaseEntity> Set<T> save(@Valid Set<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 

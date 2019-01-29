@@ -225,9 +225,9 @@ public class SkillService {
             }
             response.put("orgData", teamSkillRel);
         }
-        List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(id);
+       /* List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(id);
         Map<String, Object> taskTypeList = skillServiceTemplateClient.getTaskTypeList(serviceIds, id);
-        response.putAll(taskTypeList);
+        response.putAll(taskTypeList);*/
         response.put("skillLevels", Skill.SkillLevel.values());
         response.put("teamList", teamService.getAllTeamsInOrganization(id));
 
@@ -391,7 +391,7 @@ public class SkillService {
         skill.setEnabled(false);
         skill.setSkillStatus(Skill.SkillStatus.PENDING);
         skillGraphRepository.save(skill);
-        mailService.sendPlainMail(ADMIN_EMAIL, "Request for create new skill", "Skill creation request");
+        mailService.sendPlainMailWithSendGrid(ADMIN_EMAIL, "Request for create new skill", "Skill creation request");
         return true;
     }
 

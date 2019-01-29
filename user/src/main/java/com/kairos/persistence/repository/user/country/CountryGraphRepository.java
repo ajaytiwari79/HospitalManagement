@@ -93,7 +93,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
 
     @Query("MATCH (c:Country{isEnabled:true}) WHERE c.name=~ {0} and id(c) <> {1} RETURN c")
-    List<Country> checkDuplicateCountry(String name, Long organizationId);
+    List<Country> checkDuplicateCountry(String name, Long countryId);
 
 
     @Query("MATCH (n:Country{isEnabled:true}) RETURN collect({name:n.name, code:n.code}) as list")

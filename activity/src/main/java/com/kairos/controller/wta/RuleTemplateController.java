@@ -62,7 +62,7 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = COUNTRY_URL + "/copy_rule_template", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @RequestBody WTABaseRuleTemplateDTO template) {
+    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @RequestBody @Valid WTABaseRuleTemplateDTO template) {
         //WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = WTABuilderService.copyRuleTemplateMapToDTO(template);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId, template));
     }

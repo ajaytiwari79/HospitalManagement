@@ -811,8 +811,14 @@ public  class DateUtils {
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
-    public static Long getMinutesFromTotalMilliSeconds(long TotalMilliSeconds){
-        return TotalMilliSeconds/ONE_HOUR;
+
+    public static Double getHoursFromTotalMilliSeconds(long totalMilliSeconds){
+        long seconds, minutes, hours;
+        seconds = totalMilliSeconds / 1000;
+        minutes = seconds / 60;
+        hours = minutes / 60;
+        minutes = minutes % 60;
+        return new Double(hours+"."+minutes);
     }
 
     public static Double getHoursByMinutes(double totalMinutes){
@@ -822,22 +828,48 @@ public  class DateUtils {
     }
 
 
-    /**
-     * Case : localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-28 return true
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-27 return false
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-29 return true
-     */
-    public static boolean isEqualsAndAfter(LocalDate localDate,LocalDate localDateAfterAndEqual){
-        return localDate.equals(localDateAfterAndEqual) && localDateAfterAndEqual.isAfter(localDate);
+
+    public static boolean startDateIsEqualsOrBeforeEndDate(LocalDate startdate,LocalDate endDate){
+        return startdate.isBefore(endDate) || startdate.equals(endDate);
     }
 
-    /**
-     * Case : localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-28 return true
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-27 return true
-     *      localDate = 2019-02-28 and localDateAfterAndEqual = 2019-02-29 return false
-     */
-    public static boolean isEqualsAndBefore(LocalDate localDate,LocalDate localDateAfterAndEqual){
-        return localDateAfterAndEqual.isBefore(localDate) || localDate.equals(localDateAfterAndEqual);
+
+    public static Date plusDays(Date date,int plusDays){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));
+    }
+
+    public static Date plusMonths(Date date,int plusMonths){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMonths(plusMonths));
+    }
+
+    public static Date plusWeeks(Date date,int plusWeeks){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusWeeks(plusWeeks));
+    }
+
+    public static Date plusHours(Date date,int plusHours){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusHours(plusHours));
+    }
+
+    public static Date plusMinutes(Date date,int plusMinutes){
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMinutes(plusMinutes));
+    }
+
+    public static Date plusSeconds(Date date,int plusSeconds) {
+        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusSeconds(plusSeconds));
+    }
+
+    public static LocalDateTime getLocalDateTimeFromLocalDate(LocalDate localDate){
+        return localDate.atStartOfDay();
+
+    }
+
+    public static LocalDateTime getLocalDateTimeFromLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
+        return LocalDateTime.of(localDate,localTime);
+
+    }
+
+    public static Date getDateFromTimeZone(String timeZone){
+       return new Date(Timestamp.valueOf(LocalDateTime.now(ZoneId.of(timeZone))).getTime());
     }
 
 }

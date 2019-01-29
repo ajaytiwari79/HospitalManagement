@@ -43,7 +43,7 @@ public class PlannedHoursCalculationService implements CounterService {
         List<Long> staffIds=(filterBasedCriteria.get(FilterType.STAFF_IDS) != null)? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)):new ArrayList<>();
         List<LocalDate> filterDates = (filterBasedCriteria.get(FilterType.TIME_INTERVAL) !=null) ? filterBasedCriteria.get(FilterType.TIME_INTERVAL): Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
         List<Long> unitIds = (filterBasedCriteria.get(FilterType.UNIT_IDS)!=null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.UNIT_IDS)):new ArrayList();
-        List<String> shiftActivityStatus=(filterBasedCriteria.get(FilterType.APPROVAL_STATUS)!=null)?filterBasedCriteria.get(FilterType.APPROVAL_STATUS):new ArrayList<>();
+        List<String> shiftActivityStatus=(filterBasedCriteria.get(FilterType.ACTIVITY_STATUS)!=null)?filterBasedCriteria.get(FilterType.ACTIVITY_STATUS):new ArrayList<>();
         List<Long> employmentType = (filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)!=null) ?KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.EMPLOYMENT_TYPE)): new ArrayList();
         if(filterBasedCriteria.get(FilterType.TIME_TYPE)!=null) {
               if(filterBasedCriteria.get(FilterType.TIME_TYPE).get(0) instanceof String){
@@ -56,7 +56,7 @@ public class PlannedHoursCalculationService implements CounterService {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO=new StaffEmploymentTypeDTO(staffIds,unitIds,employmentType,organizationId,filterDates.get(0).toString(),filterDates.get(1).toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS=genericIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-        List<CommonKpiDataUnit> basicChartKpiDateUnits=shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(filterDates.get(1)));
+        List<CommonKpiDataUnit> basicChartKpiDateUnits=shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), shiftActivityStatus,timeTypeIds,DateUtils.asDate(filterDates.get(0)),DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         basicChartKpiDateUnits.forEach(kpiData->{
             kpiData.setLabel(staffIdAndNameMap.get(kpiData.getRefId()));
             ((BasicChartKpiDateUnit)kpiData).setValue(DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit)kpiData).getValue()));

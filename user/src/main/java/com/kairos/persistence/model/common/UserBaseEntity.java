@@ -2,6 +2,7 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.common.UserInfo;
 import org.neo4j.ogm.annotation.GraphId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -28,6 +29,13 @@ public abstract class UserBaseEntity implements Serializable {
 
     @LastModifiedDate
     private Long lastModificationDate;
+
+    @JsonIgnore
+    protected UserInfo createdBy;
+    @JsonIgnore
+    protected UserInfo lastModifiedBy;
+
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -58,5 +66,21 @@ public abstract class UserBaseEntity implements Serializable {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public UserInfo getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UserInfo createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public UserInfo getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(UserInfo lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 }

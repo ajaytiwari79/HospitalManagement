@@ -12,6 +12,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +31,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -129,24 +133,17 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        NumberOfPartOfDayShiftsWTATemplate that = (NumberOfPartOfDayShiftsWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds) &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(partOfDays, that.partOfDays) &&
-                minMaxSetting == that.minMaxSetting;
-    }
 
     @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, timeTypeIds, plannedTimeIds, partOfDays, recommendedValue, minMaxSetting);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = (NumberOfPartOfDayShiftsWTATemplate)wtaBaseRuleTemplate;
+        return (this != numberOfPartOfDayShiftsWTATemplate) && !(intervalLength == numberOfPartOfDayShiftsWTATemplate.intervalLength &&
+                Float.compare(numberOfPartOfDayShiftsWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, numberOfPartOfDayShiftsWTATemplate.intervalUnit) &&
+                Objects.equals(timeTypeIds, numberOfPartOfDayShiftsWTATemplate.timeTypeIds) &&
+                Objects.equals(plannedTimeIds, numberOfPartOfDayShiftsWTATemplate.plannedTimeIds) &&
+                Objects.equals(partOfDays, numberOfPartOfDayShiftsWTATemplate.partOfDays) &&
+                minMaxSetting == numberOfPartOfDayShiftsWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,numberOfPartOfDayShiftsWTATemplate.phaseTemplateValues));
     }
+
 }

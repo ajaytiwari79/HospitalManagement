@@ -9,10 +9,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UnitModuleAccess;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
@@ -32,6 +29,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
@@ -97,6 +95,9 @@ public class UserService {
     private TokenService tokenService;
     @Inject
     EnvConfig config;
+    @Inject
+    private OrganizationService organizationService;
+
     /**
      * Calls UserGraphRepository,
      * creates a new user as provided in method argument
@@ -375,13 +376,6 @@ public class UserService {
         return true;
     }
 
-    public UserOrganizationsDTO getLoggedInUserOrganizations() {
-        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
-        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
-        return userOrganizationsDTO;
-    }
 
     public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, List<Long> accessibleModules, boolean parentOrganization) {
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
@@ -430,7 +424,8 @@ public class UserService {
 
         } else {
             List<UserPermissionQueryResult> unitWisePermissions;
-            Long countryId = organizationGraphRepository.getCountryId(organizationId);
+            Organization parentOrganization = organizationService.fetchParentOrganization(organizationId);
+            Long countryId = organizationGraphRepository.getCountryId(parentOrganization.getId());
             List<DayType> dayTypes=dayTypeService.getCurrentApplicableDayType(countryId);
             Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
             boolean checkDayType=true;
@@ -442,29 +437,30 @@ public class UserService {
                 }
             }
             if(checkDayType){
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId,dayTypeIds,organizationId);
             } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId);
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId,organizationId);
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
-            List<Long> unitIds = unitWisePermissions.stream()
+            /*List<Long> unitIds = unitWisePermissions.stream()
                     .filter(userPermissionQueryResult -> !userPermissionQueryResult.isParentOrganization())
                     .map(u -> u.getUnitId())
-                    .collect(Collectors.toList());
-            List<UnitModuleAccess> unitModuleAccesses = unitTypeGraphRepository.getAccessibleModulesByUnits(unitIds);
+                    .collect(Collectors.toList());*/
+            //List<UnitModuleAccess> unitModuleAccesses = unitTypeGraphRepository.getAccessibleModulesByUnits(unitIds);
+            List<AccessPageDTO> modules = accessPageRepository.getMainActiveTabs(countryId);
+            List<Long> accessibleModules = modules.stream().map(AccessPageDTO::getId).collect(Collectors.toList());
             for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
-                List<Long> accessibleModules = unitModuleAccesses.stream()
+                /*List<Long> accessibleModules = unitModuleAccesses.stream()
                         .filter(unitModuleAccess -> unitModuleAccess.getUnitId().equals(userPermissionQueryResult.getUnitId()))
                         .findAny().map(u -> u.getAccessibleModules())
-                        .orElse(new ArrayList<>());
+                        .orElse(new ArrayList<>());*/
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
-
-
             permissionData.setOrganizationPermissions(unitPermission);
         }
+        updateLastSelectedOrganizationId(organizationId);
         return permissionData;
     }
 
@@ -664,14 +660,9 @@ public class UserService {
         return permissionList;
     }
 
-    public Boolean updateLastSelectedChildAndParentId(OrganizationSelectionDTO organizationSelectionDTO) {
+    private Boolean updateLastSelectedOrganizationId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedParentOrgId()).isPresent()) {
-            currentUser.setLastSelectedParentOrgId(organizationSelectionDTO.getLastSelectedParentOrgId());
-        }
-        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()) {
-            currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
-        }
+        currentUser.setLastSelectedOrganizationId(organizationId);
         userGraphRepository.save(currentUser);
         return true;
     }
@@ -711,7 +702,7 @@ public class UserService {
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", userEmail);
         }
         String token = tokenService.createForgotPasswordToken(currentUser);
-        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT,config.getSendGridApiKey());
+        mailService.sendPlainMailWithSendGrid(userEmail,AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token,AppConstants.MAIL_SUBJECT);
         return true;
     }
 

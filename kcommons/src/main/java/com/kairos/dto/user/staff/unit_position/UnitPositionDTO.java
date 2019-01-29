@@ -2,11 +2,13 @@ package com.kairos.dto.user.staff.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -19,9 +21,6 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UnitPositionDTO {
 
-    @NotNull(message = "Position code  is required for position")
-    @Range(min = 0, message = "Position code is required for position")
-    private Long positionCodeId;
     @NotNull(message = "expertise is required for position")
     @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
@@ -39,7 +38,7 @@ public class UnitPositionDTO {
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
-    private float hourlyCost;
+    private BigDecimal hourlyCost;
     private Double salary;
     private Long employmentTypeId;
     @NotNull(message = "employmentTypeCategory can't be null")
@@ -70,8 +69,10 @@ public class UnitPositionDTO {
     private Long timeCareExternalId;
     private boolean published;
     private Long accessGroupId;
-    private String positionCodeName;
     private boolean mainUnitPosition;
+    private float taxDeductionPercentage;
+    private ExpertiseResponseDTO expertise;
+
 
 
 
@@ -89,13 +90,12 @@ public class UnitPositionDTO {
         this.published = published;
     }
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                           float avgDailyWorkingHours, float hourlyCost, Double salary, Long employmentTypeId) {
+    public UnitPositionDTO(Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
+                           float avgDailyWorkingHours, BigDecimal hourlyCost, Double salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.hourlyCost = hourlyCost;
-        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
       //  this.startDateMillis = startDateMillis;
        // this.endDateMillis = endDateMillis;
@@ -104,9 +104,8 @@ public class UnitPositionDTO {
     }
 
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, LocalDate startDate, LocalDate endDate, int totalWeeklyHours, Long employmentTypeId,
+    public UnitPositionDTO(Long expertiseId, LocalDate startDate, LocalDate endDate, int totalWeeklyHours, Long employmentTypeId,
                            Long staffId, BigInteger wtaId, BigInteger ctaId, Long unitId, Long timeCareExternalId) {
-        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
         this.staffId = staffId;
@@ -159,14 +158,6 @@ public class UnitPositionDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public Long getPositionCodeId() {
-        return positionCodeId;
-    }
-
-    public void setPositionCodeId(Long positionCodeId) {
-        this.positionCodeId = positionCodeId;
-    }
-
     public Long getExpertiseId() {
         return expertiseId;
     }
@@ -191,11 +182,11 @@ public class UnitPositionDTO {
         this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
 
-    public float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 
@@ -338,14 +329,6 @@ public class UnitPositionDTO {
         this.positionLineId = positionLineId;
     }
 
-    public String getPositionCodeName() {
-        return positionCodeName;
-    }
-
-    public void setPositionCodeName(String positionCodeName) {
-        this.positionCodeName = positionCodeName;
-    }
-
     public boolean isMainUnitPosition() {
         return mainUnitPosition;
     }
@@ -354,4 +337,19 @@ public class UnitPositionDTO {
         this.mainUnitPosition = mainUnitPosition;
     }
 
+    public float getTaxDeductionPercentage() {
+        return taxDeductionPercentage;
+    }
+
+    public void setTaxDeductionPercentage(float taxDeductionPercentage) {
+        this.taxDeductionPercentage = taxDeductionPercentage;
+    }
+
+    public ExpertiseResponseDTO getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(ExpertiseResponseDTO expertise) {
+        this.expertise = expertise;
+    }
 }

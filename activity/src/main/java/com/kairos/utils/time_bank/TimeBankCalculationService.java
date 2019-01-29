@@ -37,6 +37,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -59,6 +60,7 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.BONUS_HOURS;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
@@ -80,6 +82,7 @@ public class TimeBankCalculationService {
     private PayOutCalculationService payOutCalculationService;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private ExceptionService exceptionService;
 
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
 
@@ -99,7 +102,7 @@ public class TimeBankCalculationService {
                 functionId= appliedFunctionDTO.get().getId();
             }
             Long requiredFunctionId=unitPosition.getFunctionId()!=null?unitPosition.getFunctionId():functionId;
-            dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(), unitPosition.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate())));
+            dailyTimeBank = dailyTimeBankEntryMap.getOrDefault(unitPosition.getId() + "" + DateUtils.getLocalDate(interval.getStart().getMillis()), new DailyTimeBankEntry(unitPosition.getId(), unitPosition.getStaffId(),  DateUtils.asLocalDate(interval.getStart().toDate())));
             int totalDailyTimebank = 0;
             int dailyScheduledMin = 0;
             int contractualMin = getContractualAndTimeBankByPlanningPeriod(planningPeriodIntervals,DateUtils.asLocalDate(shifts.get(0).getStartDate()),unitPosition.getPositionLines());
@@ -140,7 +143,7 @@ public class TimeBankCalculationService {
 
                                     } else if (ruleTemplate.getCalculationFor().equals(FUNCTIONS)) {
                                         if (ruleTemplate.getStaffFunctions().contains(requiredFunctionId)) {
-                                            float value = unitPosition.getHourlyCost() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / unitPosition.getHourlyCost() * 60 : 0;
+                                            float value = unitPosition.getHourlyCost().intValue() > 0 ? (ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()) / unitPosition.getHourlyCost().intValue() * 60 : 0;
                                             ctaTimeBankMin += value;
                                             totalDailyTimebank += ctaTimeBankMin;
                                         }
@@ -193,7 +196,7 @@ public class TimeBankCalculationService {
             if (valid) {
                 for (com.kairos.dto.user.employment.UnitPositionLinesDTO positionLine : positionLines) {
                     DateTimeInterval positionInterval = positionLine.getInterval();
-                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate))) {
+                    if ((positionInterval == null && (positionLine.getStartDate().equals(localDate) || positionLine.getStartDate().isBefore(localDate))) || (positionInterval!=null && (positionInterval.contains(date) || positionLine.getEndDate().equals(localDate)))) {
                         contractualOrTimeBankMinutes = localDate.getDayOfWeek().getValue() <= positionLine.getWorkingDaysInWeek() ? positionLine.getTotalWeeklyMinutes() / positionLine.getWorkingDaysInWeek() : 0;
                         break;
                     }
@@ -209,11 +212,13 @@ public class TimeBankCalculationService {
      * @param activity
      * @param unitPosition
      */
-    public void calculateScheduleAndDurationHour(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
+    public void calculateScheduledAndDurationMinutes(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
+        if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())){
+            exceptionService.invalidRequestException("activity.end_date.less_than.start_date",shiftActivity.getActivityName());
+        }
         int scheduledMinutes = 0;
         int duration = 0;
         int weeklyMinutes;
-
         switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 duration = shiftActivity.getDurationMinutes();
@@ -268,7 +273,7 @@ public class TimeBankCalculationService {
         }
         if (valid && CollectionUtils.isEmpty(ruleTemplate.getEmploymentTypes()) || !ruleTemplate.getEmploymentTypes().contains(unitPositionDetails.getEmploymentType().getId()))
             valid = false;
-        if (valid && (CollectionUtils.isEmpty(ruleTemplate.getPhaseInfo()) || !(ruleTemplate.getPhaseInfo().stream().filter(p -> p.getPhaseId().equals(shiftPhaseId)).findFirst().isPresent())))
+        if (valid && (CollectionUtils.isEmpty(ruleTemplate.getPhaseInfo()) || !(ruleTemplate.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent())))
             valid = false;
         if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
             valid = false;
@@ -916,7 +921,7 @@ public class TimeBankCalculationService {
                     totalScheduledMin += children.stream().mapToInt(c -> c.getTotalMin()).sum();
                 }
 
-                if (shifts != null && !shifts.isEmpty()) {
+                if (isCollectionNotEmpty(shifts)) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                             if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {

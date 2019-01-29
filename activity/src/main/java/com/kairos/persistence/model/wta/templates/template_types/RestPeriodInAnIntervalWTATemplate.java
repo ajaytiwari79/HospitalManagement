@@ -9,7 +9,10 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.springframework.security.core.parameters.P;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private float recommendedValue;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
@@ -115,20 +120,12 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        RestPeriodInAnIntervalWTATemplate that = (RestPeriodInAnIntervalWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        RestPeriodInAnIntervalWTATemplate restPeriodInAnIntervalWTATemplate = (RestPeriodInAnIntervalWTATemplate) wtaBaseRuleTemplate;
+        return (this != restPeriodInAnIntervalWTATemplate) && !(intervalLength == restPeriodInAnIntervalWTATemplate.intervalLength &&
+                Float.compare(restPeriodInAnIntervalWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, restPeriodInAnIntervalWTATemplate.intervalUnit) &&
+                Objects.equals(timeTypeIds, restPeriodInAnIntervalWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,restPeriodInAnIntervalWTATemplate.phaseTemplateValues));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, recommendedValue, timeTypeIds);
-    }
 }

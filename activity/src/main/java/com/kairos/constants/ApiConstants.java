@@ -46,7 +46,8 @@ public final class ApiConstants {
     public static final String GET_REASONCODE = "/reason_codes";
     public static final String REMOVE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/remove_functions";
     public static final String RESTORE_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/restore_functions";
-    public static final String APPLY_FUNCTIONS_BY_UNIT_POSITION_ID = "/unit_position/{unitPositionId}/applyFunction";
+    public static final String UNIT_POSITION_UNIT_POSITION_ID_REMOVE_FUNCTION_ON_DELETE_SHIFT
+            = "/unit_position/{unitPositionId}/remove_function_on_delete_shift";
     public static final String STAFF_USER_ACCESS_GROUP = "/staff/user/accessgroup";
     public static final String USER_STAFF_ID = "/user/staffId";
     public static final String STAFF_DETAILS = "/staff/details";
@@ -152,7 +153,8 @@ public final class ApiConstants {
     public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
 
     // /staff_by_employment_type
-    public static final String STAFF_BY_EMPLOYMENT_TYPE="/staff_by_employment_type";
+    public static final String STAFF_BY_KPI_FILTER ="/staff_by_kpi_filter";
+    public static final String KPI_DEFAULT_DATA = "/kpi_default_data";
 
     //Scheduler
     public static final String SCHEDULER_EXECUTE_JOB = "/scheduler_execute_job";

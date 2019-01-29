@@ -10,6 +10,8 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.util.*;
 
 import static com.kairos.utils.ShiftValidatorService.*;
@@ -23,7 +25,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
     private boolean restingTimeAllowed;
@@ -160,22 +164,13 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        DaysOffInPeriodWTATemplate that = (DaysOffInPeriodWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                restingTimeAllowed == that.restingTimeAllowed &&
-                restingTime == that.restingTime &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                minMaxSetting == that.minMaxSetting;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, minMaxSetting, restingTimeAllowed, restingTime, recommendedValue);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = (DaysOffInPeriodWTATemplate)wtaBaseRuleTemplate;
+        return (this != daysOffInPeriodWTATemplate) && !(intervalLength == daysOffInPeriodWTATemplate.intervalLength &&
+                restingTimeAllowed == daysOffInPeriodWTATemplate.restingTimeAllowed &&
+                restingTime == daysOffInPeriodWTATemplate.restingTime &&
+                Float.compare(daysOffInPeriodWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, daysOffInPeriodWTATemplate.intervalUnit) &&
+                minMaxSetting == daysOffInPeriodWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,daysOffInPeriodWTATemplate.phaseTemplateValues));
     }
 }

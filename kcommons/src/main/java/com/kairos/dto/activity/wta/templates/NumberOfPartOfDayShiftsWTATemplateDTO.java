@@ -7,6 +7,8 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long intervalLength;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
+    private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();

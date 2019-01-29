@@ -13,6 +13,8 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,9 +37,10 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private int intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-    private Long consecutiveDays;
 
     public int getIntervalLength() {
         return intervalLength;
@@ -110,13 +113,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
-    public Long getConsecutiveDays() {
-        return consecutiveDays;
-    }
-
-    public void setConsecutiveDays(Long consecutiveDays) {
-        this.consecutiveDays = consecutiveDays;
-    }
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
@@ -143,25 +139,17 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        ConsecutiveWorkWTATemplate that = (ConsecutiveWorkWTATemplate) o;
-        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                intervalLength == that.intervalLength &&
-                Objects.equals(partOfDays, that.partOfDays) &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds) &&
-                minMaxSetting == that.minMaxSetting &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(consecutiveDays, that.consecutiveDays);
-    }
 
     @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting, intervalLength, intervalUnit, consecutiveDays);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate = (ConsecutiveWorkWTATemplate)wtaBaseRuleTemplate;
+        return (this != consecutiveWorkWTATemplate) && !(Float.compare(consecutiveWorkWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                intervalLength == consecutiveWorkWTATemplate.intervalLength &&
+                Objects.equals(partOfDays, consecutiveWorkWTATemplate.partOfDays) &&
+                Objects.equals(plannedTimeIds, consecutiveWorkWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, consecutiveWorkWTATemplate.timeTypeIds) &&
+                minMaxSetting == consecutiveWorkWTATemplate.minMaxSetting &&
+                Objects.equals(intervalUnit, consecutiveWorkWTATemplate.intervalUnit) && Objects.equals(this.phaseTemplateValues,consecutiveWorkWTATemplate.phaseTemplateValues));
     }
+
 }

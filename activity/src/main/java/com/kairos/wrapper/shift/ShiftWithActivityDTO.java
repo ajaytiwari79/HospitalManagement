@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -19,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 
 /*
  * Created By Pradeep singh rajawat
@@ -30,7 +33,7 @@ public class ShiftWithActivityDTO {
 
     private BigInteger id;
     private String name;
-    private List<ShiftActivityDTO> activities = new ArrayList<>();
+    private List<ShiftActivityDTO> activities;
     private Date startDate;
 
     private Date endDate;
@@ -61,7 +64,7 @@ public class ShiftWithActivityDTO {
     private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
     private BigInteger phaseId;
     private ShiftType shiftType;
-    //~ ===================================Constructors=======================================================
+    private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
     public ShiftWithActivityDTO() {
     }
 
@@ -141,7 +144,6 @@ public class ShiftWithActivityDTO {
         this.phaseId = phaseId;
     }
 
-    //~ ===================================Setters and Getters=======================================================
     public List<ShiftStatus> getStatus() {
         return status;
     }
@@ -159,6 +161,7 @@ public class ShiftWithActivityDTO {
     }
 
     public void setActivities(List<ShiftActivityDTO> activities) {
+        activities = isNull(activities) ? new ArrayList<>() : activities;
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
@@ -320,4 +323,11 @@ public class ShiftWithActivityDTO {
         this.timeType = timeType;
     }
 
+    public List<WorkTimeAgreementRuleViolation> getWtaRuleViolations() {
+        return wtaRuleViolations;
+    }
+
+    public void setWtaRuleViolations(List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
+        this.wtaRuleViolations = wtaRuleViolations;
+    }
 }

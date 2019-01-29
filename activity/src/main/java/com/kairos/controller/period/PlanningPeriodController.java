@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +86,7 @@ public class PlanningPeriodController {
     @PutMapping(value = "/period/{periodId}/reset_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> resetPhaseData(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialData(periodId,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.restoreShiftToPreviousPhase(periodId,unitId));
     }
 
     @ApiOperation(value = "restore shift data based on shiftIds and phase")

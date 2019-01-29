@@ -24,7 +24,6 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
-    private Long consecutiveDays;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -82,14 +81,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public Long getConsecutiveDays() {
-        return consecutiveDays;
-    }
-
-    public void setConsecutiveDays(Long consecutiveDays) {
-        this.consecutiveDays = consecutiveDays;
-    }
-
     public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description) {
         this.name=name;
         this.disabled=disabled;
@@ -127,23 +118,15 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         }*/
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        ConsecutiveRestPartOfDayWTATemplate that = (ConsecutiveRestPartOfDayWTATemplate) o;
-        return Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(consecutiveDays, that.consecutiveDays) &&
-                Objects.equals(partOfDays, that.partOfDays) &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds) &&
-                minMaxSetting == that.minMaxSetting;
-    }
 
     @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), consecutiveDays, partOfDays, plannedTimeIds, timeTypeIds, recommendedValue, minMaxSetting);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate = (ConsecutiveRestPartOfDayWTATemplate)wtaBaseRuleTemplate;
+        return (this != consecutiveRestPartOfDayWTATemplate) && !(Float.compare(consecutiveRestPartOfDayWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(partOfDays, consecutiveRestPartOfDayWTATemplate.partOfDays) &&
+                Objects.equals(plannedTimeIds, consecutiveRestPartOfDayWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, consecutiveRestPartOfDayWTATemplate.timeTypeIds) &&
+                minMaxSetting == consecutiveRestPartOfDayWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,consecutiveRestPartOfDayWTATemplate.phaseTemplateValues));
     }
+
 }

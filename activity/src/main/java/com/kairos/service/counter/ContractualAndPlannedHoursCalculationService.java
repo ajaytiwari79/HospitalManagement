@@ -9,7 +9,6 @@ import com.kairos.dto.activity.counter.chart.BasicChartKpiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.BarLineChartKPIRepresentationData;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
@@ -68,7 +67,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         Set<DateTimeInterval> planningPeriodIntervel = getPlanningPeriodIntervals((CollectionUtils.isNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId)), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)));
         Map<Long,Double> calculateContractualForInterval= calculateContractualHoursForInterval(planningPeriodIntervel,new Interval(DateUtils.getLongFromLocalDate(filterDates.get(0)),DateUtils.getLongFromLocalDate(filterDates.get(1))),staffKpiFilterDTOS);
         log.info("contractual hours ",calculateContractualForInterval);
-        List<CommonKpiDataUnit> commonKpiDataUnits = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), new ArrayList<>(), new HashSet<>(), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(filterDates.get(1)));
+        List<CommonKpiDataUnit> commonKpiDataUnits = shiftMongoRepository.findShiftsByKpiFilters(staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList()), new ArrayList<>(), new HashSet<>(), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
         Map<Long,Double> staffAndPlannedHoursMap=commonKpiDataUnits.stream().collect(Collectors.toMap(k->k.getRefId().longValue(),v->DateUtils.getHoursByMinutes(((BasicChartKpiDateUnit)v).getValue())));
         List<CommonKpiDataUnit> kpiDataUnits = calculateContractualForInterval.entrySet().stream().map(entry->new BarLineChartKPiDateUnit(staffIdAndNameMap.get(entry.getKey()), entry.getKey(), entry.getValue(),staffAndPlannedHoursMap.get(entry.getKey()))).collect(Collectors.toList());
         return kpiDataUnits;

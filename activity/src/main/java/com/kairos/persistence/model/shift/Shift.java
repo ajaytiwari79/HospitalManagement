@@ -3,19 +3,19 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.commons.utils.DateTimeInterval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * Created by vipul on 30/8/17.
@@ -34,27 +34,30 @@ public class Shift extends MongoBaseEntity {
     private long probability = 0;
     private long accumulatedTimeBankInMinutes = 0;
     private String remarks;
+    @NotNull(message = "error.ShiftDTO.staffId.notnull")
     private Long staffId;
     private BigInteger phaseId;
     private BigInteger planningPeriodId;
     private Integer weekCount;
     @Indexed
+
     private Long unitId;
     private int scheduledMinutes;
     private int durationMinutes;
+    @NotEmpty(message = "message.shift.activity.empty")
     private List<ShiftActivity> activities;
     //time care id
     private String externalId;
+    @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
     private BigInteger parentOpenShiftId;
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
     private boolean sickShift;
-    private Long createdBy ;//= UserContext.getUserDetails().getId();
-    private Long updatedBy ;//= UserContext.getUserDetails().getId();
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
+    private int timeBankCtaBonusMinutes;
 
     public Long getStaffUserId() {
         return staffUserId;
@@ -69,7 +72,7 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Shift(Date startDate, Date endDate, Long unitPositionId,List<ShiftActivity> shiftActivities) {
+    public Shift(Date startDate, Date endDate, Long unitPositionId,@NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitPositionId = unitPositionId;
@@ -77,7 +80,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,@NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities,@NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -95,7 +98,7 @@ public class Shift extends MongoBaseEntity {
 
     }
     // This is used in absance shift
-    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
+    public Shift(Date startDate, Date endDate,@NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId,@NotEmpty(message = "message.shift.activity.empty")List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
@@ -108,7 +111,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId,Long staffUserId,ShiftType shiftType) {
+    public Shift( Date startDate, Date endDate, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, BigInteger copiedFromShiftId,BigInteger phaseId,BigInteger planningPeriodId,Long staffUserId,ShiftType shiftType) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
@@ -136,21 +139,7 @@ public class Shift extends MongoBaseEntity {
         this.shiftType = shiftType;
     }
 
-    public Long getUpdatedBy() {
-        return updatedBy;
-    }
 
-    public void setUpdatedBy(Long updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 
     public int getDurationMinutes() {
         return durationMinutes;
@@ -173,6 +162,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public void setActivities(List<ShiftActivity> activities) {
+        activities = isNull(activities) ? new ArrayList<>() : activities;
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         this.activities = activities;
     }
@@ -269,7 +259,6 @@ public class Shift extends MongoBaseEntity {
         this.staffId = staffId;
     }
 
-
     public Integer getWeekCount() {
         return weekCount;
     }
@@ -357,6 +346,13 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+    public int getTimeBankCtaBonusMinutes() {
+        return timeBankCtaBonusMinutes;
+    }
+
+    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
+        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
+    }
 
     @Override
     public String toString() {

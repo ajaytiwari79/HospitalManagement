@@ -12,6 +12,8 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -29,7 +31,9 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;//
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private float recommendedValue;
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -146,21 +150,14 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null ) return false;
-        if (!super.equals(o)) return false;
-        ShortestAndAverageDailyRestWTATemplate that = (ShortestAndAverageDailyRestWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                Objects.equals(plannedTimeIds, that.plannedTimeIds) &&
-                Objects.equals(timeTypeIds, that.timeTypeIds);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) wtaBaseRuleTemplate;
+        return (this != shortestAndAverageDailyRestWTATemplate) && !(intervalLength == shortestAndAverageDailyRestWTATemplate.intervalLength &&
+                Float.compare(shortestAndAverageDailyRestWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(intervalUnit, shortestAndAverageDailyRestWTATemplate.intervalUnit) &&
+                Objects.equals(plannedTimeIds, shortestAndAverageDailyRestWTATemplate.plannedTimeIds) &&
+                Objects.equals(timeTypeIds, shortestAndAverageDailyRestWTATemplate.timeTypeIds) && Objects.equals(this.phaseTemplateValues,shortestAndAverageDailyRestWTATemplate.phaseTemplateValues));
     }
 
-    @Override
-    public int hashCode() {
 
-        return Objects.hash(super.hashCode(), intervalLength, intervalUnit, recommendedValue, plannedTimeIds, timeTypeIds);
-    }
 }

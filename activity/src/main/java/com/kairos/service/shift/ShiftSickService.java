@@ -24,7 +24,6 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -57,8 +56,6 @@ public class ShiftSickService extends MongoBaseService {
     private ActivityMongoRepository activityRepository;
     @Inject
     private ExceptionService exceptionService;
-    @Inject
-    private StaffRestClient staffRestClient;
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
@@ -176,7 +173,7 @@ public class ShiftSickService extends MongoBaseService {
                 }
                 staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                shiftService.saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
+                shiftService.saveShiftWithActivity(wtaQueryResultDTO.getBreakRule(), activityWrapperMap, shift, staffAdditionalInfoDTO,false,staffAdditionalInfoDTO.getTimeSlotSets());
             }
 
             shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
@@ -307,7 +304,7 @@ public class ShiftSickService extends MongoBaseService {
                     }
                     staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     shiftService.setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                    shiftService.updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+                    shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
                 }
             }
             //shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);

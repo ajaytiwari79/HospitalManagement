@@ -9,6 +9,8 @@ public enum CounterType {
     AVERAGE_RESTING_HOURS_PER_PRESENCE_DAY("Average Resting Hours Per Presence Day"),
     SCHEDULED_HOURS_NET("Scheduled Hours-Net"),
     PLANNED_HOURS("Planned Hours"),
+    DAYTYPE_AND_TIMESLOT("DatType And TimeSlot"),
+    SHIFT_AND_ACTIVITY_DURATION("Duration Of Shift And Activity"),
     CONTRACTUAL_AND_PLANNED_HOURS("Contractual And Planned Hours Of Staff"),
     TIMEBANK("TimeBank For Units"),
     //VRP COUNTER

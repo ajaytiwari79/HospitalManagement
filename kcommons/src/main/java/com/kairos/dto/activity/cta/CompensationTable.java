@@ -6,22 +6,18 @@ import java.util.Objects;
 
 public class CompensationTable {
     private int granularityLevel;
-//    private CompensationMeasurementType compensationMeasurementType;
     private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
 
     public CompensationTable() {
-        //default
     }
 
     public CompensationTable(int granularityLevel) {
         this.granularityLevel = granularityLevel;
-//        this.compensationMeasurementType = compensationMeasurementType;
     }
 
     public CompensationTable(int granularityLevel, List<CompensationTableInterval> compensationTableIntervals) {
         this.granularityLevel = granularityLevel;
         this.setCompensationTableInterval(compensationTableIntervals);
-//        this.compensationMeasurementType = compensationMeasurementType;
     }
 
     public int getGranularityLevel() {
@@ -32,13 +28,6 @@ public class CompensationTable {
         this.granularityLevel = granularityLevel;
     }
 
-    /*public CompensationMeasurementType getCompensationMeasurementType() {
-        return compensationMeasurementType;
-    }*/
-
-    /*public void setCompensationMeasurementType(CompensationMeasurementType compensationMeasurementType) {
-        this.compensationMeasurementType = compensationMeasurementType;
-    }*/
 
     public List<CompensationTableInterval> getCompensationTableInterval() {
         return compensationTableInterval;
@@ -57,7 +46,7 @@ public class CompensationTable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof CompensationTable)) return false;
         CompensationTable that = (CompensationTable) o;
         return granularityLevel == that.granularityLevel &&
                 Objects.equals(compensationTableInterval, that.compensationTableInterval);
@@ -65,7 +54,6 @@ public class CompensationTable {
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(granularityLevel, compensationTableInterval);
+        return com.google.common.base.Objects.hashCode(granularityLevel, compensationTableInterval);
     }
 }

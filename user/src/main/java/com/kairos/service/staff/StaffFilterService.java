@@ -16,6 +16,7 @@ import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.wrapper.staff.StaffEmploymentWrapper;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -71,13 +72,30 @@ public class StaffFilterService {
     private StaffRetrievalService staffRetrievalService;
     @Inject
     private AccessGroupRepository accessGroupRepository;
+    @Inject
+    private AccessPageRepository accessPageRepository;
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId) {
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId,  Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization organization;
+        if(accessPageRepository.isHubMember(userId)){
+            organization = accessPageRepository.fetchParentHub(userId);
+        }else {
+            //TODO please Optimise these DB calls
+            organization = organizationGraphRepository.findOne(unitId);
+            if (!Optional.ofNullable(organization).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+            }
+            organization = organization.isParentOrganization() ? organization : organizationService.fetchParentOrganization(unitId);
+        }
+        Long countryId = organizationGraphRepository.getCountryId(organization.getId());
+        if (!Optional.ofNullable(countryId).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        }
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
         FiltersAndFavouriteFiltersDTO filtersAndFavouriteFiltersDTO = new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), unitId),
+                getAllFilters(moduleId, countryId, unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
         return filtersAndFavouriteFiltersDTO;
     }
@@ -257,7 +275,7 @@ public class StaffFilterService {
         Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
-        staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
+        staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
         staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(),moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));

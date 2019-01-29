@@ -46,6 +46,16 @@ public class UnitPositionWithCtaDetailsDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
+    public UnitPositionWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<UnitPositionLinesDTO> positionLines) {
+        this.id = id;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.staffId = staffId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.positionLines = positionLines;
+    }
 
     public List<UnitPositionLinesDTO> getPositionLines() {
         return positionLines;

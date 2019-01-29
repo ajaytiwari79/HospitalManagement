@@ -12,6 +12,10 @@ public class CommonKpiDataUnit {
     public CommonKpiDataUnit() {
     }
 
+    public CommonKpiDataUnit(String label) {
+        this.label = label;
+    }
+
     public CommonKpiDataUnit(String label, Number refId) {
         this.label = label;
         this.refId = refId;

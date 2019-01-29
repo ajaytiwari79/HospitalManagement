@@ -10,6 +10,8 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,10 +30,13 @@ import static com.kairos.utils.ShiftValidatorService.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
+    @Positive(message = "message.ruleTemplate.weeks.notNull")
     private int numberOfWeeks;
+    @NotNull(message = "message.ruleTemplate.weeks.notNull")
     private LocalDate validationStartDate;
     private BigInteger vetoActivityId;
     private BigInteger stopBrickActivityId;
+    @Positive(message = "message.ruleTemplate.blocking.point")
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
 
     public VetoAndStopBricksWTATemplate() {
@@ -121,21 +126,13 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        VetoAndStopBricksWTATemplate that = (VetoAndStopBricksWTATemplate) o;
-        return numberOfWeeks == that.numberOfWeeks &&
-                Float.compare(that.totalBlockingPoints, totalBlockingPoints) == 0 &&
-                Objects.equals(validationStartDate, that.validationStartDate) &&
-                Objects.equals(vetoActivityId, that.vetoActivityId) &&
-                Objects.equals(stopBrickActivityId, that.stopBrickActivityId);
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) wtaBaseRuleTemplate;
+        return (this != vetoAndStopBricksWTATemplate) && !(numberOfWeeks == vetoAndStopBricksWTATemplate.numberOfWeeks &&
+                Float.compare(vetoAndStopBricksWTATemplate.totalBlockingPoints, totalBlockingPoints) == 0 &&
+                Objects.equals(validationStartDate, vetoAndStopBricksWTATemplate.validationStartDate) &&
+                Objects.equals(vetoActivityId, vetoAndStopBricksWTATemplate.vetoActivityId) &&
+                Objects.equals(stopBrickActivityId, vetoAndStopBricksWTATemplate.stopBrickActivityId));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), numberOfWeeks, validationStartDate, vetoActivityId, stopBrickActivityId, totalBlockingPoints);
-    }
 }

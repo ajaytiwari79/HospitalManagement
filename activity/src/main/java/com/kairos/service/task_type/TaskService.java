@@ -44,9 +44,6 @@ import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.StaffRestClient;
-import com.kairos.rest_client.TimeCareRestClient;
 import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.rule_validator.task.MergeTaskSpecification;
 import com.kairos.rule_validator.task.TaskDaySpecification;
@@ -162,13 +159,7 @@ public class TaskService extends MongoBaseService {
     private TasksMergingService tasksMergingService;
 
     @Inject
-    private OrganizationRestClient organizationRestClient;
-    @Inject
-    private TimeCareRestClient timeCareRestClient;
-    @Inject
     private ClientExceptionMongoRepository clientExceptionMongoRepository;
-    @Inject
-    private StaffRestClient staffRestClient;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -736,7 +727,7 @@ public class TaskService extends MongoBaseService {
             Set<LocalDateTime> dates = shiftsToCreate.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shiftsToCreate.get(0).getUnitId(), dates);
             shiftService.saveShiftWithActivity(phaseListByDate,shiftsToCreate,staffAdditionalInfoDTO);
-            timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTO, shiftsToCreate);
+            timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO.getUnitPosition(), shiftsToCreate,activities,null,staffAdditionalInfoDTO.getDayTypes());
         }
     }

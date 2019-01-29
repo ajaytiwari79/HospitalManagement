@@ -1,12 +1,12 @@
 package com.kairos.commons.utils;
 
+import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -17,8 +17,6 @@ import java.util.function.Predicate;
  */
 
 public class ObjectUtils {
-
-
 
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
@@ -44,4 +42,15 @@ public class ObjectUtils {
     public static <T> boolean isNull(T object){
         return !Optional.ofNullable(object).isPresent();
     }
+
+    public static <T> boolean isNotNull(T object){
+        return Optional.ofNullable(object).isPresent();
+    }
+
+    public static <E> HashSet<E> newHashSet(E... elements) {
+        HashSet<E> set = new HashSet<>(elements.length);
+        Collections.addAll(set, elements);
+        return set;
+    }
+
 }

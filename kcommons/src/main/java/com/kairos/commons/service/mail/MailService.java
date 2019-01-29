@@ -22,6 +22,9 @@ import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
 
+import static com.kairos.constants.AppConstants.NO_REPLY_EMAIL;
+import static com.kairos.constants.AppConstants.SEND_GRID_API_KEY;
+
 //import javax.validation.constraints.Email;
 
 
@@ -32,40 +35,17 @@ import java.io.IOException;
 @Service
 public class MailService {
     final static Logger logger = LoggerFactory.getLogger(MailService.class);
-    final static boolean isSSL = true;
 
     @Inject
     JavaMailSender javaMailSender;
 
 
-
-
-
-    public boolean sendPlainMail(String receiver,String body, String subject) {
-        try {
-            logger.info("Sending email to::" + receiver);
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-            helper.setFrom("info@nordicplanning.dk");
-            helper.setTo(receiver);
-            helper.setSubject(subject);
-            helper.setBcc("vipul.pandey@oodlestechnologies.com");
-            helper.setText(body);
-            javaMailSender.send(mimeMessage);
-            logger.info("Email sent");
-        } catch (Exception e){
-            logger.info("exception occured {}",e);
-            return false;
-        }
-        return false;
-    }
-
-    public void sendPlainMailWithSendGrid(String receiver, String body, String subject,String sendGridApiKey) {
-       Email from=new Email("no-reply@kairosplanning.com");
+    public void sendPlainMailWithSendGrid(String receiver, String body, String subject) {
+       Email from=new Email(NO_REPLY_EMAIL);
        Email to=new Email(receiver);
        Content content=new Content("text/plain",body);
        Mail mail=new Mail(from,subject,to,content);
-       SendGrid sg = new SendGrid(sendGridApiKey);
+       SendGrid sg = new SendGrid(SEND_GRID_API_KEY);
         Request request = new Request();
         try {
             request.setMethod(Method.POST);
@@ -125,68 +105,5 @@ public class MailService {
         }
         return sb;
     }
-
-
-    public boolean sendPlainMail(String receiver,String message, String subject, String[] filePath){
-        Multipart multipart = new MimeMultipart();
-        BodyPart bodyPart = new MimeBodyPart();
-        DataSource fileDataSource;
-        BodyPart part;
-        for (String path:filePath) {
-            part = new MimeBodyPart();
-            fileDataSource= new FileDataSource(new File(path));
-            try {
-                part.setDataHandler(new DataHandler(fileDataSource));
-                part.setFileName(fileDataSource.getName());
-                multipart.addBodyPart(part);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        try {
-            Message mail = javaMailSender.createMimeMessage();
-            mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(receiver));
-
-            mail.setSubject(subject);
-            mail.setText(message);
-               mail.setContent(multipart);
-            Transport.send(mail);
-            logger.info("Message send successfully....");
-            return true;
-
-
-        } catch (Exception e) {
-            logger.info("exception occured {}",e);
-            return false;
-        }
-
-    }
-
-//    /**
-//     * send email using template {thymleaf}
-//     * @param ctx
-//     * @param templateName
-//     * @param emailTo
-//     * @param subj
-//     * @throws MessagingException
-//     */
-//    public void sendEmail(final Context ctx, final String templateName, final String emailTo,
-//                          final String subj) throws MessagingException{
-//        final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-//        try {
-//            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-//            message.setTo(emailTo);
-//            message.setSubject(subj);
-//            final String htmlContent = templateEngine.process(templateName, ctx);
-//            message.setText(htmlContent, true);
-//            javaMailSender.send(mimeMessage);
-//        }catch (Exception e)
-//        {
-//            logger.info("exception occured {}",e);
-//        }
-//    }
-
 
 }

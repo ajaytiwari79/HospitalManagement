@@ -10,6 +10,8 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -33,7 +35,9 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     private LocalTime fromTime;
     private LocalTime toTime;
     private String toDayOfWeek;
+    @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
+    @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
     private boolean restingTimeAllowed;
     private int restingTime;
@@ -226,26 +230,18 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (!super.equals(o)) return false;
-        NumberOfWeekendShiftsInPeriodWTATemplate that = (NumberOfWeekendShiftsInPeriodWTATemplate) o;
-        return intervalLength == that.intervalLength &&
-                restingTimeAllowed == that.restingTimeAllowed &&
-                restingTime == that.restingTime &&
-                Float.compare(that.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(fromDayOfWeek, that.fromDayOfWeek) &&
-                Objects.equals(fromTime, that.fromTime) &&
-                Objects.equals(toTime, that.toTime) &&
-                Objects.equals(toDayOfWeek, that.toDayOfWeek) &&
-                Objects.equals(intervalUnit, that.intervalUnit) &&
-                minMaxSetting == that.minMaxSetting;
+    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        NumberOfWeekendShiftsInPeriodWTATemplate numberOfWeekendShiftsInPeriodWTATemplate = (NumberOfWeekendShiftsInPeriodWTATemplate) wtaBaseRuleTemplate;
+        return (this != numberOfWeekendShiftsInPeriodWTATemplate) && !(intervalLength == numberOfWeekendShiftsInPeriodWTATemplate.intervalLength &&
+                restingTimeAllowed == numberOfWeekendShiftsInPeriodWTATemplate.restingTimeAllowed &&
+                restingTime == numberOfWeekendShiftsInPeriodWTATemplate.restingTime &&
+                Float.compare(numberOfWeekendShiftsInPeriodWTATemplate.recommendedValue, recommendedValue) == 0 &&
+                Objects.equals(fromDayOfWeek, numberOfWeekendShiftsInPeriodWTATemplate.fromDayOfWeek) &&
+                Objects.equals(fromTime, numberOfWeekendShiftsInPeriodWTATemplate.fromTime) &&
+                Objects.equals(toTime, numberOfWeekendShiftsInPeriodWTATemplate.toTime) &&
+                Objects.equals(toDayOfWeek, numberOfWeekendShiftsInPeriodWTATemplate.toDayOfWeek) &&
+                Objects.equals(intervalUnit, numberOfWeekendShiftsInPeriodWTATemplate.intervalUnit) &&
+                minMaxSetting == numberOfWeekendShiftsInPeriodWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,numberOfWeekendShiftsInPeriodWTATemplate.phaseTemplateValues));
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(super.hashCode(), fromDayOfWeek, fromTime, toTime, toDayOfWeek, intervalLength, intervalUnit, restingTimeAllowed, restingTime, recommendedValue, minMaxSetting);
-    }
 }

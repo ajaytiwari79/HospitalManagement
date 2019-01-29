@@ -1,5 +1,6 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
@@ -35,7 +36,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
 
     @Override
     public boolean isSatisfied(Activity activity) {
-        if (wtaResponseDTO.getEndDateMillis()!=null && new DateTime(wtaResponseDTO.getEndDateMillis()).isBefore(shift.getEndDate().getTime())) {
+        if (wtaResponseDTO.getEndDate()!=null && DateUtils.asDate(wtaResponseDTO.getEndDate()).before(shift.getEndDate())) {
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
         return true;

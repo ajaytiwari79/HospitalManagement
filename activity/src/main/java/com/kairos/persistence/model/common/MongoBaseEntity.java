@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.common.UserInfo;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,6 +13,7 @@ import java.util.Date;
 /**
  * Created by oodles on 4/1/17.
  */
+@JsonIgnoreProperties({"createdAt","createdBy","lastModifiedBy","updatedAt"}) //This annotation is used because at the time of deserialization this will become null
 public abstract class MongoBaseEntity {
 
     @Id
@@ -20,7 +23,28 @@ public abstract class MongoBaseEntity {
     @LastModifiedDate
     protected Date updatedAt;
     @JsonIgnore
-    protected boolean deleted ;
+    protected boolean deleted;
+    @JsonIgnore
+    protected UserInfo createdBy;
+    @JsonIgnore
+    protected UserInfo lastModifiedBy;
+
+
+    public UserInfo getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UserInfo createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public UserInfo getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(UserInfo lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
     public BigInteger getId() {
         return id;

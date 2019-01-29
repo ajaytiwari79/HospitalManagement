@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +40,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private Long countryId;
 
-    private Organization organization;
+    private WTAOrganization organization;
 
     private List<BigInteger> ruleTemplateIds;
 
@@ -53,8 +54,8 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private List<BigInteger> tags = new ArrayList<>();
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Date expiryDate;
 
     public List<BigInteger> getRuleTemplateIds() {
@@ -75,11 +76,11 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public Organization getOrganization() {
+    public WTAOrganization getOrganization() {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(WTAOrganization organization) {
         this.organization = organization;
     }
 
@@ -125,19 +126,19 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -201,20 +202,9 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         return disabled;
     }
 
-    public WorkingTimeAgreement(BigInteger id, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Date startDate, Date endDate, Date expiryDate) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.expiryDate = expiryDate;
-    }
 
     public WorkingTimeAgreement() {
         //default
-    }
-    public WorkingTimeAgreement basicDetails() {
-        return new WorkingTimeAgreement(this.id, this.name, this.description, this.startDate, this.endDate, this.expiryDate);
     }
 
 

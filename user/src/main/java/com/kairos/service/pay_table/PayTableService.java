@@ -519,9 +519,9 @@ public class PayTableService {
     }
 
     public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
-        if(publishedDate.isBefore(LocalDate.now())){
-            exceptionService.actionNotPermittedException("message.startdate.lessthan");
-        }
+//        if(publishedDate.isBefore(LocalDate.now())){
+//            exceptionService.actionNotPermittedException("message.startdate.lessthan");
+//        }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
@@ -539,8 +539,15 @@ public class PayTableService {
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
         logger.debug(payTable.getStartDateMillis() + "----" + publishedDate);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
-            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDate.minusDays(1).toString());
-            parentPayTable.setEndDateMillis(publishedDate);
+            LocalDate endDate;
+            if(DateUtils.getLocalDate().equals(publishedDate)) {
+                endDate=publishedDate;
+            }else {
+                endDate=publishedDate.minusDays(1);
+            }
+            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), endDate.toString());
+            validatePayTableToPublish(payTableId,publishedDate);
+            parentPayTable.setEndDateMillis(endDate);
             parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
@@ -564,7 +571,6 @@ public class PayTableService {
 
 
     public List<PayTableResponse> getPayTablesByOrganizationLevel(Long organizationLevelId) {
-
         return payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
     }
@@ -613,5 +619,9 @@ public class PayTableService {
 
     }
 
-
+    private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate){
+         if(payTableGraphRepository.existsByDate(payTableId,publishedDate.toString())){
+           exceptionService.actionNotPermittedException("published_pay_table.exists",publishedDate);
+        }
+    }
 }

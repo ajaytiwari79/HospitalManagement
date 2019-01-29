@@ -1,13 +1,19 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
@@ -18,6 +24,7 @@ import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -35,10 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.ONE_WEEK_MINUTES;
 
@@ -74,6 +78,8 @@ public class EmploymentTypeService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
+
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
         validateEmploymentType(employmentTypeDTO);
@@ -89,7 +95,7 @@ public class EmploymentTypeService {
 
         }
         EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
-                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
+                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtUnitPosition());
         employmentTypeToCreate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
@@ -118,7 +124,7 @@ public class EmploymentTypeService {
         }
         EmploymentType employmentType=new EmploymentType(employmentTypeToUpdate.getId(),employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
                 employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
-                employmentTypeDTO.isEditableAtUnitPosition(),employmentTypeDTO.isMarkMainEmployment());
+                employmentTypeDTO.isEditableAtUnitPosition());
         employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         return employmentTypeGraphRepository.save(employmentType);
     }
@@ -267,9 +273,20 @@ public class EmploymentTypeService {
         }
     }
 
-    public List<StaffKpiFilterDTO> getStaffByEmploymentTypeAndUnitId(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+    public List<StaffKpiFilterDTO> getStaffByKpiFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         Organization organization=organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(),organization.isParentOrganization()), StaffKpiFilterDTO.class);
+    }
+
+
+    public DefaultKpiDataDTO getKpiDefaultDate(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        Organization organization = organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organization.isParentOrganization()), StaffKpiFilterDTO.class);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
+        List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
+        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
+        return new DefaultKpiDataDTO(staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS);
     }
 
 

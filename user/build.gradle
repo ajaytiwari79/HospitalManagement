@@ -108,6 +108,8 @@ dependencies {
     testCompile ('com.athaydes:spock-reports:1.6.0'){
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
+    //this is for hot swaping in intelij
+    compile('org.springframework.boot:spring-boot-devtools')
 }
 
 dependencyManagement {

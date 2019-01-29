@@ -32,7 +32,6 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.ActivityUtil;
@@ -81,8 +80,6 @@ public class OrganizationActivityService extends MongoBaseService {
 
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private OrganizationRestClient organizationRestClient;
     @Inject
     private ActivityService activityService;
     @Inject
@@ -176,9 +173,13 @@ public class OrganizationActivityService extends MongoBaseService {
         return retrieveBasicDetails(activityCopied);
     }
 
-    public ActivityDTO retrieveBasicDetails(Activity activity) {
+    private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         BeanUtils.copyProperties(activity, activityDTO);
+        Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(timeType.isPresent()){
+            activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
+        }
         return activityDTO;
 
     }
@@ -247,6 +248,7 @@ public class OrganizationActivityService extends MongoBaseService {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
+        activityCopied.setCountryParentId(activity.getCountryParentId()==null?activity.getId():activity.getCountryParentId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
@@ -385,7 +387,8 @@ public class OrganizationActivityService extends MongoBaseService {
         OrderAndActivityDTO orderAndActivityDTO = new OrderAndActivityDTO();
         orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
-        orderAndActivityDTO.setMinOpenShiftHours(unitSettingRepository.getMinOpenShiftHours(unitId).getOpenShiftPhaseSetting().getMinOpenShiftHours());
+        UnitSettingDTO unitSettingDTO = unitSettingRepository.getMinOpenShiftHours(unitId);
+        orderAndActivityDTO.setMinOpenShiftHours(unitSettingDTO!=null ? unitSettingDTO.getOpenShiftPhaseSetting().getMinOpenShiftHours() : null);
         orderAndActivityDTO.setCounters(counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT));
         return orderAndActivityDTO;
     }
@@ -405,14 +408,11 @@ public class OrganizationActivityService extends MongoBaseService {
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         logger.info("I am going to create default data or organization " + unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
-        List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
-        periodSettingsService.createDefaultPeriodSettings(unitId);
-        phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
-        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
-        activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases);
-        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
-        timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-        priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        if (orgTypeAndSubTypeDTO.isParentOrganization() || orgTypeAndSubTypeDTO.isWorkcentre()) {
+            List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
+            phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
+            unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
+            activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases);
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
             existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
@@ -421,7 +421,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
 
         if (!existingActivities.isEmpty()) {
-            Set<Long> parentAccessGroupIds =existingActivities.stream().flatMap(a->a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b->b.getActivityShiftStatusSettings().stream().flatMap(c->c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
+            Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
             Map<Long, Long> accessGroupIdsMap = genericIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
             for (Activity activity : existingActivities) {
@@ -450,11 +450,15 @@ public class OrganizationActivityService extends MongoBaseService {
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }
             save(activityCopiedList);
-            costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(),orgTypeAndSubTypeDTO.getOrganizationSubTypeId(),unitId);
-            wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(),unitId,orgTypeAndSubTypeDTO.getCountryId());
+            costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationSubTypeId(), unitId);
+            wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             updateCompositeActivitiesIds(activityCopiedList);
         }
-
+            TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
+            timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
+    }
+        periodSettingsService.createDefaultPeriodSettings(unitId);
+        priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         return true;
     }
 

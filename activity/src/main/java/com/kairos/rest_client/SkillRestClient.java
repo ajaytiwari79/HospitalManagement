@@ -27,30 +27,8 @@ public class SkillRestClient {
     RestTemplate restTemplate;
 
 
-    public List<Map<String,Object>> getSkillsOfOrganization(long unitId) {
-        final String baseUrl = getBaseUrl(false);
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String,Object>>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope< List<Map<String,Object>>>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<List<Map<String,Object>>>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/skills",
-                            HttpMethod.GET,
-                            null, typeReference,unitId);
 
-            RestTemplateResponseEnvelope<List<Map<String,Object>>> response  = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e){
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
-        }
-    }
-
+    //TODO Needs to be Change to GenricIntegrationService
     public List<Skill> getSkillsByName(Set<String> skills, long countryId){
         final String baseUrl = getBaseUrl(false);
         try {

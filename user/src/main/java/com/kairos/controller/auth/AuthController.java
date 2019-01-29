@@ -177,10 +177,6 @@ public class AuthController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updatePassword(firstTimePasswordUpdateDTO));
     }
 
-    @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getLoggedInUserOrganizations());
-    }
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
@@ -200,8 +196,5 @@ public class AuthController {
         return userInfo;
     }
 
-    @RequestMapping(value = "/user/selected_organizations", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String,Object>> updateLastOrganizationSelectedByUser(@Valid @RequestBody OrganizationSelectionDTO organizationSelectionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateLastSelectedChildAndParentId(organizationSelectionDTO));
-    }
+
 }

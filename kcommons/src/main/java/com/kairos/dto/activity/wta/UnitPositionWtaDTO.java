@@ -7,7 +7,6 @@ import com.kairos.enums.shift.PaidOutFrequencyEnum;
 public class UnitPositionWtaDTO {
     private Long id;
     private Long expertiseId;
-    private Long positionCodeId;
     private Long startDateMillis;
     private Long endDateMillis;
     private int totalWeeklyMinutes;
@@ -41,14 +40,6 @@ public class UnitPositionWtaDTO {
 
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
-    }
-
-    public Long getPositionCodeId() {
-        return positionCodeId;
-    }
-
-    public void setPositionCodeId(Long positionCodeId) {
-        this.positionCodeId = positionCodeId;
     }
 
     public Long getStartDateMillis() {

@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.UnionState;
-import com.kairos.enums.payroll_system.PayRollType;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -26,12 +27,9 @@ import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.staff.employment.Employment;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.utils.ZoneIdStringConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
@@ -43,7 +41,9 @@ import org.neo4j.ogm.annotation.typeconversion.EnumString;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -104,7 +104,6 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_SUB_ORGANIZATION)
     private List<Organization> children = new ArrayList<>();
-
 
     @Relationship(type = TYPE_OF)
     private OrganizationType organizationType;
@@ -170,9 +169,6 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_LEVEL)
     private Level level;
 
-    @Relationship(type = HAS_POSITION_CODE)
-    private List<PositionCode> positionCodeList = new ArrayList<>();
-
     @Relationship(type = HAS_TIME_SLOT_SET)
     private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
 
@@ -223,7 +219,7 @@ public class Organization extends UserBaseEntity {
 
     private boolean boardingCompleted;
     private UnionState state;
-    private boolean workCenterUnit;
+    private boolean workcentre;
     private boolean gdprUnit;
     private BigInteger payRollTypeId;
     @Relationship(type = HAS_ACCOUNT_TYPE)
@@ -262,7 +258,7 @@ public class Organization extends UserBaseEntity {
     public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
                         CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted,
-                        List<Group> groupList, List<Organization> children, UnitType unitType) {
+                        List<Group> groupList, List<Organization> children, UnitType unitType,boolean workcentre) {
         this.name = name;
         this.description = description;
         this.isKairosHub = isPrekairos;
@@ -284,7 +280,7 @@ public class Organization extends UserBaseEntity {
         this.accountType = accountType;
         this.companyType = companyType;
         this.boardingCompleted = boardingCompleted;
-
+        this.workcentre = workcentre;
         this.groupList = groupList;
         this.children = children;
         this.unitType = unitType;
@@ -327,23 +323,6 @@ public class Organization extends UserBaseEntity {
 
     public Organization(String name) {
         this.name = name;
-    }
-
-    public Organization(String name, OrganizationSetting organizationSetting, OrganizationLevel organizationLevel, List<Group> groupList) {
-        this.name = name;
-        this.organizationSetting = organizationSetting;
-        this.organizationLevel = organizationLevel;
-        this.groupList = groupList;
-    }
-
-    public Organization(String name, String email, ContactDetail contact, ContactAddress contactAddress, OrganizationLevel organizationLevel, Country country, String childLevel) {
-        this.name = name;
-        this.email = email;
-        this.contactDetail = contact;
-        this.contactAddress = contactAddress;
-        this.organizationLevel = organizationLevel;
-        this.country = country;
-        this.childLevel = childLevel;
     }
 
     public String getDescription() {
@@ -565,27 +544,6 @@ public class Organization extends UserBaseEntity {
         this.tags = tags;
     }
 
-    public Map<String, Object> retrieveOrganizationUnitDetails() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", this.id);
-        map.put("name", this.name);
-        map.put("description", this.description);
-        //    map.put("type", this.organizationType.getName());
-        map.put("externalId", this.externalId);
-        map.put("kairosStatus", this.kairosStatus);
-
-        if (this.contactAddress != null) {
-            map.put("type", this.contactAddress.getStreet());
-            map.put("type", this.contactAddress.getHouseNumber());
-            //        map.put("zipCode", this.zipCode.getZipCode());
-//        map.put("zipCodeName", this.zipCode.getZipCode());
-
-        }
-
-        return map;
-    }
-
-
     public ContactAddress getBillingAddress() {
         return billingAddress;
     }
@@ -772,29 +730,6 @@ public class Organization extends UserBaseEntity {
         isAutoGeneratedPerformed = autoGeneratedPerformed;
     }
 
-/*    public List<WorkingTimeAgreement> getWorkingTimeAgreements() {
-        return workingTimeAgreements;
-    }
-
-    public void setWorkingTimeAgreements(List<WorkingTimeAgreement> workingTimeAgreements) {
-        this.workingTimeAgreements = workingTimeAgreements;
-    }*/
-
-/*
-    public void addWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
-        if (workingTimeAgreement == null)
-            throw new NullPointerException("Can't add null workingTimeAgreement");
-        workingTimeAgreements.add(workingTimeAgreement);
-    }*/
-
-    public List<PositionCode> getPositionCodeList() {
-        return positionCodeList;
-    }
-
-    public void setPositionCodeList(List<PositionCode> positionCodeList) {
-        this.positionCodeList = positionCodeList;
-    }
-
     public boolean isPhaseGenerated() {
         return phaseGenerated;
     }
@@ -949,12 +884,12 @@ public class Organization extends UserBaseEntity {
         this.boardingCompleted = boardingCompleted;
     }
 
-    public boolean isWorkCenterUnit() {
-        return workCenterUnit;
+    public boolean isWorkcentre() {
+        return workcentre;
     }
 
-    public void setWorkCenterUnit(boolean workCenterUnit) {
-        this.workCenterUnit = workCenterUnit;
+    public void setWorkcentre(boolean workcentre) {
+        this.workcentre = workcentre;
     }
 
     public boolean isGdprUnit() {
@@ -1012,4 +947,5 @@ public class Organization extends UserBaseEntity {
     public void setSectors(List<Sector> sectors) {
         this.sectors = sectors;
     }
+
 }

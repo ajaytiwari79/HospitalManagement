@@ -52,7 +52,7 @@ public class ReasonCodeService {
     public ReasonCodeDTO createReasonCodeForUnit(long unitId,ReasonCodeDTO reasonCodeDTO){
         Organization organization = organizationGraphRepository.findOne(unitId);
         if(!Optional.ofNullable(organization).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
         }
         boolean isAlreadyExists=reasonCodeGraphRepository.findByUnitIdAndNameExcludingCurrent(unitId,-1L,"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isAlreadyExists){
@@ -135,12 +135,12 @@ public class ReasonCodeService {
         return true;
     }
 
-   public void createDefalutDateForUnit(Organization organization,long countryId){
+   public void createDefalutDataForUnit(Organization organization, long countryId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
        createDefaultData(reasonCodeResponseDTO,organization);
    }
 
-    public void createDefalutDateForSubUnit(Organization organization,long parentId){
+    public void createDefalutDataForSubUnit(Organization organization, long parentId){
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO=reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
         createDefaultData(reasonCodeResponseDTO,organization);
     }

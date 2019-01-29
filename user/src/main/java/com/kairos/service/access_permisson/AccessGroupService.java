@@ -52,8 +52,10 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+
 
 
 /**
@@ -757,9 +759,9 @@ public class AccessGroupService {
      * @author vipul
      * @Desc This api is used to fetch all access group by account type id in country.
      */
-    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId) {
-
-        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId, AccessGroupRole.MANAGEMENT.toString());
+    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId,String accessGroupRole) {
+        List<String> accessGroupRoles = isNotNull(accessGroupRole) ? Arrays.asList(accessGroupRole) : Arrays.asList(AccessGroupRole.MANAGEMENT.toString(), AccessGroupRole.STAFF.toString());
+        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId,accessGroupRoles);
     }
 
     public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
@@ -880,8 +882,8 @@ public class AccessGroupService {
         return accessGroupForParentOrganizationCreation;
     }
 
-    // Method to fetch list of access group by Organization category ( Hub, Organization and Union)
-    public List<AccessGroupQueryResult> getOrganizationAccessGroupsForUnitCreation(Long organizationId) {
+    // Method to fetch list of Management access group of Organization
+    public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId) {
         return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, AccessGroupRole.MANAGEMENT.toString());
     }
 

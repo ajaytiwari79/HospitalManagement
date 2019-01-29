@@ -28,6 +28,7 @@ import java.util.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 /**
  * Created by oodles on 18/10/16.
@@ -138,27 +139,28 @@ public class TimeSlotService {
             logger.error("Invalid time slot id " + timeSlotSetId);
             exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
         }
-        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate().toString(),
-                timeSlotSetDTO.getEndDate().toString(), timeSlotSet.getTimeSlotType());
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
-        for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
+        if(timeSlotSet.getTimeSlotType().equals(TimeSlotType.TASK_PLANNING)) {
+            List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getStartDate().toString(),
+                    timeSlotSetDTO.getEndDate() != null ? timeSlotSetDTO.getEndDate().toString() : null, timeSlotSet.getTimeSlotType());
+            for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
 
-            if (timeSlotSetToValidate.getEndDate().compareTo(timeSlotSetDTO.getEndDate()) <= 0) {
-                timeSlotSetToValidate.setDeleted(true);
+                if (timeSlotSetToValidate.getEndDate().isBefore(timeSlotSetDTO.getEndDate())) {
+                    timeSlotSetToValidate.setDeleted(true);
+                } else {
+                    LocalDate dateAsLocalDate = timeSlotSetDTO.getEndDate();
+                    timeSlotSetToValidate.setStartDate(dateAsLocalDate.plusDays(1));
+                    break;
+                }
                 timeSlotSetsToUpdate.add(timeSlotSetToValidate);
-            } else {
-                LocalDate dateAsLocalDate = timeSlotSetDTO.getEndDate();
-                timeSlotSetToValidate.setStartDate(dateAsLocalDate.plusDays(1));
-                timeSlotSetsToUpdate.add(timeSlotSetToValidate);
-                break;
             }
+            timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
+            timeSlotSet.setName(timeSlotSetDTO.getName());
+            timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
+            timeSlotSetsToUpdate.add(timeSlotSet);
+            timeSlotSetRepository.saveAll(timeSlotSetsToUpdate);
         }
         updateTimeSlot(timeSlotSetDTO.getTimeSlots(), timeSlotSet.getId());
-        timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
-        timeSlotSet.setName(timeSlotSetDTO.getName());
-        timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
-        timeSlotSetsToUpdate.add(timeSlotSet);
-        timeSlotSetRepository.saveAll(timeSlotSetsToUpdate);
         return timeSlotSetsToUpdate;
     }
 
@@ -465,9 +467,14 @@ public class TimeSlotService {
     }
 
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Organization organization) {
-        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
-        List<TimeSlotDTO> timeSlotDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, TimeSlotDTO.class);
+        List<TimeSlotDTO> timeSlotDTOS=new ArrayList<>();
+        List<TimeSlotSet> timeSlotSets= timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+        if(isNotEmpty(timeSlotSets)) {
+            List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
+            timeSlotDTOS= ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, TimeSlotDTO.class);
+        }else{
+            logger.info("Time Slot is not present for organization "+organization.getName());
+        }
         return timeSlotDTOS;
     }
 
