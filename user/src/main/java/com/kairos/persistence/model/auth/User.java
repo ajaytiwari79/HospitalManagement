@@ -47,10 +47,6 @@ public class User extends UserBaseEntity {
     private String email;
     private Long lastSelectedOrganizationId;
     private LocalDate dateOfBirth;
-
-    //uniqueness of user
-    private String timeCareExternalId;
-
     @NotNull(message = "error.User.password.notnull")
     @Size(min = 8, max = 50, message = "error.User.password.size")
     private String password;
@@ -446,14 +442,6 @@ public class User extends UserBaseEntity {
         this.countryList = countryList;
     }
 
-    public String getTimeCareExternalId() {
-        return timeCareExternalId;
-    }
-
-    public void setTimeCareExternalId(String timeCareExternalId) {
-        this.timeCareExternalId = timeCareExternalId;
-    }
-
     public boolean isPasswordUpdated() {
         return isPasswordUpdated;
     }
@@ -472,7 +460,6 @@ public class User extends UserBaseEntity {
                 ", lastName='" + lastName + '\'' +
                 ", gender=" + gender +
                 ", email='" + email + '\'' +
-                ", timeCareExternalId='" + timeCareExternalId + '\'' +
                 ", age=" + age +
                 ", accessToken='" + accessToken + '\'' +
                 ", otp=" + otp +
