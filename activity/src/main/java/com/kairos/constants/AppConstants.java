@@ -201,12 +201,14 @@ public class AppConstants {
     public static final long SHIFT_LEAST_GRANULARITY =15;
 
     //KPI  BAR chart property
-    public static final String XAXIS="label";
-    public static final String YAXIS="value";
+    public static final String STAFF = "Staff";
+    public static final String DATE = "Dates";
+    public static final String LABEL = "label";
+    public static final String VALUEFIELD = "value";
     //for ContractualAndPlannedHoursCalculationService
-    public static final String BAR_YAXIS ="barValue";
-    public static final String LINEFIELD="lineValue";
-    public static final String SEND_GRID_API_KEY="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";
+    public static final String BAR_YAXIS = "barValue";
+    public static final String LINEFIELD = "lineValue";
+    public static final String SEND_GRID_API_KEY = "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";
 
     public static final short MULTIPLE_ACTIVITY = 1;
 
