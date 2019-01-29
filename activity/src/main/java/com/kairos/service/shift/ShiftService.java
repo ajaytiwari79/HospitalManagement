@@ -1060,7 +1060,7 @@ public class ShiftService extends MongoBaseService {
 
     public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, Date startDate, Date endDate, boolean management) {
         if (!DateUtils.getLocalDateFromDate(startDate).getDayOfWeek().equals(DayOfWeek.MONDAY) ||
-                !DateUtils.getLocalDateFromDate(endDate).getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                !DateUtils.getLocalDateFromDate(endDate).getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             exceptionService.invalidRequestException("message.weeklyview.incorrect.date");
         }
         ButtonConfig buttonConfig = new ButtonConfig();

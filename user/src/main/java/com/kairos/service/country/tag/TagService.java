@@ -71,7 +71,6 @@ public class TagService {
         Tag tag = tagGraphRepository.getCountryTagByIdAndDataType(tagId, countryId, tagDTO.getMasterDataType().toString(), false);
         if( tag == null) {
             exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
-
         }
 
         /*if(! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
@@ -89,7 +88,6 @@ public class TagService {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
-
         }
 
         if(filterText == null){

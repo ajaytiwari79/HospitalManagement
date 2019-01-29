@@ -167,7 +167,7 @@ public class ShiftController {
                                                                     @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
                                                                     @RequestParam(value = "startDate")
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam("viewType") ViewType viewType,
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                                     @RequestParam(value = "includeOpenShifts",required = false)  boolean includeOpenShifts,
                                                                     @RequestParam(value = "staffId",required = false) Long staffId,
                                                                     @RequestParam(value = "expertiseId",required = false) Long expertiseId,
