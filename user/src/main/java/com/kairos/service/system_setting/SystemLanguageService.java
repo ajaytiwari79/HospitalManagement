@@ -109,7 +109,9 @@ public class SystemLanguageService  {
         if(systemLanguage.isDefaultLanguage()) {
             exceptionService.dataNotFoundByIdException("message.system.language.default.cannot.delete");
         }
-
+        if(systemLanguageGraphRepository.isSystemLanguageSetInAnyCountry(systemLanguageId)){
+            exceptionService.invalidRequestException("message.system.language.cannot.set.inactive", systemLanguageId);
+        }
         systemLanguage.setDeleted(true);
         systemLanguageGraphRepository.save(systemLanguage);
         return true;

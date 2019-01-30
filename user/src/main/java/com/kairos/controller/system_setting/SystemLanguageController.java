@@ -54,6 +54,7 @@ public class SystemLanguageController {
     @PutMapping(value = COUNTRY_URL + "/system_language/{systemLanguageId}")
     @ApiOperation("To update System Language of Country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    // it use for delete and assign system language and set default language of country
     public ResponseEntity<Map<String, Object>> updateSystemLanguageOfCountry(@PathVariable Long countryId, @PathVariable Long systemLanguageId,@RequestParam(value = "defaultLanguage",required=false) Boolean defaultLanguage,@RequestParam(value = "selected",required=false) Boolean selected) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateSystemLanguageOfCountry(countryId, systemLanguageId,defaultLanguage,selected));
     }
