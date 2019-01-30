@@ -174,12 +174,12 @@ public class UnionService {
         return sectorDto;
     }
     public SectorDTO updateSector(SectorDTO sectorDto, Long sectorId) {
+        if(sectorGraphRepository.existsByName("(?i)"+sectorDto.getName(),sectorId)) {
+            exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
+        }
         Sector sector = sectorGraphRepository.findSectorById(sectorId);
         if(!Optional.ofNullable(sector).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.sector.id.notFound",sectorId);
-        }
-        if(sectorGraphRepository.existsByName("(?i)"+sectorDto.getName(),sector.getId())) {
-            exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
         }
         sector.setName(sectorDto.getName());
         sectorGraphRepository.save(sector);
@@ -228,13 +228,12 @@ public class UnionService {
         return locationDTO;
     }
     public LocationDTO updateLocation(LocationDTO locationDTO, Long unionId, Long locationId) {
+        if(locationGraphRepository.existsByName("(?i)"+locationDTO.getName(),unionId,locationId)) {
+            exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
+        }
         List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId,locationDTO.getName(),unionId);
-
         if(CollectionUtils.isEmpty(locationqueryResults)||!locationqueryResults.get(0).getLocation().getId().equals(locationId)) {
             exceptionService.dataNotFoundByIdException("message.location.not.found",locationId);
-        }
-        if(CollectionUtils.isNotEmpty(locationqueryResults)&&locationGraphRepository.existsByName("(?i)"+locationDTO.getName(),unionId,locationId)) {
-            exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
         }
         if(!locationqueryResults.get(0).getUnionId().equals(unionId)) {
             exceptionService.invalidRequestException("message.unionId.invalid",unionId);
@@ -323,13 +322,13 @@ public class UnionService {
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
+        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName(),unionId)) {
+            exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
+        }
         List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId,unionData.getName());
 
         if(CollectionUtils.isEmpty(unionDataQueryResults)||(unionDataQueryResults.size()==1&&!unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found",unionId);
-        }
-        if(CollectionUtils.isNotEmpty(unionDataQueryResults) && organizationGraphRepository.existsByName("(?i)"+unionData.getName(),unionId)) {
-            exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
         }
         Organization union = unionDataQueryResults.get(0).getUnion();
         if(!publish&&union.isBoardingCompleted()) {
