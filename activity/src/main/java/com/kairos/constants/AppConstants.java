@@ -207,10 +207,10 @@ public class AppConstants {
     public static final String STAFF = "Staff";
     public static final String DATE = "Dates";
     public static final String LABEL = "label";
-    public static final String VALUEFIELD = "value";
+    public static final String VALUE_FIELD = "value";
     //for ContractualAndPlannedHoursCalculationService
     public static final String BAR_YAXIS = "barValue";
-    public static final String LINEFIELD = "lineValue";
+    public static final String LINE_FIELD = "lineValue";
     public static final String SEND_GRID_API_KEY = "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";
 
     public static final short MULTIPLE_ACTIVITY = 1;
