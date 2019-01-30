@@ -139,7 +139,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             query += " MATCH (user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText);
         } else {
             query += " MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]-(employment:Employment)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(organization)={parentOrganizationId} " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
-                    " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos ";
+                    " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user,organization, staff, unitPos ";
         }
 
         query += getMatchQueryForRelationshipOfStaffByFilters(filters);
