@@ -1425,17 +1425,25 @@ public class ShiftService extends MongoBaseService {
      */
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long unitPositionId, ViewType viewType,
                                        ShiftFilterParam shiftFilterParam, Long expertiseId) {
-        shiftValidatorService.validateApiParams(staffId, endDate, shiftFilterParam, expertiseId);
         Object object = null;
         endDate = endDate == null ? null : endDate.plusDays(1);
         switch (shiftFilterParam){
             case INDIVIDUAL_VIEW:
+                if(staffId==null){
+                    exceptionService.actionNotPermittedException("staff_id.null");
+                }
                 object = getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId);
                 break;
             case OPEN_SHIFT:
+                if(endDate ==null){
+                    exceptionService.actionNotPermittedException("endDate.null");
+                }
                 object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate),endDate!=null?DateUtils.asDate(endDate):null, viewType);
                 break;
             case EXPERTISE:
+                if(staffId==null || endDate==null || expertiseId==null){
+                    exceptionService.actionNotPermittedException("staff_id.end_date.null");
+                }
                 object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), endDate!=null?DateUtils.asDate(endDate):null, expertiseId);
                 break;
             case SHIFT_STATE:
