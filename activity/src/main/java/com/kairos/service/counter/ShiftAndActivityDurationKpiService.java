@@ -6,6 +6,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -59,8 +60,9 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                         shiftDurationMinutes += shift.getDurationMinutes();
                     }
                 }
+                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT,DateUtils.getHoursByMinutes(shiftDurationMinutes.doubleValue())));
                 activityNameAndTotalDurationMinutesMap.keySet().forEach(s -> subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(s, activityNameAndColorCodeMap.get(s), DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(s)))));
-                clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(startDate.toString(), DateUtils.getHoursByMinutes(shiftDurationMinutes.doubleValue()), subClusteredBarValue));
+                clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(startDate.toString(), subClusteredBarValue));
                 startDate = startDate.plusDays(1);
             }
         }
@@ -85,12 +87,12 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getDurationOfShiftAndActivity(organizationId, filterBasedCriteria);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS, AppConstants.YAXIS);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getDurationOfShiftAndActivity(organizationId, filterBasedCriteria);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, AppConstants.XAXIS, AppConstants.YAXIS);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
     }
 }

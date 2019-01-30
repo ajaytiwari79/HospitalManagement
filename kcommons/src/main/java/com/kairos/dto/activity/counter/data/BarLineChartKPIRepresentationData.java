@@ -9,47 +9,48 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class BarLineChartKPIRepresentationData extends CommonRepresentationData {
-    private String xAxis;
-    private String yAxis;
-    private String lineField;
+    private KPIAxisData xAxis;
+    private KPIAxisData yAxis;
+    private KPIAxisData zAxis;
 
     public BarLineChartKPIRepresentationData() {
     }
 
-    public BarLineChartKPIRepresentationData(String xAxis, String yAxis, String lineField) {
+
+    public BarLineChartKPIRepresentationData(KPIAxisData xAxis, KPIAxisData yAxis, KPIAxisData zAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
-        this.lineField = lineField;
+        this.zAxis = zAxis;
     }
 
-    public BarLineChartKPIRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList, String xAxis, String yAxis, String lineField) {
+    public BarLineChartKPIRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList, KPIAxisData xAxis, KPIAxisData yAxis, KPIAxisData zAxis) {
         super(counterId, title, chartType, displayUnit, unit, dataList);
         this.xAxis = xAxis;
         this.yAxis = yAxis;
-        this.lineField = lineField;
+        this.zAxis = zAxis;
     }
 
-    public String getxAxis() {
+    public KPIAxisData getxAxis() {
         return xAxis;
     }
 
-    public void setxAxis(String xAxis) {
+    public void setxAxis(KPIAxisData xAxis) {
         this.xAxis = xAxis;
     }
 
-    public String getyAxis() {
+    public KPIAxisData getyAxis() {
         return yAxis;
     }
 
-    public void setyAxis(String yAxis) {
+    public void setyAxis(KPIAxisData yAxis) {
         this.yAxis = yAxis;
     }
 
-    public String getLineField() {
-        return lineField;
+    public KPIAxisData getzAxis() {
+        return zAxis;
     }
 
-    public void setLineField(String lineField) {
-        this.lineField = lineField;
+    public void setzAxis(KPIAxisData zAxis) {
+        this.zAxis = zAxis;
     }
 }
