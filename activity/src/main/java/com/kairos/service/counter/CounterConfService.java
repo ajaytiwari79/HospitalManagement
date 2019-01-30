@@ -66,7 +66,7 @@ public class CounterConfService extends MongoBaseService {
                 duplicateEntries.add(category);
             }
         });
-        if(duplicateEntries.size()>0) exceptionService.duplicateDataException("error.kpi_category.duplicate");
+        if(duplicateEntries.size()>0) exceptionService.duplicateDataException("error.dashboard.name.duplicate");
     }
 
     private List<String> getTrimmedNames(List<KPICategoryDTO> categories){
