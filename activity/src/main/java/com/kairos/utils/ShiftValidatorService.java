@@ -985,7 +985,7 @@ public class ShiftValidatorService {
      * @param shiftFilterParam
      * @param expertiseId
      */
-    public void validateApiParams(Long staffId, LocalDate endDate, ViewType viewType,
+    public void validateApiParams(Long staffId, LocalDate endDate,
                                   ShiftFilterParam shiftFilterParam, Long expertiseId){
         if (INDIVIDUAL_VIEW.equals(shiftFilterParam) && staffId==null) {
                 exceptionService.actionNotPermittedException("staff_id.null");

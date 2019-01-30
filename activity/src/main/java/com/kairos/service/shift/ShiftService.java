@@ -1425,7 +1425,7 @@ public class ShiftService extends MongoBaseService {
      */
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long unitPositionId, ViewType viewType,
                                        ShiftFilterParam shiftFilterParam, Long expertiseId) {
-        shiftValidatorService.validateApiParams(staffId, endDate, viewType, shiftFilterParam, expertiseId);
+        shiftValidatorService.validateApiParams(staffId, endDate, shiftFilterParam, expertiseId);
         Object object = null;
         endDate = endDate == null ? null : endDate.plusDays(1);
         switch (shiftFilterParam){
