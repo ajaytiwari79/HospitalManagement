@@ -202,6 +202,8 @@ public class AppConstants {
 
     //KPI  BAR chart property
     public static final String HOURS = "Hours";
+    public static final String CONTRACTUAL_HOURS = "Contractual Hours";
+    public static final String PLANNED_HOURS = "Planned Hours";
     public static final String STAFF = "Staff";
     public static final String DATE = "Dates";
     public static final String LABEL = "label";
