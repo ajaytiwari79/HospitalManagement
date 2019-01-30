@@ -3,6 +3,7 @@ package com.kairos.controller.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
@@ -168,11 +169,10 @@ public class ShiftController {
                                                                     @RequestParam(value = "startDate")
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
-                                                                    @RequestParam(value = "includeOpenShifts",required = false)  boolean includeOpenShifts,
                                                                     @RequestParam(value = "staffId",required = false) Long staffId,
                                                                     @RequestParam(value = "expertiseId",required = false) Long expertiseId,
-                                                                    @RequestParam(value = "includeShiftState",required = false)  boolean includeShiftState){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId,viewType,includeOpenShifts,expertiseId,includeShiftState));
+                                                                    @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, unitPositionId,viewType,shiftFilterParam,expertiseId));
     }
 
 }

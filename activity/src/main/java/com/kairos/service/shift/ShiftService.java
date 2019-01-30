@@ -26,6 +26,7 @@ import com.kairos.enums.Day;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.ViewType;
@@ -1417,25 +1418,31 @@ public class ShiftService extends MongoBaseService {
      * @param endDate
      * @param unitPositionId
      * @param viewType
-     * @param includeOpenShifts
+     * @param shiftFilterParam
      * @param expertiseId
-     * @param includeShiftState
-     * @Description this method will fetch all shifts / open shifts and shift states based on the above request param
-     * @return
+     * * @Description this method will fetch all shifts / open shifts and shift states based on the above request param
+     * @return shifts
      */
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long unitPositionId, ViewType viewType,
-                                       boolean includeOpenShifts, Long expertiseId, boolean includeShiftState) {
-        shiftValidatorService.validateApiParams(staffId, endDate, viewType, includeOpenShifts, expertiseId);
+                                       ShiftFilterParam shiftFilterParam, Long expertiseId) {
+        shiftValidatorService.validateApiParams(staffId, endDate, viewType, shiftFilterParam, expertiseId);
         Object object = null;
         endDate = endDate == null ? null : endDate.plusDays(1);
-        if (INDIVIDUAL.equals(viewType)) {
-            object = getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId);
-        } else if (includeOpenShifts) {
-            object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate),endDate!=null?DateUtils.asDate(endDate):null, viewType);
-        } else if (expertiseId != null) {
-            object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), endDate!=null?DateUtils.asDate(endDate):null, expertiseId);
-        } else if (includeShiftState) {
-            object = getDetailedAndCompactViewData(staffId != null ? Collections.singletonList(staffId) : new ArrayList<>(), unitId, DateUtils.asDate(startDate));
+        switch (shiftFilterParam){
+            case INDIVIDUAL_VIEW:
+                object = getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId);
+                break;
+            case OPEN_SHIFT:
+                object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate),endDate!=null?DateUtils.asDate(endDate):null, viewType);
+                break;
+            case EXPERTISE:
+                object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), endDate!=null?DateUtils.asDate(endDate):null, expertiseId);
+                break;
+            case SHIFT_STATE:
+                object = getDetailedAndCompactViewData(staffId != null ? Collections.singletonList(staffId) : new ArrayList<>(), unitId, DateUtils.asDate(startDate));
+                break;
+            default:
+                exceptionService.actionNotPermittedException("please.select.valid.criteria");
         }
         return object;
     }

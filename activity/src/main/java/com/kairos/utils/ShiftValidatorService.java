@@ -21,6 +21,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
+import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.ViewType;
@@ -78,6 +79,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.enums.shift.ShiftFilterParam.EXPERTISE;
+import static com.kairos.enums.shift.ShiftFilterParam.INDIVIDUAL_VIEW;
+import static com.kairos.enums.shift.ShiftFilterParam.OPEN_SHIFT;
 import static com.kairos.enums.shift.ViewType.INDIVIDUAL;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -978,16 +982,16 @@ public class ShiftValidatorService {
      * @param staffId it is required for getting shift by staffId(individual view) or by expertise Id
      * @param endDate it is required for getting shifts along with open shifts
      * @param viewType
-     * @param includeOpenShifts
+     * @param shiftFilterParam
      * @param expertiseId
      */
-    public void validateApiParams(Long staffId,  LocalDate endDate, ViewType viewType,
-                                  boolean includeOpenShifts, Long expertiseId){
-        if (INDIVIDUAL.equals(viewType) && staffId==null) {
+    public void validateApiParams(Long staffId, LocalDate endDate, ViewType viewType,
+                                  ShiftFilterParam shiftFilterParam, Long expertiseId){
+        if (INDIVIDUAL_VIEW.equals(shiftFilterParam) && staffId==null) {
                 exceptionService.actionNotPermittedException("staff_id.null");
-        } else if (includeOpenShifts && endDate ==null) {
+        } else if (OPEN_SHIFT.equals(shiftFilterParam) && endDate ==null) {
                 exceptionService.actionNotPermittedException("endDate.null");
-        } else if (expertiseId != null && (staffId==null || endDate==null)) {
+        } else if (EXPERTISE.equals(shiftFilterParam) && (staffId==null || endDate==null || expertiseId==null)) {
                 exceptionService.actionNotPermittedException("staff_id.end_date.null");
         }
         }
