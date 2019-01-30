@@ -40,9 +40,9 @@ public class GroupController {
     @ApiOperation(value = "Get Group of Organization by groupId")
     @RequestMapping(value = "/{groupId}", method = RequestMethod.GET)
    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getGroupOfOrganizationById(@PathVariable Long organizationId, @PathVariable Long groupId) {
+    public ResponseEntity<Map<String, Object>> getGroupOfOrganizationById(@PathVariable Long unitId, @PathVariable Long groupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                groupService.getGroupOfOrganizationById(organizationId, groupId));
+                groupService.getGroupOfOrganizationById(unitId, groupId));
 
 
     }

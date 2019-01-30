@@ -42,6 +42,8 @@ public class OrganizationHierarchyService {
     UserGraphRepository userGraphRepository;
     @Inject
     private AccessPageService accessPageService;
+    @Inject
+    private OrganizationService organizationService;
 
     public QueryResult generateHierarchyMinimum(long parentOrganizationId) {
         List<Map<String, Object>> units = organizationGraphRepository.getSubOrgHierarchy(parentOrganizationId);
@@ -218,7 +220,6 @@ public class OrganizationHierarchyService {
      */
     public QueryResult generateOrganizationHierarchyByFilter(long parentOrganizationId,OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId,organizationHierarchyFilterDTO);
-
         if (units.isEmpty()) {
             Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
             if (organization == null) {
@@ -275,12 +276,13 @@ public class OrganizationHierarchyService {
 
     /**
      *
-     * @param parentOrganizationId
+     * @param unitId
      * @return
      */
-    public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long parentOrganizationId) {
+    public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long unitId) {
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         FilterAndFavouriteFilterDTO filterAndFavouriteFilter=new FilterAndFavouriteFilterDTO();
-        Map<String,Object> filterTypeDataMap= organizationGraphRepository.getFiltersByParentOrganizationId(parentOrganizationId);
+        Map<String,Object> filterTypeDataMap= organizationGraphRepository.getFiltersByParentOrganizationId(parent.getId());
         List<FilterResponseDTO> filterResponseDTOList=new ArrayList<>();
         for(String filterType:filterTypeDataMap.keySet()){
             FilterResponseDTO filterResponseDTO=new FilterResponseDTO();

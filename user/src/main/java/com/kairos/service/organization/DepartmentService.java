@@ -27,8 +27,8 @@ public class DepartmentService{
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ExceptionService exceptionService;
-    public Organization createDepartment(long organizationId, Department department) {
-        Organization organization = organizationGraphRepository.findOne(organizationId);
+    public Organization createDepartment(long unitId, Department department) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             exceptionService.nullPointerException("error.departmentService.organization.notNull");
             
@@ -46,12 +46,12 @@ public class DepartmentService{
     }
 
 
-    public Organization addStaff(long organizationId, long departmentId, long userId) {
-        return organizationGraphRepository.addStaff(organizationId, departmentId, userId);
+    public Organization addStaff(long unitId, long departmentId, long userId) {
+        return organizationGraphRepository.addStaff(unitId, departmentId, userId);
     }
 
-    public List<Department> getDepartment(Long organizationId) {
-        return organizationGraphRepository.getAllDepartments(organizationId);
+    public List<Department> getDepartment(Long unitId) {
+        return organizationGraphRepository.getAllDepartments(unitId);
     }
 
 

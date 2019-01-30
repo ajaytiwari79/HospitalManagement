@@ -1,14 +1,11 @@
 package com.kairos.controller.counters;
 
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIMappingDTO;
-import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
@@ -24,17 +21,12 @@ import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -47,8 +39,8 @@ import static com.kairos.constants.ApiConstants.*;
 
 //TODO: TO be modified according to latest proposed distribution functionality
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 public class CounterDistController {
 
     @Inject

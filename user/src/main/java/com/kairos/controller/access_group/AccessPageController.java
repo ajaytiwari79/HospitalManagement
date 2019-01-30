@@ -23,7 +23,7 @@ import static com.kairos.constants.ApiConstants.*;
 /**
  * Created by prabjot on 3/1/17.
  */
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 @Api(value = API_V1)
 @RestController
 public class AccessPageController {
