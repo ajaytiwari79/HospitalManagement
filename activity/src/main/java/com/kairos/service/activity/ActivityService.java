@@ -969,7 +969,7 @@ public class ActivityService extends MongoBaseService {
         return new ActivityTabsWrapper(locationActivityTab);
     }
 
-    public PlannerSyncResponseDTO initialOptaplannerSync(Long organisationId, Long unitId) {
+    public PlannerSyncResponseDTO initialOptaplannerSync( Long unitId) {
         List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitId(unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)), DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
         plannerSyncService.publishActivities(unitId, activities, IntegrationOperation.CREATE);

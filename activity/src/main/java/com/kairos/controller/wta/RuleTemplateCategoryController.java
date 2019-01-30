@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 
@@ -23,7 +23,7 @@ import static com.kairos.constants.ApiConstants.COUNTRY_URL;
  */
 
 
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 @RestController
 public class RuleTemplateCategoryController {
     @Inject
