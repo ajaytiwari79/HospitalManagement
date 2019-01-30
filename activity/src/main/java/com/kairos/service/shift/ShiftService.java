@@ -1438,13 +1438,13 @@ public class ShiftService extends MongoBaseService {
                 if(endDate ==null){
                     exceptionService.actionNotPermittedException("endDate.null");
                 }
-                object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate),endDate!=null?DateUtils.asDate(endDate):null, viewType);
+                object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate),DateUtils.asDate(endDate), viewType);
                 break;
             case EXPERTISE:
                 if(staffId==null || endDate==null || expertiseId==null){
                     exceptionService.actionNotPermittedException("staff_id.end_date.null");
                 }
-                object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), endDate!=null?DateUtils.asDate(endDate):null, expertiseId);
+                object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId);
                 break;
             case SHIFT_STATE:
                 object = getDetailedAndCompactViewData(staffId != null ? Collections.singletonList(staffId) : new ArrayList<>(), unitId, DateUtils.asDate(startDate));
