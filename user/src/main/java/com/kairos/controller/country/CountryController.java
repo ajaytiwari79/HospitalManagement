@@ -56,8 +56,8 @@ import static com.kairos.constants.ApiConstants.*;
  * 1.Calls Country Service
  * 2. Call for CRUD operation on Country
  */
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 @RestController
 public class CountryController {
 
@@ -151,7 +151,7 @@ public class CountryController {
     @RequestMapping(value = "/country", method = RequestMethod.GET)
     @ApiOperation("Find all Countries")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllCountry(@PathVariable Long organizationId) {
+    public ResponseEntity<Map<String, Object>> getAllCountry() {
         List<Map<String, Object>> countryList = countryService.getAllCountries();
         if (countryList.size() != 0)
             return ResponseHandler.generateResponse(HttpStatus.OK, true, countryList);
@@ -341,10 +341,9 @@ public class CountryController {
     @ApiOperation(value = "Add a Parent Organization")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
-                                                                        @PathVariable long countryId,
+    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable long countryId,
                                                                         @Valid @RequestBody OrganizationBasicDTO organizationBasicDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationBasicDTO, countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationBasicDTO, countryId));
     }
 
 
@@ -944,12 +943,12 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.deleteExpertise(expertiseId));
     }
 
-    @ApiOperation(value = "get a single expertise based on Id")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseById(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
-    }
+//    @ApiOperation(value = "get a single expertise based on Id")
+//    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.GET)
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getExpertiseById(@PathVariable Long expertiseId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
+//    }
 
     @ApiOperation(value = "Publish expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/publish", method = RequestMethod.PUT)

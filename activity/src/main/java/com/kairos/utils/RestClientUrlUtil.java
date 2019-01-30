@@ -69,11 +69,11 @@ public class RestClientUrlUtil {
         String baseUrl = null;
 
         switch (restClientUrlType){
-            case UNIT:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl ).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
-            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).append("/country/").append(id).toString();
+            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl ).append("/country/").append(id).toString();
                 break;
-            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
+            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl ).toString();
                 break;
             case COUNTRY_WITHOUT_PARENT_ORG:
                 baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();

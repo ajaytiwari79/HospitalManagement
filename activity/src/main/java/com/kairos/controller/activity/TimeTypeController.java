@@ -18,7 +18,7 @@ import java.util.Map;
 import static com.kairos.constants.ApiConstants.*;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL+"/timeType")
+@RequestMapping(API_V1 +COUNTRY_URL+"/timeType")
 public class TimeTypeController {
 
 

@@ -183,7 +183,7 @@ public class VisitatorService{
         return demandStatusList;
     }
 
-    public Map<String, Object> getUnitVisitationInfo(long organizationId, long unitId) {
+    public Map<String, Object> getUnitVisitationInfo( long unitId) {
         long startTime = System.currentTimeMillis();
 
         Map<String, Object> organizationResult = new HashMap();

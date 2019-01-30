@@ -40,14 +40,14 @@ public class FunctionController {
     //Functions
 
     @ApiOperation(value = "Add function by countryId")
-    @RequestMapping(value = API_ORGANIZATION_URL+COUNTRY_URL + "/function", method = RequestMethod.POST)
+    @RequestMapping(value = API_V1 +COUNTRY_URL + "/function", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.createFunction(countryId, functionDTO));
     }
 
     @ApiOperation(value = "Get functions by countryId")
-    @RequestMapping(value = API_ORGANIZATION_URL+COUNTRY_URL + "/functions", method = RequestMethod.GET)
+    @RequestMapping(value = API_V1 +COUNTRY_URL + "/functions", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getFunctions(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByCountry(countryId));
@@ -55,20 +55,20 @@ public class FunctionController {
     }
 
     @ApiOperation(value = "Update functions")
-    @RequestMapping(value = API_ORGANIZATION_URL+COUNTRY_URL + "/function/{functionId}", method = RequestMethod.PUT)
+    @RequestMapping(value = API_V1 +COUNTRY_URL + "/function/{functionId}", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateFunction(countryId, functionDTO));
     }
 
     @ApiOperation(value = "Delete function by functionId")
-    @RequestMapping(value = API_ORGANIZATION_URL+COUNTRY_URL + "/function/{functionId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = API_V1 +COUNTRY_URL + "/function/{functionId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteFunction(@PathVariable long functionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.deleteFunction(functionId));
     }
     @ApiOperation(value = "Get functions by expertise id")
-    @RequestMapping(value =  API_ORGANIZATION_URL+"/function", method = RequestMethod.GET)
+    @RequestMapping(value =  API_V1 +"/function", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = "expertise") Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByExpertiseId(expertiseId));

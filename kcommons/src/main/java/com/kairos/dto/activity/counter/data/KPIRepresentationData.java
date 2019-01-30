@@ -9,36 +9,39 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class KPIRepresentationData extends CommonRepresentationData {
-    private String xAxis;
-    private String yAxis;
+    private KPIAxisData xAxis;
+    private KPIAxisData yAxis;
 
     public KPIRepresentationData() {
     }
 
-    public KPIRepresentationData(String xAxis, String yAxis) {
+    public KPIRepresentationData(KPIAxisData xAxis, KPIAxisData yAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
     }
 
-    public KPIRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList, String xAxis, String yAxis) {
+    public KPIRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList, KPIAxisData xAxis, KPIAxisData yAxis) {
         super(counterId, title, chartType, displayUnit, unit, dataList);
         this.xAxis = xAxis;
         this.yAxis = yAxis;
     }
 
-    public String getxAxis() {
+
+    public KPIAxisData getxAxis() {
         return xAxis;
     }
 
-    public void setxAxis(String xAxis) {
+    public void setxAxis(KPIAxisData xAxis) {
         this.xAxis = xAxis;
     }
 
-    public String getyAxis() {
+    public KPIAxisData getyAxis() {
         return yAxis;
     }
 
-    public void setyAxis(String yAxis) {
+    public void setyAxis(KPIAxisData yAxis) {
         this.yAxis = yAxis;
     }
+
+
 }
