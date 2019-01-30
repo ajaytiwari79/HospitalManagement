@@ -285,7 +285,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
 
-        if(organizationGraphRepository.existsByName(unionData.getName())) {
+        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName())) {
             exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
 
         }
@@ -319,7 +319,9 @@ public class UnionService {
     }
 
     public UnionDTO updateUnion(UnionDTO unionData, long countryId,Long unionId, boolean publish) {
-
+        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName())) {
+            exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
+        }
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
@@ -329,9 +331,6 @@ public class UnionService {
 
         if(CollectionUtils.isEmpty(unionDataQueryResults)||(unionDataQueryResults.size()==1&&!unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found",unionId);
-        }
-        else if(unionDataQueryResults.size()>1) {
-            exceptionService.dataNotFoundByIdException("message.union.name.alreadyexists",unionData.getName());
         }
         Organization union = unionDataQueryResults.get(0).getUnion();
         if(!publish&&union.isBoardingCompleted()) {
