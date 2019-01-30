@@ -729,8 +729,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(union:Organization) WHERE id(union)={1} MATCH(sector:Sector) WHERE id(sector)in {0} create unique (union)-[:"+HAS_SECTOR+"]-(sector)")
     void createUnionSectorRelationShip(List<Long> createSectorIds,Long unionId);
 
-    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE union.name=~{0} RETURN count(union)>0")
-    boolean existsByName(String name);
+    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)<>{1} AND union.name=~{0} RETURN count(union)>0")
+    boolean existsByName(String name,Long unionId);
 
     @Query("MATCH(union:Organization{union:true,deleted:false})-[:BELONGS_TO]-(country:Country) WHERE id(country)={0}\n" +
             "WITH union OPTIONAL MATCH(union)-[:HAS_SECTOR]-(sector:Sector) WITH union,collect(sector) as sectors OPTIONAL MATCH(union)-[:CONTACT_ADDRESS]-" +
