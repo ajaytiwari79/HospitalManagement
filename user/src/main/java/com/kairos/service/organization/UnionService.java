@@ -339,6 +339,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.union.name.alreadyexists",unionData.getName());
         }
         Organization union = unionDataQueryResults.get(0).getUnion();
+        union.setLocations(unionDataQueryResults.get(0).getLocations());
         if(!publish&&union.isBoardingCompleted()) {
             exceptionService.invalidRequestException("message.publish.union.unpublish");
         }

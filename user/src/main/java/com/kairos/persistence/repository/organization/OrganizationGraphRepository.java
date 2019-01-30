@@ -719,7 +719,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:BELONGS_TO]-(country:Country) WITH union,country OPTIONAL " +
             "MATCH(union)-[:"+HAS_SECTOR+"]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:"+CONTACT_ADDRESS+"]-" +
             "(address:ContactAddress) OPTIONAL MATCH(address)-[:"+ZIP_CODE+"]-(zipCode:ZipCode) WITH union,sectors,address,zipCode,country OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]-" +
-            "(municipality:Municipality) RETURN union,country,address,zipCode,sectors,municipality ")
+            "(municipality:Municipality) WITH union,sectors,address,zipCode,country,municipality " +
+            "OPTIONAL MATCH(union)-[:HAS_LOCATION]-(location:Location{deleted:false})" +
+            "RETURN union,country,address,zipCode,sectors,municipality,collect(location) as locations ")
     List<UnionDataQueryResult> getUnionCompleteById(Long unionId, String name);
 
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={1} MATCH(union)-[unionSectorRelDel:"+HAS_SECTOR+"]-(sector:Sector) WHERE id(sector) in {0} WITH union, " +
