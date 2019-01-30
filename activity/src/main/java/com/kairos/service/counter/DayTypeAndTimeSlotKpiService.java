@@ -114,7 +114,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         //TODO change start time and end time when use filter currently we only take day time
         TimeSlotDTO timeSlotDTO = defaultKpiDataDTO.getTimeSlotDTOS().stream().filter(timeSlotDto -> timeSlotIds.contains(timeSlotDto.getId())).findFirst().get();
         Map<Long, List<ClusteredBarChartKpiDataUnit>> staffIdAndTotalHours = getTotalHoursOfTimeSlot(staffIds, shiftWithActivityDTOS, timeSlotDTO, dayTypeIds, daysTypeIdAndDayTypeMap);
-        staffIdAndTotalHours.keySet().forEach(s -> kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(s), 0d, staffIdAndTotalHours.get(s))));
+        staffIdAndTotalHours.keySet().forEach(s -> kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(s),  staffIdAndTotalHours.get(s))));
         return kpiDataUnits;
     }
 

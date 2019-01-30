@@ -112,7 +112,7 @@ public class TimeBankKpiCalculationService implements  CounterService {
                     totalTimeBankOfUnit+=totalTimeBank;
                 }
             }
-            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(unitName, unitId, Arrays.asList(new ClusteredBarChartKpiDataUnit(unitName,"",DateUtils.getHoursByMinutes(totalTimeBankOfUnit)))));
+            kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(unitName, unitId, Arrays.asList(new ClusteredBarChartKpiDataUnit(unitName,DateUtils.getHoursByMinutes(totalTimeBankOfUnit)))));
         });
         return kpiDataUnits;
     }
