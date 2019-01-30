@@ -201,6 +201,7 @@ public class AppConstants {
     public static final long SHIFT_LEAST_GRANULARITY =15;
 
     //KPI  BAR chart property
+    public static final String HOURS = "Hours";
     public static final String STAFF = "Staff";
     public static final String DATE = "Dates";
     public static final String LABEL = "label";

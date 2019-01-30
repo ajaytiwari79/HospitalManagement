@@ -1,20 +1,20 @@
 package com.kairos.dto.activity.counter.data;
 
 public class KPIAxisData {
-    private String lablel;
+    private String label;
     private String valueField;
 
-    public KPIAxisData(String lablel, String valueField) {
-        this.lablel = lablel;
+    public KPIAxisData(String label, String valueField) {
+        this.label = label;
         this.valueField = valueField;
     }
 
-    public String getLablel() {
-        return lablel;
+    public String getLabel() {
+        return label;
     }
 
-    public void setLablel(String lablel) {
-        this.lablel = lablel;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getValueField() {
