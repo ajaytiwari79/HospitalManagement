@@ -1409,27 +1409,33 @@ public class ShiftService extends MongoBaseService {
         return activityShiftStatusSettings;
     }
 
+    /**
+     *
+     * @param unitId
+     * @param staffId
+     * @param startDate
+     * @param endDate
+     * @param unitPositionId
+     * @param viewType
+     * @param includeOpenShifts
+     * @param expertiseId
+     * @param includeShiftState
+     * @Description this method will fetch all shifts / open shifts and shift states based on the above request param
+     * @return
+     */
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long unitPositionId, ViewType viewType,
                                        boolean includeOpenShifts, Long expertiseId, boolean includeShiftState) {
-        Object object=null;
-        endDate=endDate==null?null:endDate.plusDays(1);
+        shiftValidatorService.validateApiParams(staffId, endDate, viewType, includeOpenShifts, expertiseId);
+        Object object = null;
+        endDate = endDate == null ? null : endDate.plusDays(1);
         if (INDIVIDUAL.equals(viewType)) {
-            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
             object = getShiftByStaffId(unitId, staffId, startDate, endDate, unitPositionId);
         } else if (includeOpenShifts) {
-            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
-            object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), viewType);
+            object = getAllShiftsOfSelectedDate(unitId, DateUtils.asDate(startDate),endDate!=null?DateUtils.asDate(endDate):null, viewType);
         } else if (expertiseId != null) {
-            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
-            object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), DateUtils.asDate(endDate), expertiseId);
+            object = getShiftOfStaffByExpertiseId(unitId, staffId, DateUtils.asDate(startDate), endDate!=null?DateUtils.asDate(endDate):null, expertiseId);
         } else if (includeShiftState) {
-            shiftValidatorService.validateApiParams(staffId,endDate,viewType, includeOpenShifts, expertiseId);
-            if (staffId != null) {
-                object = getDetailedAndCompactViewData(Collections.singletonList(staffId), unitId, DateUtils.asDate(startDate));
-            } else {
-                object = getDetailedAndCompactViewData(new ArrayList<>(),unitId, DateUtils.asDate(startDate));
-            }
-
+            object = getDetailedAndCompactViewData(staffId != null ? Collections.singletonList(staffId) : new ArrayList<>(), unitId, DateUtils.asDate(startDate));
         }
         return object;
     }

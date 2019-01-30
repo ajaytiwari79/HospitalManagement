@@ -161,7 +161,7 @@ public class ShiftController {
     }
 
     @ApiOperation("Get shifts by staff/unit/expertise/date ")
-    @GetMapping(value = "/shifts/all")
+    @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
                                                                     @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
