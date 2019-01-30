@@ -68,16 +68,16 @@ public class DynamicTabService extends MongoBaseService {
         verifyForDashboardTabAvailability(names, unitId, staffId, countryId, level);
         List<KPIDashboard> kpiDashboards = new ArrayList<>();
         kpiDashboardDTOS.stream().forEach(kpiDashboardDTO -> {
-            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), countryId, unitId, staffId, level,kpiDashboardDTO.isDefaultTab()));
+            if(!kpiDashboardDTO.getName().trim().isEmpty()){
+                kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), countryId, unitId, staffId, level,kpiDashboardDTO.isDefaultTab()));
+            }
         });
-        save(kpiDashboards);
-        kpiDashboards.stream().forEach(kpiDashboard -> {
-            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId()));
-        });
-        if (!kpiDashboards.isEmpty()) {
+        if (!kpiDashboards.isEmpty()){
             save(kpiDashboards);
-        } else {
-            exceptionService.actionNotPermittedException("error.kpi.invalidData");
+            kpiDashboards.stream().forEach(kpiDashboard -> {
+                kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId()));
+            });
+            save(kpiDashboards);
         }
         List<StaffDTO> staffDTOS = genericIntegrationService.getStaffListByUnit();
         if(ConfLevel.UNIT.equals(level)){
@@ -93,7 +93,7 @@ public class DynamicTabService extends MongoBaseService {
     private void verifyForDashboardTabAvailability(List<String> dashboardTabs, Long unitId, Long staffId, Long countryId, ConfLevel level) {
         // confLevel, name
         Long refId = null;
-        refId = ConfLevel.UNIT.equals(level) ? unitId : (ConfLevel.STAFF.equals(staffId) ? staffId : countryId);
+        refId = ConfLevel.UNIT.equals(level) ? unitId : (ConfLevel.STAFF.equals(level) ? staffId : countryId);
         List<String> formattedNames = new ArrayList<>();
         dashboardTabs.forEach(dashboardTab -> formattedNames.add(dashboardTab.trim().toLowerCase()));
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
@@ -126,11 +126,11 @@ public class DynamicTabService extends MongoBaseService {
         }
         Set<String> dashboardTabNames = dashboardTabs.getUpdateDashboardTab().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if (dashboardTabNames.size() != dashboardTabs.getUpdateDashboardTab().size())
-            exceptionService.duplicateDataException("error.kpi_category.duplicate");
+            exceptionService.duplicateDataException("error.dashboard.name.duplicate");
         List<KPIDashboardDTO> deletableDashboardTab = getExistingDashboardTab(dashboardTabs.getDeleteDashboardTab(), level, refId);
         List<KPIDashboardDTO> existingDashboardTab = getExistingDashboardTab(dashboardTabs.getUpdateDashboardTab(), level, refId);
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
-        List<String> deletableCategoryIds = deletableDashboardTab.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getModuleId()).collect(Collectors.toList());
+        List<String> deletableCategoryIds = deletableDashboardTab.stream().filter(k->!k.isDefaultTab()).map(kpiCategoryDTO -> kpiCategoryDTO.getModuleId()).collect(Collectors.toList());
         // counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
         counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
@@ -153,7 +153,7 @@ public class DynamicTabService extends MongoBaseService {
             return new ArrayList<>();
         }
         Map<String, KPIDashboardDTO> dashboardDTOMapById = changedDashboardTabs.parallelStream().collect(Collectors.toMap(KPIDashboardDTO::getModuleId, kPICategoryDTO -> kPICategoryDTO));
-        List<String> categoryIds = changedDashboardTabs.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
+        List<String> categoryIds = changedDashboardTabs.stream().filter(k->!k.isDefaultTab()).map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<KPIDashboard> kpiDashboards = counterRepository.getKPIDashboardByIds(categoryIds, level, refId);
         for (KPIDashboard kpiDashboard : kpiDashboards) {
             KPIDashboardDTO kpiDashboardDTO = dashboardDTOMapById.get(kpiDashboard.getModuleId());
