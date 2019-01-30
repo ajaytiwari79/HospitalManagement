@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.union.*;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
@@ -47,6 +48,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 
 /**
  * Created by vipul on 13/2/18.
@@ -308,9 +311,11 @@ public class UnionService {
             if(!CollectionUtils.isEmpty(unionData.getSectorIds())) {
                  sectors = sectorGraphRepository.findSectorsById(unionData.getSectorIds());
             }
-
-
             Organization union = new Organization(unionData.getName(),sectors,address, boardingCompleted,country,true);
+            if(isCollectionEmpty(union.getLocations())&&publish){
+            Location location = new Location(AppConstants.MAIN_LOCATION,address);
+            union.getLocations().add(location);
+            }
 
             organizationGraphRepository.save(union);
 
@@ -386,7 +391,10 @@ public class UnionService {
 
         union.setName(unionData.getName());
         union.setContactAddress(address);
-
+        if(isCollectionEmpty(union.getLocations())&&publish){
+            Location location = new Location(AppConstants.MAIN_LOCATION,address);
+            union.getLocations().add(location);
+        }
         organizationGraphRepository.save(union);
 
         unionData.setId(union.getId());

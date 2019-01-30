@@ -268,4 +268,7 @@ public class AppConstants {
     public static final String ORGANIZATION_SERVICES = "organizationService";
     public static final String ORGANIZATION_SUB_SERVICES = "organizationSubService";
     public static final String ACCOUNT_TYPES = "accountType";
+
+    //Locatiom
+    public static final String MAIN_LOCATION = "Main Location";
 }
