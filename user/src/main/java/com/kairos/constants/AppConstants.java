@@ -268,4 +268,7 @@ public class AppConstants {
     public static final String ORGANIZATION_SERVICES = "organizationService";
     public static final String ORGANIZATION_SUB_SERVICES = "organizationSubService";
     public static final String ACCOUNT_TYPES = "accountType";
+
+    //country and system langange relation
+    public static final String HAS_SYSTEM_LANGUAGE = "HAS_SYSTEM_LANGUAGE";
 }

@@ -1,6 +1,10 @@
 package com.kairos.service.system_setting;
 
 
+import com.kairos.dto.user.country.system_setting.CountrySystemLanguageDTO;
+import com.kairos.persistence.model.system_setting.CountryLanguageSettingRelationship;
+import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;
+import com.kairos.persistence.repository.system_setting.CountryLanguageSettingRelationshipRepository;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
@@ -18,6 +22,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 @Transactional
 @Service
 public class SystemLanguageService  {
@@ -32,6 +38,8 @@ public class SystemLanguageService  {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private CountryLanguageSettingRelationshipRepository countryLanguageSettingRelationshipRepository;
 
     public SystemLanguageDTO addSystemLanguage(SystemLanguageDTO systemLanguageDTO) {
 
@@ -117,19 +125,47 @@ public class SystemLanguageService  {
         return systemLanguageDTOS;
     }
 
-    public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId){
+    public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultSetting, Boolean selected) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        }
+        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
+        if (!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
+            exceptionService.dataNotFoundByIdException("message.system.language.notFound", systemLanguageId);
+        }
+        if (selected || defaultSetting) {
+            createCountryAndSystemLanguageMapping(country, systemLanguage, defaultSetting, selected);
+        } else if (!selected) {
+            deleteCountryAndSystemLanguageMapping(country.getId(), systemLanguage.getId());
         }
 
-        SystemLanguage  systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
-        if(!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
+        return true;
+    }
+
+        private Boolean deleteCountryAndSystemLanguageMapping(Long countryId,Long systemLanguageId){
+            CountryLanguageSettingRelationship countryLanguageSettingRelationship = countryLanguageSettingRelationshipRepository.findByCountryIdAndSystemLanguageId(countryId, systemLanguageId);
+            if (countryLanguageSettingRelationship.isDefaultLanguage()) {
+                exceptionService.actionNotPermittedException("message.system.language.default.cannot.delete");
+            }
+            countryLanguageSettingRelationshipRepository.delete(countryLanguageSettingRelationship);
+            return true;
         }
 
-        country.setSystemLanguage(systemLanguage);
-        countryGraphRepository.save(country);
+    private Boolean createCountryAndSystemLanguageMapping(Country country,SystemLanguage systemLanguage , Boolean defaultSetting,Boolean selected) {
+        List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findByCountryId(country.getId());
+        if (isCollectionNotEmpty(countryLanguageSettingRelationships) && defaultSetting) {
+            countryLanguageSettingRelationships.forEach(countryLanguageSettingRelationship -> {
+                if (countryLanguageSettingRelationship.getSystemLanguage().getId().equals(systemLanguage.getId())) {
+                    countryLanguageSettingRelationship.setDefaultLanguage(defaultSetting);
+                } else {
+                    countryLanguageSettingRelationship.setDefaultLanguage(false);
+                }
+            });
+        }else if(selected){
+            countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country,systemLanguage,false));
+        }
+        countryLanguageSettingRelationshipRepository.saveAll(countryLanguageSettingRelationships);
         return true;
     }
 
@@ -138,18 +174,25 @@ public class SystemLanguageService  {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
-
-        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguageByActiveStatus(true), SystemLanguageDTO.class);
-
-        SystemLanguage  systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
-        systemLanguageDTOS.stream().forEach(systemLanguageDTO -> {
-            if(Optional.ofNullable(systemLanguage).isPresent() && systemLanguageDTO.getId().equals(systemLanguage.getId())){
-                systemLanguageDTO.setDefaultLanguage(true);
-            } else {
-                systemLanguageDTO.setDefaultLanguage(false);
-            }
-        });
+        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
         return systemLanguageDTOS;
+    }
+
+    public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId){
+        Country country = countryGraphRepository.findOne(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        }
+        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguageByActiveStatus(true), SystemLanguageDTO.class);
+        List<SystemLanguageQueryResult> selectedLanguageOfCountry =systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId);
+        systemLanguageDTOS.stream().forEach(systemLanguageDTO -> {
+            selectedLanguageOfCountry.forEach(systemLanguageQueryResult  -> {
+                if(systemLanguageDTO.getId().equals(systemLanguageQueryResult.getId())){
+                    systemLanguageDTO.setSelected(true);
+                }
+            });
+        });
+        return  systemLanguageDTOS;
     }
 
     public SystemLanguage getDefaultSystemLanguageForUnit(Long unitId){

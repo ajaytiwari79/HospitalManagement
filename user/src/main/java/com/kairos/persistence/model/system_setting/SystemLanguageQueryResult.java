@@ -1,26 +1,14 @@
-package com.kairos.dto.user.country.system_setting;
+package com.kairos.persistence.model.system_setting;
 
+import org.springframework.data.neo4j.annotation.QueryResult;
 
-public class SystemLanguageDTO {
-
+@QueryResult
+public class SystemLanguageQueryResult {
     private Long id;
     private String name;
     private String code;
     private boolean active;
     private boolean defaultLanguage;
-    private boolean selected;
-
-    public SystemLanguageDTO(){
-        // default constructor
-    }
-
-    public SystemLanguageDTO(String name, String code, boolean active, boolean defaultLanguage){
-        this.name = name;
-        this.code = code;
-//        this.inactive = inactive;
-        this.active = active;
-        this.defaultLanguage =defaultLanguage;
-    }
 
     public Long getId() {
         return id;
@@ -46,14 +34,6 @@ public class SystemLanguageDTO {
         this.code = code;
     }
 
-    /*public boolean isInactive() {
-        return inactive;
-    }
-
-    public void setInactive(boolean inactive) {
-        this.inactive = inactive;
-    }*/
-
     public boolean isActive() {
         return active;
     }
@@ -68,13 +48,5 @@ public class SystemLanguageDTO {
 
     public void setDefaultLanguage(boolean defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
     }
 }

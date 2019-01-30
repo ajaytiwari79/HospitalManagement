@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.system_setting;
 
 import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -34,7 +35,7 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
     boolean isSystemLanguageSetInAnyCountry(Long syatemLanguageId);
 
     @Query("Match (c:Country)-[:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} return language")
-    SystemLanguage getSystemLanguageOfCountry(Long syatemLanguageId);
+    SystemLanguage getSystemLanguageOfCountry(Long countryId);
 
 
     @Query("Match (language:SystemLanguage{deleted:false}) WHERE lower(language.name)=lower({0})\n" +
@@ -49,5 +50,9 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
 
     @Query("Match (language:SystemLanguage{deleted:false}) WHERE id(language)={0} RETURN language")
     SystemLanguage findSystemLanguageById(Long id);
+
+    @Query("Match (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} " +
+            "return id(language) as id,language.name as name,language.active as active,rel.defaultLanguage as defaultLanguage")
+    List<SystemLanguageQueryResult> findSystemLanguagesByCountryId(Long countryId);
 
 }

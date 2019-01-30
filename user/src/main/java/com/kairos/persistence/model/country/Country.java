@@ -79,8 +79,6 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private List<EmploymentType> employmentTypeList;
 
-    @Relationship(type= HAS_SYSTEM_LANGUAGE)
-    private SystemLanguage systemLanguage;
     private Set<BigInteger> payRollTypeIds;
 
     public Country() {
@@ -199,13 +197,6 @@ public class Country extends UserBaseEntity {
         this.equipments = equipments;
     }
 
-    public SystemLanguage getSystemLanguage() {
-        return systemLanguage;
-    }
-
-    public void setSystemLanguage(SystemLanguage systemLanguage) {
-        this.systemLanguage = systemLanguage;
-    }
 
     public Set<BigInteger> getPayRollTypeIds() {
         return payRollTypeIds;
