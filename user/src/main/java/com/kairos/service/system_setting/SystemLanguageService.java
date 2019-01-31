@@ -139,7 +139,7 @@ public class SystemLanguageService  {
         }
         if (isNotNull(selected)&&selected || isNotNull(defaultLanguage)&&defaultLanguage) {
             createCountryAndSystemLanguageMapping(country, systemLanguage, defaultLanguage, selected);
-        } else if (isNotNull(selected)|| !selected) {
+        } else if (isNotNull(selected)&& !selected) {
             deleteCountryAndSystemLanguageMapping(country.getId(), systemLanguage.getId());
         }
 
@@ -148,7 +148,7 @@ public class SystemLanguageService  {
 
         private Boolean deleteCountryAndSystemLanguageMapping(Long countryId,Long systemLanguageId){
             CountryLanguageSettingRelationship countryLanguageSettingRelationship = countryLanguageSettingRelationshipRepository.findByCountryIdAndSystemLanguageId(countryId, systemLanguageId);
-            if (countryLanguageSettingRelationship.isDefaultLanguage()) {
+            if (isNotNull(countryLanguageSettingRelationship)&&countryLanguageSettingRelationship.isDefaultLanguage()) {
                 exceptionService.actionNotPermittedException("message.system.language.default.cannot.delete");
             }
             countryLanguageSettingRelationshipRepository.delete(countryLanguageSettingRelationship);
