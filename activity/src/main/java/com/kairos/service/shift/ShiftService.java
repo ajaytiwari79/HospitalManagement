@@ -1134,7 +1134,6 @@ public class ShiftService extends MongoBaseService {
         newShiftStates.addAll(shiftStateService.createDraftShiftState(newShiftStates, shifts, phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
         if (!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
         return newShiftStates;
-
     }
 
     //TODO need to optimize this method
@@ -1271,11 +1270,11 @@ public class ShiftService extends MongoBaseService {
         List<ShiftDTO> realTimeShift = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList.stream().filter(s -> s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).collect(Collectors.toList()), ShiftDTO.class);
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStatesList, ShiftDTO.class);
         List<ShiftDTO> staffValidatedShifts = shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole() != null && s.getAccessGroupRole().equals(AccessGroupRole.STAFF) && s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId())).collect(Collectors.toList());
-        Map<Long, ShiftDTO> staffAndShiftMap = staffValidatedShifts.stream().collect(Collectors.toMap(k -> k.getStaffId(), v -> v));
+        Map<String, ShiftDTO> staffAndShiftMap = staffValidatedShifts.stream().collect(Collectors.toMap(k -> k.getStaffId()+""+k.getId(), v -> v));
         DateTimeInterval graceInterval;
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         for (ShiftDTO shiftDTO : realTimeShift) {
-            if (!Optional.ofNullable(staffAndShiftMap.get(shiftDTO.getStaffId())).isPresent() && shiftDTO.getValidated() == null && phaseService.shiftEdititableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate())) {
+            if (!Optional.ofNullable(staffAndShiftMap.get(shiftDTO.getStaffId()+""+shiftDTO.getId())).isPresent() && shiftDTO.getValidated() == null && phaseService.shiftEdititableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate())) {
                 shiftDTO.setEditable(true);
             }
             updateRealTime.add(shiftDTO);
