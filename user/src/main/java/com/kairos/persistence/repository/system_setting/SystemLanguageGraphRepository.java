@@ -19,8 +19,9 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
     @Query("Match (language:SystemLanguage{deleted:false}) return language")
     List<SystemLanguage> getListOfSystemLanguage();
 
-    @Query("Match (language:SystemLanguage{deleted:false}) WHERE language.active={0} return language")
-    List<SystemLanguage> getListOfSystemLanguageByActiveStatus(Boolean active);
+    @Query("Match (language:SystemLanguage{deleted:false}) WHERE language.active={0} " +
+            "return id(language) as id,language.name as name,language.active as active")
+    List<SystemLanguageQueryResult> getListOfSystemLanguageByActiveStatus(Boolean active);
 
     @Query("Match (language:SystemLanguage{defaultLanguage:true,deleted:false})\n" +
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
@@ -52,7 +53,7 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
     SystemLanguage findSystemLanguageById(Long id);
 
     @Query("Match (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} " +
-            "return id(language) as id,language.name as name,language.active as active,rel.defaultLanguage as defaultLanguage")
+            "return id(language) as id,language.name as name,language.code as code,language.active as active,rel.defaultLanguage as defaultLanguage")
     List<SystemLanguageQueryResult> findSystemLanguagesByCountryId(Long countryId);
 
 }

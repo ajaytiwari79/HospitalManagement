@@ -10,6 +10,10 @@ public class SystemLanguageQueryResult {
     private boolean active;
     private boolean defaultLanguage;
 
+    public SystemLanguageQueryResult() {
+        //Default Constructor
+    }
+
     public Long getId() {
         return id;
     }

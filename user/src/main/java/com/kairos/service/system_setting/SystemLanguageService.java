@@ -1,7 +1,6 @@
 package com.kairos.service.system_setting;
 
 
-import com.kairos.dto.user.country.system_setting.CountrySystemLanguageDTO;
 import com.kairos.persistence.model.system_setting.CountryLanguageSettingRelationship;
 import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;
 import com.kairos.persistence.repository.system_setting.CountryLanguageSettingRelationshipRepository;
@@ -156,7 +155,7 @@ public class SystemLanguageService  {
         }
 
     private Boolean createCountryAndSystemLanguageMapping(Country country,SystemLanguage systemLanguage , Boolean defaultSetting,Boolean selected) {
-        List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findByCountryId(country.getId());
+        List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findAllByCountryId(country.getId());
         if (isCollectionNotEmpty(countryLanguageSettingRelationships) && isNotNull(defaultSetting)&&defaultSetting) {
             countryLanguageSettingRelationships.forEach(countryLanguageSettingRelationship -> {
                 if (countryLanguageSettingRelationship.getSystemLanguage().getId().equals(systemLanguage.getId())) {
