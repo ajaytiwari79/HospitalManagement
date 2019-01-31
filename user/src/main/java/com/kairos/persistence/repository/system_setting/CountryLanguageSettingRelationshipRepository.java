@@ -16,6 +16,6 @@ public interface CountryLanguageSettingRelationshipRepository extends Neo4jBaseR
     List<CountryLanguageSettingRelationship> findAllByCountryId(Long CountryId);
 
     @Query("Match (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} And id(language)={1} return rel")
-   CountryLanguageSettingRelationship findByCountryIdAndSystemLanguageId(Long CountryId,Long systemLanguageId);
+    CountryLanguageSettingRelationship findByCountryIdAndSystemLanguageId(Long countryId,Long systemLanguageId);
 
 }
