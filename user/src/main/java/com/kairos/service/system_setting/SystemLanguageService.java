@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Transactional
 @Service
@@ -127,18 +128,18 @@ public class SystemLanguageService  {
         return systemLanguageDTOS;
     }
 
-    public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultSetting, Boolean selected) {
-        Country country = countryGraphRepository.findOne(countryId);
+    public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultLanguage, Boolean selected) {
+        Country country = countryGraphRepository.findOne(countryId,0);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
+        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId,0);
         if (!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
             exceptionService.dataNotFoundByIdException("message.system.language.notFound", systemLanguageId);
         }
-        if (selected || defaultSetting) {
-            createCountryAndSystemLanguageMapping(country, systemLanguage, defaultSetting, selected);
-        } else if (!selected) {
+        if (isNotNull(selected)&&selected || isNotNull(defaultLanguage)&&defaultLanguage) {
+            createCountryAndSystemLanguageMapping(country, systemLanguage, defaultLanguage, selected);
+        } else if (isNotNull(selected)|| !selected) {
             deleteCountryAndSystemLanguageMapping(country.getId(), systemLanguage.getId());
         }
 
@@ -156,7 +157,7 @@ public class SystemLanguageService  {
 
     private Boolean createCountryAndSystemLanguageMapping(Country country,SystemLanguage systemLanguage , Boolean defaultSetting,Boolean selected) {
         List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findByCountryId(country.getId());
-        if (isCollectionNotEmpty(countryLanguageSettingRelationships) && defaultSetting) {
+        if (isCollectionNotEmpty(countryLanguageSettingRelationships) && isNotNull(defaultSetting)&&defaultSetting) {
             countryLanguageSettingRelationships.forEach(countryLanguageSettingRelationship -> {
                 if (countryLanguageSettingRelationship.getSystemLanguage().getId().equals(systemLanguage.getId())) {
                     countryLanguageSettingRelationship.setDefaultLanguage(defaultSetting);
@@ -164,7 +165,7 @@ public class SystemLanguageService  {
                     countryLanguageSettingRelationship.setDefaultLanguage(false);
                 }
             });
-        }else if(selected){
+        }else if(isNotNull(selected)&&selected){
             countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country,systemLanguage,false));
         }
         countryLanguageSettingRelationshipRepository.saveAll(countryLanguageSettingRelationships);
