@@ -19,7 +19,6 @@ public class EquipmentCategory extends UserBaseEntity{
     private Float heightInCm;
     private Float widthInCm;
     private Float volumeInCm;
-    private boolean deleted;
 
     public String getName() {
         return name;
@@ -75,13 +74,5 @@ public class EquipmentCategory extends UserBaseEntity{
 
     public void setVolumeInCm(Float volumeInCm) {
         this.volumeInCm = volumeInCm;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 }

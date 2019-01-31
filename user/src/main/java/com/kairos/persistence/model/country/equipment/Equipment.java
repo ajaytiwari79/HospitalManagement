@@ -20,7 +20,6 @@ public class Equipment extends UserBaseEntity{
     private String description;
     @Relationship(type= EQUIPMENT_HAS_CATEGORY)
     private EquipmentCategory category;
-    private boolean deleted;
 
     public String getName() {
         return name;
@@ -44,13 +43,5 @@ public class Equipment extends UserBaseEntity{
 
     public void setCategory(EquipmentCategory category) {
         this.category = category;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 }
