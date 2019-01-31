@@ -40,8 +40,8 @@ public class SystemLanguageController {
     @GetMapping(value = "/system_language")
     @ApiOperation("To fetch System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getSystemLanguage(@RequestParam(value = "active",required=false) Boolean active) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.getListOfSystemLanguage(active));
+    public ResponseEntity<Map<String, Object>> getSystemLanguage() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.getListOfSystemLanguage());
     }
 
     @DeleteMapping(value = "/system_language/{systemLanguageId}")

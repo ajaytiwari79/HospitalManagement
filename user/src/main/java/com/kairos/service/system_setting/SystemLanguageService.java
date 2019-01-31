@@ -1,7 +1,6 @@
 package com.kairos.service.system_setting;
 
 
-import com.kairos.dto.user.country.system_setting.CountrySystemLanguageDTO;
 import com.kairos.persistence.model.system_setting.CountryLanguageSettingRelationship;
 import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;
 import com.kairos.persistence.repository.system_setting.CountryLanguageSettingRelationshipRepository;
@@ -53,7 +52,7 @@ public class SystemLanguageService  {
             exceptionService.invalidRequestException("message.system.language.default.must.active");
         } else if(systemLanguageDTO.isDefaultLanguage() && systemLanguageDTO.isActive()){
             // Set default status of other lanuages as false
-            systemLanguageGraphRepository.setDefaultStatusForAllLangugae(false);
+            systemLanguageGraphRepository.setDefaultStatusForAllLanguage(false);
         } else if( !systemLanguageGraphRepository.isDefaultSystemLanguageExists()){
             exceptionService.invalidRequestException("message.system.language.must.default");
         }
@@ -76,7 +75,7 @@ public class SystemLanguageService  {
             exceptionService.invalidRequestException("message.system.language.default.must.active");
         } else if(systemLanguageDTO.isDefaultLanguage() && systemLanguageDTO.isActive()){
             // Set default status of all lanuages as false
-            systemLanguageGraphRepository.setDefaultStatusForAllLangugae(false);
+            systemLanguageGraphRepository.setDefaultStatusForAllLanguage(false);
 
         } else if( systemLanguage.isDefaultLanguage() && !systemLanguageGraphRepository.isDefaultSystemLanguageExistsExceptId(systemLanguageId)){
             // If no language exists as default
@@ -118,14 +117,9 @@ public class SystemLanguageService  {
         return true;
     }
 
-    public List<SystemLanguageDTO> getListOfSystemLanguage(Boolean active){
-        List<SystemLanguageDTO> systemLanguageDTOS = null;
-        if(Optional.ofNullable(active).isPresent() && active){
-            systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguageByActiveStatus(active), SystemLanguageDTO.class);
-        } else {
-            systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguage(), SystemLanguageDTO.class);
-        }
-        return systemLanguageDTOS;
+    public List<SystemLanguageDTO> getListOfSystemLanguage(){
+        return  ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguage(), SystemLanguageDTO.class);
+
     }
 
     public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultLanguage, Boolean selected) {
@@ -137,7 +131,7 @@ public class SystemLanguageService  {
         if (!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
             exceptionService.dataNotFoundByIdException("message.system.language.notFound", systemLanguageId);
         }
-        if (isNotNull(selected)&&selected || isNotNull(defaultLanguage)&&defaultLanguage) {
+        if (isNotNull(selected)&&selected || isNotNull(defaultLanguage) && defaultLanguage) {
             createCountryAndSystemLanguageMapping(country, systemLanguage, defaultLanguage, selected);
         } else if (isNotNull(selected)&& !selected) {
             deleteCountryAndSystemLanguageMapping(country.getId(), systemLanguage.getId());
@@ -157,7 +151,7 @@ public class SystemLanguageService  {
 
     private Boolean createCountryAndSystemLanguageMapping(Country country,SystemLanguage systemLanguage , Boolean defaultSetting,Boolean selected) {
         List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findByCountryId(country.getId());
-        if (isCollectionNotEmpty(countryLanguageSettingRelationships) && isNotNull(defaultSetting)&&defaultSetting) {
+        if (isCollectionNotEmpty(countryLanguageSettingRelationships) && isNotNull(defaultSetting) && defaultSetting) {
             countryLanguageSettingRelationships.forEach(countryLanguageSettingRelationship -> {
                 if (countryLanguageSettingRelationship.getSystemLanguage().getId().equals(systemLanguage.getId())) {
                     countryLanguageSettingRelationship.setDefaultLanguage(defaultSetting);
@@ -165,7 +159,7 @@ public class SystemLanguageService  {
                     countryLanguageSettingRelationship.setDefaultLanguage(false);
                 }
             });
-        }else if(isNotNull(selected)&&selected){
+        }else if(isNotNull(selected) && selected){
             countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country,systemLanguage,false));
         }
         countryLanguageSettingRelationshipRepository.saveAll(countryLanguageSettingRelationships);
@@ -182,11 +176,11 @@ public class SystemLanguageService  {
     }
 
     public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId){
-        Country country = countryGraphRepository.findOne(countryId);
+        Country country = countryGraphRepository.findOne(countryId,0);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
-        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguageByActiveStatus(true), SystemLanguageDTO.class);
+        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getActiveSystemLanguages(), SystemLanguageDTO.class);
         List<SystemLanguageQueryResult> selectedLanguageOfCountry =systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId);
         systemLanguageDTOS.stream().forEach(systemLanguageDTO -> {
             selectedLanguageOfCountry.forEach(systemLanguageQueryResult  -> {
