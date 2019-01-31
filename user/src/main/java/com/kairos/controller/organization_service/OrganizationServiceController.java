@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 
@@ -24,8 +24,8 @@ import static com.kairos.constants.ApiConstants.COUNTRY_URL;
  */
 //// TODO: 26/12/16 URL to be refactored later: Country/Organization will be the sequence
 @RestController
-@RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL)
-@Api(API_ORGANIZATION_URL+COUNTRY_URL)
+@RequestMapping(API_V1 +COUNTRY_URL)
+@Api(API_V1 +COUNTRY_URL)
 public class OrganizationServiceController {
 
     @Inject
@@ -98,7 +98,7 @@ public class OrganizationServiceController {
 
     @RequestMapping(value = "/organization_service", method = RequestMethod.GET)
     @ApiOperation("Find all organization_service")
-    public ResponseEntity<Map<String, Object>> getAllOrganizationService(@PathVariable Long organizationId, @PathVariable Long countryId) {
+    public ResponseEntity<Map<String, Object>> getAllOrganizationService(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getAllOrganizationService(countryId));
     }
 

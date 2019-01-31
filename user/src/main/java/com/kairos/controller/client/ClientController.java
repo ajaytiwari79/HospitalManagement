@@ -313,12 +313,12 @@ public class ClientController {
     //anil maurya this endpoints have dependency of task micro service
     // Organization tab
     // Get Services
-    @RequestMapping(value = "/{clientId}/organization/{organizationId1}/service",method = RequestMethod.GET)
-    @ApiOperation("Get citizen services")
-    private ResponseEntity<Map<String, Object>> getClientTaskData(@PathVariable long organizationId,@PathVariable long organizationId1, @PathVariable long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getClientServiceData(clientId, organizationId1));
-
-    }
+//    @RequestMapping(value = "/{clientId}/organization/{organizationId1}/service",method = RequestMethod.GET)
+//    @ApiOperation("Get citizen services")
+//    private ResponseEntity<Map<String, Object>> getClientTaskData(@PathVariable long organizationId1, @PathVariable long clientId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getClientServiceData(clientId, organizationId1));
+//
+//    }
 
 
     // Medical Tab
@@ -611,7 +611,7 @@ public class ClientController {
     @ApiOperation(value = "Get Organization Clients with min details")
     @RequestMapping(value = "/unit/{unitId}/client", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) throws InterruptedException, ExecutionException {
+    public ResponseEntity<Map<String, Object>> getOrganizationClients( @PathVariable Long unitId) throws InterruptedException, ExecutionException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getOrganizationClients(unitId));
     }
@@ -659,15 +659,15 @@ public class ClientController {
      * @auther anil maurya
      *  this endpoint is called from planner service in task micro service
      *
-     * @param organizationId
+     * @param unitId
      * @param auth2Authentication
      * @return
      */
 
     @RequestMapping(value = "/organization_clients", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, OAuth2Authentication auth2Authentication) {
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long unitId, OAuth2Authentication auth2Authentication) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,auth2Authentication));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(unitId,auth2Authentication));
 
     }
 

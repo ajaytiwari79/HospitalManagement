@@ -59,12 +59,12 @@ public class DayTypeService {
             exceptionService.duplicateDataException("message.dayType.name.code.exist");
         }
         Country country = countryGraphRepository.findOne(countryId);
-        if (country != null) {
-            DayType dayType = new DayType(dayTypeDTO.getName(), dayTypeDTO.getCode(), dayTypeDTO.getDescription(), dayTypeDTO.getColorCode(), country, dayTypeDTO.getValidDays(), dayTypeDTO.isHolidayType(), true, dayTypeDTO.isAllowTimeSettings());
-            dayTypeGraphRepository.save(dayType);
-        } else {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",country.getId());
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
+        DayType dayType = new DayType(dayTypeDTO.getName(), dayTypeDTO.getCode(), dayTypeDTO.getDescription(), dayTypeDTO.getColorCode(), country, dayTypeDTO.getValidDays(), dayTypeDTO.isHolidayType(), true, dayTypeDTO.isAllowTimeSettings());
+        dayTypeGraphRepository.save(dayType);
+        dayTypeDTO.setId(dayType.getId());
         return dayTypeDTO;
     }
 

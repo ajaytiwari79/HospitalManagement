@@ -1350,11 +1350,11 @@ public class StaffService {
         return unitPositionDetails;
     }
 
-    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
+    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
         Long userId = UserContext.getUserDetails().getId();
-
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
@@ -1368,9 +1368,10 @@ public class StaffService {
 
     }
 
-    public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
+    public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound", staffFilterDTO.getId());
@@ -1381,9 +1382,10 @@ public class StaffService {
 
     }
 
-    public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long organizationId) {
+    public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound", staffFavouriteFilterId);
@@ -1394,9 +1396,10 @@ public class StaffService {
 
     }
 
-    public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long organizationId) {
+    public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);
     }
 
