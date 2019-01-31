@@ -144,7 +144,7 @@ public class AssetService extends MongoBaseService {
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         asset.setSuggested(assetDTO.isSuggested());
         asset.setManagingDepartment(new ManagingOrganization(assetDTO.getManagingDepartment().getId(), assetDTO.getManagingDepartment().getName()));
-        asset.setAssetOwner(new Staff(assetDTO.getAssetOwner().getId(), assetDTO.getAssetOwner().getFirstName(),assetDTO.getAssetOwner().getLastName()));
+        asset.setAssetOwner(new Staff(assetDTO.getAssetOwner().getStaffId(), assetDTO.getAssetOwner().getFirstName(),assetDTO.getAssetOwner().getLastName()));
         asset.setHostingLocation(assetDTO.getHostingLocation());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         //asset.setProcessingActivityIds(assetDTO.getProcessingActivityIds());

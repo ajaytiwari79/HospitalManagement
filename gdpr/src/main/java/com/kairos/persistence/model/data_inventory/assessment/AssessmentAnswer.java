@@ -4,19 +4,24 @@ package com.kairos.persistence.model.data_inventory.assessment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionType;
 
-import javax.persistence.Embeddable;
+import javax.inject.Inject;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Embeddable
+@Entity
 public class AssessmentAnswer {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
 
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private Long questionId;
     private String attributeName;
-    private Object value;
+    private String value;
     private QuestionType questionType;
 
 
@@ -24,7 +29,7 @@ public class AssessmentAnswer {
     public AssessmentAnswer() {
     }
 
-    public AssessmentAnswer(Long questionId, String attributeName, Object value, QuestionType questionType) {
+    public AssessmentAnswer(Long questionId, String attributeName, String value, QuestionType questionType) {
         this.questionId = questionId;
         this.attributeName = attributeName;
         this.value = value;
@@ -47,7 +52,15 @@ public class AssessmentAnswer {
 
     public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
-    public Object getValue() { return value; }
+    public String getValue() { return value; }
 
-    public void setValue(Object value) { this.value = value; }
+    public void setValue(String value) { this.value = value; }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

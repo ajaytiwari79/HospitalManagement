@@ -36,10 +36,10 @@ public class AssessmentMD extends BaseEntity {
     private ProcessingActivityMD processingActivity;
 
     @OneToMany
-    private List<RiskMD> risks;
+    private List<RiskMD> risks = new ArrayList<>();
 
-   /* @ElementCollection
-    private List<AssessmentAnswer> assessmentAnswers = new ArrayList<>();*/
+    @ElementCollection
+    private List<AssessmentAnswer> assessmentAnswers = new ArrayList<>();
 
     @NotNull
     @Valid
@@ -145,10 +145,9 @@ public class AssessmentMD extends BaseEntity {
 
     public void setProcessingActivity(ProcessingActivityMD processingActivity) { this.processingActivity = processingActivity; }
 
-   /* public List<AssessmentAnswer> getAssessmentAnswers() { return assessmentAnswers; }
+    public List<AssessmentAnswer> getAssessmentAnswers() { return assessmentAnswers; }
 
     public void setAssessmentAnswers(List<AssessmentAnswer> assessmentAnswers) { this.assessmentAnswers = assessmentAnswers; }
-*/
     public LocalDate getStartDate() { return startDate; }
 
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }

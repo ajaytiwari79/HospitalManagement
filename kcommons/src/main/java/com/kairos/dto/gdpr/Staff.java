@@ -20,10 +20,14 @@ public class Staff {
     @NotBlank(message = "Staff Name can't be empty ")
     private String firstName;
 
-    public Long getId() { return staffId; }
 
-    public void setId(Long id) { this.staffId = id; }
+    public Long getStaffId() {
+        return staffId;
+    }
 
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
 
     public String getLastName() {
         return lastName;

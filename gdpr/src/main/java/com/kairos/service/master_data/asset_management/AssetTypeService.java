@@ -147,12 +147,6 @@ public class AssetTypeService extends MongoBaseService {
                 AssetTypeMD assetSubType = new AssetTypeMD(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
                 assetSubType.setSubAssetType(true);
                 assetSubType.setAssetType(assetTypeMD);
-               /* for(BasicRiskDTO subAssetTypeRisk : subAssetTypeDto.getRisks())
-                {
-                    RiskMD risk = new RiskMD(subAssetTypeRisk.getName(), subAssetTypeRisk.getDescription(), subAssetTypeRisk.getRiskRecommendation(), subAssetTypeRisk.getRiskLevel() );
-                    risk.setAssetType(assetSubType);
-                    subAssetRisks.add(risk);
-                }*/
                 List<RiskMD>  subAssetRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(subAssetTypeDto.getRisks(), RiskMD.class);
                 assetSubType.setRisks(subAssetRisks);
                 subAssetTypes.add(assetSubType);
@@ -207,6 +201,7 @@ public class AssetTypeService extends MongoBaseService {
      * @param assetType - It may be asset type or asset sub type.
      * @return List<AssetTypeRiskResponseDTO> - List of asset-type or Sub asset-type response DTO.
      */
+    //TODO Will try by Object mapper
     private AssetTypeRiskResponseDTO buildAssetTypeOrSubTypeResponseData(AssetTypeMD assetType){
             List<AssetTypeRiskResponseDTO> subAssetTypeData = new ArrayList<>();
             AssetTypeRiskResponseDTO assetTypeRiskResponseDTO = new AssetTypeRiskResponseDTO();
@@ -231,6 +226,7 @@ public class AssetTypeService extends MongoBaseService {
      * @param risks - Risks of asset-type or Sub asset-type
      * @return List<RiskBasicResponseDTO> - List of RiskResponse DTO.
      */
+    //TODO Will try by Object mapper
     private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<RiskMD> risks){
         List<RiskBasicResponseDTO> riskBasicResponseDTOS = new ArrayList<>();
         for(RiskMD assetTypeRisk : risks){

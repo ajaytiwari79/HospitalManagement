@@ -73,7 +73,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "delete Assessment by id")
     @DeleteMapping("/assessment/{assessmentId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteAssessment(@PathVariable Long unitId,@PathVariable Long assessmentId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.deleteAssessmentById(unitId,assessmentId));
     }
 
@@ -93,7 +93,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "Change Assessment status")
     @PutMapping("/assessment/{assessmentId}/status")
-    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
+    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable Long assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
         if (!Optional.ofNullable(assessmentStatus).isPresent())
         {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Assessment Status "+assessmentStatus+" is invalid");

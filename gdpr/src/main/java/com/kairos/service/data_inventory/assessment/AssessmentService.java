@@ -11,10 +11,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
-import com.kairos.persistence.model.data_inventory.assessment.Assessment;
-import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
-import com.kairos.persistence.model.data_inventory.assessment.AssessmentMD;
-import com.kairos.persistence.model.data_inventory.assessment.UserVO;
+import com.kairos.persistence.model.data_inventory.assessment.*;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.asset.AssetMD;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
@@ -475,8 +472,8 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentStatus
      * @return
      */
-    public boolean updateAssessmentStatus(Long unitId, BigInteger assessmentId, AssessmentStatus assessmentStatus) {
-        Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
+    public boolean updateAssessmentStatus(Long unitId, Long assessmentId, AssessmentStatus assessmentStatus) {
+        AssessmentMD assessment = assessmentRepository.findByOrganizationIdAndDeletedAndId( assessmentId,false, unitId);
         UserVO currentUser = new UserVO();
         ObjectMapperUtils.copyProperties(UserContext.getUserDetails(), currentUser);
         switch (assessmentStatus) {
@@ -492,7 +489,7 @@ public class AssessmentService extends MongoBaseService {
                 } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
                     exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
                 }
-                saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
+                //saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
                 break;
             case NEW:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
@@ -502,16 +499,16 @@ public class AssessmentService extends MongoBaseService {
         }
         assessment.setAssessmentLastAssistBy(currentUser);
         assessment.setAssessmentStatus(assessmentStatus);
-        assessmentMongoRepository.save(assessment);
+        assessmentRepository.save(assessment);
         return true;
     }
 
 
-    private void saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
+    private void saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, AssessmentMD assessment) {
 
-        if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAssetId()).isPresent()) {
-            Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
-            List<AssessmentAnswerValueObject> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
+        if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAsset()).isPresent()) {
+            AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted(unitId, assessment.getAsset().getId(),false);
+            List<AssessmentAnswer> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
             assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> {
                 if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
                     saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset);
@@ -521,22 +518,22 @@ public class AssessmentService extends MongoBaseService {
                 }
 
             });
-            assetMongoRepository.save(asset);
+            assetRepository.save(asset);
 
-        } else if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
-            ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, assessment.getProcessingActivityId());
-            List<AssessmentAnswerValueObject> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
+        } else if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getProcessingActivity()).isPresent()) {
+            ProcessingActivityMD processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted( assessment.getProcessingActivity().getId(),unitId,false);
+            List<AssessmentAnswer> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
             assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
                     -> {
                 if (Optional.ofNullable(processingActivityAssessmentAnswer.getAttributeName()).isPresent()) {
-                    saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
+                   // saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
 
                 } else {
                     exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
 
                 }
             });
-            processingActivityMongoRepository.save(processingActivity);
+            processingActivityRepository.save(processingActivity);
 
         }
     }
@@ -550,25 +547,28 @@ public class AssessmentService extends MongoBaseService {
 
         Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
-        return assessmentMongoRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId);
+        List<AssessmentMD> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments,AssessmentBasicResponseDTO.class );
     }
 
 
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
-        return assessmentMongoRepository.getAllAssessmentByUnitId(unitId);
+        List<AssessmentMD> assessments = assessmentRepository.getAllAssessmentByUnitId(unitId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments, AssessmentResponseDTO.class);
     }
 
     public AssessmentSchedulingFrequency[] getSchedulingFrequency() {
         return AssessmentSchedulingFrequency.values();
     }
 
-    public boolean deleteAssessmentById(Long unitId, BigInteger assessmentId) {
+    public boolean deleteAssessmentById(Long unitId, Long assessmentId) {
 
-        Assessment assessment = assessmentMongoRepository.findByUnitIdAndIdAndAssessmentStatus(unitId, assessmentId, AssessmentStatus.IN_PROGRESS);
+        AssessmentMD assessment = assessmentRepository.findByUnitIdAndIdAndAssessmentStatus(unitId, assessmentId, AssessmentStatus.IN_PROGRESS);
         if (Optional.ofNullable(assessment).isPresent()) {
             exceptionService.invalidRequestException("message.assessment.inprogress.cannot.delete", assessment.getName());
         }
-        assessmentMongoRepository.safeDeleteById(assessmentId);
+        assessment.delete();
+        assessmentRepository.save(assessment);
         return true;
     }
 
@@ -596,7 +596,7 @@ public class AssessmentService extends MongoBaseService {
             }
             assessment.setAssessmentStatus(status);
             assessment.setCompletedDate(LocalDate.now());
-            saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
+            //saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         }
         assessmentMongoRepository.save(assessment);
         return assessmentAnswerValueObjects;
@@ -609,7 +609,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assetAttributeValue asset value corresponding to field
      * @param asset               asset to which value Assessment answer were filed by assignee
      */
-    public void saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName assetAttributeName, Object assetAttributeValue, Asset asset) {
+    public void saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName assetAttributeName, Object assetAttributeValue, AssetMD asset) {
         switch (assetAttributeName) {
             case NAME:
                 asset.setName((String) assetAttributeValue);
@@ -620,23 +620,23 @@ public class AssessmentService extends MongoBaseService {
             case HOSTING_LOCATION:
                 asset.setHostingLocation((String) assetAttributeValue);
                 break;
-            case HOSTING_TYPE:
-                asset.setHostingTypeId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+           /* case HOSTING_TYPE:
+                asset.setHostingType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case DATA_DISPOSAL:
-                asset.setDataDisposalId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setDataDisposal(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case HOSTING_PROVIDER:
-                asset.setHostingProviderId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setHostingProvider(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case ASSET_TYPE:
-                asset.setAssetTypeId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setAssetType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case STORAGE_FORMAT:
                 asset.setStorageFormats(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
                 break;
             case ASSET_SUB_TYPE:
-                asset.setAssetSubTypeId(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
+                asset.setSubAssetType(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue).get(0));
                 break;
             case TECHNICAL_SECURITY_MEASURES:
                 asset.setTechnicalSecurityMeasures(castObjectIntoLinkedHashMapAndReturnIdList(assetAttributeValue));
@@ -650,7 +650,7 @@ public class AssessmentService extends MongoBaseService {
             case ASSET_OWNER:
                 asset.setAssetOwner(objectMapper.convertValue(assetAttributeValue, Staff.class));
                 asset.setManagingDepartment(objectMapper.convertValue(assetAttributeValue,ManagingOrganization.class));
-                break;
+                break;*/
             case DATA_RETENTION_PERIOD:
                 asset.setDataRetentionPeriod((Integer) assetAttributeValue);
                 break;
@@ -766,19 +766,19 @@ public class AssessmentService extends MongoBaseService {
 
     }
 
-    private void saveRiskTemplateAnswerToAssessment(Long unitId, Assessment assessment) {
-
-        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
+    private void saveRiskTemplateAnswerToAssessment(Long unitId, AssessmentMD assessment) {
+/*
+        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplate());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
         }
-        List<AssessmentAnswerValueObject> riskAssessmentAnswer = new ArrayList<>();
+        List<AssessmentAnswer> riskAssessmentAnswer = new ArrayList<>();
         for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : questionnaireTemplateDTO.getSections()) {
             for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                //riskAssessmentAnswer.add(new AssessmentAnswerValueObject(questionBasicDTO.getId(), null, null, questionBasicDTO.getQuestionType()));
+                riskAssessmentAnswer.add(new AssessmentAnswer(questionBasicDTO.getId(), null, null, questionBasicDTO.getQuestionType()));
             }
         }
-        assessment.setAssessmentAnswers(riskAssessmentAnswer);
+        assessment.setAssessmentAnswers(riskAssessmentAnswer);*/
 
 
     }
