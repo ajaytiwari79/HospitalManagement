@@ -17,7 +17,6 @@ public class Feature extends UserBaseEntity{
 
     private String name;
     private String description;
-    private boolean deleted;
 
     public Feature(){};
 
@@ -37,11 +36,4 @@ public class Feature extends UserBaseEntity{
         this.description = description;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
 }
