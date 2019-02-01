@@ -65,15 +65,15 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateProcessingActivity(unitId, id, processingActivityDTO));
     }
 
-   /* @ApiOperation(value = "get history of asset or changes done in Asset")
+    @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/processing_activity/{processingActivityId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long processingActivityId) {
 
         if (processingActivityId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId));
-    }*/
+    }
 
 //TODO
    /* @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")

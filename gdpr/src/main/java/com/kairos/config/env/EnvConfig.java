@@ -14,19 +14,19 @@ public class EnvConfig {
     private String dataBaseName;
 
    // @Value("${spring.data.mongodb.uri}")
-    private String mongoUri;
+    private String dbUri;
 
    // @Value("${spring.data.mongodb.port}")
-    private int mongoPort;
+    private int dbPort;
 
    // @Value("${spring.data.mongodb.host}")
-    private String mongoHost;
+    private String dbHost;
 
    // @Value("${spring.data.mongodb.username}")
-    private String mongoUserName;
+    private String dbUserName;
 
     //@Value("${spring.data.mongodb.password}")
-    private String mongoPassword;
+    private String dbPassword;
 
     @Value("${cloud.aws.s3.region}")
     private String s3BucketRegion;
@@ -46,44 +46,44 @@ public class EnvConfig {
         this.dataBaseName = dataBaseName;
     }
 
-    public String getMongoUri() {
-        return mongoUri;
+    public String getDbUri() {
+        return dbUri;
     }
 
-    public void setMongoUri(String mongoUri) {
-        this.mongoUri = mongoUri;
+    public void setDbUri(String dbUri) {
+        this.dbUri = dbUri;
     }
 
-    public int getMongoPort() {
-        return mongoPort;
+    public int getDbPort() {
+        return dbPort;
     }
 
-    public void setMongoPort(int mongoPort) {
-        this.mongoPort = mongoPort;
+    public void setDbPort(int dbPort) {
+        this.dbPort = dbPort;
     }
 
-    public String getMongoHost() {
-        return mongoHost;
+    public String getDbHost() {
+        return dbHost;
     }
 
-    public void setMongoHost(String mongoHost) {
-        this.mongoHost = mongoHost;
+    public void setDbHost(String dbHost) {
+        this.dbHost = dbHost;
     }
 
-    public String getMongoUserName() {
-        return mongoUserName;
+    public String getDbUserName() {
+        return dbUserName;
     }
 
-    public void setMongoUserName(String mongoUserName) {
-        this.mongoUserName = mongoUserName;
+    public void setDbUserName(String dbUserName) {
+        this.dbUserName = dbUserName;
     }
 
-    public String getMongoPassword() {
-        return mongoPassword;
+    public String getDbPassword() {
+        return dbPassword;
     }
 
-    public void setMongoPassword(String mongoPassword) {
-        this.mongoPassword = mongoPassword;
+    public void setDbPassword(String dbPassword) {
+        this.dbPassword = dbPassword;
     }
 
     public String getS3BucketRegion() { return s3BucketRegion; }

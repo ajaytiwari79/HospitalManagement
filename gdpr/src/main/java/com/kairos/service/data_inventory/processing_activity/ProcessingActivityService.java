@@ -29,6 +29,9 @@ import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
+import org.javers.core.Javers;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.jql.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,8 +45,8 @@ public class ProcessingActivityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingActivityService.class);
 
-   /* @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;*/
+    @Inject
+    private Javers javers;
 
 
     @Inject
@@ -336,14 +339,14 @@ public class ProcessingActivityService {
      * @description method return audit history of Processing Activity , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    /*public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId) {
+    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(Long processingActivityId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivityMD.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
-        return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivity.class);
+        return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivityMD.class);
 
-    }*/
+    }
 
     /**
      * @param unitId

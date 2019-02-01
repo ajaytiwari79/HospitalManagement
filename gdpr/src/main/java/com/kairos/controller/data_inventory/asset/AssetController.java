@@ -70,12 +70,11 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetByUnitId(unitId));
     }
 
-/*
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long assetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId));
-    }*/
+    }
 
 
     /*@ApiOperation(value = "Unlink Processing Activity From asset ")

@@ -118,8 +118,7 @@ public class AgreementSectionService{
             clauseData.put(clause.getTempClauseId(), clause.getId());
         });
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
-        List<AgreementSectionMD> sections = ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSectionMD.class);
-        return sections;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSectionMD.class);
     }
 
     /**

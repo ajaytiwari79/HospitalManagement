@@ -25,6 +25,9 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.asset_management.*;
 import com.kairos.service.risk_management.RiskService;
+import org.javers.core.Javers;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -80,6 +83,9 @@ public class AssetService{
 
     @Inject
     private OrganizationAssetTypeService organizationAssetTypeService;
+
+    @Inject
+    private Javers javers;
 
 
     public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
@@ -299,16 +305,15 @@ public class AssetService{
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    /*public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId) {
+    public List<Map<String, Object>> getAssetActivitiesHistory(Long assetId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, AssetMD.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
-        return javersCommonService.getHistoryMap(changes, assetId, Asset.class);
+        return javersCommonService.getHistoryMap(changes, assetId, AssetMD.class);
 
 
     }
-*/
 
     public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
         List<AssetMD> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);

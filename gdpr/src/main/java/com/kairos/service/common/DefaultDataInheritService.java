@@ -23,9 +23,9 @@ import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMDRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMDRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
@@ -78,11 +78,11 @@ public class DefaultDataInheritService{
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
     @Inject
-    private DataDisposalMDRepository dataDisposalMDRepository;
+    private DataDisposalRepository dataDisposalRepository;
     @Inject
     private HostingProviderRepository hostingProviderRepository;
     @Inject
-    private HostingTypeMDRepository hostingTypeMDRepository;
+    private HostingTypeRepository hostingTypeRepository;
     @Inject
     private OrganizationalSecurityMeasureRepository organizationalSecurityMeasureRepository;
     @Inject
@@ -147,9 +147,9 @@ public class DefaultDataInheritService{
 
         List<Callable<Boolean>> callables = new ArrayList<>();
        Callable<Boolean> dataDisposalCreationlTask = () -> {
-            List<DataDisposalResponseDTO> dataDisposalResponseDTOS = dataDisposalMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+            List<DataDisposalResponseDTO> dataDisposalResponseDTOS = dataDisposalRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
             List dataDisposalMDS = prepareMetadataObjectList(unitId,dataDisposalResponseDTOS,DataDisposalMD.class);
-            dataDisposalMDRepository.saveAll(dataDisposalMDS);
+            dataDisposalRepository.saveAll(dataDisposalMDS);
             return true;
         };
        Callable<Boolean> hostingProviderCreationTask = () -> {
@@ -159,9 +159,9 @@ public class DefaultDataInheritService{
             return true;
         };
          Callable<Boolean> hostingTypeCreationTask = () -> {
-            List<HostingTypeResponseDTO> hostingTypeDTOS = hostingTypeMDRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+            List<HostingTypeResponseDTO> hostingTypeDTOS = hostingTypeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
             List hostingTypes = prepareMetadataObjectList(unitId,hostingTypeDTOS,HostingTypeMD.class);
-            hostingTypeMDRepository.saveAll(hostingTypes);
+            hostingTypeRepository.saveAll(hostingTypes);
             return true;
 
         };
@@ -480,7 +480,7 @@ public class DefaultDataInheritService{
              dataDisposal.setOrganizationId(unitId);
              dataDisposalsList.add(dataDisposal);
          }
-        dataDisposalMDRepository.saveAll(dataDisposalsList);
+        dataDisposalRepository.saveAll(dataDisposalsList);
         }
 
     private <T extends Object> List<BaseEntity> prepareMetadataObjectList(Long unitId, List<T> metadataDTOList, Class entityClass) {
