@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 
 /**
  * CreatedBy vipulpandey on 30/8/18
  **/
 @RestController
-@Api(API_ORGANIZATION_URL)
-@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_V1)
+@RequestMapping(API_V1)
 public class SickController {
 
     @Inject

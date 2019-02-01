@@ -41,9 +41,17 @@ public class StaffAdditionalInfoDTO {
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes;
 
+    public StaffAdditionalInfoDTO() {
+    }
+
     public StaffAdditionalInfoDTO(StaffUnitPositionDetails unitPosition, List<DayTypeDTO> dayTypes) {
         this.unitPosition = unitPosition;
         this.dayTypes = dayTypes;
+    }
+
+    public StaffAdditionalInfoDTO( List<ReasonCodeDTO> reasonCodes,StaffUnitPositionDetails unitPosition) {
+        this.unitPosition = unitPosition;
+        this.reasonCodes = reasonCodes;
     }
 
     public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays() {
@@ -120,8 +128,6 @@ public class StaffAdditionalInfoDTO {
         this.dayTypes = dayTypes;
     }
 
-    public StaffAdditionalInfoDTO() {
-    }
 
     public String getName() {
         return name;

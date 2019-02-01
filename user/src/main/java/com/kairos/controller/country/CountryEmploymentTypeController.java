@@ -21,8 +21,8 @@ import static com.kairos.constants.ApiConstants.*;
 /**
  * Created by prerna on 2/11/17.
  */
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
+@Api(API_V1)
 @RestController
 public class CountryEmploymentTypeController {
 

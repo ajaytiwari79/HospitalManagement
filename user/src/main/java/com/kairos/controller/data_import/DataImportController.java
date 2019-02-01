@@ -12,14 +12,13 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by prabjot on 7/2/17.
  */
 @RestController
-@RequestMapping(API_V1 +PARENT_ORGANIZATION_URL+UNIT_URL)
+@RequestMapping(API_V1 +UNIT_URL)
 public class DataImportController {
 
     @Inject
