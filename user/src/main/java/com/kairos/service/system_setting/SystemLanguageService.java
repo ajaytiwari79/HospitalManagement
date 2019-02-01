@@ -150,7 +150,8 @@ public class SystemLanguageService  {
         }
 
     private Boolean createCountryAndSystemLanguageMapping(Country country,SystemLanguage systemLanguage , Boolean defaultSetting,Boolean selected) {
-        List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findAllByCountryId(country.getId());
+        List<Long> countryLanguageSettingRelationshipIds = countryLanguageSettingRelationshipRepository.findAllByCountryId(country.getId());
+        List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships=countryLanguageSettingRelationshipRepository.findAllById(countryLanguageSettingRelationshipIds);
         if (isCollectionNotEmpty(countryLanguageSettingRelationships) && isNotNull(defaultSetting)&&defaultSetting) {
 
             countryLanguageSettingRelationships.forEach(countryLanguageSettingRelationship -> {
