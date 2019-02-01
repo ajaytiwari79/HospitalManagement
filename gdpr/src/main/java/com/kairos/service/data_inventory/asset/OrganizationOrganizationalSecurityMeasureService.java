@@ -6,10 +6,8 @@ import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasureMD;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
-import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
@@ -27,13 +25,10 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseService {
+public class OrganizationOrganizationalSecurityMeasureService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationalSecurityMeasureService.class);
-
-    @Inject
-    private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;

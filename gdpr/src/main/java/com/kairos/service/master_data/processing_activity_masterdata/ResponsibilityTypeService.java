@@ -8,7 +8,6 @@ import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -25,7 +24,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class ResponsibilityTypeService extends MongoBaseService {
+public class ResponsibilityTypeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponsibilityTypeService.class);
 

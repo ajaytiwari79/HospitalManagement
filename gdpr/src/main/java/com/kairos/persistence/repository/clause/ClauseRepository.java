@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 public interface ClauseRepository extends JpaRepository<ClauseMD, Long> {
 
     @Query(value = "Select c from ClauseMD c where c.countryId = ?1 and lower(c.title) = lower(?2) and lower(c.description) = lower(?3) and c.deleted = false")

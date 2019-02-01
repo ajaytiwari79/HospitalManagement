@@ -44,7 +44,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile('org.slf4j:slf4j-api:1.7.7')
-    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    //compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.boot:spring-boot-starter-mail')
     // compile('org.apache.jackrabbit:jackrabbit-jcr-commons:2.17.2')
     //compile('org.apache.jackrabbit:jackrabbit-jcr2dav:2.10.1')
@@ -58,7 +58,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.6.1'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.6.1'
 
-    compile('org.javers:javers-spring-boot-starter-mongo:3.10.0')
+    //compile('org.javers:javers-spring-boot-starter-mongo:3.10.0')
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'

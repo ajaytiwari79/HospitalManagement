@@ -7,9 +7,7 @@ import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -19,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Document
-public class Clause extends MongoBaseEntity {
+public class Clause {
 
     @NotBlank
     private String title;

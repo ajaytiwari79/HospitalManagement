@@ -3,16 +3,14 @@ package com.kairos.persistence.model.questionnaire_template;
 
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class QuestionnaireTemplate extends MongoBaseEntity {
+
+public class QuestionnaireTemplate {
 
     @NotBlank(message = "Name can't be empty")
     private String name;

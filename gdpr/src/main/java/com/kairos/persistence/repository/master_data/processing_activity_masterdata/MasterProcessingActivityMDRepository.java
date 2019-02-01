@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 @Repository
 public interface MasterProcessingActivityMDRepository extends JpaRepository<MasterProcessingActivityMD,Long>{
 

@@ -1,15 +1,13 @@
 package com.kairos.persistence.model.risk_management;
 
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
-@Document
-public class Risk extends MongoBaseEntity {
+
+public class Risk {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     private String name;

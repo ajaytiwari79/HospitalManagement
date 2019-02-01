@@ -7,7 +7,6 @@ import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -52,11 +51,11 @@ public class AssessmentController {
 
     }
 
-    @ApiOperation(value = "get Assessment  By Id")
+    /*@ApiOperation(value = "get Assessment  By Id")
     @GetMapping( "/assessment/{assessmentId}")
     public ResponseEntity<ResponseDTO<List<QuestionnaireSectionResponseDTO>>> getAssetAssessmentById(@PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, assessmentService.getAssessmentById( unitId, assessmentId));
-    }
+    }*/
 
 
     @ApiOperation(value = "get All launched Assessment Assign Staff Member")

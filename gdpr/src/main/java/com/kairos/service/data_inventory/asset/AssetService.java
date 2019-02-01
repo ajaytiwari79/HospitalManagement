@@ -4,16 +4,12 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.asset.AssetMD;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
@@ -25,36 +21,23 @@ import com.kairos.persistence.repository.master_data.asset_management.tech_secur
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.asset_management.*;
 import com.kairos.service.risk_management.RiskService;
-import org.javers.core.Javers;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.jql.QueryBuilder;
-
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
 @Service
-public class AssetService extends MongoBaseService {
-
-
-    @Inject
-    private AssetMongoRepository assetMongoRepository;
+public class AssetService{
 
     @Inject
     private AssetRepository assetRepository;
-
-    @Inject
-    private Javers javers;
 
     @Inject
     private ExceptionService exceptionService;
@@ -78,13 +61,7 @@ public class AssetService extends MongoBaseService {
     private TechnicalSecurityMeasureRepository technicalSecurityMeasureRepository;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
-
-    @Inject
     private ProcessingActivityRepository processingActivityRepository;
-
-    @Inject
-    private AssessmentMongoRepository assessmentMongoRepository;
 
     @Inject
     private OrganizationalSecurityMeasureRepository organizationalSecurityMeasureRepository;
@@ -317,12 +294,12 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @param assetId
+     * @param //assetId
      * @return
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId) {
+    /*public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId) {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -331,7 +308,7 @@ public class AssetService extends MongoBaseService {
 
 
     }
-
+*/
 
     public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
         List<AssetMD> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);
@@ -348,7 +325,8 @@ public class AssetService extends MongoBaseService {
      * @param processingActivityId Processing Activity id link with Asset
      * @return
      */
-    public boolean unLinkProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger processingActivityId) {
+    //TODO
+   /*public boolean unLinkProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger processingActivityId) {
         Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
@@ -360,12 +338,12 @@ public class AssetService extends MongoBaseService {
     }
 
 
-    /**
+    *//**
      * @param unitId
      * @param assetId                 -Asset Id
      * @param subProcessingActivityId - Sub Processing Activity Id Link with Asset
      * @return
-     */
+     *//*
     public boolean unLinkSubProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger subProcessingActivityId) {
         Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
@@ -378,15 +356,15 @@ public class AssetService extends MongoBaseService {
     }
 
 
-    /**
+    *//**
      * @param unitId
      * @param assetId
      * @return
      * @description get all Previous Assessment Launched for Asset
-     */
+     *//*
     public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, BigInteger assetId) {
         return assessmentMongoRepository.findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(unitId, assetId);
-    }
+    }*/
 
 
     /**

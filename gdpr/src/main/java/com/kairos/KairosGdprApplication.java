@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.utils.user_context.UserContextInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,7 +21,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +37,6 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableAsync
 @EnableJpaRepositories
 @EnableJpaAuditing
-@EnableMongoRepositories(basePackages = "com.kairos.persistence.repository", repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosGdprApplication {
 
     public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");

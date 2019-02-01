@@ -1,41 +1,18 @@
 package com.kairos.config.javers;
 
 
-import com.google.common.collect.ImmutableMap;
-import com.kairos.config.env.EnvConfig;
-import com.kairos.config.codec.BigIntegerCodecProvider;
-import com.kairos.config.codec.BigIntegerTransformer;
-import com.kairos.dto.gdpr.ManagingOrganization;
-import com.kairos.dto.gdpr.Staff;
-import com.mongodb.*;
-import org.bson.BSON;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
-import org.javers.repository.mongo.MongoRepository;
-import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.aspect.JaversAuditableAspect;
-import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-
 @Configuration
 @EnableAspectJAutoProxy
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class JaversMongoConfig {
+//TODO
 
-
-    @Inject
+    /*@Inject
     private EnvConfig environment;
 
 
@@ -87,7 +64,7 @@ public class JaversMongoConfig {
     public CommitPropertiesProvider commitPropertiesProvider() {
         return () -> ImmutableMap.of("key","ok");
 
-    }
+    }*/
 
 
 }

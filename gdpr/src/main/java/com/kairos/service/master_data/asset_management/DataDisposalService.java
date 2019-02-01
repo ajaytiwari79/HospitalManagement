@@ -8,7 +8,6 @@ import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class DataDisposalService extends MongoBaseService {
+public class DataDisposalService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalService.class);
 

@@ -9,7 +9,6 @@ import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingTypeMD;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -25,7 +24,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class HostingTypeService extends MongoBaseService {
+public class HostingTypeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingTypeService.class);
 

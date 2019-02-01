@@ -7,16 +7,12 @@ import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDT
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
-import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionMD;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
-import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.*;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -26,17 +22,13 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
-public class QuestionnaireSectionService extends MongoBaseService {
+public class QuestionnaireSectionService{
 
     private Logger LOGGER = LoggerFactory.getLogger(QuestionnaireSectionService.class);
 
-
-    @Inject
-    private QuestionnaireSectionRepository questionnaireSectionRepository;
 
     @Inject
     private QuestionnaireSectionMDRepository questionnaireSectionMDRepository;
@@ -51,21 +43,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
     private QuestionService questionService;
 
     @Inject
-    private QuestionMongoRepository questionMongoRepository;
-
-
-    @Inject
     private QuestionnaireTemplateService questionnaireTemplateService;
-
-
-    @Inject
-    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
-
-    @Inject
-    private AssessmentMongoRepository assessmentMongoRepository;
-
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
     /**
@@ -112,7 +90,8 @@ public class QuestionnaireSectionService extends MongoBaseService {
             }
         }
         if (CollectionUtils.isNotEmpty(questionnaireSectionIdDTOMap.keySet())) {
-            List<QuestionnaireSection> previousQuestionnaireSections = isReferenceIdUnitId ? questionnaireSectionRepository.findSectionByUnitIdAndIds(referenceId, questionnaireSectionIdDTOMap.keySet()) : questionnaireSectionRepository.findSectionByCountryIdAndIds(referenceId, questionnaireSectionIdDTOMap.keySet());
+            //TODO
+           /* List<QuestionnaireSection> previousQuestionnaireSections = isReferenceIdUnitId ? questionnaireSectionRepository.findSectionByUnitIdAndIds(referenceId, questionnaireSectionIdDTOMap.keySet()) : questionnaireSectionRepository.findSectionByCountryIdAndIds(referenceId, questionnaireSectionIdDTOMap.keySet());
             previousQuestionnaireSections.forEach(questionnaireSection -> {
                 QuestionnaireSectionDTO questionnaireSectionDTO = questionnaireSectionIdDTOMap.get(questionnaireSection.getId());
                 questionnaireSection.setTitle(questionnaireSectionDTO.getTitle());
@@ -120,10 +99,11 @@ public class QuestionnaireSectionService extends MongoBaseService {
                     questionDTOListCorrespondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
                 }
             });
-            globalQuestionnaireSections.addAll(previousQuestionnaireSections);
+            globalQuestionnaireSections.addAll(previousQuestionnaireSections);*/
         }
-        List<BigInteger> sectionIdList;
-        if (!questionDTOListCorrespondingToSection.isEmpty()) {
+        List<BigInteger> sectionIdList =  new ArrayList<>();
+        //TODO
+        /*if (!questionDTOListCorrespondingToSection.isEmpty()) {
             questionService.saveAndUpdateQuestionAndAddToQuestionnaireSection(referenceId, false, questionDTOListCorrespondingToSection, templateType);
             globalQuestionnaireSections.addAll(newQuestionnaireSections);
             sectionIdList = questionnaireSectionRepository.saveAll(getNextSequence(globalQuestionnaireSections)).stream().map(QuestionnaireSection::getId).collect(Collectors.toList());
@@ -131,7 +111,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
         } else {
             globalQuestionnaireSections.addAll(newQuestionnaireSections);
             sectionIdList = questionnaireSectionRepository.saveAll(getNextSequence(globalQuestionnaireSections)).stream().map(QuestionnaireSection::getId).collect(Collectors.toList());
-        }
+        }*/
         return sectionIdList;
     }
 
@@ -139,7 +119,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
     private QuestionnaireSection buildQuestionnaireSection(QuestionnaireSectionDTO questionnaireSectionDTO, Long referenceId, boolean isReferenceIdUnitId) {
         if (isReferenceIdUnitId) {
             QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle());
-            questionnaireSection.setOrganizationId(referenceId);
+           // questionnaireSection.setOrganizationId(referenceId);
             return questionnaireSection;
         } else {
             return new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId);
@@ -168,10 +148,10 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.invalidRequestException("error.message.questionnaireTemplate.template.status.null");
         }
         if (QuestionnaireTemplateStatus.PUBLISHED.equals(questionnaireTemplate.getTemplateStatus())) {
-            List<Assessment> inProgressAssessmentsLinkedWithQuestionnaireTemplate = assessmentMongoRepository.getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(unitId, questionnaireTemplateId);
+           /* List<Assessment> inProgressAssessmentsLinkedWithQuestionnaireTemplate = assessmentMongoRepository.getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(unitId, questionnaireTemplateId);
             if (CollectionUtils.isNotEmpty(inProgressAssessmentsLinkedWithQuestionnaireTemplate)) {
                 exceptionService.invalidRequestException("message.questionnaire.cannotbe.edit", new StringBuilder(inProgressAssessmentsLinkedWithQuestionnaireTemplate.stream().map(Assessment::getName).map(String::toString).collect(Collectors.joining(","))));
-            }
+            }*/
         }
         switch (questionnaireTemplate.getTemplateType()) {
             case ASSET_TYPE:
@@ -181,10 +161,10 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 checkIfRiskQuestionnaireTemplateIsInPublishedState(unitId, questionnaireTemplate);
                 break;
             default:
-                QuestionnaireTemplate previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(unitId, questionnaireTemplate.getTemplateType());
+               /* QuestionnaireTemplate previousTemplate = questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(unitId, questionnaireTemplate.getTemplateType());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType());
-                }
+                }*/
                 break;
         }
 
@@ -194,7 +174,8 @@ public class QuestionnaireSectionService extends MongoBaseService {
     private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
 
         QuestionnaireTemplate previousTemplate = null;
-        if (questionnaireTemplate.isDefaultAssetTemplate()) {
+        //TODO
+        /*if (questionnaireTemplate.isDefaultAssetTemplate()) {
             previousTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.duplicateDataException("duplicate.questionnaire.template.assetType.defaultTemplate");
@@ -211,14 +192,15 @@ public class QuestionnaireSectionService extends MongoBaseService {
                     exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName());
                 }
             }
-        }
+        }*/
     }
 
     private void checkIfRiskQuestionnaireTemplateIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
         QuestionnaireTemplate previousTemplate = null;
         switch (questionnaireTemplate.getRiskAssociatedEntity()) {
             case ASSET_TYPE:
-                if (questionnaireTemplate.getAssetSubTypeId() != null) {
+                //TODO
+    /*            if (questionnaireTemplate.getAssetSubTypeId() != null) {
                     previousTemplate = questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, questionnaireTemplate.getAssetTypeId(), questionnaireTemplate.getAssetSubTypeId());
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName());
@@ -235,7 +217,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType());
                 }
-                break;
+                break;*/
 
         }
     }

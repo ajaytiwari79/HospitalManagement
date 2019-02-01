@@ -10,7 +10,6 @@ import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormatMD;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class StorageFormatService extends MongoBaseService {
+public class StorageFormatService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageFormatService.class);
 

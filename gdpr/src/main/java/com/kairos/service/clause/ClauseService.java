@@ -16,10 +16,7 @@ import com.kairos.persistence.model.clause.ClauseMD;
 import com.kairos.persistence.model.clause_tag.ClauseTagMD;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
-import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
-import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause.ClauseRepository;
-import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
@@ -27,7 +24,6 @@ import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,13 +36,9 @@ import java.util.*;
 
 
 @Service
-public class ClauseService extends MongoBaseService {
+public class ClauseService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseService.class);
-
-    @Inject
-    private ClauseMongoRepository clauseMongoRepository;
-
 
     @Inject
     private ClauseTagService clauseTagService;
@@ -55,13 +47,8 @@ public class ClauseService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private ClauseTagMongoRepository clauseTagMongoRepository;
-
-    @Inject
     private TemplateTypeService templateTypeService;
 
-    @Inject
-    private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
     @Inject
     private PolicyAgreementTemplateService policyAgreementTemplateService;
 

@@ -9,7 +9,6 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Ac
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationAccessorPartyService extends MongoBaseService {
+public class OrganizationAccessorPartyService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationAccessorPartyService.class);
 

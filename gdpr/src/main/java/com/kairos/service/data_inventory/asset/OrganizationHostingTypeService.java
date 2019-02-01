@@ -5,10 +5,8 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.HostingTypeMD;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ComparisonUtils;
@@ -27,7 +25,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class OrganizationHostingTypeService extends MongoBaseService {
+public class OrganizationHostingTypeService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingTypeService.class);
@@ -40,9 +38,6 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
     @Inject
     private HostingTypeService hostingTypeService;
-
-    @Inject
-    private AssetMongoRepository assetMongoRepository;
 
 
     /**

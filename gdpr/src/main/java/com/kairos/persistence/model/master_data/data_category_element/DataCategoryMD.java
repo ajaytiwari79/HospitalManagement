@@ -19,7 +19,7 @@ public class DataCategoryMD extends BaseEntity {
     private String name;
 
     // empty array to get rid of null pointer
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<DataElementMD> dataElements=new ArrayList<>();
 
     private Long countryId;

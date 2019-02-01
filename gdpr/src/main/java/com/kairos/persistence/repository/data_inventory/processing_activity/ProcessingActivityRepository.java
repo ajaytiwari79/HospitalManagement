@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 public interface ProcessingActivityRepository extends CustomGenericRepository<ProcessingActivityMD> {
 
     @Query(value = "Select PA from ProcessingActivityMD PA where PA.organizationId = ?1 and PA.id IN (?2) and PA.deleted = false")

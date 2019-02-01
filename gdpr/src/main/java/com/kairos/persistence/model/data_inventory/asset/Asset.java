@@ -2,10 +2,8 @@ package com.kairos.persistence.model.data_inventory.asset;
 
 
 import com.kairos.enums.gdpr.AssetAssessor;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,8 +11,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
-@Document
-public class Asset extends MongoBaseEntity {
+
+public class Asset {
 
     @NotBlank(message = "Name can 't be empty")
     private String name;

@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 public interface AssetTypeRepository extends JpaRepository<AssetTypeMD,Long> {
 
     @Query(value = "SELECT at FROM AssetTypeMD at WHERE at.countryId = ?2 and at.deleted = false and lower(at.name) = lower(?1) and at.subAssetType = ?3")

@@ -8,7 +8,6 @@ import com.kairos.persistence.model.master_data.default_asset_setting.StorageFor
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
@@ -27,7 +26,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class OrganizationStorageFormatService extends MongoBaseService {
+public class OrganizationStorageFormatService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationStorageFormatService.class);
 

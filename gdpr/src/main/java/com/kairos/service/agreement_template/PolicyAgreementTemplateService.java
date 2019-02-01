@@ -5,21 +5,14 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
 import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
-import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplateMD;
-import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
-import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepository;
-import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
-import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
@@ -29,11 +22,9 @@ import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDT
 import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -48,12 +39,9 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class PolicyAgreementTemplateService extends MongoBaseService {
+public class PolicyAgreementTemplateService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateService.class);
-
-    @Inject
-    private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
 
     @Inject
     private PolicyAgreementRepository policyAgreementRepository;
@@ -70,12 +58,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     @Inject
     private TemplateTypeService templateTypeService;
-
-    @Inject
-    private ClauseMongoRepository clauseMongoRepository;
-
-    @Inject
-    private AgreementSectionMongoRepository agreementSectionMongoRepository;
 
     @Inject
     private AWSBucketService awsBucketService;
@@ -134,9 +116,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param coverPageLogo       - Agreement Cover page
      * @return -Url of image uploaded at S3 bucket
      */
-    public String uploadCoverPageLogo(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId, MultipartFile coverPageLogo) {
+    public String uploadCoverPageLogo(Long referenceId, boolean isUnitId, Long agreementTemplateId, MultipartFile coverPageLogo) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementTemplateRepository.findByUnitIdAndId(referenceId, agreementTemplateId) : policyAgreementTemplateRepository.findByCountryIdAndId(referenceId, agreementTemplateId);
+        PolicyAgreementTemplateMD policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted( agreementTemplateId,referenceId,false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(agreementTemplateId,referenceId, false);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
         }
@@ -144,11 +126,11 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         if (policyAgreementTemplate.isCoverPageAdded()) {
             policyAgreementTemplate.getCoverPageData().setCoverPageLogoUrl(coverPageLogoUrl);
         } else {
-            policyAgreementTemplate.setCoverPageData(new CoverPageVO(coverPageLogoUrl));
+           // policyAgreementTemplate.setCoverPageData(new CoverPageVO(coverPageLogoUrl));
             policyAgreementTemplate.setCoverPageAdded(true);
         }
 
-        policyAgreementTemplateRepository.save(policyAgreementTemplate);
+        policyAgreementRepository.save(policyAgreementTemplate);
         return coverPageLogoUrl;
     }
 
@@ -304,7 +286,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @description - return list of Agreement Template Conatining clause in Section and Sub Sections
      */
     public List<AgreementTemplateBasicResponseDTO> getAllAgreementTemplateByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId) {
-        return policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+       //TODO
+        // return policyAgreementTemplateRepository.findAllByReferenceIdAndClauseId(referenceId, isUnitId, clauseId);
+        return new ArrayList<>();
     }
 
 
@@ -313,7 +297,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param agreementTemplateClauseUpdateDTO - agreement template ids , clause previous id and new clause id
      * @Description method update agreement template section containing previous clause with new clause
      */
-    public boolean updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(Long referenceId, boolean isUnitId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
+    //TODO
+   /* public boolean updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(Long referenceId, boolean isUnitId, AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
 
         List<AgreementSection> agreementSectionsAndSubSectionsContainingClause = policyAgreementTemplateRepository.getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(referenceId, isUnitId, agreementTemplateClauseUpdateDTO.getAgreementTemplateIds(), agreementTemplateClauseUpdateDTO.getPreviousClauseId());
         Clause clause = clauseMongoRepository.findOne(agreementTemplateClauseUpdateDTO.getNewClauseId());
@@ -336,7 +321,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionsAndSubSectionsContainingClause));
         }
         return true;
-    }
+    }*/
 
 
     /**

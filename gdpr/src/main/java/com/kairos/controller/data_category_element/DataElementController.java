@@ -2,8 +2,6 @@ package com.kairos.controller.data_category_element;
 
 
 import com.kairos.dto.gdpr.master_data.DataElementDTO;
-import com.kairos.dto.response.ResponseDTO;
-import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.service.data_subject_management.DataElementService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -15,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
-import java.math.BigInteger;
-import java.util.List;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
@@ -41,8 +36,8 @@ public class DataElementController {
 
     }
 
-
-    @ApiOperation("country ,get data Element by id")
+//TODO
+    /*@ApiOperation("country ,get data Element by id")
     @GetMapping(COUNTRY_URL + "/data_element/{dataElementId}")
     public ResponseEntity<ResponseDTO<DataElement>> getCountryDataElementById(@PathVariable Long countryId, @PathVariable BigInteger dataElementId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getDataElementById(dataElementId));
@@ -62,7 +57,7 @@ public class DataElementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.deleteDataElementById(dataElementId));
 
     }
-
+*/
 
     @ApiOperation("organization ,create  data Element ")
     @PostMapping(UNIT_URL + "/data_element")
@@ -71,8 +66,8 @@ public class DataElementController {
 
     }
 
-
-    @ApiOperation("organization ,get data Element by id")
+//TODO
+    /*@ApiOperation("organization ,get data Element by id")
     @GetMapping(UNIT_URL + "/data_element/{dataElementId}")
     public ResponseEntity<ResponseDTO<DataElement>> getOrganizationDataElementById(@PathVariable Long unitId, @PathVariable BigInteger dataElementId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.getDataElementById(dataElementId));
@@ -92,6 +87,6 @@ public class DataElementController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataElementService.deleteDataElementById(dataElementId));
 
     }
-
+*/
 
 }

@@ -9,7 +9,6 @@ import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorPartyMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class AccessorPartyService extends MongoBaseService {
+public class AccessorPartyService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessorPartyService.class);
 

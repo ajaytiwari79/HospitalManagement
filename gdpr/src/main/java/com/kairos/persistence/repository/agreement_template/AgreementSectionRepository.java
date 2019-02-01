@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 public interface AgreementSectionRepository extends JpaRepository<AgreementSectionMD, Long> {
 
     @Transactional

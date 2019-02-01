@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -12,8 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@Document
-public class AssetType extends MongoBaseEntity {
+
+public class AssetType {
 
     @NotBlank(message = "Name can't be empty or null")
     @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")

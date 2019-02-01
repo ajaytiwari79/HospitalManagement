@@ -3,31 +3,20 @@ package com.kairos.service.risk_management;
 
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.risk_management.RiskDaoImpl;
-import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.RiskResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class RiskService extends MongoBaseService {
-
-
-    @Inject
-    private RiskMongoRepository riskMongoRepository;
-
+public class RiskService{
 
     @Inject
     private ExceptionService exceptionService;
@@ -45,7 +34,7 @@ public class RiskService extends MongoBaseService {
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
      * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of RISK Ids generated after save operation
      */
-    public <T extends MongoBaseEntity, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
+    public <T, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
 
         Assert.notEmpty(risksRelatedToObject, "list can' t be empty");
         List<Risk> risks = new ArrayList<>();
@@ -78,27 +67,27 @@ public class RiskService extends MongoBaseService {
         if (!existingRisksRelatedToObject.isEmpty()) {
             risks.addAll(updateExistingRisk(referenceId, isUnitId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
         }
-        if (CollectionUtils.isNotEmpty(risks)) riskMongoRepository.saveAll(getNextSequence(risks));
+       // if (CollectionUtils.isNotEmpty(risks)) riskMongoRepository.saveAll(getNextSequence(risks));
         return riskListRelatedToObjectMap;
     }
 
 
-    private <T extends MongoBaseEntity, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long referenceId, boolean isUnitId,
+    private <T, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long referenceId, boolean isUnitId,
                                                                                               List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
         Assert.notEmpty(existingRiskIds, "List can't be empty");
-        List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(referenceId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(referenceId, existingRiskIds);
-        Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
+       // List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(referenceId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(referenceId, existingRiskIds);
+        //Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
         existingRisksRelatedToObject.forEach((objectToWhichRiskRelate, riskDTOS) ->
         {
             List<Risk> risksRelatesToObject = new ArrayList<>();
             riskDTOS.forEach(riskDTO -> {
-                Risk risk = riskMap.get(riskDTO.getId());
-                ObjectMapperUtils.copyProperties(riskDTO, risk);
-                risksRelatesToObject.add(risk);
+                //Risk risk = riskMap.get(riskDTO.getId());
+                //ObjectMapperUtils.copyProperties(riskDTO, risk);
+                //risksRelatesToObject.add(risk);
             });
             riskListRelatedToObjectMap.get(objectToWhichRiskRelate).addAll(risksRelatesToObject);
         });
-        return riskList;
+        return new ArrayList<>();
     }
 
 
@@ -136,7 +125,7 @@ public class RiskService extends MongoBaseService {
                     organizationLevelRiskDTO.getRiskRecommendation(), organizationLevelRiskDTO.getRiskLevel());
             risk.setReminderActive(organizationLevelRiskDTO.isReminderActive());
             risk.setDaysToReminderBefore(organizationLevelRiskDTO.getDaysToReminderBefore());
-            risk.setOrganizationId(unitId);
+           // risk.setOrganizationId(unitId);
             riskList.add(risk);
         }
         return riskList;
@@ -160,13 +149,5 @@ public class RiskService extends MongoBaseService {
         return riskDaoImpl.getAllRiskOfOrganizationId(unitId);
     }
 
-    /**
-     *
-     * @param riskId
-     * @return
-     */
-    public boolean deleteRiskById(BigInteger riskId) {
-        riskMongoRepository.safeDeleteById(riskId);
-        return true;
-    }
+
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
@@ -71,15 +70,15 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetByUnitId(unitId));
     }
 
-
+/*
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
     public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId));
-    }
+    }*/
 
 
-    @ApiOperation(value = "Unlink Processing Activity From asset ")
+    /*@ApiOperation(value = "Unlink Processing Activity From asset ")
     @DeleteMapping("/asset/{assetId}/processing_activity/{processingActivityId}")
     public ResponseEntity<Object> unLinkProcessingActivityFromAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @PathVariable BigInteger processingActivityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, false, assetService.unLinkProcessingActivityFromAsset(unitId, assetId, processingActivityId));
@@ -91,7 +90,7 @@ public class AssetController {
     public ResponseEntity<Object> unLinkSubProcessingActivityFromAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @PathVariable BigInteger subProcessingActivityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, false, assetService.unLinkSubProcessingActivityFromAsset(unitId, assetId, subProcessingActivityId));
 
-    }
+    }*/
 
     @ApiOperation(value = "get all active asset used in processing activity related tab")
     @GetMapping("/asset/related")
@@ -99,11 +98,11 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllActiveAsset(unitId));
     }
 
-    @ApiOperation(value = "Get Previous Assessments Launched for Asset")
+    /*@ApiOperation(value = "Get Previous Assessments Launched for Asset")
     @GetMapping("/asset/{assetId}/assesssment")
     public ResponseEntity<Object> getAllAssessmentLaunchedForAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssessmentListByAssetId(unitId, assetId));
-    }
+    }*/
 
 
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")

@@ -10,22 +10,22 @@ import org.springframework.context.annotation.PropertySource;
 public class EnvConfig {
 
 
-    @Value("${spring.data.mongodb.database}")
+    //@Value("${spring.data.mongodb.database}")
     private String dataBaseName;
 
-    @Value("${spring.data.mongodb.uri}")
+   // @Value("${spring.data.mongodb.uri}")
     private String mongoUri;
 
-    @Value("${spring.data.mongodb.port}")
+   // @Value("${spring.data.mongodb.port}")
     private int mongoPort;
 
-    @Value("${spring.data.mongodb.host}")
+   // @Value("${spring.data.mongodb.host}")
     private String mongoHost;
 
-    @Value("${spring.data.mongodb.username}")
+   // @Value("${spring.data.mongodb.username}")
     private String mongoUserName;
 
-    @Value("${spring.data.mongodb.password}")
+    //@Value("${spring.data.mongodb.password}")
     private String mongoPassword;
 
     @Value("${cloud.aws.s3.region}")

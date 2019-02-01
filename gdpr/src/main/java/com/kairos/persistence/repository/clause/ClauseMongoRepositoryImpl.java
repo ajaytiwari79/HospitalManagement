@@ -1,38 +1,10 @@
 package com.kairos.persistence.repository.clause;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
-import com.kairos.dto.gdpr.FilterSelection;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.gdpr.FilterType;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
-import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.response.dto.clause.UnitLevelClauseResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.kairos.constants.AppConstant.*;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+public class ClauseMongoRepositoryImpl  {
 
 
-public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
-
-
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -186,5 +158,5 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds()))
         );
         return mongoTemplate.aggregate(aggregation, Clause.class, Clause.class).getMappedResults();
-    }
+    }*/
 }

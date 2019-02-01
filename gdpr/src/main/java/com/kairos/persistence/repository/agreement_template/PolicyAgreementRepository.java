@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 public interface PolicyAgreementRepository extends CustomGenericRepository<PolicyAgreementTemplateMD> {
 
     @Query(value = "Select PAT from PolicyAgreementTemplateMD PAT where PAT.countryId = ?1 and PAT.id = ?2 and PAT.deleted = false")

@@ -4,7 +4,6 @@ package com.kairos.service.data_inventory.processing_activity;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataCategory;
@@ -12,13 +11,9 @@ import com.kairos.persistence.model.data_inventory.processing_activity.*;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
-import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.RelatedDataSubjectRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
@@ -26,41 +21,29 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
-import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
-import org.javers.core.Javers;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.jql.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class ProcessingActivityService extends MongoBaseService {
+public class ProcessingActivityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingActivityService.class);
 
-    @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+   /* @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;*/
 
 
     @Inject
@@ -85,28 +68,13 @@ public class ProcessingActivityService extends MongoBaseService {
     private ProcessingLegalBasisRepository processingLegalBasisRepository;
 
     @Inject
-    private Javers javers;
-
-    @Inject
     private JaversCommonService javersCommonService;
 
     @Inject
     private AssetRepository assetRepository;
 
     @Inject
-    private DataSubjectMappingRepository dataSubjectMappingRepository;
-
-    @Inject
-    private AssessmentMongoRepository assessmentMongoRepository;
-
-    @Inject
-    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
-
-    @Inject
     private RiskService riskService;
-
-    @Inject
-    private RiskMongoRepository riskMongoRepository;
 
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
@@ -368,23 +336,24 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return audit history of Processing Activity , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId) {
+    /*public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId) {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivity.class);
 
-    }
+    }*/
 
     /**
      * @param unitId
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
+    //TODO
+    /*public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
         return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubProcessingActivities(unitId);
-    }
+    }*/
 
 
     /**
@@ -393,7 +362,8 @@ public class ProcessingActivityService extends MongoBaseService {
      * @param activityRelatedDataSubjects list of data subject which contain list of data category and data Element list
      * @return
      */
-    public boolean mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
+    //TODO
+    /*public boolean mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
@@ -403,7 +373,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setDataSubjects(activityRelatedDataSubjects);
         processingActivityMongoRepository.save(processingActivity);
         return true;
-    }
+    }*/
 
     /**
      * @param unitId
@@ -412,7 +382,8 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      * @description map asset with processing activity (related tab processing activity)
      */
-    public boolean mapAssetWithProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+    //TODO
+    /*public boolean mapAssetWithProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -423,7 +394,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.save(processingActivity);
         return true;
 
-    }
+    }*/
 
     /**
      * @param unitId
@@ -469,7 +440,8 @@ public class ProcessingActivityService extends MongoBaseService {
      * @param dataSubjectId
      * @return
      */
-    public boolean removeLinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
+    //TODO
+    /*public boolean removeLinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
@@ -488,16 +460,17 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.save(processingActivity);
         return true;
     }
-
+*/
 
     /**
      * @param unitId
      * @param processingActivityId
      * @return
      */
-    public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
+    //TODO
+   /* public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
         return processingActivityMongoRepository.getAllAssetLinkedWithProcessingActivityById(unitId, processingActivityId);
-    }
+    }*/
 
 
     /**
@@ -507,7 +480,8 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      * @description method removed linked asset id from Processing activity
      */
-    public boolean removeLinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+    //TODO
+    /*public boolean removeLinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -516,7 +490,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.save(processingActivity);
         return true;
 
-    }
+    }*/
 
     /**
      * @param dataSubjectList
@@ -557,7 +531,8 @@ public class ProcessingActivityService extends MongoBaseService {
      * @param processingActivityId
      * @param processingActivityRiskDTO
      */
-    public ProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivities(Long unitId, BigInteger processingActivityId, ProcessingActivityRiskDTO processingActivityRiskDTO) {
+    //TODO
+    /*public ProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivities(Long unitId, BigInteger processingActivityId, ProcessingActivityRiskDTO processingActivityRiskDTO) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
@@ -592,12 +567,13 @@ public class ProcessingActivityService extends MongoBaseService {
         return processingActivityRiskDTO;
 
     }
-
+*/
     /**
      * @param unitId
      * @return
      */
-    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
+    //TODO
+   /* public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
         List<ProcessingActivityRiskResponseDTO> processingActivityRiskResponseDTOS = processingActivityMongoRepository.getAllProcessingActivityAndSubProcessWithRisksByUnitId(unitId);
         processingActivityRiskResponseDTOS.forEach(processingActivity -> {
             if (!Optional.ofNullable(processingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
@@ -612,15 +588,16 @@ public class ProcessingActivityService extends MongoBaseService {
 
     public List<AssessmentBasicResponseDTO> getAssessmentListByProcessingActivityId(Long unitId, BigInteger processingActivityId) {
         return assessmentMongoRepository.findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(unitId, processingActivityId);
-    }
+    }*/
 
 
     /**
      * @param unitId
-     * @param processingActivityId
+     * //@param processingActivityId
      * @return
      */
-    public boolean unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(Long unitId, BigInteger processingActivityId, BigInteger riskId) {
+    //TODO
+    /*public boolean unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(Long unitId, BigInteger processingActivityId, BigInteger riskId) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -630,7 +607,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.save(processingActivity);
         return true;
     }
-
+*/
 
     public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
 

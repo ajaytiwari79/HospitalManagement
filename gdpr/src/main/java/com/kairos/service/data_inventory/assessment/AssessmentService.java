@@ -12,43 +12,21 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.*;
-import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.asset.AssetMD;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityMD;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
-import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.common.AssessmentResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -62,11 +40,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-public class AssessmentService extends MongoBaseService {
+public class AssessmentService{
 
-
-    @Inject
-    private AssessmentMongoRepository assessmentMongoRepository;
 
     @Inject
     private ProcessingActivityRepository processingActivityRepository;
@@ -75,58 +50,10 @@ public class AssessmentService extends MongoBaseService {
     private QuestionnaireTemplateRepository questionnaireTemplateRepository;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
-
-    @Inject
     private AssetRepository assetRepository;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
-
-    @Inject
-    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
-
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
-
-    @Inject
-    private StorageFormatMongoRepository storageFormatMongoRepository;
-
-    @Inject
-    private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureRepository;
-
-    @Inject
-    private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
-
-    @Inject
-    private HostingProviderMongoRepository hostingProviderMongoRepository;
-
-    @Inject
-    private HostingTypeMongoRepository hostingTypeMongoRepository;
-
-    @Inject
-    private DataDisposalMongoRepository dataDisposalMongoRepository;
-
-    @Inject
-    private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
-
-    @Inject
-    private DataSourceMongoRepository dataSourceMongoRepository;
-
-    @Inject
-    private TransferMethodMongoRepository transferMethodMongoRepository;
-
-    @Inject
-    private AccessorPartyMongoRepository accessorPartyMongoRepository;
-
-    @Inject
-    private ProcessingLegalBasisMongoRepository processingLegalBasisMongoRepository;
-
-    @Inject
-    private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
     @Inject
     private ObjectMapper objectMapper;
@@ -335,11 +262,12 @@ public class AssessmentService extends MongoBaseService {
 
 
     /**
-     * @param unitId
-     * @param assessmentId
+     * @param //unitId
+     * @param //assessmentId
      * @return
      */
-    public List<QuestionnaireSectionResponseDTO> getAssessmentById(Long unitId, BigInteger assessmentId) {
+    //TODO
+    /*public List<QuestionnaireSectionResponseDTO> getAssessmentById(Long unitId, BigInteger assessmentId) {
 
         Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
@@ -356,7 +284,7 @@ public class AssessmentService extends MongoBaseService {
                 getProcessingActivityAssessmentQuestionAndAnswer(unitId, assessment, assessmentQuestionnaireSections);
         }
         return assessmentQuestionnaireSections;
-    }
+    }*/
 
 
     private void getRiskAssessmentAnswer(Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
@@ -420,7 +348,8 @@ public class AssessmentService extends MongoBaseService {
 
 
         switch (assetAttributeName) {
-            case HOSTING_PROVIDER:
+            //TODO
+            /*case HOSTING_PROVIDER:
                 return hostingProviderMongoRepository.findAllByUnitId(unitId);
             case HOSTING_TYPE:
                 return hostingTypeMongoRepository.findAllByUnitId(unitId);
@@ -433,7 +362,7 @@ public class AssessmentService extends MongoBaseService {
             case TECHNICAL_SECURITY_MEASURES:
                 return technicalSecurityMeasureMongoRepository.findAllByUnitId(unitId);
             case ORGANIZATION_SECURITY_MEASURES:
-                return organizationalSecurityMeasureRepository.findAllByUnitId(unitId);
+                return organizationalSecurityMeasureRepository.findAllByUnitId(unitId);*/
             default:
                 return null;
         }
@@ -446,7 +375,8 @@ public class AssessmentService extends MongoBaseService {
 
 
         switch (processingActivityAttributeName) {
-            case RESPONSIBILITY_TYPE:
+            //TODO
+            /*case RESPONSIBILITY_TYPE:
                 return responsibilityTypeMongoRepository.findAllByUnitId(unitId);
             case PROCESSING_PURPOSES:
                 return processingPurposeMongoRepository.findAllByUnitId(unitId);
@@ -457,7 +387,7 @@ public class AssessmentService extends MongoBaseService {
             case ACCESSOR_PARTY:
                 return accessorPartyMongoRepository.findAllByUnitId(unitId);
             case PROCESSING_LEGAL_BASIS:
-                return processingLegalBasisMongoRepository.findAllByUnitId(unitId);
+                return processingLegalBasisMongoRepository.findAllByUnitId(unitId);*/
             default:
                 return null;
         }
@@ -578,8 +508,8 @@ public class AssessmentService extends MongoBaseService {
      * @return
      */
     public List<AssessmentAnswerValueObject> addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, List<AssessmentAnswerValueObject> assessmentAnswerValueObjects, AssessmentStatus status) {
-
-        Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
+//TODO
+        /*Assessment assessment = assessmentMongoRepository.findByUnitIdAndId(unitId, assessmentId);
         UserVO currentUser = new UserVO();
         ObjectMapperUtils.copyProperties(UserContext.getUserDetails(), currentUser);
         if (!Optional.ofNullable(assessment).isPresent()) {
@@ -598,7 +528,7 @@ public class AssessmentService extends MongoBaseService {
             assessment.setCompletedDate(LocalDate.now());
             //saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(unitId, assessment);
         }
-        assessmentMongoRepository.save(assessment);
+        assessmentMongoRepository.save(assessment);*/
         return assessmentAnswerValueObjects;
 
     }
@@ -734,10 +664,10 @@ public class AssessmentService extends MongoBaseService {
         return entityIdList;
     }
 
-
+//TODO
     private void saveAssetValueToAssessment(Long unitId, Assessment assessment, AssetResponseDTO assetResponseDTO) {
 
-        QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
+        /*QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
         }
@@ -764,10 +694,10 @@ public class AssessmentService extends MongoBaseService {
         }
         assessment.setAssessmentAnswers(processingActivityAssessmentAnswerVOS);
 
-    }
+    }*/
 
-    private void saveRiskTemplateAnswerToAssessment(Long unitId, AssessmentMD assessment) {
-/*
+   /* private void saveRiskTemplateAnswerToAssessment(Long unitId, AssessmentMD assessment) {
+
         QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplate());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template");
@@ -781,16 +711,16 @@ public class AssessmentService extends MongoBaseService {
         assessment.setAssessmentAnswers(riskAssessmentAnswer);*/
 
 
-    }
+    //}
 
 
     //  private void mapRisk
 
-    private AssessmentAnswerValueObject mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(AssetResponseDTO assetResponseDTO, QuestionBasicResponseDTO questionBasicDTO) {
-
-        AssetAttributeName assetAttributeName = AssetAttributeName.valueOf(questionBasicDTO.getAttributeName());
+        //TODO
+        /*  private AssessmentAnswerValueObject mapAssetValueAsAsessmentAnswerStatusUpdatingFromNewToInProgress(AssetResponseDTO assetResponseDTO, QuestionBasicResponseDTO questionBasicDTO) {
+ AssetAttributeName assetAttributeName = AssetAttributeName.valueOf(questionBasicDTO.getAttributeName());
         switch (assetAttributeName) {
-       /*     case NAME:
+           case NAME:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getName(), questionBasicDTO.getQuestionType());
             case DESCRIPTION:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDescription(), questionBasicDTO.getQuestionType());
@@ -817,7 +747,7 @@ public class AssessmentService extends MongoBaseService {
             case ASSET_OWNER:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getAssetOwner(), questionBasicDTO.getQuestionType());
             case DATA_RETENTION_PERIOD:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod(), questionBasicDTO.getQuestionType());*/
+                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), assetResponseDTO.getDataRetentionPeriod(), questionBasicDTO.getQuestionType());
             default:
                 return null;
         }
@@ -859,10 +789,10 @@ public class AssessmentService extends MongoBaseService {
             case MIN_DATA_SUBJECT_VOLUME:
                 return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getMinDataSubjectVolume(), questionBasicDTO.getQuestionType());
             case JOINT_CONTROLLER_CONTACT_INFO:
-                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getJointControllerContactInfo(), questionBasicDTO.getQuestionType());*/
+                return new AssessmentAnswerValueObject(questionBasicDTO.getId(), questionBasicDTO.getAttributeName(), processingActivityDTO.getJointControllerContactInfo(), questionBasicDTO.getQuestionType());
             default:
                 return null;
-        }
+        }*/
 
     }
 

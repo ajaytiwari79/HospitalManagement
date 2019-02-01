@@ -16,14 +16,11 @@ import com.kairos.persistence.model.embeddables.ServiceCategory;
 import com.kairos.persistence.model.embeddables.SubServiceCategory;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAssetMD;
-import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
-import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetRepository;
 import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +33,9 @@ import java.util.*;
 
 
 @Service
-public class MasterAssetService extends MongoBaseService {
+public class MasterAssetService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetService.class);
-
-    @Inject
-    MasterAssetMongoRepository masterAssetMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -51,9 +45,6 @@ public class MasterAssetService extends MongoBaseService {
 
     @Inject
     private GenericRestClient restClient;
-
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
 
     @Inject
     private MasterAssetRepository masterAssetRepository;

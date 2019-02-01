@@ -29,7 +29,7 @@ public class DataSubjectMappingMD extends BaseEntity {
     @ElementCollection
     private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     private List<DataCategoryMD> dataCategories=new ArrayList<>();
 
     private Long countryId;

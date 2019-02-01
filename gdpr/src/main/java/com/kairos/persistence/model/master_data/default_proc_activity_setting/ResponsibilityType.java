@@ -2,15 +2,13 @@ package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document
-public class ResponsibilityType extends MongoBaseEntity {
+
+public class ResponsibilityType {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")

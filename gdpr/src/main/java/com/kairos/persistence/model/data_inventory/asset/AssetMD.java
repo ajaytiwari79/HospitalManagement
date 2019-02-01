@@ -6,7 +6,6 @@ import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
-import com.kairos.persistence.model.risk_management.RiskMD;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

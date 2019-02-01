@@ -9,14 +9,10 @@ import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
-import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
-import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.risk_management.RiskService;
@@ -32,7 +28,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-public class OrganizationAssetTypeService extends MongoBaseService {
+public class OrganizationAssetTypeService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationAssetTypeService.class);
@@ -42,23 +38,14 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
-
-    @Inject
     private AssetTypeRepository assetTypeRepository;
 
-
-    @Inject
-    private AssetMongoRepository assetMongoRepository;
 
     @Inject
     private RiskService riskService;
 
     @Inject
     private RiskRepository riskRepository;
-
-    @Inject
-    private RiskMongoRepository riskMongoRepository;
 
     @Inject
     private AssetTypeService assetTypeService;
@@ -140,12 +127,13 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 //            subAssetTypesIds.add(subAssetTypeDto.getId());
             //   subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
         });
-        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllByUnitIdAndIds(unitId, subAssetTypesIds);
+        //TODO
+        List<AssetType> subAssetTypesList = new ArrayList<>();/*assetTypeMongoRepository.findAllByUnitIdAndIds(unitId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
             AssetTypeOrganizationLevelDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
             subAssetType.setName(subAssetTypeDto.getName());
-        });
+        });*/
         return subAssetTypesList;
     }
 

@@ -4,10 +4,8 @@ package com.kairos.persistence.model.data_inventory.assessment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionType;
 
-import javax.inject.Inject;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity

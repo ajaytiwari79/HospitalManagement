@@ -1,15 +1,12 @@
 package com.kairos.persistence.model.questionnaire_template;
 
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class QuestionnaireSection extends MongoBaseEntity {
+
+public class QuestionnaireSection {
 
     private String title;
     private List<BigInteger> questions=new ArrayList<>();

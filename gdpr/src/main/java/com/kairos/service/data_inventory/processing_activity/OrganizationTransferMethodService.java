@@ -9,7 +9,6 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Tr
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
 import com.kairos.utils.ComparisonUtils;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationTransferMethodService extends MongoBaseService {
+public class OrganizationTransferMethodService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodService.class);

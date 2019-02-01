@@ -1,34 +1,24 @@
 package com.kairos.service.clause_tag;
 
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
-import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
 import com.kairos.persistence.model.clause_tag.ClauseTagMD;
-import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ClauseTagService extends MongoBaseService {
+public class ClauseTagService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseTagService.class);
-
-    @Inject
-    ClauseTagMongoRepository clauseTagMongoRepository;
 
     @Inject
     private
@@ -42,11 +32,12 @@ public class ClauseTagService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param clauseTag tag name
+     * @param //clauseTag tag name
      * @return tag object
      * @description method create tag and if tag already exist with same name then throw exception
      */
-    public ClauseTag createClauseTag(Long countryId, String clauseTag) {
+    //TODO
+    /*public ClauseTag createClauseTag(Long countryId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
             throw new InvalidRequestException("requested param name is null or empty");
         }
@@ -59,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setCountryId(countryId);
             return clauseTagMongoRepository.save(newClauseTag);
         }
-    }
+    }*/
 
 
     public List<ClauseTagMD> getAllClauseTagByCountryId(Long countryId) {
@@ -70,8 +61,8 @@ public class ClauseTagService extends MongoBaseService {
         return clauseTagRepository.findAllClauseTagByUnitId(unitId);
     }
 
-
-    public ClauseTag getClauseTagById(Long countryId, BigInteger id) {
+//TODO
+    /*public ClauseTag getClauseTagById(Long countryId, BigInteger id) {
 
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -80,10 +71,10 @@ public class ClauseTagService extends MongoBaseService {
             return exist;
 
         }
-    }
+    }*/
 
 
-    public Boolean deleteClauseTagById(Long countryId, BigInteger id) {
+   /* public Boolean deleteClauseTagById(Long countryId, BigInteger id) {
 
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -109,7 +100,7 @@ public class ClauseTagService extends MongoBaseService {
 
 
     }
-
+*/
     /**
      * @param referenceId
      * @param tagList     list of clause tags

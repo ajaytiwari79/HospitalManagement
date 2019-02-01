@@ -7,17 +7,11 @@ import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
-import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.model.risk_management.RiskMD;
-import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
-import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
-import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
@@ -26,14 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
-public class AssetTypeService extends MongoBaseService {
+public class AssetTypeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeService.class);
 
@@ -42,16 +34,7 @@ public class AssetTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
-
-    @Inject
-    private MasterAssetMongoRepository masterAssetMongoRepository;
-
-    @Inject
     private RiskService riskService;
-
-    @Inject
-    private RiskMongoRepository riskMongoRepository;
 
     @Inject
     private AssetTypeRepository assetTypeRepository;
@@ -258,7 +241,8 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAssetType(Long countryId, BigInteger assetTypeId) {
+//TODO
+    /*public Boolean deleteAssetType(Long countryId, BigInteger assetTypeId) {
 
         List<MasterAsset> masterAssetsLinkedWithAssetType = masterAssetMongoRepository.findAllByCountryIdAndAssetTypeId(countryId, assetTypeId);
         if (CollectionUtils.isNotEmpty(masterAssetsLinkedWithAssetType)) {
@@ -267,7 +251,7 @@ public class AssetTypeService extends MongoBaseService {
         assetTypeMongoRepository.safeDeleteById(assetTypeId);
         return true;
 
-    }
+    }*/
 
 
     /**
@@ -334,7 +318,8 @@ public class AssetTypeService extends MongoBaseService {
      * @param riskId
      * @return
      */
-    public boolean unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(Long countryId, BigInteger assetTypeId, BigInteger riskId) {
+    //TODO
+   /* public boolean unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(Long countryId, BigInteger assetTypeId, BigInteger riskId) {
 
         AssetType assetType = assetTypeMongoRepository.findByCountryIdAndId(countryId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
@@ -344,7 +329,7 @@ public class AssetTypeService extends MongoBaseService {
         riskMongoRepository.safeDeleteById(riskId);
         assetTypeMongoRepository.save(assetType);
         return true;
-    }
+    }*/
 
 
     /**

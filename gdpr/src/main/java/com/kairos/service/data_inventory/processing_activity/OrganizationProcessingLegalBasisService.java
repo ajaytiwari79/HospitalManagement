@@ -10,7 +10,6 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Pr
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ComparisonUtils;
@@ -27,7 +26,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationProcessingLegalBasisService extends MongoBaseService {
+public class OrganizationProcessingLegalBasisService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationProcessingLegalBasisService.class);

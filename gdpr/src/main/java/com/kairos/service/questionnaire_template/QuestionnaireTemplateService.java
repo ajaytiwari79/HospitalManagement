@@ -12,15 +12,10 @@ import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
-import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -33,32 +28,19 @@ import java.util.*;
 
 
 @Service
-public class QuestionnaireTemplateService extends MongoBaseService {
+public class QuestionnaireTemplateService{
 
 
     private Logger LOGGER = LoggerFactory.getLogger(QuestionnaireTemplateService.class);
 
-
-    @Inject
-    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
-
     @Inject
     private ExceptionService exceptionService;
-
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
 
     @Inject
     private AssetTypeRepository assetTypeRepository;
 
     @Inject
     private QuestionnaireSectionService questionnaireSectionService;
-
-    @Inject
-    private QuestionnaireSectionRepository questionnaireSectionRepository;
-
-    @Inject
-    private QuestionMongoRepository questionMongoRepository;
 
     @Inject
     private QuestionnaireTemplateRepository questionnaireTemplateRepository;
@@ -150,10 +132,11 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 addRiskAssociatedEntity(referenceId, isUnitId, questionnaireTemplate, templateDto);
                 break;
             default:
-                QuestionnaireTemplate previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(referenceId, templateDto.getTemplateType()) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(referenceId, templateDto.getTemplateType());
+                //TODO
+                /*QuestionnaireTemplate previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedQuestionnaireTemplateByUnitIdAndTemplateType(referenceId, templateDto.getTemplateType()) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByCountryIdAndTemplateType(referenceId, templateDto.getTemplateType());
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", templateDto.getTemplateType());
-                }
+                }*/
                 questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                 break;
         }
@@ -190,11 +173,12 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             questionnaireTemplate.setAssetType(assetType);
 
         } else {
-            previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(referenceId)
+            //TODO
+            /*previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByAssociatedProcessingActivityAndUnitId(referenceId)
                     : questionnaireTemplateMongoRepository.findRiskTemplateByAssociatedProcessingActivityAndCountryId(referenceId);
             if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                 exceptionService.invalidRequestException("duplicate.risk.questionnaireTemplate", previousTemplate.getName());
-            }
+            }*/
         }
         questionnaireTemplate.setTemplateStatus(templateDto.getTemplateStatus());
         questionnaireTemplate.setTemplateType(templateDto.getTemplateType());

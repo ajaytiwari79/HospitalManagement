@@ -8,7 +8,6 @@ import com.kairos.persistence.model.master_data.default_asset_setting.DataDispos
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ComparisonUtils;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationDataDisposalService extends MongoBaseService {
+public class OrganizationDataDisposalService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationDataDisposalService.class);

@@ -1,88 +1,17 @@
 package com.kairos.service.javers;
 
 
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.*;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
-import com.kairos.service.exception.ExceptionService;
-import org.javers.core.Javers;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.ValueObjectId;
-import org.javers.repository.jql.QueryBuilder;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.*;
-
-import static com.kairos.constants.AppConstant.*;
 
 
 @Service
 public class JaversCommonService {
 
-    @Inject
-    private MongoTemplate mongoTemplate;
-
-    @Inject
+   /* @Inject
     private Javers javers;
 
     @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
-
-    @Inject
-    private StorageFormatMongoRepository storageFormatMongoRepository;
-
-    @Inject
     private ExceptionService exceptionService;
-
-    @Inject
-    private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureRepository;
-
-    @Inject
-    private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
-
-    @Inject
-    private HostingProviderMongoRepository hostingProviderMongoRepository;
-
-    @Inject
-    private HostingTypeMongoRepository hostingTypeMongoRepository;
-
-    @Inject
-    private DataDisposalMongoRepository dataDisposalMongoRepository;
-
-    @Inject
-    private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
-
-    @Inject
-    private DataSourceMongoRepository dataSourceMongoRepository;
-
-    @Inject
-    private TransferMethodMongoRepository transferMethodMongoRepository;
-
-    @Inject
-    private AccessorPartyMongoRepository accessorPartyMongoRepository;
-
-    @Inject
-    private ProcessingLegalBasisMongoRepository processingLegalBasisMongoRepository;
-
-    @Inject
-    private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
-
-    @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
     public List<Map<String, Object>> getHistoryMap(List<CdoSnapshot> auditHistoryList, BigInteger ownerId, Class clazz) {
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
@@ -184,10 +113,10 @@ public class JaversCommonService {
 
     public void addReferencedDataOrDefaultValue(List<Object> fieldValues, String field, CdoSnapshot historyMap) {
 
-
+//TODO
         switch (field) {
 
-            case ASSET_TYPE_KEY:
+            /*case ASSET_TYPE_KEY:
                 fieldValues.add(assetTypeMongoRepository.findAssetTypeById((BigInteger) historyMap.getPropertyValue(field)));
                 break;
             case ASSET_SUB_TYPE_KEY:
@@ -239,7 +168,7 @@ public class JaversCommonService {
 
         }
 
-    }
+    }*/
 
 
 }

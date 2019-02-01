@@ -1,15 +1,13 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class DataCategory extends MongoBaseEntity {
+
+public class DataCategory {
 
     @NotBlank(message = "Name cannot be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")

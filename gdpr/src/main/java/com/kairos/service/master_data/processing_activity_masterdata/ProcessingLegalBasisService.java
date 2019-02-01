@@ -9,7 +9,6 @@ import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasisMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class ProcessingLegalBasisService extends MongoBaseService {
+public class ProcessingLegalBasisService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingLegalBasisService.class);
 

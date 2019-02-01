@@ -3,11 +3,8 @@ package com.kairos.service.data_subject_management;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.master_data.DataElementDTO;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategoryMD;
-import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.persistence.model.master_data.data_category_element.DataElementMD;
-import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementRepository;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -15,21 +12,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 
 
 @Service
-public class DataElementService extends MongoBaseService {
+public class DataElementService{
 
 
     Logger LOGGER = LoggerFactory.getLogger(DataElementService.class);
 
     @Inject
     private ExceptionService exceptionService;
-
-    @Inject
-    private DataElementMongoRepository dataElementMongoRepository;
 
     @Inject
     private DataElementRepository dataElementRepository;
@@ -123,34 +116,34 @@ public class DataElementService extends MongoBaseService {
      * @param countryId
      * @return get country data elements
      */
-    public List<DataElement> getAllDataElementByCountryId(Long countryId) {
+   /* public List<DataElement> getAllDataElementByCountryId(Long countryId) {
         return dataElementMongoRepository.getAllDataElementByCountryId(countryId);
-    }
+    }*/
 
 
     /**
      * @param unitId
      * @return get organizational data elements
      */
-    public List<DataElement> getAllDataElementByUnitId(Long unitId) {
+   /* public List<DataElement> getAllDataElementByUnitId(Long unitId) {
         return dataElementMongoRepository.getAllDataElementByUnitId(unitId);
-    }
+    }*/
 
 
-    public Boolean deleteDataElementById(BigInteger dataElementId) {
+   /* public Boolean deleteDataElementById(BigInteger dataElementId) {
         dataElementMongoRepository.safeDeleteById(dataElementId);
         return true;
 
-    }
+    }*/
 
-    public DataElement getDataElementById(BigInteger dataElementId) {
+    /*public DataElement getDataElementById(BigInteger dataElementId) {
         DataElement dataElement = dataElementMongoRepository.getByIdAndNonDeleted(dataElementId);
         if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", dataElementId);
         }
         return dataElement;
 
-    }
+    }*/
 
 
 }

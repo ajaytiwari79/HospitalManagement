@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 @Repository
 public interface MasterAssetRepository extends JpaRepository<MasterAssetMD,Long>{
 

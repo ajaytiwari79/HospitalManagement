@@ -7,7 +7,6 @@ import com.kairos.persistence.model.master_data.default_asset_setting.HostingPro
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ComparisonUtils;
@@ -26,7 +25,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class OrganizationHostingProviderService extends MongoBaseService {
+public class OrganizationHostingProviderService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationHostingProviderService.class);

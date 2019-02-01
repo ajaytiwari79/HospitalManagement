@@ -5,8 +5,6 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -16,8 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-@Document
-public class Assessment extends MongoBaseEntity {
+public class Assessment {
 
     @NotBlank
     private String name;

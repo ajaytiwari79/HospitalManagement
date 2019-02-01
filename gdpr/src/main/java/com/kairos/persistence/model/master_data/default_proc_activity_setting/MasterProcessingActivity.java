@@ -6,8 +6,6 @@ import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
@@ -15,8 +13,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class MasterProcessingActivity extends MongoBaseEntity {
+
+public class MasterProcessingActivity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;

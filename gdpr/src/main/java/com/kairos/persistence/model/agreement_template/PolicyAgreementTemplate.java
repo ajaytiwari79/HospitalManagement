@@ -8,17 +8,14 @@ import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class PolicyAgreementTemplate extends MongoBaseEntity {
+public class PolicyAgreementTemplate {
 
     @NotBlank(message = "Name cannot be empty")
     private String name;

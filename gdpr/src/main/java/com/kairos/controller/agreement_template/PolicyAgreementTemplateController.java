@@ -1,6 +1,5 @@
 package com.kairos.controller.agreement_template;
 
-import com.kairos.dto.gdpr.agreement_template.AgreementTemplateClauseUpdateDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.dto.response.ResponseDTO;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -51,7 +49,7 @@ public class PolicyAgreementTemplateController {
     //TODO
     @ApiOperation("upload cover image of agreement template , country level")
     @PostMapping(COUNTRY_URL+"/agreement_template/{agreementTemplateId}/upload")
-    public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByCountryId(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByCountryId(@PathVariable Long countryId, @PathVariable Long agreementTemplateId, @RequestParam("file") MultipartFile file) {
         if (file.getSize() == 0) {
             return ResponseHandler.generateResponseDTO(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -97,12 +95,12 @@ public class PolicyAgreementTemplateController {
     }
 
     //TODO
-    @ApiOperation("Replace Old Clause With New Version of Clause, country level ")
+    /*@ApiOperation("Replace Old Clause With New Version of Clause, country level ")
     @PutMapping(COUNTRY_URL+"/agreement_template/clause/version")
     public ResponseEntity<Object> updateMasterAgreementTemplateClauseWithNewVersion(@PathVariable Long countryId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(countryId, false,agreementTemplateClauseUpdateDTO));
 
-    }
+    }*/
 
     // Agreement template unit url
 
@@ -116,7 +114,7 @@ public class PolicyAgreementTemplateController {
     //TODO
     @ApiOperation("upload cover image of agreement template , unit level")
     @PostMapping(UNIT_URL+"/agreement_template/{agreementTemplateId}/upload")
-    public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByUnitId(@PathVariable Long unitId, @PathVariable BigInteger agreementTemplateId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseDTO<String>> uploadCoverPageLogoByUnitId(@PathVariable Long unitId, @PathVariable Long agreementTemplateId, @RequestParam("file") MultipartFile file) {
         if (file.getSize() == 0) {
             return ResponseHandler.generateResponseDTO(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -161,12 +159,12 @@ public class PolicyAgreementTemplateController {
     }
 
     //TODO
-    @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
+   /* @ApiOperation("Replace Old Clause With New Version of Clause , unit level")
     @PutMapping(UNIT_URL+"/agreement_template/clause/version")
     public ResponseEntity<Object> updateTemplateClauseWithNewVersion(@PathVariable Long unitId, @Valid @RequestBody AgreementTemplateClauseUpdateDTO agreementTemplateClauseUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateClauseWithNewVersionByReferenceIdAndTemplateIds(unitId, true,agreementTemplateClauseUpdateDTO));
 
-    }
+    }*/
 
     //TODO
     @ApiOperation(value = "All Template Type type ")

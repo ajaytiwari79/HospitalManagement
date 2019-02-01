@@ -1,37 +1,9 @@
 package com.kairos.persistence.repository.master_data.asset_management;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
-import com.kairos.dto.gdpr.FilterSelection;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
-import com.kairos.enums.gdpr.FilterType;
-import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constants.AppConstant.ID;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-
-public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetRepository {
+public class MasterAssetMongoRepositoryImpl {
 
 
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -150,5 +122,5 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         );
         return mongoTemplate.aggregate(aggregation, MasterAsset.class, MasterAssetResponseDTO.class).getMappedResults();
 
-    }
+    }*/
 }

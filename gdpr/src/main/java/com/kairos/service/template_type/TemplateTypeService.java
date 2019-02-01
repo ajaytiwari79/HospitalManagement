@@ -5,29 +5,18 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.custom_exception.DataNotExists;
 
-import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.model.template_type.TemplateTypeMD;
-import com.kairos.persistence.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
-
-import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
-import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class TemplateTypeService extends MongoBaseService {
+public class TemplateTypeService{
 
-
-    @Inject
-    private TemplateTypeMongoRepository templateTypeMongoRepository;
 
     @Inject
     private TemplateTypeRepository templateTypeRepository;
@@ -43,7 +32,8 @@ public class TemplateTypeService extends MongoBaseService {
      * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
      * @author vikash patwal
      */
-    public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateType> templateTypeList) {
+    //TODO
+    /*public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateType> templateTypeList) {
         Map<String, List<TemplateType>> result = new HashMap<>();
 
         Set<String> templateNames = new HashSet<>();
@@ -71,14 +61,14 @@ public class TemplateTypeService extends MongoBaseService {
         return result;
     }
 
-    /**
+    *//**
      * @param countryId
      * @param templateName
      * @return TemplateType
      * @throws DataNotExists
      * @description this method is used for get template by name
      * @author vikash patwal
-     */
+     *//*
     public TemplateType getTemplateByName(Long countryId, String templateName) {
         TemplateType template = templateTypeMongoRepository.findByTemplateNameAndIsDeleted(countryId, templateName);
         if (java.util.Optional.ofNullable(template).isPresent()) {
@@ -110,7 +100,7 @@ public class TemplateTypeService extends MongoBaseService {
     }
 
 
-    /**
+    *//**
      * @param id
      * @param countryId
      * @param templateType
@@ -118,7 +108,7 @@ public class TemplateTypeService extends MongoBaseService {
      * @throws DuplicateDataException
      * @description this method is used for update template by id
      * @author vikash patwal
-     */
+     *//*
     public TemplateType updateTemplateName(BigInteger id, Long countryId, TemplateType templateType) {
 
         TemplateType previousTemplateType = templateTypeMongoRepository.findByIdAndNameDeleted(templateType.getName(), countryId);
@@ -132,13 +122,13 @@ public class TemplateTypeService extends MongoBaseService {
 
     }
 
-    /**
+    *//**
      * @param id
      * @return TemplateType
      * @throws DataNotFoundByIdException
      * @description this method is used for delete template type by id.
      * @author vikash patwal
-     */
+     *//*
     public Boolean deleteTemplateType(BigInteger id, Long countryId) {
         TemplateType templateType = templateTypeMongoRepository.findByIdAndNonDeleted(id, countryId);
         if (!Optional.ofNullable(templateType).isPresent()) {
@@ -147,7 +137,7 @@ public class TemplateTypeService extends MongoBaseService {
         delete(templateType);
         return true;
 
-    }
+    }*/
 
     /**
      * @param countryId

@@ -2,12 +2,9 @@ package com.kairos.controller.data_inventory.processing_activity;
 
 
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -16,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -70,7 +65,7 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateProcessingActivity(unitId, id, processingActivityDTO));
     }
 
-    @ApiOperation(value = "get history of asset or changes done in Asset")
+   /* @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/processing_activity/{processingActivityId}/history")
     public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId) {
 
@@ -78,14 +73,14 @@ public class ProcessingActivityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId));
-    }
+    }*/
 
-
-    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
+//TODO
+   /* @ApiOperation(value = "get Processing Activity And Sub Process with Basic Response For related tab in  Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
-    }
+    }*/
 
 
     @ApiOperation(value = "updated status of processing activity")
@@ -98,15 +93,15 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.changeStatusOfProcessingActivity(unitId, processingActivityId, active));
     }
 
-
-    @ApiOperation(value = "Map Data Subject ,Data Category and data element to  Processing activity ")
+//TODO
+    /*@ApiOperation(value = "Map Data Subject ,Data Category and data element to  Processing activity ")
     @PutMapping("/processing_activity/{processingActivityId}/data_subject")
     public ResponseEntity<Object> mapDataSubjectToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRelatedDataSubject> dataSubjectList) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapDataSubjectDataCategoryAndDataElementToProcessingActivity(unitId, processingActivityId, dataSubjectList.getRequestBody()));
-    }
+    }*/
 
 
     @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
@@ -118,8 +113,8 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(unitId, processingActivityId));
     }
 
-
-    @ApiOperation(value = "Link Asset to processing activity")
+    //TODO
+    /*@ApiOperation(value = "Link Asset to processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/asset")
     public ResponseEntity<Object> linkAssetToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestParam(value = "assetId") BigInteger assetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapAssetWithProcessingActivity(unitId, processingActivityId, assetId));
@@ -177,7 +172,7 @@ public class ProcessingActivityController {
     public ResponseEntity<Object> getAllAssessmentLaunchedForProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAssessmentListByProcessingActivityId(unitId, processingActivityId));
     }
-
+*/
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
     @PostMapping(COUNTRY_URL + "/processing_activity/suggest")
     public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {

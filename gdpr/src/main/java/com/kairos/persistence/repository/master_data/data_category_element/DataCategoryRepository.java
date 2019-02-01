@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 public interface DataCategoryRepository extends JpaRepository<DataCategoryMD,Long> {
 
     @Query(value = "Select DC from DataCategoryMD DC where DC.organizationId = ?1 and lower(DC.name) = lower(?2) and DC.deleted = false")

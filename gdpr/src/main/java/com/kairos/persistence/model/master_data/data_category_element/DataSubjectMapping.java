@@ -3,8 +3,6 @@ package com.kairos.persistence.model.master_data.data_category_element;
 
 import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -14,8 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Document
-public class DataSubjectMapping extends MongoBaseEntity {
+
+public class DataSubjectMapping {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")

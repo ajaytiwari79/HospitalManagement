@@ -86,11 +86,11 @@ public class DataSubjectMappingService {
      * @param countryId
      * @return list of DataSubject With Data category List
      */
-    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryByCountryId(Long countryId) {
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryByCountryId(Long countryId, boolean isMasterData) {
         List<DataSubjectMappingResponseDTO> dataSubjectMappingResponseList = new ArrayList<>();
         List<DataSubjectMappingMD> dataSubjectMappings =  dataSubjectRepository.getAllDataSubjectByCountryId(countryId);
         for(DataSubjectMappingMD dataSubjectMapping : dataSubjectMappings){
-            dataSubjectMappingResponseList.add(prepareDataSubjectMappingResponseDTO(dataSubjectMapping , true));
+            dataSubjectMappingResponseList.add(prepareDataSubjectMappingResponseDTO(dataSubjectMapping , isMasterData));
         }
         return dataSubjectMappingResponseList;
     }

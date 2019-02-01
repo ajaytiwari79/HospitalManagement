@@ -8,7 +8,6 @@ import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 

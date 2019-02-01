@@ -2,8 +2,6 @@ package com.kairos.persistence.model.agreement_template;
 
 
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,8 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Document
-public class AgreementSection extends MongoBaseEntity {
+
+public class AgreementSection {
 
 
     @NotBlank(message = "Section Title cannot be empty")

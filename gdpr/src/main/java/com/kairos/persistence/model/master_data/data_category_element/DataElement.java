@@ -1,14 +1,11 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Document
-public class DataElement extends MongoBaseEntity {
+
+public class DataElement {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")

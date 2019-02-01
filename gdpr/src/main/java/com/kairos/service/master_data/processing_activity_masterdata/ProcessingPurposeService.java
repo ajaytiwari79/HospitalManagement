@@ -11,7 +11,6 @@ import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurposeMD;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class ProcessingPurposeService extends MongoBaseService {
+public class ProcessingPurposeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPurposeService.class);
 

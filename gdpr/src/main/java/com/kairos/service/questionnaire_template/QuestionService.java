@@ -8,10 +8,8 @@ import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
 import com.kairos.persistence.model.questionnaire_template.Question;
 import com.kairos.persistence.model.questionnaire_template.QuestionMD;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
-import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionMDRepository;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -22,15 +20,11 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class QuestionService extends MongoBaseService {
+public class QuestionService{
 
     private Logger logger = LoggerFactory.getLogger(QuestionService.class);
-
-    @Inject
-    private QuestionMongoRepository questionMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -76,7 +70,8 @@ public class QuestionService extends MongoBaseService {
             }
             questionnaireSections.add(questionnaireSection);
         });
-        if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
+        //TODO
+      /*  if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
             List<Question> existingQuestionList = isUnitId ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionDTOAndIdMap.keySet()) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionDTOAndIdMap.keySet());
             existingQuestionList.forEach(question -> {
                 QuestionDTO questionDTO = questionDTOAndIdMap.get(question.getId());
@@ -85,10 +80,10 @@ public class QuestionService extends MongoBaseService {
             });
             globalQuestionList.addAll(existingQuestionList);
         }
-        questionMongoRepository.saveAll(getNextSequence(globalQuestionList));
+        questionMongoRepository.saveAll(getNextSequence(globalQuestionList));*/
         questionnaireSections.forEach(questionnaireSection -> {
             if (Optional.ofNullable(sectionQuestionListMap.get(questionnaireSection)).isPresent()) {
-                questionnaireSection.getQuestions().addAll(sectionQuestionListMap.get(questionnaireSection).stream().map(Question::getId).collect(Collectors.toList()));
+               // questionnaireSection.getQuestions().addAll(sectionQuestionListMap.get(questionnaireSection).stream().map(Question::getId).collect(Collectors.toList()));
             }
         });
         return questionnaireSections;
@@ -99,10 +94,10 @@ public class QuestionService extends MongoBaseService {
         List<Question> questions = new ArrayList<>();
         for (QuestionDTO questionDTO : questionDTOs) {
             Question question = new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed());
-            if (isUnitId)
+           /* if (isUnitId)
                 question.setOrganizationId(referenceId);
             else
-                question.setCountryId(referenceId);
+                question.setCountryId(referenceId);*/
             addAttributeNameToQuestion(question, questionDTO, templateType);
             questions.add(question);
         }

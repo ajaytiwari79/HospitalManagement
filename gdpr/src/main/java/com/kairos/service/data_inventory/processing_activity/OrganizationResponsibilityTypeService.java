@@ -6,11 +6,9 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ResponsibilityTypeService;
 import com.kairos.utils.ComparisonUtils;
@@ -27,7 +25,7 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationResponsibilityTypeService extends MongoBaseService {
+public class OrganizationResponsibilityTypeService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationResponsibilityTypeService.class);
@@ -40,9 +38,6 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     @Inject
     private ResponsibilityTypeService responsibilityTypeService;
-
-    @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
     @Inject
     private ProcessingActivityRepository processingActivityRepository;

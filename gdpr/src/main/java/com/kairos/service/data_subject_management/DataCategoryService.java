@@ -5,7 +5,6 @@ import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.persistence.model.master_data.data_category_element.*;
 import com.kairos.persistence.repository.master_data.data_category_element.*;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,21 +17,15 @@ import java.util.*;
 
 
 @Service
-public class DataCategoryService extends MongoBaseService {
+public class DataCategoryService{
 
     private Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
-
-    @Inject
-    private DataCategoryMongoRepository dataCategoryMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
 
     @Inject
     private DataElementService dataElementService;
-
-    @Inject
-    private DataElementMongoRepository dataElementMongoRepository;
 
     @Inject
     private DataSubjectRepository dataSubjectRepository;

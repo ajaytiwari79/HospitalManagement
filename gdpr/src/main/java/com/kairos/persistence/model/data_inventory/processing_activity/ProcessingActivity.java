@@ -1,10 +1,8 @@
 package com.kairos.persistence.model.data_inventory.processing_activity;
 
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import org.springframework.data.mongodb.core.mapping.Document;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
@@ -13,8 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Document
-public class ProcessingActivity extends MongoBaseEntity {
+
+public class ProcessingActivity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;

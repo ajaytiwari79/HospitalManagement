@@ -1,41 +1,10 @@
 package com.kairos.persistence.repository.agreement_template;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.persistence.model.agreement_template.AgreementSection;
-import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
-import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
-import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-import javax.inject.Inject;
-
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
+public class PolicyAgreementTemplateRepositoryImpl  {
 
 
-public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreementTemplateRepository {
-
-
-    @Autowired
+   /* @Autowired
     private MongoTemplate mongoTemplate;
 
     @Inject
@@ -229,7 +198,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         );
         AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, ClauseBasicResponseDTO.class);
         return result.getMappedResults();
-    }
+    }*/
 
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Repository
-//@JaversSpringDataAuditable
+////@JaversSpringDataAuditable
 
 public interface RiskRepository extends CustomGenericRepository<RiskMD> {
 
@@ -32,22 +32,7 @@ public interface RiskRepository extends CustomGenericRepository<RiskMD> {
 */
 
    // List<RiskResponseDTO> getAllRiskOfOrganizationId(Long orgId);
-    /*@Query("{deleted:false,countryId:?0,_id:?1}")
-    Risk findByIdAndCountryId(Long countryId, BigInteger riskId);
-
-
-    @Query("{deleted:false,_id:?0}")
-    Risk findByIdAndNonDeleted(BigInteger riskId);
-
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<Risk> findRiskByCountryIdAndIds(Long countryId, List<BigInteger> riskIds);
-
-    @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
-    List<Risk> findRiskByUnitIdAndIds(Long unitId, List<BigInteger> riskIds);
-
-
-    @Query("{deleted:false,organizationId:?0,_id:?1}")
-    Risk findUnitIdAndId(Long unitId, BigInteger riskId);*/
+    
 
 
 }
