@@ -162,7 +162,7 @@ public class SystemLanguageService  {
                 }
             });
         }else if(isNotNull(selected) && selected){
-            countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country,systemLanguage,false));
+            countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country,systemLanguage,systemLanguage.isDefaultLanguage()));
         }
         countryLanguageSettingRelationshipRepository.saveAll(countryLanguageSettingRelationships);
         return true;
