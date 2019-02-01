@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.common.UserInfo;
 import org.neo4j.ogm.annotation.GraphId;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
@@ -33,9 +31,9 @@ public abstract class UserBaseEntity implements Serializable {
     @LastModifiedDate
     private LocalDateTime lastModificationDate;
 
-    @CreatedBy
+    @JsonIgnore
     protected UserInfo createdBy;
-    @LastModifiedBy
+    @JsonIgnore
     protected UserInfo lastModifiedBy;
 
 
