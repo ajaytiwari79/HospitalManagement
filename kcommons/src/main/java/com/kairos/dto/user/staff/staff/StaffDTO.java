@@ -232,10 +232,9 @@ public class StaffDTO {
         this.age=age;
     }
 
-    public StaffDTO(@NotBlank(message = "error.StaffDTO.firstName.notEmpty") String firstName, @NotBlank(message = "error.StaffDTO.lastName.notEmpty") String lastName, @NotBlank(message = "error.StaffDTO.cprNumber.notEmpty") BigInteger cprNumber, String privateEmail, String errorMessage) {
+    public StaffDTO(String firstName, String lastName, String privateEmail, String errorMessage) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.cprNumber = cprNumber;
         this.privateEmail = privateEmail;
         this.errorMessage = errorMessage;
     }
