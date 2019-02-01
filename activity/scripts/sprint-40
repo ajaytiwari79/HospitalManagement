@@ -1,4 +1,5 @@
 //add kpi for country
+
 db.getCollection('counter').insert({
     "_id" : "20",nextsequence
     "type" : "DAYTYPE_AND_TIMESLOT",
