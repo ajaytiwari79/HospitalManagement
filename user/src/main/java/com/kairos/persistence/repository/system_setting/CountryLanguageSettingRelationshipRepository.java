@@ -12,10 +12,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_S
 @Repository
 public interface CountryLanguageSettingRelationshipRepository extends Neo4jBaseRepository<CountryLanguageSettingRelationship,Long> {
 
-    @Query("Match (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} return id(rel)")
+    @Query("MATCH(country:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(country)={0} RETURN id(rel)")
     List<Long> findAllByCountryId(Long CountryId);
 
-    @Query("Match (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} And id(language)={1} return rel")
+    @Query("MATCH(country:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(country)={0} And id(language)={1} RETURN rel")
     CountryLanguageSettingRelationship findByCountryIdAndSystemLanguageId(Long countryId,Long systemLanguageId);
 
 }
