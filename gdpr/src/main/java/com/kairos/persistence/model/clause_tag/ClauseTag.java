@@ -1,9 +1,13 @@
 package com.kairos.persistence.model.clause_tag;
 
+import com.kairos.persistence.model.common.BaseEntity;
+
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 
 
-public class ClauseTag {
+@Entity
+public class ClauseTag extends BaseEntity {
 
     @NotBlank(message = "Name cannot be  empty")
     private String name;

@@ -5,11 +5,11 @@ import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
+import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.Question;
-import com.kairos.persistence.model.questionnaire_template.QuestionMD;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
 import com.kairos.persistence.repository.questionnaire_template.QuestionRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionMDRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class QuestionService{
     private ExceptionService exceptionService;
 
     @Inject
-    private QuestionnaireSectionMDRepository questionnaireSectionRepository;
+    private QuestionnaireSectionRepository questionnaireSectionRepository;
 
     @Inject
     private QuestionRepository questionRepository;
@@ -43,12 +43,12 @@ public class QuestionService{
      * @param templateType
      * @return
      */
-    public List<QuestionnaireSection> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnitId, Map<QuestionnaireSection, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
+    public List<QuestionnaireSectionDeprecated> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnitId, Map<QuestionnaireSectionDeprecated, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
 
-        List<Question> globalQuestionList = new ArrayList<>();
-        Map<QuestionnaireSection, List<Question>> sectionQuestionListMap = new HashMap<>();
+        List<QuestionDeprecated> globalQuestionList = new ArrayList<>();
+        Map<QuestionnaireSectionDeprecated, List<QuestionDeprecated>> sectionQuestionListMap = new HashMap<>();
         Map<BigInteger, QuestionDTO> questionDTOAndIdMap = new HashMap<>();
-        List<QuestionnaireSection> questionnaireSections = new ArrayList<>();
+        List<QuestionnaireSectionDeprecated> questionnaireSections = new ArrayList<>();
         Set<String> titles = new HashSet<>();
         sectionAndQuestionDTOListMap.forEach((questionnaireSection, questionDTOS) -> {
 
@@ -64,7 +64,7 @@ public class QuestionService{
                     questionListCorrespondingToSection.add(questionDTO);
             });
             if (CollectionUtils.isNotEmpty(questionListCorrespondingToSection)) {
-                List<Question> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCorrespondingToSection, templateType);
+                List<QuestionDeprecated> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCorrespondingToSection, templateType);
                 sectionQuestionListMap.put(questionnaireSection, questions);
                 globalQuestionList.addAll(questions);
             }
@@ -90,10 +90,10 @@ public class QuestionService{
     }
 
 
-    private List<Question> buildQuestionForQuestionnaireSectionAtUnitLevel(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
-        List<Question> questions = new ArrayList<>();
+    private List<QuestionDeprecated> buildQuestionForQuestionnaireSectionAtUnitLevel(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
+        List<QuestionDeprecated> questions = new ArrayList<>();
         for (QuestionDTO questionDTO : questionDTOs) {
-            Question question = new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed());
+            QuestionDeprecated question = new QuestionDeprecated(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed());
            /* if (isUnitId)
                 question.setOrganizationId(referenceId);
             else
@@ -105,7 +105,7 @@ public class QuestionService{
     }
 
 
-    public void addAttributeNameToQuestion(Question masterQuestion, QuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
+    public void addAttributeNameToQuestion(QuestionDeprecated masterQuestion, QuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
 
         if (!Optional.ofNullable(templateType).isPresent()) {
             exceptionService.invalidRequestException("message.invalid.request", " Attribute name is incorrect");
@@ -136,7 +136,7 @@ public class QuestionService{
      * @description deleted question by id ,and also remove id of question from questionnaire section.
      */
     public boolean deleteQuestionOfQuestionnaireSection(Long countryId, Long questionId, Long sectionId) {
-        QuestionMD question = questionRepository.findQuestionByIdAndSectionId( questionId,sectionId);
+        Question question = questionRepository.findQuestionByIdAndSectionId( questionId,sectionId);
         if (!Optional.ofNullable(question).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Question", sectionId);
         }
@@ -163,7 +163,7 @@ public class QuestionService{
     }*/
 
 
-    public List<QuestionMD> getAllMasterQuestion(Long countryId) {
+    public List<Question> getAllMasterQuestion(Long countryId) {
         return questionRepository.getAllMasterQuestion(countryId);
 
     }

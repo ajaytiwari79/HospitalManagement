@@ -2,17 +2,20 @@ package com.kairos.persistence.model.data_inventory.asset;
 
 
 import com.kairos.enums.gdpr.AssetAssessor;
-import com.kairos.dto.gdpr.ManagingOrganization;
-import com.kairos.dto.gdpr.Staff;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.ManagingOrganization;
+import com.kairos.persistence.model.embeddables.Staff;
+import com.kairos.persistence.model.master_data.default_asset_setting.*;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+@Entity
+public class Asset extends BaseEntity {
 
-public class Asset {
 
     @NotBlank(message = "Name can 't be empty")
     private String name;
@@ -20,26 +23,52 @@ public class Asset {
     private String description;
     private Long countryId;
     private String hostingLocation;
+
+    @Embedded
     private ManagingOrganization managingDepartment;
+
+    @Embedded
     private Staff assetOwner;
-    private List<BigInteger> storageFormats;
-    private List<BigInteger> orgSecurityMeasures;
-    private List<BigInteger> technicalSecurityMeasures;
-    private BigInteger hostingProviderId;
-    private BigInteger hostingTypeId;
-    private BigInteger dataDisposalId;
-    private BigInteger assetTypeId;
-    private BigInteger assetSubTypeId;
-    private Set<BigInteger> processingActivityIds;
-    private Set<BigInteger> subProcessingActivityIds;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<StorageFormat> storageFormats  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<OrganizationalSecurityMeasure> orgSecurityMeasures  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<TechnicalSecurityMeasure> technicalSecurityMeasures  = new ArrayList<>();
+
+    @OneToOne
+    private HostingProvider hostingProvider;
+
+    @OneToOne
+    private HostingType hostingType;
+
+    @OneToOne
+    private DataDisposal dataDisposal;
+
+    @OneToOne
+    private AssetType assetType;
+
+    @OneToOne
+    private AssetType subAssetType;
+
+   /* private Set<BigInteger> processingActivityIds;
+    private Set<BigInteger> subProcessingActivityIds;*/
     private Integer dataRetentionPeriod;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
     private boolean suggested;
+
     private AssetAssessor assetAssessor;
 
 
     public Asset() {
+    }
+
+    public Asset(Long id ) {
+        this.id = id;
     }
 
     public Asset(String name, String description, String hostingLocation, ManagingOrganization managingDepartment, Staff assetOwner) {
@@ -87,19 +116,6 @@ public class Asset {
 
     public void setCountryId(Long countryId) { this.countryId = countryId; }
 
-    public List<BigInteger> getStorageFormats() { return storageFormats; }
-
-    public void setStorageFormats(List<BigInteger> storageFormats) { this.storageFormats = storageFormats; }
-
-    public List<BigInteger> getOrgSecurityMeasures() { return orgSecurityMeasures; }
-
-    public void setOrgSecurityMeasures(List<BigInteger> orgSecurityMeasures) { this.orgSecurityMeasures = orgSecurityMeasures; }
-
-    public List<BigInteger> getTechnicalSecurityMeasures() { return technicalSecurityMeasures; }
-
-    public void setTechnicalSecurityMeasures(List<BigInteger> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
-
-
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
@@ -115,33 +131,71 @@ public class Asset {
 
     public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
 
-    public BigInteger getHostingProviderId() { return hostingProviderId; }
+    public List<StorageFormat> getStorageFormats() {
+        return storageFormats;
+    }
 
-    public void setHostingProviderId(BigInteger hostingProviderId) { this.hostingProviderId = hostingProviderId; }
+    public void setStorageFormats(List<StorageFormat> storageFormats) {
+        this.storageFormats = storageFormats;
+    }
 
-    public BigInteger getHostingTypeId() { return hostingTypeId; }
+    public List<OrganizationalSecurityMeasure> getOrgSecurityMeasures() {
+        return orgSecurityMeasures;
+    }
 
-    public void setHostingTypeId(BigInteger hostingTypeId) { this.hostingTypeId = hostingTypeId; }
+    public void setOrgSecurityMeasures(List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+        this.orgSecurityMeasures = orgSecurityMeasures;
+    }
 
-    public BigInteger getDataDisposalId() { return dataDisposalId; }
+    public List<TechnicalSecurityMeasure> getTechnicalSecurityMeasures() {
+        return technicalSecurityMeasures;
+    }
 
-    public void setDataDisposalId(BigInteger dataDisposalId) { this.dataDisposalId = dataDisposalId; }
+    public void setTechnicalSecurityMeasures(List<TechnicalSecurityMeasure> technicalSecurityMeasures) {
+        this.technicalSecurityMeasures = technicalSecurityMeasures;
+    }
 
-    public BigInteger getAssetTypeId() { return assetTypeId; }
+    public HostingProvider getHostingProvider() {
+        return hostingProvider;
+    }
 
-    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
+    public void setHostingProvider(HostingProvider hostingProvider) {
+        this.hostingProvider = hostingProvider;
+    }
 
-    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
+    public HostingType getHostingType() {
+        return hostingType;
+    }
 
-    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
+    public void setHostingType(HostingType hostingType) {
+        this.hostingType = hostingType;
+    }
 
-    public Set<BigInteger> getProcessingActivityIds() { return processingActivityIds; }
+    public DataDisposal getDataDisposal() {
+        return dataDisposal;
+    }
 
-    public void setProcessingActivityIds(Set<BigInteger> processingActivityIds) { this.processingActivityIds = processingActivityIds; }
+    public void setDataDisposal(DataDisposal dataDisposal) {
+        this.dataDisposal = dataDisposal;
+    }
 
-    public Set<BigInteger> getSubProcessingActivityIds() { return subProcessingActivityIds; }
+    public AssetType getAssetType() {
+        return assetType;
+    }
 
-    public void setSubProcessingActivityIds(Set<BigInteger> subProcessingActivityIds) { this.subProcessingActivityIds = subProcessingActivityIds; }
+    public void setAssetType(AssetType assetType) {
+        this.assetType = assetType;
+    }
+
+    public AssetType getSubAssetType() {
+        return subAssetType;
+    }
+
+    public void setSubAssetType(AssetType subAssetType) {
+        this.subAssetType = subAssetType;
+    }
+
+
 }
 
 

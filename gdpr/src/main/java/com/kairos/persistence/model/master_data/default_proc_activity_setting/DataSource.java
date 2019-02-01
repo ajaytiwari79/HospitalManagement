@@ -1,13 +1,14 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-
+import com.kairos.persistence.model.common.BaseEntity;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-
-public class DataSource {
+@Entity
+public class DataSource extends BaseEntity {
 
 
     @NotBlank(message = "Name can't be empty")
@@ -49,11 +50,19 @@ public class DataSource {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public DataSource(@NotBlank(message = "Name can't be empty") @Pattern(message = "Number and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public DataSource(String name) {
         this.name = name;
     }
 
     public DataSource() {
     }
-}
 
+    public DataSource(Long id) {
+        this.id = id;
+    }
+}

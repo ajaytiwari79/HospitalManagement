@@ -6,7 +6,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorPartyMD;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -44,9 +44,9 @@ public class AccessorPartyService{
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
-    public Map<String, List<AccessorPartyMD>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties, boolean isSuggestion) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<AccessorPartyMD>> result = new HashMap<>();
+        Map<String, List<AccessorParty>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
         if (!accessorParties.isEmpty()) {
             for (AccessorPartyDTO accessorParty : accessorParties) {
@@ -55,13 +55,13 @@ public class AccessorPartyService{
             List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<AccessorPartyMD> existing = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<AccessorParty> existing = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
-            List<AccessorPartyMD> newAccessorPartyList = new ArrayList<>();
+            List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorPartyMD newAccessorParty = new AccessorPartyMD(name,countryId);
+                    AccessorParty newAccessorParty = new AccessorParty(name,countryId);
                     if(isSuggestion){
                         newAccessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         newAccessorParty.setSuggestedDate(LocalDate.now());
@@ -91,8 +91,8 @@ public class AccessorPartyService{
      * @return AccessorParty object fetch by given id
      * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
-    public AccessorPartyMD getAccessorParty(Long countryId, Long id) {
-        AccessorPartyMD exist = accessorPartyRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+    public AccessorParty getAccessorParty(Long countryId, Long id) {
+        AccessorParty exist = accessorPartyRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -122,7 +122,7 @@ public class AccessorPartyService{
      */
     public AccessorPartyDTO updateAccessorParty(Long countryId, Long id, AccessorPartyDTO accessorPartyDTO) {
 
-        AccessorPartyMD accessorParty = accessorPartyRepository.findByCountryIdAndDeletedAndName(countryId, false, accessorPartyDTO.getName() );
+        AccessorParty accessorParty = accessorPartyRepository.findByCountryIdAndDeletedAndName(countryId, false, accessorPartyDTO.getName() );
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
@@ -147,9 +147,9 @@ public class AccessorPartyService{
      * @param accessorPartyDTOS
      * @return
      */
-    public List<AccessorPartyMD> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
+    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
-        Map<String, List<AccessorPartyMD>> result = createAccessorParty(countryId, accessorPartyDTOS, true);
+        Map<String, List<AccessorParty>> result = createAccessorParty(countryId, accessorPartyDTOS, true);
         return result.get(NEW_DATA_LIST);
     }
 
@@ -161,7 +161,7 @@ public class AccessorPartyService{
      * @param suggestedDataStatus
      * @return
      */
-    public List<AccessorPartyMD> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<Long> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<AccessorParty> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<Long> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = accessorPartyRepository.updateMetadataStatus(countryId, accessorPartyIds,suggestedDataStatus);
         if(updateCount > 0){

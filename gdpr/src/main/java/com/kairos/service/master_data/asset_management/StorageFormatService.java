@@ -7,7 +7,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormatMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -44,9 +44,9 @@ public class StorageFormatService{
      * and if exist then simply add  StorageFormat to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
-    public Map<String, List<StorageFormatMD>> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS, boolean isSuggestion) {
+    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<StorageFormatMD>> result = new HashMap<>();
+        Map<String, List<StorageFormat>> result = new HashMap<>();
         Set<String> storageFormatNames = new HashSet<>();
         if (!storageFormatDTOS.isEmpty()) {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
@@ -56,13 +56,13 @@ public class StorageFormatService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<StorageFormatMD> existing = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<StorageFormat> existing = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
-            List<StorageFormatMD> newStorageFormats = new ArrayList<>();
+            List<StorageFormat> newStorageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-                    StorageFormatMD newStorageFormat = new StorageFormatMD(name,countryId);
+                    StorageFormat newStorageFormat = new StorageFormat(name,countryId);
                     if(isSuggestion){
                         newStorageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         newStorageFormat.setSuggestedDate(LocalDate.now());
@@ -99,9 +99,9 @@ public class StorageFormatService{
      * @return StorageFormat object fetch via given id
      * @throws DataNotFoundByIdException throw exception if StorageFormat not exist for given id
      */
-    public StorageFormatMD getStorageFormat(Long countryId, Long id) {
+    public StorageFormat getStorageFormat(Long countryId, Long id) {
 
-        StorageFormatMD exist = storageFormatRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        StorageFormat exist = storageFormatRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -132,7 +132,7 @@ public class StorageFormatService{
      */
     public StorageFormatDTO updateStorageFormat(Long countryId, Long id, StorageFormatDTO storageFormatDTO) {
         //TODO What actually this code is doing?
-        StorageFormatMD storageFormat = storageFormatRepository.findByCountryIdAndDeletedAndName(countryId, false, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatRepository.findByCountryIdAndDeletedAndName(countryId, false, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
@@ -156,8 +156,8 @@ public class StorageFormatService{
      * @param storageFormatDTOS
      * @return
      */
-    public List<StorageFormatMD> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
-        Map<String, List<StorageFormatMD>> result = createStorageFormat(countryId, storageFormatDTOS,true);
+    public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
+        Map<String, List<StorageFormat>> result = createStorageFormat(countryId, storageFormatDTOS,true);
         return result.get(NEW_DATA_LIST);
 
     }
@@ -170,7 +170,7 @@ public class StorageFormatService{
      * @param suggestedDataStatus
      * @return
      */
-    public List<StorageFormatMD> updateSuggestedStatusOfStorageFormatList(Long countryId, Set<Long> storageFormatIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<StorageFormat> updateSuggestedStatusOfStorageFormatList(Long countryId, Set<Long> storageFormatIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = storageFormatRepository.updateMetadataStatus(countryId, storageFormatIds, suggestedDataStatus);
         if(updateCount > 0){

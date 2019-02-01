@@ -1,19 +1,19 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-
-public class DataSubjectMapping {
+@Entity
+public class DataSubjectMapping extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -23,11 +23,14 @@ public class DataSubjectMapping {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
+    @ElementCollection
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
 
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    @ElementCollection
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
 
-    private Set<BigInteger> dataCategories = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<DataCategory> dataCategories=new ArrayList<>();
 
     private Long countryId;
 
@@ -35,24 +38,24 @@ public class DataSubjectMapping {
     public DataSubjectMapping() {
     }
 
-    public DataSubjectMapping(String name, String description, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS,
-                              Set<BigInteger> dataCategories) {
+    public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
+                              List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.dataCategories = dataCategories;
     }
 
 
-    public DataSubjectMapping( @NotBlank(message = "error.message.name.notNull.orEmpty")
-                               @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty Set<BigInteger> dataCategories) {
+    public DataSubjectMapping(@NotBlank(message = "error.message.name.notNull.orEmpty")
+                               @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
         this.dataCategories = dataCategories;
     }
 
-    public DataSubjectMapping(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name,@NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
+    public DataSubjectMapping(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
         this.name = name;
         this.description=description;
     }
@@ -65,11 +68,11 @@ public class DataSubjectMapping {
         this.countryId = countryId;
     }
 
-    public Set<BigInteger> getDataCategories() {
+    public List<DataCategory> getDataCategories() {
         return dataCategories;
     }
 
-    public void setDataCategories(Set<BigInteger> dataCategories) {
+    public void setDataCategories(List<DataCategory> dataCategories) {
         this.dataCategories = dataCategories;
     }
 
@@ -89,20 +92,20 @@ public class DataSubjectMapping {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationType> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubType> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
 

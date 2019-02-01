@@ -5,13 +5,13 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
+import com.kairos.persistence.model.agreement_template.AgreementSectionDeprecated;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
-import com.kairos.persistence.model.agreement_template.AgreementSectionMD;
+import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplateDeprecated;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplateMD;
-import com.kairos.persistence.model.clause.Clause;
+import com.kairos.persistence.model.clause.ClauseDeprecated;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
-import com.kairos.persistence.model.clause.ClauseMD;
+import com.kairos.persistence.model.clause.Clause;
 import com.kairos.persistence.model.embeddables.CoverPage;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionRepository;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementRepository;
@@ -67,13 +67,13 @@ public class AgreementSectionService{
      */
     public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long referenceId, boolean isUnitId, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
         AgreementTemplateSectionResponseDTO agreementTemplateSectionResponseDTO = new AgreementTemplateSectionResponseDTO();
-        PolicyAgreementTemplateMD policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId, false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId,referenceId, false);
+        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId, false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId,referenceId, false);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }
         if (CollectionUtils.isNotEmpty(agreementTemplateSectionDTO.getSections())) {
             checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementTemplateSectionDTO.getSections());
-            List<AgreementSectionMD> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getSections());
+            List<AgreementSection> agreementSections = saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(agreementTemplateSectionDTO.getSections());
             policyAgreementTemplate.setAgreementSections(agreementSections);
         }
         policyAgreementTemplate.setSignatureComponentAdded(agreementTemplateSectionDTO.isSignatureComponentAdded());
@@ -109,16 +109,16 @@ public class AgreementSectionService{
     }
 
 
-    private List<AgreementSectionMD> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList){
+    private List<AgreementSection> saveNewClausesAndMapToEmbeddedClausesOfSectionDTO(List<AgreementSectionDTO> sectionDTOList){
         List<ClauseBasicDTO> newClauses = findNewClauses(sectionDTOList);
-        List<ClauseMD> clauses = ObjectMapperUtils.copyPropertiesOfListByMapper(newClauses, ClauseMD.class);
+        List<Clause> clauses = ObjectMapperUtils.copyPropertiesOfListByMapper(newClauses, Clause.class);
         clauses = clauseRepository.saveAll(clauses);
         Map<UUID,Long > clauseData = new HashMap<>();
         clauses.forEach(clause -> {
             clauseData.put(clause.getTempClauseId(), clause.getId());
         });
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSectionMD.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(sectionDTOList, AgreementSection.class);
     }
 
     /**
@@ -128,11 +128,11 @@ public class AgreementSectionService{
      */
     public boolean deleteAgreementSection(Long referenceId, boolean isUnitId, Long templateId, Long sectionId) {
 
-        AgreementSectionMD agreementSection = isUnitId ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId, false) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId, false);
+        AgreementSection agreementSection = isUnitId ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId, false) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId, false);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
         }
-        PolicyAgreementTemplateMD policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId, false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId, referenceId, false);
+        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId, false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId, referenceId, false);
         policyAgreementTemplate.getAgreementSections().remove(agreementSection);
         policyAgreementRepository.save(policyAgreementTemplate);
         agreementSection.delete();
@@ -165,17 +165,17 @@ public class AgreementSectionService{
      * @param globalAgreementSectionAndClauseDTOListHashMap
      */
     //todo refactored for country and unit both
-    private void buildAgreementSectionAndSubSection(Long referenceId, boolean isUnitId, List<AgreementSectionDTO> agreementSectionDTOs, Map<AgreementSection, List<AgreementSection>> agreementSubSectionsCorrespondingToAgreementSection,
-                                                    Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap) {
+    private void buildAgreementSectionAndSubSection(Long referenceId, boolean isUnitId, List<AgreementSectionDTO> agreementSectionDTOs, Map<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> agreementSubSectionsCorrespondingToAgreementSection,
+                                                    Map<AgreementSectionDeprecated, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap) {
 
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
-            AgreementSection agreementSection = new AgreementSection(agreementSectionDTO.getTitle(), agreementSectionDTO.getOrderedIndex(), false, agreementSectionDTO.getTitleHtml());
+            AgreementSectionDeprecated agreementSection = new AgreementSectionDeprecated(agreementSectionDTO.getTitle(), agreementSectionDTO.getOrderedIndex(), false, agreementSectionDTO.getTitleHtml());
            //TODO
             // if (isUnitId) agreementSection.setOrganizationId(referenceId);
             //else agreementSection.setCountryIdList(referenceId);
-            List<AgreementSection> subSectionList = new ArrayList<>();
+            List<AgreementSectionDeprecated> subSectionList = new ArrayList<>();
             for (AgreementSectionDTO subSectionDTO : agreementSectionDTO.getAgreementSubSections()) {
-                AgreementSection subSection = new AgreementSection(subSectionDTO.getTitle(), subSectionDTO.getOrderedIndex(), true, subSectionDTO.getTitleHtml());
+                AgreementSectionDeprecated subSection = new AgreementSectionDeprecated(subSectionDTO.getTitle(), subSectionDTO.getOrderedIndex(), true, subSectionDTO.getTitleHtml());
                 //TODO
                 //if (isUnitId) subSection.setOrganizationId(referenceId);
                 //else subSection.setCountryIdList(referenceId);
@@ -196,15 +196,15 @@ public class AgreementSectionService{
      * @param agreementSectionList
      * @param agreementSubSectionListAndCorrespondingToAgreementSectionMap
      */
-    private void saveAgreementSectionAndSubSectionIfClauseNotExist(List<AgreementSection> agreementSectionList, Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCorrespondingToAgreementSectionMap) {
-        List<AgreementSection> subSectionList = new ArrayList<>();
+    private void saveAgreementSectionAndSubSectionIfClauseNotExist(List<AgreementSectionDeprecated> agreementSectionList, Map<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> agreementSubSectionListAndCorrespondingToAgreementSectionMap) {
+        List<AgreementSectionDeprecated> subSectionList = new ArrayList<>();
         agreementSubSectionListAndCorrespondingToAgreementSectionMap.forEach((agreementSection, subSections) -> subSectionList.addAll(subSections));
         if (CollectionUtils.isNotEmpty(subSectionList)) {
            // agreementSectionMongoRepository.saveAll(getNextSequence(subSectionList));
         }
-        for (Map.Entry<AgreementSection, List<AgreementSection>> entrySet : agreementSubSectionListAndCorrespondingToAgreementSectionMap.entrySet()) {
-            AgreementSection agreementSection = entrySet.getKey();
-            List<AgreementSection> agreementSubSections = entrySet.getValue();
+        for (Map.Entry<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> entrySet : agreementSubSectionListAndCorrespondingToAgreementSectionMap.entrySet()) {
+            AgreementSectionDeprecated agreementSection = entrySet.getKey();
+            List<AgreementSectionDeprecated> agreementSubSections = entrySet.getValue();
             if (CollectionUtils.isNotEmpty(agreementSubSections)) {
                 //entrySet.getKey().getSubSections().addAll(agreementSubSections.stream().map(AgreementSection::getId).collect(Collectors.toList()));
             }
@@ -222,18 +222,18 @@ public class AgreementSectionService{
      * and if save call is second time and section contain id then sections with no id equals to newAgreementSectionDTOList.
      * method create section ,Sub Section clause and update clauses,section ,sub section.
      */
-    public List<BigInteger> createOrUpdateSectionAndSubSectionOfAgreementTemplate(Long referenceId, boolean isUnitid, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplateMD policyAgreementTemplate) {
+    public List<BigInteger> createOrUpdateSectionAndSubSectionOfAgreementTemplate(Long referenceId, boolean isUnitid, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
-        Map<AgreementSectionMD, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
+        Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
         List<AgreementSectionDTO> newAgreementSectionDTOList = new ArrayList<>();
         List<Long> agreementSectionIdList = new ArrayList<>();
-        Map<Long, List<AgreementSectionMD>> newSubSectionListCoresspondingToSection = new HashMap<>();
+        Map<Long, List<AgreementSection>> newSubSectionListCoresspondingToSection = new HashMap<>();
         Map<Long, AgreementSectionDTO> agreementSectionDTOMap = new HashMap<>();
         agreementSectionDTOS.forEach(agreementSectionDTO -> {
             if (!Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
                 newAgreementSectionDTOList.add(agreementSectionDTO);
             } else {
-                List<AgreementSection> subSectionListCoresspondingToAgreementSection = new ArrayList<>();
+                List<AgreementSectionDeprecated> subSectionListCoresspondingToAgreementSection = new ArrayList<>();
                 agreementSectionIdList.add(agreementSectionDTO.getId());
                 agreementSectionDTOMap.put(agreementSectionDTO.getId(), agreementSectionDTO);
                 if (CollectionUtils.isNotEmpty(agreementSectionDTO.getAgreementSubSections())) {
@@ -243,7 +243,7 @@ public class AgreementSectionService{
                             subSectionIdList.add(agreementSubSectionDTO.getId());
                             agreementSectionDTOMap.put(agreementSubSectionDTO.getId(), agreementSubSectionDTO);
                         } else {
-                            AgreementSection subSection = new AgreementSection(agreementSubSectionDTO.getTitle(), agreementSubSectionDTO.getOrderedIndex(), true, agreementSubSectionDTO.getTitleHtml());
+                            AgreementSectionDeprecated subSection = new AgreementSectionDeprecated(agreementSubSectionDTO.getTitle(), agreementSubSectionDTO.getOrderedIndex(), true, agreementSubSectionDTO.getTitleHtml());
                             if (isUnitid) {
                                 // subSection.setOrganizationId(referenceId);
                             }
@@ -260,11 +260,11 @@ public class AgreementSectionService{
                 //newSubSectionListCoresspondingToSection.put(agreementSectionDTO.getId(), subSectionListCoresspondingToAgreementSection);
             }
         });
-        Map<AgreementSection, List<AgreementSection>> agreementSubSectionListCoresspondingToAgreementSection = new HashMap<>();
+        Map<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> agreementSubSectionListCoresspondingToAgreementSection = new HashMap<>();
         if (CollectionUtils.isNotEmpty(newAgreementSectionDTOList)) {
             //buildAgreementSectionAndSubSection(referenceId, isUnitid, newAgreementSectionDTOList, agreementSubSectionListCoresspondingToAgreementSection, globalAgreementSectionAndClauseDTOListHashMap);
         }
-        List<AgreementSection> agreementSectionList = new ArrayList<>();
+        List<AgreementSectionDeprecated> agreementSectionList = new ArrayList<>();
        /* List<AgreementSection> agreementSections = isUnitid ? agreementSectionMongoRepository.findAllByUnitIdAndIds(referenceId, agreementSectionIdList) : agreementSectionMongoRepository.findAllByCountryIdAndIds(referenceId, agreementSectionIdList);
         updateExistingSectionAndSubSection(agreementSections, agreementSectionDTOMap, newSubSectionListCoresspondingToSection, globalAgreementSectionAndClauseDTOListHashMap
                 , agreementSubSectionListCoresspondingToAgreementSection);
@@ -290,10 +290,10 @@ public class AgreementSectionService{
      * @param globalAgreementSectionAndClauseDTOListHashMap          - Clause DTO list Corresponding to sections and sub sections
      * @param agreementSubSectionListCorrespondingToAgreementSection list of agreement sub section Corresponding to section
      */
-    private void updateExistingSectionAndSubSection(List<AgreementSection> agreementSections, Map<BigInteger, AgreementSectionDTO> agreementSectionDTOMap,
-                                                    Map<BigInteger, List<AgreementSection>> newSubSectionListCorrespondingToSection,
-                                                    Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
-                                                    Map<AgreementSection, List<AgreementSection>> agreementSubSectionListCorrespondingToAgreementSection) {
+    private void updateExistingSectionAndSubSection(List<AgreementSectionDeprecated> agreementSections, Map<BigInteger, AgreementSectionDTO> agreementSectionDTOMap,
+                                                    Map<BigInteger, List<AgreementSectionDeprecated>> newSubSectionListCorrespondingToSection,
+                                                    Map<AgreementSectionDeprecated, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
+                                                    Map<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> agreementSubSectionListCorrespondingToAgreementSection) {
         //TODO
         /*for (AgreementSection agreementSection : agreementSections) {
             AgreementSectionDTO agreementSectionDTO = agreementSectionDTOMap.get(agreementSection.getId());
@@ -319,12 +319,12 @@ public class AgreementSectionService{
      * @param agreementTemplate
      */
     //todo refactored for unit and country both
-    private List<AgreementSection> saveAndUpdateClauseOfAgreementSection(Long referenceId, boolean isUnitId, Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
-                                                                         Map<AgreementSection, List<AgreementSection>> agreementSectionAndSubSectionListMap, PolicyAgreementTemplate agreementTemplate) {
+    private List<AgreementSectionDeprecated> saveAndUpdateClauseOfAgreementSection(Long referenceId, boolean isUnitId, Map<AgreementSectionDeprecated, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
+                                                                                   Map<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> agreementSectionAndSubSectionListMap, PolicyAgreementTemplateDeprecated agreementTemplate) {
 
-        List<Clause> clauseList = new ArrayList<>();
-        Map<AgreementSection, List<Clause>> clauseListCorrespondingToAgreementSection = new HashMap<>();
-        Map<AgreementSection, List<ClauseBasicDTO>> exisitingClauseListCorrespondingToAgreementSections = new HashMap<>();
+        List<ClauseDeprecated> clauseList = new ArrayList<>();
+        Map<AgreementSectionDeprecated, List<ClauseDeprecated>> clauseListCorrespondingToAgreementSection = new HashMap<>();
+        Map<AgreementSectionDeprecated, List<ClauseBasicDTO>> exisitingClauseListCorrespondingToAgreementSections = new HashMap<>();
         Set<BigInteger> alteredClauseIdList = new HashSet<>();
        // ClauseTag defaultTag = clauseTagMongoRepository.findDefaultTag();
         //agreementTemplate.setDefaultClauseTag(defaultTag);
@@ -342,7 +342,7 @@ public class AgreementSectionService{
             if (!existingClauseList.isEmpty()) {
                 exisitingClauseListCorrespondingToAgreementSections.put(agreementSection, existingClauseList);
             }
-            List<Clause> clauseRelatedToAgreementSection = new ArrayList<>();
+            List<ClauseDeprecated> clauseRelatedToAgreementSection = new ArrayList<>();
             if (!newClauseRelatedToAgreementSection.isEmpty()) {
                 clauseRelatedToAgreementSection = buildClauseForAgreementSection(referenceId, isUnitId, newClauseRelatedToAgreementSection, agreementTemplate);
                 clauseList.addAll(clauseRelatedToAgreementSection);
@@ -352,7 +352,7 @@ public class AgreementSectionService{
         if (!exisitingClauseListCorrespondingToAgreementSections.isEmpty()) {
             clauseList.addAll(updateClauseListOfAgreementSection(referenceId, isUnitId, alteredClauseIdList, exisitingClauseListCorrespondingToAgreementSections, clauseListCorrespondingToAgreementSection, agreementTemplate));
         }
-        List<AgreementSection> agreementSubSections = new ArrayList<>();
+        List<AgreementSectionDeprecated> agreementSubSections = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(clauseList)) {
            // clauseMongoRepository.saveAll(getNextSequence(clauseList));
         }
@@ -378,8 +378,8 @@ public class AgreementSectionService{
      * @param clauseListCorrespondingToAgreementSection
      * @param
      */
-    private void sortClauseByOrderIndexAndAddClauseIdToAgreementSectionAndSubSections(Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCorrespondingToAgreementSectionMap, List<AgreementSection> subSections,
-                                                                                      Map<AgreementSection, List<Clause>> clauseListCorrespondingToAgreementSection) {
+    private void sortClauseByOrderIndexAndAddClauseIdToAgreementSectionAndSubSections(Map<AgreementSectionDeprecated, List<AgreementSectionDeprecated>> agreementSubSectionListAndCorrespondingToAgreementSectionMap, List<AgreementSectionDeprecated> subSections,
+                                                                                      Map<AgreementSectionDeprecated, List<ClauseDeprecated>> clauseListCorrespondingToAgreementSection) {
         agreementSubSectionListAndCorrespondingToAgreementSectionMap.forEach((agreementSection, subSectionList) ->
         {
             mapClauseCkEditorHtmlAndSortClauseArray(agreementSection, clauseListCorrespondingToAgreementSection.get(agreementSection));
@@ -398,10 +398,10 @@ public class AgreementSectionService{
     }
 
 
-    private void mapClauseCkEditorHtmlAndSortClauseArray(AgreementSection agreementSection, List<Clause> clauseList) {
+    private void mapClauseCkEditorHtmlAndSortClauseArray(AgreementSectionDeprecated agreementSection, List<ClauseDeprecated> clauseList) {
         if (CollectionUtils.isNotEmpty(clauseList)) {
             Set<ClauseCkEditorVO> clauseCkEditorVOS = new HashSet<>();
-            List<Clause> clauses = clauseList.stream().sorted(Comparator.comparing(Clause::getOrderedIndex)).collect(Collectors.toList());
+            List<ClauseDeprecated> clauses = clauseList.stream().sorted(Comparator.comparing(ClauseDeprecated::getOrderedIndex)).collect(Collectors.toList());
 //            clauses.forEach(clause -> clauseCkEditorVOS.add(new ClauseCkEditorVO(clause.getId(), clause.getTitleHtml(), clause.getDescriptionHtml())));
             //agreementSection.setClauseIdOrderedIndex(clauses.stream().map(Clause::getId).collect(Collectors.toList()));
             agreementSection.setClauseCkEditorVOS(clauseCkEditorVOS);
@@ -415,14 +415,14 @@ public class AgreementSectionService{
      * @param policyAgreementTemplate
      * @return
      */
-    private List<Clause> buildClauseForAgreementSection(Long referenceId, boolean isUnitId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+    private List<ClauseDeprecated> buildClauseForAgreementSection(Long referenceId, boolean isUnitId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplateDeprecated policyAgreementTemplate) {
 
 
         List<String> clauseTitles = new ArrayList<>();
-        List<Clause> clauseList = new ArrayList<>();
+        List<ClauseDeprecated> clauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
             clauseTitles.add(clauseBasicDTO.getTitle());
-            Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription());
+            ClauseDeprecated clause = new ClauseDeprecated(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription());
             if (isUnitId) {
                 //clause.setOrganizationId(referenceId);
             } else {
@@ -457,10 +457,10 @@ public class AgreementSectionService{
      * @param agreementSectionClauseList
      * @return
      */
-    private List<Clause> updateClauseListOfAgreementSection(Long referenceId, boolean isUnitId, Set<BigInteger> clauseIds,
-                                                            Map<AgreementSection, List<ClauseBasicDTO>> existingClauseMap,
-                                                            Map<AgreementSection, List<Clause>> agreementSectionClauseList,
-                                                            PolicyAgreementTemplate agreementTemplate) {
+    private List<ClauseDeprecated> updateClauseListOfAgreementSection(Long referenceId, boolean isUnitId, Set<BigInteger> clauseIds,
+                                                                      Map<AgreementSectionDeprecated, List<ClauseBasicDTO>> existingClauseMap,
+                                                                      Map<AgreementSectionDeprecated, List<ClauseDeprecated>> agreementSectionClauseList,
+                                                                      PolicyAgreementTemplateDeprecated agreementTemplate) {
 
             //TODO
         /*Set<BigInteger> clauseIdListPresentInOtherSectionAndSubSection = policyAgreementTemplateRepository.getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(referenceId, isUnitId, agreementTemplate.getId(), clauseIds);
@@ -491,9 +491,9 @@ public class AgreementSectionService{
     }
 
 
-    private Clause createVersionOfClause(Long referenceId, boolean isUnitd, ClauseBasicDTO clauseBasicDTO, PolicyAgreementTemplate policyAgreementTemplate) {
+    private ClauseDeprecated createVersionOfClause(Long referenceId, boolean isUnitd, ClauseBasicDTO clauseBasicDTO, PolicyAgreementTemplateDeprecated policyAgreementTemplate) {
 
-        Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription());
+        ClauseDeprecated clause = new ClauseDeprecated(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription());
         if (isUnitd) {
            // clause.setOrganizationId(referenceId);
         } else {

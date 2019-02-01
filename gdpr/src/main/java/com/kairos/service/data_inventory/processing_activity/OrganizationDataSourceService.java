@@ -6,7 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.DataSourceDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSourceMD;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
@@ -53,9 +53,9 @@ public class OrganizationDataSourceService{
      * and if exist then simply add  DataSource to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public Map<String, List<DataSourceMD>> createDataSource(Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
+    public Map<String, List<DataSource>> createDataSource(Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
 
-        Map<String, List<DataSourceMD>> result = new HashMap<>();
+        Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
         if (!dataSourceDTOS.isEmpty()) {
             for (DataSourceDTO dataSource : dataSourceDTOS) {
@@ -64,13 +64,13 @@ public class OrganizationDataSourceService{
             List<String> nameInLowerCase = dataSourceNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<DataSourceMD> existing = dataSourceRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            List<DataSource> existing = dataSourceRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
-            List<DataSourceMD> newDataSources = new ArrayList<>();
+            List<DataSource> newDataSources = new ArrayList<>();
             if (dataSourceNames.size() != 0) {
                 for (String name : dataSourceNames) {
-                    DataSourceMD newDataSource = new DataSourceMD(name);
+                    DataSource newDataSource = new DataSource(name);
                     newDataSource.setOrganizationId(organizationId);
                     newDataSources.add(newDataSource);
 
@@ -101,9 +101,9 @@ public class OrganizationDataSourceService{
      * @return DataSource object fetch by given id
      * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
-    public DataSourceMD getDataSource(Long organizationId, Long id) {
+    public DataSource getDataSource(Long organizationId, Long id) {
 
-        DataSourceMD exist = dataSourceRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
+        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -130,7 +130,7 @@ public class OrganizationDataSourceService{
      */
     public DataSourceDTO updateDataSource(Long organizationId, Long id, DataSourceDTO dataSourceDTO) {
 
-        DataSourceMD dataSource = dataSourceRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, dataSourceDTO.getName());
+        DataSource dataSource = dataSourceRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
@@ -148,10 +148,10 @@ public class OrganizationDataSourceService{
 
     }
 
-    public Map<String, List<DataSourceMD>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
+    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
 
-        Map<String, List<DataSourceMD>> result = createDataSource(organizationId, dataSourceDTOS);
-        List<DataSourceMD> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, dataSourceDTOS);
+        Map<String, List<DataSource>> result = createDataSource(organizationId, dataSourceDTOS);
+        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, dataSourceDTOS);
         if (!masterDataSourceSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterDataSourceSuggestedByUnit);
         }

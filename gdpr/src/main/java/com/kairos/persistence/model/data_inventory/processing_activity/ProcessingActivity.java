@@ -1,53 +1,89 @@
 package com.kairos.persistence.model.data_inventory.processing_activity;
 
 
-import com.kairos.dto.gdpr.ManagingOrganization;
-import com.kairos.dto.gdpr.Staff;
-import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.embeddables.ManagingOrganization;
+import com.kairos.persistence.model.embeddables.Staff;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
+import com.kairos.persistence.model.risk_management.Risk;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-
-public class ProcessingActivity {
+@Entity
+public class ProcessingActivity extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
     @NotBlank(message = "Description can't be empty")
     private String description;
+
+    @Embedded
     private ManagingOrganization managingDepartment;
+
+    @Embedded
     private Staff processOwner;
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects = new ArrayList<>();
-    private List<BigInteger> linkedAssets = new ArrayList<>();
-    private List<BigInteger> processingPurposes;
-    private List<BigInteger> dataSources;
-    private List<BigInteger> transferMethods;
-    private List<BigInteger> accessorParties;
-    private List<BigInteger> processingLegalBasis;
-    private List<BigInteger> subProcessingActivities = new ArrayList<>();
-    private BigInteger responsibilityType;
+
+    Long countryId;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ProcessingPurpose> processingPurposes  = new ArrayList<>();
+
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<DataSource> dataSources  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<TransferMethod> transferMethods  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<AccessorParty> accessorParties  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ProcessingLegalBasis> processingLegalBasis  = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Asset> linkedAssets  = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="processingActivity_id")
+    private ProcessingActivity processingActivity;
+
+    @OneToMany(mappedBy = "processingActivity", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+    private List<ProcessingActivity> subProcessingActivities  = new ArrayList<>();
+
+    @OneToOne
+    ResponsibilityType responsibilityType;
+
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
-    private boolean active = true;
-    private boolean subProcess;
-    private Set<BigInteger> risks = new HashSet<>();
+
+    private boolean isSubProcessingActivity;
+
+    @OneToMany(cascade = CascadeType.PERSIST)
+    private List<RelatedDataSubject> dataSubjects = new ArrayList<>();
+
+
+   private boolean active = true;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Risk> risks  = new ArrayList<Risk>();
     private boolean suggested;
 
     public ProcessingActivity() {
     }
 
-    public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
+    public ProcessingActivity(String name, String description) {
         this.name = name;
         this.description = description;
-        this.managingDepartment = managingDepartment;
-        this.processOwner = processOwner;
+
     }
 
     public ProcessingActivity(String name, String description, boolean active) {
@@ -60,26 +96,18 @@ public class ProcessingActivity {
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
-    public Set<BigInteger> getRisks() { return risks; }
+    public List<RelatedDataSubject> getDataSubjects() {
+        return dataSubjects;
+    }
 
-    public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
-
-    public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
-    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
-
-    public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
-
-    public void setSubProcessingActivities(List<BigInteger> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
+    public void setDataSubjects(List<RelatedDataSubject> dataSubjects) {
+        this.dataSubjects = dataSubjects;
+    }
 
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
 
-    public boolean isSubProcess() {
-        return subProcess;
-    }
-
-    public void setSubProcess(boolean subProcess) { this.subProcess = subProcess; }
 
     public String getName() { return name; }
 
@@ -89,65 +117,178 @@ public class ProcessingActivity {
 
     public void setDescription(String description) { this.description = description; }
 
-    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() {
+        return managingDepartment;
+    }
 
-    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) {
+        this.managingDepartment = managingDepartment;
+    }
 
-    public Staff getProcessOwner() { return processOwner; }
+    public Staff getProcessOwner() {
+        return processOwner;
+    }
 
-    public void setProcessOwner(Staff processOwner) { this.processOwner = processOwner; }
+    public void setProcessOwner(Staff processOwner) {
+        this.processOwner = processOwner;
+    }
 
-    public List<BigInteger> getProcessingPurposes() { return processingPurposes; }
+    public List<ProcessingPurpose> getProcessingPurposes() {
+        return processingPurposes;
+    }
 
-    public void setProcessingPurposes(List<BigInteger> processingPurposes) { this.processingPurposes = processingPurposes; }
+    public void setProcessingPurposes(List<ProcessingPurpose> processingPurposes) {
+        this.processingPurposes = processingPurposes;
+    }
 
-    public List<BigInteger> getDataSources() { return dataSources; }
+    public List<DataSource> getDataSources() {
+        return dataSources;
+    }
 
-    public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
+    public void setDataSources(List<DataSource> dataSources) {
+        this.dataSources = dataSources;
+    }
 
-    public Integer getControllerContactInfo() { return controllerContactInfo; }
+    public List<TransferMethod> getTransferMethods() {
+        return transferMethods;
+    }
 
-    public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
+    public void setTransferMethods(List<TransferMethod> transferMethods) {
+        this.transferMethods = transferMethods;
+    }
 
-    public Integer getDpoContactInfo() { return dpoContactInfo; }
+    public List<AccessorParty> getAccessorParties() {
+        return accessorParties;
+    }
 
-    public void setDpoContactInfo(Integer dpoContactInfo) { this.dpoContactInfo = dpoContactInfo; }
+    public void setAccessorParties(List<AccessorParty> accessorParties) {
+        this.accessorParties = accessorParties;
+    }
 
-    public Integer getJointControllerContactInfo() { return jointControllerContactInfo; }
+    public List<ProcessingLegalBasis> getProcessingLegalBasis() {
+        return processingLegalBasis;
+    }
 
-    public void setJointControllerContactInfo(Integer jointControllerContactInfo) { this.jointControllerContactInfo = jointControllerContactInfo; }
+    public void setProcessingLegalBasis(List<ProcessingLegalBasis> processingLegalBasis) {
+        this.processingLegalBasis = processingLegalBasis;
+    }
 
-    public Long getMinDataSubjectVolume() { return minDataSubjectVolume; }
+    public List<Asset> getLinkedAssets() {
+        return linkedAssets;
+    }
 
-    public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
+    public void setLinkedAssets(List<Asset> linkedAssets) {
+        this.linkedAssets = linkedAssets;
+    }
 
-    public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
+    public ProcessingActivity getProcessingActivity() {
+        return processingActivity;
+    }
 
-    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) { this.maxDataSubjectVolume = maxDataSubjectVolume; }
+    public void setProcessingActivity(ProcessingActivity processingActivity) {
+        this.processingActivity = processingActivity;
+    }
 
-    public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
+    public List<ProcessingActivity> getSubProcessingActivities() {
+        return subProcessingActivities;
+    }
 
-    public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
+    public void setSubProcessingActivities(List<ProcessingActivity> subProcessingActivities) {
+        this.subProcessingActivities = subProcessingActivities;
+    }
 
-    public List<BigInteger> getAccessorParties() { return accessorParties; }
+    public ResponsibilityType getResponsibilityType() {
+        return responsibilityType;
+    }
 
-    public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
+    public void setResponsibilityType(ResponsibilityType responsibilityType) {
+        this.responsibilityType = responsibilityType;
+    }
 
-    public List<BigInteger> getTransferMethods() { return transferMethods; }
+    public Integer getControllerContactInfo() {
+        return controllerContactInfo;
+    }
 
-    public void setTransferMethods(List<BigInteger> transferMethods) { this.transferMethods = transferMethods; }
+    public void setControllerContactInfo(Integer controllerContactInfo) {
+        this.controllerContactInfo = controllerContactInfo;
+    }
 
-    public BigInteger getResponsibilityType() { return responsibilityType; }
+    public Integer getDpoContactInfo() {
+        return dpoContactInfo;
+    }
 
-    public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
+    public void setDpoContactInfo(Integer dpoContactInfo) {
+        this.dpoContactInfo = dpoContactInfo;
+    }
 
-    public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
+    public Integer getJointControllerContactInfo() {
+        return jointControllerContactInfo;
+    }
 
-    public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
+    public void setJointControllerContactInfo(Integer jointControllerContactInfo) {
+        this.jointControllerContactInfo = jointControllerContactInfo;
+    }
 
-    public List<BigInteger> getLinkedAssets() { return linkedAssets; }
+    public Long getMinDataSubjectVolume() {
+        return minDataSubjectVolume;
+    }
 
-    public void setLinkedAssets(List<BigInteger> linkedAssets) { this.linkedAssets = linkedAssets; }
+    public void setMinDataSubjectVolume(Long minDataSubjectVolume) {
+        this.minDataSubjectVolume = minDataSubjectVolume;
+    }
 
+    public Long getMaxDataSubjectVolume() {
+        return maxDataSubjectVolume;
+    }
 
+    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) {
+        this.maxDataSubjectVolume = maxDataSubjectVolume;
+    }
+
+    public Integer getDataRetentionPeriod() {
+        return dataRetentionPeriod;
+    }
+
+    public void setDataRetentionPeriod(Integer dataRetentionPeriod) {
+        this.dataRetentionPeriod = dataRetentionPeriod;
+    }
+
+    public boolean isSubProcessingActivity() {
+        return isSubProcessingActivity;
+    }
+
+    public void setSubProcessingActivity(boolean subProcessingActivity) {
+        this.isSubProcessingActivity = subProcessingActivity;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public List<Risk> getRisks() {
+        return risks;
+    }
+
+    public void setRisks(List<Risk> risks) {
+        this.risks = risks;
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.setDeleted(true);
+        this.getRisks().forEach( processingActivityRisk -> {
+            processingActivityRisk.delete();
+        });
+        if(!this.getSubProcessingActivities().isEmpty()) {
+            this.getSubProcessingActivities().forEach(subProcessingActivity -> {
+                subProcessingActivity.delete();
+            });
+        }
+
+    }
 }

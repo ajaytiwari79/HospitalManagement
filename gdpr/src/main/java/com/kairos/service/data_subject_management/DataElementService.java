@@ -2,8 +2,8 @@ package com.kairos.service.data_subject_management;
 
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.master_data.DataElementDTO;
-import com.kairos.persistence.model.master_data.data_category_element.DataCategoryMD;
-import com.kairos.persistence.model.master_data.data_category_element.DataElementMD;
+import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
+import com.kairos.persistence.model.master_data.data_category_element.DataElement;
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -34,16 +34,16 @@ public class DataElementService{
      * @return map of Data Elements  List  and new Data Elements ids
      * @decription method create new Data Elements throw exception if data element already exist
      */
-    public List<DataElementMD> createDataElements(Long referenceId, boolean isUnitId, List<DataElementDTO> dataElementsDto, DataCategoryMD dataCategory) {
+    public List<DataElement> createDataElements(Long referenceId, boolean isUnitId, List<DataElementDTO> dataElementsDto, DataCategory dataCategory) {
 
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
-        List<DataElementMD> existingDataElement = isUnitId ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
+        List<DataElement> existingDataElement = isUnitId ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         if (CollectionUtils.isNotEmpty(existingDataElement)) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
-        List<DataElementMD> dataElementList = new ArrayList<>();
+        List<DataElement> dataElementList = new ArrayList<>();
         for (String name : dataElementNames) {
-            DataElementMD dataElement = new DataElementMD(name);
+            DataElement dataElement = new DataElement(name);
             if (isUnitId)
                 dataElement.setOrganizationId(referenceId);
             else
@@ -63,16 +63,16 @@ public class DataElementService{
      */
 
     //TODO need to refactor
-    public List<DataElementMD> updateDataElementAndCreateNewDataElement(Long referenceId, boolean isUnitId, List<DataElementDTO> dataElementsDto) {
+    public List<DataElement> updateDataElementAndCreateNewDataElement(Long referenceId, boolean isUnitId, List<DataElementDTO> dataElementsDto) {
 
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
         Map<Long, DataElementDTO> dataElementDTOMap = new HashMap<>();
-        List<DataElementMD> dataElements = new ArrayList<>();
+        List<DataElement> dataElements = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
             if (Optional.ofNullable(dataElementDto.getId()).isPresent()) {
                 dataElementDTOMap.put(dataElementDto.getId(), dataElementDto);
             } else {
-                DataElementMD dataElement = new DataElementMD(dataElementDto.getName());
+                DataElement dataElement = new DataElement(dataElementDto.getName());
                 if (isUnitId)
                     dataElement.setOrganizationId(referenceId);
                 else
@@ -80,7 +80,7 @@ public class DataElementService{
                 dataElements.add(dataElement);
             }
         });
-        List<DataElementMD> previousDataElementList = isUnitId ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
+        List<DataElement> previousDataElementList = isUnitId ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         previousDataElementList.forEach(dataElement -> {
 
             if (!dataElementDTOMap.containsKey(dataElement.getId())) {

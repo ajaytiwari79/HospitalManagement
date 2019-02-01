@@ -10,8 +10,8 @@ import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataCategory;
 import com.kairos.persistence.model.data_inventory.processing_activity.*;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 //import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
-import com.kairos.persistence.model.master_data.data_category_element.DataElement;
-import com.kairos.persistence.model.risk_management.RiskMD;
+import com.kairos.persistence.model.master_data.data_category_element.DataElementDeprecated;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.RelatedDataSubjectRepository;
@@ -93,11 +93,11 @@ public class ProcessingActivityService {
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivityMD exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, processingActivityDTO.getName());
+        ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
-        ProcessingActivityMD processingActivity = new ProcessingActivityMD();
+        ProcessingActivity processingActivity = new ProcessingActivity();
         processingActivity = buildProcessingActivity(organizationId, processingActivityDTO, processingActivity);
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities()));
@@ -114,21 +114,21 @@ public class ProcessingActivityService {
     }
 
 
-    private List<RiskMD> updateExistingRisksOrCreateNewRisk(Long orgId, List<OrganizationLevelRiskDTO> riskDTOList, ProcessingActivityMD processingActivity){
+    private List<Risk> updateExistingRisksOrCreateNewRisk(Long orgId, List<OrganizationLevelRiskDTO> riskDTOList, ProcessingActivity processingActivity){
         Map<Long, OrganizationLevelRiskDTO> existingRiskDtoCorrespondingToIds = new HashMap<>();
-        List<RiskMD> risks = new ArrayList<>();
+        List<Risk> risks = new ArrayList<>();
         riskDTOList.forEach( riskDTO -> {
             if (Optional.ofNullable(riskDTO.getId()).isPresent()) {
                 existingRiskDtoCorrespondingToIds.put(riskDTO.getId(), riskDTO);
             }else{
-                risks.add(ObjectMapperUtils.copyPropertiesByMapper(riskDTO, RiskMD.class));
+                risks.add(ObjectMapperUtils.copyPropertiesByMapper(riskDTO, Risk.class));
             }
         });
         processingActivity.getRisks().forEach( processingActivityRisk -> {
             OrganizationLevelRiskDTO organizationLevelRiskDTO = existingRiskDtoCorrespondingToIds.get(processingActivityRisk.getId());
            /* processingActivityRisk.setName(organizationLevelRiskDTO.getName());
             processingActivityRisk.setDescription(organizationLevelRiskDTO.getDescription());*/
-            risks.add(ObjectMapperUtils.copyPropertiesByMapper(organizationLevelRiskDTO, RiskMD.class));
+            risks.add(ObjectMapperUtils.copyPropertiesByMapper(organizationLevelRiskDTO, Risk.class));
         });
         return risks;
     }
@@ -153,7 +153,7 @@ public class ProcessingActivityService {
     public ProcessingActivityDTO updateProcessingActivity(Long organizationId, Long id, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivityMD processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,  processingActivityDTO.getName());
+        ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,  processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
@@ -175,10 +175,10 @@ public class ProcessingActivityService {
 
     }
 
-    private List<ProcessingActivityMD> createSubProcessingActivity(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
-        List<ProcessingActivityMD> subProcessingActivities = new ArrayList<>();
+    private List<ProcessingActivity> createSubProcessingActivity(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+        List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         for (ProcessingActivityDTO processingActivityDTO : subProcessingActivityDTOs) {
-            ProcessingActivityMD subProcessingActivity = new ProcessingActivityMD();
+            ProcessingActivity subProcessingActivity = new ProcessingActivity();
             subProcessingActivity = buildProcessingActivity(organizationId, processingActivityDTO,subProcessingActivity);
             subProcessingActivity.setSubProcessingActivity(true);
             subProcessingActivities.add(subProcessingActivity);
@@ -187,8 +187,8 @@ public class ProcessingActivityService {
     }
 
 
-    private ProcessingActivityMD buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivityMD processingActivity) {
-        processingActivity = ObjectMapperUtils.copyPropertiesByMapper(processingActivityDTO, ProcessingActivityMD.class);
+    private ProcessingActivity buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
+        processingActivity = ObjectMapperUtils.copyPropertiesByMapper(processingActivityDTO, ProcessingActivity.class);
         processingActivity.setOrganizationId(organizationId);
        /* processingActivity.setName(processingActivityDTO.getName());
         processingActivity.setDescription(processingActivityDTO.getDescription());
@@ -213,7 +213,7 @@ public class ProcessingActivityService {
 
     }
 
-    private List<ProcessingActivityMD> updateExistingSubProcessingActivitiesAndCreateNewSubProcess(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+    private List<ProcessingActivity> updateExistingSubProcessingActivitiesAndCreateNewSubProcess(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
 
         List<ProcessingActivityDTO> newSubProcessingActivityDTOList = new ArrayList<>();
         Map<Long, ProcessingActivityDTO> existingSubProcessingActivityMap = new HashMap<>();
@@ -224,7 +224,7 @@ public class ProcessingActivityService {
                 newSubProcessingActivityDTOList.add(processingActivityDTO);
             }
         });
-        List<ProcessingActivityMD> subProcessingActivities = new ArrayList<>();
+        List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(existingSubProcessingActivityMap.keySet())) {
             subProcessingActivities.addAll(updateSubProcessingActivities(organizationId, existingSubProcessingActivityMap.keySet(), existingSubProcessingActivityMap));
         } else if (CollectionUtils.isNotEmpty(newSubProcessingActivityDTOList)) {
@@ -235,9 +235,9 @@ public class ProcessingActivityService {
     }
 
 
-    private List<ProcessingActivityMD> updateSubProcessingActivities(Long orgId, Set<Long> subProcessingActivityIds, Map<Long, ProcessingActivityDTO> subProcessingActivityMap) {
+    private List<ProcessingActivity> updateSubProcessingActivities(Long orgId, Set<Long> subProcessingActivityIds, Map<Long, ProcessingActivityDTO> subProcessingActivityMap) {
         List updatesSubProcessingActivities = new ArrayList();
-        List<ProcessingActivityMD> subProcessingActivities = processingActivityRepository.findSubProcessingActivitiesByIdsAndOrganisationId(orgId, subProcessingActivityIds);
+        List<ProcessingActivity> subProcessingActivities = processingActivityRepository.findSubProcessingActivitiesByIdsAndOrganisationId(orgId, subProcessingActivityIds);
         subProcessingActivities.forEach(subProcessingActivity -> {
             ProcessingActivityDTO processingActivityDTO = subProcessingActivityMap.get(subProcessingActivity.getId());
             subProcessingActivity = buildProcessingActivity(orgId, processingActivityDTO, subProcessingActivity);
@@ -255,7 +255,7 @@ public class ProcessingActivityService {
      */
     public boolean deleteProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivityMD processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId, unitId, false);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId, unitId, false);
         processingActivity.delete();
         processingActivityRepository.save(processingActivity);
         return true;
@@ -265,7 +265,7 @@ public class ProcessingActivityService {
 
     public boolean deleteSubProcessingActivity(Long unitId, Long processingActivityId, Long subProcessingActivityId) {
 
-        ProcessingActivityMD processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndProcessingActivityId(subProcessingActivityId,unitId, processingActivityId);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndProcessingActivityId(subProcessingActivityId,unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", processingActivityId);
         }
@@ -279,7 +279,7 @@ public class ProcessingActivityService {
 
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long unitId) {
         List<ProcessingActivityResponseDTO> processingActivityResponseDTOS = new ArrayList<>();
-        List<ProcessingActivityMD> processingActivitys = processingActivityRepository.findAllByOrganizationId(unitId);
+        List<ProcessingActivity> processingActivitys = processingActivityRepository.findAllByOrganizationId(unitId);
         processingActivitys.forEach(processingActivity -> {
             processingActivityResponseDTOS.add(prepareProcessingActivityResponseData(processingActivity));
            /* if (!Optional.ofNullable(processingActivityResponseDTO.getSubProcessingActivities().get(0).getId()).isPresent()) {
@@ -290,7 +290,7 @@ public class ProcessingActivityService {
     }
 
 
-    ProcessingActivityResponseDTO prepareProcessingActivityResponseData(ProcessingActivityMD processingActivity){
+    ProcessingActivityResponseDTO prepareProcessingActivityResponseData(ProcessingActivity processingActivity){
         /*ProcessingActivityResponseDTO processingActivityResponseDTO = new ProcessingActivityResponseDTO();
         processingActivityResponseDTO.setId(processingActivityResponseDTO.getId());
         processingActivityResponseDTO.setName(processingActivity.getName());
@@ -341,10 +341,10 @@ public class ProcessingActivityService {
      */
     public List<Map<String, Object>> getProcessingActivityActivitiesHistory(Long processingActivityId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivityMD.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
-        return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivityMD.class);
+        return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivity.class);
 
     }
 
@@ -407,7 +407,7 @@ public class ProcessingActivityService {
      */
     public List<ProcessingActivityRelatedDataSubject> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivityMD processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId,unitId, false);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId,unitId, false);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
@@ -512,7 +512,7 @@ public class ProcessingActivityService {
             dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 
                 if (dataElementsCorrespondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
-                    List<DataElement> dataElementBasicResponseDTOS = new ArrayList<>();
+                    List<DataElementDeprecated> dataElementBasicResponseDTOS = new ArrayList<>();
                     Set<Long> dataElementIdList = dataElementsCorrespondingToDataCategory.get(dataCategoryResponseDTO.getId());
                     dataCategoryResponseDTO.getDataElements().forEach(dataElementBasicResponseDTO -> {
                         if (dataElementIdList.contains(dataElementBasicResponseDTO.getId())) {

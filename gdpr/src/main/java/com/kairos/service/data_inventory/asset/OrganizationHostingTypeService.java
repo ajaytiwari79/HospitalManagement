@@ -4,7 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.HostingTypeMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -48,9 +48,9 @@ public class OrganizationHostingTypeService{
      * and if exist then simply add  HostingType to existing list and return list ;
      * findByOrganizationIdAndNamesList()  return list of existing HostingType using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingTypeMD>> createHostingType(Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
+    public Map<String, List<HostingType>> createHostingType(Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
 
-        Map<String, List<HostingTypeMD>> result = new HashMap<>();
+        Map<String, List<HostingType>> result = new HashMap<>();
         Set<String> hostingTypeNames = new HashSet<>();
         if (!hostingTypeDTOS.isEmpty()) {
             for (HostingTypeDTO hostingType : hostingTypeDTOS) {
@@ -62,12 +62,12 @@ public class OrganizationHostingTypeService{
             List<String> nameInLowerCase = hostingTypeNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<HostingTypeMD> existing = hostingTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            List<HostingType> existing = hostingTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
-            List<HostingTypeMD> newHostingTypes = new ArrayList<>();
+            List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
                 for (String name : hostingTypeNames) {
-                    HostingTypeMD newHostingType = new HostingTypeMD(name);
+                    HostingType newHostingType = new HostingType(name);
                     newHostingType.setOrganizationId(organizationId);
                     newHostingTypes.add(newHostingType);
                 }
@@ -100,9 +100,9 @@ public class OrganizationHostingTypeService{
      * @return HostingType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if HostingType not found for given id
      */
-    public HostingTypeMD getHostingType(Long organizationId, Long id) {
+    public HostingType getHostingType(Long organizationId, Long id) {
 
-        HostingTypeMD exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        HostingType exist = hostingTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -134,7 +134,7 @@ public class OrganizationHostingTypeService{
     public HostingTypeDTO updateHostingType(Long organizationId, Long id, HostingTypeDTO hostingTypeDTO) {
 
 
-        HostingTypeMD hostingType = hostingTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, hostingTypeDTO.getName());
+        HostingType hostingType = hostingTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, hostingTypeDTO.getName());
         if (Optional.ofNullable(hostingType).isPresent()) {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
@@ -153,10 +153,10 @@ public class OrganizationHostingTypeService{
     }
 
 
-    public Map<String, List<HostingTypeMD>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
+    public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
 
-        Map<String, List<HostingTypeMD>> result = createHostingType(organizationId, hostingTypeDTOS);
-        List<HostingTypeMD> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, hostingTypeDTOS);
+        Map<String, List<HostingType>> result = createHostingType(organizationId, hostingTypeDTOS);
+        List<HostingType> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, hostingTypeDTOS);
         if (!masterHostingTypeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterHostingTypeSuggestedByUnit);
         }

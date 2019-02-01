@@ -1,57 +1,72 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.dto.gdpr.ServiceCategoryDTO;
-import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
+import com.kairos.persistence.model.risk_management.Risk;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MasterProcessingActivity {
+@Entity
+public class MasterProcessingActivity extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
-    private List<ServiceCategoryDTO> organizationServices;
-    private List<SubServiceCategoryDTO> organizationSubServices;
-    private List<BigInteger> subProcessingActivityIds;
+
+    @ElementCollection
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <ServiceCategory> organizationServices = new ArrayList<>();
+
+    @ElementCollection
+    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Risk> risks  = new ArrayList<Risk>();
+
+    @ManyToOne
+    @JoinColumn(name="masterProcessingActivity_id")
+    private MasterProcessingActivity masterProcessingActivity;
+
+    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<MasterProcessingActivity> subProcessingActivities =new ArrayList<MasterProcessingActivity>();
+
     private Long countryId;
-    private List<BigInteger> risks=new ArrayList<>();
-    private boolean subProcess;
+    private boolean subProcessActivity;
     private boolean hasSubProcessingActivity;
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
-
 
     public MasterProcessingActivity() {
 
     }
 
 
-    public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+   public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus, Long countryId) {
         this.name = name;
         this.description = description;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
-        this.organizationServices = organizationServices;
-        this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
+        this.countryId = countryId;
     }
 
-    public MasterProcessingActivity( String name, String description, Long countryId,SuggestedDataStatus suggestedDataStatus,LocalDate suggestedDate) {
+    public MasterProcessingActivity(String name, String description, Long countryId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
         this.name = name;
         this.description = description;
         this.countryId = countryId;
-        this.subProcess = subProcess;
+        this.subProcessActivity = subProcessActivity;
         this.suggestedDataStatus=suggestedDataStatus;
         this.suggestedDate=suggestedDate;
     }
@@ -64,9 +79,9 @@ public class MasterProcessingActivity {
 
     public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
-    public boolean isSubProcess() { return subProcess; }
+    public boolean isSubProcessActivity() { return subProcessActivity; }
 
-    public MasterProcessingActivity setSubProcess(boolean subProcess) { this.subProcess = subProcess; return this;}
+    public MasterProcessingActivity setSubProcessActivity(boolean subProcessActivity) { this.subProcessActivity = subProcessActivity; return this;}
 
     public boolean isHasSubProcessingActivity() { return hasSubProcessingActivity; }
 
@@ -80,12 +95,6 @@ public class MasterProcessingActivity {
         this.countryId = countryId;
     }
 
-    public List<BigInteger> getSubProcessingActivityIds() {
-        return subProcessingActivityIds;
-    }
-
-    public void setSubProcessingActivityIds(List<BigInteger> subProcessingActivityIds) { this.subProcessingActivityIds = subProcessingActivityIds; }
-
     public String getName() {
         return name;
     }
@@ -98,33 +107,59 @@ public class MasterProcessingActivity {
 
     public MasterProcessingActivity setDescription(String description) { this.description = description; return this; }
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationType> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public MasterProcessingActivity setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS;  return this;}
-
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public MasterProcessingActivity setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; return this; }
+    public List<OrganizationSubType> getOrganizationSubTypes() {
+        return organizationSubTypes;
+    }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() {
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
+    }
+
+    public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public MasterProcessingActivity setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices;  return this;}
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+        this.organizationServices = organizationServices;
+    }
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
+    public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public MasterProcessingActivity setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
+    }
 
-    public List<BigInteger> getRisks() { return risks;}
+    public List<Risk> getRisks() {
+        return risks;
+    }
 
-    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
+    public void setRisks(List<Risk> risks) {
+        this.risks = risks;
+    }
 
+    public MasterProcessingActivity getMasterProcessingActivity() {
+        return masterProcessingActivity;
+    }
 
+    public void setMasterProcessingActivity(MasterProcessingActivity masterProcessingActivity) {
+        this.masterProcessingActivity = masterProcessingActivity;
+    }
+
+    public List<MasterProcessingActivity> getSubProcessingActivities() {
+        return subProcessingActivities;
+    }
+
+    public void setSubProcessingActivities(List<MasterProcessingActivity> subProcessingActivities) {
+        this.subProcessingActivities = subProcessingActivities;
+    }
 }

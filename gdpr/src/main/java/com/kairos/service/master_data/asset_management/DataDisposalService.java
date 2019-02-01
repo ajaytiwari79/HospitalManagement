@@ -5,7 +5,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposalMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -42,10 +42,10 @@ public class DataDisposalService{
      * and if exist then simply add  data disposal to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
-    public Map<String, List<DataDisposalMD>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
+    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, List<DataDisposalDTO> dataDisposalDTOS, boolean isSuggestion) {
 
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<DataDisposalMD>> result = new HashMap<>();
+        Map<String, List<DataDisposal>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
         for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
             dataDisposalsNames.add(dataDisposal.getName());
@@ -55,12 +55,12 @@ public class DataDisposalService{
                 .collect(Collectors.toList());
 
         //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataDisposalMD> existing = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+        List<DataDisposal> existing = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-        List<DataDisposalMD> newDataDisposals = new ArrayList<>();
+        List<DataDisposal> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposalMD newDataDisposal = new DataDisposalMD(name, countryId);
+                DataDisposal newDataDisposal = new DataDisposal(name, countryId);
                 if(isSuggestion){
                     newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                     newDataDisposal.setSuggestedDate(LocalDate.now());
@@ -93,8 +93,8 @@ public class DataDisposalService{
      * @return object of data disposal
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
-    public DataDisposalMD getDataDisposalById(Long countryId, Long id) {
-        DataDisposalMD exist = dataDisposalRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+    public DataDisposal getDataDisposalById(Long countryId, Long id) {
+        DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -125,7 +125,7 @@ public class DataDisposalService{
     public DataDisposalDTO updateDataDisposal(Long countryId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
-        DataDisposalMD dataDisposal = dataDisposalRepository.findByCountryIdAndDeletedAndName(countryId, false, dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalRepository.findByCountryIdAndDeletedAndName(countryId, false, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
@@ -147,8 +147,8 @@ public class DataDisposalService{
      * @return
      * @description method save data disposal suggested by unit
      */
-    public List<DataDisposalMD> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
-        Map<String, List<DataDisposalMD>> result = createDataDisposal(countryId, dataDisposalDTOS, true);
+    public List<DataDisposal> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
+        Map<String, List<DataDisposal>> result = createDataDisposal(countryId, dataDisposalDTOS, true);
         return result.get(NEW_DATA_LIST);
     }
 
@@ -158,7 +158,7 @@ public class DataDisposalService{
      * @param dataDisposalIds     - id of data disposal
      * @param suggestedDataStatus -status to update
      */
-    public List<DataDisposalMD> updateSuggestedStatusOfDataDisposals(Long countryId, Set<Long> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, Set<Long> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = dataDisposalRepository.updateMetadataStatus(countryId, dataDisposalIds, suggestedDataStatus);
         if(updateCount > 0){

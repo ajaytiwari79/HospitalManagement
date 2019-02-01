@@ -6,7 +6,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasureMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -43,9 +43,9 @@ public class TechnicalSecurityMeasureService{
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<TechnicalSecurityMeasureMD>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS, boolean isSuggestion) {
+    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<TechnicalSecurityMeasureMD>> result = new HashMap<>();
+        Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
         Set<String> techSecurityMeasureNames = new HashSet<>();
         if (!technicalSecurityMeasureDTOS.isEmpty()) {
             for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
@@ -55,13 +55,13 @@ public class TechnicalSecurityMeasureService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TechnicalSecurityMeasureMD> existing = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
-            List<TechnicalSecurityMeasureMD> newTechnicalMeasures = new ArrayList<>();
+            List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasureMD newTechnicalSecurityMeasure = new TechnicalSecurityMeasureMD(name,countryId);
+                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name,countryId);
                     if(isSuggestion){
                         newTechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         newTechnicalSecurityMeasure.setSuggestedDate(LocalDate.now());
@@ -100,9 +100,9 @@ public class TechnicalSecurityMeasureService{
      * @return object of TechnicalSecurityMeasure
      * @throws DataNotFoundByIdException throw exception if TechnicalSecurityMeasure not exist for given id
      */
-    public TechnicalSecurityMeasureMD getTechnicalSecurityMeasure(Long countryId, Long id) {
+    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, Long id) {
 
-        TechnicalSecurityMeasureMD exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -134,7 +134,7 @@ public class TechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
         //TODO What actually this code is doing?
-        TechnicalSecurityMeasureMD technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
@@ -158,8 +158,8 @@ public class TechnicalSecurityMeasureService{
      * @param technicalSecurityMeasureDTOS
      * @return
      */
-    public List<TechnicalSecurityMeasureMD> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
-        Map<String, List<TechnicalSecurityMeasureMD>> result = createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
+    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
+        Map<String, List<TechnicalSecurityMeasure>> result = createTechnicalSecurityMeasure(countryId, technicalSecurityMeasureDTOS, true);
         return result.get(NEW_DATA_LIST);
 
     }
@@ -172,7 +172,7 @@ public class TechnicalSecurityMeasureService{
      * @param suggestedDataStatus
      * @return
      */
-    public List<TechnicalSecurityMeasureMD> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<Long> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<Long> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = technicalSecurityMeasureRepository.updateMetadataStatus(countryId, techSecurityMeasureIds, suggestedDataStatus);
         if(updateCount > 0){

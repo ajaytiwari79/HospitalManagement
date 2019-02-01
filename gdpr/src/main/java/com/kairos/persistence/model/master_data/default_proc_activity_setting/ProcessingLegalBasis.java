@@ -2,13 +2,14 @@ package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-
+import com.kairos.persistence.model.common.BaseEntity;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-
-public class ProcessingLegalBasis {
+@Entity
+public class ProcessingLegalBasis extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
@@ -51,9 +52,18 @@ public class ProcessingLegalBasis {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Number and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public ProcessingLegalBasis(String name) {
         this.name = name;
     }
     public ProcessingLegalBasis() {
+    }
+
+    public ProcessingLegalBasis(Long id ) {
+        this.id = id;
     }
 }

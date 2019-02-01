@@ -8,7 +8,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurposeMD;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -48,9 +48,9 @@ public class ProcessingPurposeService{
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurposeMD>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS, boolean isSuggestion) {
+    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<ProcessingPurposeMD>> result = new HashMap<>();
+        Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
         if (!processingPurposeDTOS.isEmpty()) {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
@@ -63,13 +63,13 @@ public class ProcessingPurposeService{
             List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingPurposeMD> existing = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<ProcessingPurpose> existing = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
-            List<ProcessingPurposeMD> newProcessingPurposes = new ArrayList<>();
+            List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
             if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
-                    ProcessingPurposeMD newProcessingPurpose = new ProcessingPurposeMD(name,countryId);
+                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId);
                     if(isSuggestion){
                         newProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         newProcessingPurpose.setSuggestedDate(LocalDate.now());
@@ -106,8 +106,8 @@ public class ProcessingPurposeService{
      * @return ProcessingPurpose object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
-    public ProcessingPurposeMD getProcessingPurpose(Long countryId, Long id) {
-        ProcessingPurposeMD exist = processingPurposeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+    public ProcessingPurpose getProcessingPurpose(Long countryId, Long id) {
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -137,7 +137,7 @@ public class ProcessingPurposeService{
      * @return ProcessingPurpose updated object
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
-        ProcessingPurposeMD processingPurpose = processingPurposeRepository.findByCountryIdAndDeletedAndName( countryId, false, processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeRepository.findByCountryIdAndDeletedAndName( countryId, false, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
@@ -161,8 +161,8 @@ public class ProcessingPurposeService{
      * @param processingPurposeDTOS - processing purpose suggested by unit
      * @return
      */
-    public List<ProcessingPurposeMD> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
-        Map<String, List<ProcessingPurposeMD>> result = createProcessingPurpose(countryId, processingPurposeDTOS, true);
+    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
+        Map<String, List<ProcessingPurpose>> result = createProcessingPurpose(countryId, processingPurposeDTOS, true);
         return result.get(NEW_DATA_LIST);
 
     }
@@ -175,7 +175,7 @@ public class ProcessingPurposeService{
      * @param suggestedDataStatus
      * @return
      */
-    public List<ProcessingPurposeMD> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<Long> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<ProcessingPurpose> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<Long> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = processingPurposeRepository.updateMetadataStatus(countryId, processingPurposeIds,suggestedDataStatus);
         if(updateCount > 0){

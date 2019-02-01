@@ -42,17 +42,17 @@ public class DataCategoryService{
      */
     public DataCategoryDTO saveDataCategoryAndDataElement(Long referenceId, boolean isUnitId, DataCategoryDTO dataCategoryDto) {
 
-        DataCategoryMD previousDataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
+        DataCategory previousDataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(previousDataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
 
-        DataCategoryMD dataCategory = new DataCategoryMD(dataCategoryDto.getName());
+        DataCategory dataCategory = new DataCategory(dataCategoryDto.getName());
         if (isUnitId)
             dataCategory.setOrganizationId(referenceId);
         else
             dataCategory.setCountryId(referenceId);
-        List<DataElementMD> dataElementList = dataElementService.createDataElements(referenceId, isUnitId, dataCategoryDto.getDataElements(), dataCategory);
+        List<DataElement> dataElementList = dataElementService.createDataElements(referenceId, isUnitId, dataCategoryDto.getDataElements(), dataCategory);
         dataCategory.setDataElements(dataElementList);
         dataCategoryRepository.save(dataCategory);
         dataCategoryDto.setId(dataCategory.getId());
@@ -69,7 +69,7 @@ public class DataCategoryService{
      */
     public DataCategoryDTO updateDataCategoryAndDataElement(Long referenceId, boolean isUnitId, Long dataCategoryId, DataCategoryDTO dataCategoryDto) {
 
-        DataCategoryMD dataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
+        DataCategory dataCategory = isUnitId ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !dataCategoryId.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
@@ -77,7 +77,7 @@ public class DataCategoryService{
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
-        List<DataElementMD> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isUnitId, dataCategoryDto.getDataElements());
+        List<DataElement> dataElements = dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isUnitId, dataCategoryDto.getDataElements());
         dataCategory.setName(dataCategoryDto.getName());
        // dataCategory.setDataElements(dataElements);
         dataCategoryRepository.save(dataCategory);
@@ -112,7 +112,7 @@ public class DataCategoryService{
      * @return return data category with its data elements
      */
     public DataCategoryResponseDTO getDataCategoryWithDataElementByCountryIdAndId(Long countryId, Long dataCategoryId) {
-        DataCategoryMD dataCategory = dataCategoryRepository.getDataCategoryByCountryIdAndId(countryId, dataCategoryId);
+        DataCategory dataCategory = dataCategoryRepository.getDataCategoryByCountryIdAndId(countryId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
@@ -126,7 +126,7 @@ public class DataCategoryService{
      * @return return data category with its data elements
      */
     public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, Long dataCategoryId) {
-        DataCategoryMD dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
+        DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
         }
@@ -140,7 +140,7 @@ public class DataCategoryService{
      * @return return list of Data Category with data Elements
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByCountryId(Long countryId) {
-        List<DataCategoryMD> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
@@ -150,7 +150,7 @@ public class DataCategoryService{
      * @return return list of Data Category with data Elements
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
-        List<DataCategoryMD> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(unitId);
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(unitId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
@@ -159,8 +159,8 @@ public class DataCategoryService{
      * @param ids LIst of data category ids
      * @return return list of Data Category with data Elements
      */
-    public List<DataCategoryMD> getAllDataCategoriesByIds(Set<Long> ids) {
-        List<DataCategoryMD> dataCategories = dataCategoryRepository.getAllDataCategoriesByIds(ids);
+    public List<DataCategory> getAllDataCategoriesByIds(Set<Long> ids) {
+        List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByIds(ids);
         return dataCategories;
     }
 

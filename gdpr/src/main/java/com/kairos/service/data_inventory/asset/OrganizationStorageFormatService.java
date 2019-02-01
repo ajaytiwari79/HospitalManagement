@@ -4,7 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormatMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
@@ -52,9 +52,9 @@ public class OrganizationStorageFormatService{
      * and if exist then simply add  StorageFormat to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
-    public Map<String, List<StorageFormatMD>> createStorageFormat(Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
+    public Map<String, List<StorageFormat>> createStorageFormat(Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<StorageFormatMD>> result = new HashMap<>();
+        Map<String, List<StorageFormat>> result = new HashMap<>();
         Set<String> storageFormatNames = new HashSet<>();
         if (!storageFormatDTOS.isEmpty()) {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
@@ -63,13 +63,13 @@ public class OrganizationStorageFormatService{
             List<String> nameInLowerCase = storageFormatNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<StorageFormatMD> existing = storageFormatRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            List<StorageFormat> existing = storageFormatRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
-            List<StorageFormatMD> newStorageFormats = new ArrayList<>();
+            List<StorageFormat> newStorageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-                    StorageFormatMD newStorageFormat = new StorageFormatMD(name);
+                    StorageFormat newStorageFormat = new StorageFormat(name);
                     newStorageFormat.setOrganizationId(organizationId);
                     newStorageFormats.add(newStorageFormat);
                 }
@@ -101,9 +101,9 @@ public class OrganizationStorageFormatService{
      * @return StorageFormat object fetch via given id
      * @throws DataNotFoundByIdException throw exception if StorageFormat not exist for given id
      */
-    public StorageFormatMD getStorageFormat(Long organizationId, Long id) {
+    public StorageFormat getStorageFormat(Long organizationId, Long id) {
 
-        StorageFormatMD exist = storageFormatRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
+        StorageFormat exist = storageFormatRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -134,7 +134,7 @@ public class OrganizationStorageFormatService{
      */
     public StorageFormatDTO updateStorageFormat(Long organizationId, Long id, StorageFormatDTO storageFormatDTO) {
 
-        StorageFormatMD storageFormat = storageFormatRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
@@ -152,17 +152,17 @@ public class OrganizationStorageFormatService{
     }
 
 
-    public Map<String, List<StorageFormatMD>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
+    public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
 
-        Map<String, List<StorageFormatMD>> result = createStorageFormat(organizationId, storageFormatDTOS);
-        List<StorageFormatMD> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, storageFormatDTOS);
+        Map<String, List<StorageFormat>> result = createStorageFormat(organizationId, storageFormatDTOS);
+        List<StorageFormat> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, storageFormatDTOS);
         if (!masterStorageFormatSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterStorageFormatSuggestedByUnit);
         }
         return result;
     }
 
-    public List<StorageFormatMD> getAllOrganizationalStorageFormatByIds(Set<Long> ids){
+    public List<StorageFormat> getAllOrganizationalStorageFormatByIds(Set<Long> ids){
         return storageFormatRepository.findAllByIds(ids);
     }
 

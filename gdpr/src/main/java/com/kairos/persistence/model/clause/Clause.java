@@ -1,45 +1,66 @@
 package com.kairos.persistence.model.clause;
 
 
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.dto.gdpr.ServiceCategoryDTO;
-import com.kairos.dto.gdpr.SubServiceCategoryDTO;
-import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.*;
+import com.kairos.persistence.model.template_type.TemplateType;
 import org.springframework.data.annotation.Transient;
 
+import javax.annotation.Nullable;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
-public class Clause {
+@Entity
+public class Clause extends BaseEntity {
 
     @NotBlank
     private String title;
-    @NotEmpty
-    private List<ClauseTag> tags = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<ClauseTag> tags  = new ArrayList<>();
+
     @NotNull
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
-    private List<ServiceCategoryDTO> organizationServices;
-    private List<SubServiceCategoryDTO> organizationSubServices;
-    private List<AccountTypeVO> accountTypes;
+
+    @ElementCollection
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <ServiceCategory> organizationServices = new ArrayList<>();
+
+    @ElementCollection
+    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
+    @ElementCollection
+    private List<AccountType> accountTypes = new ArrayList<>();
     private Long countryId;
-    private List<Long> organizationList;
-    private BigInteger parentClauseId;
-    private List<BigInteger> templateTypes;
+
+    //TODO
+    //private List<Long> organizationList;
+    private Long parentClauseId;
+
+    @OneToMany
+    private List<TemplateType> templateTypes  = new ArrayList<>();
+
     @Transient
     private Integer orderedIndex;
     @Transient
     private String titleHtml;
     @Transient
     private String descriptionHtml;
+
+    @Nullable
+    private UUID tempClauseId;
 
 
 
@@ -60,39 +81,35 @@ public class Clause {
         this.tags=tags;
     }
 
-    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags,List<BigInteger> templateTypes) {
+    public Clause(@NotBlank String title, @NotNull String description, @NotEmpty List<ClauseTag> tags, List<TemplateType> templateTypes) {
         this.title = title;
         this.description = description;
         this.tags=tags;
         this.templateTypes=templateTypes;
     }
 
-    public Clause(String title, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+    public Clause(String title, String description, Long countryId) {
         this.title = title;
         this.description = description;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
-        this.organizationServices = organizationServices;
-        this.organizationSubServices = organizationSubServices;
         this.countryId = countryId;
     }
 
     public Clause() {
     }
 
-    public List<Long> getOrganizationList() {
+   /* public List<Long> getOrganizationList() {
         return organizationList;
     }
 
     public void setOrganizationList(List<Long> organizationList) {
         this.organizationList = organizationList;
-    }
+    }*/
 
-    public List<BigInteger> getTemplateTypes() {
+    public List<TemplateType> getTemplateTypes() {
         return templateTypes;
     }
 
-    public void setTemplateTypes(List<BigInteger> templateTypes) {
+    public void setTemplateTypes(List<TemplateType> templateTypes) {
         this.templateTypes = templateTypes;
     }
 
@@ -104,11 +121,11 @@ public class Clause {
         this.countryId = countryId;
     }
 
-    public BigInteger getParentClauseId() {
+    public Long getParentClauseId() {
         return parentClauseId;
     }
 
-    public void setParentClauseId(BigInteger parentClauseId) {
+    public void setParentClauseId(Long parentClauseId) {
         this.parentClauseId = parentClauseId;
     }
 
@@ -136,43 +153,11 @@ public class Clause {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypeDTOS;
-    }
-
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
-    }
-
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
-    }
-
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
-    }
-
-    public List<ServiceCategoryDTO> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
-
-    public List<AccountTypeVO> getAccountTypes() {
+    public List<AccountType> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(List<AccountTypeVO> accountTypes) {
+    public void setAccountTypes(List<AccountType> accountTypes) {
         this.accountTypes = accountTypes;
     }
 
@@ -200,5 +185,43 @@ public class Clause {
         this.descriptionHtml = descriptionHtml;
     }
 
+    public List<OrganizationType> getOrganizationTypes() {
+        return organizationTypes;
+    }
 
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
+
+    public List<OrganizationSubType> getOrganizationSubTypes() {
+        return organizationSubTypes;
+    }
+
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
+    }
+
+    public List<ServiceCategory> getOrganizationServices() {
+        return organizationServices;
+    }
+
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+        this.organizationServices = organizationServices;
+    }
+
+    public List<SubServiceCategory> getOrganizationSubServices() {
+        return organizationSubServices;
+    }
+
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
+    }
+
+    public UUID getTempClauseId() {
+        return tempClauseId;
+    }
+
+    public void setTempClauseId(UUID tempClauseId) {
+        this.tempClauseId = tempClauseId;
+    }
 }

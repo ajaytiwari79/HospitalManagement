@@ -1,5 +1,8 @@
 package com.kairos.persistence.model.template_type;
 
+import com.kairos.persistence.model.common.BaseEntity;
+
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -7,8 +10,8 @@ import javax.validation.constraints.Pattern;
  * @Auther vikash patwal
  */
 
-
-public class TemplateType {
+@Entity
+public class TemplateType extends BaseEntity {
 
 
     @NotBlank(message = "templateName cannot be empty ")

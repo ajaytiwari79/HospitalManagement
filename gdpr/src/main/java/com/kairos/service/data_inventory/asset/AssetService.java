@@ -4,11 +4,11 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistence.model.data_inventory.asset.AssetMD;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetTypeMD;
-import com.kairos.persistence.model.risk_management.RiskMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
@@ -89,7 +89,7 @@ public class AssetService{
 
 
     public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
-        AssetMD previousAsset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, false, assetDTO.getName());
+        Asset previousAsset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, false, assetDTO.getName());
         Optional.ofNullable(previousAsset).ifPresent(asset ->
                 {
                     //TODO need refactor why these conditions
@@ -99,7 +99,7 @@ public class AssetService{
                     }
                 }
         );
-        AssetMD asset = buildAsset(unitId, assetDTO);
+        Asset asset = buildAsset(unitId, assetDTO);
         saveAssetTypeSubTypeAndRisk(unitId, asset, assetDTO);
         assetRepository.save(asset);
         assetDTO.setId(asset.getId());
@@ -107,13 +107,13 @@ public class AssetService{
     }
 
 
-    private AssetMD buildAsset(Long unitId, AssetDTO assetDTO) {
+    private Asset buildAsset(Long unitId, AssetDTO assetDTO) {
 
-        AssetMD asset;
+        Asset asset;
         if (Optional.ofNullable(assetDTO.getId()).isPresent())
             asset = assetRepository.getOne(assetDTO.getId());
         else
-            asset = new AssetMD();
+            asset = new Asset();
         asset.setOrganizationId(unitId);
         asset.setName(assetDTO.getName());
         asset.setDescription(assetDTO.getDescription());
@@ -136,9 +136,9 @@ public class AssetService{
     }
 
 
-    private void saveAssetTypeSubTypeAndRisk(Long unitId, AssetMD asset, AssetDTO assetDTO) {
-        AssetTypeMD assetType;
-        AssetTypeMD assetSubType = null;
+    private void saveAssetTypeSubTypeAndRisk(Long unitId, Asset asset, AssetDTO assetDTO) {
+        AssetType assetType;
+        AssetType assetSubType = null;
         if (Optional.ofNullable(assetDTO.getAssetType().getId()).isPresent()) {
             assetType = assetTypeRepository.getOne(assetDTO.getAssetType().getId());
             assetType = linkRiskWithAssetTypeAndSubType(assetType,assetDTO.getAssetType().getRisks());
@@ -146,22 +146,22 @@ public class AssetService{
                 if (assetDTO.getAssetSubType().getId() != null)
                     assetSubType = assetTypeRepository.getOne(assetDTO.getAssetSubType().getId());
                 else
-                    assetSubType = new AssetTypeMD(assetDTO.getAssetSubType().getName());
+                    assetSubType = new AssetType(assetDTO.getAssetSubType().getName());
                 assetSubType.setOrganizationId(unitId);
                 assetSubType.setSubAssetType(true);
                 assetSubType.setAssetType(assetType);
                 assetSubType = linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getAssetSubType().getRisks());
             }
         } else {
-            AssetTypeMD previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetDTO.getAssetType().getName(), unitId, false);
+            AssetType previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetDTO.getAssetType().getName(), unitId, false);
             if (Optional.ofNullable(previousAssetType).isPresent()) {
                 exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
             }
-            assetType = new AssetTypeMD(assetDTO.getAssetType().getName());
+            assetType = new AssetType(assetDTO.getAssetType().getName());
             assetType.setOrganizationId(unitId);
             assetType = linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
             if (Optional.ofNullable(assetDTO.getAssetSubType()).isPresent()) {
-                assetSubType = new AssetTypeMD(assetDTO.getAssetSubType().getName());
+                assetSubType = new AssetType(assetDTO.getAssetSubType().getName());
                 assetSubType.setOrganizationId(unitId);
                 assetSubType.setSubAssetType(true);
                 assetSubType.setAssetType(assetType);
@@ -178,14 +178,14 @@ public class AssetService{
 
     }
 
-    private AssetTypeMD linkRiskWithAssetTypeAndSubType(AssetTypeMD assetType, List<OrganizationLevelRiskDTO> risks){
-        List<RiskMD> assetTypeRisks = new ArrayList<>();
+    private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, List<OrganizationLevelRiskDTO> risks){
+        List<Risk> assetTypeRisks = new ArrayList<>();
         risks.forEach( risk ->{
             if (!Optional.ofNullable(risk.getId()).isPresent()) {
-                RiskMD assetTypeRisk = new RiskMD(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
+                Risk assetTypeRisk = new Risk(risk.getName(), risk.getDescription(), risk.getRiskRecommendation(), risk.getRiskLevel());
                 assetTypeRisks.add(assetTypeRisk);
             }else{
-                RiskMD  existingRisk = riskRepository.getOne(risk.getId());
+                Risk existingRisk = riskRepository.getOne(risk.getId());
                 existingRisk.setName(risk.getName());
                 existingRisk.setDescription(risk.getDescription());
                 existingRisk.setRiskRecommendation(risk.getRiskRecommendation());
@@ -200,7 +200,7 @@ public class AssetService{
 
 
     public Map<String, Object> deleteAssetById(Long organizationId, Long assetId) {
-        AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted( assetId, organizationId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted( assetId, organizationId, false);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + assetId);
         }
@@ -226,7 +226,7 @@ public class AssetService{
      * @description method updated active status of Asset
      */
     public boolean updateStatusOfAsset(Long unitId, Long assetId, boolean active) {
-        AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId, unitId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId, unitId, false);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
@@ -243,7 +243,7 @@ public class AssetService{
      * @return method return Asset with Meta Data (storage format ,data Disposal, hosting type and etc)
      */
     public AssetResponseDTO getAssetWithRelatedDataAndRiskByUnitIdAndId(Long unitId, Long id) {
-        AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted( id, unitId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted( id, unitId, false);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
@@ -256,7 +256,7 @@ public class AssetService{
     }
 
 
-    private AssetResponseDTO prepareAssetResponseData(AssetMD asset, boolean isBasicDataOnly){
+    private AssetResponseDTO prepareAssetResponseData(Asset asset, boolean isBasicDataOnly){
         AssetResponseDTO assetResponseDTO = new AssetResponseDTO();
         assetResponseDTO.setId(asset.getId());
         assetResponseDTO.setName(asset.getName());
@@ -291,7 +291,7 @@ public class AssetService{
      */
     public List<AssetResponseDTO> getAllAssetByUnitId(Long unitId) {
         List<AssetResponseDTO> assetResponseDTOS =  new ArrayList<>();
-        List<AssetMD> assets = assetRepository.findAllByOrganizationId(unitId);
+        List<Asset> assets = assetRepository.findAllByOrganizationId(unitId);
         assets.forEach( asset -> {
             assetResponseDTOS.add(prepareAssetResponseData(asset, false));
         });
@@ -307,16 +307,16 @@ public class AssetService{
      */
     public List<Map<String, Object>> getAssetActivitiesHistory(Long assetId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, AssetMD.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
-        return javersCommonService.getHistoryMap(changes, assetId, AssetMD.class);
+        return javersCommonService.getHistoryMap(changes, assetId, Asset.class);
 
 
     }
 
     public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
-        List<AssetMD> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);
+        List<Asset> activeAssets = assetRepository.findAllActiveAssetByOrganizationId(unitId);
         List<AssetResponseDTO> assetResponseDTOS =  new ArrayList<>();
         activeAssets.forEach( asset -> {
             assetResponseDTOS.add(prepareAssetResponseData(asset, true));

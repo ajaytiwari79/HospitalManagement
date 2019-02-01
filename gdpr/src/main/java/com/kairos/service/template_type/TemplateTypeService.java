@@ -5,7 +5,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.custom_exception.DataNotExists;
 
-import com.kairos.persistence.model.template_type.TemplateTypeMD;
+import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -145,7 +145,7 @@ public class TemplateTypeService{
      * @description this method is used for get all template type.
      * @author vikash patwal
      */
-    public List<TemplateTypeMD> getAllTemplateType(Long countryId) {
+    public List<TemplateType> getAllTemplateType(Long countryId) {
         return templateTypeRepository.getAllTemplateType(countryId);
     }
 }

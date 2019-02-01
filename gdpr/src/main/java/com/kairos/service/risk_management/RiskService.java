@@ -3,7 +3,7 @@ package com.kairos.service.risk_management;
 
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
-import com.kairos.persistence.model.risk_management.Risk;
+import com.kairos.persistence.model.risk_management.RiskDeprecated;
 import com.kairos.persistence.repository.risk_management.RiskDaoImpl;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.RiskResponseDTO;
@@ -34,11 +34,11 @@ public class RiskService{
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
      * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of RISK Ids generated after save operation
      */
-    public <T, E extends BasicRiskDTO> Map<T, List<Risk>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
+    public <T, E extends BasicRiskDTO> Map<T, List<RiskDeprecated>> saveRiskAtCountryLevelOrOrganizationLevel(Long referenceId, boolean isUnitId, Map<T, List<E>> risksRelatedToObject) {
 
         Assert.notEmpty(risksRelatedToObject, "list can' t be empty");
-        List<Risk> risks = new ArrayList<>();
-        Map<T, List<Risk>> riskListRelatedToObjectMap = new HashMap<>();
+        List<RiskDeprecated> risks = new ArrayList<>();
+        Map<T, List<RiskDeprecated>> riskListRelatedToObjectMap = new HashMap<>();
         List<BigInteger> existingRiskIds = new ArrayList<>();
         Map<T, List<E>> existingRisksRelatedToObject = new HashMap<>();
 
@@ -57,7 +57,7 @@ public class RiskService{
                 existingRisksRelatedToObject.put(objectToWhichRiskRelated, existingRiskDTOS);
 
             }
-            List<Risk> riskRelatedTOObject = new ArrayList<>();
+            List<RiskDeprecated> riskRelatedTOObject = new ArrayList<>();
             if (!newRisk.isEmpty()) {
                 riskRelatedTOObject = isUnitId ? buildRiskAtOrganizationLevel(referenceId, newRisk) : buildRiskAtCountryLevel(referenceId, newRisk);
                 risks.addAll(riskRelatedTOObject);
@@ -72,14 +72,14 @@ public class RiskService{
     }
 
 
-    private <T, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long referenceId, boolean isUnitId,
-                                                                                              List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
+    private <T, E extends BasicRiskDTO> List<RiskDeprecated> updateExistingRisk(Long referenceId, boolean isUnitId,
+                                                                                List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<RiskDeprecated>> riskListRelatedToObjectMap) {
         Assert.notEmpty(existingRiskIds, "List can't be empty");
        // List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(referenceId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(referenceId, existingRiskIds);
         //Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
         existingRisksRelatedToObject.forEach((objectToWhichRiskRelate, riskDTOS) ->
         {
-            List<Risk> risksRelatesToObject = new ArrayList<>();
+            List<RiskDeprecated> risksRelatesToObject = new ArrayList<>();
             riskDTOS.forEach(riskDTO -> {
                 //Risk risk = riskMap.get(riskDTO.getId());
                 //ObjectMapperUtils.copyProperties(riskDTO, risk);
@@ -96,12 +96,12 @@ public class RiskService{
      * @param riskDTOS  list of RISK Dto
      * @return
      */
-    private <E extends BasicRiskDTO> List<Risk> buildRiskAtCountryLevel(Long countryId, List<E> riskDTOS) {
+    private <E extends BasicRiskDTO> List<RiskDeprecated> buildRiskAtCountryLevel(Long countryId, List<E> riskDTOS) {
 
         checkForDuplicateNames(riskDTOS);
-        List<Risk> riskList = new ArrayList<>();
+        List<RiskDeprecated> riskList = new ArrayList<>();
         for (E riskDTO : riskDTOS) {
-            Risk risk = new Risk(countryId, riskDTO.getName(), riskDTO.getDescription(),
+            RiskDeprecated risk = new RiskDeprecated(countryId, riskDTO.getName(), riskDTO.getDescription(),
                     riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
             riskList.add(risk);
         }
@@ -115,13 +115,13 @@ public class RiskService{
      * @param riskDTOS list of RISK Dto
      * @return
      */
-    private <E extends BasicRiskDTO> List<Risk> buildRiskAtOrganizationLevel(Long unitId, List<E> riskDTOS) {
+    private <E extends BasicRiskDTO> List<RiskDeprecated> buildRiskAtOrganizationLevel(Long unitId, List<E> riskDTOS) {
 
         checkForDuplicateNames(riskDTOS);
-        List<Risk> riskList = new ArrayList<>();
+        List<RiskDeprecated> riskList = new ArrayList<>();
         for (E riskDTO : riskDTOS) {
             OrganizationLevelRiskDTO organizationLevelRiskDTO = (OrganizationLevelRiskDTO) riskDTO;
-            Risk risk = new Risk(organizationLevelRiskDTO.getName(), organizationLevelRiskDTO.getDescription(),
+            RiskDeprecated risk = new RiskDeprecated(organizationLevelRiskDTO.getName(), organizationLevelRiskDTO.getDescription(),
                     organizationLevelRiskDTO.getRiskRecommendation(), organizationLevelRiskDTO.getRiskLevel());
             risk.setReminderActive(organizationLevelRiskDTO.isReminderActive());
             risk.setDaysToReminderBefore(organizationLevelRiskDTO.getDaysToReminderBefore());

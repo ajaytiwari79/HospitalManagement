@@ -7,7 +7,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
-import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasureMD;
+import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -45,9 +45,9 @@ public class OrganizationalSecurityMeasureService{
      * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
-    public Map<String, List<OrganizationalSecurityMeasureMD>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS, boolean isSuggestion) {
+    public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<OrganizationalSecurityMeasureMD>> result = new HashMap<>();
+        Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
         Set<String> orgSecurityMeasureNames = new HashSet<>();
         if (!securityMeasureDTOS.isEmpty()) {
             for (OrganizationalSecurityMeasureDTO securityMeasure : securityMeasureDTOS) {
@@ -57,12 +57,12 @@ public class OrganizationalSecurityMeasureService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<OrganizationalSecurityMeasureMD> existing = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
-            List<OrganizationalSecurityMeasureMD> newOrgSecurityMeasures = new ArrayList<>();
+            List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
-                    OrganizationalSecurityMeasureMD newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasureMD(name,countryId);
+                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId);
                         if(isSuggestion){
                             newOrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                             newOrganizationalSecurityMeasure.setSuggestedDate(LocalDate.now());
@@ -100,9 +100,9 @@ public class OrganizationalSecurityMeasureService{
      * @return OrganizationalSecurityMeasure object fetch via id
      * @throws DataNotFoundByIdException throw exception if OrganizationalSecurityMeasure not exist for given id
      */
-    public OrganizationalSecurityMeasureMD getOrganizationalSecurityMeasure(Long countryId, Long id) {
+    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId, Long id) {
 
-        OrganizationalSecurityMeasureMD exist = organizationalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -134,7 +134,7 @@ public class OrganizationalSecurityMeasureService{
     public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long countryId, Long id, OrganizationalSecurityMeasureDTO securityMeasureDTO) {
 
         //TODO What actually this code is doing?
-        OrganizationalSecurityMeasureMD orgSecurityMeasure = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, securityMeasureDTO.getName());
+        OrganizationalSecurityMeasure orgSecurityMeasure = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndName(countryId, false, securityMeasureDTO.getName());
         if (Optional.ofNullable(orgSecurityMeasure).isPresent()) {
             if (id.equals(orgSecurityMeasure.getId())) {
                 return securityMeasureDTO;
@@ -159,8 +159,8 @@ public class OrganizationalSecurityMeasureService{
      * @param organizationalSecurityMeasureDTOS
      * @return
      */
-    public List<OrganizationalSecurityMeasureMD> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
-        Map<String, List<OrganizationalSecurityMeasureMD>> result = createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
+    public List<OrganizationalSecurityMeasure> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
+        Map<String, List<OrganizationalSecurityMeasure>> result = createOrganizationalSecurityMeasure(countryId, organizationalSecurityMeasureDTOS, true);
         return result.get(NEW_DATA_LIST);
     }
 
@@ -172,7 +172,7 @@ public class OrganizationalSecurityMeasureService{
      * @param suggestedDataStatus
      * @return
      */
-    public List<OrganizationalSecurityMeasureMD> updateSuggestedStatusOfOrganizationalSecurityMeasures(Long countryId, Set<Long> orgSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<OrganizationalSecurityMeasure> updateSuggestedStatusOfOrganizationalSecurityMeasures(Long countryId, Set<Long> orgSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = organizationalSecurityMeasureRepository.updateMetadataStatus(countryId, orgSecurityMeasureIds, suggestedDataStatus);
         if(updateCount > 0){

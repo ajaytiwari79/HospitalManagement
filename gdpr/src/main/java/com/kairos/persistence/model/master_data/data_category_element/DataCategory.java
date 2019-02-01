@@ -1,28 +1,34 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
+import com.kairos.persistence.model.common.BaseEntity;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class DataCategory {
+@Entity
+public class DataCategory extends BaseEntity {
 
     @NotBlank(message = "Name cannot be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     // empty array to get rid of null pointer
-    private List<BigInteger> dataElements=new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<DataElement> dataElements=new ArrayList<>();
 
     private Long countryId;
 
-    public List<BigInteger> getDataElements() {
+    public List<DataElement> getDataElements() {
         return dataElements;
     }
 
-    public void setDataElements(List<BigInteger> dataElements) {
+    public void setDataElements(List<DataElement> dataElements) {
         this.dataElements = dataElements;
     }
 
@@ -42,9 +48,9 @@ public class DataCategory {
         this.name = name;
     }
 
-    public DataCategory( @NotBlank(message = "Name cannot be empty")
+    public DataCategory(@NotBlank(message = "Name cannot be empty")
                          @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
-                                 String name, List<BigInteger> dataElements) {
+                                 String name, List<DataElement> dataElements) {
         this.name = name;
         this.dataElements = dataElements;
     }

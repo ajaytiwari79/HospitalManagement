@@ -7,7 +7,7 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethodMD;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -46,9 +46,9 @@ public class TransferMethodService{
      * and if exist then simply add  TransferMethod to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
-    public Map<String, List<TransferMethodMD>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS, boolean isSuggestion) {
+    public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS, boolean isSuggestion) {
         //TODO still need to optimize we can get name of list in string from here
-        Map<String, List<TransferMethodMD>> result = new HashMap<>();
+        Map<String, List<TransferMethod>> result = new HashMap<>();
         Set<String> transferMethodNames = new HashSet<>();
         if (!transferMethodDTOS.isEmpty()) {
             for (TransferMethodDTO transferMethod : transferMethodDTOS) {
@@ -57,13 +57,13 @@ public class TransferMethodService{
             List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TransferMethodMD> existing = transferMethodRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<TransferMethod> existing = transferMethodRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
             transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
-            List<TransferMethodMD> newTransferMethods = new ArrayList<>();
+            List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (!transferMethodNames.isEmpty()) {
                 for (String name : transferMethodNames) {
-                    TransferMethodMD newTransferMethod = new TransferMethodMD(name,countryId);
+                    TransferMethod newTransferMethod = new TransferMethod(name,countryId);
                     if(isSuggestion){
                         newTransferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                         newTransferMethod.setSuggestedDate(LocalDate.now());
@@ -99,8 +99,8 @@ public class TransferMethodService{
      * @return TransferMethod object fetch by given id
      * @throws DataNotFoundByIdException throw exception if TransferMethod not found for given id
      */
-    public TransferMethodMD getTransferMethod(Long countryId, Long id) {
-        TransferMethodMD exist = transferMethodRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+    public TransferMethod getTransferMethod(Long countryId, Long id) {
+        TransferMethod exist = transferMethodRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
@@ -131,7 +131,7 @@ public class TransferMethodService{
      */
     public TransferMethodDTO updateTransferMethod(Long countryId, Long id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethodMD transferMethod = transferMethodRepository.findByCountryIdAndDeletedAndName(countryId, false, transferMethodDTO.getName());
+        TransferMethod transferMethod = transferMethodRepository.findByCountryIdAndDeletedAndName(countryId, false, transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
@@ -154,8 +154,8 @@ public class TransferMethodService{
      * @param transferMethodDTOS - transfer method suggested by unit
      * @return
      */
-    public List<TransferMethodMD> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
-        Map<String, List<TransferMethodMD>> result = createTransferMethod(countryId, transferMethodDTOS, true);
+    public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
+        Map<String, List<TransferMethod>> result = createTransferMethod(countryId, transferMethodDTOS, true);
         return result.get(NEW_DATA_LIST);
 
     }
@@ -168,7 +168,7 @@ public class TransferMethodService{
      * @param suggestedDataStatus
      * @return
      */
-    public List<TransferMethodMD> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<Long> transferMethodIds , SuggestedDataStatus suggestedDataStatus) {
+    public List<TransferMethod> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<Long> transferMethodIds , SuggestedDataStatus suggestedDataStatus) {
 
         Integer updateCount = transferMethodRepository.updateMetadataStatus(countryId, transferMethodIds,suggestedDataStatus);
         if(updateCount > 0){

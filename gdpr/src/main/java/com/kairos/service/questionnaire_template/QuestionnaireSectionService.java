@@ -7,10 +7,10 @@ import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDT
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionMD;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateDeprecated;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
 import com.kairos.persistence.repository.questionnaire_template.*;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -31,7 +31,7 @@ public class QuestionnaireSectionService{
 
 
     @Inject
-    private QuestionnaireSectionMDRepository questionnaireSectionMDRepository;
+    private QuestionnaireSectionRepository questionnaireSectionRepository;
 
     @Inject
     private QuestionnaireTemplateRepository questionnaireTemplateRepository;
@@ -54,14 +54,14 @@ public class QuestionnaireSectionService{
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
     public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long organizationCountryId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto, boolean isMaster) {
-        QuestionnaireTemplateMD questionnaireTemplate = isMaster ? questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, organizationCountryId, false) :
+        QuestionnaireTemplate questionnaireTemplate = isMaster ? questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, organizationCountryId, false) :
                 questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(templateId, organizationCountryId, false);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
 
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(masterQuestionnaireSectionDto.getSections());
-        questionnaireTemplate.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(masterQuestionnaireSectionDto.getSections(), QuestionnaireSectionMD.class));
+        questionnaireTemplate.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(masterQuestionnaireSectionDto.getSections(), QuestionnaireSection.class));
         //List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto.getSections(), questionnaireTemplate.getTemplateType());
        // questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateRepository.save(questionnaireTemplate);
@@ -73,16 +73,16 @@ public class QuestionnaireSectionService{
     public List<BigInteger> createAndUpdateQuestionnaireSectionsAndQuestions(Long referenceId, boolean isReferenceIdUnitId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
 
         Map<BigInteger, QuestionnaireSectionDTO> questionnaireSectionIdDTOMap = new HashMap<>();
-        Map<QuestionnaireSection, List<QuestionDTO>> questionDTOListCorrespondingToSection = new HashMap<>();
-        List<QuestionnaireSection> globalQuestionnaireSections = new ArrayList<>();
-        List<QuestionnaireSection> newQuestionnaireSections = new ArrayList<>();
+        Map<QuestionnaireSectionDeprecated, List<QuestionDTO>> questionDTOListCorrespondingToSection = new HashMap<>();
+        List<QuestionnaireSectionDeprecated> globalQuestionnaireSections = new ArrayList<>();
+        List<QuestionnaireSectionDeprecated> newQuestionnaireSections = new ArrayList<>();
 
 
         for (QuestionnaireSectionDTO questionnaireSectionDTO : questionnaireSectionDTOS) {
             if (Optional.ofNullable(questionnaireSectionDTO.getId()).isPresent()) {
                 //questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
             } else {
-                QuestionnaireSection questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO, referenceId, isReferenceIdUnitId);
+                QuestionnaireSectionDeprecated questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO, referenceId, isReferenceIdUnitId);
                 newQuestionnaireSections.add(questionnaireSection);
                 if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
                     questionDTOListCorrespondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
@@ -116,13 +116,13 @@ public class QuestionnaireSectionService{
     }
 
 
-    private QuestionnaireSection buildQuestionnaireSection(QuestionnaireSectionDTO questionnaireSectionDTO, Long referenceId, boolean isReferenceIdUnitId) {
+    private QuestionnaireSectionDeprecated buildQuestionnaireSection(QuestionnaireSectionDTO questionnaireSectionDTO, Long referenceId, boolean isReferenceIdUnitId) {
         if (isReferenceIdUnitId) {
-            QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle());
+            QuestionnaireSectionDeprecated questionnaireSection = new QuestionnaireSectionDeprecated(questionnaireSectionDTO.getTitle());
            // questionnaireSection.setOrganizationId(referenceId);
             return questionnaireSection;
         } else {
-            return new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId);
+            return new QuestionnaireSectionDeprecated(questionnaireSectionDTO.getTitle(), referenceId);
         }
     }
 
@@ -134,7 +134,7 @@ public class QuestionnaireSectionService{
      * @description soft delete section and remove section id from template
      */
     public boolean deleteQuestionnaireSectionFromTemplate(Long organizationCountryId, Long templateId, Long questionnaireSectionId, boolean isMaster) {
-        QuestionnaireSectionMD questionnaireSection =  questionnaireSectionMDRepository.findByIdAndDeleted( questionnaireSectionId,false);
+        QuestionnaireSection questionnaireSection =  questionnaireSectionRepository.findByIdAndDeleted( questionnaireSectionId,false);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  section", templateId);
         }
@@ -143,7 +143,7 @@ public class QuestionnaireSectionService{
         return true;
     }
 
-    private void checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {
+    private void checkIfQuestionnaireTemplatePublishedOrLinkedWithAnyInProgressAssessment(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplateDeprecated questionnaireTemplate, QuestionnaireTemplateSectionDTO questionnaireSectionDTO) {
         if (!Optional.ofNullable(questionnaireSectionDTO.getTemplateStatus()).isPresent()) {
             exceptionService.invalidRequestException("error.message.questionnaireTemplate.template.status.null");
         }
@@ -171,9 +171,9 @@ public class QuestionnaireSectionService{
     }
 
 
-    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
+    private void checkIfQuestionnaireTemplateOfAssetTypeIsInPublishedState(Long unitId, QuestionnaireTemplateDeprecated questionnaireTemplate) {
 
-        QuestionnaireTemplate previousTemplate = null;
+        QuestionnaireTemplateDeprecated previousTemplate = null;
         //TODO
         /*if (questionnaireTemplate.isDefaultAssetTemplate()) {
             previousTemplate = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
@@ -195,8 +195,8 @@ public class QuestionnaireSectionService{
         }*/
     }
 
-    private void checkIfRiskQuestionnaireTemplateIsInPublishedState(Long unitId, QuestionnaireTemplate questionnaireTemplate) {
-        QuestionnaireTemplate previousTemplate = null;
+    private void checkIfRiskQuestionnaireTemplateIsInPublishedState(Long unitId, QuestionnaireTemplateDeprecated questionnaireTemplate) {
+        QuestionnaireTemplateDeprecated previousTemplate = null;
         switch (questionnaireTemplate.getRiskAssociatedEntity()) {
             case ASSET_TYPE:
                 //TODO

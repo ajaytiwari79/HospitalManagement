@@ -8,7 +8,7 @@ import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.gdpr.ServiceCategoryDTO;
 import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
-import com.kairos.persistence.model.clause_tag.ClauseTagMD;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import javax.validation.constraints.NotBlank;
@@ -25,7 +25,7 @@ public class ClauseResponseDTO {
     @NotBlank
     private String title;
     @NotNull
-    private List<ClauseTagMD> tags = new ArrayList<>();
+    private List<ClauseTag> tags = new ArrayList<>();
     @NotBlank
     private String description;
 
@@ -70,11 +70,11 @@ public class ClauseResponseDTO {
         this.title = title;
     }
 
-    public List<ClauseTagMD> getTags() {
+    public List<ClauseTag> getTags() {
         return tags;
     }
 
-    public void setTags(List<ClauseTagMD> tags) {
+    public void setTags(List<ClauseTag> tags) {
         this.tags = tags;
     }
 

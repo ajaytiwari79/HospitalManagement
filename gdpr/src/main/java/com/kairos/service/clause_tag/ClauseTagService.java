@@ -2,7 +2,7 @@ package com.kairos.service.clause_tag;
 
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
-import com.kairos.persistence.model.clause_tag.ClauseTagMD;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -53,11 +53,11 @@ public class ClauseTagService{
     }*/
 
 
-    public List<ClauseTagMD> getAllClauseTagByCountryId(Long countryId) {
+    public List<ClauseTag> getAllClauseTagByCountryId(Long countryId) {
         return clauseTagRepository.findAllByCountryId(countryId);
     }
 
-    public List<ClauseTagMD> getAllClauseTagByUnitId(Long unitId) {
+    public List<ClauseTag> getAllClauseTagByUnitId(Long unitId) {
         return clauseTagRepository.findAllClauseTagByUnitId(unitId);
     }
 
@@ -108,9 +108,9 @@ public class ClauseTagService{
      * @throws DuplicateDataException if tag with same name is present in tagList
      * @description method new create tags and if tag already exist with same name then simply add tag id to  existClauseTagIds which later add to clause ,
      */
-    public List<ClauseTagMD> saveClauseTagList(Long referenceId, boolean isUnitId, List<ClauseTagDTO> tagList) {
+    public List<ClauseTag> saveClauseTagList(Long referenceId, boolean isUnitId, List<ClauseTagDTO> tagList) {
 
-        List<ClauseTagMD> clauseTagList = new ArrayList<>();
+        List<ClauseTag> clauseTagList = new ArrayList<>();
         List<Long> existClauseTagIds = new ArrayList<>();
         Set<String> clauseTagsName = new HashSet<>();
         for (ClauseTagDTO tagDto : tagList) {
@@ -119,7 +119,7 @@ public class ClauseTagService{
                     exceptionService.duplicateDataException("message.duplicate", "message.tag", tagDto.getName());
                 }
                 clauseTagsName.add(tagDto.getName());
-                ClauseTagMD clauseTag = new ClauseTagMD(tagDto.getName());
+                ClauseTag clauseTag = new ClauseTag(tagDto.getName());
                 if (isUnitId)
                     clauseTag.setOrganizationId(referenceId);
                 else
@@ -133,7 +133,7 @@ public class ClauseTagService{
         if(!clauseTagsName.isEmpty()){
         Set<String> nameInLowerCase = clauseTagsName.stream().map(String::toLowerCase)
                 .collect(Collectors.toSet());
-        List<ClauseTagMD> previousClauseTags = isUnitId ? clauseTagRepository.findByUnitIdAndTitles(referenceId, nameInLowerCase) : clauseTagRepository.findByCountryIdAndTitles(referenceId, nameInLowerCase);
+        List<ClauseTag> previousClauseTags = isUnitId ? clauseTagRepository.findByUnitIdAndTitles(referenceId, nameInLowerCase) : clauseTagRepository.findByCountryIdAndTitles(referenceId, nameInLowerCase);
         if (CollectionUtils.isNotEmpty(previousClauseTags)) {
             exceptionService.duplicateDataException("message.duplicate", "message.tag", previousClauseTags.get(0).getName());
         }}

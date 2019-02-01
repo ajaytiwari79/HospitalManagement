@@ -1,14 +1,15 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-
+import com.kairos.persistence.model.common.BaseEntity;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 
-
-public class AccessorParty {
+@Entity
+public class AccessorParty extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
@@ -56,6 +57,15 @@ public class AccessorParty {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public AccessorParty(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public AccessorParty() {
+    }
+
+    public AccessorParty(Long id ) {
+        this.id = id;
     }
 }

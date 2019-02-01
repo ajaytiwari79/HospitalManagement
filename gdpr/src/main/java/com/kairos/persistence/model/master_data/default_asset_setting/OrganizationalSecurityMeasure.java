@@ -1,13 +1,15 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-
-public class OrganizationalSecurityMeasure {
+@Entity
+public class OrganizationalSecurityMeasure extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
@@ -41,7 +43,7 @@ public class OrganizationalSecurityMeasure {
 
     public void setName(String name) { this.name = name; }
 
-    public OrganizationalSecurityMeasure( String name) {
+    public OrganizationalSecurityMeasure(String name) {
         this.name = name;
     }
 
@@ -50,6 +52,12 @@ public class OrganizationalSecurityMeasure {
         this.countryId = countryId;
         this.suggestedDataStatus = suggestedDataStatus;
     }
+
+    public OrganizationalSecurityMeasure(@NotBlank(message = "Name can't be empty") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
 
     public OrganizationalSecurityMeasure() {
     }

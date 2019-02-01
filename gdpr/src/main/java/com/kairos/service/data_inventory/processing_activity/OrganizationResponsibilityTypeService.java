@@ -5,7 +5,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityTypeMD;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
@@ -51,9 +51,9 @@ public class OrganizationResponsibilityTypeService{
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
      * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
-    public Map<String, List<ResponsibilityTypeMD>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Map<String, List<ResponsibilityTypeMD>> result = new HashMap<>();
+        Map<String, List<ResponsibilityType>> result = new HashMap<>();
         Set<String> responsibilityTypeNames = new HashSet<>();
         if (!responsibilityTypeDTOS.isEmpty()) {
             for (ResponsibilityTypeDTO responsibilityType : responsibilityTypeDTOS) {
@@ -66,13 +66,13 @@ public class OrganizationResponsibilityTypeService{
             List<String> nameInLowerCase = responsibilityTypeNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ResponsibilityTypeMD> existing = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
+            List<ResponsibilityType> existing = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
-            List<ResponsibilityTypeMD> newResponsibilityTypes = new ArrayList<>();
+            List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
-                    ResponsibilityTypeMD newResponsibilityType = new ResponsibilityTypeMD(name);
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
                     newResponsibilityType.setOrganizationId(organizationId);
                     newResponsibilityTypes.add(newResponsibilityType);
                 }
@@ -103,9 +103,9 @@ public class OrganizationResponsibilityTypeService{
      * @return ResponsibilityType object fetch by given id
      * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
      */
-    public ResponsibilityTypeMD getResponsibilityType(Long organizationId, Long id) {
+    public ResponsibilityType getResponsibilityType(Long organizationId, Long id) {
 
-        ResponsibilityTypeMD exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -135,7 +135,7 @@ public class OrganizationResponsibilityTypeService{
     public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityTypeMD responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,responsibilityTypeDTO.getName());
+        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
@@ -154,10 +154,10 @@ public class OrganizationResponsibilityTypeService{
     }
 
 
-    public Map<String, List<ResponsibilityTypeMD>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
+    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Map<String, List<ResponsibilityTypeMD>> result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
-        List<ResponsibilityTypeMD> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
+        Map<String, List<ResponsibilityType>> result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
+        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
         if (!masterResponsibilityTypeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterResponsibilityTypeSuggestedByUnit);
         }

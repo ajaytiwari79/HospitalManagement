@@ -12,11 +12,11 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.assessment.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.*;
-import com.kairos.persistence.model.data_inventory.asset.AssetMD;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityDeprecated;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityMD;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplateMD;
-import com.kairos.persistence.model.risk_management.RiskMD;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
@@ -77,17 +77,17 @@ public class AssessmentService{
         if(!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()){
             exceptionService.illegalArgumentException("message.assessment.relativedeadline.require");
         }
-        AssessmentMD previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, false);
+        Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedAssessmentByUnitIdAndAssetId(unitId, assetId, assessmentStatusList, false);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId,unitId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId,unitId, false);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
         validateLaunchAssessmentValue(assessmentDTO);
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.ASSET_TYPE);
-        AssessmentMD assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, asset) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, asset);
+        Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, asset) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE, asset);
         assessment.setAsset(asset);
         if (!assessmentDTO.isRiskAssessment()) {
             //saveAssetValueToAssessment(unitId, assessment, assetResponseDTO);
@@ -127,14 +127,14 @@ public class AssessmentService{
      */
     public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO,boolean subProcessingActivity) {
 
-        AssessmentMD previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId,assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId,assessmentStatusList, false);
+        Assessment previousAssessment = assessmentDTO.isRiskAssessment() ? assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId,assessmentStatusList, true) : assessmentRepository.findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(unitId, processingActivityId,assessmentStatusList, false);
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
         assessmentDTO.setRiskAssociatedEntity(QuestionnaireTemplateType.PROCESSING_ACTIVITY);
-        ProcessingActivityMD processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId,unitId, false);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId,unitId, false);
         try {
-            AssessmentMD assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivity) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivity);
+            Assessment assessment = assessmentDTO.isRiskAssessment() ? buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.RISK, processingActivity) : buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, processingActivity);
             assessment.setProcessingActivity(processingActivity);
             if (!assessmentDTO.isRiskAssessment()) {
                // saveProcessingActivityValueToAssessment(unitId, assessment, processingActivityDTO);
@@ -155,9 +155,9 @@ public class AssessmentService{
      * @param assessmentDTO
      * @return
      */
-    private AssessmentMD buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
+    private Assessment buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
 
-        AssessmentMD previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, false, assessmentDTO.getName());
+        Assessment previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, false, assessmentDTO.getName());
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
@@ -166,14 +166,14 @@ public class AssessmentService{
         }else if(assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())){
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        AssessmentMD assessment = new AssessmentMD(assessmentDTO.getName(), assessmentDTO.getEndDate(),  assessmentDTO.getComment(),assessmentDTO.getStartDate());
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(),  assessmentDTO.getComment(),assessmentDTO.getStartDate());
         assessment.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class));
         assessment.setAssigneeList(ObjectMapperUtils.copyPropertiesOfListByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class));
         assessment.setOrganizationId(unitId);
-        QuestionnaireTemplateMD questionnaireTemplate;
+        QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
-                AssetMD asset = (AssetMD)entity;
+                Asset asset = (Asset)entity;
                 questionnaireTemplate = checkPreviousLaunchedAssetAssessment(unitId,  asset);
                 break;
             case RISK:
@@ -209,9 +209,9 @@ public class AssessmentService{
     }
 
 
-    private QuestionnaireTemplateMD checkPreviousLaunchedAssetAssessment(Long unitId, AssetMD asset) {
+    private QuestionnaireTemplate checkPreviousLaunchedAssetAssessment(Long unitId, Asset asset) {
         //TODO commented due to id type change from Biginteger to Long
-        QuestionnaireTemplateMD questionnaireTemplate = null;
+        QuestionnaireTemplate questionnaireTemplate = null;
         if (asset.getSubAssetType() != null) {
             questionnaireTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByUnitIdAndAssetTypeIdAndSubAssetTypeId(unitId, asset.getAssetType().getId(), asset.getSubAssetType().getId(),QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
         } else {
@@ -231,12 +231,12 @@ public class AssessmentService{
      * @param entity
      * @return
      */
-    private QuestionnaireTemplateMD checkPreviousLaunchedRiskAssessment(Long unitId, AssessmentDTO assessmentDTO, AssessmentMD assessment, Object entity) {
+    private QuestionnaireTemplate checkPreviousLaunchedRiskAssessment(Long unitId, AssessmentDTO assessmentDTO, Assessment assessment, Object entity) {
 
-        List<RiskMD> risks = new ArrayList<>();
-        QuestionnaireTemplateMD questionnaireTemplate = null;
+        List<Risk> risks = new ArrayList<>();
+        QuestionnaireTemplate questionnaireTemplate = null;
         if (QuestionnaireTemplateType.ASSET_TYPE.equals(assessmentDTO.getRiskAssociatedEntity())) {
-            AssetMD asset = (AssetMD)entity;
+            Asset asset = (Asset)entity;
             risks = asset.getAssetType().getRisks();
             risks.addAll(asset.getSubAssetType().getRisks());
             if (CollectionUtils.isEmpty(risks)) {
@@ -247,7 +247,7 @@ public class AssessmentService{
             else
                 questionnaireTemplate = questionnaireTemplateRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeAndTemplateType(unitId, asset.getAssetType().getId(),QuestionnaireTemplateType.RISK,QuestionnaireTemplateType.ASSET_TYPE,QuestionnaireTemplateStatus.PUBLISHED);
         } else if (QuestionnaireTemplateType.PROCESSING_ACTIVITY.equals(assessmentDTO.getRiskAssociatedEntity())) {
-            ProcessingActivityMD processingActivity = (ProcessingActivityMD) entity;
+            ProcessingActivity processingActivity = (ProcessingActivity) entity;
             risks.addAll(processingActivity.getRisks());
             if (CollectionUtils.isEmpty(risks)) {
                 exceptionService.invalidRequestException("message.assessment.cannotbe.launched.risk.not.present");
@@ -287,7 +287,7 @@ public class AssessmentService{
     }*/
 
 
-    private void getRiskAssessmentAnswer(Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
+    private void getRiskAssessmentAnswer(AssessmentDeprecated assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         List<AssessmentAnswerValueObject> assessmentAnswers = assessment.getAssessmentAnswers();
         Map<BigInteger, Object> riskAssessmentAnswer = new HashMap<>();
@@ -301,7 +301,7 @@ public class AssessmentService{
     }
 
 
-    private void getAssetAssessmentQuestionAndAnswer(Long unitId, Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
+    private void getAssetAssessmentQuestionAndAnswer(Long unitId, AssessmentDeprecated assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         List<AssessmentAnswerValueObject> assetAssessmentAnswers = assessment.getAssessmentAnswers();
         Map<AssetAttributeName, Object> assetAttributeNameObjectMap = new HashMap<>();
@@ -323,7 +323,7 @@ public class AssessmentService{
     }
 
 
-    private void getProcessingActivityAssessmentQuestionAndAnswer(Long unitId, Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
+    private void getProcessingActivityAssessmentQuestionAndAnswer(Long unitId, AssessmentDeprecated assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         List<AssessmentAnswerValueObject> processingActivityAssessmentAnswers = assessment.getAssessmentAnswers();
         Map<ProcessingActivityAttributeName, Object> processingActivityAttributeNameObjectMap = new HashMap<>();
@@ -403,7 +403,7 @@ public class AssessmentService{
      * @return
      */
     public boolean updateAssessmentStatus(Long unitId, Long assessmentId, AssessmentStatus assessmentStatus) {
-        AssessmentMD assessment = assessmentRepository.findByOrganizationIdAndDeletedAndId( assessmentId,false, unitId);
+        Assessment assessment = assessmentRepository.findByOrganizationIdAndDeletedAndId( assessmentId,false, unitId);
         UserVO currentUser = new UserVO();
         ObjectMapperUtils.copyProperties(UserContext.getUserDetails(), currentUser);
         switch (assessmentStatus) {
@@ -434,10 +434,10 @@ public class AssessmentService{
     }
 
 
-    private void saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, AssessmentMD assessment) {
+    private void saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
 
         if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAsset()).isPresent()) {
-            AssetMD asset = assetRepository.findByIdAndOrganizationIdAndDeleted(unitId, assessment.getAsset().getId(),false);
+            Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(unitId, assessment.getAsset().getId(),false);
             List<AssessmentAnswer> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
             assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> {
                 if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
@@ -451,7 +451,7 @@ public class AssessmentService{
             assetRepository.save(asset);
 
         } else if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getProcessingActivity()).isPresent()) {
-            ProcessingActivityMD processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted( assessment.getProcessingActivity().getId(),unitId,false);
+            ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted( assessment.getProcessingActivity().getId(),unitId,false);
             List<AssessmentAnswer> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
             assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
                     -> {
@@ -477,13 +477,13 @@ public class AssessmentService{
 
         Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
-        List<AssessmentMD> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
+        List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments,AssessmentBasicResponseDTO.class );
     }
 
 
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
-        List<AssessmentMD> assessments = assessmentRepository.getAllAssessmentByUnitId(unitId);
+        List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitId(unitId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments, AssessmentResponseDTO.class);
     }
 
@@ -493,7 +493,7 @@ public class AssessmentService{
 
     public boolean deleteAssessmentById(Long unitId, Long assessmentId) {
 
-        AssessmentMD assessment = assessmentRepository.findByUnitIdAndIdAndAssessmentStatus(unitId, assessmentId, AssessmentStatus.IN_PROGRESS);
+        Assessment assessment = assessmentRepository.findByUnitIdAndIdAndAssessmentStatus(unitId, assessmentId, AssessmentStatus.IN_PROGRESS);
         if (Optional.ofNullable(assessment).isPresent()) {
             exceptionService.invalidRequestException("message.assessment.inprogress.cannot.delete", assessment.getName());
         }
@@ -539,7 +539,7 @@ public class AssessmentService{
      * @param assetAttributeValue asset value corresponding to field
      * @param asset               asset to which value Assessment answer were filed by assignee
      */
-    public void saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName assetAttributeName, Object assetAttributeValue, AssetMD asset) {
+    public void saveAssessmentAnswerForAssetOnCompletionOfAssessment(AssetAttributeName assetAttributeName, Object assetAttributeValue, Asset asset) {
         switch (assetAttributeName) {
             case NAME:
                 asset.setName((String) assetAttributeValue);
@@ -594,7 +594,7 @@ public class AssessmentService{
      * @param processingActivityAttributeValue processing activity  value corresponding to field
      * @param processingActivity               processing activity to which value Assessment answer were filed by assignee
      */
-    public void saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName processingActivityAttributeName, Object processingActivityAttributeValue, ProcessingActivity processingActivity) {
+    public void saveAssessmentAnswerForProcessingActivityOnCompletionOfAssessment(ProcessingActivityAttributeName processingActivityAttributeName, Object processingActivityAttributeValue, ProcessingActivityDeprecated processingActivity) {
         switch (processingActivityAttributeName) {
             case NAME:
                 processingActivity.setName((String) processingActivityAttributeValue);
@@ -665,7 +665,7 @@ public class AssessmentService{
     }
 
 //TODO
-    private void saveAssetValueToAssessment(Long unitId, Assessment assessment, AssetResponseDTO assetResponseDTO) {
+    private void saveAssetValueToAssessment(Long unitId, AssessmentDeprecated assessment, AssetResponseDTO assetResponseDTO) {
 
         /*QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {
@@ -696,7 +696,7 @@ public class AssessmentService{
 
     }*/
 
-   /* private void saveRiskTemplateAnswerToAssessment(Long unitId, AssessmentMD assessment) {
+   /* private void saveRiskTemplateAnswerToAssessment(Long unitId, Assessment assessment) {
 
         QuestionnaireTemplateResponseDTO questionnaireTemplateDTO = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplate());
         if (!Optional.ofNullable(questionnaireTemplateDTO).isPresent()) {

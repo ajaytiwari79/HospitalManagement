@@ -2,13 +2,15 @@ package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-
-public class TransferMethod {
+@Entity
+public class TransferMethod extends BaseEntity {
 
 
     @NotBlank(message = "Name can't be empty")
@@ -51,10 +53,19 @@ public class TransferMethod {
         this.suggestedDataStatus = suggestedDataStatus;
     }
 
+    public TransferMethod(@NotBlank(message = "Name can't be empty") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public TransferMethod(String name) {
         this.name = name;
     }
     public TransferMethod() {
+    }
+
+    public TransferMethod(Long id ) {
+        this.id = id;
     }
 }
 

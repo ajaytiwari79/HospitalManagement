@@ -1,55 +1,79 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
 
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.dto.gdpr.ServiceCategoryDTO;
-import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-
-public class MasterAsset {
+@Entity
+public class MasterAsset extends BaseEntity {
 
 
     @NotBlank(message = "Name can't be empty")
     private  String name;
     @NotBlank(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List <OrganizationSubTypeDTO> organizationSubTypeDTOS;
-    private List <ServiceCategoryDTO> organizationServices;
-    private List <SubServiceCategoryDTO> organizationSubServices;
+
+    @ElementCollection
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <ServiceCategory> organizationServices = new ArrayList<>();
+
+    @ElementCollection
+    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
     private Long countryId;
-    private BigInteger assetTypeId;
-    private BigInteger assetSubTypeId;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private AssetType assetTypeMD;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private AssetType subAssetType;
+
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
 
 
-    public MasterAsset(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS,
-                       List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices, SuggestedDataStatus suggestedDataStatus) {
+    public MasterAsset(String name, String description, Long countryId, List<OrganizationType> organizationTypes,
+                       List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices, SuggestedDataStatus suggestedDataStatus) {
         this.name = name;
         this.description = description;
         this.countryId=countryId;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
 
     }
 
-    public MasterAsset(String name,  String description, Long countryId, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
+    public MasterAsset(String name, String description, Long countryId, LocalDate suggestedDate, SuggestedDataStatus suggestedDataStatus) {
         this.name = name;
         this.description = description;
         this.countryId = countryId;
         this.suggestedDate = suggestedDate;
         this.suggestedDataStatus = suggestedDataStatus;
+    }
+
+    public MasterAsset(String name, String description, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.description = description;
+        this.countryId=countryId;
+        this.suggestedDataStatus=suggestedDataStatus;
+
     }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }
@@ -61,14 +85,6 @@ public class MasterAsset {
     public MasterAsset setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus;return this; }
 
     public Long getCountryId() { return countryId; }
-
-    public BigInteger getAssetTypeId() { return assetTypeId; }
-
-    public void setAssetTypeId(BigInteger assetTypeId) { this.assetTypeId = assetTypeId; }
-
-    public BigInteger getAssetSubTypeId() { return assetSubTypeId; }
-
-    public void setAssetSubTypeId(BigInteger assetSubTypeId) { this.assetSubTypeId = assetSubTypeId; }
 
     public MasterAsset setCountryId(Long countryId) { this.countryId = countryId; return this;}
 
@@ -84,30 +100,45 @@ public class MasterAsset {
 
     public MasterAsset setDescription(String description) { this.description = description;return this; }
 
-    public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+    public List<OrganizationType> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public MasterAsset setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; return this;}
+    public MasterAsset setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; return this;}
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+    public List<OrganizationSubType> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public MasterAsset setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS;return this; }
+    public MasterAsset setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes;return this; }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() {
+    public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public MasterAsset setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; return this;}
+    public MasterAsset setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; return this;}
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
+    public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public MasterAsset setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
+    public MasterAsset setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
 
+    public AssetType getAssetType() {
+        return assetTypeMD;
+    }
+
+    public void setAssetType(AssetType assetType) {
+        this.assetTypeMD = assetType;
+    }
+
+    public AssetType getSubAssetType() {
+        return subAssetType;
+    }
+
+    public void setSubAssetType(AssetType subAssetType) {
+        this.subAssetType = subAssetType;
+    }
 
     public MasterAsset() {
     }
