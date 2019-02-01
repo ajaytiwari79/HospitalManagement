@@ -475,28 +475,43 @@ public class StaffService {
                     continue;
                 }
                 // to check mandatory fields
-                int[] mandatoryCellColumnIndexs = {2, 8, 19, 20, 21, 23, 41};
+                int[] mandatoryCellColumnIndexs = {2, 20, 21, 23, 28, 41};
                 boolean isPerStaffMandatoryFieldsExists = validateStaffData(row, mandatoryCellColumnIndexs);
+                Long cprAsLong = null; String firstName = ""; String lastName = ""; String privateEmail = "";
+                if( isNotNull(row.getCell(41)) ){
+                    cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
+                }
+                if( isNotNull(row.getCell(20)) ){
+                    firstName = getStringValueOfIndexedCell(row, 20);
+                }
+                if( isNotNull(row.getCell(21)) ){
+                    lastName =getStringValueOfIndexedCell(row, 21);
+                }
+                if( isNotNull(row.getCell(28)) ){
+                    privateEmail = getStringValueOfIndexedCell(row, 28);
+                }
                 if (!isPerStaffMandatoryFieldsExists) {
-                    Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
-                    StaffDTO staffDTO = new StaffDTO(getStringValueOfIndexedCell(row, 20),getStringValueOfIndexedCell(row, 21), new BigInteger(cprNumberLong.toString()), getStringValueOfIndexedCell(row, 28).toLowerCase(),"Some of the mandatory fields are missing");
+                    StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail,"Some of the mandatory fields are missing");
+                    if(isNotNull(cprAsLong)) {
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
+                    }
                     staffErrorList.add(staffDTO);
                 } else {
                     String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
-                        StaffDTO staffDTO = new StaffDTO(getStringValueOfIndexedCell(row, 20), getStringValueOfIndexedCell(row, 21), new BigInteger(cprNumberLong.toString()), getStringValueOfIndexedCell(row, 28).toLowerCase(),"Duplicate External Id");
+                        StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail,"Duplicate External Id");
+                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                         staffErrorList.add(staffDTO);
                         continue;
                     }
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    staff.setUserName(getStringValueOfIndexedCell(row, 19));
-                    staff.setFirstName(getStringValueOfIndexedCell(row, 20));
-                    staff.setLastName(getStringValueOfIndexedCell(row, 21));
-                    staff.setFamilyName(staff.getLastName());
+                    staff.setUserName(privateEmail);
+                    staff.setFirstName(firstName);
+                    staff.setLastName(lastName);
+                    staff.setFamilyName(lastName);
                     if (row.getCell(17) != null) {
                         staff.setBadgeNumber(getStringValueOfIndexedCell(row, 17));
                     }
@@ -509,15 +524,14 @@ public class StaffService {
                     staff.setContactAddress(contactAddress);
                     User user = null;
                     if (isPerStaffMandatoryFieldsExists) {
-                        user = userGraphRepository.findByEmail(getStringValueOfIndexedCell(row, 28).toLowerCase());
+                        user = userGraphRepository.findByEmail(privateEmail.toLowerCase());
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(getStringValueOfIndexedCell(row, 20));
-                            user.setLastName(getStringValueOfIndexedCell(row, 21));
-                            Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
-                            user.setCprNumber(cprNumberLong.toString().trim());
+                            user.setFirstName(firstName);
+                            user.setLastName(lastName);
+                            user.setCprNumber(cprAsLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
