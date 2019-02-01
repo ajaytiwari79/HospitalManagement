@@ -3,12 +3,13 @@ package com.kairos.service.common;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
-import com.kairos.persistence.model.clause.Clause;
-import com.kairos.persistence.model.clause_tag.ClauseTag;
+import com.kairos.persistence.model.clause.ClauseMD;
+import com.kairos.persistence.model.clause_tag.ClauseTagMD;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
-import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityMD;
 import com.kairos.persistence.model.master_data.data_category_element.DataCategoryMD;
 import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
@@ -17,10 +18,11 @@ import com.kairos.persistence.model.questionnaire_template.Question;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
-import com.kairos.persistence.repository.clause.ClauseMongoRepository;
+import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMDRepository;
@@ -32,7 +34,7 @@ import com.kairos.persistence.repository.master_data.asset_management.tech_secur
 import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityMDRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
@@ -46,7 +48,6 @@ import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
-import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
@@ -79,11 +80,11 @@ public class DefaultDataInheritService extends MongoBaseService {
     @Inject
     private MasterAssetMongoRepository masterAssetMongoRepository;
     @Inject
-    private MasterProcessingActivityRepository masterProcessingActivityRepository;
+    private MasterProcessingActivityMDRepository masterProcessingActivityMDRepository;
     @Inject
     private AssetMongoRepository assetMongoRepository;
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingActivityRepository processingActivityRepository;
     @Inject
     private DataDisposalMDRepository dataDisposalMDRepository;
     @Inject
@@ -129,9 +130,9 @@ public class DefaultDataInheritService extends MongoBaseService {
     @Inject
     private DataSubjectMappingRepository dataSubjectMappingRepository;
     @Inject
-    private ClauseTagMongoRepository clauseTagMongoRepository;
+    private ClauseTagRepository clauseTagRepository;
     @Inject
-    private ClauseMongoRepository clauseMongoRepository;
+    private ClauseRepository clauseRepository;
 
     @Inject
     private AssetTypeService assetTypeService;
@@ -147,10 +148,10 @@ public class DefaultDataInheritService extends MongoBaseService {
     public boolean copyMasterDataFromCountry(Long unitId, OrgTypeSubTypeServiceCategoryVO orgTypeSubTypeServiceCategoryVO) throws Exception {
 
         Long countryId = orgTypeSubTypeServiceCategoryVO.getCountryId();
-       /* OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId()),
+        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList()),
                 orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));*/
+                orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
        /* List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(countryId);
         List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryService.getAllDataCategoryWithDataElementByCountryId(countryId);
         saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
@@ -236,12 +237,12 @@ public class DefaultDataInheritService extends MongoBaseService {
             responsibilityTypeRepository.saveAll(transferMethods);
             return true;
         };
-        /*Callable<Boolean> processingActivityTask = () -> {
-            List<MasterProcessingActivityResponseDTO> masterProcessingActivityDTOS = masterProcessingActivityRepository.getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
+        Callable<Boolean> processingActivityTask = () -> {
+            List<MasterProcessingActivityMD> masterProcessingActivityDTOS = masterProcessingActivityMDRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(),organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
             copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivityDTOS);
             return true;
         };
-        Callable<Boolean> questionniareTemplateTask = () -> {
+        /*Callable<Boolean> questionniareTemplateTask = () -> {
             List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(countryId);
             copyQuestionnaireTemplateFromCountry(unitId, questionnaireTemplateDTOS);
             return true;
@@ -250,35 +251,34 @@ public class DefaultDataInheritService extends MongoBaseService {
             List<MasterAssetResponseDTO> masterAssetDTOS = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
             copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssetDTOS);
             return true;
-        };
+        };*/
         Callable<Boolean> dataSubjectTask = () -> {
             List<DataSubjectMappingResponseDTO> dataSubjectMappingDTOS = dataSubjectMappingService.getAllDataSubjectWithDataCategoryByCountryId(countryId);
             copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
             return true;
         };
         Callable<Boolean> clauseTask = () -> {
-            List<Clause> clauses = clauseMongoRepository.getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
+            List<ClauseMD> clauses = clauseRepository.getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO.getOrganizationTypeId(),organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
             copyClauseFromCountry(unitId, clauses);
             return true;
         };
 
 
-        /*callables.add(technicalSecurityMeasureTask);
-        callables.add(storageFormatTask);
-        callables.add(orgSecurityMeasureTask);
-        callables.add(accessorPartyTask);
-        callables.add(dataSourceTask);
-        callables.add(legalBasisTask);
-        callables.add(processingPurposeTask);
-        callables.add(responsibilityTypeTask);
-        callables.add(transferMethodTask);
-        callables.add(processingActivityTask);
-        callables.add(questionniareTemplateTask);
-        callables.add(assetTask);
-        callables.add(dataSubjectTask);
+//        callables.add(technicalSecurityMeasureTask);
+//        callables.add(storageFormatTask);
+//        callables.add(orgSecurityMeasureTask);
+//        callables.add(accessorPartyTask);
+//        callables.add(dataSourceTask);
+//        callables.add(legalBasisTask);
+//        callables.add(processingPurposeTask);
+//        callables.add(responsibilityTypeTask);
+//        callables.add(transferMethodTask);
+ //       callables.add(processingActivityTask);
+//        callables.add(questionniareTemplateTask);
+//        callables.add(assetTask);
+//        callables.add(dataSubjectTask);
         callables.add(clauseTask);
-        */
-        callables.add(dataDisposalCreationlTask);
+        //callables.add(dataDisposalCreationlTask);
         /*callables.add(hostingProviderCreationTask);
         callables.add(hostingTypeCreationTask);*/
         asynchronousService.executeAsynchronously(callables);
@@ -303,69 +303,54 @@ public class DefaultDataInheritService extends MongoBaseService {
         }
     }
 
-    private void copyClauseFromCountry(Long unitId, List<Clause> clauses) {
+    private void copyClauseFromCountry(Long unitId, List<ClauseMD> clauses) {
         if (CollectionUtils.isNotEmpty(clauses)) {
 
-            Set<BigInteger> clauseTagIds = new HashSet<>();
-            List<ClauseTag> clauseTags = new ArrayList<>();
-            List<Clause> clauseList = new ArrayList<>();
+            Set<Long> clauseTagIds = new HashSet<>();
+            List<ClauseMD> clauseList = new ArrayList<>();
             clauses.forEach(clauseResponse -> {
-                Clause clause = new Clause(clauseResponse.getTitle(), clauseResponse.getDescription());
+                ClauseMD clause = new ClauseMD(clauseResponse.getTitle(), clauseResponse.getDescription());
                 clause.setOrganizationId(unitId);
-                List<ClauseTag> tags = new ArrayList<>();
+                List<ClauseTagMD> tags = new ArrayList<>();
                 clauseResponse.getTags().forEach(clauseTag -> {
                     if (!clauseTagIds.contains(clauseTag.getId())) {
-                        ClauseTag tag = new ClauseTag(clauseTag.getName());
+                        ClauseTagMD tag = new ClauseTagMD(clauseTag.getName());
                         tag.setOrganizationId(unitId);
                         tag.setDefaultTag(clauseTag.isDefaultTag());
                         clauseTagIds.add(clauseTag.getId());
-                        tags.add(clauseTag);
+                        tags.add(tag);
                     }
                 });
                 clause.setTags(tags);
-                clauseTags.addAll(tags);
                 clauseList.add(clause);
             });
-            clauseTagMongoRepository.saveAll(clauseTags);
-            clauseMongoRepository.saveAll(clauseList);
+           // clauseTagRepository.saveAll(clauseTags);
+            clauseRepository.saveAll(clauseList);
         }
 
     }
 
 
-    private void copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(Long unitId, List<MasterProcessingActivityResponseDTO> masterProcessingActivityDTOS) {
+    private void copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(Long unitId, List<MasterProcessingActivityMD> masterProcessingActivities) {
 
-        if (CollectionUtils.isNotEmpty(masterProcessingActivityDTOS)) {
-            List<ProcessingActivity> processingActivities = new ArrayList<>();
-            Map<ProcessingActivity, List<ProcessingActivity>> processingActivitySubProcessingActivityListMap = new HashMap<>();
-            for (MasterProcessingActivityResponseDTO masterProcessingActivityDTO : masterProcessingActivityDTOS) {
-                ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivityDTO.getName(), masterProcessingActivityDTO.getDescription(), false);
-                processingActivity.setSubProcess(false);
-                processingActivity.setOrganizationId(unitId);
-                List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
-                if (CollectionUtils.isNotEmpty(masterProcessingActivityDTO.getSubProcessingActivities())) {
-                    for (MasterProcessingActivityResponseDTO subProcessingActivityDTO : masterProcessingActivityDTO.getSubProcessingActivities()) {
-                        ProcessingActivity subProcessingActivity = new ProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), false);
-                        subProcessingActivity.setOrganizationId(unitId);
-                        subProcessingActivity.setSubProcess(true);
-                        subProcessingActivities.add(subProcessingActivity);
-                    }
-                    processingActivities.addAll(subProcessingActivities);
-                }
-                processingActivitySubProcessingActivityListMap.put(processingActivity, subProcessingActivities);
-            }
-
-            if (CollectionUtils.isNotEmpty(processingActivities)) {
-                processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
-            }
-            processingActivitySubProcessingActivityListMap.forEach((processingActivity, subProcessingActivities) -> {
-                if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
-                    processingActivity.setSubProcessingActivities(subProcessingActivities.stream().map(ProcessingActivity::getId).collect(Collectors.toList()));
-                }
-            });
-            processingActivities = new ArrayList<>(processingActivitySubProcessingActivityListMap.keySet());
-            processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
+        if (CollectionUtils.isNotEmpty(masterProcessingActivities)) {
+            List<ProcessingActivityMD> unitLevelProcessingActivities = prepareProcessingActivityAndSubProcessingActivityBasicDataOnly(unitId, masterProcessingActivities, false);
+            processingActivityRepository.saveAll(unitLevelProcessingActivities);
         }
+    }
+
+    private List<ProcessingActivityMD> prepareProcessingActivityAndSubProcessingActivityBasicDataOnly(Long unitId, List<MasterProcessingActivityMD> masterProcessingActivities, boolean isSubProcessingActivity){
+        List<ProcessingActivityMD> processingActivityList = new ArrayList<>();
+        for (MasterProcessingActivityMD masterProcessingActivity : masterProcessingActivities) {
+            ProcessingActivityMD processingActivity = new ProcessingActivityMD(masterProcessingActivity.getName(), masterProcessingActivity.getDescription(), false);
+            processingActivity.setSubProcessingActivity(isSubProcessingActivity);
+            processingActivity.setOrganizationId(unitId);
+            if(!masterProcessingActivity.getSubProcessingActivities().isEmpty() && masterProcessingActivity.isHasSubProcessingActivity() == true) {
+                processingActivity.setSubProcessingActivities(prepareProcessingActivityAndSubProcessingActivityBasicDataOnly(unitId, masterProcessingActivity.getSubProcessingActivities(), true));
+            }
+            processingActivityList.add(processingActivity);
+        }
+        return processingActivityList;
     }
 
 

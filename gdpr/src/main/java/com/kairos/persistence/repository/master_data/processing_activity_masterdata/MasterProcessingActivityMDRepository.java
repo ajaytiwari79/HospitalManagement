@@ -39,4 +39,7 @@ public interface MasterProcessingActivityMDRepository extends JpaRepository<Mast
     @Modifying
     @Query(value = "Update master_processing_activitymd set deleted = true, master_processing_activity_id = null where countryId = ?1 and master_processing_activity_id = ?2 and id = ?3", nativeQuery = true)
     Integer deleteSubProcessingActivityFromMasterProcessingActivity(Long countryId, Long processingActivityId, Long subProcessingActivityId);
+
+    @Query(value = "Select MPA from MasterProcessingActivityMD MPA JOIN MPA.organizationTypes OT JOIN MPA.organizationSubTypes OST JOIN MPA.organizationServices SC JOIN MPA.organizationSubServices SSC where MPA.countryId = ?1 and MPA.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
+    List<MasterProcessingActivityMD> findAllByCountryIdAndOrganizationalMetadata(Long countryId, List<Long> organizationTypeIds,List<Long> organizationSubTypeIds,List<Long> organizationServiceCategoryIds,List<Long> organizationSubServiceCategoryTypeIds);
 }

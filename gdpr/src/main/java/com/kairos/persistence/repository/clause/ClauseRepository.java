@@ -33,7 +33,10 @@ public interface ClauseRepository extends JpaRepository<ClauseMD, Long> {
     @Query(value = "Select c from ClauseMD c where c.tempClauseId != null")
     List<ClauseMD> getAllClausesHavingTempId();
 
-    @Query(value = "Select c from ClauseMD c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?1) and OST.id IN (?2) and SC.id IN (?3) and SSC.id IN (?4)")
+    @Query(value = "Select c from ClauseMD c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
     List<ClauseMD> findAllClauseByAgreementTemplateMetadataAndCountryId(Long countryId,List<Long> organizationTypeIds,List<Long> organizationSubTypeIds,List<Long> serviceCategoryIds,List<Long> subServiceCategoryIds, Long templateTypeId);
+
+    @Query(value = "Select DISTINCT c from ClauseMD c JOIN c.organizationTypes OT JOIN c.organizationSubTypes OST JOIN c.organizationServices SC JOIN c.organizationSubServices SSC where c.countryId = ?1 and c.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
+    List<ClauseMD> getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(Long countryId, List<Long> organizationTypeIds,List<Long> organizationSubTypeIds,List<Long> organizationServiceCategoryIds,List<Long> organizationSubServiceCategoryTypeIds);
 
 }

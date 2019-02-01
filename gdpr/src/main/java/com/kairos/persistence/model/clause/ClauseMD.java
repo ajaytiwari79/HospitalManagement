@@ -23,7 +23,7 @@ public class ClauseMD extends BaseEntity {
     @NotBlank
     private String title;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<ClauseTagMD> tags  = new ArrayList<>();
 
     @NotNull
@@ -49,7 +49,7 @@ public class ClauseMD extends BaseEntity {
     //private List<Long> organizationList;
     private Long parentClauseId;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany
     private List<TemplateTypeMD> templateTypes  = new ArrayList<>();
 
     @Transient
