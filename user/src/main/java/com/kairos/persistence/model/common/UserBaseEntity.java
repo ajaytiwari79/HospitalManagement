@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.common.UserInfo;
 import org.neo4j.ogm.annotation.GraphId;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Contains common fields of an entity
@@ -24,15 +27,15 @@ public abstract class UserBaseEntity implements Serializable {
     @JsonIgnore
 
     @CreatedDate
-    private Long creationDate;
+    private LocalDateTime creationDate;
     @JsonIgnore
 
     @LastModifiedDate
-    private Long lastModificationDate;
+    private LocalDateTime lastModificationDate;
 
-    @JsonIgnore
+    @CreatedBy
     protected UserInfo createdBy;
-    @JsonIgnore
+    @LastModifiedBy
     protected UserInfo lastModifiedBy;
 
 
@@ -44,19 +47,19 @@ public abstract class UserBaseEntity implements Serializable {
         return id;
     }
 
-    public Long getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Long creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
 
-    public Long getLastModificationDate() {
+    public LocalDateTime getLastModificationDate() {
         return lastModificationDate;
     }
 
-    public void setLastModificationDate(Long lastModificationDate) {
+    public void setLastModificationDate(LocalDateTime lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
 

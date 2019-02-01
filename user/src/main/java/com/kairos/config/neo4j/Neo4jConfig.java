@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -32,6 +33,7 @@ import static com.kairos.constants.Neo4jConstant.*;
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 @ComponentScan("com.kairos.persistence")
 @EnableTransactionManagement
+@EnableNeo4jAuditing
 public class Neo4jConfig  implements EnvironmentAware {
 
     private final Logger logger = LoggerFactory.getLogger(Neo4jConfig.class);

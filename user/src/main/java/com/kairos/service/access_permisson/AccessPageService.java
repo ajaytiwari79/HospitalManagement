@@ -168,8 +168,6 @@ public class AccessPageService {
                 EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
                 employmentAccessPageRelation.setRead(true);
                 employmentAccessPageRelation.setWrite(false);
-                employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-                employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
                 employmentAccessPageRelations.add(employmentAccessPageRelation);
             }
         }
@@ -183,8 +181,6 @@ public class AccessPageService {
             EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
             employmentAccessPageRelation.setRead(true);
             employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-            employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
@@ -197,8 +193,6 @@ public class AccessPageService {
             EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
             employmentAccessPageRelation.setRead(true);
             employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-            employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
