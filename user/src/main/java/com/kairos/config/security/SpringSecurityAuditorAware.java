@@ -24,14 +24,10 @@ public class SpringSecurityAuditorAware implements AuditorAware<User> {
 
     public Optional<User> getCurrentAuditor() {
         if (Optional.ofNullable(UserContext.getUserDetails()).isPresent() && Optional.ofNullable(UserContext.getUserDetails().getId()).isPresent()) {
-            LOGGER.info("Created by or modified by "+UserContext.getUserDetails().getUserName());
+            LOGGER.info("Created by or modified by " + UserContext.getUserDetails().getUserName());
             return userGraphRepository.findById(UserContext.getUserDetails().getId(), 0);
-        }
-        else {
-            return  Optional.of(new User());
+        } else {
+            return Optional.of(new User());
         }
     }
-
-
-
 }
