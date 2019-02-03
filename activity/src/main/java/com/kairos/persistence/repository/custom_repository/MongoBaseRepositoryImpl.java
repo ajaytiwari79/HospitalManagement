@@ -112,11 +112,11 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 				className = entity.getClass().getSuperclass().getSimpleName();
 			}
-			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+			//entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 			entity.setCreatedAt(DateUtils.getDate());
 			entity.setId(nextSequence(className));
 		}else {
-			entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+			//entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 		}
 		/**
 		 *  Set updatedAt time as current time
@@ -173,7 +173,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 						className = entity.getClass().getSuperclass().getSimpleName();
 					}
 					entity.setId(nextSequence(className));
-					entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+					//entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 					dbObject = new BasicDBObject();
 
                     /*
@@ -186,7 +186,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
                     * */
 					bulkWriteOperation.insert(dbObject);
 				}else {
-					entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+					//entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 					dbObject = new BasicDBObject();
 
                     /*

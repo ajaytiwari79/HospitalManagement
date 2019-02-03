@@ -9,11 +9,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ import static com.kairos.constants.MongoConstant.MONGO_URI;
  */
 @Configuration
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+@EnableMongoAuditing
+@EnableTransactionManagement
 public class MongoConfig extends AbstractMongoConfiguration implements EnvironmentAware {
 
     Environment environment;
