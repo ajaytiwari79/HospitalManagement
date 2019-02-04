@@ -69,16 +69,4 @@ public class IndustryType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-
-
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
-    }
 }

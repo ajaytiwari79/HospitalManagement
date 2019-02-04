@@ -529,15 +529,15 @@ public class CountryController {
     @ApiOperation(value = "Add ContractType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/contractType", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addContractType(@PathVariable long countryId, @Validated @RequestBody ContractType contractType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.createContractType(countryId, contractType));
+    public ResponseEntity<Map<String, Object>> addContractType(@PathVariable long countryId, @Validated @RequestBody ContractTypeDTO contractTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.createContractType(countryId, contractTypeDTO));
     }
 
     @ApiOperation(value = "Update ContractType")
     @RequestMapping(value = COUNTRY_URL + "/contractType", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateContractType(@Validated @RequestBody ContractType contractType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateContractType(contractType));
+    public ResponseEntity<Map<String, Object>> updateContractType(@PathVariable long countryId, @Validated @RequestBody ContractTypeDTO contractTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateContractType(countryId, contractTypeDTO));
     }
 
     @ApiOperation(value = "Delete ContractType by contractTypeId")

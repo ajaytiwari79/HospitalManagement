@@ -92,17 +92,4 @@ public class VatType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("percentage",this.percentage);
-        map.put("code",this.code);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
-    }
 }
