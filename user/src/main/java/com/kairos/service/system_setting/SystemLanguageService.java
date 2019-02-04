@@ -162,7 +162,7 @@ public class SystemLanguageService {
                 }
             });
         } else if (isNotNull(selected) && selected) {
-            countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country, systemLanguage, systemLanguage.isDefaultLanguage()));
+            countryLanguageSettingRelationships.add(new CountryLanguageSettingRelationship(country, systemLanguage, false));
         }
         countryLanguageSettingRelationshipRepository.saveAll(countryLanguageSettingRelationships);
         return true;
@@ -190,6 +190,8 @@ public class SystemLanguageService {
                     systemLanguageDTO.setSelected(true);
                 }
             });
+            //TODO remove when fixed code reivew point
+            systemLanguageDTO.setDefaultLanguage(false);
         });
         return systemLanguageDTOS;
     }
