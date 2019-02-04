@@ -79,7 +79,7 @@ public class ExpertiseNightWorkerSettingServiceUnitTest {
 
         expertiseNightWorkerSettingDTO.setIntervalUnitToCheckNightWorker(DurationType.HOURS);
         when(expertiseNightWorkerSettingRepository.findOne(new BigInteger("10"))).thenReturn(expertiseNightWorkerSetting);
-        when(mongoBaseService.save(expertiseNightWorkerSetting)).thenReturn(expertiseNightWorkerSetting);
+        when(expertiseNightWorkerSettingRepository.save(expertiseNightWorkerSetting)).thenReturn(expertiseNightWorkerSetting);
         ExpertiseNightWorkerSettingDTO result=expertiseNightWorkerSettingService.updateExpertiseNightWorkerSettingsInUnit(1075L,1075L,expertiseNightWorkerSettingDTO);
         Assert.assertEquals(DurationType.HOURS,result.getIntervalUnitToCheckNightWorker());
 
