@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -23,7 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,7 +37,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by vipul on 19/1/18.
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ShiftServiceUnitTest {
     private final Logger logger = LoggerFactory.getLogger(ShiftServiceUnitTest.class);
     @InjectMocks
@@ -58,8 +61,11 @@ public class ShiftServiceUnitTest {
 
     @Test
     public void findButtonConfigForSendToPayrollNegativeCase() {
-        Date startDate = new Date(2018,11,19);
-        Date endDate = new Date(2018,11,25);
+        LocalDate startdate = LocalDate.now();
+        startdate = startdate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        LocalDate enddate=startdate.plusDays(7);
+        Date startDate = DateUtils.asDate(startdate);
+        Date endDate = DateUtils.asDate(enddate);
         List<ShiftDTO> shifts = new ArrayList<>();
 
         ShiftDTO shift = new ShiftDTO(BigInteger.valueOf(13870L),new Date(2018,11,19,13,0),new Date(2018,11,19,16,0),35602L,14139L);
@@ -87,8 +93,11 @@ public class ShiftServiceUnitTest {
 
     @Test
     public void findButtonConfigForSendToPayrollPositiveCase() {
-        Date startDate = new Date(2018,11,19);
-        Date endDate = new Date(2018,11,25);
+        LocalDate startdate = LocalDate.now();
+        startdate = startdate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        LocalDate enddate=startdate.plusDays(7);
+        Date startDate = DateUtils.asDate(startdate);
+        Date endDate = DateUtils.asDate(enddate);
         List<ShiftDTO> shifts = new ArrayList<>();
 
         ShiftDTO shift = new ShiftDTO(BigInteger.valueOf(13879L),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
@@ -123,6 +132,7 @@ public class ShiftServiceUnitTest {
         Map<String,Phase> phaseMap=new HashMap<>();
         phaseMap.put(phase.getPhaseEnum().toString(),phase);
         activity=new ShiftActivity();
+        activity.setId(new BigInteger("12"));
         activity.setActivityId(BigInteger.valueOf(47));
         activity.setStartDate(new Date(2018,10,28,12,30));
         activity.setEndDate(new Date(2018,10,28,18,00));

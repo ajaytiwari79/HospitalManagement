@@ -3,7 +3,6 @@ package com.kairos.service.night_worker;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.common.MongoSequence;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
@@ -23,11 +22,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ExpertiseNightWorkerSettingServiceUnitTest {
 
     @InjectMocks
@@ -68,7 +65,7 @@ public class ExpertiseNightWorkerSettingServiceUnitTest {
         expertiseNightWorkerSetting.setCountryId(1012L);
         when(expertiseNightWorkerSettingRepository.findOne(new BigInteger("10"))).thenReturn(expertiseNightWorkerSetting);
         when(mongoSequenceRepository.nextSequence("")).thenReturn(new BigInteger("15"));
-        when(mongoBaseService.save(expertiseNightWorkerSetting)).thenReturn(expertiseNightWorkerSetting);
+        when(expertiseNightWorkerSettingRepository.save(expertiseNightWorkerSetting)).thenReturn(expertiseNightWorkerSetting);
         ExpertiseNightWorkerSettingDTO result=expertiseNightWorkerSettingService.updateExpertiseNightWorkerSettingsInUnit(1075L,1075L,expertiseNightWorkerSettingDTO);
         Assert.assertEquals(null,result.getId());
 

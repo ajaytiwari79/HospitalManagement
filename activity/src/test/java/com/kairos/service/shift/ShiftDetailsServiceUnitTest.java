@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -53,7 +52,7 @@ public class ShiftDetailsServiceUnitTest {
     public void shiftDetailsById() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        String jsonString = "{'id':297,'name':null,'activities':[{'startDate':'2019-01-09T17:15:00.000+0000', 'endDate':'2019-01-09T23:00:00.000+0000','activityName':'Devops','reasonCodeId':4,'id':834,'description':null,'wtaRuleViolations':[" +
+        String jsonString = "{'id':297,'name':null,'activities':[{'startDate':'2019-01-09T17:15:00.000+0000', 'endDate':'2019-01-09T23:00:00.000+0000','activityName':'Devops','absenceReasonCodeId':4,'id':834,'description':null,'wtaRuleViolations':[" +
                 "{'ruleTemplateId':462,'name':'Maximum shift length','counter':3}]}],'startDate':'2019-01-09T17:15:00.000+0000'," +
                 "'endDate':'2019-01-09T23:00:00.000+0000'}";
         ShiftWithActivityDTO shiftWithActivityDTO = mapper.readValue(jsonString, ShiftWithActivityDTO.class);
@@ -71,7 +70,7 @@ public class ShiftDetailsServiceUnitTest {
         ReasonCodeWrapper reasonCodeWrapper = new ReasonCodeWrapper(Collections.singletonList(reasonCodeDTO), contactAddressData);
         List<NameValuePair> requestParam = new ArrayList<>();
         Set<Long> reasonCodeIds= new HashSet<Long>(){{add(4l);}};
-        requestParam.add(new BasicNameValuePair("reasonCodeIds", reasonCodeIds.toString()));
+        requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", reasonCodeIds.toString()));
         when(genericIntegrationService.getUnitInfoAndReasonCodes(unitId,requestParam)).thenReturn(reasonCodeWrapper);
         when(shiftMongoRepository.findAllShiftsByIds(shiftIds)).thenReturn(Arrays.asList(shiftWithActivityDTO));
         List<ShiftViolatedRules> shiftViolatedRules =new ArrayList<>();
