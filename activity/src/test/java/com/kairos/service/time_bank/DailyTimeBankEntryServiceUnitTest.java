@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DailyTimeBankEntryServiceUnitTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DailyTimeBankEntryServiceUnitTest.class);

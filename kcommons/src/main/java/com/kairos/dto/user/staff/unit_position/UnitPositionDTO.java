@@ -90,15 +90,15 @@ public class UnitPositionDTO {
         this.published = published;
     }
 
-    public UnitPositionDTO(Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
+    public UnitPositionDTO(Long expertiseId, LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes,
                            float avgDailyWorkingHours, BigDecimal hourlyCost, Double salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.hourlyCost = hourlyCost;
         this.expertiseId = expertiseId;
-      //  this.startDateMillis = startDateMillis;
-       // this.endDateMillis = endDateMillis;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.employmentTypeId = employmentTypeId;
 
     }
