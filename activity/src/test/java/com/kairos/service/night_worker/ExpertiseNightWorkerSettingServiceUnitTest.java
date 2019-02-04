@@ -24,7 +24,7 @@ import java.math.BigInteger;
 
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ExpertiseNightWorkerSettingServiceUnitTest {
 
     @InjectMocks

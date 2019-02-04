@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by vipul on 19/1/18.
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.Strict.class)
 public class ShiftServiceUnitTest {
     private final Logger logger = LoggerFactory.getLogger(ShiftServiceUnitTest.class);
     @InjectMocks
