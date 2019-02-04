@@ -14,6 +14,7 @@ public class UnionDTO {
     private String name;
     private ContactAddressDTO mainAddress;
     private List<Long> sectorIds = new ArrayList<>();
+    private List<LocationDTO> locations = new ArrayList<>();
     private List<Long> locationIds = new ArrayList<>();
     private Long id;
     private UnionState state;
@@ -64,5 +65,13 @@ public class UnionDTO {
 
     public void setState(UnionState state) {
         this.state = state;
+    }
+
+    public List<LocationDTO> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<LocationDTO> locations) {
+        this.locations = locations;
     }
 }

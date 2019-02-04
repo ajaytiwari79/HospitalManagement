@@ -50,6 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 /**
  * Created by vipul on 13/2/18.
@@ -317,7 +318,9 @@ public class UnionService {
             }
 
             organizationGraphRepository.save(union);
-
+            if(isCollectionNotEmpty(union.getLocations())){
+            unionData.setLocations(ObjectMapperUtils.copyPropertiesOfListByMapper(union.getLocations(),LocationDTO.class));
+            }
             unionData.setId(union.getId());
         return unionData;
     }
@@ -394,7 +397,9 @@ public class UnionService {
             union.getLocations().add(location);
         }
         organizationGraphRepository.save(union);
-
+        if(isCollectionNotEmpty(union.getLocations())){
+            unionData.setLocations(ObjectMapperUtils.copyPropertiesOfListByMapper(union.getLocations(),LocationDTO.class));
+        }
         unionData.setId(union.getId());
         return unionData;
     }
