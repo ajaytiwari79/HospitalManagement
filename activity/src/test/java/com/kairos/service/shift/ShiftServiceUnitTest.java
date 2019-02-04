@@ -37,9 +37,8 @@ import static org.mockito.Mockito.when;
 /**
  * Created by vipul on 19/1/18.
  */
-@RunWith(MockitoJUnitRunner.Strict.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ShiftServiceUnitTest {
-    private final Logger logger = LoggerFactory.getLogger(ShiftServiceUnitTest.class);
     @InjectMocks
     private ShiftService shiftService;
 
@@ -50,7 +49,6 @@ public class ShiftServiceUnitTest {
     @Mock
     private ShiftStateMongoRepository shiftStateMongoRepository;
     @Mock private PhaseService phaseService;
-    public Phase phase;
     public ShiftDTO shiftDTO;
     public ShiftActivity activity;
     public ShiftActivityDTO activity1;
@@ -125,7 +123,7 @@ public class ShiftServiceUnitTest {
     public void validateRealTimeShift(){
         timeZone="Asia/Kolkata";
         Long unitId=958l;
-        phase=new Phase();
+        Phase phase=new Phase();
         phase.setPhaseEnum(PhaseDefaultName.REALTIME);
         phase.setRealtimeDuration(5);
         phase.setId(BigInteger.valueOf(69));
@@ -186,7 +184,7 @@ public class ShiftServiceUnitTest {
         shiftDTO.setShiftStatePhaseId(BigInteger.valueOf(69));
         shiftDTO.setShiftDate(LocalDate.of(2018,11,28));
         shiftDTO.setShiftId(BigInteger.valueOf(354));
-        when(phaseMongoRepository.findByUnitIdAndName(958l,PhaseDefaultName.REALTIME.toString())).thenReturn(phase);
+        //when(phaseMongoRepository.findByUnitIdAndName(958l,PhaseDefaultName.REALTIME.toString())).thenReturn(phase);
         when(genericIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
         when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
@@ -198,5 +196,7 @@ public class ShiftServiceUnitTest {
         assertTrue(thrown);
 
     }
+
+
 
 }
