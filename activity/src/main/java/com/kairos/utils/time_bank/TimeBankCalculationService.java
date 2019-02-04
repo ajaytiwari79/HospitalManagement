@@ -376,10 +376,8 @@ public class TimeBankCalculationService {
      * @param payOutTransactions
      * @return TimeBankAndPayoutDTO
      */
-    public TimeBankAndPayoutDTO getTimeBankAdvanceView(Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS, List<PayOut> payOuts, List<PayOutTransaction> payOutTransactions) {
+    public TimeBankDTO getTimeBankAdvanceView(List<Interval> intervals,Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS,Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap) {
         TimeBankDTO timeBankDTO = new TimeBankDTO(startDate,DateUtils.asDate(DateUtils.asLocalDate(endDate).minusDays(1)),unitPositionWithCtaDetailsDTO,unitPositionWithCtaDetailsDTO.getStaffId(),unitPositionWithCtaDetailsDTO.getId(),unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes(),unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
-        List<Interval> intervals = getAllIntervalsBetweenDates(startDate, endDate, query);
-        Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = getPayoutTrasactionIntervalsMap(intervals, payOutTransactions);
         Interval interval = new Interval(startDate.getTime(), endDate.getTime());
         Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap = getTimebankIntervalsMap(intervals, dailyTimeBankEntries);
         Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = getShiftsIntervalMap(intervals, shifts);
@@ -410,8 +408,7 @@ public class TimeBankCalculationService {
         timeBankDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBeforeCtaMin);
         timeBankDTO.setTotalScheduledMin(totalScheduledMin);
         timeBankDTO.setTotalTimeBankDiff(totalTimeBankDiff);
-        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOuts, payoutTransactionIntervalMap, unitPositionWithCtaDetailsDTO, query);
-        return new TimeBankAndPayoutDTO(timeBankDTO, payOut);
+        return timeBankDTO;
     }
 
     /**
@@ -419,7 +416,7 @@ public class TimeBankCalculationService {
      * @param payOuts
      * @return Map<Interval, List<PayOutTransaction>>
      */
-    private Map<Interval, List<PayOutTransaction>> getPayoutTrasactionIntervalsMap(List<Interval> intervals, List<PayOutTransaction> payOuts) {
+    public Map<Interval, List<PayOutTransaction>> getPayoutTrasactionIntervalsMap(List<Interval> intervals, List<PayOutTransaction> payOuts) {
         Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap = new HashMap<>(intervals.size());
         intervals.forEach(interval -> payoutTransactionAndIntervalMap.put(interval, getPayoutTransactionsByInterval(interval, payOuts)));
         return payoutTransactionAndIntervalMap;
@@ -1002,7 +999,7 @@ public class TimeBankCalculationService {
      * @param field
      * @return List<Interval>
      */
-    private List<Interval> getAllIntervalsBetweenDates(Date startDate, Date endDate, String field) {
+    public List<Interval> getAllIntervalsBetweenDates(Date startDate, Date endDate, String field) {
         DateTime startDateTime = new DateTime(startDate);
         DateTime endDateTime = new DateTime(endDate);
         List<Interval> intervals = new ArrayList<>();
