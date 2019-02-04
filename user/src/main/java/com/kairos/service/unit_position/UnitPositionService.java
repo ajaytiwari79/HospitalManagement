@@ -463,7 +463,7 @@ public class UnitPositionService {
                 if (changeResultDTO.isEmploymentTypeChanged()) {
                     unitPositionEmploymentTypeRelationShipGraphRepository.updateEmploymentTypeInCurrentUnitPositionLine(currentUnitPositionLine.getId(), unitPositionDTO.getEmploymentTypeId(), unitPositionDTO.getEmploymentTypeCategory());
                 }
-                //TODO uncomment if function setting is changed currently function not add in unitposition KP-6010
+                //TODO uncomment if function setting is changed currently function not add in unitpositionLine KP-6010
                // if (changeResultDTO.isFunctionsChanged()) {
                     //linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
                 //}
