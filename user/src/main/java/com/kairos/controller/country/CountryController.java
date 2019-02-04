@@ -1,6 +1,7 @@
 package com.kairos.controller.country;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
 import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
@@ -8,10 +9,7 @@ import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.default_data.BusinessType;
-import com.kairos.persistence.model.country.default_data.CitizenStatus;
-import com.kairos.persistence.model.country.default_data.ClinicType;
-import com.kairos.persistence.model.country.default_data.ContractType;
+import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
@@ -438,15 +436,15 @@ public class CountryController {
     @ApiOperation(value = "Add IndustryType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/industryType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addIndustryType(@PathVariable long countryId, @Validated @RequestBody IndustryType industryType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.createIndustryType(countryId, industryType));
+    public ResponseEntity<Map<String, Object>> addIndustryType(@PathVariable long countryId, @Validated @RequestBody IndustryTypeDTO industryTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.createIndustryType(countryId, industryTypeDTO));
     }
 
     @ApiOperation(value = "Update IndustryType")
     @RequestMapping(value = COUNTRY_URL + "/industryType", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateIndustryType(@Validated @RequestBody IndustryType industryType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.updateIndustryType(industryType));
+    public ResponseEntity<Map<String, Object>> updateIndustryType(@PathVariable long countryId, @Validated @RequestBody IndustryTypeDTO industryTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.updateIndustryType(countryId, industryTypeDTO));
     }
 
     @ApiOperation(value = "Delete IndustryType by industryTypeId")

@@ -1,8 +1,9 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -27,6 +28,14 @@ public class IndustryType extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
     private boolean isEnabled = true;
+
+    public IndustryType() {
+    }
+
+    public IndustryType(@NotBlank(message = "error.IndustryType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -60,8 +69,7 @@ public class IndustryType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public IndustryType() {
-    }
+
 
 
     public Map<String, Object> retrieveDetails() {

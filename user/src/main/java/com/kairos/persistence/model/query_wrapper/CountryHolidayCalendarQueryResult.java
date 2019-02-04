@@ -2,7 +2,7 @@ package com.kairos.persistence.model.query_wrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;

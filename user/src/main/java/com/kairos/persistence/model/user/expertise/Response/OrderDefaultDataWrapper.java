@@ -4,6 +4,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.open_shift.OrderResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -22,7 +23,7 @@ public class OrderDefaultDataWrapper {
     private List<PresenceTypeDTO> plannedTime;
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
-    private List<com.kairos.persistence.model.country.DayType> dayTypes;
+    private List<DayType> dayTypes;
     private Integer minOpenShiftHours;
     private List<CounterDTO> counters;
 
@@ -32,7 +33,7 @@ public class OrderDefaultDataWrapper {
 
     public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
                                    List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes,
-                                   List<com.kairos.persistence.model.country.DayType> dayTypes, Integer minOpenShiftHours,List<CounterDTO> counters) {
+                                   List<DayType> dayTypes, Integer minOpenShiftHours, List<CounterDTO> counters) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
@@ -119,11 +120,11 @@ public class OrderDefaultDataWrapper {
         this.reasonCodes = reasonCodes;
     }
 
-    public List<com.kairos.persistence.model.country.DayType> getDayTypes() {
+    public List<DayType> getDayTypes() {
         return dayTypes;
     }
 
-    public void setDayTypes(List<com.kairos.persistence.model.country.DayType> dayTypes) {
+    public void setDayTypes(List<DayType> dayTypes) {
         this.dayTypes = dayTypes;
     }
 

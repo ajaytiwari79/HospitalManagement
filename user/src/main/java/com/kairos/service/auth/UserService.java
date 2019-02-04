@@ -12,7 +12,7 @@ import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
