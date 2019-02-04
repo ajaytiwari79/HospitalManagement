@@ -35,8 +35,8 @@ public class IndustryTypeService {
         if ( country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         } else {
-            Boolean industryTypeExists = industryTypeGraphRepository.industryTypeExistInCountryByName(countryId, "(?i)" + industryTypeDTO.getName(), -1L);
-            if (industryTypeExists) {
+            Boolean industryTypeExistInCountryByName = industryTypeGraphRepository.industryTypeExistInCountryByName(countryId, "(?i)" + industryTypeDTO.getName(), -1L);
+            if (industryTypeExistInCountryByName) {
                 exceptionService.duplicateDataException("error.IndustryType.name.exist");
             }
             industryType = new IndustryType(industryTypeDTO.getName(),industryTypeDTO.getDescription());
@@ -52,8 +52,8 @@ public class IndustryTypeService {
     }
 
     public IndustryTypeDTO updateIndustryType(long countryId, IndustryTypeDTO industryTypeDTO){
-        Boolean industryTypeExists = industryTypeGraphRepository.industryTypeExistInCountryByName(countryId, "(?i)" + industryTypeDTO.getName(), industryTypeDTO.getId());
-        if (industryTypeExists) {
+        Boolean industryTypeExistInCountryByName = industryTypeGraphRepository.industryTypeExistInCountryByName(countryId, "(?i)" + industryTypeDTO.getName(), industryTypeDTO.getId());
+        if (industryTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.IndustryType.name.exist");
         }
         IndustryType currentIndustryType = industryTypeGraphRepository.findOne(industryTypeDTO.getId());

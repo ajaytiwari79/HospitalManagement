@@ -1,8 +1,9 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -29,6 +30,9 @@ public class OwnershipType extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
     private boolean isEnabled = true;
+
+    public OwnershipType() {
+    }
 
     public String getName() {
         return name;
@@ -63,16 +67,8 @@ public class OwnershipType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public OwnershipType() {
-    }
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
+    public OwnershipType(@NotBlank(message = "error.OwnershipType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 }

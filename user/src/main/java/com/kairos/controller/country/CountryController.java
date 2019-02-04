@@ -467,15 +467,15 @@ public class CountryController {
     @ApiOperation(value = "Add OwnershipType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/ownershipType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOwnershipType(@PathVariable long countryId, @Validated @RequestBody OwnershipType ownershipType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.createOwnershipType(countryId, ownershipType));
+    public ResponseEntity<Map<String, Object>> addOwnershipType(@PathVariable long countryId, @Validated @RequestBody OwnershipTypeDTO ownershipTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.createOwnershipType(countryId, ownershipTypeDTO));
     }
 
     @ApiOperation(value = "Update OwnershipType")
     @RequestMapping(value = COUNTRY_URL + "/ownershipType", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOwnershipType(@Validated @RequestBody OwnershipType ownershipType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.updateOwnershipType(ownershipType));
+    public ResponseEntity<Map<String, Object>> updateOwnershipType(@PathVariable long countryId, @Validated @RequestBody OwnershipTypeDTO ownershipTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.updateOwnershipType(countryId, ownershipTypeDTO));
     }
 
     @ApiOperation(value = "Delete OwnershipType by ownershipTypeId")
@@ -559,15 +559,15 @@ public class CountryController {
     @ApiOperation(value = "Add VatType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/vatType", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addVatType(@PathVariable long countryId, @Validated @RequestBody VatType vatType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.createVatType(countryId, vatType));
+    public ResponseEntity<Map<String, Object>> addVatType(@PathVariable long countryId, @Validated @RequestBody VatTypeDTO vatTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.createVatType(countryId, vatTypeDTO));
     }
 
     @ApiOperation(value = "Update VatType")
     @RequestMapping(value = COUNTRY_URL + "/vatType", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateVatType(@Validated @RequestBody VatType vatType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.updateVatType(vatType));
+    public ResponseEntity<Map<String, Object>> updateVatType(@PathVariable long countryId, @Validated @RequestBody VatTypeDTO vatTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.updateVatType(countryId, vatTypeDTO));
     }
 
     @ApiOperation(value = "Delete VatType by vatTypeId")

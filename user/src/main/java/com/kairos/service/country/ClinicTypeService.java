@@ -32,8 +32,8 @@ public class ClinicTypeService {
         ClinicType clinicType = null;
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
-            Boolean clinicTypeExists = clinicTypeGraphRepository.clinicTypeExistInCountryByName(countryId, "(?i)" + clinicTypeDTO.getName(), -1L);
-            if (clinicTypeExists) {
+            Boolean clinicTypeExistInCountryByName = clinicTypeGraphRepository.clinicTypeExistInCountryByName(countryId, "(?i)" + clinicTypeDTO.getName(), -1L);
+            if (clinicTypeExistInCountryByName) {
                 exceptionService.duplicateDataException("error.ClinicType.name.exist");
             }
             clinicType = new ClinicType(clinicTypeDTO.getName(), clinicTypeDTO.getDescription());
@@ -51,8 +51,8 @@ public class ClinicTypeService {
     }
 
     public ClinicTypeDTO updateClinicType(long countryId, ClinicTypeDTO clinicTypeDTO){
-        Boolean clinicTypeExists = clinicTypeGraphRepository.clinicTypeExistInCountryByName(countryId, "(?i)" + clinicTypeDTO.getName(), clinicTypeDTO.getId());
-        if (clinicTypeExists) {
+        Boolean clinicTypeExistInCountryByName = clinicTypeGraphRepository.clinicTypeExistInCountryByName(countryId, "(?i)" + clinicTypeDTO.getName(), clinicTypeDTO.getId());
+        if (clinicTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.ClinicType.name.exist");
         }
         ClinicType currentClinicType = clinicTypeGraphRepository.findOne(clinicTypeDTO.getId());
@@ -69,8 +69,9 @@ public class ClinicTypeService {
         if (currentClinicType!=null){
             currentClinicType.setEnabled(false);
             clinicTypeGraphRepository.save(currentClinicType);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.ClinicType.notfound");
         }
-        return false;
+        return true;
     }
 }

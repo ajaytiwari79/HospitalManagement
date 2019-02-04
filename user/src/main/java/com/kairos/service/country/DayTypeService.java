@@ -52,8 +52,8 @@ public class DayTypeService {
 
     public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
 
-        Boolean dayTypeExists = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
-        if (dayTypeExists) {
+        Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
+        if (dayTypeExistInCountryByNameOrCode) {
             exceptionService.duplicateDataException("message.dayType.name.code.exist");
         }
         Country country = countryGraphRepository.findOne(countryId);
@@ -81,8 +81,8 @@ public class DayTypeService {
         if (dayType != null) {
             //If there's a change in DayType name or in DayType then only verify existing DayTypes
             if (!dayTypeDTO.getName().equalsIgnoreCase(dayType.getName()) || dayTypeDTO.getCode() != dayType.getCode()) {
-                Boolean dayTypeExists = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
-                if (dayTypeExists) {
+                Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
+                if (dayTypeExistInCountryByNameOrCode) {
                     exceptionService.duplicateDataException("message.dayType.name.code.exist");
                 }
             }

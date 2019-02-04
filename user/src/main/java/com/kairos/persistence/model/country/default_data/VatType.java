@@ -1,8 +1,9 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -33,6 +34,16 @@ public class VatType extends UserBaseEntity {
     private Country country;
     private boolean isEnabled = true;
 
+    public VatType() {
+    }
+
+    public VatType(@NotBlank(message = "error.VatType.name.notEmpty") String name, int code, String description, @NotBlank(message = "error.VatType.percentage.notEmpty") String percentage) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.percentage = percentage;
+    }
+
     public int getCode() {
         return code;
     }
@@ -48,8 +59,6 @@ public class VatType extends UserBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
-
-
 
     public String getDescription() {
         return description;
@@ -83,8 +92,7 @@ public class VatType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public VatType() {
-    }
+
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
