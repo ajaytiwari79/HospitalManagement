@@ -31,11 +31,10 @@ public class TableConfigRestClient {
      * @auther anil maurya
      *
      * @param staffId
-     * @param organizationId
      * @param unitId
      * @return
      */
-    public TableConfiguration getTableConfiguration(long organizationId, long unitId, Long staffId){
+    public TableConfiguration getTableConfiguration(long unitId, Long staffId){
 
         final String baseUrl=getBaseUrl(true);
 

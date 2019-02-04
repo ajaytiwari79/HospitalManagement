@@ -27,7 +27,6 @@ public class TimeSlotSetTimeSlotRelationship extends UserBaseEntity {
     private int endHour;
     private int endMinute;
     private boolean shiftStartTime;
-    private boolean deleted;
 
     public TimeSlotSetTimeSlotRelationship() {
         //default constructor
@@ -96,13 +95,5 @@ public class TimeSlotSetTimeSlotRelationship extends UserBaseEntity {
 
     public void setShiftStartTime(boolean shiftStartTime) {
         this.shiftStartTime = shiftStartTime;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 }

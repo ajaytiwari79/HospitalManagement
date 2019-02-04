@@ -163,7 +163,7 @@ public class UnionService {
         return sectors;
     }
     public SectorDTO createSector(SectorDTO sectorDto, Long countryId) {
-        if(sectorGraphRepository.existsByName(sectorDto.getName())) {
+        if(sectorGraphRepository.existsByName("(?i)"+sectorDto.getName(),-1l)) {
             exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
         }
         Sector sector = new Sector(sectorDto.getName());
@@ -177,12 +177,12 @@ public class UnionService {
         return sectorDto;
     }
     public SectorDTO updateSector(SectorDTO sectorDto, Long sectorId) {
+        if(sectorGraphRepository.existsByName("(?i)"+sectorDto.getName(),sectorId)) {
+            exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
+        }
         Sector sector = sectorGraphRepository.findSectorById(sectorId);
         if(!Optional.ofNullable(sector).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.sector.id.notFound",sectorId);
-        }
-        else if(sector.getName().equals(sectorDto.getName())) {
-            exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
         }
         sector.setName(sectorDto.getName());
         sectorGraphRepository.save(sector);
@@ -209,7 +209,7 @@ public class UnionService {
         return locations;
     }
     public LocationDTO createLocation(LocationDTO locationDTO, Long unionId) {
-        if(locationGraphRepository.existsByName(locationDTO.getName(),unionId)) {
+        if(locationGraphRepository.existsByName("(?i)"+locationDTO.getName(),unionId,-1l)) {
             exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
         }
         Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
@@ -231,8 +231,10 @@ public class UnionService {
         return locationDTO;
     }
     public LocationDTO updateLocation(LocationDTO locationDTO, Long unionId, Long locationId) {
+        if(locationGraphRepository.existsByName("(?i)"+locationDTO.getName(),unionId,locationId)) {
+            exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
+        }
         List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId,locationDTO.getName(),unionId);
-
         if(CollectionUtils.isEmpty(locationqueryResults)||!locationqueryResults.get(0).getLocation().getId().equals(locationId)) {
             exceptionService.dataNotFoundByIdException("message.location.not.found",locationId);
         }
@@ -240,9 +242,6 @@ public class UnionService {
             exceptionService.invalidRequestException("message.unionId.invalid",unionId);
         }
 
-        else if(locationqueryResults.size()>1) {
-            exceptionService.dataNotFoundByIdException("message.location.name.alreadyexists",locationDTO.getName());
-        }
 
         boolean zipCodeUpdated = false;
         boolean municipalityUpdated = false;
@@ -288,7 +287,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
 
-        if(organizationGraphRepository.existsByName(unionData.getName())) {
+        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName(),-1l)) {
             exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
 
         }
@@ -324,19 +323,17 @@ public class UnionService {
     }
 
     public UnionDTO updateUnion(UnionDTO unionData, long countryId,Long unionId, boolean publish) {
-
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-
+        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName(),unionId)) {
+            exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
+        }
         List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId,unionData.getName());
 
         if(CollectionUtils.isEmpty(unionDataQueryResults)||(unionDataQueryResults.size()==1&&!unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found",unionId);
-        }
-        else if(unionDataQueryResults.size()>1) {
-            exceptionService.dataNotFoundByIdException("message.union.name.alreadyexists",unionData.getName());
         }
         Organization union = unionDataQueryResults.get(0).getUnion();
         union.setLocations(unionDataQueryResults.get(0).getLocations());

@@ -6,10 +6,6 @@ import org.neo4j.ogm.annotation.GraphId;
  * Created by oodles on 28/9/16.
  */
 public class ClientDoctor extends UserBaseEntity {
-
-    @GraphId
-    private Long id;
-
     private boolean isPrimary;
     private String type;
     private String name;
@@ -30,14 +26,6 @@ public class ClientDoctor extends UserBaseEntity {
     }
 
     public ClientDoctor() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public boolean isPrimary() {

@@ -23,7 +23,7 @@ import static com.kairos.constants.ApiConstants.*;
  * @date - 30/7/18
  */
 
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 @RestController
 public class CostTimeAgreementController {
     @Inject

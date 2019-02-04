@@ -377,8 +377,6 @@ public class BootDataService {
         Skill skill;
         for (String personalSkill : personalSkills) {
             skill = new Skill(personalSkill, personalSkillCategory);
-            skill.setCreationDate(DateUtil.getCurrentDate().getTime());
-            skill.setLastModificationDate(DateUtil.getCurrentDate().getTime());
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
@@ -387,8 +385,6 @@ public class BootDataService {
         String medicalSkills[] = new String[]{"Pharma knowledge", "Basic Medical Checkup", "Basic Nursing"};
         for (String medicalSkill : medicalSkills) {
             skill = new Skill(medicalSkill, medicalSkillCategory);
-            skill.setCreationDate(DateUtil.getCurrentDate().getTime());
-            skill.setLastModificationDate(DateUtil.getCurrentDate().getTime());
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
@@ -397,8 +393,6 @@ public class BootDataService {
         String homeSkills[] = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
         for (String homeSkill : homeSkills) {
             skill = new Skill(homeSkill, homeSkillCategory);
-            skill.setCreationDate(DateUtil.getCurrentDate().getTime());
-            skill.setLastModificationDate(DateUtil.getCurrentDate().getTime());
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
@@ -414,16 +408,12 @@ public class BootDataService {
                 new OrganizationService("Home Dusting"),
                 new OrganizationService("Home Cooking"),
                 new OrganizationService("Home Maintenance")));
-        homeCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
-        homeCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         medicalCareService = new OrganizationService("Medical Service");
         medicalCareService.setOrganizationSubService(Arrays.asList(
                 new OrganizationService("Basic Checkup"),
                 new OrganizationService("Disease Diagnose"),
                 new OrganizationService("Medication")));
-        medicalCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
-        medicalCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         organizationServiceRepository.saveAll(Arrays.asList(homeCareService, medicalCareService));
 
@@ -431,30 +421,19 @@ public class BootDataService {
 
     private void createOrganizationTypes() {
         publicOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PUBLIC.value, homeCareService.getOrganizationSubService());
-        publicOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
-        publicOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         publicOrganization.setCountry(denmark);
 
         privateOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PRIVATE.value, medicalCareService.getOrganizationSubService());
-        privateOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
-        privateOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         privateOrganization.setCountry(denmark);
 
         ngoOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.NGO.value,
                 homeCareService.getOrganizationSubService());
         ngoOrganization.setCountry(denmark);
-
-
-        ngoOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
-        ngoOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         ngoOrganization.setCountry(denmark);
-
 
         organizationTypeGraphRepository.save(publicOrganization);
         organizationTypeGraphRepository.save(privateOrganization);
         organizationTypeGraphRepository.save(ngoOrganization);
-
-
     }
 
     private void createCountries() {
@@ -464,8 +443,6 @@ public class BootDataService {
         // denmark.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
         countryGraphRepository.save(denmark);
         //  createCitizenStatus();
-
-
     }
 
     private void createCitizenStatus() {
@@ -663,8 +640,6 @@ public class BootDataService {
 //        admin.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         admin.setContactDetail(new ContactDetail("ulrik_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/ulrik_cool"));
         //        admin.setAge(28);
-        admin.setCreationDate(DateUtil.getCurrentDate().getTime());
-        admin.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         //userGraphRepository.save(Arrays.asList(michal, liva, alma,admin));
         userGraphRepository.save(admin);
     }
@@ -709,8 +684,6 @@ public class BootDataService {
         //creating teams
         nestingTeam = new Team();
         nestingTeam.setName("Nesting Team");
-        nestingTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
-        nestingTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam));
     }
 
@@ -730,8 +703,6 @@ public class BootDataService {
 
     private void createCountryAdminAccessGroup() {
         accessGroup = new AccessGroup(AppConstants.AG_COUNTRY_ADMIN, "Country Admin Access Group", AccessGroupRole.MANAGEMENT);
-        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
-        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRepository.save(accessGroup);
     }
 
@@ -822,13 +793,9 @@ public class BootDataService {
     private void createTeamsForCityLevel() {
         nestingTeam = new Team();
         nestingTeam.setName("Nesting Team");
-        nestingTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
-        nestingTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         experiencedTeam = new Team();
         experiencedTeam.setName("Experienced Team");
-        experiencedTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
-        experiencedTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
     }
 
@@ -897,14 +864,10 @@ public class BootDataService {
     private void createPaymentTypes() {
         PaymentType creditCard = new PaymentType();
         creditCard.setName("Credit Cards");
-        creditCard.setCreationDate(DateUtil.getCurrentDate().getTime());
-        creditCard.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         creditCard.setCountry(denmark);
 
         PaymentType paySafecard = new PaymentType();
         paySafecard.setName("Paysafecard");
-        paySafecard.setCreationDate(DateUtil.getCurrentDate().getTime());
-        paySafecard.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         paySafecard.setCountry(denmark);
         paymentTypeGraphRepository.saveAll(Arrays.asList(creditCard, paySafecard));
     }
@@ -912,8 +875,6 @@ public class BootDataService {
     private void createCurrency() {
         com.kairos.persistence.model.country.Currency currency = new com.kairos.persistence.model.country.Currency();
         currency.setName("krone");
-        currency.setCreationDate(DateUtil.getCurrentDate().getTime());
-        currency.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
     }

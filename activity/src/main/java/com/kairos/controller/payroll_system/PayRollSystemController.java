@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_V1)
 public class PayRollSystemController {
 
     @Inject
