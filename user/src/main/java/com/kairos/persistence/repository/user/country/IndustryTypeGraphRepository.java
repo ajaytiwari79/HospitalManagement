@@ -23,5 +23,5 @@ public interface IndustryTypeGraphRepository extends Neo4jBaseRepository<Industr
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(industryType:IndustryType {isEnabled:true}) WHERE id(country)={0} AND id(industryType)<>{2} AND industryType.name =~{1}  " +
             " WITH count(industryType) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
-    Boolean industryTypeExistInCountryByName(Long countryId, String name, Long currentDayTypeId);
+    Boolean industryTypeExistInCountryByName(Long countryId, String name, Long currentIndustryTypeId);
 }

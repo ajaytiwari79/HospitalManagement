@@ -405,15 +405,15 @@ public class CountryController {
     @ApiOperation(value = "Add DayType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/clinicType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addClinicType(@PathVariable long countryId, @Validated @RequestBody ClinicType clinicType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.createClinicType(countryId, clinicType));
+    public ResponseEntity<Map<String, Object>> addClinicType(@PathVariable long countryId, @Validated @RequestBody ClinicTypeDTO clinicTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.createClinicType(countryId, clinicTypeDTO));
     }
 
     @ApiOperation(value = "Update DayType")
     @RequestMapping(value = COUNTRY_URL + "/clinicType", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateClinicType(@Validated @RequestBody ClinicType clinicType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.updateClinicType(clinicType));
+    public ResponseEntity<Map<String, Object>> updateClinicType(@PathVariable long countryId, @Validated @RequestBody ClinicTypeDTO clinicTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.updateClinicType(countryId, clinicTypeDTO));
     }
 
     @ApiOperation(value = "Delete DayType by dayTypeId")
