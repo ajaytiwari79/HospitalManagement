@@ -57,6 +57,10 @@ public class ShiftServiceUnitTest {
     public boolean realtime=true;
     boolean thrown=true;
 
+    /**
+     * This method is being used to check the all shift is not validated. So it should return false
+     * send to payroll button will be shown only if all shifts is validated
+     */
     @Test
     public void findButtonConfigForSendToPayrollNegativeCase() {
         LocalDate startdate = LocalDate.now();
@@ -89,6 +93,10 @@ public class ShiftServiceUnitTest {
     }
 
 
+    /**
+     * This method is being used to check the all shift is  validated. So it should return true.
+     * send to payroll button will be shown only if all shifts is validated
+     */
     @Test
     public void findButtonConfigForSendToPayrollPositiveCase() {
         LocalDate startdate = LocalDate.now();

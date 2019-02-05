@@ -44,8 +44,7 @@ public class StaffingLevelImportExportUnitTest {
 
     @Test
     public void processStaffingLevel() throws IOException {
-        File file = new File("/opt/kairos/Staffing_levels.csv");
-
+        File file = new File(getClass().getResource("/Staffing_levels.csv").getFile());
         FileInputStream input = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file",
                 file.getName(), "text/plain", IOUtils.toByteArray(input));
