@@ -14,9 +14,11 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.employment.Employment;
@@ -310,7 +312,6 @@ public class UnitPositionService {
             exceptionService.actionNotPermittedException("message.lastdate.notlessthan.enddate");
         }
         oldUnitPosition.setLastWorkingDate(unitPositionDTO.getLastWorkingDate());
-
         UnitPositionLine unitPositionLine = new UnitPositionLine.UnitPositionLineBuilder()
                 .setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours())
                 .setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60) + unitPositionDTO.getTotalWeeklyMinutes())
@@ -378,7 +379,6 @@ public class UnitPositionService {
         if (newAppliedFunctions.size() != olderAppliesFunctions.size()) {
             changeResultDTO.setCalculativeChanged(true);
             changeResultDTO.setFunctionsChanged(true);
-            changeResultDTO.setFunctions(newAppliedFunctions);
         } else {  // earlier appilied function 4 amount 5 new applied 4 but amount 6
             olderAppliesFunctions.forEach(currentOldFunction -> {
                 AtomicBoolean currentMatched = new AtomicBoolean(false);
@@ -392,11 +392,12 @@ public class UnitPositionService {
                 if (!currentMatched.get()) {
                     changeResultDTO.setCalculativeChanged(true);
                     changeResultDTO.setFunctionsChanged(true);
-                    changeResultDTO.setFunctions(newAppliedFunctions);
                     return; // this is used to break from outer loop.
                 }
             });
         }
+        //TODO add outside if statement becouse if function size is same not sent setCalculativeChanged true
+        changeResultDTO.setFunctions(newAppliedFunctions);
         return changeResultDTO;
     }
 
@@ -464,9 +465,10 @@ public class UnitPositionService {
                 if (changeResultDTO.isEmploymentTypeChanged()) {
                     unitPositionEmploymentTypeRelationShipGraphRepository.updateEmploymentTypeInCurrentUnitPositionLine(currentUnitPositionLine.getId(), unitPositionDTO.getEmploymentTypeId(), unitPositionDTO.getEmploymentTypeCategory());
                 }
-                if (changeResultDTO.isFunctionsChanged()) {
-                    linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
-                }
+                //TODO uncomment if function setting is changed currently function not add in unitpositionLine KP-6010
+               // if (changeResultDTO.isFunctionsChanged()) {
+                    //linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
+                //}
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
                 unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, currentUnitPositionLine);
@@ -476,12 +478,12 @@ public class UnitPositionService {
                 setEndDateToUnitPosition(oldUnitPosition, unitPositionDTO);
                 unitPositionGraphRepository.save(oldUnitPosition);
                 linkPositionLineWithEmploymentType(unitPositionLine, unitPositionDTO);
-                if (changeResultDTO.isFunctionsChanged()) {
-                    linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false, unitPositionDTO.getFunctions());
-                }
+               // if (changeResultDTO.isFunctionsChanged()) {
+                  //  linkFunctions(changeResultDTO.getFunctions(), unitPositionLine, false, unitPositionDTO.getFunctions());
+                //}
                 unitPositionQueryResult = getBasicDetails(employmentType, unitPositionDTO, oldUnitPosition, positionLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, unitPositionLine);
             }
-
+            linkFunctions(changeResultDTO.getFunctions(), currentUnitPositionLine, true, unitPositionDTO.getFunctions());
 
             CTAWTAWrapper newCTAWTAWrapper = null;
             if (changeResultDTO.getCtaId() != null || changeResultDTO.getWtaId() != null) {
