@@ -184,7 +184,6 @@ public class ShiftServiceUnitTest {
         shiftDTO.setShiftStatePhaseId(BigInteger.valueOf(69));
         shiftDTO.setShiftDate(LocalDate.of(2018,11,28));
         shiftDTO.setShiftId(BigInteger.valueOf(354));
-        //when(phaseMongoRepository.findByUnitIdAndName(958l,PhaseDefaultName.REALTIME.toString())).thenReturn(phase);
         when(genericIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
         when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
         when(phaseService.shiftEdititableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
