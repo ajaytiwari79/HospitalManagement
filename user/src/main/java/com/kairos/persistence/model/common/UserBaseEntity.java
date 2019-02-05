@@ -36,9 +36,9 @@ public abstract class UserBaseEntity implements Serializable {
     private LocalDateTime lastModificationDate;
 
     @CreatedBy
-    protected User createdBy;
+    protected Long createdBy;
     @LastModifiedBy
-    protected User lastModifiedBy;
+    protected Long lastModifiedBy;
 
 
     public void setId(Long id) {
@@ -73,19 +73,19 @@ public abstract class UserBaseEntity implements Serializable {
         this.deleted = deleted;
     }
 
-    public User getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(User createdBy) {
+    public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public User getLastModifiedBy() {
+    public Long getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(User lastModifiedBy) {
+    public void setLastModifiedBy(Long lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 }

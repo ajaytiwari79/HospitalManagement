@@ -16,18 +16,18 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 @Component
-public class SpringSecurityAuditorAware implements AuditorAware<User> {
+public class SpringSecurityAuditorAware implements AuditorAware<Long> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringSecurityAuditorAware.class);
     @Inject
     private UserGraphRepository userGraphRepository;
 
-    public Optional<User> getCurrentAuditor() {
+    public Optional<Long> getCurrentAuditor() {
         if (Optional.ofNullable(UserContext.getUserDetails()).isPresent() && Optional.ofNullable(UserContext.getUserDetails().getId()).isPresent()) {
-            LOGGER.info("Created by or modified by " + UserContext.getUserDetails().getUserName());
-            return userGraphRepository.findById(UserContext.getUserDetails().getId(), 0);
+            LOGGER.info("Created by or modified by " + UserContext.getUserDetails().getId());
+            return Optional.of(UserContext.getUserDetails().getId());
         } else {
-            return Optional.of(new User());
+            return Optional.ofNullable(null);
         }
     }
 }
