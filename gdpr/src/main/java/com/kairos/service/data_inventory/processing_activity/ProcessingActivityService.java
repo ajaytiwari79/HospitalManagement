@@ -93,7 +93,7 @@ public class ProcessingActivityService {
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, processingActivityDTO.getName());
+        ProcessingActivity exist = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId,  processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
@@ -153,11 +153,11 @@ public class ProcessingActivityService {
     public ProcessingActivityDTO updateProcessingActivity(Long organizationId, Long id, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,  processingActivityDTO.getName());
+        ProcessingActivity processingActivity = processingActivityRepository.findByOrganizationIdAndDeletedAndName(organizationId,   processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
-        processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!processingActivity.isActive()) {
             exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
@@ -255,7 +255,7 @@ public class ProcessingActivityService {
      */
     public boolean deleteProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId, unitId, false);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId, unitId);
         processingActivity.delete();
         processingActivityRepository.save(processingActivity);
         return true;
@@ -407,7 +407,7 @@ public class ProcessingActivityService {
      */
     public List<ProcessingActivityRelatedDataSubject> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, Long processingActivityId) {
 
-        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId,unitId, false);
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted(processingActivityId,unitId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }

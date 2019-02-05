@@ -207,7 +207,7 @@ public class OrganizationAssetTypeService{
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public AssetTypeResponseDTO getAssetTypeById(Long organizationId, Long id) {
-        AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", id);
         }
@@ -231,7 +231,7 @@ public class OrganizationAssetTypeService{
         if (Optional.ofNullable(assetType).isPresent() && !assetTypeId.equals(assetType.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
         }
-        assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(assetTypeId, unitId,false);
+        assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(assetTypeId, unitId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset type", assetTypeId);
         }
@@ -345,7 +345,7 @@ public class OrganizationAssetTypeService{
         if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetType)) {
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.assetType", StringUtils.join(assetsLinkedWithAssetType, ','));
         }
-        AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(assetTypeId, unitId, false);
+        AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(assetTypeId, unitId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetTypeId);
         }

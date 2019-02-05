@@ -55,7 +55,7 @@ public class AccessorPartyService{
             List<String> nameInLowerCase = accessorPartyNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<AccessorParty> existing = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<AccessorParty> existing = accessorPartyRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
@@ -92,7 +92,7 @@ public class AccessorPartyService{
      * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
     public AccessorParty getAccessorParty(Long countryId, Long id) {
-        AccessorParty exist = accessorPartyRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        AccessorParty exist = accessorPartyRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

@@ -89,7 +89,7 @@ public class AssetService{
 
 
     public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
-        Asset previousAsset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, false, assetDTO.getName());
+        Asset previousAsset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, assetDTO.getName());
         Optional.ofNullable(previousAsset).ifPresent(asset ->
                 {
                     //TODO need refactor why these conditions
@@ -117,12 +117,12 @@ public class AssetService{
         asset.setOrganizationId(unitId);
         asset.setName(assetDTO.getName());
         asset.setDescription(assetDTO.getDescription());
-        asset.setHostingProvider(hostingProviderRepository.findByIdAndOrganizationIdAndDeleted(assetDTO.getHostingProvider(), unitId, false));
-        asset.setHostingType(hostingTypeRepository.findByIdAndOrganizationIdAndDeleted(assetDTO.getHostingType(), unitId, false));
+        asset.setHostingProvider(hostingProviderRepository.findByIdAndOrganizationIdAndDeleted(assetDTO.getHostingProvider(), unitId));
+        asset.setHostingType(hostingTypeRepository.findByIdAndOrganizationIdAndDeleted(assetDTO.getHostingType(), unitId));
         asset.setOrgSecurityMeasures(organizationalSecurityMeasureRepository.findAllByIds(assetDTO.getOrgSecurityMeasures()));
         asset.setTechnicalSecurityMeasures(technicalSecurityMeasureRepository.findAllByIds(assetDTO.getTechnicalSecurityMeasures()));
         asset.setStorageFormats(storageFormatRepository.findAllByIds(assetDTO.getStorageFormats()));
-        asset.setDataDisposal(dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(assetDTO.getDataDisposal(),unitId, false));
+        asset.setDataDisposal(dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(assetDTO.getDataDisposal(),unitId));
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         asset.setSuggested(assetDTO.isSuggested());
@@ -200,7 +200,7 @@ public class AssetService{
 
 
     public Map<String, Object> deleteAssetById(Long organizationId, Long assetId) {
-        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted( assetId, organizationId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted( assetId, organizationId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset" + assetId);
         }
@@ -226,7 +226,7 @@ public class AssetService{
      * @description method updated active status of Asset
      */
     public boolean updateStatusOfAsset(Long unitId, Long assetId, boolean active) {
-        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId, unitId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
@@ -243,7 +243,7 @@ public class AssetService{
      * @return method return Asset with Meta Data (storage format ,data Disposal, hosting type and etc)
      */
     public AssetResponseDTO getAssetWithRelatedDataAndRiskByUnitIdAndId(Long unitId, Long id) {
-        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted( id, unitId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted( id, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }

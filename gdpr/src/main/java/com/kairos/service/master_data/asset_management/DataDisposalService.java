@@ -55,7 +55,7 @@ public class DataDisposalService{
                 .collect(Collectors.toList());
 
         //TODO still need to update we can return name of list from here and can apply removeAll on list
-        List<DataDisposal> existing = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+        List<DataDisposal> existing = dataDisposalRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposal> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
@@ -94,7 +94,7 @@ public class DataDisposalService{
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
     public DataDisposal getDataDisposalById(Long countryId, Long id) {
-        DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

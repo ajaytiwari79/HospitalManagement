@@ -55,7 +55,7 @@ public class TechnicalSecurityMeasureService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
@@ -102,7 +102,7 @@ public class TechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, Long id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

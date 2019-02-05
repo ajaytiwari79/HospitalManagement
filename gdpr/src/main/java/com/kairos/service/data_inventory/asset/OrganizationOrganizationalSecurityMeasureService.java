@@ -105,7 +105,7 @@ public class OrganizationOrganizationalSecurityMeasureService{
      */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long organizationId, Long id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -135,7 +135,7 @@ public class OrganizationOrganizationalSecurityMeasureService{
      */
     public OrganizationalSecurityMeasureDTO updateOrganizationalSecurityMeasure(Long organizationId, Long id, OrganizationalSecurityMeasureDTO orgSecurityMeasureDTO) {
 
-        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, orgSecurityMeasureDTO.getName());
+        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(organizationId,  orgSecurityMeasureDTO.getName());
         if (Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
             if (id.equals(organizationalSecurityMeasure.getId())) {
                 return orgSecurityMeasureDTO;

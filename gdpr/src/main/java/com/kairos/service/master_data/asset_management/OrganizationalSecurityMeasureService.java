@@ -57,7 +57,7 @@ public class OrganizationalSecurityMeasureService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
             List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
@@ -102,7 +102,7 @@ public class OrganizationalSecurityMeasureService{
      */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId, Long id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

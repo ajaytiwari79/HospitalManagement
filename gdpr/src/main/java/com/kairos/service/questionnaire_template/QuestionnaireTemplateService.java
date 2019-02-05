@@ -149,7 +149,7 @@ public class QuestionnaireTemplateService{
             if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
                 exceptionService.invalidRequestException("message.assetType.not.selected");
             }
-            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(), referenceId, false) : assetTypeRepository.findByIdAndCountryIdAndDeleted( templateDto.getAssetType(), referenceId, false);
+            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndDeleted( templateDto.getAssetType(), referenceId);
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
                /* previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findPublishedRiskTemplateByUnitIdAndAssetTypeId(referenceId, templateDto.getAssetType())
                         : questionnaireTemplateMongoRepository.findRiskTemplateByCountryIdAndAssetTypeId(referenceId, templateDto.getAssetType());
@@ -200,7 +200,7 @@ public class QuestionnaireTemplateService{
             if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
                 exceptionService.invalidRequestException("message.assetType.not.selected");
             }
-            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(),referenceId, false) : assetTypeRepository.findByIdAndCountryIdAndDeleted(templateDto.getAssetType(),referenceId,  false);
+            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(),referenceId) : assetTypeRepository.findByIdAndCountryIdAndDeleted(templateDto.getAssetType(),referenceId);
             questionnaireTemplate.setAssetType(assetType);
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
                 previousTemplate = isUnitId ? questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(referenceId, templateDto.getAssetType(),QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED) : questionnaireTemplateRepository.findQuestionnaireTemplateByAssetTypeAndByCountryId(referenceId, templateDto.getAssetType(),QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
@@ -230,7 +230,7 @@ public class QuestionnaireTemplateService{
      * @description delete questionnaire template ,sections and question related to template.
      */
     public boolean deleteMasterQuestionnaireTemplate(Long countryId, Long id) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted( id,countryId,false);
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted( id,countryId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", id);
         }
@@ -346,7 +346,7 @@ public class QuestionnaireTemplateService{
      */
     public QuestionnaireTemplateDTO saveQuestionnaireTemplate(Long unitId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId,false, questionnaireTemplateDTO.getName());
+        QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
         }
@@ -420,7 +420,7 @@ public class QuestionnaireTemplateService{
      */
     public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, false, questionnaireTemplateDTO.getName());
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId,  questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(questionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(questionnaireTemplate.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
         }
@@ -441,7 +441,7 @@ public class QuestionnaireTemplateService{
 
 
     public boolean deleteQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId, false);
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
         }

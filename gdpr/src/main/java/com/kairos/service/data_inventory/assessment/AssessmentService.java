@@ -81,7 +81,7 @@ public class AssessmentService{
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.assessment.cannotbe.launched.asset", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId,unitId, false);
+        Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(assetId,unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
         }
@@ -157,7 +157,7 @@ public class AssessmentService{
      */
     private Assessment buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
 
-        Assessment previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, false, assessmentDTO.getName());
+        Assessment previousAssessment = assessmentRepository.findByOrganizationIdAndDeletedAndName(unitId, assessmentDTO.getName());
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
@@ -437,7 +437,7 @@ public class AssessmentService{
     private void saveAssessmentAnswerOnCompletionToAssetOrProcessingActivity(Long unitId, Assessment assessment) {
 
         if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getAsset()).isPresent()) {
-            Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(unitId, assessment.getAsset().getId(),false);
+            Asset asset = assetRepository.findByIdAndOrganizationIdAndDeleted(unitId, assessment.getAsset().getId());
             List<AssessmentAnswer> assessmentAnswersForAsset = assessment.getAssessmentAnswers();
             assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> {
                 if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
@@ -451,7 +451,7 @@ public class AssessmentService{
             assetRepository.save(asset);
 
         } else if (!assessment.isRiskAssessment() && Optional.ofNullable(assessment.getProcessingActivity()).isPresent()) {
-            ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted( assessment.getProcessingActivity().getId(),unitId,false);
+            ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeleted( assessment.getProcessingActivity().getId(),unitId);
             List<AssessmentAnswer> assessmentAnswersForProcessingActivity = assessment.getAssessmentAnswers();
             assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
                     -> {

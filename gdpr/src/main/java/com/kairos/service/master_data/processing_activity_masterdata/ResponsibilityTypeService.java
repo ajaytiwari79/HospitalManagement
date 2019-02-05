@@ -55,7 +55,7 @@ public class ResponsibilityTypeService{
             List<String> nameInLowerCase = responsibilityTypeNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ResponsibilityType> existing = responsibilityTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<ResponsibilityType> existing = responsibilityTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId, nameInLowerCase);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
@@ -97,7 +97,7 @@ public class ResponsibilityTypeService{
      * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
      */
     public ResponsibilityType getResponsibilityType(Long countryId, Long id) {
-        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
