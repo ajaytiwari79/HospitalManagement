@@ -81,8 +81,10 @@ public class UnionService {
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
-    @Inject private OrganizationService organizationService;
-    @Inject private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
 
     public UnionQueryWrapper getAllUnionOfCountry(Long countryId) {
@@ -113,14 +115,13 @@ public class UnionService {
     public List<UnionResponseDTO> getAllUnionByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-           exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> organizationQueryResult = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         return organizationQueryResult;
     }
-
 
 
     public List<UnionResponseDTO> getAllApplicableUnionsForOrganization(Long unitId) {
@@ -145,7 +146,7 @@ public class UnionService {
         }
         Organization union = organizationGraphRepository.findOne(unionId);
         if (!Optional.ofNullable(union).isPresent() || union.isUnion() == false || union.isEnable() == false) {
-    exceptionService.dataNotFoundByIdException("message.union.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.union.id.notFound");
 
         }
         if (joined)
@@ -158,32 +159,34 @@ public class UnionService {
 
     public List<Sector> findAllSectorsByCountry(Long countryId) {
         List<Sector> sectors = sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId);
-        if(CollectionUtils.isEmpty(sectors)) {
-            exceptionService.dataNotFoundByIdException("message.sector.notFound",countryId);
+        if (CollectionUtils.isEmpty(sectors)) {
+            exceptionService.dataNotFoundByIdException("message.sector.notFound", countryId);
         }
         return sectors;
     }
+
     public SectorDTO createSector(SectorDTO sectorDto, Long countryId) {
-        if(sectorGraphRepository.existsByName("(?i)"+sectorDto.getName(),-1l)) {
-            exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
+        if (sectorGraphRepository.existsByName("(?i)" + sectorDto.getName(), -1l)) {
+            exceptionService.duplicateDataException("message.sector.alreadyexists", sectorDto.getName());
         }
         Sector sector = new Sector(sectorDto.getName());
         Country country = countryGraphRepository.findCountryById(countryId);
-        if(!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
         sector.setCountry(country);
         sectorGraphRepository.save(sector);
         sectorDto.setId(sector.getId());
         return sectorDto;
     }
+
     public SectorDTO updateSector(SectorDTO sectorDto, Long sectorId) {
-        if(sectorGraphRepository.existsByName("(?i)"+sectorDto.getName(),sectorId)) {
-            exceptionService.duplicateDataException("message.sector.alreadyexists",sectorDto.getName());
+        if (sectorGraphRepository.existsByName("(?i)" + sectorDto.getName(), sectorId)) {
+            exceptionService.duplicateDataException("message.sector.alreadyexists", sectorDto.getName());
         }
         Sector sector = sectorGraphRepository.findSectorById(sectorId);
-        if(!Optional.ofNullable(sector).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.sector.id.notFound",sectorId);
+        if (!Optional.ofNullable(sector).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.sector.id.notFound", sectorId);
         }
         sector.setName(sectorDto.getName());
         sectorGraphRepository.save(sector);
@@ -193,8 +196,8 @@ public class UnionService {
 
     public Boolean deleteSector(Long sectorId) {
         Sector sector = sectorGraphRepository.findSectorById(sectorId);
-        if(!Optional.ofNullable(sector).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.sector.id.notFound",sectorId);
+        if (!Optional.ofNullable(sector).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.sector.id.notFound", sectorId);
         }
 
         sector.setDeleted(true);
@@ -204,25 +207,26 @@ public class UnionService {
 
     public List<Location> findAllLocationsByUnion(Long unionId) {
         List<Location> locations = locationGraphRepository.findLocationsByUnion(unionId);
-        if(CollectionUtils.isEmpty(locations)) {
-            exceptionService.dataNotFoundByIdException("message.location.notFound",unionId);
+        if (CollectionUtils.isEmpty(locations)) {
+            exceptionService.dataNotFoundByIdException("message.location.notFound", unionId);
         }
         return locations;
     }
+
     public LocationDTO createLocation(LocationDTO locationDTO, Long unionId) {
-        if(locationGraphRepository.existsByName("(?i)"+locationDTO.getName(),unionId,-1l)) {
-            exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
+        if (locationGraphRepository.existsByName("(?i)" + locationDTO.getName(), unionId, -1l)) {
+            exceptionService.duplicateDataException("message.location.name.alreadyexists", locationDTO.getName());
         }
         Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
-        if(!Optional.ofNullable(union).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.unionId.notFound",unionId);
+        if (!Optional.ofNullable(union).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.expertise.unionId.notFound", unionId);
         }
 
         ContactAddress address = null;
-        if(Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
-             address = getAddress(locationDTO.getAddress(),false,false,null,null,null);
+        if (Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
+            address = getAddress(locationDTO.getAddress(), false, false, null, null, null);
         }
-        Location location = new Location(locationDTO.getName(),address);
+        Location location = new Location(locationDTO.getName(), address);
         union.getLocations().add(location);
         organizationGraphRepository.save(union);
         locationGraphRepository.save(location);
@@ -231,36 +235,37 @@ public class UnionService {
 
         return locationDTO;
     }
+
     public LocationDTO updateLocation(LocationDTO locationDTO, Long unionId, Long locationId) {
-        if(locationGraphRepository.existsByName("(?i)"+locationDTO.getName(),unionId,locationId)) {
-            exceptionService.duplicateDataException("message.location.name.alreadyexists",locationDTO.getName());
+        if (locationGraphRepository.existsByName("(?i)" + locationDTO.getName(), unionId, locationId)) {
+            exceptionService.duplicateDataException("message.location.name.alreadyexists", locationDTO.getName());
         }
-        List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId,locationDTO.getName(),unionId);
-        if(CollectionUtils.isEmpty(locationqueryResults)||!locationqueryResults.get(0).getLocation().getId().equals(locationId)) {
-            exceptionService.dataNotFoundByIdException("message.location.not.found",locationId);
+        List<LocationQueryResult> locationqueryResults = locationGraphRepository.findByIdOrNameAndDeletedFalse(locationId, locationDTO.getName(), unionId);
+        if (CollectionUtils.isEmpty(locationqueryResults) || !locationqueryResults.get(0).getLocation().getId().equals(locationId)) {
+            exceptionService.dataNotFoundByIdException("message.location.not.found", locationId);
         }
-        if(!locationqueryResults.get(0).getUnionId().equals(unionId)) {
-            exceptionService.invalidRequestException("message.unionId.invalid",unionId);
+        if (!locationqueryResults.get(0).getUnionId().equals(unionId)) {
+            exceptionService.invalidRequestException("message.unionId.invalid", unionId);
         }
 
 
         boolean zipCodeUpdated = false;
         boolean municipalityUpdated = false;
 
-            if(Optional.ofNullable(locationqueryResults.get(0).getZipCodeId()).isPresent()) {
-                zipCodeUpdated = !locationqueryResults.get(0).getZipCodeId().equals(locationDTO.getAddress().getZipCodeId());
-            }
-            if(Optional.ofNullable(locationqueryResults.get(0).getMunicipalityId()).isPresent()) {
-                municipalityUpdated = !locationqueryResults.get(0).getMunicipalityId().equals(locationDTO.getAddress().getMunicipalityId());
-            }
+        if (Optional.ofNullable(locationqueryResults.get(0).getZipCodeId()).isPresent()) {
+            zipCodeUpdated = !locationqueryResults.get(0).getZipCodeId().equals(locationDTO.getAddress().getZipCodeId());
+        }
+        if (Optional.ofNullable(locationqueryResults.get(0).getMunicipalityId()).isPresent()) {
+            municipalityUpdated = !locationqueryResults.get(0).getMunicipalityId().equals(locationDTO.getAddress().getMunicipalityId());
+        }
 
 
         Location location = locationqueryResults.get(0).getLocation();
         Long addressIdDb = locationqueryResults.get(0).getAddressId();
 
-        if(Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
-            location.setAddress(getAddress(locationDTO.getAddress(),zipCodeUpdated,municipalityUpdated,addressIdDb,
-                    locationqueryResults.get(0).getZipCodeId(),locationqueryResults.get(0).getMunicipalityId()));
+        if (Optional.ofNullable(locationDTO.getAddress()).isPresent()) {
+            location.setAddress(getAddress(locationDTO.getAddress(), zipCodeUpdated, municipalityUpdated, addressIdDb,
+                    locationqueryResults.get(0).getZipCodeId(), locationqueryResults.get(0).getMunicipalityId()));
         }
         location.setName(locationDTO.getName());
 
@@ -271,8 +276,8 @@ public class UnionService {
 
     public boolean deleteLocation(Long locationId) {
         Location location = locationGraphRepository.findByIdAndDeletedFalse(locationId);
-        if(!Optional.ofNullable(location).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.location.id.notFound",locationId);
+        if (!Optional.ofNullable(location).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.location.id.notFound", locationId);
         }
 
         location.setDeleted(true);
@@ -288,56 +293,55 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
 
-        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName(),-1l)) {
+        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
             exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
 
         }
         ContactAddress address = null;
-            if(!Optional.ofNullable(unionData.getMainAddress()).isPresent()&&publish){
-                exceptionService.invalidRequestException("message.publish.address.missing");
-            }  else if(Optional.ofNullable(unionData.getMainAddress()).isPresent()){
+        if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
+            exceptionService.invalidRequestException("message.publish.address.missing");
+        } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
 
-                address = getAddress(unionData.getMainAddress(),false,false,null,null,null);
-            }
+            address = getAddress(unionData.getMainAddress(), false, false, null, null, null);
+        }
 
-            boolean boardingCompleted=false;
+        boolean boardingCompleted = false;
 
-            if(publish) {
-                validateAddress(unionData.getMainAddress());
-                boardingCompleted = true;
-                unionData.setState(UnionState.PUBLISHED);
-            }
-            List<Sector> sectors = null;
-            if(!CollectionUtils.isEmpty(unionData.getSectorIds())) {
-                 sectors = sectorGraphRepository.findSectorsById(unionData.getSectorIds());
-            }
-            Organization union = new Organization(unionData.getName(),sectors,address, boardingCompleted,country,true);
-            if(isCollectionEmpty(union.getLocations())&&publish){
-            Location location = new Location(AppConstants.MAIN_LOCATION,true,address);
-            union.getLocations().add(location);
-            }
+        if (publish) {
+            validateAddress(unionData.getMainAddress());
+            boardingCompleted = true;
+            unionData.setState(UnionState.PUBLISHED);
+        }
+        List<Sector> sectors = null;
+        if (!CollectionUtils.isEmpty(unionData.getSectorIds())) {
+            sectors = sectorGraphRepository.findSectorsById(unionData.getSectorIds());
+        }
+        Organization union = new Organization(unionData.getName(), sectors, address, boardingCompleted, country, true);
+        if (isCollectionEmpty(union.getLocations()) && publish) {
+            union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
+        }
 
-            organizationGraphRepository.save(union);
-            unionData.setId(union.getId());
+        organizationGraphRepository.save(union);
+        unionData.setId(union.getId());
         return unionData;
     }
 
-    public UnionDTO updateUnion(UnionDTO unionData, long countryId,Long unionId, boolean publish) {
+    public UnionDTO updateUnion(UnionDTO unionData, long countryId, Long unionId, boolean publish) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-        if(organizationGraphRepository.existsByName("(?i)"+unionData.getName(),unionId)) {
+        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
             exceptionService.duplicateDataException("message.union.name.exists", unionData.getName());
         }
-        List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId,unionData.getName());
+        List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId, unionData.getName());
 
-        if(CollectionUtils.isEmpty(unionDataQueryResults)||(unionDataQueryResults.size()==1&&!unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
-            exceptionService.dataNotFoundByIdException("message.union.not.found",unionId);
+        if (CollectionUtils.isEmpty(unionDataQueryResults) || (unionDataQueryResults.size() == 1 && !unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
+            exceptionService.dataNotFoundByIdException("message.union.not.found", unionId);
         }
         Organization union = unionDataQueryResults.get(0).getUnion();
         union.setLocations(unionDataQueryResults.get(0).getLocations());
-        if(!publish&&union.isBoardingCompleted()) {
+        if (!publish && union.isBoardingCompleted()) {
             exceptionService.invalidRequestException("message.publish.union.unpublish");
         }
 
@@ -347,16 +351,16 @@ public class UnionService {
 
         sectorIDsCreated.removeAll(sectorIdsDb);
         sectorIdsToBeDeleted.removeAll(unionData.getSectorIds());
-        if(!sectorIdsToBeDeleted.isEmpty()&&!union.isBoardingCompleted()) {
-            organizationGraphRepository.deleteUnionSectorRelationShip(sectorIdsToBeDeleted,unionId);
-        }else if(!sectorIdsToBeDeleted.isEmpty()&&union.isBoardingCompleted()) {
+        if (!sectorIdsToBeDeleted.isEmpty() && !union.isBoardingCompleted()) {
+            organizationGraphRepository.deleteUnionSectorRelationShip(sectorIdsToBeDeleted, unionId);
+        } else if (!sectorIdsToBeDeleted.isEmpty() && union.isBoardingCompleted()) {
             exceptionService.unsupportedOperationException("message.sector.unlinked");
         }
 
-        if(! sectorIDsCreated.isEmpty()) {
-            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsCreated,unionId);
+        if (!sectorIDsCreated.isEmpty()) {
+            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsCreated, unionId);
         }
-        if(publish) {
+        if (publish) {
             validateAddress(unionData.getMainAddress());
             union.setBoardingCompleted(true);
             unionData.setState(UnionState.PUBLISHED);
@@ -370,28 +374,27 @@ public class UnionService {
         boolean municipalityUpdated = false;
         UnionDataQueryResult unionDataQueryResult = unionDataQueryResults.get(0);
 
-        if(!Optional.ofNullable(unionData.getMainAddress()).isPresent()&&publish){
+        if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
             exceptionService.invalidRequestException("message.publish.address.missing");
 
-        }else if(Optional.ofNullable(unionData.getMainAddress()).isPresent()){
+        } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
 
-        if(Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
-            zipCodeUpdated = !unionDataQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
-        }
-        if(Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
-            municipalityUpdated = !unionDataQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
-        }
-        Long zipCodeIdDB = Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()?unionDataQueryResult.getZipCode().getId():null;
-        Long municipalityIdDB = Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()?unionDataQueryResult.getMunicipality().getId():null;
-        address = getAddress(unionData.getMainAddress(),zipCodeUpdated,municipalityUpdated,Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()?
-                unionDataQueryResult.getAddress().getId():null,zipCodeIdDB,municipalityIdDB);
+            if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
+                zipCodeUpdated = !unionDataQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
+            }
+            if (Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
+                municipalityUpdated = !unionDataQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
+            }
+            Long zipCodeIdDB = Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent() ? unionDataQueryResult.getZipCode().getId() : null;
+            Long municipalityIdDB = Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent() ? unionDataQueryResult.getMunicipality().getId() : null;
+            address = getAddress(unionData.getMainAddress(), zipCodeUpdated, municipalityUpdated, Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent() ?
+                    unionDataQueryResult.getAddress().getId() : null, zipCodeIdDB, municipalityIdDB);
         }
 
         union.setName(unionData.getName());
         union.setContactAddress(address);
-        if(isCollectionEmpty(union.getLocations())&&publish){
-            Location location = new Location(AppConstants.MAIN_LOCATION,true,address);
-            union.getLocations().add(location);
+        if (isCollectionEmpty(union.getLocations()) && publish) {
+            union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
         organizationGraphRepository.save(union);
         unionData.setId(union.getId());
@@ -405,54 +408,53 @@ public class UnionService {
 //    }
 
 
-
     public boolean validateAddress(ContactAddressDTO addressDTO) {
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()),exceptionService.convertMessage("message.houseNumber.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()),exceptionService.convertMessage("message.province.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getStreet()),exceptionService.convertMessage("message.street.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getCity()),exceptionService.convertMessage("message.city.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getRegionName()),exceptionService.convertMessage("message.region.null"));
-        Assert.notNull(addressDTO.getZipCodeId(),exceptionService.convertMessage("message.zipCodeId.null"));
-        Assert.notNull(addressDTO.getMunicipalityId(),exceptionService.convertMessage("message.municipality.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()), exceptionService.convertMessage("message.houseNumber.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()), exceptionService.convertMessage("message.province.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getStreet()), exceptionService.convertMessage("message.street.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getCity()), exceptionService.convertMessage("message.city.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getRegionName()), exceptionService.convertMessage("message.region.null"));
+        Assert.notNull(addressDTO.getZipCodeId(), exceptionService.convertMessage("message.zipCodeId.null"));
+        Assert.notNull(addressDTO.getMunicipalityId(), exceptionService.convertMessage("message.municipality.null"));
         return true;
     }
 
 
     /**
-     * @Author Yatharth Govil
-     * @Last ModifiedBy Yatharth Govil
      * @param addressDTO
      * @param zipCodeUpdated
      * @param municipalityUpdated
      * @param addressId
-     * @Description This method is used for creating address object for saving in DB
      * @return ContactAddress
+     * @Author Yatharth Govil
+     * @Last ModifiedBy Yatharth Govil
+     * @Description This method is used for creating address object for saving in DB
      */
-    public ContactAddress getAddress(ContactAddressDTO addressDTO,boolean zipCodeUpdated,boolean municipalityUpdated, Long addressId, Long oldZipCodeId,
+    public ContactAddress getAddress(ContactAddressDTO addressDTO, boolean zipCodeUpdated, boolean municipalityUpdated, Long addressId, Long oldZipCodeId,
                                      Long oldMunicipalityId) {
 
         ContactAddress contactAddress = new ContactAddress(addressDTO.getHouseNumber(),
-                addressDTO.getProvince(),addressDTO.getStreet(),addressDTO.getCity(),addressDTO.getRegionName());
+                addressDTO.getProvince(), addressDTO.getStreet(), addressDTO.getCity(), addressDTO.getRegionName());
 
         contactAddress.setId(addressId);
-        if(Optional.ofNullable(addressDTO.getZipCodeId()).isPresent()) {
+        if (Optional.ofNullable(addressDTO.getZipCodeId()).isPresent()) {
             ZipCode zipCode = zipCodeGraphRepository.findByIdDeletedFalse(addressDTO.getZipCodeId());
-            if(!Optional.ofNullable(zipCode).isPresent()) {
+            if (!Optional.ofNullable(zipCode).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
             }
-            if(zipCodeUpdated) {
-                zipCodeGraphRepository.deleteAddressZipcodeRelation(addressId,oldZipCodeId);
+            if (zipCodeUpdated) {
+                zipCodeGraphRepository.deleteAddressZipcodeRelation(addressId, oldZipCodeId);
             }
             contactAddress.setZipCode(zipCode);
         }
-        if(Optional.ofNullable(addressDTO.getMunicipalityId()).isPresent()) {
-            Municipality municipality = municipalityGraphRepository.findByZipCodeIdandIdDeletedFalse(addressDTO.getMunicipalityId(),addressDTO.getZipCodeId());
-            if(!Optional.ofNullable(municipality).isPresent()) {
+        if (Optional.ofNullable(addressDTO.getMunicipalityId()).isPresent()) {
+            Municipality municipality = municipalityGraphRepository.findByZipCodeIdandIdDeletedFalse(addressDTO.getMunicipalityId(), addressDTO.getZipCodeId());
+            if (!Optional.ofNullable(municipality).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.municipality.notFound");
             }
             contactAddress.setMunicipality(municipality);
-            if(municipalityUpdated) {
-                municipalityGraphRepository.deleteAddressMunicipalityRelation(addressId,oldMunicipalityId);
+            if (municipalityUpdated) {
+                municipalityGraphRepository.deleteAddressMunicipalityRelation(addressId, oldMunicipalityId);
             }
         }
 
@@ -465,55 +467,55 @@ public class UnionService {
         List<UnionDataQueryResult> unionDataObjects = organizationGraphRepository.getUnionData(countryId);
         List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(location -> location.getId())).collect(
                 Collectors.toList());
-        Set<Long> municipalityIds= unionDataObjects.stream().flatMap(unionDataQueryResult->unionDataQueryResult.getMunicipalities().stream().map(
-                municipality->municipality.getId())).collect(Collectors.toSet());
+        Set<Long> municipalityIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getMunicipalities().stream().map(
+                municipality -> municipality.getId())).collect(Collectors.toSet());
         List<LocationDataQueryResult> locationDataObjects = locationGraphRepository.getLocationData(locationIds);
         municipalityIds.addAll(locationDataObjects.stream().flatMap(locationDataQueryResult -> locationDataQueryResult.getMunicipalities().stream().map(
                 municipality -> municipality.getId())).collect(Collectors.toSet()));
         List<MunicipalityQueryResult> municipalityQueryResults = municipalityGraphRepository.findMunicipalityRegionAndProvince(municipalityIds);
-        Map<Long,MunicipalityQueryResult> municipalityMap = municipalityQueryResults.stream().collect(Collectors.toMap(municipalityQueryResult->municipalityQueryResult.getMunicipality().getId(),v->v));
+        Map<Long, MunicipalityQueryResult> municipalityMap = municipalityQueryResults.stream().collect(Collectors.toMap(municipalityQueryResult -> municipalityQueryResult.getMunicipality().getId(), v -> v));
         ZipCodeSectorQueryResult zipCodesSectors = zipCodeGraphRepository.getZipCodesAndSectors(countryId);
 
         List<ZipCodeDTO> zipCodes = null;
         List<SectorDTO> sectors = null;
-        if(CollectionUtils.isNotEmpty(zipCodesSectors.getZipCodes())) {
-             zipCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getZipCodes(),ZipCodeDTO.class);
+        if (CollectionUtils.isNotEmpty(zipCodesSectors.getZipCodes())) {
+            zipCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
         }
-        if(CollectionUtils.isNotEmpty(zipCodesSectors.getSectors())) {
-             sectors = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getSectors(),SectorDTO.class);
+        if (CollectionUtils.isNotEmpty(zipCodesSectors.getSectors())) {
+            sectors = ObjectMapperUtils.copyPropertiesOfListByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
         }
-        UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes,sectors);
+        UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes, sectors);
 
-        Map<Long,LocationDataQueryResult> locationDataMap = locationDataObjects.stream().collect(Collectors.toMap(LocationDataQueryResult::getLocationId,
-                locationDataQueryResult -> locationDataQueryResult,(first,second)->second));
+        Map<Long, LocationDataQueryResult> locationDataMap = locationDataObjects.stream().collect(Collectors.toMap(LocationDataQueryResult::getLocationId,
+                locationDataQueryResult -> locationDataQueryResult, (first, second) -> second));
         List<UnionDataDTO> unionDataDTOS = new ArrayList<>();
-        for(UnionDataQueryResult unionDataQueryResult:unionDataObjects) {
+        for (UnionDataQueryResult unionDataQueryResult : unionDataObjects) {
 
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setSectors(ObjectMapperUtils.copyPropertiesOfListByMapper(unionDataQueryResult.getSectors(),SectorDTO.class));
+            unionDataDTO.setSectors(ObjectMapperUtils.copyPropertiesOfListByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<LocationDTO>();
             List<MunicipalityDTO> municipalitiesUnion;
-            if(Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()) {
-                ContactAddressDTO contactAddressDTOUnion = ObjectMapperUtils.copyPropertiesByMapper(unionDataQueryResult.getAddress(),ContactAddressDTO.class);
-                if(Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
+            if (Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()) {
+                ContactAddressDTO contactAddressDTOUnion = ObjectMapperUtils.copyPropertiesByMapper(unionDataQueryResult.getAddress(), ContactAddressDTO.class);
+                if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTOUnion.setZipCodeId(unionDataQueryResult.getZipCode().getId());
                     contactAddressDTOUnion.setZipCodeValue(unionDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesUnion = ObjectMapperUtils.copyPropertiesOfListByMapper(unionDataQueryResult.getMunicipalities(),MunicipalityDTO.class);
-                    updateMunicipalities(municipalitiesUnion,municipalityMap);
+                    municipalitiesUnion = ObjectMapperUtils.copyPropertiesOfListByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    updateMunicipalities(municipalitiesUnion, municipalityMap);
                     unionDataDTO.setMunicipalities(municipalitiesUnion);
                 }
-                if(Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
+                if (Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
                     contactAddressDTOUnion.setMunicipalityId(unionDataQueryResult.getMunicipality().getId());
                     contactAddressDTOUnion.setMunicipalityName(unionDataQueryResult.getMunicipality().getName());
                 }
                 unionDataDTO.setMainAddress(contactAddressDTOUnion);
 
             }
-            updateLocations(locationDataMap,unionDataQueryResult,municipalityMap,locationDTOS);
+            updateLocations(locationDataMap, unionDataQueryResult, municipalityMap, locationDTOS);
             unionDataDTO.setLocations(locationDTOS);
-            unionDataDTO.setState(unionDataQueryResult.getUnion().isBoardingCompleted()?UnionState.PUBLISHED:UnionState.DRAFT);
+            unionDataDTO.setState(unionDataQueryResult.getUnion().isBoardingCompleted() ? UnionState.PUBLISHED : UnionState.DRAFT);
 
 
             unionDataDTOS.add(unionDataDTO);
@@ -522,38 +524,38 @@ public class UnionService {
         return globalDataDTO;
     }
 
-    public void updateMunicipalities(List<MunicipalityDTO> municipalities,  Map<Long,MunicipalityQueryResult> municipalityMap) {
-        for(MunicipalityDTO municipalityDTO:municipalities) {
+    public void updateMunicipalities(List<MunicipalityDTO> municipalities, Map<Long, MunicipalityQueryResult> municipalityMap) {
+        for (MunicipalityDTO municipalityDTO : municipalities) {
             MunicipalityQueryResult currentMunicipality = municipalityMap.get(municipalityDTO.getId());
-            RegionDTO regionDTO = new RegionDTO(currentMunicipality.getRegion().getId(),currentMunicipality.getRegion().getName());
-            ProvinceDTO province = new ProvinceDTO(currentMunicipality.getProvince().getId(),currentMunicipality.getProvince().getName(),regionDTO);
+            RegionDTO regionDTO = new RegionDTO(currentMunicipality.getRegion().getId(), currentMunicipality.getRegion().getName());
+            ProvinceDTO province = new ProvinceDTO(currentMunicipality.getProvince().getId(), currentMunicipality.getProvince().getName(), regionDTO);
             municipalityDTO.setProvince(province);
         }
     }
 
-    public void updateLocations(Map<Long,LocationDataQueryResult> locationDataMap,UnionDataQueryResult unionDataQueryResult,Map<Long,MunicipalityQueryResult>
-            municipalityMap,List<LocationDTO> locationDTOS) {
+    public void updateLocations(Map<Long, LocationDataQueryResult> locationDataMap, UnionDataQueryResult unionDataQueryResult, Map<Long, MunicipalityQueryResult>
+            municipalityMap, List<LocationDTO> locationDTOS) {
 
 
-        for(Location location:unionDataQueryResult.getLocations()) {
+        for (Location location : unionDataQueryResult.getLocations()) {
             LocationDataQueryResult locationDataQueryResult = locationDataMap.get(location.getId());
             ContactAddressDTO contactAddressDTO = null;
             List<MunicipalityDTO> municipalitiesLocation = null;
-            if(Optional.ofNullable(locationDataQueryResult.getAddress()).isPresent()) {
-                contactAddressDTO = ObjectMapperUtils.copyPropertiesByMapper(locationDataQueryResult.getAddress(),ContactAddressDTO.class);
-                if(Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
+            if (Optional.ofNullable(locationDataQueryResult.getAddress()).isPresent()) {
+                contactAddressDTO = ObjectMapperUtils.copyPropertiesByMapper(locationDataQueryResult.getAddress(), ContactAddressDTO.class);
+                if (Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTO.setZipCodeId(locationDataQueryResult.getZipCode().getId());
                     contactAddressDTO.setZipCodeValue(locationDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesLocation = ObjectMapperUtils.copyPropertiesOfListByMapper(locationDataQueryResult.getMunicipalities(),MunicipalityDTO.class);
-                    updateMunicipalities(municipalitiesLocation,municipalityMap);
+                    municipalitiesLocation = ObjectMapperUtils.copyPropertiesOfListByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    updateMunicipalities(municipalitiesLocation, municipalityMap);
                 }
-                if(Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {
+                if (Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {
                     contactAddressDTO.setMunicipalityId(locationDataQueryResult.getMunicipality().getId());
                     contactAddressDTO.setMunicipalityName(locationDataQueryResult.getMunicipality().getName());
                 }
             }
 
-            locationDTOS.add(new LocationDTO(location.getId(),location.getName(),contactAddressDTO,municipalitiesLocation));
+            locationDTOS.add(new LocationDTO(location.getId(), location.getName(), contactAddressDTO, municipalitiesLocation));
         }
     }
 
