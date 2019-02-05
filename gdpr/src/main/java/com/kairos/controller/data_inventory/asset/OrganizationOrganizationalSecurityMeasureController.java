@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -42,7 +41,7 @@ public class OrganizationOrganizationalSecurityMeasureController {
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId) {
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
     }
 
@@ -56,14 +55,14 @@ public class OrganizationOrganizationalSecurityMeasureController {
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
     @DeleteMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId) {
+    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
 
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/organization_security/{orgSecurityMeasureId}")
-    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
+    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long unitId, @PathVariable Long orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId, orgSecurityMeasure));
 
     }

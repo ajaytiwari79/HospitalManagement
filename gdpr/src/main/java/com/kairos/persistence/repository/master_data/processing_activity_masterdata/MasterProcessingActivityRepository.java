@@ -1,32 +1,45 @@
 package com.kairos.persistence.repository.master_data.processing_activity_masterdata;
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
+////@JaversSpringDataAuditable
 @Repository
-@JaversSpringDataAuditable
-public interface MasterProcessingActivityRepository extends MongoBaseRepository<MasterProcessingActivity, BigInteger>, CustomMasterProcessingActivity {
+public interface MasterProcessingActivityRepository extends JpaRepository<MasterProcessingActivity,Long>{
 
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    MasterProcessingActivity findByIdAndCountryId(Long countryId, BigInteger id);
+    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?2 and lower(MPA.name) = lower(?1) and MPA.deleted = false")
+    MasterProcessingActivity findByNameAndCountryId(String name, Long countryId);
 
-    MasterProcessingActivity findByid(BigInteger id);
+    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.deleted = false and MPA.subProcessActivity = false")
+    List<MasterProcessingActivity> findAllByCountryId(Long countryId);
 
-    @Query("{deleted:false,countryId:?0,name:?1}")
-    MasterProcessingActivity findByNameAndCountryId(Long countryId, String name);
+    @Query(value = "Select MPA from MasterProcessingActivity MPA where MPA.countryId = ?1 and MPA.id = ?2 and MPA.deleted = false")
+    MasterProcessingActivity getMasterAssetByCountryIdAndId(Long countryId, Long id);
 
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1},subProcess:true}")
-    List<MasterProcessingActivity> findAllMasterSubProcessingActivityByIds(Long countryId, Set<BigInteger> subProcessingActivityIds);
+    @Transactional
+    @Modifying
+    @Query(value = "update MasterProcessingActivity set deleted = true where countryId = ?1 and id = ?2 and deleted = false")
+    Integer updateMasterProcessingActivity(Long countryId, Long id);
 
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1},subProcess:false}")
-    List<MasterProcessingActivity> findAllMasterProcessingActivityByIds(Long countryId, Set<BigInteger> subProcessingActivityIds);
+    @Transactional
+    @Modifying
+    @Query(value = "update MasterProcessingActivity set suggestedDataStatus = ?3 where countryId = ?1 and id IN (?2) and deleted = false")
+    Integer updateMasterMasterProcessingActivityStatus(Long countryId, Set<Long> ids, SuggestedDataStatus status);
 
+    @Transactional
+    @Modifying
+    @Query(value = "Update master_processing_activitymd set deleted = true, master_processing_activity_id = null where countryId = ?1 and master_processing_activity_id = ?2 and id = ?3", nativeQuery = true)
+    Integer deleteSubProcessingActivityFromMasterProcessingActivity(Long countryId, Long processingActivityId, Long subProcessingActivityId);
+
+    @Query(value = "Select MPA from MasterProcessingActivity MPA JOIN MPA.organizationTypes OT JOIN MPA.organizationSubTypes OST JOIN MPA.organizationServices SC JOIN MPA.organizationSubServices SSC where MPA.countryId = ?1 and MPA.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
+    List<MasterProcessingActivity> findAllByCountryIdAndOrganizationalMetadata(Long countryId, List<Long> organizationTypeIds, List<Long> organizationSubTypeIds, List<Long> organizationServiceCategoryIds, List<Long> organizationSubServiceCategoryTypeIds);
 }

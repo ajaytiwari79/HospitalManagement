@@ -42,7 +42,7 @@ public class OrganizationHostingTypeController {
 
     @ApiOperation("get HostingType by id")
     @GetMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> getHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId) {
+    public ResponseEntity<Object> getHostingType(@PathVariable Long unitId, @PathVariable Long hostingTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(unitId, hostingTypeId));
 
     }
@@ -63,7 +63,7 @@ public class OrganizationHostingTypeController {
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/{hostingTypeId}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable Long hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(unitId, hostingTypeId, hostingTypeDTO));
     }
 

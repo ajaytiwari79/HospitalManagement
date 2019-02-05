@@ -54,8 +54,8 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += " MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
-                    "MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
+            matchRelationshipQueryForStaff += "MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
+                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,unitPos,user,exp \n" +
                     "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
                     "OPTIONAL MATCH(positionLine)-[:"+HAS_FUNCTION+"]-(function:Function) " +
@@ -64,9 +64,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "with staff,user,employmentType, \n" +
                     "COLLECT(distinct {id:id(unitPos),startDate:unitPos.startDate,endDate:unitPos.endDate,expertise:{id:id(exp),name:exp.name},positionLines:positionLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         } else {
-            matchRelationshipQueryForStaff += "MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
-                    "MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
-                    "MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
+            matchRelationshipQueryForStaff += "OPTIONAL MATCH(unitPos)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine)  " +
+                    "OPTIONAL MATCH(unitPos)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
+                    "OPTIONAL MATCH (positionLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
                     "OPTIONAL MATCH(positionLine)-[:"+HAS_FUNCTION+"]-(function:Function) " +
                     "WITH staff,organization,unitPos,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,positionLine,exp,employmentType\n" +
                     "WITH staff,organization,unitPos,user, COLLECT(distinct {id:id(positionLine),startDate:positionLine.startDate,endDate:positionLine.endDate,functions:functions}) as positionLines,exp,employmentType\n" +
@@ -136,10 +136,12 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         String query = "";
         if (Optional.ofNullable(filters.get(FilterType.UNIT_POSITION)).isPresent() || ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
-            query += " MATCH (user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText);
+            query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
+                    " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos,organization ";
         } else {
-            query += " MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]-(employment:Employment)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(organization)={parentOrganizationId} " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
-                    " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user,organization, staff, unitPos ";
+            query += " MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]-(employment:Employment)-[:" + BELONGS_TO + "]-(staff:Staff) where id(organization)={parentOrganizationId} " +
+                    " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User)  " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
+                    " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(unitPos:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos,organization ";
         }
 
         query += getMatchQueryForRelationshipOfStaffByFilters(filters);

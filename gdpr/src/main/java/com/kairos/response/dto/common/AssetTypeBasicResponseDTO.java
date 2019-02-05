@@ -2,10 +2,10 @@ package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -14,13 +14,29 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AssetTypeBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private Long organizationId;
     private SuggestedDataStatus suggestedDataStatus;
     private Boolean subAssetType;
     private Set<BigInteger> risks;
-    private List<RiskBasicResponseDTO> riskList;
+    private List<OrganizationLevelRiskDTO> riskList;
+
+    public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType) {
+        this.id = id;
+        this.name = name;
+        this.subAssetType = subAssetType;
+    }
+
+    public AssetTypeBasicResponseDTO(Long id, String name, Boolean subAssetType, List<OrganizationLevelRiskDTO> riskList) {
+        this.id = id;
+        this.name = name;
+        this.subAssetType = subAssetType;
+        this.riskList = riskList;
+    }
+
+    public AssetTypeBasicResponseDTO() {
+    }
 
     public Set<BigInteger> getRisks() { return risks; }
 
@@ -38,15 +54,15 @@ public class AssetTypeBasicResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
 
-    public List<RiskBasicResponseDTO> getRiskList() { return riskList; }
+    public List<OrganizationLevelRiskDTO> getRiskList() { return riskList; }
 
-    public void setRiskList(List<RiskBasicResponseDTO> riskList) { this.riskList = riskList; }
+    public void setRiskList(List<OrganizationLevelRiskDTO> riskList) { this.riskList = riskList; }
 }

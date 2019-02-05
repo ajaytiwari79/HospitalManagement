@@ -1,19 +1,19 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.risk_management.Risk;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
-@Document
-public class AssetType extends MongoBaseEntity {
+@Entity
+public class AssetType extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty or null")
     @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
@@ -23,8 +23,17 @@ public class AssetType extends MongoBaseEntity {
     private boolean hasSubAsset;
     private SuggestedDataStatus suggestedDataStatus;
     private LocalDate suggestedDate;
-    private Set<BigInteger> risks=new HashSet<>();
-    private Set<BigInteger> subAssetTypes=new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Risk> risks  = new ArrayList<Risk>();
+
+    @ManyToOne
+    @JoinColumn(name="assetType_id")
+    private AssetType assetType;
+
+    @OneToMany(mappedBy="assetType",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AssetType> subAssetTypes=new ArrayList<AssetType>();
+
 
 
     public AssetType(String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
@@ -34,6 +43,13 @@ public class AssetType extends MongoBaseEntity {
     }
 
 
+    public List<Risk> getRisks() {
+        return risks;
+    }
+
+    public void setRisks(List<Risk> risks) {
+        this.risks = risks;
+    }
 
     public AssetType(String name) {
         this.name = name;
@@ -50,10 +66,6 @@ public class AssetType extends MongoBaseEntity {
     public boolean isHasSubAsset() { return hasSubAsset; }
 
     public void setHasSubAsset(boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
-
-    public Set<BigInteger> getSubAssetTypes() { return subAssetTypes; }
-
-    public void setSubAssetTypes(Set<BigInteger> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
 
     public boolean isSubAssetType() { return subAssetType; }
 
@@ -75,10 +87,43 @@ public class AssetType extends MongoBaseEntity {
         this.name = name;
     }
 
-    public Set<BigInteger> getRisks() { return risks; }
+    public AssetType getAssetType() {
+        return assetType;
+    }
 
-    public void setRisks(Set<BigInteger> risks) { this.risks = risks; }
+    public void setAssetType(AssetType assetType) {
+        this.assetType = assetType;
+    }
+
+    public List<AssetType> getSubAssetTypes() {
+        return subAssetTypes;
+    }
+
+    public void setSubAssetTypes(List<AssetType> subAssetTypes) {
+        this.subAssetTypes = subAssetTypes;
+    }
 
     public AssetType() {
+    }
+
+    List<Risk> getRiskOfAssetTypeAndSubAssetType(){
+        List<Risk> risks = this.getRisks();
+        this.getSubAssetTypes().forEach( subAssetType -> {
+            risks.addAll(subAssetType.getRisks());
+        });
+        return risks;
+    }
+
+    @Override
+    public void delete() {
+        this.setDeleted(true);
+        this.getRisks().forEach( assetTypeRisk -> {
+            assetTypeRisk.delete();
+        });
+        if(!this.getSubAssetTypes().isEmpty()) {
+            this.getSubAssetTypes().forEach(subAssetType -> {
+                subAssetType.delete();
+            });
+        }
     }
 }

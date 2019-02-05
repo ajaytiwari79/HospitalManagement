@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -43,7 +42,7 @@ public class OrganizationStorageFormatController {
 
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> getStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
+    public ResponseEntity<Object> getStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(unitId, storageFormatId));
     }
 
@@ -57,7 +56,7 @@ public class OrganizationStorageFormatController {
 
     @ApiOperation("delete StorageFormat  by id")
     @DeleteMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
+    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(unitId, storageFormatId));
 
     }
@@ -65,7 +64,7 @@ public class OrganizationStorageFormatController {
 
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/storage_format/{storageFormatId}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long unitId, @PathVariable Long storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(unitId, storageFormatId, storageFormat));
 
     }

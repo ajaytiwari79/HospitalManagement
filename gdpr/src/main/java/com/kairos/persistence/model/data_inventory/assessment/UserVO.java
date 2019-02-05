@@ -3,37 +3,59 @@ package com.kairos.persistence.model.data_inventory.assessment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Embeddable
 public class UserVO {
 
-    private Long id;
-    private String userName;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private Long userId;
+    private String assessmentUserName;
+    private String assessmentUserFirstName;
+    private String assessmentUserLastName;
+    private String assessmentUserEmail;
     private Long countryId;
 
-    public Long getId() { return id; }
+    public Long getUserId() {
+        return userId;
+    }
 
-    public void setId(Long id) { this.id = id; }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
-    public String getUserName() { return userName; }
+    public String getAssessmentUserName() {
+        return assessmentUserName;
+    }
 
-    public void setUserName(String userName) { this.userName = userName; }
+    public void setAssessmentUserName(String assessmentUserName) {
+        this.assessmentUserName = assessmentUserName;
+    }
 
-    public String getFirstName() { return firstName; }
+    public String getAssessmentUserFirstName() {
+        return assessmentUserFirstName;
+    }
 
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setAssessmentUserFirstName(String assessmentUserFirstName) {
+        this.assessmentUserFirstName = assessmentUserFirstName;
+    }
 
-    public String getLastName() { return lastName; }
+    public String getAssessmentUserLastName() {
+        return assessmentUserLastName;
+    }
 
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setAssessmentUserLastName(String assessmentUserLastName) {
+        this.assessmentUserLastName = assessmentUserLastName;
+    }
 
-    public String getEmail() { return email; }
+    public String getAssessmentUserEmail() {
+        return assessmentUserEmail;
+    }
 
-    public void setEmail(String email) { this.email = email; }
+    public void setAssessmentUserEmail(String assessmentUserEmail) {
+        this.assessmentUserEmail = assessmentUserEmail;
+    }
 
     public Long getCountryId() { return countryId; }
 
@@ -47,17 +69,17 @@ public class UserVO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserVO userVO = (UserVO) o;
-        return Objects.equals(id, userVO.id) &&
+        return Objects.equals(userId, userVO.userId) &&
                /* Objects.equals(userName, userVO.userName) &&
                 Objects.equals(firstName, userVO.firstName) &&
                 Objects.equals(lastName, userVO.lastName) &&*/
-                Objects.equals(email, userVO.email);/* &&
+                Objects.equals(assessmentUserEmail, userVO.getAssessmentUserEmail());/* &&
                 Objects.equals(countryId, userVO.countryId);*/
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, userName, firstName, lastName, email, countryId);
+        return Objects.hash(userId, assessmentUserName, assessmentUserFirstName, assessmentUserLastName, assessmentUserEmail, countryId);
     }
 }

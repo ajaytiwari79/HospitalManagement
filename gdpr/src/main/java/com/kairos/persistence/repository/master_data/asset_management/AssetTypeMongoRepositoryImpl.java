@@ -1,33 +1,10 @@
 package com.kairos.persistence.repository.master_data.asset_management;
 
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
-import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.List;
-
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+public class AssetTypeMongoRepositoryImpl  {
 
 
-public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
-
-
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -143,5 +120,5 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
         AggregationResults<AssetTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeResponseDTO.class);
         return result.getMappedResults();
-    }
+    }*/
 }

@@ -1,90 +1,88 @@
 package com.kairos.service.javers;
 
 
-import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.*;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
+import static com.kairos.constants.AppConstant.*;
+
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityRepository;
+import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeRepository;
+import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureRepository;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
+import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.jql.QueryBuilder;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.*;
-
-import static com.kairos.constants.AppConstant.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
 public class JaversCommonService {
 
     @Inject
-    private MongoTemplate mongoTemplate;
-
-    @Inject
     private Javers javers;
-
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
-
-    @Inject
-    private StorageFormatMongoRepository storageFormatMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureRepository;
+    private AssetTypeRepository assetTypeRepository;
 
     @Inject
-    private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
+    private StorageFormatRepository storageFormatRepository;
 
     @Inject
-    private HostingProviderMongoRepository hostingProviderMongoRepository;
+    private DataDisposalRepository dataDisposalRepository;
 
     @Inject
-    private HostingTypeMongoRepository hostingTypeMongoRepository;
+    private OrganizationalSecurityMeasureRepository organizationalSecurityMeasureRepository;
 
     @Inject
-    private DataDisposalMongoRepository dataDisposalMongoRepository;
+    private TechnicalSecurityMeasureRepository technicalSecurityMeasureRepository;
 
     @Inject
-    private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
+    private HostingProviderRepository hostingProviderRepository;
 
     @Inject
-    private DataSourceMongoRepository dataSourceMongoRepository;
+    private HostingTypeRepository hostingTypeRepository;
 
     @Inject
-    private TransferMethodMongoRepository transferMethodMongoRepository;
+    private ProcessingPurposeRepository processingPurposeRepository;
 
     @Inject
-    private AccessorPartyMongoRepository accessorPartyMongoRepository;
+    private DataSourceRepository dataSourceRepository;
 
     @Inject
-    private ProcessingLegalBasisMongoRepository processingLegalBasisMongoRepository;
+    private TransferMethodRepository transferMethodRepository;
 
     @Inject
-    private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
+    private AccessorPartyRepository accessorPartyRepository;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private ProcessingLegalBasisRepository processingLegalBasisRepository;
 
-    public List<Map<String, Object>> getHistoryMap(List<CdoSnapshot> auditHistoryList, BigInteger ownerId, Class clazz) {
+    @Inject
+    private ResponsibilityTypeRepository responsibilityTypeRepository;
+
+    @Inject
+    private ProcessingActivityRepository processingActivityRepository;
+
+    public List<Map<String, Object>> getHistoryMap(List<CdoSnapshot> auditHistoryList, Long ownerId, Class clazz) {
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
         int currPosition = auditHistoryList.size();
         for (CdoSnapshot snapShot : auditHistoryList) {
@@ -104,7 +102,7 @@ public class JaversCommonService {
         return auditHistoryListData;
     }
 
-    private List<Object> getOldFieldsValues(List<String> fields, List<CdoSnapshot> auditHistoryList, int index, int version, BigInteger ownerId, Class ownerClass) {
+    private List<Object> getOldFieldsValues(List<String> fields, List<CdoSnapshot> auditHistoryList, int index, int version, Long ownerId, Class ownerClass) {
         List<Object> oldValues = new ArrayList<>();
         for (String field : fields) {
             if (version >= 2) {
@@ -131,7 +129,7 @@ public class JaversCommonService {
         return oldValues;
     }
 
-    private List<Object> getFieldsValue(CdoSnapshot historyMap, List<String> fields, BigInteger ownerId, Class ownerClass) {
+    private List<Object> getFieldsValue(CdoSnapshot historyMap, List<String> fields, Long ownerId, Class ownerClass) {
         List<Object> fieldValues = new ArrayList<>();
         for (String field : fields) {
             if (historyMap.getState().getPropertyValue(field) instanceof ValueObjectId) {
@@ -184,54 +182,54 @@ public class JaversCommonService {
 
     public void addReferencedDataOrDefaultValue(List<Object> fieldValues, String field, CdoSnapshot historyMap) {
 
-
+//TODO
         switch (field) {
 
             case ASSET_TYPE_KEY:
-                fieldValues.add(assetTypeMongoRepository.findAssetTypeById((BigInteger) historyMap.getPropertyValue(field)));
+                fieldValues.add(assetTypeRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
                 break;
             case ASSET_SUB_TYPE_KEY:
-                fieldValues.add(assetTypeMongoRepository.findAssetTypeListByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(assetTypeRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field), true));
                 break;
             case STORAGE_FORMAT_KEY:
-                fieldValues.add(storageFormatMongoRepository.findStorageFormatByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(storageFormatRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case DATA_DISPOSAL_KEY:
-                fieldValues.add(dataDisposalMongoRepository.findDataDisposalByid((BigInteger) historyMap.getPropertyValue(field)));
+                fieldValues.add(dataDisposalRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
                 break;
             case ORG_SECURITY_MEASURE_KEY:
-                fieldValues.add(organizationalSecurityMeasureRepository.findOrganizationalSecurityMeasuresListByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(organizationalSecurityMeasureRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case TECHNICAL_SECURITY_MEASURE_KEY:
-                fieldValues.add(technicalSecurityMeasureMongoRepository.findTechnicalSecurityMeasuresListByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(technicalSecurityMeasureRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case HOSTING_PROVIDER_KEY:
-                fieldValues.add(hostingProviderMongoRepository.findHostingProviderById((BigInteger) historyMap.getPropertyValue(field)));
+                fieldValues.add(hostingProviderRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
                 break;
             case HOSTING_TYPE_KEY:
-                fieldValues.add(hostingTypeMongoRepository.findHostingTypeById((BigInteger) historyMap.getPropertyValue(field)));
+                fieldValues.add(hostingTypeRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
                 break;
             //processing activity keys
             case PROCESSING_PURPOSE_KEY:
-                fieldValues.add(processingPurposeMongoRepository.findProcessingPurposeByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(processingPurposeRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case DATA_SOURCE_KEY:
-                fieldValues.add(dataSourceMongoRepository.findDataSourceByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(dataSourceRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case TRANSFER_METHOD_KEY:
-                fieldValues.add(transferMethodMongoRepository.findTransferMethodByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(transferMethodRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case ACCESSOR_PARTY_KEY:
-                fieldValues.add(accessorPartyMongoRepository.findAccessorPartyByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(accessorPartyRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case PROCESSING_LEGAL_BASIS_KEY:
-                fieldValues.add(processingLegalBasisMongoRepository.findProcessingLegalBasisByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(processingLegalBasisRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             case RESPONSIBILITY_TYPE_KEY:
-                fieldValues.add(responsibilityTypeMongoRepository.findResponsibilityTypeByid((BigInteger) historyMap.getPropertyValue(field)));
+                fieldValues.add(responsibilityTypeRepository.findByIdAndDeleted((Long) historyMap.getPropertyValue(field)));
                 break;
             case SUB_PROCESSING_ACTIVITY_KEY:
-                fieldValues.add(processingActivityMongoRepository.findAllSubProcessingActivitiesByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
+                fieldValues.add(processingActivityRepository.findAllByIds((List<Long>) historyMap.getPropertyValue(field)));
                 break;
             default:
                 fieldValues.add(historyMap.getState().getPropertyValue(field));

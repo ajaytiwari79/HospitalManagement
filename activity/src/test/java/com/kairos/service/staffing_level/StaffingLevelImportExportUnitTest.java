@@ -4,6 +4,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -34,13 +35,16 @@ public class StaffingLevelImportExportUnitTest {
     private EnvConfig envConfig;
     @Mock
     private ActivityMongoRepository activityTypeMongoRepository;
+    @Mock
+    StaffingLevelActivityRankService staffingLevelActivityRankService;
+    @Mock
+    PlannerSyncService plannerSyncService;
 
 
 
     @Test
     public void processStaffingLevel() throws IOException {
-        File file = new File("/home/vipul/Downloads/Staffing_levels.csv");
-
+        File file = new File(getClass().getResource("/Staffing_levels.csv").getFile());
         FileInputStream input = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file",
                 file.getName(), "text/plain", IOUtils.toByteArray(input));

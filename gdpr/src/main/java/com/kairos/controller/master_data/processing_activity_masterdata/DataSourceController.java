@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,14 +42,14 @@ public class DataSourceController {
     @ApiOperation("add dataSource")
     @PostMapping("/data_source")
     public ResponseEntity<Object> createDataSource(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get dataSource by id")
     @GetMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId) {
+    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId, @PathVariable Long dataSourceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId, dataSourceId));
     }
 
@@ -63,21 +62,21 @@ public class DataSourceController {
 
     @ApiOperation("delete dataSource  by id")
     @DeleteMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> deleteDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId) {
+    public ResponseEntity<Object> deleteDataSource(@PathVariable Long countryId, @PathVariable Long dataSourceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(countryId, dataSourceId));
 
     }
 
     @ApiOperation("update dataSource by id")
     @PutMapping("/data_source/{dataSourceId}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId, @PathVariable Long dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(countryId, dataSourceId, dataSource));
 
     }
 
     @ApiOperation("update Suggested status of Data Sources ")
     @PutMapping("/data_source")
-    public ResponseEntity<Object> updateSuggestedStatusOfDataSources(@PathVariable Long countryId, @RequestBody Set<BigInteger> dataSourceIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfDataSources(@PathVariable Long countryId, @RequestBody Set<Long> dataSourceIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(dataSourceIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Data Source is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

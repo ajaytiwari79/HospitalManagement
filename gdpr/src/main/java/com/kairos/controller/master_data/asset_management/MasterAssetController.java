@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -54,27 +53,26 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/master_asset/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id, @Validated @RequestBody MasterAssetDTO assetDTO) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable Long id, @Validated @RequestBody MasterAssetDTO assetDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(countryId, id, assetDTO));
     }
 
-
     @ApiOperation(value = "delete master asset")
     @DeleteMapping("/master_asset/delete/{id}")
-    public ResponseEntity<Object> deleteMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteMasterAsset(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.deleteMasterAsset(countryId, id));
     }
 
     @ApiOperation(value = "get master asset by id")
     @GetMapping("/master_asset/{id}")
-    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(countryId, id));
 
     }
 
     @ApiOperation(value = "Update Suggest Status of Master Assets")
     @PutMapping("/master_asset/status")
-    public ResponseEntity<Object> updateStatusOfMasterAssetByIds(@PathVariable Long countryId, @RequestBody Set<BigInteger> assetIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateStatusOfMasterAssetByIds(@PathVariable Long countryId, @RequestBody Set<Long> assetIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(assetIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Provider is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

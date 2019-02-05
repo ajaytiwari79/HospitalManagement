@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.ManagingOrganization;
 
-import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

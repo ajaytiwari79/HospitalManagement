@@ -1,31 +1,10 @@
 package com.kairos.persistence.repository.data_inventory.asset;
 
-import com.kairos.persistence.model.data_inventory.asset.Asset;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import org.bson.Document;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Collation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
-
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+public class AssetMongoRepositoryImpl  {
 
 
-public class AssetMongoRepositoryImpl implements CustomAssetRepository {
-
-
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -99,6 +78,6 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 new CustomAggregationOperation(Document.parse(groupOperation))
         );
         return  aggregation;
-    }
+    }*/
 
 }

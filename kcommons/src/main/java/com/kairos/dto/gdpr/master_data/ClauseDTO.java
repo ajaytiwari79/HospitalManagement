@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseDTO {
 
-    protected BigInteger id;
+    protected Long id;
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     protected String title;
@@ -25,14 +25,14 @@ public class ClauseDTO {
     protected String description;
 
     @NotEmpty(message = "error.message.templateType.notNull")
-    private List<BigInteger> templateTypes;
+    private List<Long> templateTypes;
 
     public ClauseDTO() {
     }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getTitle() { return title; }
 
@@ -46,11 +46,11 @@ public class ClauseDTO {
 
     public void setDescription(String description) { this.description = description; }
 
-    public List<BigInteger> getTemplateTypes() {
+    public List<Long> getTemplateTypes() {
         return templateTypes;
     }
 
-    public void setTemplateTypes(List<BigInteger> templateTypes) {
+    public void setTemplateTypes(List<Long> templateTypes) {
         this.templateTypes = templateTypes;
     }
 }

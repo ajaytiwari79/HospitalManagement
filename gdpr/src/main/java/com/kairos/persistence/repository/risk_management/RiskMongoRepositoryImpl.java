@@ -1,25 +1,9 @@
 package com.kairos.persistence.repository.risk_management;
 
-import com.kairos.persistence.model.risk_management.Risk;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.response.dto.common.RiskResponseDTO;
-import org.bson.Document;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constants.AppConstant.*;
-
-import javax.inject.Inject;
-import java.util.List;
-
-public class RiskMongoRepositoryImpl implements CustomRiskRepository {
+public class RiskMongoRepositoryImpl  {
 
 
-    @Inject
+   /* @Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -39,5 +23,5 @@ public class RiskMongoRepositoryImpl implements CustomRiskRepository {
         );
         AggregationResults<RiskResponseDTO> results = mongoTemplate.aggregate(aggregation, Risk.class, RiskResponseDTO.class);
         return results.getMappedResults();
-    }
+    }*/
 }

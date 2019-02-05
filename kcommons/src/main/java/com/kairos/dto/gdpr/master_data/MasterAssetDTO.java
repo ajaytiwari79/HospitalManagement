@@ -2,10 +2,10 @@ package com.kairos.dto.gdpr.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 
 import javax.validation.Valid;
@@ -13,7 +13,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class MasterAssetDTO {
 
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
@@ -33,19 +32,19 @@ public class MasterAssetDTO {
 
     @Valid
     @NotEmpty(message = "error.message.organizationType.not.Selected")
-    private List<OrganizationType> organizationTypes=new ArrayList<>();
+    private List<OrganizationTypeDTO> organizationTypes =new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.organizationSubType.not.Selected")
-    private List<OrganizationSubType> organizationSubTypes=new ArrayList<>();
+    private List<OrganizationSubTypeDTO> organizationSubTypes =new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceCategory.not.Selected")
-    private List<ServiceCategory> organizationServices=new ArrayList<>();
+    private List<ServiceCategoryDTO> organizationServices=new ArrayList<>();
 
     @Valid
     @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
-    private List<SubServiceCategory> organizationSubServices=new ArrayList<>();
+    private List<SubServiceCategoryDTO> organizationSubServices=new ArrayList<>();
 
     @NotNull(message = "error.message.assetType.notNull")
     private AssetTypeBasicDTO assetType;
@@ -67,35 +66,35 @@ public class MasterAssetDTO {
         this.description = description;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
-    public List<ServiceCategory> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) { this.organizationServices = organizationServices; }
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

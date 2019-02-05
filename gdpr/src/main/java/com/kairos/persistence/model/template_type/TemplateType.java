@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.template_type;
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -10,8 +10,8 @@ import javax.validation.constraints.Pattern;
  * @Auther vikash patwal
  */
 
-@Document
-public class TemplateType extends MongoBaseEntity {
+@Entity
+public class TemplateType extends BaseEntity {
 
 
     @NotBlank(message = "templateName cannot be empty ")
