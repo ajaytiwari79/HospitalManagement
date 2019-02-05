@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.ApiConstant.*;
@@ -43,9 +42,9 @@ public class RiskController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, riskService.getAllRiskByUnitId(unitId));
     }
 
-    @ApiOperation(value = "delete risk by id")
+    /*@ApiOperation(value = "delete risk by id")
     @DeleteMapping(UNIT_URL + "/risk/{riskId}")
     public ResponseEntity<Object> deleteRiskById(@PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, riskService.deleteRiskById(riskId));
-    }
+    }*/
 }

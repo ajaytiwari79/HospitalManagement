@@ -2,28 +2,27 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyAgreementTemplateResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private String description;
     private List<AccountTypeVO> accountTypes;
-    private List<OrganizationType> organizationTypes;
-    private List<OrganizationSubType> organizationSubTypes;
-    private List<ServiceCategory> organizationServices;
-    private List<SubServiceCategory> organizationSubServices;
-    private List<BigInteger> sections;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
+    private List<ServiceCategoryDTO> organizationServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
+    private List<AgreementSectionResponseDTO> agreementSections;
 
     private TemplateTypeResponseDTO templateType;
 
@@ -35,11 +34,11 @@ public class PolicyAgreementTemplateResponseDTO {
         this.templateType = templateType;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -63,39 +62,43 @@ public class PolicyAgreementTemplateResponseDTO {
 
     public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 
-    public List<BigInteger> getSections() { return sections; }
+    public List<AgreementSectionResponseDTO> getAgreementSections() {
+        return agreementSections;
+    }
 
-    public void setSections(List<BigInteger> sections) { this.sections = sections; }
+    public void setAgreementSections(List<AgreementSectionResponseDTO> agreementSections) {
+        this.agreementSections = agreementSections;
+    }
 
-    public List<OrganizationType> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<ServiceCategory> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

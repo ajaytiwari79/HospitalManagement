@@ -2,13 +2,11 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataElementBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -22,11 +20,11 @@ public class DataElementBasicResponseDTO {
         this.deleted = deleted;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

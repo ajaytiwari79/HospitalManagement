@@ -7,12 +7,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseBasicDTO {
 
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
@@ -25,11 +26,13 @@ public class ClauseBasicDTO {
     @NotNull(message = "Clause order is Not defined")
     private Integer orderedIndex;
 
-    public BigInteger getId() {
+    private UUID tempClauseId;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -86,6 +89,15 @@ public class ClauseBasicDTO {
         this.descriptionHtml = descriptionHtml;
     }
 
+    public UUID getTempClauseId() {
+        return this.tempClauseId;
+    }
+
+    public void setTempClauseId(UUID tempClauseId) {
+        this.tempClauseId = tempClauseId;
+    }
+
     public ClauseBasicDTO() {
+        this.tempClauseId = UUID.randomUUID();
     }
 }

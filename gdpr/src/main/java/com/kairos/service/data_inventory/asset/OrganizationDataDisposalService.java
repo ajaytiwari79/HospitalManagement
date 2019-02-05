@@ -5,22 +5,19 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,19 +25,19 @@ import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
-public class OrganizationDataDisposalService extends MongoBaseService {
+public class OrganizationDataDisposalService{
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationDataDisposalService.class);
 
     @Inject
-    private DataDisposalMongoRepository dataDisposalMongoRepository;
+    private DataDisposalRepository dataDisposalRepository;
 
     @Inject
     private ExceptionService exceptionService;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
     @Inject
     private DataDisposalService dataDisposalService;
@@ -55,13 +52,17 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
     public Map<String, List<DataDisposal>> createDataDisposal(Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
-
+        //TODO still need to optimize we can get name of list in string from here
         Map<String, List<DataDisposal>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
         for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
             dataDisposalsNames.add(dataDisposal.getName());
         }
-        List<DataDisposal> existing = findMetaDataByNameAndUnitId(organizationId, dataDisposalsNames, DataDisposal.class);
+
+        List<String> nameInLowerCase = dataDisposalsNames.stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        //TODO still need to update we can return name of list from here and can apply removeAll on list
+        List<DataDisposal> existing = dataDisposalRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposal> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
@@ -71,7 +72,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
                 newDataDisposals.add(newDataDisposal);
             }
 
-            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+            newDataDisposals = dataDisposalRepository.saveAll(newDataDisposals);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataDisposals);
@@ -84,7 +85,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long organizationId) {
-        return dataDisposalMongoRepository.findAllByUnitIdAndSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return dataDisposalRepository.findAllByUnitIdAndSortByCreatedDate(organizationId);
     }
 
 
@@ -94,9 +95,9 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return object of data disposal
      * @throws DataNotFoundByIdException if data disposal not found for id
      */
-    public DataDisposal getDataDisposalById(Long organizationId, BigInteger id) {
+    public DataDisposal getDataDisposalById(Long organizationId, Long id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByUnitIdAndId(organizationId, id);
+        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -106,15 +107,18 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataDisposalById(Long unitId, BigInteger dataDisposalId) {
-
-        List<AssetBasicResponseDTO> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithDataDisposal)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", new StringBuilder(assetsLinkedWithDataDisposal.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+    public Boolean deleteDataDisposalById(Long unitId, Long dataDisposalId) {
+        List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
+        if (CollectionUtils.isNotEmpty(assetNames)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", StringUtils.join(assetNames, ','));
         }
-        dataDisposalMongoRepository.safeDeleteById(dataDisposalId);
+        Integer resultCount = dataDisposalRepository.deleteByIdAndOrganizationId(dataDisposalId, unitId);
+        if (resultCount > 0) {
+            LOGGER.info("Data Disposal deleted successfully for id :: {}", dataDisposalId);
+        }else{
+            throw new DataNotFoundByIdException("No data found");
+        }
         return true;
-
     }
 
 
@@ -125,31 +129,29 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return updated data disposal object
      * @throws DuplicateDataException if data disposal exist with same name then throw exception
      */
-    public DataDisposalDTO updateDataDisposal(Long organizationId, BigInteger id, DataDisposalDTO dataDisposalDTO) {
+    public DataDisposalDTO updateDataDisposal(Long organizationId, Long id, DataDisposalDTO dataDisposalDTO) {
 
-
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByUnitIdAndName(organizationId, dataDisposalDTO.getName());
+        //TODO What actually this code is doing?
+        DataDisposal dataDisposal = dataDisposalRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "Data Disposal", dataDisposal.getName());
+            throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
         }
-        dataDisposal = dataDisposalMongoRepository.findByid(id);
-        if (!Optional.ofNullable(dataDisposal).isPresent()) {
+        Integer resultCount =  dataDisposalRepository.updateMetadataName(dataDisposalDTO.getName(), id, organizationId);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataDisposalDTO.getName());
         }
-        dataDisposal.setName(dataDisposalDTO.getName());
-        dataDisposalMongoRepository.save(dataDisposal);
-
         return dataDisposalDTO;
 
     }
 
     public Map<String, List<DataDisposal>> saveAndSuggestDataDisposal(Long countryId, Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
 
-        Map<String, List<DataDisposal>> result;
-        result = createDataDisposal(organizationId, dataDisposalDTOS);
+        Map<String, List<DataDisposal>> result = createDataDisposal(organizationId, dataDisposalDTOS);
         List<DataDisposal> masterDataDisposalSuggestedByUnit = dataDisposalService.saveSuggestedDataDisposalFromUnit(countryId, dataDisposalDTOS);
         if (!masterDataDisposalSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterDataDisposalSuggestedByUnit);

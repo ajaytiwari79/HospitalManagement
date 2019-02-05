@@ -2,14 +2,13 @@ package com.kairos.persistence.model.questionnaire_template;
 
 
 import com.kairos.enums.gdpr.QuestionType;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import com.kairos.persistence.model.common.BaseEntity;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Document
-public class Question extends MongoBaseEntity {
+@Entity
+public class Question extends BaseEntity {
 
     @NotBlank(message = "Question cant'be empty")
     private String question;
@@ -22,14 +21,14 @@ public class Question extends MongoBaseEntity {
     private String attributeName;
     private Long countryId;
 
-    public Question(String question, String description,  boolean required,QuestionType questionType, boolean notSureAllowed, Long countryId) {
+    public Question(String question, String description, boolean required, QuestionType questionType, boolean notSureAllowed, Long countryId) {
         this.question = question;
         this.description = description;
         this.questionType = questionType;
         this.countryId = countryId;
     }
 
-    public Question( String question, String description, boolean required, QuestionType questionType, boolean notSureAllowed) {
+    public Question(String question, String description, boolean required, QuestionType questionType, boolean notSureAllowed) {
         this.question = question;
         this.description = description;
         this.required = required;

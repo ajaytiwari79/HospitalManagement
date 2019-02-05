@@ -10,14 +10,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssessmentDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
@@ -28,7 +27,7 @@ public class AssessmentDTO {
     @NotNull(message = "error.message.assignee.not.selected")
     @Valid
     private  List<Staff> assigneeList;
-    private boolean riskAssessment;
+    private boolean isRiskAssessment;
     private Staff approver;
     private LocalDate assessmentLaunchedDate;
     private QuestionnaireTemplateType riskAssociatedEntity;
@@ -39,9 +38,9 @@ public class AssessmentDTO {
     private int relativeDeadlineDuration;
     private DurationType relativeDeadlineType;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name.trim(); }
 
@@ -71,9 +70,9 @@ public class AssessmentDTO {
 
     public void setAssessmentSchedulingFrequency(AssessmentSchedulingFrequency assessmentSchedulingFrequency) { this.assessmentSchedulingFrequency = assessmentSchedulingFrequency; }
 
-    public boolean isRiskAssessment() { return riskAssessment; }
+    public boolean isRiskAssessment() { return isRiskAssessment; }
 
-    public void setRiskAssessment(boolean riskAssessment) { this.riskAssessment = riskAssessment; }
+    public void setRiskAssessment(boolean riskAssessment) { this.isRiskAssessment = riskAssessment; }
 
     public QuestionnaireTemplateType getRiskAssociatedEntity() { return riskAssociatedEntity; }
 

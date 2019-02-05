@@ -1,59 +1,72 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
 
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.dto.gdpr.ServiceCategory;
-import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
+import com.kairos.persistence.model.risk_management.Risk;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class MasterProcessingActivity extends MongoBaseEntity {
+@Entity
+public class MasterProcessingActivity extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
     private String description;
-    private List<OrganizationType> organizationTypes;
-    private List<OrganizationSubType> organizationSubTypes;
-    private List<ServiceCategory> organizationServices;
-    private List<SubServiceCategory> organizationSubServices;
-    private List<BigInteger> subProcessingActivityIds;
+
+    @ElementCollection
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
+    @ElementCollection
+    private List <ServiceCategory> organizationServices = new ArrayList<>();
+
+    @ElementCollection
+    private List <SubServiceCategory> organizationSubServices = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Risk> risks  = new ArrayList<Risk>();
+
+    @ManyToOne
+    @JoinColumn(name="masterProcessingActivity_id")
+    private MasterProcessingActivity masterProcessingActivity;
+
+    @OneToMany(mappedBy="masterProcessingActivity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<MasterProcessingActivity> subProcessingActivities =new ArrayList<MasterProcessingActivity>();
+
     private Long countryId;
-    private List<BigInteger> risks=new ArrayList<>();
-    private boolean subProcess;
+    private boolean subProcessActivity;
     private boolean hasSubProcessingActivity;
     private LocalDate suggestedDate;
     private SuggestedDataStatus suggestedDataStatus;
-
 
     public MasterProcessingActivity() {
 
     }
 
 
-    public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus,List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
+   public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus, Long countryId) {
         this.name = name;
         this.description = description;
-        this.organizationTypes = organizationTypes;
-        this.organizationSubTypes = organizationSubTypes;
-        this.organizationServices = organizationServices;
-        this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
+        this.countryId = countryId;
     }
 
-    public MasterProcessingActivity( String name, String description, Long countryId,SuggestedDataStatus suggestedDataStatus,LocalDate suggestedDate) {
+    public MasterProcessingActivity(String name, String description, Long countryId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
         this.name = name;
         this.description = description;
         this.countryId = countryId;
-        this.subProcess = subProcess;
+        this.subProcessActivity = subProcessActivity;
         this.suggestedDataStatus=suggestedDataStatus;
         this.suggestedDate=suggestedDate;
     }
@@ -66,9 +79,9 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
-    public boolean isSubProcess() { return subProcess; }
+    public boolean isSubProcessActivity() { return subProcessActivity; }
 
-    public MasterProcessingActivity setSubProcess(boolean subProcess) { this.subProcess = subProcess; return this;}
+    public MasterProcessingActivity setSubProcessActivity(boolean subProcessActivity) { this.subProcessActivity = subProcessActivity; return this;}
 
     public boolean isHasSubProcessingActivity() { return hasSubProcessingActivity; }
 
@@ -81,12 +94,6 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
-
-    public List<BigInteger> getSubProcessingActivityIds() {
-        return subProcessingActivityIds;
-    }
-
-    public void setSubProcessingActivityIds(List<BigInteger> subProcessingActivityIds) { this.subProcessingActivityIds = subProcessingActivityIds; }
 
     public String getName() {
         return name;
@@ -104,29 +111,55 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         return organizationTypes;
     }
 
-    public MasterProcessingActivity setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes;  return this;}
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
 
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public MasterProcessingActivity setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; return this; }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
+    }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public MasterProcessingActivity setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices;  return this;}
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
+        this.organizationServices = organizationServices;
+    }
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public MasterProcessingActivity setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
+    }
 
-    public List<BigInteger> getRisks() { return risks;}
+    public List<Risk> getRisks() {
+        return risks;
+    }
 
-    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
+    public void setRisks(List<Risk> risks) {
+        this.risks = risks;
+    }
 
+    public MasterProcessingActivity getMasterProcessingActivity() {
+        return masterProcessingActivity;
+    }
 
+    public void setMasterProcessingActivity(MasterProcessingActivity masterProcessingActivity) {
+        this.masterProcessingActivity = masterProcessingActivity;
+    }
+
+    public List<MasterProcessingActivity> getSubProcessingActivities() {
+        return subProcessingActivities;
+    }
+
+    public void setSubProcessingActivities(List<MasterProcessingActivity> subProcessingActivities) {
+        this.subProcessingActivities = subProcessingActivities;
+    }
 }

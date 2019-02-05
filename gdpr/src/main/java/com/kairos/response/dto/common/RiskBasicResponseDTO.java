@@ -2,17 +2,15 @@ package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskBasicResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private String description;
     private String riskRecommendation;
@@ -20,16 +18,11 @@ public class RiskBasicResponseDTO {
     private boolean isReminderActive;
     private int daysToReminderBefore;
     private RiskSeverity riskLevel;
-    private Staff riskOwner;
 
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
-
-    public Staff getRiskOwner() { return riskOwner; }
-
-    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

@@ -6,7 +6,6 @@ import com.kairos.response.dto.common.RiskBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
 public class AssetTypeRiskResponseDTO {
 
     @NotNull
-    private BigInteger id;
+    private Long id;
     @NotBlank
     private String name;
     private List<RiskBasicResponseDTO> risks=new ArrayList<>();
@@ -22,9 +21,9 @@ public class AssetTypeRiskResponseDTO {
     private List<AssetTypeRiskResponseDTO> subAssetTypes=new ArrayList<>();
 
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

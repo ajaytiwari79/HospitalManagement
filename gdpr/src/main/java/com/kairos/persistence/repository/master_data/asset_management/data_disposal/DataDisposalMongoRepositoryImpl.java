@@ -1,25 +1,8 @@
 package com.kairos.persistence.repository.master_data.asset_management.data_disposal;
 
-import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistence.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.common.DataDisposalResponseDTO;
-import org.bson.Document;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+public class DataDisposalMongoRepositoryImpl  {
 
-public class DataDisposalMongoRepositoryImpl  implements CustomDataDisposalRepository {
-
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -47,5 +30,5 @@ public class DataDisposalMongoRepositoryImpl  implements CustomDataDisposalRepos
 
         AggregationResults<DataDisposalResponseDTO> results = mongoTemplate.aggregate(aggregation,DataDisposal.class, DataDisposalResponseDTO.class);
         return results.getMappedResults();
-    }
+    }*/
 }

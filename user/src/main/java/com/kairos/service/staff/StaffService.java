@@ -425,8 +425,6 @@ public class StaffService {
                 exceptionService.internalServerError("error.xssfsheet.noMoreRow", 0);
 
             }
-            Row header = sheet.getRow(0);
-
             Set<Long> externalIdsOfStaffToBeSaved = new HashSet<>();
             boolean headerSkipped = false;
             for (Row row : sheet) { // For each Row.
@@ -436,28 +434,13 @@ public class StaffService {
                 }
                 Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
                 if (cell != null) {
-//                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
-                    externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
+                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                    if (cell.getNumericCellValue() > 0) {
+                        externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
+                    }
                 }
             }
             List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(externalIdsOfStaffToBeSaved);
-            logger.info(externalIdsOfStaffToBeSaved.toString());
-
-            int NumberOfColumnsInSheet = header.getLastCellNum();
-            int cprHeader = -1;
-
-            for (int i = 0; i < NumberOfColumnsInSheet; i++) {
-                String columnHeader = header.getCell(i).getStringCellValue();
-                if (columnHeader.equalsIgnoreCase(CPR_NUMBER)) {
-                    cprHeader = i;
-                    break;
-                }
-            }
-            if (cprHeader == -1) {
-                logger.info("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
-                exceptionService.internalServerError("error.sheet.add.crpnumber");
-
-            }
             // TODO get CountryId
             SystemLanguage defaultSystemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
             while (rowIterator.hasNext()) {
