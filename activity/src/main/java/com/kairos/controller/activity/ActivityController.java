@@ -408,4 +408,12 @@ public class ActivityController {
     ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
     }
+
+    @ApiOperation("To update the expertise  Id in activities")
+    @DeleteMapping(value = "/update_expertise/{expertiseId}")
+    ResponseEntity<Map<String, Object>> updateExpertiseInActivity(@PathVariable Long expertiseId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateExpertiseInActivity(expertiseId));
+    }
+
+
 }

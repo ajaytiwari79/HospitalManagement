@@ -134,5 +134,9 @@ public class ActivityIntegrationService {
         });
     }
 
+    public void updateActivities(Long expertiseId,Long updatedExpertiseId,Long countryId){
+        genericRestClient.publishRequest(null,countryId,false,IntegrationOperation.UPDATE,"/update_expertise/{expertiseId}",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},expertiseId);
+    }
+
 }
 
