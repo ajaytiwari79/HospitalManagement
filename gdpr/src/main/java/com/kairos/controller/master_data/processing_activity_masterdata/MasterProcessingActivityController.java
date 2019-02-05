@@ -43,28 +43,28 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/master_processing_activity/update/{id}")
-    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody MasterProcessingActivityDTO processingActivityDto) {
+    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long id, @Valid @RequestBody MasterProcessingActivityDTO processingActivityDto) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivityAndSubProcessingActivities(countryId, id, processingActivityDto));
     }
 
     @ApiOperation(value = "delete MasterProcessingActivity")
     @DeleteMapping("/master_processing_activity/delete/{id}")
-    public ResponseEntity<Object> deleteMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteMasterProcessingActivity(countryId, id));
     }
 
 
     @ApiOperation(value = "delete MasterProcessingActivity")
     @DeleteMapping("/master_processing_activity/{id}/sub_processing_activity/{subProcessingActivityId}")
-    public ResponseEntity<Object> deleteSubProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @PathVariable BigInteger subProcessingActivityId) {
+    public ResponseEntity<Object> deleteSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long id, @PathVariable Long subProcessingActivityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteSubProcessingActivity(countryId, id, subProcessingActivityId));
     }
 
 
     @ApiOperation(value = "get MasterProcessingActivity by id")
     @GetMapping("/master_processing_activity/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, id));
     }
 

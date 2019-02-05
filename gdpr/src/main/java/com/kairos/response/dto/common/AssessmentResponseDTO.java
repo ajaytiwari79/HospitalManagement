@@ -8,7 +8,6 @@ import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
 public class AssessmentResponseDTO {
 
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private LocalDate endDate;
     private LocalDate completedDate;
@@ -32,9 +31,9 @@ public class AssessmentResponseDTO {
     private AssessmentSchedulingFrequency assessmentSchedulingFrequency;
     private LocalDate startDate;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

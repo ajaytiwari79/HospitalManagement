@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,14 +42,14 @@ public class ResponsibilityTypeController {
     @ApiOperation("add ResponsibilityType  ")
     @PostMapping("/responsibility_type")
     public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, responsibilityTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, responsibilityTypes.getRequestBody(), false));
 
     }
 
 
     @ApiOperation("get ResponsibilityType  by id")
     @GetMapping("/responsibility_type/{responsibilityTypeId}")
-    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger responsibilityTypeId) {
+    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId, @PathVariable Long responsibilityTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId, responsibilityTypeId));
     }
 
@@ -64,7 +63,7 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("delete ResponsibilityType  by id")
     @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
-    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger responsibilityTypeId) {
+    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long countryId, @PathVariable Long responsibilityTypeId) {
           return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(countryId, responsibilityTypeId));
 
     }
@@ -72,7 +71,7 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/responsibility_type/{responsibilityTypeId}")
-    public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
+    public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable Long responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, responsibilityTypeId, responsibilityType));
 
     }
@@ -80,7 +79,7 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("update Suggested status of Responsibility Types")
     @PutMapping("/responsibility_type")
-    public ResponseEntity<Object> updateSuggestedStatusOfResponsibilityTypes(@PathVariable Long countryId, @RequestBody Set<BigInteger> responsibilityTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+    public ResponseEntity<Object> updateSuggestedStatusOfResponsibilityTypes(@PathVariable Long countryId, @RequestBody Set<Long> responsibilityTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(responsibilityTypeIds)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Responsibility Type is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {

@@ -5,11 +5,11 @@ import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
+import com.kairos.persistence.model.questionnaire_template.QuestionDeprecated;
 import com.kairos.persistence.model.questionnaire_template.Question;
-import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
-import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSectionDeprecated;
+import com.kairos.persistence.repository.questionnaire_template.QuestionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -17,23 +17,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class QuestionService extends MongoBaseService {
+public class QuestionService{
 
     private Logger logger = LoggerFactory.getLogger(QuestionService.class);
-
-    @Inject
-    private QuestionMongoRepository questionMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;
 
     @Inject
     private QuestionnaireSectionRepository questionnaireSectionRepository;
+
+    @Inject
+    private QuestionRepository questionRepository;
 
 
     /**
@@ -43,12 +43,12 @@ public class QuestionService extends MongoBaseService {
      * @param templateType
      * @return
      */
-    public List<QuestionnaireSection> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnitId, Map<QuestionnaireSection, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
+    public List<QuestionnaireSectionDeprecated> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnitId, Map<QuestionnaireSectionDeprecated, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
 
-        List<Question> globalQuestionList = new ArrayList<>();
-        Map<QuestionnaireSection, List<Question>> sectionQuestionListMap = new HashMap<>();
+        List<QuestionDeprecated> globalQuestionList = new ArrayList<>();
+        Map<QuestionnaireSectionDeprecated, List<QuestionDeprecated>> sectionQuestionListMap = new HashMap<>();
         Map<BigInteger, QuestionDTO> questionDTOAndIdMap = new HashMap<>();
-        List<QuestionnaireSection> questionnaireSections = new ArrayList<>();
+        List<QuestionnaireSectionDeprecated> questionnaireSections = new ArrayList<>();
         Set<String> titles = new HashSet<>();
         sectionAndQuestionDTOListMap.forEach((questionnaireSection, questionDTOS) -> {
 
@@ -64,13 +64,14 @@ public class QuestionService extends MongoBaseService {
                     questionListCorrespondingToSection.add(questionDTO);
             });
             if (CollectionUtils.isNotEmpty(questionListCorrespondingToSection)) {
-                List<Question> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCorrespondingToSection, templateType);
+                List<QuestionDeprecated> questions = buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, isUnitId,questionListCorrespondingToSection, templateType);
                 sectionQuestionListMap.put(questionnaireSection, questions);
                 globalQuestionList.addAll(questions);
             }
             questionnaireSections.add(questionnaireSection);
         });
-        if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
+        //TODO
+      /*  if (CollectionUtils.isNotEmpty(questionDTOAndIdMap.keySet())) {
             List<Question> existingQuestionList = isUnitId ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionDTOAndIdMap.keySet()) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionDTOAndIdMap.keySet());
             existingQuestionList.forEach(question -> {
                 QuestionDTO questionDTO = questionDTOAndIdMap.get(question.getId());
@@ -79,24 +80,24 @@ public class QuestionService extends MongoBaseService {
             });
             globalQuestionList.addAll(existingQuestionList);
         }
-        questionMongoRepository.saveAll(getNextSequence(globalQuestionList));
+        questionMongoRepository.saveAll(getNextSequence(globalQuestionList));*/
         questionnaireSections.forEach(questionnaireSection -> {
             if (Optional.ofNullable(sectionQuestionListMap.get(questionnaireSection)).isPresent()) {
-                questionnaireSection.getQuestions().addAll(sectionQuestionListMap.get(questionnaireSection).stream().map(Question::getId).collect(Collectors.toList()));
+               // questionnaireSection.getQuestions().addAll(sectionQuestionListMap.get(questionnaireSection).stream().map(Question::getId).collect(Collectors.toList()));
             }
         });
         return questionnaireSections;
     }
 
 
-    private List<Question> buildQuestionForQuestionnaireSectionAtUnitLevel(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
-        List<Question> questions = new ArrayList<>();
+    private List<QuestionDeprecated> buildQuestionForQuestionnaireSectionAtUnitLevel(Long referenceId, boolean isUnitId, List<QuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
+        List<QuestionDeprecated> questions = new ArrayList<>();
         for (QuestionDTO questionDTO : questionDTOs) {
-            Question question = new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed());
-            if (isUnitId)
+            QuestionDeprecated question = new QuestionDeprecated(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed());
+           /* if (isUnitId)
                 question.setOrganizationId(referenceId);
             else
-                question.setCountryId(referenceId);
+                question.setCountryId(referenceId);*/
             addAttributeNameToQuestion(question, questionDTO, templateType);
             questions.add(question);
         }
@@ -104,7 +105,7 @@ public class QuestionService extends MongoBaseService {
     }
 
 
-    public void addAttributeNameToQuestion(Question masterQuestion, QuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
+    public void addAttributeNameToQuestion(QuestionDeprecated masterQuestion, QuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
 
         if (!Optional.ofNullable(templateType).isPresent()) {
             exceptionService.invalidRequestException("message.invalid.request", " Attribute name is incorrect");
@@ -134,19 +135,23 @@ public class QuestionService extends MongoBaseService {
      * @return
      * @description deleted question by id ,and also remove id of question from questionnaire section.
      */
-    public boolean deleteMasterQuestion(Long countryId, BigInteger questionId, BigInteger sectionId) {
-        QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByCountryIdAndId(countryId, sectionId);
-        if (!Optional.ofNullable(questionnaireSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Section", sectionId);
+    public boolean deleteQuestionOfQuestionnaireSection(Long countryId, Long questionId, Long sectionId) {
+        Question question = questionRepository.findQuestionByIdAndSectionId( questionId,sectionId);
+        if (!Optional.ofNullable(question).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Question", sectionId);
         }
-        questionnaireSection.getQuestions().remove(questionId);
-        questionnaireSectionRepository.save(questionnaireSection);
-        questionMongoRepository.safeDeleteById(questionId);
+        try{
+        question.delete();
+        questionnaireSectionRepository.unlinkQuestionFromQuestionnaireSection(sectionId, questionId);
+        questionRepository.save(question);
+        }catch (EntityNotFoundException ene){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Question", questionId);
+        }
         return true;
     }
 
 
-    public boolean deleteQuestionOfQuestionnaireSectionOfUnit(Long unitId, BigInteger questionId, BigInteger sectionId) {
+    /*public boolean deleteQuestionOfQuestionnaireSectionOfUnit(Long unitId, BigInteger questionId, BigInteger sectionId) {
         QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findQuestionnaireSectionByUnitIdAndId(unitId, sectionId);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Section", sectionId);
@@ -155,11 +160,11 @@ public class QuestionService extends MongoBaseService {
         questionnaireSectionRepository.save(questionnaireSection);
         questionMongoRepository.safeDeleteById(questionId);
         return true;
-    }
+    }*/
 
 
     public List<Question> getAllMasterQuestion(Long countryId) {
-        return questionMongoRepository.getAllMasterQuestion(countryId);
+        return questionRepository.getAllMasterQuestion(countryId);
 
     }
 

@@ -2,33 +2,32 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionnaireTemplateResponseDTO {
 
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private String description;
     private QuestionnaireTemplateType templateType;
-    private boolean defaultAssetTemplate;
-    private AssetType assetType;
-    private AssetType assetSubType;
+    private boolean isDefaultAssetTemplate;
+    private QuestionnaireAssetTypeDTO assetType;
+    private QuestionnaireAssetTypeDTO assetSubType;
     private QuestionnaireTemplateStatus templateStatus;
     private List<QuestionnaireSectionResponseDTO> sections;
 
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -36,13 +35,13 @@ public class QuestionnaireTemplateResponseDTO {
 
     public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
 
-    public AssetType getAssetSubType() { return assetSubType; }
+    public QuestionnaireAssetTypeDTO getAssetSubType() { return assetSubType; }
 
-    public void setAssetSubType(AssetType assetSubType) { this.assetSubType = assetSubType; }
+    public void setAssetSubType(QuestionnaireAssetTypeDTO assetSubType) { this.assetSubType = assetSubType; }
 
-    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
+    public boolean isDefaultAssetTemplate() { return isDefaultAssetTemplate; }
 
-    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.isDefaultAssetTemplate = defaultAssetTemplate; }
 
     public String getName() {
         return name;
@@ -64,11 +63,11 @@ public class QuestionnaireTemplateResponseDTO {
 
     public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
 
-    public AssetType getAssetType() {
+    public QuestionnaireAssetTypeDTO getAssetType() {
         return assetType;
     }
 
-    public void setAssetType(AssetType assetType) {
+    public void setAssetType(QuestionnaireAssetTypeDTO assetType) {
         this.assetType = assetType;
     }
 
@@ -80,14 +79,16 @@ public class QuestionnaireTemplateResponseDTO {
         this.sections = sections;
     }
 
-    public QuestionnaireTemplateResponseDTO(BigInteger id, String name, String description) {
+    public QuestionnaireTemplateResponseDTO(Long id, String name, String description, QuestionnaireTemplateType templateType, boolean isDefaultAssetTemplate, QuestionnaireTemplateStatus templateStatus) {
         this.id = id;
         this.name = name;
         this.description = description;
-
+        this.templateType = templateType;
+        this.isDefaultAssetTemplate = isDefaultAssetTemplate;
+        this.templateStatus = templateStatus;
     }
 
-    public QuestionnaireTemplateResponseDTO(BigInteger id) {
+    public QuestionnaireTemplateResponseDTO(Long id) {
         this.id = id;
     }
 

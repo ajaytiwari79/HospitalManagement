@@ -3,10 +3,8 @@ package com.kairos.response.dto.policy_agreement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.clause.ClauseCkEditorVO;
-import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,16 +12,16 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     @NotBlank
     private String title;
     private String titleHtml;
     private Integer orderedIndex;
-    private List<BigInteger> clauseIdOrderedIndex;
-    private List<ClauseBasicResponseDTO> clauses;
-    private List<ClauseCkEditorVO> clauseCkEditorVOS;
-    private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
+    //private List<BigInteger> clauseIdOrderedIndex;
+    //private List<ClauseBasicResponseDTO> clauses;
+    private List<ClauseCkEditorVO> clauses;
+    private List<AgreementSectionResponseDTO> agreementSubSections =new ArrayList<>();
 
     public Integer getOrderedIndex() {
         return orderedIndex;
@@ -33,33 +31,34 @@ public class AgreementSectionResponseDTO {
         this.orderedIndex = orderedIndex;
     }
 
-    public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
+    /*public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
 
     public void setClauseIdOrderedIndex(List<BigInteger> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }
 
-    public BigInteger getId() {
+    */
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public List<AgreementSectionResponseDTO> getSubSections() {
-        return subSections;
+    public List<AgreementSectionResponseDTO> getAgreementSubSections() {
+        return agreementSubSections;
     }
 
-    public void setSubSections(List<AgreementSectionResponseDTO> subSections) {
-        this.subSections = subSections;
+    public void setAgreementSubSections(List<AgreementSectionResponseDTO> agreementSubSections) {
+        this.agreementSubSections = agreementSubSections;
     }
 
-    public List<ClauseBasicResponseDTO> getClauses() {
+    /*public List<ClauseBasicResponseDTO> getClauses() {
         return clauses;
     }
 
     public void setClauses(List<ClauseBasicResponseDTO> clauses) {
         this.clauses = clauses;
-    }
+    }*/
 
     public String getTitle() {
         return title;
@@ -69,9 +68,13 @@ public class AgreementSectionResponseDTO {
         this.title = title;
     }
 
-    public List<ClauseCkEditorVO> getClauseCkEditorVOS() { return clauseCkEditorVOS; }
+    public List<ClauseCkEditorVO> getClauses() {
+        return clauses;
+    }
 
-    public void setClauseCkEditorVOS(List<ClauseCkEditorVO> clauseCkEditorVOS) { this.clauseCkEditorVOS = clauseCkEditorVOS; }
+    public void setClauses(List<ClauseCkEditorVO> clauses) {
+        this.clauses = clauses;
+    }
 
     public String getTitleHtml() { return titleHtml; }
 

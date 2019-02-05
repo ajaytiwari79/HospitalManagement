@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
@@ -47,7 +46,7 @@ public class AssetTypeController {
 
     @ApiOperation("get AssetType by id")
     @GetMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId) {
+    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable Long assetTypeId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, assetTypeId));
 
@@ -61,35 +60,35 @@ public class AssetTypeController {
 
     }
 
-    @ApiOperation("delete AssetType  by id")
+   /* @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/asset_type/{assetId}")
     public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable BigInteger assetId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, false, assetTypeService.deleteAssetType(countryId,assetId));
 
-    }
+    }*/
 
     @ApiOperation("update Asset type and Sub Asset ")
     @PutMapping("/asset_type/{assetTypeId}")
-    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId, @Valid @RequestBody AssetTypeDTO assetType) {
+    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable Long assetTypeId, @Valid @RequestBody AssetTypeDTO assetType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(countryId, assetTypeId, assetType));
 
     }
 
-    @ApiOperation("unlink RISK From Asset Type and delete risk")
+    /*@ApiOperation("unlink RISK From Asset Type and delete risk")
     @DeleteMapping("/asset_type/{assetTypeId}/risk/{riskId}")
     public ResponseEntity<Object> unlinkRiskFromAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId,@PathVariable BigInteger riskId ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(countryId, assetTypeId, riskId));
 
-    }
+    }*/
 
 
-    @ApiOperation("unlink RISK From Sub Asset Type and delete risk")
+    /*@ApiOperation("unlink RISK From Sub Asset Type and delete risk")
     @DeleteMapping("/asset_type/sub_asset_type/{subAssetTypeId}/risk/{riskId}")
     public ResponseEntity<Object> unlinkRiskFromSubAssetType(@PathVariable Long countryId, @PathVariable BigInteger subAssetTypeId,@PathVariable BigInteger riskId ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(countryId, subAssetTypeId, riskId));
 
-    }
+    }*/
 
 
 }
