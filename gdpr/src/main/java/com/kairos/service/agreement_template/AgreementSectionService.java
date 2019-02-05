@@ -67,7 +67,7 @@ public class AgreementSectionService{
      */
     public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long referenceId, boolean isUnitId, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
         AgreementTemplateSectionResponseDTO agreementTemplateSectionResponseDTO = new AgreementTemplateSectionResponseDTO();
-        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId, false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId,referenceId, false);
+        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId,referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
         }
@@ -128,11 +128,11 @@ public class AgreementSectionService{
      */
     public boolean deleteAgreementSection(Long referenceId, boolean isUnitId, Long templateId, Long sectionId) {
 
-        AgreementSection agreementSection = isUnitId ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId, false) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId, false);
+        AgreementSection agreementSection = isUnitId ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
         }
-        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId, false) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId, referenceId, false);
+        PolicyAgreementTemplate policyAgreementTemplate = isUnitId ? policyAgreementRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeleted(templateId, referenceId);
         policyAgreementTemplate.getAgreementSections().remove(agreementSection);
         policyAgreementRepository.save(policyAgreementTemplate);
         agreementSection.delete();

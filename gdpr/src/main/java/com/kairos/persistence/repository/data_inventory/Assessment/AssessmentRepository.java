@@ -20,7 +20,7 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
     Assessment findPreviousLaunchedAssessmentByUnitIdAndAssetId();
 
     @Query(value = "SELECT assessment FROM Assessment assessment WHERE assessment.organizationId = ?1 and assessment.deleted = ?2 and lower(assessment.name) = lower(?3)")
-    Assessment findByOrganizationIdAndDeletedAndName(Long orgId, boolean deleted, String name);
+    Assessment findByOrganizationIdAndDeletedAndName(Long orgId, String name);
 
     @Query(value = "Select assessment from Assessment assessment where assessment.organizationId = ?1 and assessment.processingActivity.id = ?2 and assessment.assessmentStatus IN (?3) and assessment.isRiskAssessment = ?4 and assessment.deleted = false")
     Assessment findPreviousLaunchedRiskAssessmentByUnitIdAndProcessingActivityId(Long orgId, Long processingActivityId, List<AssessmentStatus> status, boolean isRiskAssessment);

@@ -35,7 +35,7 @@ public class QuestionnaireSectionController {
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
             return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(countryId, templateId, questionnaireSectionsDto, true));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(countryId, templateId, questionnaireSectionsDto, false));
     }
 
 
@@ -52,7 +52,7 @@ public class QuestionnaireSectionController {
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getSections())) {
             return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Create Section" );
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(unitId, templateId, questionnaireSectionsDto,false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(unitId, templateId, questionnaireSectionsDto,true));
     }
 
     @ApiOperation("delete questionnaire section by id ")

@@ -19,11 +19,11 @@ public interface AgreementSectionRepository extends JpaRepository<AgreementSecti
     @Query(value = "update agreement_sectionmd_clauses set deleted = true , agreement_sectionmd_id=null where agreement_sectionmd_id =?1 and id = ?2", nativeQuery = true)
     Integer removeClauseIdFromAgreementSection(Long sectionId, Long clauseId);
 
-    @Query(value = "SELECT hp FROM AgreementSection hp WHERE hp.id = ?1 and hp.countryId = ?2 and hp.deleted = ?3")
-    AgreementSection findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
+    @Query(value = "SELECT hp FROM AgreementSection hp WHERE hp.id = ?1 and hp.countryId = ?2 and hp.deleted = false")
+    AgreementSection findByIdAndCountryIdAndDeleted(Long id, Long countryId);
 
-    @Query(value = "SELECT hp FROM AgreementSection hp WHERE hp.id = ?1 and hp.organizationId = ?2 and hp.deleted = ?3")
-    AgreementSection findByIdAndOrganizationIdAndDeleted(Long id, Long orgId, boolean deleted);
+    @Query(value = "SELECT hp FROM AgreementSection hp WHERE hp.id = ?1 and hp.organizationId = ?2 and hp.deleted = false")
+    AgreementSection findByIdAndOrganizationIdAndDeleted(Long id, Long orgId);
 
     @Transactional
     @Modifying

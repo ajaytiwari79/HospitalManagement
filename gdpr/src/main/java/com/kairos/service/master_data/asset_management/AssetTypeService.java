@@ -232,7 +232,7 @@ public class AssetTypeService{
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public AssetTypeRiskResponseDTO getAssetTypeById(Long countryId, Long id) {
-        AssetType assetType = assetTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        AssetType assetType = assetTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", id);
         }

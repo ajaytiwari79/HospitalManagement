@@ -25,7 +25,7 @@ import java.util.*;
 
 
 @Service
-public class QuestionnaireSectionService{
+public class QuestionnaireSectionService {
 
     private Logger LOGGER = LoggerFactory.getLogger(QuestionnaireSectionService.class);
 
@@ -47,15 +47,15 @@ public class QuestionnaireSectionService{
 
 
     /**
-     * @param organizationCountryId
+     * @param referenceId
      * @param templateId                    questionnaire template id ,required to fetch
      * @param masterQuestionnaireSectionDto contains list of sections ,And section contain list of questions
      * @return add sections ids to questionnaire template and return questionnaire template
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
-    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long organizationCountryId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto, boolean isMaster) {
-        QuestionnaireTemplate questionnaireTemplate = isMaster ? questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, organizationCountryId, false) :
-                questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(templateId, organizationCountryId, false);
+    //TODO use dto as response
+    public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplate(Long referenceId, Long templateId, QuestionnaireTemplateSectionDTO masterQuestionnaireSectionDto, boolean isUnitId) {
+        QuestionnaireTemplate questionnaireTemplate = isUnitId ? questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(templateId, referenceId) : questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(templateId, referenceId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
@@ -63,9 +63,9 @@ public class QuestionnaireSectionService{
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(masterQuestionnaireSectionDto.getSections());
         questionnaireTemplate.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(masterQuestionnaireSectionDto.getSections(), QuestionnaireSection.class));
         //List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto.getSections(), questionnaireTemplate.getTemplateType());
-       // questionnaireTemplate.setSections(sectionIdList);
+        // questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateRepository.save(questionnaireTemplate);
-        return questionnaireTemplateService.getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(organizationCountryId, questionnaireTemplate.getId(),true);
+        return questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(referenceId, questionnaireTemplate.getId(), isUnitId);
 
     }
 
@@ -101,7 +101,7 @@ public class QuestionnaireSectionService{
             });
             globalQuestionnaireSections.addAll(previousQuestionnaireSections);*/
         }
-        List<BigInteger> sectionIdList =  new ArrayList<>();
+        List<BigInteger> sectionIdList = new ArrayList<>();
         //TODO
         /*if (!questionDTOListCorrespondingToSection.isEmpty()) {
             questionService.saveAndUpdateQuestionAndAddToQuestionnaireSection(referenceId, false, questionDTOListCorrespondingToSection, templateType);
@@ -119,7 +119,7 @@ public class QuestionnaireSectionService{
     private QuestionnaireSectionDeprecated buildQuestionnaireSection(QuestionnaireSectionDTO questionnaireSectionDTO, Long referenceId, boolean isReferenceIdUnitId) {
         if (isReferenceIdUnitId) {
             QuestionnaireSectionDeprecated questionnaireSection = new QuestionnaireSectionDeprecated(questionnaireSectionDTO.getTitle());
-           // questionnaireSection.setOrganizationId(referenceId);
+            // questionnaireSection.setOrganizationId(referenceId);
             return questionnaireSection;
         } else {
             return new QuestionnaireSectionDeprecated(questionnaireSectionDTO.getTitle(), referenceId);
@@ -134,7 +134,7 @@ public class QuestionnaireSectionService{
      * @description soft delete section and remove section id from template
      */
     public boolean deleteQuestionnaireSectionFromTemplate(Long organizationCountryId, Long templateId, Long questionnaireSectionId, boolean isMaster) {
-        QuestionnaireSection questionnaireSection =  questionnaireSectionRepository.findByIdAndDeleted( questionnaireSectionId,false);
+        QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByIdAndDeleted(questionnaireSectionId, false);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  section", templateId);
         }

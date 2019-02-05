@@ -21,8 +21,8 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     AssetType findByIdAndNameAndCountryIdAndSubAssetType(Long id, String name, Long countryId, boolean hasSubAssetType);
 
 
-    @Query(value = "SELECT at FROM AssetType at WHERE at.id = ?1 and at.countryId = ?2 and at.deleted = ?3")
-    AssetType findByIdAndCountryIdAndDeleted(Long id, Long countryId, boolean deleted);
+    @Query(value = "SELECT at FROM AssetType at WHERE at.id = ?1 and at.countryId = ?2 and at.deleted = false")
+    AssetType findByIdAndCountryIdAndDeleted(Long id, Long countryId);
 
     @Transactional
     @Modifying
@@ -43,8 +43,8 @@ public interface AssetTypeRepository extends JpaRepository<AssetType,Long> {
     AssetType findByIdAndNameAndOrganizationIdAndSubAssetType(Long id, String name, Long countryId, boolean hasSubAssetType);
 
 
-    @Query(value = "SELECT at FROM AssetType at WHERE at.id = ?1 and at.organizationId = ?2 and at.deleted = ?3")
-    AssetType findByIdAndOrganizationIdAndDeleted(Long id, Long countryId, boolean deleted);
+    @Query(value = "SELECT at FROM AssetType at WHERE at.id = ?1 and at.organizationId = ?2 and at.deleted = false")
+    AssetType findByIdAndOrganizationIdAndDeleted(Long id, Long countryId);
 
     @Transactional
     @Modifying

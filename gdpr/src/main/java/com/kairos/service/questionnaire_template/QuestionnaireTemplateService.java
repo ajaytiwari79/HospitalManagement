@@ -107,7 +107,7 @@ public class QuestionnaireTemplateService {
             if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
                 exceptionService.invalidRequestException("message.assetType.not.selected");
             }
-            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(), referenceId, false) : assetTypeRepository.findByIdAndCountryIdAndDeleted(templateDto.getAssetType(), referenceId, false);
+            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndDeleted(templateDto.getAssetType(), referenceId);
             questionnaireTemplate.setAssetType(assetType);
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
                 previousTemplate = isUnitId ? questionnaireTemplateRepository.findQuestionnaireTemplateByUnitIdAssetTypeIdAndTemplateStatus(referenceId, templateDto.getAssetType(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED) : questionnaireTemplateRepository.findQuestionnaireTemplateByAssetTypeAndByCountryId(referenceId, templateDto.getAssetType(), QuestionnaireTemplateType.ASSET_TYPE, QuestionnaireTemplateStatus.PUBLISHED);
@@ -137,7 +137,7 @@ public class QuestionnaireTemplateService {
             if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
                 exceptionService.invalidRequestException("message.assetType.not.selected");
             }
-            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(), referenceId, false) : assetTypeRepository.findByIdAndCountryIdAndDeleted(templateDto.getAssetType(), referenceId, false);
+            AssetType assetType = isUnitId ? assetTypeRepository.findByIdAndOrganizationIdAndDeleted(templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndDeleted(templateDto.getAssetType(), referenceId);
             if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
                 previousTemplate = isUnitId ? questionnaireTemplateRepository.findPublishedRiskTemplateByAssetTypeIdAndOrgId(referenceId, templateDto.getAssetType())
                         : questionnaireTemplateRepository.findRiskTemplateByCountryIdAndAssetTypeId(referenceId, templateDto.getAssetType());
@@ -179,7 +179,7 @@ public class QuestionnaireTemplateService {
      * @description delete questionnaire template ,sections and question related to template.
      */
     public boolean deleteMasterQuestionnaireTemplate(Long countryId, Long id) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", id);
         }
@@ -223,51 +223,24 @@ public class QuestionnaireTemplateService {
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(Long referenceId, Long questionnaireTemplateId, boolean isMasterData) {
-        QuestionnaireTemplate questionnaireTemplate = isMasterData ? questionnaireTemplateRepository.getMasterQuestionnaireTemplateWithSectionsByCountryId(referenceId, questionnaireTemplateId) :
-                questionnaireTemplateRepository.getQuestionnaireTemplateWithSectionsByOrganizationId(referenceId, questionnaireTemplateId);
+    public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(Long referenceId, Long questionnaireTemplateId, boolean isUnitId) {
+        QuestionnaireTemplate questionnaireTemplate = isUnitId ?
+                questionnaireTemplateRepository.getQuestionnaireTemplateWithSectionsByOrganizationId(referenceId, questionnaireTemplateId) : questionnaireTemplateRepository.getMasterQuestionnaireTemplateWithSectionsByCountryId(referenceId, questionnaireTemplateId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
         }
-       /* if (!Optional.ofNullable(templateResponseDto.getSections().get(0).getId()).isPresent()) {
-            templateResponseDto.setSections(new ArrayList<>());
-        }*/
-        return prepareQuestionnaireTemplateResponseData(questionnaireTemplate);
+        return ObjectMapperUtils.copyPropertiesByMapper(questionnaireTemplate, QuestionnaireTemplateResponseDTO.class);
     }
 
     /**
-     * This method is used to prepare Questionnaire template Response object from actual entity object
-     */
-    QuestionnaireTemplateResponseDTO prepareQuestionnaireTemplateResponseData(QuestionnaireTemplate questionnaireTemplate) {
-        QuestionnaireTemplateResponseDTO questionnaireTemplateResponseDTO = new QuestionnaireTemplateResponseDTO(questionnaireTemplate.getId(), questionnaireTemplate.getName(), questionnaireTemplate.getDescription(), questionnaireTemplate.getTemplateType(), questionnaireTemplate.isDefaultAssetTemplate(), questionnaireTemplate.getTemplateStatus());
-        questionnaireTemplateResponseDTO.setAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetType().getId(), questionnaireTemplate.getAssetType().getName(), questionnaireTemplate.getAssetType().isSubAssetType()));
-        questionnaireTemplateResponseDTO.setAssetSubType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getAssetSubType().getId(), questionnaireTemplate.getAssetSubType().getName(), questionnaireTemplate.getAssetSubType().isSubAssetType()));
-        questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
-
-        return questionnaireTemplateResponseDTO;
-    }
-
-
-    /**
-     * @param id
+     * @param referenceId
      * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
      * @description we get  section[ {} ] as query response from mongo on using group operation,
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    public List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long id, boolean isMasterData) {
-        List<QuestionnaireTemplateResponseDTO> questionnaireTemplateResponseDTOS = new ArrayList<>();
-        List<QuestionnaireTemplate> questionnaireTemplates = isMasterData ? questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(id) :
-                questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(id);
-        questionnaireTemplates.forEach(questionnaireTemplate -> {
-            questionnaireTemplateResponseDTOS.add(prepareQuestionnaireTemplateResponseData(questionnaireTemplate));
-        });
-        /*templateResponseDTOs.forEach(template -> {
-            if (!Optional.ofNullable(template.getSections().get(0).getId()).isPresent()) {
-                template.setSections(new ArrayList<>());
-            }
-        });*/
-        return questionnaireTemplateResponseDTOS;
+    public List<QuestionnaireTemplate> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long referenceId, boolean isUnitId) {
+        return isUnitId ? questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(referenceId) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(referenceId);
 
     }
 
@@ -294,63 +267,16 @@ public class QuestionnaireTemplateService {
      */
     public QuestionnaireTemplateDTO saveQuestionnaireTemplate(Long unitId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, false, questionnaireTemplateDTO.getName());
+        QuestionnaireTemplate previousTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
         }
-        validateQuestionnaireTemplateDTOByTemplateTypeCriteriaForUnit(unitId, questionnaireTemplateDTO);
         QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), QuestionnaireTemplateStatus.DRAFT);
         questionnaireTemplate.setOrganizationId(unitId);
         validateQuestionnaireTemplateAndAddTemplateType(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
         questionnaireTemplateRepository.save(questionnaireTemplate);
         return questionnaireTemplateDTO.setId(questionnaireTemplate.getId());
 
-    }
-
-    /**
-     * @param unitId
-     * @param templateDto
-     */
-    private void validateQuestionnaireTemplateDTOByTemplateTypeCriteriaForUnit(Long unitId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplateType questionnaireTemplateType = templateDto.getTemplateType();
-        QuestionnaireTemplate previousMasterTemplate;
-        switch (questionnaireTemplateType) {
-            case ASSET_TYPE:
-                if (!templateDto.isDefaultAssetTemplate()) {
-                    previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(unitId, templateDto);
-                } else {
-                    previousMasterTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndDefaultAssetTemplateAndOrganizationId(questionnaireTemplateType, true, unitId, QuestionnaireTemplateStatus.PUBLISHED);
-                }
-                break;
-            case RISK:
-                if (QuestionnaireTemplateType.ASSET_TYPE.equals(templateDto.getRiskAssociatedEntity())) {
-                    previousMasterTemplate = getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(unitId, templateDto);
-                } else {
-                    previousMasterTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByTemplateTypeAndRiskAssociatedEntityAndOrganizationId(questionnaireTemplateType, templateDto.getRiskAssociatedEntity(), unitId, QuestionnaireTemplateStatus.PUBLISHED);
-                }
-                break;
-            default:
-                previousMasterTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByOrganizationIdAndTemplateType(unitId, questionnaireTemplateType, QuestionnaireTemplateStatus.PUBLISHED);
-                break;
-        }
-        if (previousMasterTemplate != null) {
-            exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.templateType.config", "Organization Questionnaire template");
-        }
-    }
-
-    /**
-     * @param unitId
-     * @param templateDto
-     * @return
-     */
-    private QuestionnaireTemplate getQuestionnaireTemplateByAssetTypeOrSubTypeForUnit(Long unitId, QuestionnaireTemplateDTO templateDto) {
-        QuestionnaireTemplate previousMasterTemplate = null;
-        if (templateDto.getAssetSubType() != null) {
-            previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndSubAssetTypeAndOrganizationId(templateDto.getTemplateType(), templateDto.getAssetType(), templateDto.getAssetSubType(), unitId);
-        } else {
-            previousMasterTemplate = questionnaireTemplateRepository.findQuestionnaireTemplateByTemplateTypeAndAssetTypeAndAndOrganizationId(templateDto.getTemplateType(), templateDto.getAssetType(), unitId);
-        }
-        return previousMasterTemplate;
     }
 
 
@@ -363,7 +289,7 @@ public class QuestionnaireTemplateService {
      */
     public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
 
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, false, questionnaireTemplateDTO.getName());
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByOrganizationIdAndDeletedAndName(unitId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(questionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(questionnaireTemplate.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
         }
@@ -383,7 +309,7 @@ public class QuestionnaireTemplateService {
 
 
     public boolean deleteQuestionnaireTemplate(Long unitId, Long questionnaireTemplateId) {
-        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId, false);
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeleted(questionnaireTemplateId, unitId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
         }
@@ -399,7 +325,7 @@ public class QuestionnaireTemplateService {
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    /*public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateDataWithSectionsByTemplateIdAndUnitOrOrganisationId(Long unitId, Long questionnaireTemplateId) {
+    /*public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(Long unitId, Long questionnaireTemplateId) {
         QuestionnaireTemplateResponseDTO templateResponseDto = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, questionnaireTemplateId);
         if (!Optional.ofNullable(templateResponseDto.getSections().get(0).getId()).isPresent()) {
             templateResponseDto.setSections(new ArrayList<>());
