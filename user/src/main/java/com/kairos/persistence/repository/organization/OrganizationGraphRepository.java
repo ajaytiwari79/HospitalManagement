@@ -739,7 +739,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "(address:ContactAddress) WITH union,sectors,address OPTIONAL MATCH(address)-[:ZIP_CODE]-(zipCode:ZipCode) WITH union,sectors,address,zipCode\n" +
             "OPTIONAL MATCH(address)-[:MUNICIPALITY]-(municipality:Municipality) WITH union,sectors,address,zipCode,municipality OPTIONAL MATCH(zipCode)-\n" +
             "[:MUNICIPALITY]-(linkedMunicipality:Municipality) WITH union,sectors,address,zipCode,municipality,collect(linkedMunicipality)as municipalities\n" +
-            "OPTIONAL MATCH(union)-[:HAS_LOCATION]-(location:Location{deleted:false}) RETURN union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
+            "OPTIONAL MATCH(union)-[:HAS_LOCATION]-(location:Location{deleted:false,defaultLocation:false}) RETURN union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
     List<UnionDataQueryResult> getUnionData(Long countryId);
 
     @Query("MATCH(union:Organization{deleted:false}) WHERE id(union)={0} RETURN union.boardingCompleted")

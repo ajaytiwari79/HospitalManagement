@@ -313,14 +313,11 @@ public class UnionService {
             }
             Organization union = new Organization(unionData.getName(),sectors,address, boardingCompleted,country,true);
             if(isCollectionEmpty(union.getLocations())&&publish){
-            Location location = new Location(AppConstants.MAIN_LOCATION,address);
+            Location location = new Location(AppConstants.MAIN_LOCATION,true,address);
             union.getLocations().add(location);
             }
 
             organizationGraphRepository.save(union);
-            if(isCollectionNotEmpty(union.getLocations())){
-            unionData.setLocations(ObjectMapperUtils.copyPropertiesOfListByMapper(union.getLocations(),LocationDTO.class));
-            }
             unionData.setId(union.getId());
         return unionData;
     }
@@ -393,13 +390,10 @@ public class UnionService {
         union.setName(unionData.getName());
         union.setContactAddress(address);
         if(isCollectionEmpty(union.getLocations())&&publish){
-            Location location = new Location(AppConstants.MAIN_LOCATION,address);
+            Location location = new Location(AppConstants.MAIN_LOCATION,true,address);
             union.getLocations().add(location);
         }
         organizationGraphRepository.save(union);
-        if(isCollectionNotEmpty(union.getLocations())){
-            unionData.setLocations(ObjectMapperUtils.copyPropertiesOfListByMapper(union.getLocations(),LocationDTO.class));
-        }
         unionData.setId(union.getId());
         return unionData;
     }
