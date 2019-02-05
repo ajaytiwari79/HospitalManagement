@@ -719,7 +719,7 @@ public class UnitPositionService {
 
                 ctawtaWrapper.getWta().forEach(wta -> {
                     LocalDate wtaStartDate = wta.getStartDate();
-                    LocalDate wtaEndDate = wta.getEndDate() != null ? wta.getEndDate() : null;
+                    LocalDate wtaEndDate = wta.getEndDate();
                     if ((positionLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(positionLine.getStartDate())) ||
                             positionLine.getEndDate() != null && (wtaStartDate.isBefore(positionLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(positionLine.getStartDate()) || wtaEndDate.equals(positionLine.getStartDate())))) {
                         positionLine.setWorkingTimeAgreement(wta);
