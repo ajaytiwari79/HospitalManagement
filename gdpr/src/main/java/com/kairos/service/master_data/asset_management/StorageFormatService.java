@@ -56,7 +56,7 @@ public class StorageFormatService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<StorageFormat> existing = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<StorageFormat> existing = storageFormatRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
@@ -101,7 +101,7 @@ public class StorageFormatService{
      */
     public StorageFormat getStorageFormat(Long countryId, Long id) {
 
-        StorageFormat exist = storageFormatRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        StorageFormat exist = storageFormatRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

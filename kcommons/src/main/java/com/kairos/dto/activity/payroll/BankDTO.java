@@ -4,6 +4,9 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
+
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
@@ -20,6 +23,7 @@ public class BankDTO {
     private String swiftCode; //stands for Society for Worldwide Interbank Financial Telecommunication
     private Long organizationId;
     private Long staffId;
+    @Length(max = 16,message = "accountNumber.greater_than.provided_value")
     private Long accountNumber;
 
 

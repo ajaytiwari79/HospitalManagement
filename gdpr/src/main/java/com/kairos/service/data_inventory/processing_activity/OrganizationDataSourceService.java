@@ -103,7 +103,7 @@ public class OrganizationDataSourceService{
      */
     public DataSource getDataSource(Long organizationId, Long id) {
 
-        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
+        DataSource exist = dataSourceRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -130,7 +130,7 @@ public class OrganizationDataSourceService{
      */
     public DataSourceDTO updateDataSource(Long organizationId, Long id, DataSourceDTO dataSourceDTO) {
 
-        DataSource dataSource = dataSourceRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, dataSourceDTO.getName());
+        DataSource dataSource = dataSourceRepository.findByOrganizationIdAndDeletedAndName(organizationId,  dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;

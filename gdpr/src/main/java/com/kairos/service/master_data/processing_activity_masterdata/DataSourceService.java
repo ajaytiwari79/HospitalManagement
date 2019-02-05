@@ -55,7 +55,7 @@ public class DataSourceService{
             List<String> nameInLowerCase = dataSourceNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<DataSource> existing = dataSourceRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<DataSource> existing = dataSourceRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
@@ -97,7 +97,7 @@ public class DataSourceService{
      * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
     public DataSource getDataSource(Long countryId, Long id) {
-        DataSource exist = dataSourceRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        DataSource exist = dataSourceRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

@@ -88,8 +88,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -174,7 +176,7 @@ public class UnitPositionService {
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws ExecutionException, Exception {
         Organization organization = organizationService.getOrganizationDetail(unitPositionDTO.getUnitId(), type);
-        Organization parentOrganization=organization.isParentOrganization()?organization:organizationService.getParentOfOrganization(organization.getId());
+        Organization parentOrganization = organization.isParentOrganization() ? organization : organizationService.getParentOfOrganization(organization.getId());
 
         Employment employment = employmentGraphRepository.findEmploymentByStaff(unitPositionDTO.getStaffId());
         if (!Optional.ofNullable(employment).isPresent()) {
@@ -197,10 +199,10 @@ public class UnitPositionService {
             exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", unitPositionDTO.getEmploymentTypeId());
         }
         List<FunctionWithAmountQueryResult> functions = findAndValidateFunction(unitPositionDTO);
-        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft,unitPositionDTO.getTaxDeductionPercentage());
+        UnitPosition unitPosition = new UnitPosition(organization, unitPositionDTO.getStartDate(), unitPositionDTO.getTimeCareExternalId(), !saveAsDraft, unitPositionDTO.getTaxDeductionPercentage());
 
         preparePosition(unitPosition, unitPositionDTO, createFromTimeCare);
-        if ((unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO,-1)) {
+        if ((unitPositionDTO.isMainUnitPosition()) && employmentService.eligibleForMainUnitPosition(unitPositionDTO, -1)) {
             unitPosition.setMainUnitPosition(true);
         }
         unitPositionGraphRepository.save(unitPosition);
@@ -436,7 +438,7 @@ public class UnitPositionService {
         }
 
         EmploymentType employmentType = employmentTypeGraphRepository.findById(unitPositionDTO.getEmploymentTypeId(), 0).orElse(null);
-        if ( unitPositionDTO.isMainUnitPosition() && employmentService.eligibleForMainUnitPosition(unitPositionDTO,unitPositionId)) {
+        if (unitPositionDTO.isMainUnitPosition() && employmentService.eligibleForMainUnitPosition(unitPositionDTO, unitPositionId)) {
             oldUnitPosition.setMainUnitPosition(true);
         }
 
@@ -500,7 +502,7 @@ public class UnitPositionService {
             } else {
                 unitPositionQueryResult.getPositionLines().get(0).setCostTimeAgreement(existingCtaWtaWrapper.getCta().get(0));
             }
-            updateTimeBank(newCTAWTAWrapper.getCta().get(0).getId(),unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate(),unitPositionQueryResult.getPositionLines().get(0).getEndDate(),unitId);
+            updateTimeBank(newCTAWTAWrapper.getCta().get(0).getId(), unitPositionId, unitPositionQueryResult.getPositionLines().get(0).getStartDate(), unitPositionQueryResult.getPositionLines().get(0).getEndDate(), unitId);
         }
         // calculative value is not changed it means only end date is updated.
         else {
@@ -537,7 +539,7 @@ public class UnitPositionService {
      */
     private void updateTimeBank(BigInteger ctaId, long unitPositionId, LocalDate unitPositionLineStartDate, LocalDate unitPositionLineEndDate, Long unitId) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByUnitPositionIdAndStaffId(unitPositionLineStartDate, unitPositionGraphRepository.getStaffIdFromUnitPosition(unitPositionId), unitPositionId, unitId, ORGANIZATION, Collections.emptySet());
-        activityIntegrationService.updateTimeBankOnUnitPositionUpdation(ctaId,unitPositionId, unitPositionLineStartDate, unitPositionLineEndDate, staffAdditionalInfoDTO);
+        activityIntegrationService.updateTimeBankOnUnitPositionUpdation(ctaId, unitPositionId, unitPositionLineStartDate, unitPositionLineEndDate, staffAdditionalInfoDTO);
     }
 
     private void setEndDateToUnitPosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) {
@@ -691,7 +693,7 @@ public class UnitPositionService {
         Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent() ? employmentReasonCode.getReasonCode().getId() : null;
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd(), employment.getMainEmploymentStartDate(), employment.getMainEmploymentEndDate(), employment.isMainEmployment());
 
-        List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization) ? unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) : unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId,unitId);
+        List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization) ? unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) : unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId, unitId);
 
         List<Long> unitPositionIds = unitPositionQueryResults.stream().map(UnitPositionQueryResult::getId).collect(Collectors.toList());
         List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("upIds", unitPositionIds.toString().replace("[", "").replace("]", "")));
@@ -705,21 +707,21 @@ public class UnitPositionService {
         unitPositionQueryResults.forEach(u -> {
             u.setPositionLines(positionLinesMap.get(u.getId()));
             u.getPositionLines().forEach(positionLine -> {
-                BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
+                BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
                 positionLine.setHourlyCost(hourlyCost);
 
                 ctawtaWrapper.getCta().forEach(cta -> {
                     if ((positionLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(positionLine.getStartDate())) ||
-                            positionLine.getEndDate() != null && (cta.getStartDate().isBefore(positionLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getStartDate()) ||cta.getEndDate().equals(positionLine.getStartDate())  ))) {
+                            positionLine.getEndDate() != null && (cta.getStartDate().isBefore(positionLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(positionLine.getStartDate()) || cta.getEndDate().equals(positionLine.getStartDate())))) {
                         positionLine.setCostTimeAgreement(cta);
                     }
                 });
 
                 ctawtaWrapper.getWta().forEach(wta -> {
                     LocalDate wtaStartDate = wta.getStartDate();
-                    LocalDate wtaEndDate =wta.getEndDate()!=null?wta.getEndDate():null;
+                    LocalDate wtaEndDate = wta.getEndDate() != null ? wta.getEndDate() : null;
                     if ((positionLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(positionLine.getStartDate())) ||
-                            positionLine.getEndDate() != null && (wtaStartDate.isBefore(positionLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(positionLine.getStartDate()) || wtaEndDate.equals(positionLine.getStartDate()) ))) {
+                            positionLine.getEndDate() != null && (wtaStartDate.isBefore(positionLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(positionLine.getStartDate()) || wtaEndDate.equals(positionLine.getStartDate())))) {
                         positionLine.setWorkingTimeAgreement(wta);
                     }
                 });
@@ -767,13 +769,13 @@ public class UnitPositionService {
         return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(),
                 unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(), unitPosition.getLastWorkingDate()
                 , wtaResponseDTO, unitPosition.getUnit().getId(), parentOrganizationId, unitPosition.isPublished(), reasonCode, unitInfo, unitPosition.isMainUnitPosition(),
-                Collections.singletonList(unitPositionLinesQueryResult),unitPositionDTO.getTaxDeductionPercentage());
+                Collections.singletonList(unitPositionLinesQueryResult), unitPositionDTO.getTaxDeductionPercentage());
 
     }
 
     protected UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition, WTAResponseDTO wtaResponseDTO, UnitPositionLine unitPositionLine) {
         UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
-        return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(), unitPosition.getEndDate(), unitPosition.getId(),  unitPosition.getUnion(),
+        return new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDate(), unitPosition.getEndDate(), unitPosition.getId(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDate(), wtaResponseDTO, unitPositionQueryResult.getUnitId(), unitPosition.isPublished(), unitPositionQueryResult.getParentUnitId());
 
     }
@@ -789,7 +791,7 @@ public class UnitPositionService {
             unitPositionDetail.setCountryId(countryId);
             unitPositionDetail.setUnitTimeZone(organization.getTimeZone());
             UnitPositionLinesQueryResult unitPositionLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
-            BigDecimal hourlyCost = unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
+            BigDecimal hourlyCost = unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
             unitPositionDetail.setHourlyCost(hourlyCost);
             unitPositionDetailsList.add(unitPositionDetail);
         });
@@ -812,7 +814,7 @@ public class UnitPositionService {
                 unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
             }
             UnitPositionLinesQueryResult unitPositionLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), UnitPositionLinesQueryResult.class);
-            BigDecimal hourlyCost = unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
+            BigDecimal hourlyCost = unitPositionLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(unitPositionLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
             unitPositionDetails.setHourlyCost(hourlyCost);
         }
         return unitPositionDetails;
@@ -869,7 +871,7 @@ public class UnitPositionService {
             if (staff == null) {
                 exceptionService.dataNotFoundByIdException("message.staff.externalid.notexist", timeCareEmploymentDTO.getPersonID());
             }
-            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(),  ctawtaWrapper.getWta().get(0).getId(), ctawtaWrapper.getCta().get(0).getId(), organization.getId());
+            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaWrapper.getWta().get(0).getId(), ctawtaWrapper.getCta().get(0).getId(), organization.getId());
             createUnitPosition(organization.getId(), "Organization", unitEmploymentPosition, true, true);
         }
         return true;
@@ -944,6 +946,11 @@ public class UnitPositionService {
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds);
         List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffUnitPositionDetails.class);
         List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
+        Map<Long, StaffUnitPositionDetails> staffUnitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(StaffUnitPositionDetails::getStaffId, Function.identity()));
+        List<String> invalidStaffs = staffAdditionalInfoQueryResult.stream().filter(staffAdditionalInfoQueryResult1 -> !staffUnitPositionDetailsMap.containsKey(staffAdditionalInfoQueryResult1.getId())).map(StaffAdditionalInfoQueryResult::getName).collect(Collectors.toList());
+        if (isCollectionEmpty(invalidStaffs)) {
+            exceptionService.dataNotMatchedException("unit_position.absent", invalidStaffs);
+        }
         Map<Long, StaffUnitPositionDetails> unitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));
         List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
         staffAdditionalInfoDTOS.forEach(currentData -> convertStaffUnitPositionObject(unitPositionDetailsMap.get(currentData.getId()), currentData, expertisePlannedTimes));
@@ -953,7 +960,7 @@ public class UnitPositionService {
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
-        return  staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId, System.currentTimeMillis());
+        return staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId, System.currentTimeMillis());
     }
 
     /**
@@ -977,11 +984,11 @@ public class UnitPositionService {
         return unitPositionDTOList;
     }
 
-    private void setHourlyCost(UnitPositionQueryResult unitPositionQueryResult){
-        List<UnitPositionLinesQueryResult> hourlyCostPerLine= unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPositionQueryResult.getId()));
+    private void setHourlyCost(UnitPositionQueryResult unitPositionQueryResult) {
+        List<UnitPositionLinesQueryResult> hourlyCostPerLine = unitPositionGraphRepository.findFunctionalHourlyCost(Collections.singletonList(unitPositionQueryResult.getId()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(UnitPositionLinesQueryResult::getId, UnitPositionLinesQueryResult::getHourlyCost, (previous, current) -> current));
-        unitPositionQueryResult.getPositionLines().forEach(positionLine->{
-            BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE),2,BigDecimal.ROUND_CEILING);
+        unitPositionQueryResult.getPositionLines().forEach(positionLine -> {
+            BigDecimal hourlyCost = positionLine.getStartDate().isLeapYear() ? hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(positionLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
             positionLine.setHourlyCost(hourlyCost);
         });
     }

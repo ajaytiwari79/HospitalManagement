@@ -97,7 +97,7 @@ public class OrganizationDataDisposalService{
      */
     public DataDisposal getDataDisposalById(Long organizationId, Long id) {
 
-        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        DataDisposal exist = dataDisposalRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -132,7 +132,7 @@ public class OrganizationDataDisposalService{
     public DataDisposalDTO updateDataDisposal(Long organizationId, Long id, DataDisposalDTO dataDisposalDTO) {
 
         //TODO What actually this code is doing?
-        DataDisposal dataDisposal = dataDisposalRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, dataDisposalDTO.getName());
+        DataDisposal dataDisposal = dataDisposalRepository.findByOrganizationIdAndDeletedAndName(organizationId,  dataDisposalDTO.getName());
         if (Optional.ofNullable(dataDisposal).isPresent()) {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;

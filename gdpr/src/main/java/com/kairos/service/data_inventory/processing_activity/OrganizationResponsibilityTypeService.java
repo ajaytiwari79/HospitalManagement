@@ -105,7 +105,7 @@ public class OrganizationResponsibilityTypeService{
      */
     public ResponsibilityType getResponsibilityType(Long organizationId, Long id) {
 
-        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        ResponsibilityType exist = responsibilityTypeRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -135,7 +135,7 @@ public class OrganizationResponsibilityTypeService{
     public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, Long id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,responsibilityTypeDTO.getName());
+        ResponsibilityType responsibilityType = responsibilityTypeRepository.findByOrganizationIdAndDeletedAndName(organizationId, responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;

@@ -57,7 +57,7 @@ public class TransferMethodService{
             List<String> nameInLowerCase = transferMethodNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<TransferMethod> existing = transferMethodRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<TransferMethod> existing = transferMethodRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();
@@ -100,7 +100,7 @@ public class TransferMethodService{
      * @throws DataNotFoundByIdException throw exception if TransferMethod not found for given id
      */
     public TransferMethod getTransferMethod(Long countryId, Long id) {
-        TransferMethod exist = transferMethodRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        TransferMethod exist = transferMethodRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

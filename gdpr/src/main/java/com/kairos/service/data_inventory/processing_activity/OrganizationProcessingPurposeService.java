@@ -102,7 +102,7 @@ public class OrganizationProcessingPurposeService{
      */
     public ProcessingPurpose getProcessingPurpose(Long organizationId, Long id) {
 
-        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId,false);
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -131,7 +131,7 @@ public class OrganizationProcessingPurposeService{
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, Long id, ProcessingPurposeDTO processingPurposeDTO) {
 
-        ProcessingPurpose processingPurpose = processingPurposeRepository.findByOrganizationIdAndDeletedAndName(organizationId, false,processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeRepository.findByOrganizationIdAndDeletedAndName(organizationId, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;

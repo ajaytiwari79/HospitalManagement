@@ -58,7 +58,7 @@ public class ProcessingLegalBasisService{
             List<String> nameInLowerCase = legalBasisNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingLegalBasis> existing = processingLegalBasisRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<ProcessingLegalBasis> existing = processingLegalBasisRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
@@ -104,7 +104,7 @@ public class ProcessingLegalBasisService{
      */
 
     public ProcessingLegalBasis getProcessingLegalBasis(Long countryId, Long id) {
-        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        ProcessingLegalBasis exist = processingLegalBasisRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
