@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class UnitWiseStaffPermissionsDTO {
 
     private Boolean hub;
+    private String role;
     private HashMap<String, Object> hubPermissions;
     private HashMap<Long, Object> organizationPermissions;
 
@@ -34,5 +35,13 @@ public class UnitWiseStaffPermissionsDTO {
 
     public void setOrganizationPermissions(HashMap<Long, Object> organizationPermissions) {
         this.organizationPermissions = organizationPermissions;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

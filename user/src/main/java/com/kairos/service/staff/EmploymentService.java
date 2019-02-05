@@ -8,6 +8,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.employment.EmploymentDTO;
 import com.kairos.dto.user.employment.employment_dto.EmploymentOverlapDTO;
@@ -77,6 +78,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 
 
@@ -142,15 +144,21 @@ public class EmploymentService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
-    public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
+    public Map<String, Object> saveEmploymentDetail(long unitId,long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
+        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
-
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
+        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())&&userAccessRoleDTO.getStaff()) {
             exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
         }
+        if(!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())){
+            Staff staff = staffGraphRepository.findByExternalId(staffEmploymentDetail.getTimeCareExternalId());
+            if (Optional.ofNullable(staff).isPresent()) {
+                exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
 
+            }
+        }
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if (Optional.ofNullable(employmentUnitPosition).isPresent()) {
@@ -188,7 +196,7 @@ public class EmploymentService {
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
         map.put("email", user.getEmail());
-        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
+        map.put("profilePic", (isNotNull(staff.getProfilePic()))?envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic():staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId", staff.getExternalId());
