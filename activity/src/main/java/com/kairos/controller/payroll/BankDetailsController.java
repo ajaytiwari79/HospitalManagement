@@ -67,7 +67,7 @@ public class BankDetailsController {
 
 
     @ApiOperation("update Bank details of Staff")
-    @PutMapping(STAFF_BANK_DETAILS)
+    @PutMapping(UNIT_URL+STAFF_BANK_DETAILS)
     public ResponseEntity<Map<String,Object>> updateBankDetailsOfStaff(@PathVariable Long staffId,@RequestBody StaffBankAndPensionProviderDetailsDTO staffBankAndPensionProviderDetailsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.linkBankDetailsForStaff(staffId,staffBankAndPensionProviderDetailsDTO));
     }

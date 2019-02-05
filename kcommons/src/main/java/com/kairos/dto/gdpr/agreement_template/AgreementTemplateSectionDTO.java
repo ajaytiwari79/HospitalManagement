@@ -59,4 +59,7 @@ public class AgreementTemplateSectionDTO {
     public void setIncludeContentPage(boolean includeContentPage) {
         this.includeContentPage = includeContentPage;
     }
+
+    public AgreementTemplateSectionDTO() {
+    }
 }

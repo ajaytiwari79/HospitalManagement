@@ -5,22 +5,19 @@ import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
-import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,12 +26,12 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 
 @Service
-public class OrganizationStorageFormatService extends MongoBaseService {
+public class OrganizationStorageFormatService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationStorageFormatService.class);
 
     @Inject
-    private StorageFormatMongoRepository storageFormatMongoRepository;
+    private StorageFormatRepository storageFormatRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -43,7 +40,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     private StorageFormatService storageFormatService;
 
     @Inject
-    private AssetMongoRepository assetMongoRepository;
+    private AssetRepository assetRepository;
 
 
     /**
@@ -56,28 +53,27 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
     public Map<String, List<StorageFormat>> createStorageFormat(Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
-
+        //TODO still need to optimize we can get name of list in string from here
         Map<String, List<StorageFormat>> result = new HashMap<>();
         Set<String> storageFormatNames = new HashSet<>();
         if (!storageFormatDTOS.isEmpty()) {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
             }
-            List<StorageFormat> existing = findMetaDataByNameAndUnitId(organizationId, storageFormatNames, StorageFormat.class);
+            List<String> nameInLowerCase = storageFormatNames.stream().map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            //TODO still need to update we can return name of list from here and can apply removeAll on list
+            List<StorageFormat> existing = storageFormatRepository.findByOrganizationIdAndDeletedAndNameIn(organizationId, false, nameInLowerCase);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
-
                     StorageFormat newStorageFormat = new StorageFormat(name);
                     newStorageFormat.setOrganizationId(organizationId);
                     newStorageFormats.add(newStorageFormat);
-
                 }
-
-
-                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
+                newStorageFormats = storageFormatRepository.saveAll(newStorageFormats);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -95,7 +91,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return storageFormatRepository.findAllByOrganizationIdAndSortByCreatedDate(organizationId);
     }
 
     /**
@@ -105,9 +101,9 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return StorageFormat object fetch via given id
      * @throws DataNotFoundByIdException throw exception if StorageFormat not exist for given id
      */
-    public StorageFormat getStorageFormat(Long organizationId, BigInteger id) {
+    public StorageFormat getStorageFormat(Long organizationId, Long id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByUnitIdAndId(organizationId, id);
+        StorageFormat exist = storageFormatRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -117,13 +113,13 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(Long unitId, BigInteger storageFormatId) {
+    public Boolean deleteStorageFormat(Long unitId, Long storageFormatId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithStorageFormat)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", new StringBuilder(assetsLinkedWithStorageFormat.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+       List<String> assetsLinked = assetRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
+        if (CollectionUtils.isNotEmpty(assetsLinked)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", StringUtils.join(assetsLinked, ','));
         }
-        storageFormatMongoRepository.safeDeleteById(storageFormatId);
+        storageFormatRepository.deleteByIdAndOrganizationId(storageFormatId, unitId);
         return true;
     }
 
@@ -136,21 +132,21 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return StorageFormat updated object
      * @throws DuplicateDataException throw exception if data not exist for given id
      */
-    public StorageFormatDTO updateStorageFormat(Long organizationId, BigInteger id, StorageFormatDTO storageFormatDTO) {
+    public StorageFormatDTO updateStorageFormat(Long organizationId, Long id, StorageFormatDTO storageFormatDTO) {
 
-        StorageFormat storageFormat = storageFormatMongoRepository.findByUnitIdAndName(organizationId, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
             }
             exceptionService.duplicateDataException("message.duplicate", "Storage Format", storageFormat.getName());
         }
-        storageFormat = storageFormatMongoRepository.findByid(id);
-        if (!Optional.ofNullable(storageFormat).isPresent()) {
+        Integer resultCount =  storageFormatRepository.updateMetadataName(storageFormatDTO.getName(), id, organizationId);
+        if(resultCount <=0){
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", id);
+        }else{
+            LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, storageFormatDTO.getName());
         }
-        storageFormat.setName(storageFormatDTO.getName());
-        storageFormatMongoRepository.save(storageFormat);
         return storageFormatDTO;
 
     }
@@ -158,13 +154,16 @@ public class OrganizationStorageFormatService extends MongoBaseService {
 
     public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
 
-        Map<String, List<StorageFormat>> result;
-        result = createStorageFormat(organizationId, storageFormatDTOS);
+        Map<String, List<StorageFormat>> result = createStorageFormat(organizationId, storageFormatDTOS);
         List<StorageFormat> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, storageFormatDTOS);
         if (!masterStorageFormatSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterStorageFormatSuggestedByUnit);
         }
         return result;
+    }
+
+    public List<StorageFormat> getAllOrganizationalStorageFormatByIds(Set<Long> ids){
+        return storageFormatRepository.findAllByIds(ids);
     }
 
 }

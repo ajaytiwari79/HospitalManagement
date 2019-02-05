@@ -1,15 +1,15 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Document
-public class TechnicalSecurityMeasure extends MongoBaseEntity {
+@Entity
+public class TechnicalSecurityMeasure extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
@@ -44,7 +44,7 @@ public class TechnicalSecurityMeasure extends MongoBaseEntity {
         this.name = name;
     }
 
-    public TechnicalSecurityMeasure( String name) {
+    public TechnicalSecurityMeasure(String name) {
         this.name = name;
     }
 
@@ -52,6 +52,11 @@ public class TechnicalSecurityMeasure extends MongoBaseEntity {
         this.name = name;
         this.countryId = countryId;
         this.suggestedDataStatus = suggestedDataStatus;
+    }
+
+    public TechnicalSecurityMeasure(@NotBlank(message = "Name can't be empty")String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
     }
 
     public TechnicalSecurityMeasure() {

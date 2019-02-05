@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BasicRiskDTO {
 
-    protected BigInteger id;
+    protected Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp ="^[a-zA-Z\\s]+$" )
@@ -43,11 +43,11 @@ public class BasicRiskDTO {
 
     public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

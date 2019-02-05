@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.agreement_template;
 
-import com.kairos.persistence.model.agreement_template.AgreementSection;
-import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.model.agreement_template.AgreementSectionDeprecated;
+import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplateDeprecated;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementTemplateBasicResponseDTO;
@@ -17,15 +17,15 @@ public interface CustomPolicyAgreementTemplateRepository {
     List<PolicyAgreementTemplateResponseDTO> findAllTemplateByCountryIdOrUnitId(Long referenceId, boolean isUnitId);
 
 
-    PolicyAgreementTemplate findByCountryIdAndName(Long countryId, String templateName);
+    PolicyAgreementTemplateDeprecated findByCountryIdAndName(Long countryId, String templateName);
 
-    PolicyAgreementTemplate findByUnitIdAndName(Long unitId, String templateName);
+    PolicyAgreementTemplateDeprecated findByUnitIdAndName(Long unitId, String templateName);
 
     List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionByReferenceIdAndAgreementTemplateId(Long referenceId, boolean isUnitId, BigInteger agreementTemplateId);
 
     List<AgreementTemplateBasicResponseDTO> findAllByReferenceIdAndClauseId(Long referenceId, boolean isUnitId, BigInteger clauseId);
 
-    List<AgreementSection> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long countryId, boolean isUnitId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
+    List<AgreementSectionDeprecated> getAllAgreementSectionAndSubSectionByReferenceIdAndClauseId(Long countryId, boolean isUnitId, Set<BigInteger> agreementTemplateIds, BigInteger clauseId);
 
     Set<BigInteger> getClauseIdListPresentInOtherTemplateByReferenceIdAndTemplateIdAndClauseIds(Long referenceId, boolean isUnitId, BigInteger templateId, Set<BigInteger> clauseIds);
 

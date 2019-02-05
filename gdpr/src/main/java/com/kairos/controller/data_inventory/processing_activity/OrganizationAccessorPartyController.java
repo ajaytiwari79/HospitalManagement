@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -45,7 +44,7 @@ public class OrganizationAccessorPartyController {
 
     @ApiOperation("get AccessorParty by id")
     @GetMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> getAccessorPartyById(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId) {
+    public ResponseEntity<Object> getAccessorPartyById(@PathVariable Long unitId, @PathVariable Long accessorPartyId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -65,7 +64,7 @@ public class OrganizationAccessorPartyController {
 
     @ApiOperation("delete AccessorParty  by id")
     @DeleteMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId) {
+    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable Long accessorPartyId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
@@ -76,7 +75,7 @@ public class OrganizationAccessorPartyController {
 
     @ApiOperation("update AccessorParty by id")
     @PutMapping("/accessor_party/{accessorPartyId}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long unitId, @PathVariable Long accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 

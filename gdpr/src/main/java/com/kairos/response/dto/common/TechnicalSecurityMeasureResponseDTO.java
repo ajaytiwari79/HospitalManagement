@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class TechnicalSecurityMeasureResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
@@ -20,6 +19,17 @@ public class TechnicalSecurityMeasureResponseDTO {
     private SuggestedDataStatus suggestedDataStatus;
 
     private LocalDate suggestedDate;
+
+    public TechnicalSecurityMeasureResponseDTO(Long id, String name, Long organizationId, SuggestedDataStatus suggestedDataStatus, LocalDate suggestedDate) {
+        this.id = id;
+        this.name = name;
+        this.organizationId = organizationId;
+        this.suggestedDataStatus = suggestedDataStatus;
+        this.suggestedDate = suggestedDate;
+    }
+
+    public TechnicalSecurityMeasureResponseDTO() {
+    }
 
     public LocalDate getSuggestedDate() { return suggestedDate; }
 
@@ -33,9 +43,9 @@ public class TechnicalSecurityMeasureResponseDTO {
 
     public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

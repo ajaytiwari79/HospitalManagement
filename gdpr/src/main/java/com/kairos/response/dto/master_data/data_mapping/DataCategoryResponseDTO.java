@@ -3,16 +3,21 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataCategoryResponseDTO {
 
-    private BigInteger id;
+    private Long id;
 
     private String name;
+
+    public DataCategoryResponseDTO(Long id, String name, List<DataElementBasicResponseDTO> dataElements) {
+        this.id = id;
+        this.name = name;
+        this.dataElements = dataElements;
+    }
 
     private List<DataElementBasicResponseDTO> dataElements=new ArrayList<>();
 
@@ -24,11 +29,11 @@ public class DataCategoryResponseDTO {
         this.dataElements = dataElements;
     }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

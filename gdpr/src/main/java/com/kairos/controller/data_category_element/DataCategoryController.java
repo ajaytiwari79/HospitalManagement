@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
@@ -41,7 +40,7 @@ public class DataCategoryController {
 
     @ApiOperation("get data category by id with data Elements ")
     @GetMapping(COUNTRY_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<DataCategoryResponseDTO>> getDataCategoryWithDataElementsById(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId) {
+    public ResponseEntity<ResponseDTO<DataCategoryResponseDTO>> getDataCategoryWithDataElementsById(@PathVariable Long countryId, @PathVariable Long dataCategoryId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementByCountryIdAndId(countryId, dataCategoryId));
 
     }
@@ -55,14 +54,14 @@ public class DataCategoryController {
 
     @ApiOperation("delete data category by id ")
     @DeleteMapping(COUNTRY_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteDataCategory(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteDataCategory(@PathVariable Long countryId, @PathVariable Long dataCategoryId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategoryById(countryId,false,dataCategoryId));
 
     }
 
     @ApiOperation("update data category by id ")
     @PutMapping(COUNTRY_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
+    public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable Long dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(countryId, false, dataCategoryId, dataCategoryDto));
 
     }
@@ -76,14 +75,14 @@ public class DataCategoryController {
 
     @ApiOperation("organization update data category by id ")
     @PutMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateOrganizationDataCategoryAndDataElement(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
+    public ResponseEntity<ResponseDTO<DataCategoryDTO>> updateOrganizationDataCategoryAndDataElement(@PathVariable Long unitId, @PathVariable Long dataCategoryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(unitId, true, dataCategoryId, dataCategoryDto));
 
     }
 
     @ApiOperation("organization, get data category by id with data Elements ")
     @GetMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<DataCategoryResponseDTO>> getOrganizationDataCategoryWithDataElements(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
+    public ResponseEntity<ResponseDTO<DataCategoryResponseDTO>> getOrganizationDataCategoryWithDataElements(@PathVariable Long unitId, @PathVariable Long dataCategoryId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementByUnitIdAndId(unitId, dataCategoryId));
 
     }
@@ -97,7 +96,7 @@ public class DataCategoryController {
 
     @ApiOperation("organization ,delete data category by id ")
     @DeleteMapping(UNIT_URL + "/data_category/{dataCategoryId}")
-    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataCategory(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
+    public ResponseEntity<ResponseDTO<Boolean>> deleteOrganizationDataCategory(@PathVariable Long unitId, @PathVariable Long dataCategoryId) {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, dataCategoryService.deleteDataCategoryById(unitId,true,dataCategoryId));
 
     }

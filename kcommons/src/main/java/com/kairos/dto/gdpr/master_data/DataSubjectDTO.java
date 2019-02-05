@@ -12,7 +12,7 @@ import java.util.Set;
 public class DataSubjectDTO {
 
 
-    protected BigInteger id;
+    protected Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
@@ -21,11 +21,11 @@ public class DataSubjectDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     protected String description;
     @NotEmpty(message = "Data Category  can't be  empty")
-    protected Set<BigInteger> dataCategories;
+    protected Set<Long> dataCategories;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 
@@ -35,7 +35,7 @@ public class DataSubjectDTO {
 
     public void setDescription(String description) { this.description = description; }
 
-    public Set<BigInteger> getDataCategories() { return dataCategories; }
+    public Set<Long> getDataCategories() { return dataCategories; }
 
-    public void setDataCategories(Set<BigInteger> dataCategories) { this.dataCategories = dataCategories; }
+    public void setDataCategories(Set<Long> dataCategories) { this.dataCategories = dataCategories; }
 }

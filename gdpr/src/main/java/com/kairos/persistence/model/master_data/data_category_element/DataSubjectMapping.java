@@ -1,21 +1,19 @@
 package com.kairos.persistence.model.master_data.data_category_element;
 
 
-import com.kairos.dto.gdpr.OrganizationSubType;
-import com.kairos.dto.gdpr.OrganizationType;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-@Document
-public class DataSubjectMapping extends MongoBaseEntity {
+@Entity
+public class DataSubjectMapping extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
@@ -25,11 +23,14 @@ public class DataSubjectMapping extends MongoBaseEntity {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    private List<OrganizationType> organizationTypes;
+    @ElementCollection
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
 
-    private List<OrganizationSubType> organizationSubTypes;
+    @ElementCollection
+    private List <OrganizationSubType> organizationSubTypes = new ArrayList<>();
 
-    private Set<BigInteger> dataCategories = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<DataCategory> dataCategories=new ArrayList<>();
 
     private Long countryId;
 
@@ -38,7 +39,7 @@ public class DataSubjectMapping extends MongoBaseEntity {
     }
 
     public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
-                              Set<BigInteger> dataCategories) {
+                              List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
         this.organizationTypes = organizationTypes;
@@ -47,14 +48,14 @@ public class DataSubjectMapping extends MongoBaseEntity {
     }
 
 
-    public DataSubjectMapping( @NotBlank(message = "error.message.name.notNull.orEmpty")
-                               @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty Set<BigInteger> dataCategories) {
+    public DataSubjectMapping(@NotBlank(message = "error.message.name.notNull.orEmpty")
+                               @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
         this.dataCategories = dataCategories;
     }
 
-    public DataSubjectMapping(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name,@NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
+    public DataSubjectMapping(@NotBlank(message = "Name can't be null or empty") @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
         this.name = name;
         this.description=description;
     }
@@ -67,11 +68,11 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public Set<BigInteger> getDataCategories() {
+    public List<DataCategory> getDataCategories() {
         return dataCategories;
     }
 
-    public void setDataCategories(Set<BigInteger> dataCategories) {
+    public void setDataCategories(List<DataCategory> dataCategories) {
         this.dataCategories = dataCategories;
     }
 

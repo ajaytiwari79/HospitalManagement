@@ -1,39 +1,10 @@
 package com.kairos.persistence.repository.filter;
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
-import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
-import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.gdpr.FilterType;
-import com.kairos.persistence.model.filter.FilterGroup;
-import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
-import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.response.dto.filter.FilterCategoryResult;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.query.Criteria;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
-import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
-import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
 
 
 public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
 
 
-    @Inject
+    /*@Inject
     private MongoTemplate mongoTemplate;
 
     @Override
@@ -53,11 +24,11 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
 
-    /**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (clause ,asset ,master processing activity)
+    *//**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (clause ,asset ,master processing activity)
      * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPES etc represent field name in domains(Clause,MasterAsset and Master Processing activity)
      * @param filterType
      * @return
-     */
+     *//*
     @Override
     public void buildAggregationQuery(FilterType filterType, Map<String, AggregationOperation> aggregationOperations ) {
         switch (filterType) {
@@ -126,5 +97,5 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
                 throw new DataNotFoundByIdException("data not found by moduleId" + moduleId);
 
         }
-    }
+    }*/
 }

@@ -1,13 +1,13 @@
 package com.kairos.persistence.model.clause_tag;
 
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.persistence.model.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 
 
-@Document
-public class ClauseTag extends MongoBaseEntity {
+@Entity
+public class ClauseTag extends BaseEntity {
 
     @NotBlank(message = "Name cannot be  empty")
     private String name;

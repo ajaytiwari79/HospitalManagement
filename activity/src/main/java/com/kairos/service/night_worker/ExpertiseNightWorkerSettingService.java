@@ -82,7 +82,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
             expertiseNightWorkerSetting.setMinShiftsValueToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsValueToCheckNightWorker());
             expertiseNightWorkerSetting.setMinShiftsUnitToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsUnitToCheckNightWorker());
         }
-        save(expertiseNightWorkerSetting);
+        expertiseNightWorkerSettingRepository.save(expertiseNightWorkerSetting);
         nightWorkerSettingDTO.setId(expertiseNightWorkerSetting.getId());
         return nightWorkerSettingDTO;
     }

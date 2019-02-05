@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRelatedDataSubject;
 import com.kairos.response.dto.common.*;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProcessingActivityResponseDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private String description;
     private ManagingOrganization managingDepartment;
@@ -25,7 +25,7 @@ public class ProcessingActivityResponseDTO {
     private List<AccessorPartyResponseDTO> accessorParties;
     private List<TransferMethodResponseDTO> transferMethods;
     private List<ProcessingLegalBasisResponseDTO> processingLegalBasis;
-    private List<ResponsibilityTypeResponseDTO>responsibilityType;
+    private ResponsibilityTypeResponseDTO responsibilityType;
     private List<RiskBasicResponseDTO> risks;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -36,6 +36,7 @@ public class ProcessingActivityResponseDTO {
     private Boolean active;
     private Boolean suggested;
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
 
 
     public List<RiskBasicResponseDTO> getRisks() { return risks; }
@@ -54,19 +55,19 @@ public class ProcessingActivityResponseDTO {
 
     public void setSuggested(Boolean suggested) { this.suggested = suggested; }
 
-    public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
+    public ResponsibilityTypeResponseDTO getResponsibilityType() { return responsibilityType; }
 
-    public void setResponsibilityType(List<ResponsibilityTypeResponseDTO> responsibilityType) { this.responsibilityType = responsibilityType; }
+    public void setResponsibilityType(ResponsibilityTypeResponseDTO responsibilityType) { this.responsibilityType = responsibilityType; }
 
     public List<ProcessingLegalBasisResponseDTO> getProcessingLegalBasis() { return processingLegalBasis; }
 
     public void setProcessingLegalBasis(List<ProcessingLegalBasisResponseDTO> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -172,5 +173,13 @@ public class ProcessingActivityResponseDTO {
 
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) {
         this.dataRetentionPeriod = dataRetentionPeriod;
+    }
+
+    public List<ProcessingActivityRelatedDataSubject> getDataSubjects() {
+        return dataSubjects;
+    }
+
+    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) {
+        this.dataSubjects = dataSubjects;
     }
 }
