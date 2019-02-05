@@ -5,6 +5,7 @@ import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.service.exception.ExceptionService;
 import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,15 +43,16 @@ public class UnitPositionServiceUnitTest {
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithoutEndDate() throws Exception {
         unitPositionDTO = new UnitPositionDTO( 733L, LocalDate.of(2018,12,02), null, 100, 10.2f, new BigDecimal(10.2f), 10.2d, null);
-        when(unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO))
-                .thenThrow(new ActionNotPermittedException("Already a unit employment position_code is active with same expertise on this period."));
+        boolean result = unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        Assert.assertTrue(result);
     }
 
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithEndDates() throws Exception {
         unitPositionDTO = new UnitPositionDTO(733L,LocalDate.of(2018,12,02), LocalDate.of(2019,06,02), 100, 10.2f, new BigDecimal(10.2f), 10.2d, null);
         unitPositions.get(1).setEndDate(LocalDate.now().plusDays(100));
-        System.out.println(unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO));
+        boolean result=unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        Assert.assertTrue(result);
     }
 
     @Test
@@ -58,7 +60,8 @@ public class UnitPositionServiceUnitTest {
         unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
         UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5));
         unitPositions.add(uep5);
-        unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        boolean result=unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        Assert.assertTrue(result);
     }
 
     @Test
@@ -66,7 +69,8 @@ public class UnitPositionServiceUnitTest {
         unitPositions.clear();
         UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5));
         unitPositions.add(uep5);
-        unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        boolean result = unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        Assert.assertTrue(result);
     }
 
 
@@ -75,7 +79,8 @@ public class UnitPositionServiceUnitTest {
         unitPositions.clear();
         UnitPosition uep5 = new UnitPosition(LocalDate.now(), LocalDate.now().plusDays(5));
         unitPositions.add(uep5);
-        unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        boolean result =  unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
+        Assert.assertTrue(result);
     }
 
 }

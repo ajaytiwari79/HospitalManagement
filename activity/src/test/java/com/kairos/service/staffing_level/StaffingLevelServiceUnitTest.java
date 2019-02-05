@@ -113,10 +113,13 @@ public class StaffingLevelServiceUnitTest {
         shiftNotificationEvent.setShift(updatedShift);
         Object[] array;
         List<StaffingLevel> updatedStaffingLevel2=staffingLevelService.updateStaffingLevelAvailableStaffCountForUpdatedShift(Arrays.asList(updatedStaffingLevel1),shiftNotificationEvent);
+        LocalTime shiftStartTime=DateUtils.getLocalTimeFromLocalDateTime(DateUtils.dateToLocalDateTime(updatedShift.getStartDate()));
+        LocalTime shiftEndTime=DateUtils.getLocalTimeFromLocalDateTime(DateUtils.dateToLocalDateTime(updatedShift.getEndDate()));
         updatedStaffingLevel2.forEach(staffingLevel->{
             staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
-                        if(staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
-                            Assert.assertEquals(0L,staffingLevelInterval.getAvailableNoOfStaff());
+                        if(staffingLevelInterval.getStaffingLevelDuration().getFrom().isBefore(staffingLevelInterval.getStaffingLevelDuration().getTo()) && (staffingLevelInterval.getStaffingLevelDuration().getFrom().equals(shiftStartTime) || staffingLevelInterval.getStaffingLevelDuration().getFrom().isAfter(shiftStartTime)) &&
+                                (staffingLevelInterval.getStaffingLevelDuration().getTo().equals(shiftEndTime) || staffingLevelInterval.getStaffingLevelDuration().getTo().isBefore(shiftEndTime)) && staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
+                            Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff());
                         }
                     }
             );
