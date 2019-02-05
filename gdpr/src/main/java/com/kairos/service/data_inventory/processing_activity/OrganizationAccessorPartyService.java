@@ -94,7 +94,7 @@ public class OrganizationAccessorPartyService{
      */
     public AccessorParty getAccessorPartyById(Long organizationId, Long id) {
 
-        AccessorParty exist = accessorPartyRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId,false);
+        AccessorParty exist = accessorPartyRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -124,7 +124,7 @@ public class OrganizationAccessorPartyService{
     public AccessorPartyDTO updateAccessorParty(Long organizationId, Long id, AccessorPartyDTO accessorPartyDTO) {
 
 
-        AccessorParty accessorParty = accessorPartyRepository.findByOrganizationIdAndDeletedAndName(organizationId,false,  accessorPartyDTO.getName());
+        AccessorParty accessorParty = accessorPartyRepository.findByOrganizationIdAndDeletedAndName(organizationId,  accessorPartyDTO.getName());
         if (Optional.ofNullable(accessorParty).isPresent()) {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;

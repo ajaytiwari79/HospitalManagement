@@ -103,7 +103,7 @@ public class OrganizationStorageFormatService{
      */
     public StorageFormat getStorageFormat(Long organizationId, Long id) {
 
-        StorageFormat exist = storageFormatRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId, false);
+        StorageFormat exist = storageFormatRepository.findByIdAndOrganizationIdAndDeleted( id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -134,7 +134,7 @@ public class OrganizationStorageFormatService{
      */
     public StorageFormatDTO updateStorageFormat(Long organizationId, Long id, StorageFormatDTO storageFormatDTO) {
 
-        StorageFormat storageFormat = storageFormatRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatRepository.findByOrganizationIdAndDeletedAndName(organizationId,  storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;

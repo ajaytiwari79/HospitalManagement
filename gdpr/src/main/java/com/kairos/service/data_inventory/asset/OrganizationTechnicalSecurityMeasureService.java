@@ -106,7 +106,7 @@ public class OrganizationTechnicalSecurityMeasureService{
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long organizationId, Long id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId, false);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureRepository.findByIdAndOrganizationIdAndDeleted(id, organizationId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -136,7 +136,7 @@ public class OrganizationTechnicalSecurityMeasureService{
      * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
     public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long organizationId, Long id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(organizationId, false, technicalSecurityMeasureDTO.getName());
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureRepository.findByOrganizationIdAndDeletedAndName(organizationId, technicalSecurityMeasureDTO.getName());
         if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;

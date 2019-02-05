@@ -63,7 +63,7 @@ public class ProcessingPurposeService{
             List<String> nameInLowerCase = processingPurposesNames.stream().map(String::toLowerCase)
                     .collect(Collectors.toList());
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<ProcessingPurpose> existing = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<ProcessingPurpose> existing = processingPurposeRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
@@ -107,7 +107,7 @@ public class ProcessingPurposeService{
      * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
     public ProcessingPurpose getProcessingPurpose(Long countryId, Long id) {
-        ProcessingPurpose exist = processingPurposeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        ProcessingPurpose exist = processingPurposeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {

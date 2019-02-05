@@ -56,7 +56,7 @@ public class HostingTypeService{
                     .collect(Collectors.toList());
 
             //TODO still need to update we can return name of list from here and can apply removeAll on list
-            List<HostingType> existing = hostingTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId, false, nameInLowerCase);
+            List<HostingType> existing = hostingTypeRepository.findByCountryIdAndDeletedAndNameIn(countryId,  nameInLowerCase);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
@@ -101,7 +101,7 @@ public class HostingTypeService{
      */
     public HostingType getHostingType(Long countryId, Long id) {
 
-        HostingType exist = hostingTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId, false);
+        HostingType exist = hostingTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("No data found");
         } else {
