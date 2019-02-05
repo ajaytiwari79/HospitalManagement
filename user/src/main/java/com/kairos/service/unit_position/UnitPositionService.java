@@ -947,12 +947,7 @@ public class UnitPositionService {
         List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffUnitPositionDetails.class);
         List<StaffUnitPositionDetails> staffData = unitPositionGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
         Map<Long, StaffUnitPositionDetails> staffUnitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(StaffUnitPositionDetails::getStaffId, Function.identity()));
-        List<String> invalidStaffs = new ArrayList<>();
-        staffAdditionalInfoQueryResult.forEach(staffAdditionalInfoQueryResult1 -> {
-            if (!staffUnitPositionDetailsMap.containsKey(staffAdditionalInfoQueryResult1.getId())) {
-                invalidStaffs.add(staffAdditionalInfoQueryResult1.getName());
-            }
-        });
+        List<String> invalidStaffs = staffAdditionalInfoQueryResult.stream().filter(staffAdditionalInfoQueryResult1 -> !staffUnitPositionDetailsMap.containsKey(staffAdditionalInfoQueryResult1.getId())).map(StaffAdditionalInfoQueryResult::getName).collect(Collectors.toList());
         if (isCollectionEmpty(invalidStaffs)) {
             exceptionService.dataNotMatchedException("unit_position.absent", invalidStaffs);
         }
