@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 ////@JaversSpringDataAuditable
-public interface QuestionnaireTemplateRepository extends CustomGenericRepository<QuestionnaireTemplate> {
+public interface QuestionnaireTemplateRepository extends CustomGenericRepository<QuestionnaireTemplate> ,CustomQuestionnaireTemplateRepository {
 
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.countryId = ?1 and QT.templateType = ?2 and QT.isDefaultAssetTemplate =?3 and QT.deleted = false")
@@ -33,7 +33,11 @@ public interface QuestionnaireTemplateRepository extends CustomGenericRepository
     QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByCountryId(long countryId);
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?3 and QT.assetType.id = ?2 and QT.assetSubType IS NULL and QT.deleted = false and QT.templateStatus = ?4")
-    QuestionnaireTemplate findPublishedQuestionnaireTemplateByAssetTypeAndByUnitId(Long orgId, Long assetTypeId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus );
+    QuestionnaireTemplate findQuestionnaireTemplateByUnitIdAssetTypeIdAndTemplateStatus(Long orgId, Long assetTypeId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus );
+
+    @Query(value = "Select QT from QuestionnaireTemplate QT where QT.organizationId = ?1 and QT.templateType = ?2 and QT.templateStatus = ?3")
+    QuestionnaireTemplate findQuestionnaireTemplateByUnitIdAndTemplateTypeAndTemplateStatus(Long orgId, QuestionnaireTemplateType templateType , QuestionnaireTemplateStatus templateStatus );
+
 
     @Query(value = "Select QT from QuestionnaireTemplate QT where QT.countryId = ?1 and QT.assetType.id = ?2 and QT.assetSubType IS NULL and QT.deleted = false and QT.templateType = ?3  and QT.templateStatus = ?4")
     QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndByCountryId(Long countryId, Long assetTypeId, QuestionnaireTemplateType templateType, QuestionnaireTemplateStatus templateStatus);

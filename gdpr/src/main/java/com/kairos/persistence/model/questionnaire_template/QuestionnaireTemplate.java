@@ -20,29 +20,22 @@ public class QuestionnaireTemplate extends BaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
-
     @NotBlank(message = "Description cannot be empty")
     private String description;
-
     @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
-
     @OneToOne
     private AssetType assetType;
-
     @OneToOne
     private AssetType assetSubType;
-
     private Long countryId;
-
     private boolean isDefaultAssetTemplate;
-
     private QuestionnaireTemplateStatus templateStatus;
-
     private QuestionnaireTemplateType riskAssociatedEntity;
-
     @OneToMany(cascade = CascadeType.ALL)
     private List<QuestionnaireSection> sections=new ArrayList<>();
+
+
 
     public QuestionnaireTemplate(String name, Long countryId, String description) {
         this.name = name;
