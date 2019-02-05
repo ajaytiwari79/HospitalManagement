@@ -1,4 +1,5 @@
-package com.kairos.dto.activity.activity;/*
+package com.kairos.dto.activity.activity;
+/*
  *Created By Pavan on 11/8/18
  *
  */
