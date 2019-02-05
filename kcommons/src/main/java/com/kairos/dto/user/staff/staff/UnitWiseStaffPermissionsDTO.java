@@ -1,11 +1,13 @@
 package com.kairos.dto.user.staff.staff;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+
 import java.util.HashMap;
 
 public class UnitWiseStaffPermissionsDTO {
 
     private Boolean hub;
-    private String role;
+    private AccessGroupRole role;
     private HashMap<String, Object> hubPermissions;
     private HashMap<Long, Object> organizationPermissions;
 
@@ -37,11 +39,11 @@ public class UnitWiseStaffPermissionsDTO {
         this.organizationPermissions = organizationPermissions;
     }
 
-    public String getRole() {
+    public AccessGroupRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(AccessGroupRole role) {
         this.role = role;
     }
 }

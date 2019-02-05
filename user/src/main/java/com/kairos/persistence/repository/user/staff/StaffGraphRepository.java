@@ -432,8 +432,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("Optional MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(e:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE staff.email=~{0} AND id(organization)={1} RETURN staff")
     Staff findStaffByEmailInOrganization(String email,Long unitId);
 
-    @Query("Optional MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]-(e:Employment)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(organization)={1} with staff  " +
-            "MATCH (staff)-[:" + HAS_CONTACT_DETAIL + "]-(contactDetail:ContactDetail)  WHERE staff.email=~{0} OR contactDetail.privateEmail=~{0}  RETURN staff")
+    @Query("MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(e:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + HAS_CONTACT_DETAIL + "]->(contactDetail:ContactDetail) WHERE id(organization)={1} with staff  " +
+            "AND staff.email=~{0} OR contactDetail.privateEmail=~{0}  RETURN staff")
     Staff findStaffByEmailIdInOrganization(String email, Long unitId);
 
     @Query("MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) WHERE id(organization)={0} \n" +

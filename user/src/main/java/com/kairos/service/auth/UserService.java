@@ -464,7 +464,7 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement())? AccessGroupRole.MANAGEMENT.toString():AccessGroupRole.STAFF.toString());
+        permissionData.setRole((userAccessRoleDTO.getManagement())? AccessGroupRole.MANAGEMENT:AccessGroupRole.STAFF);
         return permissionData;
     }
 
