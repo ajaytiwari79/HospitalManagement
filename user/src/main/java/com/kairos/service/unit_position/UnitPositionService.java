@@ -91,6 +91,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
@@ -952,7 +953,7 @@ public class UnitPositionService {
                 invalidStaffs.add(staffAdditionalInfoQueryResult1.getName());
             }
         });
-        if (staffData.size() != staffAdditionalInfoQueryResult.size()) {
+        if (isCollectionEmpty(invalidStaffs)) {
             exceptionService.dataNotMatchedException("unit_position.absent", invalidStaffs);
         }
         Map<Long, StaffUnitPositionDetails> unitPositionDetailsMap = staffData.stream().collect(Collectors.toMap(o -> o.getStaffId(), v -> v));

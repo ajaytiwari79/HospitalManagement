@@ -103,8 +103,6 @@ public class ExpertiseService {
     @Inject
     private GenericRestClient genericRestClient;
     @Inject
-    private ActivityIntegrationService activityIntegrationService;
-    @Inject
     private ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
 
     @Inject
@@ -633,7 +631,6 @@ public class ExpertiseService {
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
-            //activityIntegrationService.updateActivities(parentExpertise.getId(),expertise.getId(),expertise.getCountry().getId());
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
             parentExpertise.setHistory(true);

@@ -1079,9 +1079,4 @@ public class ActivityService extends MongoBaseService {
         return true;
     }
 
-    public boolean updateExpertiseInActivity(Long expertiseId){
-
-        return true;
-    }
-
 }
