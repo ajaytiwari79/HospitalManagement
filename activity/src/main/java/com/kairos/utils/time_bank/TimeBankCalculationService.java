@@ -363,19 +363,6 @@ public class TimeBankCalculationService {
     }
 
 
-    /**
-     * @param totalTimeBankBeforeStartDate
-     * @param startDate
-     * @param endDate
-     * @param query
-     * @param shifts
-     * @param dailyTimeBankEntries
-     * @param unitPositionWithCtaDetailsDTO
-     * @param timeTypeDTOS
-     * @param payOuts
-     * @param payOutTransactions
-     * @return TimeBankAndPayoutDTO
-     */
     public TimeBankDTO getTimeBankAdvanceView(List<Interval> intervals,Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS,Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap) {
         TimeBankDTO timeBankDTO = new TimeBankDTO(startDate,DateUtils.asDate(DateUtils.asLocalDate(endDate).minusDays(1)),unitPositionWithCtaDetailsDTO,unitPositionWithCtaDetailsDTO.getStaffId(),unitPositionWithCtaDetailsDTO.getId(),unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes(),unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
         Interval interval = new Interval(startDate.getTime(), endDate.getTime());
@@ -386,17 +373,17 @@ public class TimeBankCalculationService {
         List<CTADistributionDTO> timeBankCTADistributions = timeBankIntervalDTOS.stream().flatMap(ti -> ti.getTimeBankDistribution().getChildren().stream()).collect(Collectors.toList());
         Map<String, Integer> ctaDistributionMap = timeBankCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getName(), Collectors.summingInt(tb -> tb.getMinutes())));
         timeBankCTADistributions = getDistributionOfTimeBank(ctaDistributionMap, unitPositionWithCtaDetailsDTO);
-        long[] payoutCalculatedValue = calculateTimebankValues(timeBankIntervalDTOS);
-        long totalContractedMin = payoutCalculatedValue[0];
-        long minutesFromCta = payoutCalculatedValue[1];
-        long totalScheduledMin = payoutCalculatedValue[2];
-        long totalTimeBankAfterCtaMin = payoutCalculatedValue[3];
-        long totalTimeBankBeforeCtaMin = payoutCalculatedValue[4];
-        long totalTimeBankDiff = payoutCalculatedValue[5];
-        long totalTimeBank = payoutCalculatedValue[6];
-        long requestPayOut = payoutCalculatedValue[7];
-        long paidPayOut = payoutCalculatedValue[8];
-        long approvePayOut = payoutCalculatedValue[9];
+        long[] calculateTimebankValues = calculateTimebankValues(timeBankIntervalDTOS);
+        long totalContractedMin = calculateTimebankValues[0];
+        long minutesFromCta = calculateTimebankValues[1];
+        long totalScheduledMin = calculateTimebankValues[2];
+        long totalTimeBankAfterCtaMin = calculateTimebankValues[3];
+        long totalTimeBankBeforeCtaMin = calculateTimebankValues[4];
+        long totalTimeBankDiff = calculateTimebankValues[5];
+        long totalTimeBank = calculateTimebankValues[6];
+        long requestPayOut = calculateTimebankValues[7];
+        long paidPayOut = calculateTimebankValues[8];
+        long approvePayOut = calculateTimebankValues[9];
         timeBankDTO.setApprovePayOut(approvePayOut);
         timeBankDTO.setPaidoutChange(paidPayOut);
         timeBankDTO.setRequestPayOut(requestPayOut);
@@ -885,7 +872,7 @@ public class TimeBankCalculationService {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                             if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
-                                totalScheduledMin += shift.getScheduledMinutes();
+                                totalScheduledMin += shiftActivity.getScheduledMinutes();
                             }
                         }
 
@@ -927,7 +914,7 @@ public class TimeBankCalculationService {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                             if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
-                                totalScheduledMin += shift.getScheduledMinutes();
+                                totalScheduledMin += shiftActivity.getScheduledMinutes();
                             }
                         }
                     }
