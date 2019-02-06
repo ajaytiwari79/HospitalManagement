@@ -80,8 +80,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/employment_details", method = RequestMethod.PUT)
     @ApiOperation("update staff employment details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveEmploymentInfo(@PathVariable long staffId, @Validated @RequestBody StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
-        Map<String, Object> response = employmentService.saveEmploymentDetail(staffId, staffEmploymentDetail);
+    public ResponseEntity<Map<String, Object>> saveEmploymentInfo(@PathVariable long unitId,@PathVariable long staffId, @Validated @RequestBody StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
+        Map<String, Object> response = employmentService.saveEmploymentDetail(unitId,staffId, staffEmploymentDetail);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
         } else {
@@ -111,14 +111,6 @@ public class StaffController {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
-    }
-
-    @RequestMapping(value = "/{staffId}/password", method = RequestMethod.PUT)
-    @ApiOperation("update password")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePassword(staffId, passwordUpdateDTO));
     }
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)

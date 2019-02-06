@@ -716,10 +716,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as unitId, org.timeZone as timezone ORDER BY unitId")
     List<UnitTimeZoneQueryResult> findTimezoneforAllorganizations();
 
-    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:BELONGS_TO]-(country:Country) WITH union,country OPTIONAL " +
-            "MATCH(union)-[:"+HAS_SECTOR+"]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:"+CONTACT_ADDRESS+"]-" +
-            "(address:ContactAddress) OPTIONAL MATCH(address)-[:"+ZIP_CODE+"]-(zipCode:ZipCode) WITH union,sectors,address,zipCode,country OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]-" +
-            "(municipality:Municipality) RETURN union,country,address,zipCode,sectors,municipality ")
+    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:" + BELONGS_TO + "]-(country:Country) WITH union,country OPTIONAL " +
+            "MATCH(union)-[:" + HAS_SECTOR + "]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:" + CONTACT_ADDRESS + "]-" +
+            "(address:ContactAddress) OPTIONAL MATCH(address)-[:" + ZIP_CODE + "]-(zipCode:ZipCode) WITH union,sectors,address,zipCode,country OPTIONAL MATCH(address)-[:" + MUNICIPALITY + "]-" +
+            "(municipality:Municipality) WITH union,sectors,address,zipCode,country,municipality " +
+            "OPTIONAL MATCH(union)-[:" + HAS_LOCATION + "]-(location:Location{deleted:false})" +
+            "RETURN union,country,address,zipCode,sectors,municipality,collect(location) as locations ")
     List<UnionDataQueryResult> getUnionCompleteById(Long unionId, String name);
 
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={1} MATCH(union)-[unionSectorRelDel:"+HAS_SECTOR+"]-(sector:Sector) WHERE id(sector) in {0} WITH union, " +
@@ -732,12 +734,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)<>{1} AND union.name=~{0} RETURN count(union)>0")
     boolean existsByName(String name,Long unionId);
 
-    @Query("MATCH(union:Organization{union:true,deleted:false})-[:BELONGS_TO]-(country:Country) WHERE id(country)={0}\n" +
-            "WITH union OPTIONAL MATCH(union)-[:HAS_SECTOR]-(sector:Sector) WITH union,collect(sector) as sectors OPTIONAL MATCH(union)-[:CONTACT_ADDRESS]-" +
-            "(address:ContactAddress) WITH union,sectors,address OPTIONAL MATCH(address)-[:ZIP_CODE]-(zipCode:ZipCode) WITH union,sectors,address,zipCode\n" +
-            "OPTIONAL MATCH(address)-[:MUNICIPALITY]-(municipality:Municipality) WITH union,sectors,address,zipCode,municipality OPTIONAL MATCH(zipCode)-\n" +
+    @Query("MATCH(union:Organization{union:true,deleted:false})-[:" + BELONGS_TO + "]-(country:Country) WHERE id(country)={0}\n" +
+            "WITH union OPTIONAL MATCH(union)-[:" + HAS_SECTOR + "]-(sector:Sector) WITH union,collect(sector) as sectors OPTIONAL MATCH(union)-[:" + CONTACT_ADDRESS + "]-" +
+            "(address:ContactAddress) WITH union,sectors,address OPTIONAL MATCH(address)-[:" + ZIP_CODE + "]-(zipCode:ZipCode) WITH union,sectors,address,zipCode\n" +
+            "OPTIONAL MATCH(address)-[:" + MUNICIPALITY + "]-(municipality:Municipality) WITH union,sectors,address,zipCode,municipality OPTIONAL MATCH(zipCode)-\n" +
             "[:MUNICIPALITY]-(linkedMunicipality:Municipality) WITH union,sectors,address,zipCode,municipality,collect(linkedMunicipality)as municipalities\n" +
-            "OPTIONAL MATCH(union)-[:HAS_LOCATION]-(location:Location{deleted:false}) RETURN union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
+            "OPTIONAL MATCH(union)-[:" + HAS_LOCATION + "]-(location:Location{deleted:false,defaultLocation:false}) RETURN union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
     List<UnionDataQueryResult> getUnionData(Long countryId);
 
     @Query("MATCH(union:Organization{deleted:false}) WHERE id(union)={0} RETURN union.boardingCompleted")
