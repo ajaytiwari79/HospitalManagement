@@ -24,8 +24,8 @@ public class MasterAssetResponseDTO {
     private String name;
     @NotBlank(message = "Description can't be empty")
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
     private AssetTypeBasicResponseDTO assetType;
@@ -75,16 +75,16 @@ public class MasterAssetResponseDTO {
     }
 
     public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; }
+    public void setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; }
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS; }
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;

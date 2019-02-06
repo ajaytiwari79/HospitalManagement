@@ -20,8 +20,8 @@ public class MasterAssetDeprecated {
     private  String name;
     @NotBlank(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List <OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List <OrganizationSubTypeDTO> organizationSubTypes;
     private List <ServiceCategoryDTO> organizationServices;
     private List <SubServiceCategoryDTO> organizationSubServices;
     private Long countryId;
@@ -31,13 +31,13 @@ public class MasterAssetDeprecated {
     private SuggestedDataStatus suggestedDataStatus;
 
 
-    public MasterAssetDeprecated(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS,
-                                 List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices, SuggestedDataStatus suggestedDataStatus) {
+    public MasterAssetDeprecated(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypes,
+                                 List<OrganizationSubTypeDTO> organizationSubTypes, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices, SuggestedDataStatus suggestedDataStatus) {
         this.name = name;
         this.description = description;
         this.countryId=countryId;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.suggestedDataStatus=suggestedDataStatus;
@@ -85,16 +85,16 @@ public class MasterAssetDeprecated {
     public MasterAssetDeprecated setDescription(String description) { this.description = description;return this; }
 
     public List<OrganizationTypeDTO> getOrganizationTypeDTOS() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public MasterAssetDeprecated setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypeDTOS) { this.organizationTypeDTOS = organizationTypeDTOS; return this;}
+    public MasterAssetDeprecated setOrganizationTypeDTOS(List<OrganizationTypeDTO> organizationTypes) { this.organizationTypes = organizationTypes; return this;}
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+        return organizationSubTypes;
     }
 
-    public MasterAssetDeprecated setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) { this.organizationSubTypeDTOS = organizationSubTypeDTOS;return this; }
+    public MasterAssetDeprecated setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes;return this; }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;

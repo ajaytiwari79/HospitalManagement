@@ -25,8 +25,8 @@ public class ClauseDeprecated {
     private List<ClauseTagDeprecated> tags = new ArrayList<>();
     @NotNull
     private String description;
-    private List<OrganizationTypeDTO> organizationTypeDTOS;
-    private List<OrganizationSubTypeDTO> organizationSubTypeDTOS;
+    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
     private List<AccountTypeVO> accountTypes;
@@ -67,11 +67,11 @@ public class ClauseDeprecated {
         this.templateTypes=templateTypes;
     }
 
-    public ClauseDeprecated(String title, String description, Long countryId, List<OrganizationTypeDTO> organizationTypeDTOS, List<OrganizationSubTypeDTO> organizationSubTypeDTOS, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+    public ClauseDeprecated(String title, String description, Long countryId, List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
         this.title = title;
         this.description = description;
-        this.organizationTypeDTOS = organizationTypeDTOS;
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
         this.countryId = countryId;
@@ -137,19 +137,19 @@ public class ClauseDeprecated {
     }
 
     public List<OrganizationTypeDTO> getOrganizationTypes() {
-        return organizationTypeDTOS;
+        return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypeDTOS) {
-        this.organizationTypeDTOS = organizationTypeDTOS;
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
     public List<OrganizationSubTypeDTO> getOrganizationSubTypeDTOS() {
-        return organizationSubTypeDTOS;
+        return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypeDTOS) {
-        this.organizationSubTypeDTOS = organizationSubTypeDTOS;
+    public void setOrganizationSubTypeDTOS(List<OrganizationSubTypeDTO> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
     public List<ServiceCategoryDTO> getOrganizationServices() {
