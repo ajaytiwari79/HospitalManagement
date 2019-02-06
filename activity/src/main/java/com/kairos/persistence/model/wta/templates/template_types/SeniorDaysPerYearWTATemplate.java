@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
+import javax.inject.Inject;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
@@ -7,6 +8,7 @@ import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,10 +23,13 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
 
+
 /**
  * Created by pavan on 24/4/18.
  */
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
+    @Inject
+    private ShiftValidatorService  shiftValidatorService;
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
@@ -74,7 +79,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            CareDaysDTO careDays = getCareDays(infoWrapper.getSeniorCareDays(),infoWrapper.getStaffAge());
+            CareDaysDTO careDays = shiftValidatorService.getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
 
@@ -88,17 +93,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         }
     }
 
-    private CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS,int staffAge){
-        CareDaysDTO staffCareDaysDTO = null;
-        for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-            if(careDaysDTO.getTo()==null && staffAge > careDaysDTO.getFrom()){
-                staffCareDaysDTO = careDaysDTO;
-            } else if(isNotNull(careDaysDTO.getId())&&careDaysDTO.getFrom() <= staffAge && careDaysDTO.getTo() >= staffAge){
-                staffCareDaysDTO = careDaysDTO;
-            }
-        }
-        return staffCareDaysDTO;
-    }
 
     public SeniorDaysPerYearWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange) {
         super(name, description);
