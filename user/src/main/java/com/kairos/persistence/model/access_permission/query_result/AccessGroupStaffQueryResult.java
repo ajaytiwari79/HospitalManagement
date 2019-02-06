@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.access_permission.query_result;
 
-import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

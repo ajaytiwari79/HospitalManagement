@@ -2,12 +2,15 @@ package com.kairos.service.country;
 
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.ClinicType;
+import com.kairos.persistence.model.country.default_data.ClinicTypeDTO;
 import com.kairos.persistence.repository.user.country.ClinicTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,59 +21,57 @@ import java.util.Map;
 @Service
 @Transactional
 public class ClinicTypeService {
-
     @Inject
     private ClinicTypeGraphRepository clinicTypeGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-
-
-    public Map<String, Object> createClinicType(long countryId, ClinicType clinicType){
+    public ClinicTypeDTO createClinicType(long countryId, ClinicTypeDTO clinicTypeDTO){
+        ClinicType clinicType = null;
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
+            Boolean clinicTypeExistInCountryByName = clinicTypeGraphRepository.clinicTypeExistInCountryByName(countryId, "(?i)" + clinicTypeDTO.getName(), -1L);
+            if (clinicTypeExistInCountryByName) {
+                exceptionService.duplicateDataException("error.ClinicType.name.exist");
+            }
+            clinicType = new ClinicType(clinicTypeDTO.getName(), clinicTypeDTO.getDescription());
             clinicType.setCountry(country);
             clinicTypeGraphRepository.save(clinicType);
-            return  clinicType.retrieveDetails();
+        } else {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-        return null;
+        clinicTypeDTO.setId(clinicType.getId());
+        return clinicTypeDTO;
     }
 
-    public List<Object> getClinicTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = clinicTypeGraphRepository.findClinicByCountryId(countryId);
-        List<Object> response =new ArrayList<>();
-        if (data!=null){
-            for (Map<String,Object> map: data) {
-                Object o = map.get("result");
-                response.add(o);
-            }
-            return response;
-        }
-        return null;
+    public List<ClinicTypeDTO> getClinicTypeByCountryId(long countryId){
+        return clinicTypeGraphRepository.findClinicByCountryId(countryId);
     }
 
-    public Map<String, Object> updateClinicType(ClinicType clinicType){
-        ClinicType currentClinicType = clinicTypeGraphRepository.findOne(clinicType.getId());
+    public ClinicTypeDTO updateClinicType(long countryId, ClinicTypeDTO clinicTypeDTO){
+        Boolean clinicTypeExistInCountryByName = clinicTypeGraphRepository.clinicTypeExistInCountryByName(countryId, "(?i)" + clinicTypeDTO.getName(), clinicTypeDTO.getId());
+        if (clinicTypeExistInCountryByName) {
+            exceptionService.duplicateDataException("error.ClinicType.name.exist");
+        }
+        ClinicType currentClinicType = clinicTypeGraphRepository.findOne(clinicTypeDTO.getId());
         if (currentClinicType!=null){
-            currentClinicType.setName(clinicType.getName());
-            currentClinicType.setDescription(clinicType.getDescription());
+            currentClinicType.setName(clinicTypeDTO.getName());
+            currentClinicType.setDescription(clinicTypeDTO.getDescription());
             clinicTypeGraphRepository.save(currentClinicType);
-            return  currentClinicType.retrieveDetails();
         }
-        return null;
+        return clinicTypeDTO;
     }
-
 
     public boolean deleteClinicType(long clinicTypeId){
         ClinicType currentClinicType = clinicTypeGraphRepository.findOne(clinicTypeId);
         if (currentClinicType!=null){
             currentClinicType.setEnabled(false);
             clinicTypeGraphRepository.save(currentClinicType);
-            return true;
+        } else {
+            exceptionService.dataNotFoundByIdException("error.ClinicType.notfound");
         }
-        return false;
+        return true;
     }
-
-
-
 }

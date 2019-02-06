@@ -1,8 +1,10 @@
-package com.kairos.persistence.model.country;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -14,31 +16,22 @@ import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
-
 /**
  * Created by oodles on 9/1/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class VatType extends UserBaseEntity {
+public class OwnershipType extends UserBaseEntity {
 
-    @NotBlank(message = "error.VatType.name.notEmpty")
+    @NotBlank(message = "error.OwnershipType.name.notEmpty")
     private String name;
-    private int code;
     private String description;
-    @NotBlank(message = "error.VatType.percentage.notEmpty")
-    private String percentage;
     @Relationship(type = BELONGS_TO)
     private Country country;
     private boolean isEnabled = true;
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
+    public OwnershipType() {
     }
 
     public String getName() {
@@ -46,9 +39,8 @@ public class VatType extends UserBaseEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtils.trim(name);
     }
-
 
 
     public String getDescription() {
@@ -56,15 +48,7 @@ public class VatType extends UserBaseEntity {
     }
 
     public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPercentage() {
-        return percentage;
-    }
-
-    public void setPercentage(String percentage) {
-        this.percentage = percentage;
+        this.description = StringUtils.trim(description);
     }
 
     public Country getCountry() {
@@ -83,18 +67,8 @@ public class VatType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public VatType() {
-    }
-
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("percentage",this.percentage);
-        map.put("code",this.code);
-        map.put("description",this.description);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
+    public OwnershipType(@NotBlank(message = "error.OwnershipType.name.notEmpty") String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 }
