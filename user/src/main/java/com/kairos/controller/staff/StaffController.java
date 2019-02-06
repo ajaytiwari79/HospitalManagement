@@ -113,14 +113,6 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
     }
 
-    @RequestMapping(value = "/{staffId}/password", method = RequestMethod.PUT)
-    @ApiOperation("update password")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePassword(staffId, passwordUpdateDTO));
-    }
-
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

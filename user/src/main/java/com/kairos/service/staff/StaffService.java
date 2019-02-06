@@ -65,6 +65,7 @@ import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -209,8 +210,8 @@ public class StaffService {
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
-
-
+    @Inject
+    private UserService userService;
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
 
@@ -240,14 +241,8 @@ public class StaffService {
     }
 
 
-    public boolean updatePassword(long staffId, PasswordUpdateDTO passwordUpdateDTO) {
-
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        if (!Optional.ofNullable(user).isPresent()) {
-            logger.error("User not found belongs to this staff id " + staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.user.id.notfound", staffId);
-
-        }
+    public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
+        User user = userService.getUserById(Long.valueOf(UserContext.getUserId()));
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
         if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
