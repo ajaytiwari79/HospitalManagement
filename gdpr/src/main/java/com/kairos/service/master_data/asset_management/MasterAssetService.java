@@ -203,8 +203,8 @@ public class MasterAssetService{
             subServiceCategories.add(new SubServiceCategoryDTO(subServiceCategory.getId(), subServiceCategory.getName())) ;
         }
 
-        masterAssetResponseDTO.setOrganizationTypeDTOS(organizationTypes);
-        masterAssetResponseDTO.setOrganizationSubTypeDTOS(organizationSubTypes);
+        masterAssetResponseDTO.setOrganizationTypes(organizationTypes);
+        masterAssetResponseDTO.setOrganizationSubTypes(organizationSubTypes);
         masterAssetResponseDTO.setOrganizationServices(serviceCategories);
         masterAssetResponseDTO.setOrganizationSubServices(subServiceCategories);
         return masterAssetResponseDTO;
