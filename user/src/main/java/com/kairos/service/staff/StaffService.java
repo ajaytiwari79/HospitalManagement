@@ -91,7 +91,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -215,6 +217,8 @@ public class StaffService {
     private UserService userService;
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
+    @Inject @Lazy
+    private PasswordEncoder passwordEncoder;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -241,21 +245,17 @@ public class StaffService {
         return true;
     }
 
-
     public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
         User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
-        if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
             userGraphRepository.save(user);
         } else {
-            logger.error("Password not matched ");
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
-
         }
         return true;
-
     }
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
