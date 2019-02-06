@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.utils.ShiftValidatorService.getCareDays;
 import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
 
 /**
@@ -30,8 +31,6 @@ import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
-    @Inject
-    private ShiftValidatorService shiftValidatorService;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
     private boolean carryForwardLeave;
@@ -70,7 +69,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            CareDaysDTO careDays = shiftValidatorService.getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
+            CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
 

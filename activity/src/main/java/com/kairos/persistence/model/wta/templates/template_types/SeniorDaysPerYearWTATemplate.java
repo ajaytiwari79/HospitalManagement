@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.utils.ShiftValidatorService.getCareDays;
 import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
 
 
@@ -28,8 +29,6 @@ import static com.kairos.utils.ShiftValidatorService.getIntervalByActivity;
  * Created by pavan on 24/4/18.
  */
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
-    @Inject
-    private ShiftValidatorService  shiftValidatorService;
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
@@ -79,7 +78,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled()) {
-            CareDaysDTO careDays = shiftValidatorService.getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
+            CareDaysDTO careDays = getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
 

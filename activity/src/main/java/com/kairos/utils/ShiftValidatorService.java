@@ -987,7 +987,7 @@ public class ShiftValidatorService {
     }
 
 
-    public CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS, int staffAge) {
+    public static CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS, int staffAge) {
         CareDaysDTO staffCareDaysDTO = null;
         for (CareDaysDTO careDaysDTO : careDaysDTOS) {
             if (careDaysDTO.getTo() == null && staffAge > careDaysDTO.getFrom()) {
