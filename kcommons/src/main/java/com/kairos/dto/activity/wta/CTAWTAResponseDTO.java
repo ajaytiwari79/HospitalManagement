@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.wta;
 
-import javafx.util.converter.BigIntegerStringConverter;
-
 import java.math.BigInteger;
 public class CTAWTAResponseDTO {
 
