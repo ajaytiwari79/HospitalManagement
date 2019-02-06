@@ -16,6 +16,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.staff.unit_position.StaffUnitPositionUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
@@ -78,6 +79,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.shift.ShiftFilterParam.EXPERTISE;
 import static com.kairos.enums.shift.ShiftFilterParam.INDIVIDUAL_VIEW;
@@ -982,5 +984,18 @@ public class ShiftValidatorService {
                 exceptionService.actionNotPermittedException("message.staffingLevel.activity");
             }
         }
+    }
+
+
+    public static CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS, int staffAge) {
+        CareDaysDTO staffCareDaysDTO = null;
+        for (CareDaysDTO careDaysDTO : careDaysDTOS) {
+            if (careDaysDTO.getTo() == null && staffAge > careDaysDTO.getFrom()) {
+                staffCareDaysDTO = careDaysDTO;
+            } else if (isNotNull(careDaysDTO.getTo()) && careDaysDTO.getFrom() <= staffAge && careDaysDTO.getTo() >= staffAge) {
+                staffCareDaysDTO = careDaysDTO;
+            }
+        }
+        return staffCareDaysDTO;
     }
 }
