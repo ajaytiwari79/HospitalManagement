@@ -269,6 +269,11 @@ public class AppConstants {
     public static final String ORGANIZATION_SUB_SERVICES = "organizationSubService";
     public static final String ACCOUNT_TYPES = "accountType";
 
+
+    //Locatiom
+    public static final String MAIN_LOCATION = "Main Location";
+
     //country and system langange relation
     public static final String HAS_SYSTEM_LANGUAGE = "HAS_SYSTEM_LANGUAGE";
+
 }

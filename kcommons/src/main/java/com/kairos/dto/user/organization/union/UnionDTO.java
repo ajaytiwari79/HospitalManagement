@@ -65,4 +65,5 @@ public class UnionDTO {
     public void setState(UnionState state) {
         this.state = state;
     }
+
 }
