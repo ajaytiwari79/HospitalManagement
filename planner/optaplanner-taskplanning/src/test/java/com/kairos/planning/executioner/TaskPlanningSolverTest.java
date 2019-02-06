@@ -6,6 +6,7 @@ import org.junit.Test;
 
 //@PropertySource("/media/pradeep/bak/multiOpta/task-planner/src/main/resources/taskplanner.properties")
 public class TaskPlanningSolverTest {
+	@Ignore
 	@Test
 	public void test() {
 		//RequestedTask requestedTask =  new RequestedTask();

@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -65,6 +66,7 @@ import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -209,8 +211,8 @@ public class StaffService {
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
-
-
+    @Inject
+    private UserService userService;
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
 
@@ -240,14 +242,8 @@ public class StaffService {
     }
 
 
-    public boolean updatePassword(long staffId, PasswordUpdateDTO passwordUpdateDTO) {
-
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        if (!Optional.ofNullable(user).isPresent()) {
-            logger.error("User not found belongs to this staff id " + staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.user.id.notfound", staffId);
-
-        }
+    public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
+        User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
         if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
@@ -263,15 +259,25 @@ public class StaffService {
     }
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
+        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.findUserAccessRole(unitId);
+        Organization parentOrganization=organizationService.fetchParentOrganization(unitId);
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
-
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+        }
+        if(!staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())){
+            if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentOrganization.getId()) != null) {
+                exceptionService.duplicateDataException("message.email.alreadyExist", "Staff",staffPersonalDetail.getContactDetail().getPrivateEmail());
+            }
         }
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
         }
+        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        if(!CollectionUtils.isEqualCollection(expertises,oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList()))&&!userAccessRoleDTO.getManagement()){
+            exceptionService.actionNotPermittedException("message.unitposition.expertise.notchanged");
+        }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
 //        Map<Long, Set<Long>> sectorWiseGroupedExpertise = expertiseList.stream().collect(Collectors.groupingBy(k->k.getSector().getId(), Collectors.mapping(Expertise::getId, Collectors.toSet())));
 //        //TODO added temporary to block staff master card expertise selection until changes on seniority level in unit position line
@@ -315,9 +321,8 @@ public class StaffService {
 
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
-        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         staffToUpdate.setLanguage(language);
-        // Setting Staff Details
+        // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
         staffGraphRepository.save(staffToUpdate);
 

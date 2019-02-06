@@ -5,6 +5,7 @@ package com.kairos.service.staff;
  */
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
@@ -21,7 +22,9 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +59,10 @@ public class StaffExpertiseUnitTest {
     LanguageGraphRepository languageGraphRepository;
     @Mock
     UserGraphRepository userGraphRepository;
+    @Mock
+    AccessGroupService accessGroupService;
+    @Mock
+    OrganizationService organizationService;
 
      List<Long> expertiseIds= new ArrayList<>();
 
@@ -65,6 +72,7 @@ public class StaffExpertiseUnitTest {
      List<StaffExpertiseQueryResult> staffExpertiseQueryResults=new ArrayList<>();
      public List<Expertise> expertiseList;
      public Staff staff;
+    public UserAccessRoleDTO userAccessRoleDTO;
 
    @Before
     public void setUp(){
@@ -74,7 +82,8 @@ public class StaffExpertiseUnitTest {
 
     @Test
     public void saveStaffPersonalDetails() throws ParseException {
-
+        userAccessRoleDTO=new UserAccessRoleDTO();
+        userAccessRoleDTO.setManagement(true);
         expertiseList=new ArrayList<>();
         staff=new Staff();
         staff.setId(1956L);
@@ -83,6 +92,8 @@ public class StaffExpertiseUnitTest {
         ContactDetail contactDetail=new ContactDetail();
         contactDetail.setId(22071L);
         contactDetail.setPrivatePhone("9876767767");
+        contactDetail.setPrivateEmail("abc@kairosplanning.com");
+        staff.setContactDetail(contactDetail);
         List<Long> expertiseIds= new ArrayList<>();
         expertiseIds.add(23234L);
         expertiseIds.add(23238L);
@@ -175,10 +186,11 @@ public class StaffExpertiseUnitTest {
         sectorWiseExpertise.add(sectorAndStaffExpertiseQueryResult);
         staffPersonalDetailResult.setSectorWiseExpertise(sectorWiseExpertise);
         when(staffGraphRepository.findOne(1956l)).thenReturn(staff);
+        when(accessGroupService.findUserAccessRole(20123l)).thenReturn(userAccessRoleDTO);
         when(expertiseGraphRepository.findAllById(expertiseIds)).thenReturn(expertiseList);
         when(userGraphRepository.getUserByStaffId(1956L)).thenReturn(user);
         when(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(1956L)).thenReturn(sectorWiseExpertise);
-        StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L,staffPersonalDetail,0l);
+        StaffPersonalDetail staffPersonalDetail1 = staffService.savePersonalDetail(1956L,staffPersonalDetail,20123);
         staffPersonalDetail1.setSectorWiseExpertise(sectorWiseExpertise);
         assertEquals(staffPersonalDetail1, staffPersonalDetailResult);
     }
