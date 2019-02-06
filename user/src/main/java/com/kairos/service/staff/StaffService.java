@@ -243,7 +243,7 @@ public class StaffService {
 
 
     public boolean updatePassword(PasswordUpdateDTO passwordUpdateDTO) {
-        User user = userService.getUserById(Long.valueOf(UserContext.getUserId()));
+        User user = userService.getUserById(UserContext.getUserDetails().getId());
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
         if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
