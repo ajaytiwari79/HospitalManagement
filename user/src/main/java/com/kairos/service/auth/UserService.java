@@ -411,7 +411,7 @@ public class UserService {
     }
 
     public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
-        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.findUserAccessRole(organizationId);
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organizationId);
         long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
@@ -464,7 +464,7 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement())? AccessGroupRole.MANAGEMENT:AccessGroupRole.STAFF);
+        permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 

@@ -144,15 +144,15 @@ public class EmploymentService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
-    public Map<String, Object> saveEmploymentDetail(long unitId,long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
-        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.findUserAccessRole(unitId);
+    public Map<String, Object> saveEmploymentDetail(long unitId, long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())&&userAccessRoleDTO.getStaff()) {
+        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
             exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
         }
-        if(!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())){
+        if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
             Staff staff = staffGraphRepository.findByExternalId(staffEmploymentDetail.getTimeCareExternalId());
             if (Optional.ofNullable(staff).isPresent()) {
                 exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
@@ -196,7 +196,7 @@ public class EmploymentService {
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
         map.put("email", user.getEmail());
-        map.put("profilePic", (isNotNull(staff.getProfilePic()))?envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic():staff.getProfilePic());
+        map.put("profilePic", (isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId", staff.getExternalId());
@@ -260,18 +260,18 @@ public class EmploymentService {
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
-            staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+            staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
 
 
         } else {
-            staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+            staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
             // need to remove unit permission
             if (unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId) <= 1) {
                 exceptionService.actionNotPermittedException("error.permission.remove");
             }
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
         }
-         accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
+        accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
         accessGroupPermissionCounterDTO.setStaffId(staffId);
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
@@ -872,10 +872,10 @@ public class EmploymentService {
     }
 
 
-    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO,long unitPositionId) {
-        UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(),unitPositionId);
-        if(unitPositionQueryResult!=null){
-            if(unitPositionQueryResult.getEndDate()==null){
+    public boolean eligibleForMainUnitPosition(UnitPositionDTO unitPositionDTO, long unitPositionId) {
+        UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.findAllByStaffIdAndBetweenDates(unitPositionDTO.getStaffId(), unitPositionDTO.getStartDate().toString(), unitPositionDTO.getEndDate() == null ? null : unitPositionDTO.getEndDate().toString(), unitPositionId);
+        if (unitPositionQueryResult != null) {
+            if (unitPositionQueryResult.getEndDate() == null) {
                 exceptionService.actionNotPermittedException("message.main_unit_position.exists", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate());
             } else {
                 exceptionService.actionNotPermittedException("message.main_unit_position.exists_with_end_date", unitPositionQueryResult.getUnitName(), unitPositionQueryResult.getStartDate(), unitPositionQueryResult.getEndDate());
