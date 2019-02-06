@@ -102,7 +102,6 @@ public class ShiftCopyService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
         Map<BigInteger, ActivityWrapper> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         StaffUnitPositionUnitDataWrapper dataWrapper = genericIntegrationService.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
-
         List<StaffUnitPositionDetails> staffDataList = dataWrapper.getStaffUnitPositionDetails();
         List<Long> unitPositionIds = staffDataList.stream().map(StaffUnitPositionDetails::getId).collect(Collectors.toList());
         findAndAddCTAInUnitPositions(staffDataList, copyShiftDTO, dataWrapper, unitPositionIds);

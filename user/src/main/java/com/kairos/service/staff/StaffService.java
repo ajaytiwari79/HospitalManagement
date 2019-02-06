@@ -217,7 +217,6 @@ public class StaffService {
     private UserService userService;
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
-
     @Inject @Lazy
     private PasswordEncoder passwordEncoder;
 
